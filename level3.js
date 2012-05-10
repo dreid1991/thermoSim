@@ -8,6 +8,7 @@ function level3(){
 	this.wallHeatTrans = 0;
 	this.introText = "I AM A CHANGE!  LOOK AT ME, I'M DIFFERENT!";
 	this.outroText = "YOUR TRAINING IS NOW COMPLETE.  \nYOU CAN LEARN NOTHING MORE FROM ME.";
+	//THIS COMMENT IS REALLY HELPFUL
 	this.updateListeners = [];
 	this.onWallImpactListeners = [];
 	this.updates = {run:this.updateRunning, compress:this.updateCompressing, expand:this.updateExpanding, pause:this.updatePause};
