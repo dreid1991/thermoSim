@@ -6,7 +6,7 @@ function level3(){
 	this.data.addSet("v");
 
 	this.wallHeatTrans = 0;
-	this.introText = "I AM A CHANGE!  LOOK AT ME, I'M DIFFERENT!";
+	this.introText = "LEVEL THREE HAS A CRAZY NEW INTRO I'M TRYING OUT";
 	this.outroText = "YOUR TRAINING IS NOW COMPLETE.  \nYOU CAN LEARN NOTHING MORE FROM ME.";
 	this.updateListeners = [];
 	this.onWallImpactListeners = [];
