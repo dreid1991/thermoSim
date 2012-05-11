@@ -137,11 +137,11 @@ function makeHeader(text){
 	return text;
 }
 function cleanDash(level){
-	for (buttonName in level.buttons){  //HEY - var buttonName?
+	for (var buttonName in level.buttons){ 
 		Button.prototype.remove.apply(level.buttons[buttonName]);
 		delete level.buttons[buttonName];
 	}
-	for (sliderName in level.sliders){
+	for (var sliderName in level.sliders){
 		Slider.prototype.remove.apply(level.sliders[sliderName]);
 		delete level.sliders[sliderName];
 	}

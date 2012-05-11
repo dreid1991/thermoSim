@@ -205,10 +205,10 @@ level3.prototype = {
 	moveWalls: function(){
 		var wall = walls.pts[0];
 
-		if(wall[0].y<this.maxY && !this.movedWallsLast){
-			wall[0].y+=10*this.wallHeatTrans;
-			wall[1].y+=10*this.wallHeatTrans;
-			wall[wall.length-1].y+=10*this.wallHeatTrans;
+		if((wall[0].y<this.maxY && this.wallHeatTrans>0) || (wall[0].y>this.minY && this.wallHeatTrans<0) && !this.movedWallsLast){
+			wall[0].y+=5*this.wallHeatTrans;
+			wall[1].y+=5*this.wallHeatTrans;
+			wall[wall.length-1].y+=5*this.wallHeatTrans;
 			this.movedWallsLast = true;
 		} else {
 			this.movedWallsLast = false;
