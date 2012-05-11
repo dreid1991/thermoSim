@@ -4,34 +4,28 @@ function level3(){
 	this.data.addSet("t");
 	this.data.addSet("p");
 	this.data.addSet("v");
-
+	walls = new WallHandler([[P(10,10), P(540,10), P(540,440), P(10,440)]])
 	this.wallHeatTrans = 0;
 	this.introText = "LEVEL THREE HAS A CRAZY NEW INTRO I'M TRYING OUT";
 	this.outroText = "YOUR TRAINING IS NOW COMPLETE.  \nYOU CAN LEARN NOTHING MORE FROM ME.";
-
-	this.updateListeners = [];
-	this.onWallImpactListeners = [];
-	this.updates = {run:this.updateRunning, compress:this.updateCompressing, expand:this.updateExpanding, pause:this.updatePause};
-	this.dataUpdates = {run:this.dataRun, pause:this.dataPause};
+	this.updateListeners = {};//{run:this.updateRun, compress:this.updateCompress, expand:this.updateExpand, pause:this.updatePause};
+	this.dataListeners = {};//{run:this.dataRun, pause:this.dataPause};
 	this.buttons = {};
 	this.sliders = {};
 	var heaterX = 200;
 	var heaterY = 280;
-	var heaterWidth = 100;
-	var heaterHeight = 75;
+	var heaterWidth = 50;
+	var heaterHeight = 30;
 	this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight)
 //	this.weight = new Weight(
 	//walls = new WallHandler([[P(100,100), P(300,100),P(300,300),P(100,300)]])
-	walls = new WallHandler([[P(10,10), P(540,10), P(540,440), P(10,440)], this.heater.pts])
+
 	//walls = new WallHandler([[P(10,10), P(540,10), P(540,440), P(10,440)]])
 	walls.setup();
 	this.minY = 10;
 	this.maxY = walls.pts[0][2].y-75
 	collide.setup();
 }
-function foo(){
-	console.log("ki");
-}	
 level3.prototype = {
 	init: function(){
 
@@ -41,8 +35,9 @@ level3.prototype = {
 	},
 	startIntro: function(){
 		cleanDash(this);
-		this.curData = this.dataUpdates.pause;
-		this.curUpdate = this.updates.pause;
+		emptyListener(this, "update");
+		emptyListener(this, "data");
+		//addListener(this, "update", "pause", this.updatePause);
 		this.drawDashStart();
 		this.textBox = new MainTextBox(this.introText);
 	},
@@ -50,8 +45,10 @@ level3.prototype = {
 		this.textBox.remove();
 		cleanDash(this);
 		this.drawDashRun();		
-		this.curUpdate = this.updates.run;
-		this.curData = this.dataUpdates.run;
+		addListener(this, "update", "run", this.updateRun);
+		addListener(this, "data", "run", this.dataRun);
+		//this.curUpdate = this.updates.run;
+		//this.curData = this.dataUpdates.run;
 		this.pVSv = new Graph(575,8+header.height,300,300, "Volume", "Pressure", "#5a8a92");
 		this.tVSv = new Graph(575,8+header.height+30+this.pVSv.height, 300, 300,"Volume", "Temperature", "#ca1a14");
 		this.fTurn=0;
@@ -60,40 +57,39 @@ level3.prototype = {
 	},
 	startOutro: function(){
 		cleanDash(this);
-		this.curData = this.dataUpdates.pause;
-		this.curUpdate = this.updates.pause;
+		emptyListener(this, "update");
+		emptyListener(this, "data");
+		//addListener(this, "update", "pause", this.updatePause);
 		this.drawDashOut();
 		this.textBox = new MainTextBox(this.outroText);
 	},
 	update: function(){
-		this.curUpdate();
+		for (var updateListener in this.updateListeners){
+			this.updateListeners[updateListener].apply(curLevel);
+		}
 	},
 	addData: function(){
-		this.curData();
+		for (var dataListener in this.dataListeners){
+			this.dataListeners[dataListener].apply(curLevel);
+		}
 	},
 	updatePause: function(){
 	
 	},
-	updateRunning: function(){
+	updateRun: function(){
 		move();
 		this.checkDotHits();
 		this.checkWallHits();
 		this.drawRun();
 	},
-	updateCompressing: function(){
+	updateRunMoveWall: function(){
 		move();
-		this.compressWalls();
+		this.moveWalls();
 		this.checkDotHits();
 		this.checkWallHits();
 		this.drawRun();
 	},
-	updateExpanding: function(){
-		move();
-		this.expandWalls();
-		this.checkDotHits();
-		this.checkWallHits();
-		this.drawRun();
-	},
+
 	drawRun: function(){
 		draw.clear();
 		draw.dots();
@@ -110,12 +106,7 @@ level3.prototype = {
 		walls.check();
 	},
 	onWallImpact: function(dot, line, wallUV, perpV){
-		//for (var listenerIdx=0; listenerIdx<wallImpactListenerNames.length; listenerIdx++){
-		//you were here, with BIG DECISIONS TO MAKE
-		//could just make all of the stuff below the one listener for this level
-		//}
 		this.fTurn += dot.m*perpV;
-		
 		if(line[0]==0 && line[1]==0){
 			if(this.wallHeatTrans<0 && walls.pts[0][0].y!=this.minY){
 				perpV -= Math.max(0,Math.sqrt(-this.wallHeatTrans/dot.m));
@@ -127,10 +118,8 @@ level3.prototype = {
 		if(line[0]==1){
 			var foo = hitHeater(dot, perpV, this.heater.t)
 		}
+
 	},
-	//applyWallHitListeners: function(){
-		
-	//},
 	addDots: function(){
 		addSpecies(["spc1", "spc2", "spc3"]);
 		//populate("spc1", 15, 15, myCanvas.width-400, myCanvas.height-150, 200, 4);
@@ -190,47 +179,43 @@ level3.prototype = {
 		//this.sliders[mass].addDragListener(this, this.changeWeight);
 	},
 	clickCompress: function(){
+		removeListener(this, "update", "run");
+		addListener(this, "update", "runMoveWall", this.updateRunMoveWall);
 		this.wallHeatTrans=.1;
 		this.curUpdate = this.updates.compress;
 	},
 	releaseCompress: function(){
+		removeListener(this, "update", "runMoveWall");
+		addListener(this, "update", "run", this.updateRun);
 		this.wallHeatTrans=0;
 		this.curUpdate = this.updates.run;
 	},
 	clickExpand: function(){
+		removeListener(this, "update", "run");
+		addListener(this, "update", "runMoveWall", this.updateRunMoveWall);
 		this.wallHeatTrans=-.1
 		this.curUpdate = this.updates.expand;
 	},
 	releaseExpand: function(){
+		removeListener(this, "update", "runMoveWall");
+		addListener(this, "update", "run", this.updateRun);
 		this.wallHeatTrans=0;
 		this.curUpdate = this.updates.run;
 	},
-	compressWalls: function(){
+	moveWalls: function(){
 		var wall = walls.pts[0];
 
 		if(wall[0].y<this.maxY && !this.movedWallsLast){
-			wall[0].y++;
-			wall[1].y++;
-			wall[wall.length-1].y++;
+			wall[0].y+=10*this.wallHeatTrans;
+			wall[1].y+=10*this.wallHeatTrans;
+			wall[wall.length-1].y+=10*this.wallHeatTrans;
 			this.movedWallsLast = true;
 		} else {
 			this.movedWallsLast = false;
 		}
 		walls.setupWall(0);
 	},
-	expandWalls: function(){
-		var wall = walls.pts[0];
-		
-		if(wall[0].y>this.minY && !this.movedWallsLast){
-			wall[0].y-=1;
-			wall[1].y-=1;
-			wall[wall.length-1].y-=1;
-			this.movedWallsLast = true;
-		} else {
-			this.movedWallsLast = false;
-		}	
-		walls.setupWall(0);
-	},
+
 	changeTemp: function(sliderVal){
 		this.heater.changeTemp(sliderVal);
 	},

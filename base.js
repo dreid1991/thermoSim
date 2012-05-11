@@ -137,7 +137,7 @@ function makeHeader(text){
 	return text;
 }
 function cleanDash(level){
-	for (buttonName in level.buttons){
+	for (buttonName in level.buttons){  //HEY - var buttonName?
 		Button.prototype.remove.apply(level.buttons[buttonName]);
 		delete level.buttons[buttonName];
 	}
@@ -153,13 +153,24 @@ function hitHeater(dot, perpV, temp){
 	dot.v.dx = UV.dx*vNew;
 	dot.v.dy = UV.dy*vNew;
 }
+function addListener(object, typeName, funcName, listener){
+	object[typeName + 'Listeners'][funcName] = listener;
+}
+function removeListener(object, typeName, funcName){
+	delete object[typeName + 'Listeners'][funcName];
+}
+function emptyListener(object, typeName){
+	for (var listName in object[typeName + 'Listeners']){
+		delete object[typeName + 'Listeners'][listName];
+	}
+}
 var canvas = document.getElementById("myCanvas");
 var c = canvas.getContext("2d");
 var spcs = [];
 draw = new drawingTools();
 collide = new CollideHandler();
 
-levels = [new level2()]
+levels = [new level3()]
 curLevel = levels[0];
 curLevel.init();
 

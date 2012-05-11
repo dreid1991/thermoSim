@@ -8,7 +8,7 @@ function Heater(x, y, width, height){
 	this.t = (this.tMax+this.tMin)/2;
 	this.col = Col(255/2, 255/2, 255/2);
 	this.pts = this.getPts(this.x, this.y, this.width, this.height)
-
+	walls.pts.push(this.pts);
 }
 //function Weight(xInit, yInit, tagWall, LWRatio, 
 Heater.prototype = {

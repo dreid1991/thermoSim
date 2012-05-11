@@ -4,8 +4,8 @@ function level2(){
 	this.data.addSet("t");
 	this.data.addSet("p");
 	this.data.addSet("v");
-	this.updates = {run:this.updateRunning, compress:this.updateCompressing, expand:this.updateExpanding, pause:this.updatePause};
-	this.dataUpdates = {run:this.dataRun, pause:this.dataPause};
+	this.updateListeners = {};//{run:this.updateRun, compress:this.updateCompress, expand:this.updateExpand, pause:this.updatePause};
+	this.dataListeners = {};//{run:this.dataRun, pause:this.dataPause};
 	this.buttons = {};
 	this.sliders = {};
 
@@ -29,17 +29,19 @@ level2.prototype = {
 	},
 	startIntro: function(){
 		cleanDash(this);
-		this.curData = this.dataUpdates.pause;
-		this.curUpdate = this.updates.pause;
+		emptyListener(this, "update");
+		emptyListener(this, "data");
 		this.drawDashStart();
 		this.textBox = new MainTextBox(this.introText);
 	},
 	startSim: function(){
 		this.textBox.remove();
 		cleanDash(this);
+		emptyListener(this, "update");
+		emptyListener(this, "data");
+		addListener(this, "update", "run", this.updateRun);
+		addListener(this, "data", "run", this.dataRun);
 		this.drawDashRun();		
-		this.curUpdate = this.updates.run;
-		this.curData = this.dataUpdates.run;
 		this.pVSv = new Graph(575,8+header.height,300,300, "Volume", "Pressure", "#5a8a92");
 		this.tVSv = new Graph(575,8+header.height+30+this.pVSv.height, 300, 300,"Volume", "Temperature", "#ca1a14");
 		this.fTurn=0;
@@ -48,16 +50,20 @@ level2.prototype = {
 	},
 	startOutro: function(){
 		cleanDash(this);
-		this.curData = this.dataUpdates.pause;
-		this.curUpdate = this.updates.pause;
+		emptyListener(this, "update");
+		emptyListener(this, "data");
 		this.drawDashOut();
 		this.textBox = new MainTextBox(this.outroText);
 	},
 	update: function(){
-		this.curUpdate();
+		for (var updateListener in this.updateListeners){
+			this.updateListeners[updateListener].apply(curLevel);
+		}
 	},
 	addData: function(){
-		this.curData();
+		for (var dataListener in this.dataListeners){
+			this.dataListeners[dataListener].apply(curLevel);
+		}
 	},
 	updatePause: function(){
 	
@@ -70,23 +76,24 @@ level2.prototype = {
 		draw.dots();
 		draw.walls(walls);
 	},
-	updateCompressing: function(){
+	updateRun: function(){
 		move();
-		this.compressWalls();
 		this.checkDotHits();
 		this.checkWallHits();
-		draw.clear();
-		draw.dots();
-		draw.walls(walls);	
+		this.drawRun();
 	},
-	updateExpanding: function(){
+	updateRunMoveWall: function(){
 		move();
-		this.expandWalls();
+		this.moveWalls();
 		this.checkDotHits();
 		this.checkWallHits();
+		this.drawRun();
+	},
+	drawRun: function(){
 		draw.clear();
 		draw.dots();
-		draw.walls(walls);	
+		draw.walls(walls);
+		draw.fillWall(1, this.heater.col);
 	},
 	checkDotHits: function(){
 		collide.check();
@@ -161,77 +168,41 @@ level2.prototype = {
 		var tempSliderName = "temp";
 	},
 	clickCompress: function(){
+		removeListener(this, "update", "run");
+		addListener(this, "update", "runMoveWall", this.updateRunMoveWall);
 		this.wallHeatTrans=.1;
-		this.curUpdate = this.updates[1];
+		this.curUpdate = this.updates.compress;
 	},
 	releaseCompress: function(){
+		removeListener(this, "update", "runMoveWall");
+		addListener(this, "update", "run", this.updateRun);
 		this.wallHeatTrans=0;
-		this.curUpdate = this.updates[0];
+		this.curUpdate = this.updates.run;
 	},
 	clickExpand: function(){
+		removeListener(this, "update", "run");
+		addListener(this, "update", "runMoveWall", this.updateRunMoveWall);
 		this.wallHeatTrans=-.1
-		this.curUpdate = this.updates[2];
+		this.curUpdate = this.updates.expand;
 	},
 	releaseExpand: function(){
+		removeListener(this, "update", "runMoveWall");
+		addListener(this, "update", "run", this.updateRun);
 		this.wallHeatTrans=0;
-		this.curUpdate = this.updates[0];
+		this.curUpdate = this.updates.run;
 	},
-	compressWalls: function(){
+	moveWalls: function(){
 		var wall = walls.pts[0];
+
 		if(wall[0].y<this.maxY && !this.movedWallsLast){
-			wall[0].y++;
-			wall[1].y++;
-			wall[wall.length-1].y++;
+			wall[0].y+=10*this.wallHeatTrans;
+			wall[1].y+=10*this.wallHeatTrans;
+			wall[wall.length-1].y+=10*this.wallHeatTrans;
 			this.movedWallsLast = true;
 		} else {
 			this.movedWallsLast = false;
 		}
 		walls.setupWall(0);
 	},
-	expandWalls: function(){
-		var wall = walls.pts[0];
-		if(wall[0].y>this.minY && !this.movedWallsLast){
-			wall[0].y-=1;
-			wall[1].y-=1;
-			wall[wall.length-1].y-=1;
-			this.movedWallsLast = true;
-		} else {
-			this.movedWallsLast = false;
-		}	
-		walls.setupWall(0);
-	},
-	onClickCompress: function(){
-		curLevel.clickCompress();
-	},
-	onReleaseCompress: function(){
-		curLevel.releaseCompress();
-	},
-	onClickExpand: function(){
-		curLevel.clickExpand();		
-	},
-	onReleaseExpand: function(){
-		curLevel.releaseExpand();
-	},
-	onClickToSim: function(){
-	
-	},
-	onReleaseToSim: function(){
-		curLevel.startSim();
-	},
-	onClickToIntro: function(){
-	
-	},
-	onReleaseToIntro: function(){
-		curLevel.startIntro();
-	},
-	onClickToOutro: function(){
-	
-	},
-	onReleaseToOutro: function(){
-		curLevel.startOutro();
-	},
 
-}
-function foo(){
-	console.log("ha-HA!");
 }

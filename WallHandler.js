@@ -3,6 +3,8 @@ function WallHandler(pts){
 	this.gridDim=20;
 	this.wallUVs = [];
 	this.wallGrids = [];
+	this.xSpan = Math.floor(myCanvas.width/this.gridDim);
+	this.ySpan = Math.floor(myCanvas.height/this.gridDim);
 };
 WallHandler.prototype = {
 	setup: function(){
@@ -38,9 +40,9 @@ WallHandler.prototype = {
 	},
 	getSubwallGrid: function(wallIdx){
 		var subwallGrid = [];
-		for (var x=0; x<Math.floor(myCanvas.width/this.gridDim)+1; x++){
+		for (var x=0; x<Math.ceil(myCanvas.width/this.gridDim); x++){ //HEY - you changed this from .floor +1
 			var column = []
-			for (var y=0; y<Math.floor(myCanvas.height/this.gridDim)+1; y++){
+			for (var y=0; y<Math.ceil(myCanvas.height/this.gridDim); y++){
 				column.push(this.getSubwallsInGrid(wallIdx, x, y));
 			}
 			subwallGrid.push(column);
@@ -125,25 +127,26 @@ WallHandler.prototype = {
 				var checkedWalls = [];
 				var gridX = Math.floor(dot.x/this.gridDim);
 				var gridY = Math.floor(dot.y/this.gridDim);
-				for (var x=-1; x<=1; x++){
-					for (var y=-1; y<=1; y++){
-						try{
+				if(gridX>this.xSpan || gridX<0 || gridY>this.ySpan || gridY<0){
+					returnEscapist(dot);
+					console.log("ball out of bounds");				
+				}
+				else{
+					for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, this.xSpan); x++){
+						for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, this.ySpan); y++){
+							
 							for (var subwallIdx=0; subwallIdx<walls.wallGrids.length; subwallIdx++){
-								for (var lineIdx=0; lineIdx<this.wallGrids[subwallIdx][gridX+x][gridY+y].length; lineIdx++){
-									var line = this.wallGrids[subwallIdx][gridX+x][gridY+y][lineIdx];
+								for (var lineIdx=0; lineIdx<this.wallGrids[subwallIdx][x][y].length; lineIdx++){
+									var line = this.wallGrids[subwallIdx][x][y][lineIdx];
 									if (!this.haveChecked([subwallIdx, line], checkedWalls)){
 										this.checkWallHit(dot, [subwallIdx, line]);
 										checkedWalls.push([subwallIdx, line]);
 									}
 								}
 							}
-						}catch(e){
-							if(!(gridX>=0 && gridY>=0 && gridX<this.wallGrids[0].length && gridY<this.wallGrids[0][0].length)){
-								returnEscapist(dot);
-								console.log("ball out of bounds ", e.message);
-							}
+		
+								
 						}
-							
 					}
 				}
 			}
