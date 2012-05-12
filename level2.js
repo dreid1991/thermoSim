@@ -107,14 +107,13 @@ level2.prototype = {
 		walls.check();
 	},
 	onWallImpact: function(dot, line, wallUV, perpV){
-		this.fTurn += dot.m*perpV;
 		if(line[0]==0 && line[1]==0){
-			if(this.wallV<0 && walls.pts[0][0].y!=this.minY){
-				perpV -= Math.max(0,Math.sqrt(-this.wallV/dot.m));
-			}else if (this.wallV>0 && walls.pts[0][0].y!=this.maxY){
-				perpV += Math.max(0,Math.sqrt(this.wallV/dot.m));
+			if(walls.pts[0][0].y!=this.minY && walls.pts[0][0].y!=this.maxY){
+				perpV += this.wallVLast;
 			}
+			this.wallV-=(dot.m/this.weight.weight)*(perpV+this.wallV);
 		}
+		this.fTurn += dot.m*perpV;
 		walls.impactStd(dot, wallUV, perpV)
 	},
 	addDots: function(){

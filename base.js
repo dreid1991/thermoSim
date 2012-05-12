@@ -116,10 +116,11 @@ function returnEscapist(dot){
 	var pt1 = walls.pts[0][0];
 	var pt2 = walls.pts[0][1];
 	UV = walls.wallUVs[0][0];
-	var x = (pt1.x+pt2.x)/2 - 5*UV.dy
+	var x = (pt1.x+pt2.x)/2 - 5*UV.dy;
 	var y = (pt1.y+pt2.y)/2 + 5*UV.dx;
-	dot.x = x
-	dot.y = y
+	dot.v.dy = Math.abs(dot.v.dy);
+	dot.x = x;
+	dot.y = y;
 }
 function clickEvent(){
 	alert();
@@ -181,7 +182,7 @@ var spcs = [];
 draw = new drawingTools();
 collide = new CollideHandler();
 
-levels = [new level3()]
+levels = [new level4()]
 curLevel = levels[0];
 curLevel.init();
 

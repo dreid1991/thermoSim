@@ -6,6 +6,7 @@ function level3(){
 	this.data.addSet("v");
 	walls = new WallHandler([[P(10,75), P(540,75), P(540,440), P(10,440)]])
 	this.wallV = 0;
+	this.wallVLast = 0;
 	this.introText = "LEVEL THREE HAS A CRAZY NEW INTRO I'M TRYING OUT";
 	this.outroText = "YOUR TRAINING IS NOW COMPLETE.  \nYOU CAN LEARN NOTHING MORE FROM ME.";
 	this.updateListeners = {};//{run:this.updateRun, compress:this.updateCompress, expand:this.updateExpand, pause:this.updatePause};
@@ -99,15 +100,13 @@ level3.prototype = {
 		walls.check();
 	},
 	onWallImpact: function(dot, line, wallUV, perpV){
-		this.fTurn += dot.m*perpV;
 		if(line[0]==0 && line[1]==0){
-			if(this.wallV<0 && walls.pts[0][0].y!=this.minY){
-				perpV -= Math.max(0,Math.sqrt(-this.wallV/dot.m));
-			}else if (this.wallV>0 && walls.pts[0][0].y!=this.maxY){
-				perpV += Math.max(0,Math.sqrt(this.wallV/dot.m));
+			if(walls.pts[0][0].y!=this.minY && walls.pts[0][0].y!=this.maxY){
+				perpV += this.wallVLast;
 			}
 			this.wallV-=(dot.m/this.weight.weight)*(perpV+this.wallV);
 		}
+		this.fTurn += dot.m*perpV;
 		walls.impactStd(dot, wallUV, perpV)
 		if(line[0]==1){
 			var foo = hitHeater(dot, perpV, this.heater.t)
@@ -164,7 +163,7 @@ level3.prototype = {
 		this.sliders[weightSliderName].addDragListener(this.changeWeight, this);
 	},
 	moveWalls: function(){
-		
+		this.wallVLast = this.wallV;
 		var wall = walls.pts[0];
 		var lastY = wall[0].y
 		var newY = Math.max(this.minY, Math.min(this.maxY, lastY+this.wallV));

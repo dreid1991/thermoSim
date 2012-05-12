@@ -2,6 +2,7 @@ function WallHandler(pts){
 	this.pts = pts;
 	this.gridDim=20;
 	this.wallUVs = [];
+	this.wallPerpUVs = [];
 	this.wallGrids = [];
 	this.xSpan = Math.floor(myCanvas.width/this.gridDim);
 	this.ySpan = Math.floor(myCanvas.height/this.gridDim);
@@ -16,6 +17,7 @@ WallHandler.prototype = {
 	},
 	setupWall: function(wallIdx){
 		this.wallUVs[wallIdx] = this.getWallUV(wallIdx);
+		this.wallPerpUVs[wallIdx] = this.getPerpUVs(wallIdx);
 		this.wallGrids[wallIdx] = this.getSubwallGrid(wallIdx);
 	},
 	closeWalls: function(){
@@ -27,6 +29,15 @@ WallHandler.prototype = {
 	},
 	closeWall: function(wall){
 		wall.push(P(wall[0].x, wall[0].y))
+	},
+	getPerpUVs: function(wallIdx){
+		var wallUVSet = this.wallUVs[wallIdx];
+		var perpUVs = [];
+		for (var wallUVIdx=0; wallUVIdx<wallUVSet.length; wallUVIdx++){
+			var wallUV = wallUVSet[wallUVIdx];
+			perpUVs.push(V(wallUV.dy, -wallUV.dx));
+		}
+		return perpUVs;
 	},
 	getWallUV: function(wallIdx){
 		var wall = walls.pts[wallIdx];
@@ -154,30 +165,17 @@ WallHandler.prototype = {
 	},
 	checkWallHit: function(dot, line){
 		var wallPt = walls.pts[line[0]][line[1]];
-		var dotVec = V(dot.x - wallPt.x, dot.y - wallPt.y);
-		var wallUV = this.wallUVs[line[0]][line[1]]
+		var wallUV = this.wallUVs[line[0]][line[1]];
+		var perpUV = this.wallPerpUVs[line[0]][line[1]]
+		var dotVec = V(dot.x + dot.v.dx + perpUV.dx*dot.r - wallPt.x, dot.y + dot.v.dy + perpUV.dy*dot.r - wallPt.y);
 		var dotAB = dotVec.dotProd(wallUV);
-		var hypSqrd = dotVec.dx*dotVec.dx + dotVec.dy*dotVec.dy;
-		var dist = Math.sqrt(hypSqrd - dotAB*dotAB);
-		var perpVec = V(wallUV.dy, -wallUV.dx);
-		var perpV = perpVec.dotProd(dot.v);
-		if(line==[0][0] && curLevel.wallV!==undefined){
-			if (perpV+dot.r+curLevel.wallV>dist && this.inRange(dot, line, dot.r, dotAB)){
-				curLevel.onWallImpact(dot, line, wallUV, perpV);
-			}
-		}else{
-			if (perpV+dot.r>dist && this.inRange(dot, line, dot.r, dotAB)){
-				curLevel.onWallImpact(dot, line, wallUV, perpV);
-			}
+		var distFromWall = perpUV.dotProd(dotVec);
+		var perpV = perpUV.dotProd(dot.v);
+		if (distFromWall>0 && distFromWall<30 && this.isBetween(dot, line, dot.r, dotAB)){
+			curLevel.onWallImpact(dot, line, wallUV, perpV);
 		}
 	},
-	sumWallListeners: function(){
-		var sum = 0;
-		for (var distListener in this.distListeners){
-			sum+=this.distListeners[distListener].apply(curLevel, [line]);
-		}
-	},
-	inRange: function(dot, line, r, dotDirectionOne){
+	isBetween: function(dot, line, r, dotDirectionOne){
 		var wallUV = this.wallUVs[line[0]][line[1]];
 		var wallPt = walls.pts[line[0]][line[1]+1];
 		var otherDir = V(-wallUV.dx, -wallUV.dy);
