@@ -161,8 +161,20 @@ WallHandler.prototype = {
 		var dist = Math.sqrt(hypSqrd - dotAB*dotAB);
 		var perpVec = V(wallUV.dy, -wallUV.dx);
 		var perpV = perpVec.dotProd(dot.v);
-		if (perpV+dot.r>dist && this.inRange(dot, line, dot.r, dotAB)){
-			curLevel.onWallImpact(dot, line, wallUV, perpV);
+		if(line==[0][0] && curLevel.wallV!==undefined){
+			if (perpV+dot.r+curLevel.wallV>dist && this.inRange(dot, line, dot.r, dotAB)){
+				curLevel.onWallImpact(dot, line, wallUV, perpV);
+			}
+		}else{
+			if (perpV+dot.r>dist && this.inRange(dot, line, dot.r, dotAB)){
+				curLevel.onWallImpact(dot, line, wallUV, perpV);
+			}
+		}
+	},
+	sumWallListeners: function(){
+		var sum = 0;
+		for (var distListener in this.distListeners){
+			sum+=this.distListeners[distListener].apply(curLevel, [line]);
 		}
 	},
 	inRange: function(dot, line, r, dotDirectionOne){

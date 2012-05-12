@@ -9,7 +9,7 @@ function level2(){
 	this.buttons = {};
 	this.sliders = {};
 
-	this.wallHeatTrans = 0;
+	this.wallV = 0;
 
 	this.introText = "Let's look at adiabatic compression.  We know that when you compress a container adiabatically, it heats up because you’re putting energy into the system through work.  We can relate a molecule’s temperature to its speed with the equation (1/2)mv^2=(3/2)kT.  This tell us that being compressed makes molecules speed up, but why?\n  To figure this out, we need to look how molecules behave when they collide with objects.  When an ideal gas molecule hits another object, it undergoes an elastic collision.  When that object is a massive stationary wall, the gas molecule is reflected by the wall and its kinetic energy is unchanged.  When the wall is moving, this is not true.\nSo to understand why compression heats a system, we need to describe molecules’ collisions with moving walls.  Try to do that using the simulation.  ";
 	this.outroText = "     -You should have seen that as you compressed the container, the temperature increased faster than linearly as volume decreased.  Adiabatic expansion and compression can be described by the equation P1V1^k = P2V2^k with k=Cp/Cv.  From that equation, solve for T2 with P1 and V1 as your initial state.  Graph it.  Does this fit what you saw?\n     -So, did you figure out why the collisions with a moving wall cause a temperature change?\n     -Why is the temperature change nonlinear?  Think about how the number of molecules hitting the moving wall changes as pressure increases.\n     -If you compress and expand the container a few times, you’ll notice that the temperature starts to creep up.  Why does it do that?\n     -Related:  Is this expansion/compression reversible?";
@@ -28,6 +28,7 @@ level2.prototype = {
 		this.startIntro();
 	},
 	startIntro: function(){
+		saveVals(this);
 		cleanDash(this);
 		emptyListener(this, "update");
 		emptyListener(this, "data");
@@ -49,6 +50,7 @@ level2.prototype = {
 		this.movedWallsLast = false;	
 	},
 	startOutro: function(){
+		saveVals(this);
 		cleanDash(this);
 		emptyListener(this, "update");
 		emptyListener(this, "data");
@@ -107,10 +109,10 @@ level2.prototype = {
 	onWallImpact: function(dot, line, wallUV, perpV){
 		this.fTurn += dot.m*perpV;
 		if(line[0]==0 && line[1]==0){
-			if(this.wallHeatTrans<0 && walls.pts[0][0].y!=this.minY){
-				perpV -= Math.max(0,Math.sqrt(-this.wallHeatTrans/dot.m));
-			}else if (this.wallHeatTrans>0 && walls.pts[0][0].y!=this.maxY){
-				perpV += Math.max(0,Math.sqrt(this.wallHeatTrans/dot.m));
+			if(this.wallV<0 && walls.pts[0][0].y!=this.minY){
+				perpV -= Math.max(0,Math.sqrt(-this.wallV/dot.m));
+			}else if (this.wallV>0 && walls.pts[0][0].y!=this.maxY){
+				perpV += Math.max(0,Math.sqrt(this.wallV/dot.m));
 			}
 		}
 		walls.impactStd(dot, wallUV, perpV)
@@ -170,34 +172,33 @@ level2.prototype = {
 	clickCompress: function(){
 		removeListener(this, "update", "run");
 		addListener(this, "update", "runMoveWall", this.updateRunMoveWall);
-		this.wallHeatTrans=.1;
+		this.wallV=.3;
 		this.curUpdate = this.updates.compress;
 	},
 	releaseCompress: function(){
 		removeListener(this, "update", "runMoveWall");
 		addListener(this, "update", "run", this.updateRun);
-		this.wallHeatTrans=0;
+		this.wallV=0;
 		this.curUpdate = this.updates.run;
 	},
 	clickExpand: function(){
 		removeListener(this, "update", "run");
 		addListener(this, "update", "runMoveWall", this.updateRunMoveWall);
-		this.wallHeatTrans=-.1
+		this.wallV=-.3
 		this.curUpdate = this.updates.expand;
 	},
 	releaseExpand: function(){
 		removeListener(this, "update", "runMoveWall");
 		addListener(this, "update", "run", this.updateRun);
-		this.wallHeatTrans=0;
+		this.wallV=0;
 		this.curUpdate = this.updates.run;
 	},
 	moveWalls: function(){
 		var wall = walls.pts[0];
-
-		if((wall[0].y<this.maxY && this.wallHeatTrans>0) || (wall[0].y>this.minY && this.wallHeatTrans<0) && !this.movedWallsLast){
-			wall[0].y+=5*this.wallHeatTrans;
-			wall[1].y+=5*this.wallHeatTrans;
-			wall[wall.length-1].y+=10*this.wallHeatTrans;
+		if((wall[0].y<this.maxY && this.wallV>0 && !this.movedWallsLast) || (wall[0].y>this.minY && this.wallV<0 && !this.movedWallsLast)){
+			wall[0].y+=2*this.wallV;
+			wall[1].y+=2*this.wallV;
+			wall[wall.length-1].y+=2*this.wallV;
 			this.movedWallsLast = true;
 		} else {
 			this.movedWallsLast = false;

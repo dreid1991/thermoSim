@@ -33,13 +33,12 @@ drawingTools.prototype = {
 		}
 		c.stroke();
 	},
-	fillWall: function(wallIdx, col){
-		var wall = walls.pts[wallIdx];
+	fillPts: function(pts, col){
 		c.fillStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
 		c.beginPath();
-		c.moveTo(wall[0].x, wall[1].y);
-		for (var ptIdx=1; ptIdx<wall.length; ptIdx++){
-			var pt = wall[ptIdx];
+		c.moveTo(pts[0].x, pts[1].y);
+		for (var ptIdx=1; ptIdx<pts.length; ptIdx++){
+			var pt = pts[ptIdx];
 			c.lineTo(pt.x, pt.y);
 		}
 		c.closePath();
@@ -164,6 +163,18 @@ function emptyListener(object, typeName){
 		delete object[typeName + 'Listeners'][listName];
 	}
 }
+function saveVals(level){
+	for (sliderName in level.sliders){
+		if (!(level.sliders[sliderName].val===undefined)){
+			level.savedVals[sliderName] = level.sliders[sliderName].val;
+		}
+	}
+}
+//function loadVals(level){
+//	for (sliderName in level.slider){
+//		level.sliders[sliderName].val=level.savedVals[sliderName];
+//	}
+//}
 var canvas = document.getElementById("myCanvas");
 var c = canvas.getContext("2d");
 var spcs = [];

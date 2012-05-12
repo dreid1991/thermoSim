@@ -1,4 +1,4 @@
-function Slider(x, y, title, onDrag){
+function Slider(level, name, x, y, title, onDrag){
 	var self = this;
 	this.rectCol = "#bdbdbd"
 	this.frameCol = "#787878"
@@ -9,7 +9,12 @@ function Slider(x, y, title, onDrag){
 	this.sliderLines = [];
 	this.capHeight = 12;
 	this.title = title;
-	this.val = .5
+	if(level.savedVals[name]===undefined){
+		this.val = .5	
+	}else{
+		this.val = level.savedVals[name];
+	}
+
 	this.height = 100;
 	this.width = 30;
 	this.rectWidth=this.width-5;
@@ -35,7 +40,7 @@ Slider.prototype = {
 		this.capBot = dash.path(capBot).attr("fill",this.frameCol);
 		var line = "M"+String(this.x+this.width/2)+","+String(this.y+this.fontSize+this.capHeight)+"L"+String(this.x+this.width/2)+","+String(this.y+this.height-this.capHeight);
 		this.line = dash.path(line).attr("fill",this.frameCol).attr("stroke",this.frameCol);
-		this.rect = dash.rect(this.x+(this.width-this.rectWidth)/2,(this.sliderMin+this.sliderMax)/2,this.rectWidth,this.rectHeight);
+		this.rect = dash.rect(this.x+(this.width-this.rectWidth)/2,(1-this.val)*(this.sliderMax-this.sliderMin)+this.sliderMin,this.rectWidth,this.rectHeight);
 		this.rect.attr("fill",this.rectCol);	
 		this.text = dash.text(this.x+this.width/2, this.y, this.title);
 		this.text.attr("font-size",13).attr("fill", this.rectCol);
