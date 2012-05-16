@@ -46,24 +46,27 @@ drawingTools.prototype = {
 	},
 }
 function move(){
-	var wallPE = (curLevel.maxY-walls.pts[0][0].y)*curLevel.weight.weight*curLevel.weightScalar;
+	var wallPE = (curLevel.maxY-walls.pts[0][0].y)*curLevel.weight.weight*curLevel.g;
 	var wallKE = .5*curLevel.weight.weight*curLevel.wallV*curLevel.wallV;
-	console.log("wallPE: ",wallPE);
-	console.log("wallKE: ",wallKE);
+	//console.log("wallPE: ",wallPE);
+	//console.log("wallKE: ",wallKE);
+	var sum = wallPE + wallKE;
+	console.log("sum: ",sum);
 	for (var spcIdx = 0; spcIdx<spcs.length; spcIdx++){
 		var spc = spcs[spcIdx];
 		for (var dotIdx = 0; dotIdx<spc.dots.length; dotIdx++){
 			var dot = spc.dots[dotIdx];
-			var dotKE = dot.m*dot.v.magSqr();
+			//var dotKE = dot.m*dot.v.magSqr();
 
-			var sum = dotKE+wallPE+wallKE;
-			console.log("dotKE: ",dotKE);
+			//var sum = dotKE+wallPE+wallKE;
+			//console.log("dotKE: ",dotKE);
 
-			console.log("sum: ",sum);
+			
 			dot.x += dot.v.dx;
 			dot.y += dot.v.dy;
 		}
 	}
+	
 }
 function gauss(avg, stdev){
 	var numStdev = (Math.random() + Math.random() + Math.random())-1.5;

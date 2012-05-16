@@ -5,7 +5,7 @@ function level4(){
 	this.data.addSet("p");
 	this.data.addSet("v");
 	walls = new WallHandler([[P(10,75), P(540,75), P(540,440), P(10,440)]])
-	this.wallV = 0;
+	this.wallV = 1.5;
 	this.introText = "I AM LEVEL 4";
 	this.outroText = "YOUR TRAINING IS NOW COMPLETE.  \nYOU CAN LEARN NOTHING MORE FROM ME.";
 	this.updateListeners = {};//{run:this.updateRun, compress:this.updateCompress, expand:this.updateExpand, pause:this.updatePause};
@@ -13,7 +13,7 @@ function level4(){
 	this.buttons = {};
 	this.sliders = {};
 	this.savedVals = {};
-	this.weightScalar = .0002;
+	this.g = .002;
 	var heaterX = 200;
 	var heaterY = 400;
 	var heaterWidth = 50;
@@ -25,9 +25,10 @@ function level4(){
 	walls.setup();
 	this.minY = 25;
 	this.maxY = walls.pts[0][2].y-75;
+	this.counter = 0;
 	collide.setup();
 }
-//foo
+
 level4.prototype = {
 	init: function(){
 		this.addDots();
@@ -81,7 +82,8 @@ level4.prototype = {
 		this.drawRun();
 	},
 	addWeightForce: function(){
-		this.wallV += this.weight.weight*this.weightScalar;
+		this.counter++;
+		this.wallV += this.g;
 	},
 	drawRun: function(){
 		draw.clear();
@@ -175,16 +177,26 @@ level4.prototype = {
 	moveWalls: function(){
 		var wall = walls.pts[0];
 		var lastY = wall[0].y
-		var newY = Math.max(this.minY, Math.min(this.maxY, lastY+this.wallV));
-		if(newY==this.maxY || newY==this.minY){
-			this.wallV = -this.wallV;
+		var unboundedY = lastY + this.wallV;
+		var dyWeight = this.wallV;
+		if(unboundedY>this.maxY || unboundedY<this.minY){
+			var boundedY = Math.max(this.minY, Math.min(this.maxY, unboundedY));
+			wall[0].y = boundedY;
+			wall[1].y = boundedY;
+			wall[wall.length-1].y = boundedY;
+			var deltaPEOverM = this.g*(unboundedY-boundedY);
+			if(this.wallV>0){
+				this.wallV = -Math.sqrt(this.wallV*this.wallV - 2*deltaPEOverM);
+			} else {
+				this.wallV = Math.sqrt(this.wallV*this.wallV - 2*deltaPEOverM);
+			}
+			dyWeight = boundedY - lastY;
 		}else{
-			this.wallV = newY-lastY;
+			wall[0].y+=this.wallV;
+			wall[1].y+=this.wallV;
+			wall[wall.length-1].y+=this.wallV;
 		}
-		this.weight.move(V(0,this.wallV));
-		wall[0].y+=this.wallV;
-		wall[1].y+=this.wallV;
-		wall[wall.length-1].y+=this.wallV;
+		this.weight.move(V(0,dyWeight));
 		walls.setupWall(0);
 	},
 	changeTemp: function(sliderVal){
