@@ -25,7 +25,6 @@ function level4(){
 	walls.setup();
 	this.minY = 25;
 	this.maxY = walls.pts[0][2].y-75;
-	this.counter = 0;
 	collide.setup();
 }
 
@@ -119,11 +118,6 @@ level4.prototype = {
 			walls.impactStd(dot, wallUV, perpV)		
 		}
 		this.fTurn += dot.m*perpV;
-
-		//if(line[0]==1){
-		//	var foo = hitHeater(dot, perpV, this.heater.t)
-		//}
-
 	},
 	addDots: function(){
 		addSpecies(["spc1", "spc2", "spc3"]);
@@ -181,10 +175,11 @@ level4.prototype = {
 		var dyWeight = this.wallV;
 		if(unboundedY>this.maxY || unboundedY<this.minY){
 			var boundedY = Math.max(this.minY, Math.min(this.maxY, unboundedY));
-			wall[0].y = boundedY;
-			wall[1].y = boundedY;
-			wall[wall.length-1].y = boundedY;
-			var deltaPEOverM = this.g*(unboundedY-boundedY);
+			var nextY = 2*boundedY-unboundedY
+			wall[0].y = nextY;
+			wall[1].y = nextY;
+			wall[wall.length-1].y = nextY;
+			var deltaPEOverM = this.g*(unboundedY-nextY);
 			if(this.wallV>0){
 				this.wallV = -Math.sqrt(this.wallV*this.wallV - 2*deltaPEOverM);
 			} else {
