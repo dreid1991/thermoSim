@@ -5,7 +5,7 @@ function level4(){
 	this.data.addSet("p");
 	this.data.addSet("v");
 	walls = new WallHandler([[P(10,75), P(540,75), P(540,440), P(10,440)]])
-	this.wallV = 1.5;
+	this.wallV = 0;
 	this.introText = "I AM LEVEL 4";
 	this.outroText = "YOUR TRAINING IS NOW COMPLETE.  \nYOU CAN LEARN NOTHING MORE FROM ME.";
 	this.updateListeners = {};//{run:this.updateRun, compress:this.updateCompress, expand:this.updateExpand, pause:this.updatePause};
@@ -13,13 +13,13 @@ function level4(){
 	this.buttons = {};
 	this.sliders = {};
 	this.savedVals = {};
-	this.g = .002;
+	this.g = .001;
 	var heaterX = 200;
 	var heaterY = 400;
 	var heaterWidth = 50;
 	var heaterHeight = 30;
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
-	this.weight = new Weight(250,75,.5,10,100);
+	this.weight = new Weight(250,75,.5,100,1000);
 	//walls = new WallHandler([[P(100,100), P(300,100),P(300,300),P(100,300)]])
 	//walls = new WallHandler([[P(10,10), P(540,10), P(540,440), P(10,440)]])
 	walls.setup();
