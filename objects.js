@@ -43,14 +43,14 @@ function Weight(xInit, yInit, dimRatio, weightMin, weightMax){
 	this.weightMin = weightMin;
 	this.weightMax = weightMax;
 	this.weight = (this.weightMin+this.weightMax)/2;
-	this.scalar = .3;
+	this.scalar = .1;
 	this.pts = [];
 	this.getPts();
 	this.col = Col(100,100,200);
 }
 Weight.prototype = {
 	getPts: function(){
-		var width = this.weight*this.scalar;
+		var width = Math.sqrt(this.weight*this.scalar/this.dimRatio);
 		var height = width*this.dimRatio;
 		this.pts = [P(this.x-width/2,this.y), P(this.x+width/2,this.y), P(this.x+width/2, this.y-height), P(this.x-width/2, this.y-height)];
 	},
