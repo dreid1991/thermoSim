@@ -46,8 +46,6 @@ level2.prototype = {
 		this.pVSv = new Graph(575,8+header.height,300,300, "Volume", "Pressure", "#5a8a92");
 		this.tVSv = new Graph(575,8+header.height+30+this.pVSv.height, 300, 300,"Volume", "Temperature", "#ca1a14");
 		this.fTurn=0;
-		this.movedWallsLast = new Boolean();
-		this.movedWallsLast = false;	
 	},
 	startOutro: function(){
 		saveVals(this);
@@ -95,7 +93,6 @@ level2.prototype = {
 		draw.clear();
 		draw.dots();
 		draw.walls(walls);
-		draw.fillWall(1, this.heater.col);
 	},
 	checkDotHits: function(){
 		collide.check();
@@ -108,13 +105,11 @@ level2.prototype = {
 	},
 	onWallImpact: function(dot, line, wallUV, perpV){
 		if(line[0]==0 && line[1]==0){
-			if(walls.pts[0][0].y!=this.minY && walls.pts[0][0].y!=this.maxY){
-				perpV += this.wallVLast;
-			}
-			this.wallV-=(dot.m/this.weight.weight)*(perpV+this.wallV);
+			dot.v.dy = -dot.v.dy+2*this.wallV;
+		}else{
+			walls.impactStd(dot, wallUV, perpV)
 		}
 		this.fTurn += dot.m*perpV;
-		walls.impactStd(dot, wallUV, perpV)
 	},
 	addDots: function(){
 		addSpecies(["spc1", "spc2", "spc3"]);
@@ -122,8 +117,8 @@ level2.prototype = {
 		//populate("spc2", 75, 75, myCanvas.width-400, myCanvas.height-150, 20, 4);
 		//populate("spc3", 15, 15, myCanvas.width-400, myCanvas.height-150, 400, 4);		
 		populate("spc1", 15, 15, 500, 400, 300, 300);
-		populate("spc3", 15, 15, 500, 400, 500, 300);		
-		populate("spc2", 15, 15, 75, 75, 20, 400);
+		populate("spc3", 15, 15, 500, 400, 400, 300);		
+		populate("spc2", 15, 15, 300, 400, 1, 400);
 		
 		
 	},
@@ -171,37 +166,33 @@ level2.prototype = {
 	clickCompress: function(){
 		removeListener(this, "update", "run");
 		addListener(this, "update", "runMoveWall", this.updateRunMoveWall);
-		this.wallV=.3;
-		this.curUpdate = this.updates.compress;
+		this.wallV=1;
 	},
 	releaseCompress: function(){
 		removeListener(this, "update", "runMoveWall");
 		addListener(this, "update", "run", this.updateRun);
 		this.wallV=0;
-		this.curUpdate = this.updates.run;
 	},
 	clickExpand: function(){
 		removeListener(this, "update", "run");
 		addListener(this, "update", "runMoveWall", this.updateRunMoveWall);
-		this.wallV=-.3
-		this.curUpdate = this.updates.expand;
+		this.wallV=-1;
 	},
 	releaseExpand: function(){
 		removeListener(this, "update", "runMoveWall");
 		addListener(this, "update", "run", this.updateRun);
 		this.wallV=0;
-		this.curUpdate = this.updates.run;
 	},
 	moveWalls: function(){
 		var wall = walls.pts[0];
-		if((wall[0].y<this.maxY && this.wallV>0 && !this.movedWallsLast) || (wall[0].y>this.minY && this.wallV<0 && !this.movedWallsLast)){
-			wall[0].y+=2*this.wallV;
-			wall[1].y+=2*this.wallV;
-			wall[wall.length-1].y+=2*this.wallV;
-			this.movedWallsLast = true;
-		} else {
-			this.movedWallsLast = false;
+		if((wall[0].y<this.maxY && this.wallV>0) || (wall[0].y>this.minY && this.wallV<0)){
+			wall[0].y+=this.wallV;
+			wall[1].y+=this.wallV;
+			wall[wall.length-1].y+=this.wallV;
+		}else{
+			this.wallV = 0;
 		}
+
 		walls.setupWall(0);
 	},
 
