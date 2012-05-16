@@ -13,7 +13,7 @@ function level4(){
 	this.buttons = {};
 	this.sliders = {};
 	this.savedVals = {};
-	this.g = .016;//.004
+	this.g = .3;
 	var heaterX = 200;
 	var heaterY = 400;
 	var heaterWidth = 50;
@@ -82,7 +82,7 @@ level4.prototype = {
 	},
 	addWeightForce: function(){
 		this.counter++;
-		this.wallV += this.g;
+		this.wallV += this.g*updateInterval/1000;
 	},
 	drawRun: function(){
 		draw.clear();
