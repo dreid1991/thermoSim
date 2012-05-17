@@ -5,7 +5,7 @@ function level4(){
 	this.data.addSet("p");
 	this.data.addSet("v");
 	walls = new WallHandler([[P(10,75), P(540,75), P(540,440), P(10,440)]])
-	this.wallV = 0;
+	this.wallV = 15;
 	this.introText = "I AM LEVEL 4";
 	this.outroText = "YOUR TRAINING IS NOW COMPLETE.  \nYOU CAN LEARN NOTHING MORE FROM ME.";
 	this.updateListeners = {};//{run:this.updateRun, compress:this.updateCompress, expand:this.updateExpand, pause:this.updatePause};
@@ -13,7 +13,7 @@ function level4(){
 	this.buttons = {};
 	this.sliders = {};
 	this.savedVals = {};
-	this.g = 5*updateInterval/1000;
+	this.g = 50*updateInterval/1000;
 	var heaterX = 200;
 	var heaterY = 400;
 	var heaterWidth = 50;
@@ -177,22 +177,20 @@ level4.prototype = {
 		var dyWeight = null;
 		if(unboundedY>this.maxY || unboundedY<this.minY){
 			var boundedY = Math.max(this.minY, Math.min(this.maxY, unboundedY));
-			var tHit = (-this.wallV + Math.sqrt(this.wallV*this.wallV + 2*this.g*(boundedY-lastY)))/this.g;
+			var tHit = null;
+			if (boundedY==this.maxY){
+				var tHit = (-this.wallV + Math.sqrt(this.wallV*this.wallV + 2*this.g*(boundedY-lastY)))/this.g;
+			}else if (boundedY==this.minY){
+				var tHit = (-this.wallV - Math.sqrt(this.wallV*this.wallV + 2*this.g*(boundedY-lastY)))/this.g;
+			}
 			var vRebound = -(this.wallV + this.g*tHit);
 			var tLeft = 1 - tHit;
 			var nextY = boundedY + vRebound*tLeft + .5*this.g*tLeft*tLeft;
 			this.wallV += 2*this.g*tHit;
 			this.wallV = -this.wallV;
-			//var nextY = 2*boundedY-unboundedY
 			wall[0].y = nextY;
 			wall[1].y = nextY;
 			wall[wall.length-1].y = nextY;
-			//var deltaPEOverM = this.g*(unboundedY-nextY);
-			//if(this.wallV>0){
-			//	this.wallV = -Math.sqrt(this.wallV*this.wallV - 2*deltaPEOverM);
-			//} else {
-			//	this.wallV = Math.sqrt(this.wallV*this.wallV - 2*deltaPEOverM);
-			//}
 			dyWeight = nextY - lastY;
 		}else{
 			wall[0].y = unboundedY;
