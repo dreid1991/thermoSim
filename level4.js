@@ -48,8 +48,8 @@ level4.prototype = {
 		this.drawDashRun();		
 		addListener(this, "update", "run", this.updateRun);
 		addListener(this, "data", "run", this.dataRun);
-		this.pVSv = new Graph(575,8+header.height,300,300, "Volume", "Pressure", "#5a8a92");
-		this.tVSv = new Graph(575,8+header.height+30+this.pVSv.height, 300, 300,"Volume", "Temperature", "#ca1a14");
+		this.pVSv = new Graph(575,8+header.height,300,300, "Volume", "Pressure", "#5a8a92", "#eee252");
+		this.tVSv = new Graph(575,8+header.height+30+this.pVSv.height, 300, 300,"Volume", "Temperature", "#ca1a14", "#eee252");
 		this.fTurn=0;
 		this.movedWallsLast = new Boolean();
 		this.movedWallsLast = false;	

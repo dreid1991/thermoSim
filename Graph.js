@@ -1,4 +1,4 @@
-function Graph(x, y, width, height, xLabel, yLabel, pointColor){
+function Graph(x, y, width, height, xLabel, yLabel, pointColor, flashColor){
 	this.width = width;
 	this.height = height;
 	this.borderSpacing = 70;
@@ -21,10 +21,12 @@ function Graph(x, y, width, height, xLabel, yLabel, pointColor){
 	this.gridCol = "#484848";
 	this.textCol = "white";
 	this.pointCol = pointColor;
+	this.flashCol = flashColor;
 	this.graphBoundCol = "white";
 	this.pointSize = 4;
 	this.axisLabelFontSize = 15;
 	this.axisValFontSize = 11;
+	this.flashAnim = Raphael.animation({r: this.pointSize, fill:this.pointCol}, .15e3)
 	this.graph = Raphael(x, y, this.width, this.height);
 	this.drawBGRect()
 	this.drawBounds()
@@ -103,12 +105,14 @@ Graph.prototype = {
 			this.yMax = yRange[1]*1.1;
 			if(this.xMinLast!=this.xMin || this.xMaxLast!=this.xMax || this.yMinLast!=this.yMin || this.yMaxLast!=this.yMax){
 				this.drawAxisVals();
-				this.drawPts(xVals, yVals);				
+				this.drawPts(xVals, yVals);
+
 			} else{
 				var xVal = xVals[xVals.length-1];
 				var yVal = yVals[yVals.length-1];
 				this.drawPt(xVal, yVal);
 			}
+			this.flashLast();
 
 		} else if (xVals.length!=yVals.length){
 			console.log("xVals has ", xVals.length, "entries");
@@ -162,6 +166,12 @@ Graph.prototype = {
 		this.pts.push(this.graph.circle(xPt, yPt, this.pointSize));
 		var last = this.pts[this.pts.length-1]
 		last.attr("fill",this.pointCol);
+	},
+	flashLast: function(){
+		var pt = this.pts[this.pts.length-1];
+		pt.attr({r:1.5*this.pointSize, fill:this.flashCol});
+		pt.animate(this.flashAnim);
+		pt.attr({r:this.pointSize, fill:this.pointCol});
 	},
 	removePts: function(){
 		for (var ptIdx=0; ptIdx<this.pts.length; ptIdx++){
