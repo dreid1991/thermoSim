@@ -13,13 +13,14 @@ function level4(){
 	this.buttons = {};
 	this.sliders = {};
 	this.savedVals = {};
-	this.g = .3;
+	this.g = 5*updateInterval/1000;
 	var heaterX = 200;
 	var heaterY = 400;
 	var heaterWidth = 50;
 	var heaterHeight = 30;
+	this.counter=0;
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
-	this.weight = new Weight(250,75,.5,5000,20000);
+	this.weight = new Weight(250,75,.5,200,2000);
 	//walls = new WallHandler([[P(100,100), P(300,100),P(300,300),P(100,300)]])
 	//walls = new WallHandler([[P(10,10), P(540,10), P(540,440), P(10,440)]])
 	walls.setup();
@@ -74,15 +75,15 @@ level4.prototype = {
 	},
 	updateRun: function(){
 		move();
-		this.addWeightForce();	
 		this.moveWalls();
+		this.addGravity();	
 		this.checkDotHits(); //okay, I think move walls should go up here so if we're at max, wallV gets set to zero.  I dunno though.  Figger it out.
 		this.checkWallHits();
 		this.drawRun();
 	},
-	addWeightForce: function(){
-		this.counter++;
-		this.wallV += this.g*updateInterval/1000;
+	addGravity: function(){
+		this.counter++;//DELETE COUNTER AT SOME POINT.
+		this.wallV += this.g;
 	},
 	drawRun: function(){
 		draw.clear();
@@ -124,9 +125,9 @@ level4.prototype = {
 		//populate("spc1", 15, 15, myCanvas.width-400, myCanvas.height-150, 200, 4);
 		//populate("spc2", 75, 75, myCanvas.width-400, myCanvas.height-150, 20, 4);
 		//populate("spc3", 15, 15, myCanvas.width-400, myCanvas.height-150, 400, 4);		
-		populate("spc1", 20, 100, 500, 300, 500, 300);
-		populate("spc3", 20, 100, 500, 300, 400, 300);		
-		populate("spc2", 20, 100, 500, 300, 10, 300);
+		//populate("spc1", 20, 100, 500, 300, 500, 300);
+		//populate("spc3", 20, 100, 500, 300, 400, 300);		
+		//populate("spc2", 20, 100, 500, 300, 10, 300);
 	},
 	dataRun: function(){
 		this.data.p.push(this.dataHandler.pressure(this.fTurn));
@@ -169,27 +170,35 @@ level4.prototype = {
 		this.sliders[weightSliderName].addDragListener(this.changeWeight, this);
 	},
 	moveWalls: function(){
+		console.log(this.counter);
 		var wall = walls.pts[0];
 		var lastY = wall[0].y
-		var unboundedY = lastY + this.wallV;
-		var dyWeight = this.wallV;
+		var unboundedY = lastY + this.wallV + .5*this.g;
+		var dyWeight = null;
 		if(unboundedY>this.maxY || unboundedY<this.minY){
 			var boundedY = Math.max(this.minY, Math.min(this.maxY, unboundedY));
-			var nextY = 2*boundedY-unboundedY
+			var tHit = (-this.wallV + Math.sqrt(this.wallV*this.wallV + 2*this.g*(boundedY-lastY)))/this.g;
+			var vRebound = -(this.wallV + this.g*tHit);
+			var tLeft = 1 - tHit;
+			var nextY = boundedY + vRebound*tLeft + .5*this.g*tLeft*tLeft;
+			this.wallV += 2*this.g*tHit;
+			this.wallV = -this.wallV;
+			//var nextY = 2*boundedY-unboundedY
 			wall[0].y = nextY;
 			wall[1].y = nextY;
 			wall[wall.length-1].y = nextY;
-			var deltaPEOverM = this.g*(unboundedY-nextY);
-			if(this.wallV>0){
-				this.wallV = -Math.sqrt(this.wallV*this.wallV - 2*deltaPEOverM);
-			} else {
-				this.wallV = Math.sqrt(this.wallV*this.wallV - 2*deltaPEOverM);
-			}
-			dyWeight = boundedY - lastY;
+			//var deltaPEOverM = this.g*(unboundedY-nextY);
+			//if(this.wallV>0){
+			//	this.wallV = -Math.sqrt(this.wallV*this.wallV - 2*deltaPEOverM);
+			//} else {
+			//	this.wallV = Math.sqrt(this.wallV*this.wallV - 2*deltaPEOverM);
+			//}
+			dyWeight = nextY - lastY;
 		}else{
-			wall[0].y+=this.wallV;
-			wall[1].y+=this.wallV;
-			wall[wall.length-1].y+=this.wallV;
+			wall[0].y = unboundedY;
+			wall[1].y = unboundedY;
+			wall[wall.length-1].y = unboundedY;
+			dyWeight = unboundedY - lastY;
 		}
 		this.weight.move(V(0,dyWeight));
 		walls.setupWall(0);
