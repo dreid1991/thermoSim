@@ -13,13 +13,13 @@ function level4(){
 	this.buttons = {};
 	this.sliders = {};
 	this.savedVals = {};
-	this.g = 5*updateInterval/1000;
+	this.g = 50*updateInterval/1000;
 	var heaterX = 200;
 	var heaterY = 400;
 	var heaterWidth = 50;
 	var heaterHeight = 30;
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
-	this.weight = new Weight(250,75,.5,100,2000);
+	this.weight = new Weight(250,75,.5,10,250);
 	//walls = new WallHandler([[P(100,100), P(300,100),P(300,300),P(100,300)]])
 	//walls = new WallHandler([[P(10,10), P(540,10), P(540,440), P(10,440)]])
 	walls.setup();
@@ -123,7 +123,7 @@ level4.prototype = {
 		//populate("spc1", 15, 15, myCanvas.width-400, myCanvas.height-150, 200, 4);
 		//populate("spc2", 75, 75, myCanvas.width-400, myCanvas.height-150, 20, 4);
 		//populate("spc3", 15, 15, myCanvas.width-400, myCanvas.height-150, 400, 4);		
-		populate("spc1", 20, 80, 500, 300, 500, 300);
+		populate("spc1", 20, 80, 500, 300, 700, 300);
 		populate("spc3", 20, 80, 500, 300, 400, 300);		
 		populate("spc2", 20, 80, 500, 300, 20, 300);
 	},
