@@ -74,8 +74,8 @@ CollideHandler.prototype = {
 	},
 	getMaxR: function(){
 		var maxR = 0;
-		for (var defIdx=0; defIdx<speciesDefs.length; defIdx++){
-			var spc = speciesDefs[defIdx];
+		for (var spcIdx=0; spcIdx<spcs.length; spcIdx++){
+			var spc = spcs[spcIdx];
 			maxR = Math.max(maxR, spc.r);
 		}
 		return maxR;	

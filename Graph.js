@@ -42,8 +42,9 @@ Graph.prototype = {
 		var ptOrigin = P(this.xStart*this.width, this.yStart*this.height);
 		var ptYAxis = P(this.xStart*this.width, this.yEnd*this.height);
 		var ptXAxis = P(this.xEnd*this.width, this.yStart*this.height);
-		var path = "M"+String(ptOrigin.x)+","+String(ptOrigin.y)+"L"+String(ptXAxis.x)+","+String(ptXAxis.y)+"L"+String(ptXAxis.x)+","+String(ptYAxis.y)+"L"+String(ptYAxis.x)+","+String(ptYAxis.y)+"L"+String(ptOrigin.x)+","+String(ptOrigin.y);
-		this.graphBounds = this.graph.path(path);
+		//var path = "M"+String(ptOrigin.x)+","+String(ptOrigin.y)+"L"+String(ptXAxis.x)+","+String(ptXAxis.y)+"L"+String(ptXAxis.x)+","+String(ptYAxis.y)+"L"+String(ptYAxis.x)+","+String(ptYAxis.y)+"L"+String(ptOrigin.x)+","+String(ptOrigin.y);
+		var path = [P(ptOrigin.x, ptOrigin.y), P(ptXAxis.x,ptXAxis.y), P(ptXAxis.x, ptYAxis.y), P(ptYAxis.x, ptYAxis.y), P(ptOrigin.x,ptOrigin.y)]
+		this.graphBounds = this.graph.path(makePath(path));
 		this.graphBounds.attr("stroke",this.graphBoundCol);
 	},
 	removeBounds: function(){
@@ -56,16 +57,16 @@ Graph.prototype = {
 			var xPos = String(this.xStart*this.width + this.gridSpacing*xGridIdx);
 			var yEnd = String(this.yEnd*this.height);
 			var yAxis = String(this.yStart*this.height + this.hashMarkLen);
-			var path = "M"+xPos+","+yAxis+"L"+xPos+","+yEnd;
-			this.xGrid.push(this.graph.path(path));
+			//var path = "M"+xPos+","+yAxis+"L"+xPos+","+yEnd;
+			this.xGrid.push(this.graph.path(makePath([P(xPos,yAxis),P(xPos,yEnd)])));
 			this.xGrid[this.xGrid.length-1].attr("stroke",this.gridCol);
 		}
 		for (var yGridIdx=0; yGridIdx<Math.ceil(this.height*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing); yGridIdx++){
 			var yPos = String(this.yStart*this.height - this.gridSpacing*yGridIdx);
 			var xEnd = String(this.xEnd*this.width);
 			var xAxis = String(this.xStart*this.width - this.hashMarkLen);
-			var path = "M"+xAxis+","+yPos+","+"L"+xEnd+","+yPos;
-			this.yGrid.push(this.graph.path(path));
+			//var path = "M"+xAxis+","+yPos+","+"L"+xEnd+","+yPos;
+			this.yGrid.push(this.graph.path(makePath([P(xAxis, yPos), P(xEnd, yPos)])));
 			this.yGrid[this.yGrid.length-1].attr("stroke",this.gridCol);
 		}
 		

@@ -168,19 +168,22 @@ WallHandler.prototype = {
 		var wallUV = this.wallUVs[line[0]][line[1]];
 		var perpUV = this.wallPerpUVs[line[0]][line[1]]
 		var dotVec = V(dot.x + dot.v.dx + perpUV.dx*dot.r - wallPt.x, dot.y + dot.v.dy + perpUV.dy*dot.r - wallPt.y);
-		var dotAB = dotVec.dotProd(wallUV);
 		var distFromWall = perpUV.dotProd(dotVec);
 		var perpV = perpUV.dotProd(dot.v);
-		if (distFromWall>0 && distFromWall<30 && this.isBetween(dot, line, dot.r, dotAB)){
+		if (distFromWall>0 && distFromWall<30 && this.isBetween(dot, line, wallUV)){
 			curLevel.onWallImpact(dot, line, wallUV, perpV);
 		}
 	},
-	isBetween: function(dot, line, r, dotDirectionOne){
-		var wallUV = this.wallUVs[line[0]][line[1]];
-		var wallPt = walls.pts[line[0]][line[1]+1];
-		var otherDir = V(-wallUV.dx, -wallUV.dy);
-		var dotVec = V(dot.x-wallPt.x, dot.y-wallPt.y);
-		return (dotDirectionOne>=0 && dotVec.dotProd(otherDir)>=0)
+	isBetween: function(dot, line, wallUV){
+		var wallAdjust = dot.v.dotProd(wallUV);
+		var xAdj = wallAdjust*wallUV.dx;
+		var yAdj = wallAdjust*wallUV.dy;
+		var wallPtA = P(walls.pts[line[0]][line[1]].x+xAdj, walls.pts[line[0]][line[1]].y+yAdj);
+		var wallPtB = P(walls.pts[line[0]][line[1]+1].x+xAdj, walls.pts[line[0]][line[1]+1].y+yAdj);
+		var reverseWallUV = V(-wallUV.dx, -wallUV.dy);
+		var dotVecA = V(dot.x-wallPtA.x, dot.y-wallPtA.y);
+		var dotVecB = V(dot.x-wallPtB.x, dot.y-wallPtB.y);
+		return (dotVecA.dotProd(wallUV)>=0 && dotVecB.dotProd(reverseWallUV)>=0)
 	},
 	impactStd: function(dot, wallUV, perpV){
 		dot.v.dx -= 2*wallUV.dy*perpV;

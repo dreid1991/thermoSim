@@ -43,7 +43,7 @@ function Weight(xInit, yInit, dimRatio, weightMin, weightMax){
 	this.weightMin = weightMin;
 	this.weightMax = weightMax;
 	this.weight = (this.weightMin+this.weightMax)/2;
-	this.scalar = .1;
+	this.scalar = 8;
 	this.pts = [];
 	this.getPts();
 	this.col = Col(100,100,200);

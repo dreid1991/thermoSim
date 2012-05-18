@@ -169,8 +169,8 @@ function removeListener(object, typeName, funcName){
 	delete object[typeName + 'Listeners'][funcName];
 }
 function emptyListener(object, typeName){
-	for (var listName in object[typeName + 'Listeners']){
-		delete object[typeName + 'Listeners'][listName];
+	for (var listenerName in object[typeName + 'Listeners']){
+		delete object[typeName + 'Listeners'][listenerName];
 	}
 }
 function saveVals(level){
@@ -179,6 +179,17 @@ function saveVals(level){
 			level.savedVals[sliderName] = level.sliders[sliderName].val;
 		}
 	}
+}
+function makePath(pts){
+	var path = "M"+String(pts[0].x)+","+String(pts[0].y);
+	for (var ptIdx=1; ptIdx<pts.length; ptIdx++){
+		var pt = pts[ptIdx];
+		path+="L";
+		path+=String(pt.x);
+		path+=",";
+		path+=String(pt.y);
+	}
+	return path;
 }
 //function loadVals(level){
 //	for (sliderName in level.slider){

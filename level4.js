@@ -1,9 +1,11 @@
 function level4(){
+	
 	this.dataHandler = new DataHandler();
 	this.data = new Database();
 	this.data.addSet("t");
 	this.data.addSet("p");
 	this.data.addSet("v");
+	this.data.addSet("e");
 	walls = new WallHandler([[P(10,75), P(540,75), P(540,440), P(10,440)]])
 	this.wallV = 0;
 	this.introText = "I AM LEVEL 4";
@@ -13,20 +15,24 @@ function level4(){
 	this.buttons = {};
 	this.sliders = {};
 	this.savedVals = {};
-	this.g = 50*updateInterval/1000;
+	this.g = 100*updateInterval/1000;
 	var heaterX = 200;
 	var heaterY = 400;
 	var heaterWidth = 50;
 	var heaterHeight = 30;
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
-	this.weight = new Weight(250,75,.5,10,250);
+	this.weight = new Weight(250,75,.5,15,60);
+	this.readout = new Readout(400, 60, 100, "white", "#bdbdbd", "#454545");
 	//walls = new WallHandler([[P(100,100), P(300,100),P(300,300),P(100,300)]])
 	//walls = new WallHandler([[P(10,10), P(540,10), P(540,440), P(10,440)]])
+	this.counter = 0;
 	walls.setup();
 	this.minY = 25;
 	this.maxY = walls.pts[0][2].y-75;
+	addSpecies(["spc1", "spc2", "spc3"]);
 	collide.setup();
 }
+
 
 level4.prototype = {
 	init: function(){
@@ -76,9 +82,10 @@ level4.prototype = {
 		move();
 		this.moveWalls();
 		this.addGravity();	
-		this.checkDotHits(); //okay, I think move walls should go up here so if we're at max, wallV gets set to zero.  I dunno though.  Figger it out.
+		this.checkDotHits(); 
 		this.checkWallHits();
 		this.drawRun();
+
 	},
 	addGravity: function(){
 		this.wallV += this.g;
@@ -104,27 +111,20 @@ level4.prototype = {
 			var pt = walls.pts[line[0]][line[1]];
 			var dotVo = dot.v.dy;
 			var wallVo = this.wallV;
-			if (pt.y==this.yMin){
-				dot.v.dy = -dotVo;
-			}else if (pt.y==this.yMax){
-				this.wallV = (wallVo*(this.weight.weight-dot.m)+2*dot.m*dotVo)/(this.weight.weight+dot.m);
-			} else{
-				dot.v.dy = (dotVo*(dot.m-this.weight.weight)+2*this.weight.weight*wallVo)/(dot.m+this.weight.weight);
-				this.wallV = (wallVo*(this.weight.weight-dot.m)+2*dot.m*dotVo)/(this.weight.weight+dot.m);
-				dot.y = pt.y+dot.r;
-			}
+			dot.v.dy = (dotVo*(dot.m-this.weight.weight)+2*this.weight.weight*wallVo)/(dot.m+this.weight.weight);
+			this.wallV = (wallVo*(this.weight.weight-dot.m)+2*dot.m*dotVo)/(this.weight.weight+dot.m);
+			dot.y = pt.y+dot.r;
 		}else{
 			walls.impactStd(dot, wallUV, perpV)		
 		}
 		this.fTurn += dot.m*perpV;
 	},
 	addDots: function(){
-		addSpecies(["spc1", "spc2", "spc3"]);
 		//populate("spc1", 15, 15, myCanvas.width-400, myCanvas.height-150, 200, 4);
 		//populate("spc2", 75, 75, myCanvas.width-400, myCanvas.height-150, 20, 4);
 		//populate("spc3", 15, 15, myCanvas.width-400, myCanvas.height-150, 400, 4);		
 		populate("spc1", 20, 80, 500, 300, 700, 300);
-		populate("spc3", 20, 80, 500, 300, 400, 300);		
+		populate("spc3", 20, 80, 500, 300, 700, 300);		
 		populate("spc2", 20, 80, 500, 300, 20, 300);
 	},
 	dataRun: function(){
@@ -204,5 +204,11 @@ level4.prototype = {
 	changeWeight: function(sliderVal){
 		this.weight.changeWeight(sliderVal);
 	},
+	printOsc: function(){
+		for (var oscIdx=0; oscIdx<this.oscillations.length; oscIdx++){
+			var osc = this.oscillations[oscIdx];
+			console.log('time: ', String(osc.time), ' vol: ', String(osc.vol));
+		}
+	}
 
 }
