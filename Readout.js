@@ -13,13 +13,13 @@ function Readout(x, y, width, textCol, frameCol, bgCol){
 	this.divLine.attr({stroke:frameCol});
 	this.frame = null;
 	this.entries = [];
+	return this;
 }
 function ReadoutEntry(name, address){
 	this.name = name;
 	this.address = address;
 	this.nameText = null;
 	this.valText = null;
-	return this;
 }
 Readout.prototype = {
 	addEntry: function(name, address){
@@ -28,6 +28,7 @@ Readout.prototype = {
 		this.bgRect.attr({height:newHeight});
 		var divLineX = this.divLine.attrs.path[0][1];
 		this.divLine.attr({path:makePath([P(divLineX, this.bgRect.attrs.y), P(divLineX, this.bgRect.attrs.y + this.bgRect.attrs.height)])});
+		return this;
 	},
 
 }

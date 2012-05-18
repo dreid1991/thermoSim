@@ -1,9 +1,8 @@
 function level2(){
 	this.dataHandler = new DataHandler();
-	this.data = new Database();
-	this.data.addSet("t");
-	this.data.addSet("p");
-	this.data.addSet("v");
+	this.data.t = [];
+	this.data.p = [];
+	this.data.v = [];
 	this.updateListeners = {};//{run:this.updateRun, compress:this.updateCompress, expand:this.updateExpand, pause:this.updatePause};
 	this.dataListeners = {};//{run:this.dataRun, pause:this.dataPause};
 	this.buttons = {};

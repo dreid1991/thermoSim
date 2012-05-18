@@ -1,11 +1,11 @@
 function level4(){
 	
 	this.dataHandler = new DataHandler();
-	this.data = new Database();
-	this.data.addSet("t");
-	this.data.addSet("p");
-	this.data.addSet("v");
-	this.data.addSet("e");
+	this.data = {};
+	this.data.t = [];
+	this.data.p = [];
+	this.data.v = [];
+	this.data.e = [];
 	walls = new WallHandler([[P(10,75), P(540,75), P(540,440), P(10,440)]])
 	this.wallV = 0;
 	this.introText = "I AM LEVEL 4";
