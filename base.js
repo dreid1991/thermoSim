@@ -154,6 +154,9 @@ function cleanDash(level){
 		Slider.prototype.remove.apply(level.sliders[sliderName]);
 		delete level.sliders[sliderName];
 	}
+	try{
+		level.readout.hide();
+	}catch(e){};
 }
 function hitHeater(dot, perpV, temp){
 	var vRatio = Math.sqrt(temp/dot.temp())

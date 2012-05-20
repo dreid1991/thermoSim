@@ -5,8 +5,8 @@ function Button(x, y, width, height, label, color, altColor){
 	this.rect = dash.rect(x, y, width, height, 8);
 	this.rect.attr("fill",color);
 	this.text = dash.text(x+width/2, y+height/2, label);
-	this.text.attr("fill","#000");
-	this.text.attr({'font-size':17});
+	this.text.attr({"fill":"#000",'font-size':17});
+	//this.text.attr({'font-size':17});
 	this.clickListeners = [];
 	this.releaseListeners = [];
 

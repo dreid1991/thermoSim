@@ -22,7 +22,8 @@ function level4(){
 	var heaterHeight = 30;
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
 	this.weight = new Weight(250,75,.5,15,60);
-	this.readout = new Readout(400, 60, 100, "white", "#bdbdbd", "#454545");
+	this.readout = new Readout(250, 60, 140, "white", "#bdbdbd", "#454545");
+	this.readout.addEntry('Temp',['data','t']).addEntry('Pressure',['data','p']);
 	//walls = new WallHandler([[P(100,100), P(300,100),P(300,300),P(100,300)]])
 	//walls = new WallHandler([[P(10,10), P(540,10), P(540,440), P(10,440)]])
 	this.counter = 0;
@@ -134,6 +135,7 @@ level4.prototype = {
 		this.fTurn = 0;
 		this.pVSv.plotData(this.data.v, this.data.p);
 		this.tVSv.plotData(this.data.v, this.data.t);
+		this.readout.update();
 	},
 	drawHeader: function(){
 		this.header = makeHeader("THE PATH TO THE BEYOND");
@@ -154,6 +156,7 @@ level4.prototype = {
 		this.buttons[name].addReleaseListener(this.startSim, this);
 	},
 	drawDashRun: function(){
+		this.readout.show();
 		var toIntroName = "toIntro";
 		this.buttons[toIntroName] = new Button(425,15,90,30,"To intro","#ceae6a", "#b3975c");
 		this.buttons[toIntroName].addReleaseListener(this.startIntro, this);
@@ -161,10 +164,10 @@ level4.prototype = {
 		this.buttons[toOutroName] = new Button(425,55,90,30,"To outro","#ceae6a", "#b3975c");
 		this.buttons[toOutroName].addReleaseListener(this.startOutro, this);
 		var tempSliderName = "temp";
-		this.sliders[tempSliderName] = new Slider(this, tempSliderName, 150,20,"Temperature");
+		this.sliders[tempSliderName] = new Slider(this, tempSliderName, 100,20,"Temperature");
 		this.sliders[tempSliderName].addDragListener(this.changeTemp,this);
 		var weightSliderName = "weight";
-		this.sliders[weightSliderName] = new Slider(this, weightSliderName, 240,20,"Weight");
+		this.sliders[weightSliderName] = new Slider(this, weightSliderName, 190,20,"Weight");
 		this.sliders[weightSliderName].addDragListener(this.changeWeight, this);
 	},
 	moveWalls: function(){
@@ -204,11 +207,4 @@ level4.prototype = {
 	changeWeight: function(sliderVal){
 		this.weight.changeWeight(sliderVal);
 	},
-	printOsc: function(){
-		for (var oscIdx=0; oscIdx<this.oscillations.length; oscIdx++){
-			var osc = this.oscillations[oscIdx];
-			console.log('time: ', String(osc.time), ' vol: ', String(osc.vol));
-		}
-	}
-
 }

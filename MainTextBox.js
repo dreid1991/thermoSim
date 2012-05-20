@@ -7,10 +7,7 @@ function MainTextBox(text){
 	var numLineBreaks = this.numLinesBreaks(text);
 	var height = 1.3*this.fontSize*numLineBreaks/2 + this.fontSize/2+2;
 	var textObj = this.mainDisp.text(10,height,text);
-	textObj.attr({"text-anchor":"start"});
-	textObj.attr("font-size",this.fontSize);
-	//textObj.attr("stroke", "white");
-	textObj.attr("fill", "white");
+	textObj.attr({"text-anchor":"start", "font-size":this.fontSize, fill: "white"});
 }
 MainTextBox.prototype = {
 	wordWrap: function(text, width){
