@@ -3,7 +3,7 @@ drawingTools.prototype = {
 		var width = myCanvas.width;
 		var height = myCanvas.height;
 		c.clearRect(0, 0, width, height);
-		c.fillStyle = "black";
+		c.fillStyle = "#05111a";
 		c.fillRect(0,0, width, height);	
 	},
 	dots: function(){
@@ -22,7 +22,7 @@ drawingTools.prototype = {
 	},
 	walls: function(walls){
 		c.beginPath()
-		
+		//alert(c.strokeStyle);
 		for (var wallIdx=0; wallIdx<walls.pts.length; wallIdx++){
 			var wall = walls.pts[wallIdx];
 			c.moveTo(wall[0].x, wall[0].y);
@@ -145,7 +145,7 @@ function makeHeader(text){
 	text.attr("fill","white");
 	return text;
 }
-function cleanDash(level){
+/*function cleanDash(level){
 	for (var buttonName in level.buttons){ 
 		Button.prototype.remove.apply(level.buttons[buttonName]);
 		delete level.buttons[buttonName];
@@ -157,13 +157,19 @@ function cleanDash(level){
 	try{
 		level.readout.hide();
 	}catch(e){};
-}
+}*/
 function hitHeater(dot, perpV, temp){
 	var vRatio = Math.sqrt(temp/dot.temp())
 	var vNew = dot.v.mag()*vRatio;
 	var UV = dot.v.UV();
 	dot.v.dx = UV.dx*vNew;
 	dot.v.dy = UV.dy*vNew;
+}
+function makeButton(text, id){
+	var newDiv = $('<div>');
+	newDiv.append( $('<button>').text(text).button() );
+	newDiv.attr({id:id});
+	return newDiv;
 }
 function addListener(object, typeName, funcName, listener){
 	object[typeName + 'Listeners'][funcName] = listener;
@@ -199,17 +205,25 @@ function makePath(pts){
 //		level.sliders[sliderName].val=level.savedVals[sliderName];
 //	}
 //}
-var canvas = document.getElementById("myCanvas");
-var c = canvas.getContext("2d");
+var canvas;
+var c; 
+$(function(){
+	canvas = document.getElementById("myCanvas");
+	c = canvas.getContext("2d");
+	c.strokeStyle = 'white';
+})
+
+
 var spcs = [];
 draw = new drawingTools();
 collide = new CollideHandler();
+canvasHeight = 450;
+tempScalar = 100;
+updateInterval = 35;
+dataInterval = 1000;
 
-levels = [new level4()]
-curLevel = levels[0];
-curLevel.init();
 
 
-c.strokeStyle = "rgb(255,255,255)";
+
 setInterval("curLevel.update()", updateInterval);
 setInterval("curLevel.addData()", dataInterval);

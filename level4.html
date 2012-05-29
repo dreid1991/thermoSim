@@ -3,35 +3,59 @@
 <link type='text/css' href = 'css/sunny/jquery-ui-1.8.20.custom.css' rel='stylesheet' />
 <link type='text/css' href = 'styles.css' rel='stylesheet'/>
 <script src = 'js/jquery-1.7.2.min.js'></script>
+<script src = 'js/jquery-ui-1.8.20.custom.min.js'></script>
 <div id='main' class='main'>
-<div id='header' class='header'></div>
-<div id='display' class='display'>
-	<canvas id='myCanvas'></canvas>
-	<div id='displayText' class='displayText'></div>
-</div>
+	<div id='header' class='header'>
+		Ribbon
+	</div>
+	<div id='display' class='display'>
+		<canvas id='myCanvas'>
+		</canvas>
+		<div id='textIntro' class='displayText'>
+			I'm a whole bunch of text.  Look at me.
+		</div>
+		<div id='textOutro' class='displayText'>
+			BYE EVERYONE!
+		</div>
+	</div>
 
 
-<div id='dash' class='dash'></div>
+	<div id='dashIntro' class='dash'>
+		<center>
+			<button id='toSim'>To the simulation racecar</button>
+		</center>
+	</div>
+	<div id='dashRun' class='dash'>
+		running
+	</div>
+	<div id='dashOutro' class='dash'>
+		<center>
+			<button id='toSim'>racecar noitalumis eht oT</button>
+		</center>
+	</div>
+	
 
 </div>
 
 <script src = 'raphael-min.js'></script>
 <script type = 'text/javascript'>
+var curLevel;
+$(function(){
+	myCanvas.height = canvasHeight;
+	curLevel = new level4();
+	curLevel.init();
+	$('button').button();
+	$('#toSim').click(function(){curLevel.startSim()})
+
+	
+});
 myCanvas.width = $('#main').width();
-myCanvas.height = 450;
-tempScalar = 100;
-var headerTextSize = 22;
-updateInterval = 35;
-dataInterval = 1000;
-var headerHeight = 45;
-var dividerWidth = 5;
-var dividerCol = '#b3b2b1';
-var headerRounding = 30
+
 
 </script>
 
 
-<script src = 'js/jquery-ui-1.8.20.custom.min.js'></script>
+
 <script src = 'indepClasses.js'></script>
 <script src = 'Graph.js'></script>
 <script src = 'SpeciesDefs.js'></script>

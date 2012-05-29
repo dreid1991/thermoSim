@@ -8,8 +8,6 @@ function level4(){
 	this.data.e = [];
 	walls = new WallHandler([[P(10,75), P(540,75), P(540,440), P(10,440)]])
 	this.wallV = 0;
-	this.introText = "I AM LEVEL 4";
-	this.outroText = "YOUR TRAINING IS NOW COMPLETE.  \nYOU CAN LEARN NOTHING MORE FROM ME.";
 	this.updateListeners = {};//{run:this.updateRun, compress:this.updateCompress, expand:this.updateExpand, pause:this.updatePause};
 	this.dataListeners = {};//{run:this.dataRun, pause:this.dataPause};
 	this.buttons = {};
@@ -22,8 +20,8 @@ function level4(){
 	var heaterHeight = 30;
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
 	this.weight = new Weight(250,75,.5,15,60);
-	this.readout = new Readout(250, 60, 140, "white", "#bdbdbd", "#454545");
-	this.readout.addEntry('Temp',['data','t']).addEntry('Pressure',['data','p']);
+	//this.readout = new Readout(250, 60, 140, "white", "#bdbdbd", "#454545");
+	//this.readout.addEntry('Temp',['data','t']).addEntry('Pressure',['data','p']);
 	//walls = new WallHandler([[P(100,100), P(300,100),P(300,300),P(100,300)]])
 	//walls = new WallHandler([[P(10,10), P(540,10), P(540,440), P(10,440)]])
 	this.counter = 0;
@@ -38,32 +36,40 @@ function level4(){
 level4.prototype = {
 	init: function(){
 		this.addDots();
-		this.drawHeader();
+		this.hideDash();
+		this.hideText();
 		this.startIntro();	
 	},
 	startIntro: function(){
 		saveVals(this);
-		cleanDash(this);
+		this.hideDash();
+		this.hideText();
+		$('#myCanvas').hide();
+		$('#textIntro').show();
+		$('#dashIntro').show();
 		emptyListener(this, "update");
 		emptyListener(this, "data");
-		this.drawDashStart();
-		this.textBox = new MainTextBox(this.introText);
 	},
 	startSim: function(){
-		this.textBox.remove();
-		cleanDash(this);
-		this.drawDashRun();		
+		this.hideDash();
+		this.hideText();
+		$('#dashRun').show();
+		$('#myCanvas').show();
 		addListener(this, "update", "run", this.updateRun);
 		addListener(this, "data", "run", this.dataRun);
-		this.pVSv = new Graph(575,8+header.height,300,300, "Volume", "Pressure", "#5a8a92", "#eee252");
-		this.tVSv = new Graph(575,8+header.height+30+this.pVSv.height, 300, 300,"Volume", "Temperature", "#ca1a14", "#eee252");
+		this.pVSv = new Graph(575,8,300,300, "Volume", "Pressure", "#5a8a92", "#eee252");
+		this.tVSv = new Graph(575,8+30+this.pVSv.height, 300, 300,"Volume", "Temperature", "#ca1a14", "#eee252");
 		this.fTurn=0;
 		this.movedWallsLast = new Boolean();
 		this.movedWallsLast = false;	
 	},
 	startOutro: function(){
 		saveVals(this);
-		cleanDash(this);
+		this.hideDash();
+		this.hideText();
+		$('#myCanvas').hide();
+		$('#textOutro').show();	
+		$('#dashOutro').show();
 		emptyListener(this, "update");
 		emptyListener(this, "data");
 		this.drawDashOut();
@@ -135,40 +141,12 @@ level4.prototype = {
 		this.fTurn = 0;
 		this.pVSv.plotData(this.data.v, this.data.p);
 		this.tVSv.plotData(this.data.v, this.data.t);
-		this.readout.update();
 	},
 	drawHeader: function(){
 		this.header = makeHeader("THE PATH TO THE BEYOND");
 	},
 	vol: function(){
 		return walls.area(0);// - walls.area(1);
-	},
-	drawDashStart: function(){
-		var buttonWidth = 150;
-		var name = "toSim"
-		this.buttons[name] = (new Button(myCanvas.width/2 - buttonWidth/2, 40, buttonWidth, 50,"To the simulation!","#ceae6a", "#b3975c"));
-		this.buttons[name].addReleaseListener(this.startSim, this);
-	},
-	drawDashOut: function(){
-		var buttonWidth = 150;
-		var name = "toSim"
-		this.buttons[name] = new Button(myCanvas.width/2 - buttonWidth/2, 40, buttonWidth, 50,"To the simulation!","#ceae6a", "#b3975c");
-		this.buttons[name].addReleaseListener(this.startSim, this);
-	},
-	drawDashRun: function(){
-		this.readout.show();
-		var toIntroName = "toIntro";
-		this.buttons[toIntroName] = new Button(425,15,90,30,"To intro","#ceae6a", "#b3975c");
-		this.buttons[toIntroName].addReleaseListener(this.startIntro, this);
-		var toOutroName = "toOutro";
-		this.buttons[toOutroName] = new Button(425,55,90,30,"To outro","#ceae6a", "#b3975c");
-		this.buttons[toOutroName].addReleaseListener(this.startOutro, this);
-		var tempSliderName = "temp";
-		this.sliders[tempSliderName] = new Slider(this, tempSliderName, 100,20,"Temperature");
-		this.sliders[tempSliderName].addDragListener(this.changeTemp,this);
-		var weightSliderName = "weight";
-		this.sliders[weightSliderName] = new Slider(this, weightSliderName, 190,20,"Weight");
-		this.sliders[weightSliderName].addDragListener(this.changeWeight, this);
 	},
 	moveWalls: function(){
 		var wall = walls.pts[0];
@@ -206,5 +184,14 @@ level4.prototype = {
 	},
 	changeWeight: function(sliderVal){
 		this.weight.changeWeight(sliderVal);
+	},
+	hideDash: function(){
+		$('#dashIntro').hide();
+		$('#dashRun').hide();
+		$('#dashOutro').hide();
+	},
+	hideText: function(){
+		$('#textIntro').hide();
+		$('#textOutro').hide();
 	},
 }
