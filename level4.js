@@ -19,7 +19,10 @@ function level4(){
 	var heaterWidth = 50;
 	var heaterHeight = 30;
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
-	this.weight = new Weight(250,75,.5,15,60);
+	this.weightMin=15;
+	this.weightMax=60;
+	this.weightInit=(this.weightMin+this.weightMax)/2;
+	this.weight = new Weight(250,75,.5,this.weightMin,this.weightMax, this.weightInit);
 	//this.readout = new Readout(250, 60, 140, "white", "#bdbdbd", "#454545");
 	//this.readout.addEntry('Temp',['data','t']).addEntry('Pressure',['data','p']);
 	//walls = new WallHandler([[P(100,100), P(300,100),P(300,300),P(100,300)]])
@@ -182,8 +185,8 @@ level4.prototype = {
 	changeTemp: function(sliderVal){
 		this.heater.changeTemp(sliderVal);
 	},
-	changeWeight: function(sliderVal){
-		this.weight.changeWeight(sliderVal);
+	changeWeight: function(event, ui){
+		this.weight.changeWeight(ui.value);
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();

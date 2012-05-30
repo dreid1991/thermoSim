@@ -46,7 +46,7 @@ $(function(){
 	curLevel.init();
 	$('button').button();
 	$('#toSim').click(function(){curLevel.startSim()})
-
+	$('#dashRun').append(makeSlider("weightSlider", curLevel.weight.weightMin, curLevel.weight.weightMax, curLevel.weight.weight, curLevel.changeWeight, function(){}))
 	
 });
 myCanvas.width = $('#main').width();

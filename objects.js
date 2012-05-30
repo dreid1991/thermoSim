@@ -36,13 +36,13 @@ Heater.prototype = {
 	}
 
 }
-function Weight(xInit, yInit, dimRatio, weightMin, weightMax){
+function Weight(xInit, yInit, dimRatio, weightMin, weightMax, weightInit){
 	this.x = xInit;
 	this.y = yInit-1;
 	this.dimRatio = dimRatio;
 	this.weightMin = weightMin;
 	this.weightMax = weightMax;
-	this.weight = (this.weightMin+this.weightMax)/2;
+	this.weight = weightInit
 	this.scalar = 8;
 	this.pts = [];
 	this.getPts();
@@ -66,8 +66,8 @@ Weight.prototype = {
 		this.y+=vector.dy;
 		this.movePts(vector);
 	},
-	changeWeight: function(percent){
-		this.weight = this.weightMin + percent*(this.weightMax-this.weightMin);
+	changeWeight: function(val){
+		this.weight = val;
 		this.getPts();
 	},
 }

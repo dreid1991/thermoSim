@@ -200,6 +200,20 @@ function makePath(pts){
 	}
 	return path;
 }
+function makeSlider(id, low, high, init, onSlide, onChange){
+	var newDiv = $('<div>');
+	newDiv.attr({id:id});
+	newDiv.slider({
+		min:low,
+		max:high,
+		value:init,
+		slide: function(event, ui){onSlide.apply(curLevel, [event, ui])},
+		change: function(event,ui){onChange.apply(curLevel, [event, ui])}
+	});
+	return newDiv;
+	
+	
+}
 //function loadVals(level){
 //	for (sliderName in level.slider){
 //		level.sliders[sliderName].val=level.savedVals[sliderName];
