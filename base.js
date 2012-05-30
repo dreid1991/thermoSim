@@ -200,11 +200,22 @@ function makePath(pts){
 	}
 	return path;
 }
-function makeSlider(id, attrs){
+function makeSlider(id, attrs, handlers){
 	var newDiv = $('<div>');
 	newDiv.attr({id:id});
 	newDiv.slider({});
 	newDiv.slider("option",attrs);
+	for (var handlerIdx=0; handlerIdx<handlers.length; handlerIdx++){
+		var handler=handlers[handlerIdx];
+		var eventType = handler.eventType;
+		var obj = handler.obj;
+		var func = handler.func;
+		if(obj===undefined){
+			newDiv.bind(eventType, function(event, ui){func.apply([event,ui])});
+		}else{
+			newDiv.bind(eventType, function(event, ui){func.apply(obj, [event,ui])});
+		}
+	}
 	return newDiv;
 	
 	

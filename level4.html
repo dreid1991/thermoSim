@@ -46,16 +46,22 @@ $(function(){
 	curLevel.init();
 	$('button').button();
 	$('#toSim').click(function(){curLevel.startSim()})
-	$('#dashRun').append(makeSlider("weightSlider", 
-									{
-									min:curLevel.weight.weightMin, 
-									max:curLevel.weight.weightMax, 
-									value:curLevel.weight.weight, 
-									slide:function(event, ui){curLevel.changeWeight.apply(curLevel,[event,ui])}
-									}
-									));
-	
+	$('#dashRun').append(makeSlider(
+		"weightSlider", 
+		{
+		orientation:'vertical',
+		min:curLevel.weight.weightMin, 
+		max:curLevel.weight.weightMax, 
+		value:curLevel.weight.weight, 
+		},
+		[
+		{name:'slide', obj:curLevel, func:curLevel.changeWeight},
+		]
+	));
+	//$('#dashRun').append(makeButton(
+	//	"
 });
+
 myCanvas.width = $('#main').width();
 
 
