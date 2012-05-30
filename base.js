@@ -200,13 +200,10 @@ function makePath(pts){
 	}
 	return path;
 }
-function makeSlider(id, attrs, onSlide, onChange){
+function makeSlider(id, attrs){
 	var newDiv = $('<div>');
 	newDiv.attr({id:id});
-	newDiv.slider({
-		slide: function(event, ui){onSlide.apply(curLevel, [event, ui])},
-		change: function(event,ui){onChange.apply(curLevel, [event, ui])}
-	});
+	newDiv.slider({});
 	newDiv.slider("option",attrs);
 	return newDiv;
 	
