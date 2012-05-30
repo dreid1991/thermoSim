@@ -1,0 +1,36 @@
+.main{
+	width:550px
+}
+.header{
+	height:40px;
+	border-top-left-radius:20px;
+	border-top-right-radius:20px;
+	background-color:#05111a;
+	text-align:center;
+	font-size:x-large;
+	color:white;
+	padding:2px;
+}
+.display{
+	height:450px;
+	background-color:#05111a;
+	border-top: 3px solid;
+	border-bottom:3px solid;
+	border-color:#b3b2b1;
+	
+}
+.displayText{
+	font-size:large;
+	color:white;
+	padding:10px;
+}
+.dash{
+	height:140px;
+	border-bottom-left-radius:20px;
+	border-bottom-right-radius:20px;
+	background-color:#05111a;
+	color:white;
+	padding:10px;
+}
+
+
