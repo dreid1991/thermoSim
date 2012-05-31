@@ -5,14 +5,14 @@
 <script src = 'js/jquery-1.7.2.min.js'></script>
 <script src = 'js/jquery-ui-1.8.20.custom.min.js'></script>
 <div id='main' class='main'>
-	<div id='header' class='header'>
+	<div id='mainHseader' class='header'>
 		Ribbon
 	</div>
 	<div id='display' class='display'>
 		<canvas id='myCanvas'>
 		</canvas>
 		<div id='textIntro' class='displayText'>
-			I'm a whole bunch of text.  Look at me.
+			I'm a whole bunch of text.  Look at meeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.
 		</div>
 		<div id='textOutro' class='displayText'>
 			BYE EVERYONE!
@@ -24,9 +24,12 @@
 		<center>
 			<button id='toSim'>To the simulation racecar</button>
 		</center>
+		
 	</div>
 	<div id='dashRun' class='dash'>
 		running
+		<div id='sliderWeight' style='width:300px'></div> 
+		
 	</div>
 	<div id='dashOutro' class='dash'>
 		<center>
@@ -36,6 +39,24 @@
 	
 
 </div>
+<br>
+<div id='base' class='base'>
+	<div id='baseHeader' class='header'>Hello</div>
+	<div class='borderedBlock'>
+		<div id='quesHolder'>
+		</div>
+		<div style='padding:10px'>
+			<div id='answerDiv' class='answerDiv'>
+				<textarea id='answer' cols='60' rows='5'>Type yer stuffs here.</textarea>
+			</div>
+			<div id='submitDiv' class='submit'>
+				<button id = 'submit'>SUBMIT</button>
+			</div>
+		</div>
+	</div>
+
+	<div id='baseDash' class='dashShort'>I am blank</div>
+</div>
 
 <script src = 'raphael-min.js'></script>
 <script type = 'text/javascript'>
@@ -44,20 +65,22 @@ $(function(){
 	myCanvas.height = canvasHeight;
 	curLevel = new level4();
 	curLevel.init();
+	addQDivs();
+	//$('#sliderWeight').css({width:'300px'});
 	$('button').button();
-	$('#toSim').click(function(){curLevel.startSim()})
-	$('#dashRun').append(makeSlider(
-		"weightSlider", 
+	$('#toSim').click(function(){curLevel.startSim()});
+	$('#submit').click(function(){submit()});
+	makeSlider(
+		"sliderWeight", 
 		{
-		orientation:'vertical',
 		min:curLevel.weight.weightMin, 
 		max:curLevel.weight.weightMax, 
 		value:curLevel.weight.weight, 
 		},
 		[
-		{name:'slide', obj:curLevel, func:curLevel.changeWeight},
+		{eventType:'slide', obj:curLevel, func:curLevel.changeWeight},
 		]
-	));
+	);
 	//$('#dashRun').append(makeButton(
 	//	"
 });

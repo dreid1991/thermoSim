@@ -13,6 +13,11 @@ function level4(){
 	this.buttons = {};
 	this.sliders = {};
 	this.savedVals = {};
+	this.curQ = 0;
+	this.qa=[
+		{q:'How many spots does a proper Irishman have?'},
+		{q:'Alligators: Snout or prickles?'}
+	]
 	this.g = 100*updateInterval/1000;
 	var heaterX = 200;
 	var heaterY = 400;
@@ -27,7 +32,6 @@ function level4(){
 	//this.readout.addEntry('Temp',['data','t']).addEntry('Pressure',['data','p']);
 	//walls = new WallHandler([[P(100,100), P(300,100),P(300,300),P(100,300)]])
 	//walls = new WallHandler([[P(10,10), P(540,10), P(540,440), P(10,440)]])
-	this.counter = 0;
 	walls.setup();
 	this.minY = 25;
 	this.maxY = walls.pts[0][2].y-75;
@@ -41,12 +45,14 @@ level4.prototype = {
 		this.addDots();
 		this.hideDash();
 		this.hideText();
+		this.hideBase();
 		this.startIntro();	
 	},
 	startIntro: function(){
 		saveVals(this);
 		this.hideDash();
 		this.hideText();
+		this.hideBase();
 		$('#myCanvas').hide();
 		$('#textIntro').show();
 		$('#dashIntro').show();
@@ -58,6 +64,8 @@ level4.prototype = {
 		this.hideText();
 		$('#dashRun').show();
 		$('#myCanvas').show();
+		$('#base').show();
+		showCurQ();
 		addListener(this, "update", "run", this.updateRun);
 		addListener(this, "data", "run", this.dataRun);
 		this.pVSv = new Graph(575,8,300,300, "Volume", "Pressure", "#5a8a92", "#eee252");
@@ -70,6 +78,7 @@ level4.prototype = {
 		saveVals(this);
 		this.hideDash();
 		this.hideText();
+		this.hideBase();
 		$('#myCanvas').hide();
 		$('#textOutro').show();	
 		$('#dashOutro').show();
@@ -197,4 +206,8 @@ level4.prototype = {
 		$('#textIntro').hide();
 		$('#textOutro').hide();
 	},
+	hideBase: function(){
+		$('#base').hide();
+	},
+
 }

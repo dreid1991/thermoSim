@@ -36,7 +36,7 @@ function Graph(x, y, width, height, xLabel, yLabel, pointColor, flashColor){
 Graph.prototype = {
 	drawBGRect: function(){
 		this.bgRect = this.graph.rect(0,0,this.width,this.height,10);
-		this.bgRect.attr("fill","black");
+		this.bgRect.attr("fill","#05111a");
 	},
 	drawBounds: function(){
 		var ptOrigin = P(this.xStart*this.width, this.yStart*this.height);

@@ -201,24 +201,50 @@ function makePath(pts){
 	return path;
 }
 function makeSlider(id, attrs, handlers){
-	var newDiv = $('<div>');
-	newDiv.attr({id:id});
-	newDiv.slider({});
-	newDiv.slider("option",attrs);
+	//var newDiv = $('<div>');
+	//newDiv.attr({id:id});
+	var div = $('#' + id);
+	div.slider({});
+	div.slider("option",attrs);
+	div.attr({width:300});
 	for (var handlerIdx=0; handlerIdx<handlers.length; handlerIdx++){
 		var handler=handlers[handlerIdx];
 		var eventType = handler.eventType;
 		var obj = handler.obj;
 		var func = handler.func;
 		if(obj===undefined){
-			newDiv.bind(eventType, function(event, ui){func.apply([event,ui])});
+			div.bind(eventType, function(event, ui){func.apply([event,ui])});
 		}else{
-			newDiv.bind(eventType, function(event, ui){func.apply(obj, [event,ui])});
+			div.bind(eventType, function(event, ui){func.apply(obj, [event,ui])});
 		}
 	}
-	return newDiv;
-	
-	
+	return div;
+}
+function addQDivs(){
+	for (var qIdx=0; qIdx<curLevel.qa.length; qIdx++){
+		var q = curLevel.qa[qIdx].q;
+		var qDiv = $('<div>');
+		var id='q'+String(qIdx);
+		qDiv.attr({id:id,class:'question'});
+		qDiv.html(q);
+		$('#quesHolder').append(qDiv);
+	}
+}
+function showCurQ(){
+	for (var qIdx=0; qIdx<curLevel.qa.length; qIdx++){
+		if(qIdx==curLevel.curQ){
+			$('#q'+String(qIdx)).show();
+		}else{
+			$('#q'+String(qIdx)).hide();
+		}
+	}
+}
+function submit(){
+	if(curLevel.curQ<curLevel.qa.length-1){
+		curLevel.curQ++;
+	}
+	showCurQ();
+	curLevel.qa[curLevel.curQ].a = $('textarea#answer').val();
 }
 //function loadVals(level){
 //	for (sliderName in level.slider){
