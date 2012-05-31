@@ -8,16 +8,24 @@ function Graph(x, y, width, height, xLabel, yLabel, pointColor, flashColor){
 	this.yEnd = .05
 	this.gridSpacing = 40;
 	this.hashMarkLen = 10;
+	this.numXGridLines = Math.floor(this.width*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing);
+	this.numYGridLines = Math.floor(this.height*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
 	this.axisVals = [];
 	this.pts = [];
-	this.xMin=null;
-	this.xMax=null;
-	this.yMin=null;
-	this.yMax=null;	
-	this.xMinLast=null;
-	this.xMaxLast=null;
-	this.yMinLast=null;
-	this.yMaxLast=null;
+	this.xMin;
+	this.xMax;
+	this.yMin;
+	this.yMax;
+	this.xMinLast;
+	this.xMaxLast;
+	this.yMinLast;
+	this.yMaxLast;
+	this.xAxisMin;
+	this.xAxisMax;
+	this.xStepSize;
+	this.yAxisMin;
+	this.yAxisMax;
+	this.yStepSize;
 	this.gridCol = "#484848";
 	this.textCol = "white";
 	this.pointCol = pointColor;
@@ -53,19 +61,17 @@ Graph.prototype = {
 	drawGrid: function(){
 		this.xGrid = [];
 		this.yGrid = [];
-		for (var xGridIdx=0; xGridIdx<Math.ceil(this.width*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing); xGridIdx++){
+		for (var xGridIdx=0; xGridIdx<=this.numXGridLines; xGridIdx++){
 			var xPos = String(this.xStart*this.width + this.gridSpacing*xGridIdx);
 			var yEnd = String(this.yEnd*this.height);
 			var yAxis = String(this.yStart*this.height + this.hashMarkLen);
-			//var path = "M"+xPos+","+yAxis+"L"+xPos+","+yEnd;
 			this.xGrid.push(this.graph.path(makePath([P(xPos,yAxis),P(xPos,yEnd)])));
 			this.xGrid[this.xGrid.length-1].attr("stroke",this.gridCol);
 		}
-		for (var yGridIdx=0; yGridIdx<Math.ceil(this.height*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing); yGridIdx++){
+		for (var yGridIdx=0; yGridIdx<=this.numYGridLines; yGridIdx++){
 			var yPos = String(this.yStart*this.height - this.gridSpacing*yGridIdx);
 			var xEnd = String(this.xEnd*this.width);
 			var xAxis = String(this.xStart*this.width - this.hashMarkLen);
-			//var path = "M"+xAxis+","+yPos+","+"L"+xEnd+","+yPos;
 			this.yGrid.push(this.graph.path(makePath([P(xAxis, yPos), P(xEnd, yPos)])));
 			this.yGrid[this.yGrid.length-1].attr("stroke",this.gridCol);
 		}
@@ -99,12 +105,13 @@ Graph.prototype = {
 			this.xMaxLast = this.xMax;
 			this.yMinLast = this.yMin;
 			this.yMaxLast = this.yMax;
-			this.xMin = xRange[0]*.9
-			this.xMax = xRange[1]*1.1;
+			this.xMin = xRange[0];
+			this.xMax = xRange[1];
 			var yRange = this.range(yVals);
-			this.yMin = yRange[0]*.9
-			this.yMax = yRange[1]*1.1;
+			this.yMin = yRange[0];
+			this.yMax = yRange[1];
 			if(this.xMinLast!=this.xMin || this.xMaxLast!=this.xMax || this.yMinLast!=this.yMin || this.yMaxLast!=this.yMax){
+				this.getAxisBounds();
 				this.drawAxisVals();
 				this.drawPts(xVals, yVals);
 
@@ -121,21 +128,36 @@ Graph.prototype = {
 			console.log("UH-OH");
 		};
 	},
+	getAxisBounds: function(){
+		var expX = Math.pow(10, Math.floor(log10(this.xMax-this.xMin)));
+		this.xAxisMin = Math.floor(this.xMin/expX)*expX;
+		var unroundStepX = (this.xMax-this.xAxisMin)/this.numXGridLines;
+		var expStepX = Math.pow(10, Math.floor(log10(unroundStepX)))
+		this.xStepSize = Math.ceil(unroundStepX/expStepX)*expStepX;
+		this.xAxisMax = this.xAxisMin + this.numXGridLines*this.xStepSize;
+		
+		var expY = Math.pow(10, Math.floor(log10(this.yMax-this.yMin)));
+		this.yAxisMin = Math.floor(this.yMin/expY)*expY;
+		var unroundStepY = (this.yMax-this.yAxisMin)/this.numYGridLines;
+		var expStepY = Math.pow(10, Math.floor(log10(unroundStepY)))
+		this.yStepSize = Math.ceil(unroundStepY/expStepY)*expStepY;
+		this.yAxisMax = this.yAxisMin + this.numYGridLines*this.yStepSize;		
+	},
 	drawAxisVals: function(){
 		this.removeAxisVals();
-		for (var xGridIdx=0; xGridIdx<Math.ceil(this.width*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing); xGridIdx++){
+		for (var xGridIdx=0; xGridIdx<=this.numXGridLines; xGridIdx++){
 			var xPos = this.xStart*this.width + this.gridSpacing*xGridIdx;
 			var yPos = this.yStart*this.height + this.hashMarkLen + 10;
-			var val = String(round(this.xMin + (this.xMax-this.xMin)*(this.gridSpacing*xGridIdx)/(Math.abs(this.xEnd-this.xStart)*this.width),1));
+			var val = String(round(this.xAxisMin + this.xStepSize*xGridIdx, 1));
 			this.axisVals.push(this.graph.text(xPos, yPos, val));
 			var last = this.axisVals[this.axisVals.length-1]
 			last.attr("fill", this.textCol);
 			last.attr("font-size", this.axisValFontSize);
 		}
-		for (var yGridIdx=0; yGridIdx<Math.ceil(this.height*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing); yGridIdx++){
+		for (var yGridIdx=0; yGridIdx<=this.numYGridLines; yGridIdx++){
 			var yPos = this.yStart*this.height - this.gridSpacing*yGridIdx;
 			var xPos = this.xStart*this.width - this.hashMarkLen - 10;
-			var val = String(round(this.yMin + (this.yMax-this.yMin)*(this.gridSpacing*yGridIdx)/(Math.abs(this.yEnd-this.yStart)*this.height),1));
+			var val = String(round(this.yAxisMin + this.yStepSize*yGridIdx,1));
 			this.axisVals.push(this.graph.text(xPos, yPos, val));
 			var last = this.axisVals[this.axisVals.length-1]
 			last.attr("fill", this.textCol);
@@ -160,10 +182,10 @@ Graph.prototype = {
 		}
 	},
 	drawPt: function(xVal, yVal){
-		var xRange = this.xMax-this.xMin;
-		var yRange = this.yMax-this.yMin;
-		var xPt = Math.abs(this.xEnd-this.xStart)*this.width*(xVal-this.xMin)/xRange + this.xStart*this.width;
-		var yPt = this.height - (1-this.yStart)*this.height - Math.abs(this.yEnd-this.yStart)*this.height*(yVal-this.yMin)/yRange;
+		var xRange = this.xAxisMax-this.xAxisMin;
+		var yRange = this.yAxisMax-this.yAxisMin;
+		var xPt = Math.abs(this.xEnd-this.xStart)*this.width*(xVal-this.xAxisMin)/xRange + this.xStart*this.width;
+		var yPt = this.height - (1-this.yStart)*this.height - Math.abs(this.yEnd-this.yStart)*this.height*(yVal-this.yAxisMin)/yRange;
 		this.pts.push(this.graph.circle(xPt, yPt, this.pointSize));
 		var last = this.pts[this.pts.length-1]
 		last.attr("fill",this.pointCol);

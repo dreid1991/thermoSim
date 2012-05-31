@@ -246,6 +246,9 @@ function submit(){
 	showCurQ();
 	curLevel.qa[curLevel.curQ].a = $('textarea#answer').val();
 }
+function log10(val){
+	return Math.log(val)/Math.log(10);
+}
 //function loadVals(level){
 //	for (sliderName in level.slider){
 //		level.sliders[sliderName].val=level.savedVals[sliderName];
