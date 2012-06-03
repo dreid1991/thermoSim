@@ -120,7 +120,7 @@ Graph.prototype = {
 				var yVal = yVals[yVals.length-1];
 				this.drawPt(xVal, yVal);
 			}
-			this.flashLast();
+			//this.flashLast();
 
 		} else if (xVals.length!=yVals.length){
 			console.log("xVals has ", xVals.length, "entries");
@@ -129,19 +129,32 @@ Graph.prototype = {
 		};
 	},
 	getAxisBounds: function(){		/*tr means truncated*/
-		var range = this.xMax-this.xMin;
-		var unroundStepX = range/(this.numXGridLines-1);
-		var expStepX = Math.pow(10, Math.floor(log10(unroundStepX)))
-		this.xStepSize = Math.ceil(unroundStepX/expStepX)*expStepX;
-		this.xAxisMin = Math.floor(this.xMin/this.xStepSize)*this.xStepSize;
-		this.xAxisMax = this.xAxisMin + this.numXGridLines*this.xStepSize;
+		var rangeX = this.xMax-this.xMin;
+		if(rangeX!=0){
+			var unroundStepX = rangeX/(this.numXGridLines-1);
+			var expStepX = Math.pow(10, Math.floor(log10(unroundStepX)))
+			this.xStepSize = Math.ceil(unroundStepX/expStepX)*expStepX;
+			this.xAxisMin = Math.floor(this.xMin/this.xStepSize)*this.xStepSize;
+			this.xAxisMax = this.xAxisMin + this.numXGridLines*this.xStepSize;
+		}else{
+			this.xAxisMin = Math.floor(this.xMin);
+			this.xStepSize = .2;
+			this.xAxisMax = this.xAxisMin + this.xStepSize*this.numXGridLines;	
+		}
 		
-		var range = Math.abs(this.yMax-this.yMin);
-		var unroundStepY = range/(this.numYGridLines-1);
-		var expStepY = Math.pow(10, Math.floor(log10(unroundStepY)))
-		this.yStepSize = Math.ceil(unroundStepY/expStepY)*expStepY;
-		this.yAxisMin = Math.floor(this.yMin/this.yStepSize)*this.yStepSize;
-		this.yAxisMax = this.yAxisMin + this.numYGridLines*this.yStepSize;	
+		var rangeY = Math.abs(this.yMax-this.yMin);
+		if(rangeY!=0){
+			var unroundStepY = rangeY/(this.numYGridLines-1);
+			var expStepY = Math.pow(10, Math.floor(log10(unroundStepY)))
+			this.yStepSize = Math.ceil(unroundStepY/expStepY)*expStepY;
+			this.yAxisMin = Math.floor(this.yMin/this.yStepSize)*this.yStepSize;
+			this.yAxisMax = this.yAxisMin + this.numYGridLines*this.yStepSize;
+		}else{
+			this.yAxisMin = Math.floor(this.yMin);
+			this.yStepSize = .2;
+			this.yAxisMax = this.yAxisMin + this.yStepSize*this.numYGridLines;	
+			
+		}
 	},
 	drawAxisVals: function(){
 		this.removeAxisVals();

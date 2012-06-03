@@ -1,54 +1,84 @@
 function level2(){
+	
 	this.dataHandler = new DataHandler();
+	this.data = {};
 	this.data.t = [];
 	this.data.p = [];
 	this.data.v = [];
+	this.data.e = [];
+	this.yInit=75;
+	walls = new WallHandler([[P(10,this.yInit), P(540,this.yInit), P(540,440), P(10,440)]])
+	this.wallSpd = 1;
+	this.wallDir = 0;
 	this.updateListeners = {};//{run:this.updateRun, compress:this.updateCompress, expand:this.updateExpand, pause:this.updatePause};
 	this.dataListeners = {};//{run:this.dataRun, pause:this.dataPause};
+	this.wallImpactListeners = {};
 	this.buttons = {};
 	this.sliders = {};
-
-	this.wallV = 0;
-
-	this.introText = "Let's look at adiabatic compression.  We know that when you compress a container adiabatically, it heats up because you’re putting energy into the system through work.  We can relate a molecule’s temperature to its speed with the equation (1/2)mv^2=(3/2)kT.  This tell us that being compressed makes molecules speed up, but why?\n  To figure this out, we need to look how molecules behave when they collide with objects.  When an ideal gas molecule hits another object, it undergoes an elastic collision.  When that object is a massive stationary wall, the gas molecule is reflected by the wall and its kinetic energy is unchanged.  When the wall is moving, this is not true.\nSo to understand why compression heats a system, we need to describe molecules’ collisions with moving walls.  Try to do that using the simulation.  ";
-	this.outroText = "     -You should have seen that as you compressed the container, the temperature increased faster than linearly as volume decreased.  Adiabatic expansion and compression can be described by the equation P1V1^k = P2V2^k with k=Cp/Cv.  From that equation, solve for T2 with P1 and V1 as your initial state.  Graph it.  Does this fit what you saw?\n     -So, did you figure out why the collisions with a moving wall cause a temperature change?\n     -Why is the temperature change nonlinear?  Think about how the number of molecules hitting the moving wall changes as pressure increases.\n     -If you compress and expand the container a few times, you’ll notice that the temperature starts to creep up.  Why does it do that?\n     -Related:  Is this expansion/compression reversible?";
-	//walls = new WallHandler([[P(10,10), P(200,10), P(250,100), P(540,10), P(540,150), P(260,110), P(350,150), P(540,440), P(10,440)]]); // list of lists, can have multiple walls
-	walls = new WallHandler([[P(10,10), P(540,10), P(540,440), P(10,440)]])
-	walls.setup(this.walls);
-	this.minY = 10;
-	this.maxY = walls.pts[0][2].y-75
+	this.savedVals = {};
+	this.curQ = 0;
+	this.qa=[
+		{q:'Or is it just a ruse?  Answer in nearly complete sentances.'},
+		{q:'Is this really level 2?'},
+	]
+	walls.setup();
+	this.yMin = 25;
+	this.wallSetPt;
+	
+	this.yMax = walls.pts[0][2].y-100;
+	addSpecies(["spc1", "spc2", "spc3"]);
 	collide.setup();
-
 }
+
+
 level2.prototype = {
 	init: function(){
 		this.addDots();
-		this.drawHeader();
-		this.startIntro();
+		this.hideDash();
+		this.hideText();
+		this.hideBase();
+		this.startIntro();	
+	},
+	foo: function(){
+		alert('hi');
 	},
 	startIntro: function(){
 		saveVals(this);
-		cleanDash(this);
+		this.hideDash();
+		this.hideText();
+		this.hideBase();
+		$('#myCanvas').hide();
+		$('#textIntro').show();
+		$('#dashIntro').show();
 		emptyListener(this, "update");
 		emptyListener(this, "data");
-		this.drawDashStart();
-		this.textBox = new MainTextBox(this.introText);
 	},
 	startSim: function(){
-		this.textBox.remove();
-		cleanDash(this);
+		this.hideDash();
+		this.hideText();
+		$('#dashRun').show();
+		$('#myCanvas').show();
+		$('#base').show();
+		showCurQ();
 		emptyListener(this, "update");
 		emptyListener(this, "data");
-		addListener(this, "update", "run", this.updateRun);
-		addListener(this, "data", "run", this.dataRun);
-		this.drawDashRun();		
-		this.pVSv = new Graph(575,8+header.height,300,300, "Volume", "Pressure", "#5a8a92", "#eee252");
-		this.tVSv = new Graph(575,8+header.height+30+this.pVSv.height, 300, 300,"Volume", "Temperature", "#ca1a14", "#eee252");
+		addListener(this, "update", "run", this.updateRun, this);
+		addListener(this, "data", "run", this.dataRun, this);
+		addListener(this, 'wallImpact', 'stationary', this.onWallImpact, this);
+		this.pVSv = new Graph(575,8,300,300, "Volume", "Pressure", "#5a8a92", "#eee252");
+		this.tVSv = new Graph(575,8+30+this.pVSv.height, 300, 300,"Volume", "Temperature", "#ca1a14", "#eee252");
 		this.fTurn=0;
+		this.movedWallsLast = new Boolean();
+		this.movedWallsLast = false;	
 	},
 	startOutro: function(){
 		saveVals(this);
-		cleanDash(this);
+		this.hideDash();
+		this.hideText();
+		this.hideBase();
+		$('#myCanvas').hide();
+		$('#textOutro').show();	
+		$('#dashOutro').show();
 		emptyListener(this, "update");
 		emptyListener(this, "data");
 		this.drawDashOut();
@@ -56,38 +86,33 @@ level2.prototype = {
 	},
 	update: function(){
 		for (var updateListener in this.updateListeners){
-			this.updateListeners[updateListener].apply(curLevel);
+			var listener = this.updateListeners[updateListener]
+			listener.func.apply(listener.obj);
 		}
 	},
 	addData: function(){
 		for (var dataListener in this.dataListeners){
-			this.dataListeners[dataListener].apply(curLevel);
+			var listener = this.dataListeners[dataListener];
+			listener.func.apply(listener.obj);
 		}
-	},
-	updatePause: function(){
-	
-	},
-	updateRunning: function(){
-		move();
-		this.checkDotHits();
-		this.checkWallHits();
-		draw.clear();
-		draw.dots();
-		draw.walls(walls);
 	},
 	updateRun: function(){
 		move();
-		this.checkDotHits();
+		this.checkDotHits(); 
 		this.checkWallHits();
 		this.drawRun();
 	},
-	updateRunMoveWall: function(){
+	updateRunMove: function(){
 		move();
 		this.moveWalls();
 		this.checkDotHits();
 		this.checkWallHits();
 		this.drawRun();
+		if(this.wallSetPt==walls.pts[0][0].y){
+			this.revertToStationary();
+		}
 	},
+
 	drawRun: function(){
 		draw.clear();
 		draw.dots();
@@ -102,24 +127,43 @@ level2.prototype = {
 	checkWallHits: function(){
 		walls.check();
 	},
+
 	onWallImpact: function(dot, line, wallUV, perpV){
+		walls.impactStd(dot, wallUV, perpV)		
+		this.fTurn += dot.m*perpV;
+	},
+	onWallImpactMove: function(dot, line, wallUV, perpV){
 		if(line[0]==0 && line[1]==0){
-			dot.v.dy = -dot.v.dy+2*this.wallV;
+			dot.v.dy = -dot.v.dy + 2*this.wallSpd*this.wallDir;
+			perpV = dot.v.dy;
 		}else{
-			walls.impactStd(dot, wallUV, perpV)
+			walls.impactStd(dot, wallUV, perpV);
 		}
 		this.fTurn += dot.m*perpV;
 	},
+	moveWalls: function(){
+		var curPt = walls.pts[0][0].y;
+		curPt+=this.wallSpd*this.wallDir;
+		curPt = this.wallDir*Math.min(this.wallDir*curPt, this.wallDir*this.wallSetPt);//hey - wallV needs directionality
+		walls.pts[0][0].y=curPt;
+		walls.pts[0][1].y=curPt;
+		walls.pts[0][4].y=curPt;
+		walls.setupWall(0);
+	},
+	revertToStationary: function(){
+		emptyListener(this, 'update');
+		emptyListener(this, 'wallImpact');
+		addListener(this, 'update', 'run', this.updateRun, this);	
+		addListener(this, 'wallImpact', 'stationary', this.onWallImpact, this);//Hey - you're going from wall functions to func in curLevel to another func in curLevel back to walls.  Err
+	},												//You can just send it straight to wall handler by making the wall impact std function be your listener.  BE CAREFUL OF PRESSURE.
 	addDots: function(){
-		addSpecies(["spc1", "spc2", "spc3"]);
 		//populate("spc1", 15, 15, myCanvas.width-400, myCanvas.height-150, 200, 4);
 		//populate("spc2", 75, 75, myCanvas.width-400, myCanvas.height-150, 20, 4);
 		//populate("spc3", 15, 15, myCanvas.width-400, myCanvas.height-150, 400, 4);		
-		populate("spc1", 15, 15, 500, 400, 300, 300);
-		populate("spc3", 15, 15, 500, 400, 400, 300);		
-		populate("spc2", 15, 15, 300, 400, 1, 400);
-		
-		
+		//populate('spc1', 20,80,500,300,1,300);
+		populate("spc1", 20, 80, 500, 300, 700, 300);
+		populate("spc3", 20, 80, 500, 300, 700, 300);		
+		populate("spc2", 20, 80, 500, 300, 20, 300);
 	},
 	dataRun: function(){
 		this.data.p.push(this.dataHandler.pressure(this.fTurn));
@@ -129,70 +173,27 @@ level2.prototype = {
 		this.pVSv.plotData(this.data.v, this.data.p);
 		this.tVSv.plotData(this.data.v, this.data.t);
 	},
-	dataPause: function(){
-	
+	changeWallSetPt: function(event, ui){
+		this.wallSetPt = ui.value;
+		var diff = this.wallSetPt-walls.pts[0][0].y
+		this.wallDir = Math.abs(diff)/(diff)
+		emptyListener(this, 'update');
+		emptyListener(this, 'wallImpact');
+		addListener(this, 'update', 'runMoveWalls', this.updateRunMove, this);
+		addListener(this, 'wallImpact', 'moveWalls', this.onWallImpactMove, this);
+		
 	},
-	drawHeader: function(){
-		this.header = makeHeader("Adiabatic compression");
+	hideDash: function(){
+		$('#dashIntro').hide();
+		$('#dashRun').hide();
+		$('#dashOutro').hide();
 	},
-	drawDashStart: function(){
-		var buttonWidth = 150;
-		var name = "toSim"
-		this.buttons[name] = (new Button(myCanvas.width/2 - buttonWidth/2, 40, buttonWidth, 50,"To the simulation!","#ceae6a", "#b3975c"));
-		this.buttons[name].addReleaseListener(this.startSim, this);
+	hideText: function(){
+		$('#textIntro').hide();
+		$('#textOutro').hide();
 	},
-	drawDashOut: function(){
-		var buttonWidth = 150;
-		var name = "toSim"
-		this.buttons[name] = new Button(myCanvas.width/2 - buttonWidth/2, 40, buttonWidth, 50,"To the simulation!","#ceae6a", "#b3975c");
-		this.buttons[name].addReleaseListener(this.startSim, this);
-	},
-	drawDashRun: function(){
-		var compName = "compress";
-		this.buttons[compName] = new Button(15,15,90,30,"Compress","#ceae6a", "#b3975c");
-		this.buttons[compName].addClickListener(this.clickCompress, this).addReleaseListener(this.releaseCompress, this);
-		var expName = "expand";
-		this.buttons[expName] = new Button(15,55,90,30,"Expand","#ceae6a", "#b3975c");
-		this.buttons[expName].addClickListener(this.clickExpand, this).addReleaseListener(this.releaseExpand, this);
-		var toIntroName = "toIntro";
-		this.buttons[toIntroName] = new Button(425,15,90,30,"To intro","#ceae6a", "#b3975c");
-		this.buttons[toIntroName].addReleaseListener(this.startIntro, this);
-		var toOutroName = "toOutro";
-		this.buttons[toOutroName] = new Button(425,55,90,30,"To outro","#ceae6a", "#b3975c");
-		this.buttons[toOutroName].addReleaseListener(this.startOutro, this);
-		var tempSliderName = "temp";
-	},
-	clickCompress: function(){
-		removeListener(this, "update", "run");
-		addListener(this, "update", "runMoveWall", this.updateRunMoveWall);
-		this.wallV=1;
-	},
-	releaseCompress: function(){
-		removeListener(this, "update", "runMoveWall");
-		addListener(this, "update", "run", this.updateRun);
-		this.wallV=0;
-	},
-	clickExpand: function(){
-		removeListener(this, "update", "run");
-		addListener(this, "update", "runMoveWall", this.updateRunMoveWall);
-		this.wallV=-1;
-	},
-	releaseExpand: function(){
-		removeListener(this, "update", "runMoveWall");
-		addListener(this, "update", "run", this.updateRun);
-		this.wallV=0;
-	},
-	moveWalls: function(){
-		var wall = walls.pts[0];
-		if((wall[0].y<this.maxY && this.wallV>0) || (wall[0].y>this.minY && this.wallV<0)){
-			wall[0].y+=this.wallV;
-			wall[1].y+=this.wallV;
-			wall[wall.length-1].y+=this.wallV;
-		}else{
-			this.wallV = 0;
-		}
-
-		walls.setupWall(0);
+	hideBase: function(){
+		$('#base').hide();
 	},
 
 }

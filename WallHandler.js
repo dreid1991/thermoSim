@@ -171,7 +171,10 @@ WallHandler.prototype = {
 		var distFromWall = perpUV.dotProd(dotVec);
 		var perpV = perpUV.dotProd(dot.v);
 		if (distFromWall>0 && distFromWall<30 && this.isBetween(dot, line, wallUV)){
-			curLevel.onWallImpact(dot, line, wallUV, perpV);
+			for (wallImpactListener in curLevel.wallImpactListeners){
+				var listener = curLevel.wallImpactListeners[wallImpactListener]
+				listener.func.apply(listener.obj,[dot, line, wallUV, perpV]);
+			}
 		}
 	},
 	isBetween: function(dot, line, wallUV){

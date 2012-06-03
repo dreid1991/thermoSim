@@ -138,26 +138,6 @@ function round(val, dec){
 	var pow = Math.pow(10,dec);
 	return Math.round(val*pow)/pow;
 }
-function makeHeader(text){
-	var text = header.text(header.width/2, header.height/2, text)
-	text.attr("font-size", headerTextSize);
-	text.attr("stroke", "white");
-	text.attr("fill","white");
-	return text;
-}
-/*function cleanDash(level){
-	for (var buttonName in level.buttons){ 
-		Button.prototype.remove.apply(level.buttons[buttonName]);
-		delete level.buttons[buttonName];
-	}
-	for (var sliderName in level.sliders){
-		Slider.prototype.remove.apply(level.sliders[sliderName]);
-		delete level.sliders[sliderName];
-	}
-	try{
-		level.readout.hide();
-	}catch(e){};
-}*/
 function hitHeater(dot, perpV, temp){
 	var vRatio = Math.sqrt(temp/dot.temp())
 	var vNew = dot.v.mag()*vRatio;
@@ -171,8 +151,8 @@ function makeButton(text, id){
 	newDiv.attr({id:id});
 	return newDiv;
 }
-function addListener(object, typeName, funcName, listener){
-	object[typeName + 'Listeners'][funcName] = listener;
+function addListener(object, typeName, funcName, func, destObj){
+	object[typeName + 'Listeners'][funcName] = {func:func, obj:destObj};
 }
 function removeListener(object, typeName, funcName){
 	delete object[typeName + 'Listeners'][funcName];

@@ -10,6 +10,7 @@ function level4(){
 	this.wallV = 0;
 	this.updateListeners = {};//{run:this.updateRun, compress:this.updateCompress, expand:this.updateExpand, pause:this.updatePause};
 	this.dataListeners = {};//{run:this.dataRun, pause:this.dataPause};
+	this.wallImpactListeners = {};
 	this.buttons = {};
 	this.sliders = {};
 	this.savedVals = {};
@@ -66,8 +67,11 @@ level4.prototype = {
 		$('#myCanvas').show();
 		$('#base').show();
 		showCurQ();
-		addListener(this, "update", "run", this.updateRun);
-		addListener(this, "data", "run", this.dataRun);
+		emptyListener(this, "update");
+		emptyListener(this, "data");
+		addListener(this, "update", "run", this.updateRun, this);
+		addListener(this, "data", "run", this.dataRun, this);
+		addListener(this, 'wallImpact', 'stationary', this.onWallImpact, this);
 		this.pVSv = new Graph(575,8,300,300, "Volume", "Pressure", "#5a8a92", "#eee252");
 		this.tVSv = new Graph(575,8+30+this.pVSv.height, 300, 300,"Volume", "Temperature", "#ca1a14", "#eee252");
 		this.fTurn=0;
@@ -89,12 +93,14 @@ level4.prototype = {
 	},
 	update: function(){
 		for (var updateListener in this.updateListeners){
-			this.updateListeners[updateListener].apply(curLevel);
+			var listener = this.updateListeners[updateListener]
+			listener.func.apply(listener.obj);
 		}
 	},
 	addData: function(){
 		for (var dataListener in this.dataListeners){
-			this.dataListeners[dataListener].apply(curLevel);
+			var listener = this.dataListeners[dataListener];
+			listener.func.apply(listener.obj);
 		}
 	},
 	updateRun: function(){
@@ -153,9 +159,6 @@ level4.prototype = {
 		this.fTurn = 0;
 		this.pVSv.plotData(this.data.v, this.data.p);
 		this.tVSv.plotData(this.data.v, this.data.t);
-	},
-	drawHeader: function(){
-		this.header = makeHeader("THE PATH TO THE BEYOND");
 	},
 	vol: function(){
 		return walls.area(0);// - walls.area(1);
