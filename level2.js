@@ -12,7 +12,8 @@ function level2(){
 	this.wallDir = 0;
 	this.updateListeners = {};//{run:this.updateRun, compress:this.updateCompress, expand:this.updateExpand, pause:this.updatePause};
 	this.dataListeners = {};//{run:this.dataRun, pause:this.dataPause};
-	this.wallImpactListeners = {};
+	this.wallImpactListeners = {};	
+	this.dotImpactListeners = {};
 	this.buttons = {};
 	this.sliders = {};
 	this.savedVals = {};
@@ -65,6 +66,7 @@ level2.prototype = {
 		addListener(this, "update", "run", this.updateRun, this);
 		addListener(this, "data", "run", this.dataRun, this);
 		addListener(this, 'wallImpact', 'stationary', this.onWallImpact, this);
+		addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
 		this.pVSv = new Graph(575,8,300,300, "Volume", "Pressure", "#5a8a92", "#eee252");
 		this.tVSv = new Graph(575,8+30+this.pVSv.height, 300, 300,"Volume", "Temperature", "#ca1a14", "#eee252");
 		this.fTurn=0;
@@ -121,9 +123,6 @@ level2.prototype = {
 	checkDotHits: function(){
 		collide.check();
 	},
-	onDotImpact: function(a, b){
-		collide.impactStd(a, b);
-	},
 	checkWallHits: function(){
 		walls.check();
 	},
@@ -136,6 +135,7 @@ level2.prototype = {
 		if(line[0]==0 && line[1]==0){
 			dot.v.dy = -dot.v.dy + 2*this.wallSpd*this.wallDir;
 			perpV = dot.v.dy;
+			dot.y -= wallUV.dy
 		}else{
 			walls.impactStd(dot, wallUV, perpV);
 		}
