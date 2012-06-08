@@ -75,10 +75,10 @@ $(function(){
 		{
 		min:curLevel.weight.weightMin, 
 		max:curLevel.weight.weightMax, 
-		value:curLevel.weight.weight, 
+		value:curLevel.weightSetPt, 
 		},
 		[
-		{eventType:'slide', obj:curLevel, func:curLevel.changeWeight},
+		{eventType:'slidechange', obj:curLevel, func:curLevel.changeWeightSetPt},
 		]
 	);
 	//$('#dashRun').append(makeButton(

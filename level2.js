@@ -40,9 +40,6 @@ level2.prototype = {
 		this.hideBase();
 		this.startIntro();	
 	},
-	foo: function(){
-		alert('hi');
-	},
 	startIntro: function(){
 		saveVals(this);
 		this.hideDash();
@@ -144,7 +141,7 @@ level2.prototype = {
 	moveWalls: function(){
 		var curPt = walls.pts[0][0].y;
 		curPt+=this.wallSpd*this.wallDir;
-		curPt = this.wallDir*Math.min(this.wallDir*curPt, this.wallDir*this.wallSetPt);//hey - wallV needs directionality
+		curPt = this.wallDir*Math.min(this.wallDir*curPt, this.wallDir*this.wallSetPt);
 		walls.pts[0][0].y=curPt;
 		walls.pts[0][1].y=curPt;
 		walls.pts[0][4].y=curPt;

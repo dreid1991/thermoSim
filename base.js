@@ -150,7 +150,7 @@ function makeButton(text, id){
 	newDiv.append( $('<button>').text(text).button() );
 	newDiv.attr({id:id});
 	return newDiv;
-}
+} 
 function addListener(object, typeName, funcName, func, destObj){
 	object[typeName + 'Listeners'][funcName] = {func:func, obj:destObj};
 }
