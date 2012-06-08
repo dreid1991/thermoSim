@@ -157,7 +157,7 @@ level4.prototype = {
 		2 = wall
 		m1vo1^2 + m2vo2^2 = m1v1^2 + m2v2^2
 		m1vo1 + m2vo2 = m1v1 + A*m2v2
-		where A = 1 + abs(wallV)^(.15)
+		where A = (abs(wallV)+1)^(.15)
 		leads to
 		a = m1 + m1^2/(A^2m2)
 		b = -2*vo1*m1^2/(A^2m2) - 2*vo2*m1/A^2
