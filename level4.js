@@ -163,7 +163,7 @@ level4.prototype = {
 		b = -2*vo1*m1^2/(A^2m2) - 2*vo2*m1/A^2
 		c = m1^2*vo1^2/(A^2*m2) + 2*m1*vo2*vo1/A^2 + m2*(vo2/A)^2 - m1*vo1^2 - m2*vo2^2
 		I recommend grouping squared terms in each block for faster computation
-		v1 = (-b +/- (b^2 - 4*a*c)^.5)/2a
+		v1 = (-b + (b^2 - 4*a*c)^.5)/2a
 		v2 = (m1*vo1 + m2*vo2 - m1*v1)/(m2*A)
 		*/
 		if(line[0]==0 && line[1]==0){
@@ -171,16 +171,15 @@ level4.prototype = {
 			var vo2 = this.wallV;
 			var m1 = dot.m;
 			var m2 = this.weight.weight;
-			var vo1Sqr = Math.pow(vo1,2);
-			var vo2Sqr = Math.pow(vo2,2);
+			var vo1Sqr = vo1*vo1;
+			var vo2Sqr = vo2*vo2;
 			
-			var m1Sqr = Math.pow(m1,2);
 			var scalar = Math.pow(Math.abs(vo2)+1, .15);
-			var scalarSqr = Math.pow(scalar, 2);
+			var scalarSqr = scalar*scalar
 			
 			var a = m1*(1 + m1/(scalarSqr*m2));
 			var b = -2*m1*(vo1*m1/(m2) + vo2)/scalarSqr;
-			var c = (m1Sqr*vo1Sqr/(m2) + 2*m1*vo2*vo1 + m2*vo2Sqr)/scalarSqr - m1*vo1Sqr - m2*vo2Sqr;
+			var c = (m1*(m1*vo1Sqr/m2 + 2*vo2*vo1) + m2*vo2Sqr)/scalarSqr - m1*vo1Sqr - m2*vo2Sqr;
 			
 			dot.v.dy = (-b + Math.pow(b*b - 4*a*c,.5))/(2*a);
 			dot.y = dot.y+dot.r;
