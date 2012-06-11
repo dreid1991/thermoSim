@@ -1,5 +1,4 @@
 function level2(){
-	
 	this.dataHandler = new DataHandler();
 	this.data = {};
 	this.data.t = [];
@@ -39,13 +38,16 @@ level2.prototype = {
 		this.hideText();
 		this.hideBase();
 		this.startIntro();	
+		$('#myCanvas').show();
 	},
 	startIntro: function(){
 		saveVals(this);
 		this.hideDash();
 		this.hideText();
 		this.hideBase();
-		$('#myCanvas').hide();
+
+		$('#canvasDiv').hide()
+		$('#display').show();
 		$('#textIntro').show();
 		$('#dashIntro').show();
 		emptyListener(this, "update");
@@ -54,9 +56,10 @@ level2.prototype = {
 	startSim: function(){
 		this.hideDash();
 		this.hideText();
+		$('#display').hide();
+		$('#canvasDiv').show()
 		$('#dashRun').show();
-		$('#myCanvas').show();
-		$('#base').show();
+		$('#base').show()
 		showCurQ();
 		emptyListener(this, "update");
 		emptyListener(this, "data");
@@ -75,7 +78,8 @@ level2.prototype = {
 		this.hideDash();
 		this.hideText();
 		this.hideBase();
-		$('#myCanvas').hide();
+		$('#canvasDiv').hide()
+		$('#display').show();
 		$('#textOutro').show();	
 		$('#dashOutro').show();
 		emptyListener(this, "update");

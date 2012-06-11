@@ -8,17 +8,15 @@ drawingTools.prototype = {
 	},
 	dots: function(){
 		for (var spcIdx = 0; spcIdx<spcs.length; spcIdx++){
-			var spc = spcs[spcIdx];
-			c.fillStyle = "rgb(" + spc.cols.r + "," + spc.cols.g + "," + spc.cols.b + ")";
-			for (var dotIdx = 0; dotIdx<spc.dots.length; dotIdx++){
-				var dot = spc.dots[dotIdx];
+			c.fillStyle = "rgb(" + spcs[spcIdx].cols.r + "," + spcs[spcIdx].cols.g + "," + spcs[spcIdx].cols.b + ")";
+			for (var dotIdx = 0; dotIdx<spcs[spcIdx].dots.length; dotIdx++){
+				var dot = spcs[spcIdx].dots[dotIdx];
 				c.beginPath();
-				c.arc(dot.x,dot.y,dot.r,0,Math.PI*2,true);
+				c.arc(spcs[spcIdx].dots[dotIdx].x,spcs[spcIdx].dots[dotIdx].y,spcs[spcIdx].dots[dotIdx].r,0,Math.PI*2,true);
 				c.closePath();
 				c.fill();	
 			}
 		}
-
 	},
 	walls: function(walls){
 		c.beginPath()
@@ -242,11 +240,32 @@ $(function(){
 	c.strokeStyle = 'white';
 })
 
+mousePos = P(0,0)
+$(document).mousemove(function(e){
+	mousePos.x = e.pageX-myCanvas.offsetLeft;
+	mousePos.y = e.pageY-myCanvas.offsetTop;
+	for (var mousemoveListener in curLevel.mousemoveListeners){
+		var listener = curLevel.mousemoveListeners[mousemoveListener]
+		listener.func.apply(listener.obj);
+	}	
+})
+$(document).mousedown(function(e){
+	for (var mousedownListener in curLevel.mousedownListeners){
+		var listener = curLevel.mousedownListeners[mousedownListener]
+		listener.func.apply(listener.obj);
+	}		
+})
+$(document).mouseup(function(e){
+	for (var mouseupListener in curLevel.mouseupListeners){
+		var listener = curLevel.mouseupListeners[mouseupListener]
+		listener.func.apply(listener.obj);
+	}	
+})
 
 var spcs = [];
 draw = new drawingTools();
 collide = new CollideHandler();
-canvasHeight = 450;
+
 tempScalar = 100;
 updateInterval = 35;
 dataInterval = 1000;

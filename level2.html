@@ -8,9 +8,11 @@
 	<div id='mainHseader' class='header'>
 		Ribbon
 	</div>
-	<div id='display' class='display'>
+	<div id='canvasDiv' class='canvasDiv'>
 		<canvas id='myCanvas'>
 		</canvas>
+	</div>
+	<div id='display' class='display'>
 		<div id='textIntro' class='displayText'>
 			Apple snapchop warlock grinning but not why.
 		</div>
@@ -64,6 +66,7 @@
 <script src = 'raphael-min.js'></script>
 <script type = 'text/javascript'>
 var curLevel;
+canvasHeight = 450;
 $(function(){
 	myCanvas.height = canvasHeight;
 	curLevel = new level2();

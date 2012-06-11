@@ -19,6 +19,11 @@
 	border-color:#b3b2b1;
 	
 }
+.canvasDiv{
+	border-top: 3px solid;
+	border-bottom:3px solid;
+	border-color:#b3b2b1;	
+}
 .displayText{
 	font-size:large;
 	color:white;
@@ -40,6 +45,14 @@
 	color:white;
 	padding:10px;
 }	
+.bottomRound{
+	height:10px;
+	border-bottom-left-radius:20px;
+	border-bottom-right-radius:20px;
+	background-color:#05111a;
+	color:white;
+	padding:10px;
+}
 .borderedBlock{
 	background-color:#05111a;
 	border-top: 3px solid;

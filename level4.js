@@ -1,5 +1,4 @@
 function level4(){
-	
 	this.dataHandler = new DataHandler();
 	this.data = {};
 	this.data.t = [];
@@ -12,6 +11,9 @@ function level4(){
 	this.dataListeners = {};//{run:this.dataRun, pause:this.dataPause};
 	this.wallImpactListeners = {};
 	this.dotImpactListeners = {};
+	this.mousedownListeners = {};
+	this.mouseupListeners = {};
+	this.mousemoveListeners = {};
 	this.buttons = {};
 	this.sliders = {};
 	this.savedVals = {};
@@ -25,15 +27,19 @@ function level4(){
 	var heaterY = 400;
 	var heaterWidth = 50;
 	var heaterHeight = 30;
+	
+	this.dragWeights = new DragWeights([{name:'sml', count:15, weight:2}, 
+									{name:'med', count:5, weight:6}, 
+									{name:'lrg', count:2, weight:15}
+									],
+									walls.pts[0][2].y,
+									function(){return walls.pts[0][0].y},
+									myCanvas.height-15,
+									Col(218, 187, 41),
+									Col(150, 150, 150)
+									);
+	this.weight = function(){return this.dragWeights.pistonWeight};
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
-	this.weightMin=15;
-	this.weightMax=60;
-	this.weightSetPt=(this.weightMin+this.weightMax)/2;
-	this.weightSpd=6;
-	var weightInit = 17;
-	var diff = this.weightSetPt-weightInit;
-	this.weightDir = Math.abs(diff)/diff;
-	this.weight = new Weight(250,75,.5,this.weightMin,this.weightMax, weightInit);
 	walls.setup();
 	this.minY = 25;
 	this.maxY = walls.pts[0][2].y-75;
@@ -41,21 +47,25 @@ function level4(){
 	collide.setup();
 }
 
-
 level4.prototype = {
+
 	init: function(){
 		this.addDots();
 		this.hideDash();
 		this.hideText();
 		this.hideBase();
-		this.startIntro();	
+		this.startIntro();
+		this.dragWeights.init();
+		$('#myCanvas').show();
 	},
 	startIntro: function(){
 		saveVals(this);
 		this.hideDash();
 		this.hideText();
 		this.hideBase();
-		$('#myCanvas').hide();
+		$('#canvasDiv').hide()
+
+		$('#display').show();
 		$('#textIntro').show();
 		$('#dashIntro').show();
 		emptyListener(this, "update");
@@ -64,13 +74,14 @@ level4.prototype = {
 	startSim: function(){
 		this.hideDash();
 		this.hideText();
+		$('#canvasDiv').show()
+		$('#display').hide();
 		$('#dashRun').show();
-		$('#myCanvas').show();
+
 		$('#base').show();
 		showCurQ();
-		emptyListener(this, "update");
 		emptyListener(this, "data");
-		addListener(this, 'update', 'updateChangeWeight', this.updateRunChangeWeight, this);
+		addListener(this, 'update', 'run', this.updateRun, this);
 		addListener(this, "data", "run", this.dataRun, this);
 		addListener(this, 'wallImpact', 'moving', this.onWallImpact, this);
 		addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
@@ -85,10 +96,11 @@ level4.prototype = {
 		this.hideDash();
 		this.hideText();
 		this.hideBase();
-		$('#myCanvas').hide();
+		$('#canvasDiv').hide()
+		$('#display').show();
 		$('#textOutro').show();	
 		$('#dashOutro').show();
-		emptyListener(this, "update");
+		removeListener(this, 'update', 'run');
 		emptyListener(this, "data");
 		this.drawDashOut();
 		this.textBox = new MainTextBox(this.outroText);
@@ -111,28 +123,8 @@ level4.prototype = {
 		this.addGravity();	
 		this.checkDotHits(); 
 		this.checkWallHits();
+		this.dragWeights.moveWeightsOnPiston();
 		this.drawRun();
-	},
-	updateRunChangeWeight: function(){
-		move();
-		this.moveWalls();
-		this.adjustWeight();
-		this.addGravity();	
-		this.checkDotHits(); 
-		this.checkWallHits();
-		this.drawRun();
-		if(this.weight.weight==this.weightSetPt){
-			this.revertToFixedWeight()
-		}
-	},
-	revertToFixedWeight: function(){
-		emptyListener(this, 'update');
-		addListener(this, 'update', 'run', this.updateRun, this);
-	},
-	adjustWeight: function(){
-		var curWeight = this.weight.weight + this.weightSpd*this.weightDir;
-		curWeight = this.weightDir*Math.min(this.weightDir*curWeight, this.weightDir*this.weightSetPt);		
-		this.weight.changeWeight(curWeight);
 	},
 	addGravity: function(){
 		this.wallV += this.g;
@@ -142,7 +134,7 @@ level4.prototype = {
 		draw.dots();
 		draw.walls(walls);
 		//draw.fillPts(walls.pts[1], this.heater.col);
-		draw.fillPts(this.weight.pts, this.weight.col);
+		this.dragWeights.draw();
 	},
 	checkDotHits: function(){
 		collide.check();
@@ -157,7 +149,7 @@ level4.prototype = {
 		2 = wall
 		m1vo1^2 + m2vo2^2 = m1v1^2 + m2v2^2
 		m1vo1 + m2vo2 = m1v1 + A*m2v2
-		where A = (abs(wallV)+1)^(.15)
+		where A = (abs(wallV)+1)^(const, maybe .1 to .3)
 		leads to
 		a = m1 + m1^2/(A^2m2)
 		b = -2*vo1*m1^2/(A^2m2) - 2*vo2*m1/A^2
@@ -170,11 +162,11 @@ level4.prototype = {
 			var vo1 = dot.v.dy;
 			var vo2 = this.wallV;
 			var m1 = dot.m;
-			var m2 = this.weight.weight;
+			var m2 = this.weight();
 			var vo1Sqr = vo1*vo1;
 			var vo2Sqr = vo2*vo2;
 			
-			var scalar = Math.pow(Math.abs(vo2)+1, .15);
+			var scalar = Math.pow(Math.abs(vo2)+1, .2);
 			var scalarSqr = scalar*scalar
 			
 			var a = m1*(1 + m1/(scalarSqr*m2));
@@ -236,7 +228,6 @@ level4.prototype = {
 			wall[wall.length-1].y = unboundedY;
 			dyWeight = unboundedY - lastY;
 		}
-		this.weight.move(V(0,dyWeight));
 		walls.setupWall(0);
 	},
 	changeTemp: function(sliderVal){

@@ -8,9 +8,12 @@
 	<div id='mainHseader' class='header'>
 		Ribbon
 	</div>
-	<div id='display' class='display'>
+	<div id='canvasDiv' class='canvasDiv'>
 		<canvas id='myCanvas'>
 		</canvas>
+	</div>
+	<div id='display' class='display'>
+		
 		<div id='textIntro' class='displayText'>
 			I'm a whole bunch of text.  Look at meeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.
 		</div>
@@ -26,10 +29,7 @@
 		</center>
 		
 	</div>
-	<div id='dashRun' class='dash'>
-		running
-		<div id='sliderWeight' style='width:300px'></div> 
-		
+	<div id='dashRun' class='bottomRound'>
 	</div>
 	<div id='dashOutro' class='dash'>
 		<center>
@@ -61,28 +61,15 @@
 <script src = 'raphael-min.js'></script>
 <script type = 'text/javascript'>
 var curLevel;
+canvasHeight = 560;
 $(function(){
 	myCanvas.height = canvasHeight;
 	curLevel = new level4();
 	curLevel.init();
 	addQDivs();
-	//$('#sliderWeight').css({width:'300px'});
 	$('button').button();
 	$('#toSim').click(function(){curLevel.startSim()});
 	$('#submit').click(function(){submit()});
-	makeSlider(
-		"sliderWeight", 
-		{
-		min:curLevel.weight.weightMin, 
-		max:curLevel.weight.weightMax, 
-		value:curLevel.weightSetPt, 
-		},
-		[
-		{eventType:'slidechange', obj:curLevel, func:curLevel.changeWeightSetPt},
-		]
-	);
-	//$('#dashRun').append(makeButton(
-	//	"
 });
 
 myCanvas.width = $('#main').width();

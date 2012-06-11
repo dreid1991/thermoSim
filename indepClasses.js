@@ -1,8 +1,5 @@
 
-$(document).mousemove(function(e){
-	mousePos.x = e.pageX;
-	mousePos.y = e.pageY;
-})
+
 function Dot(x, y, v, mass, radius, name){
 	this.x = x;
 	this.y = y;
@@ -86,4 +83,3 @@ Dot.prototype = {
 		return this.KE()*updateInterval*updateInterval/tempScalar;
 	}
 }
-mousePos = P(0,0)
