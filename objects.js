@@ -225,19 +225,19 @@ DragWeights.prototype = {
 		var numCols = Math.floor(this.pistonBinWidth/(dims.dx + this.blockSpacing));
 		var usedWidth = numCols*(dims.dx+this.blockSpacing);
 		var unusedWidth = this.pistonBinWidth-usedWidth;
-		x+=unusedWidth/2;
+		startX = x + unusedWidth/2;
 		var numRows = Math.ceil(numSlots/numCols);
 		var slots = [];
 		var yOffset = this.blockSpacing;
 		for (var rowIdx=0; rowIdx<numRows; rowIdx++){
 			var row = [];
-			var x = x + this.blockSpacing;
+			var blockX = startX + this.blockSpacing;
 			for (var colIdx=0; colIdx<numCols; colIdx++){
 				var fy = this.pistonMinusVal(yOffset);
 				var isFull = new Boolean();
 				var isFull = false;
-				row.push(this.newSlot(isFull, x, fy, weightGroup.name, 'pistonBins', rowIdx, colIdx));
-				x += dims.dx+this.blockSpacing;
+				row.push(this.newSlot(isFull, blockX, fy, weightGroup.name, 'pistonBins', rowIdx, colIdx));
+				blockX += dims.dx+this.blockSpacing;
 			}
 			slots.push(row);
 			yOffset += dims.dy+this.blockSpacing;
@@ -304,8 +304,14 @@ DragWeights.prototype = {
 			var dy = dest.y-weight.pos.y;
 			if(dx!=0 || dy!=0){
 				var dirUV = V(dx,dy).UV();
-				var signX = Math.abs(dx)/dx;
-				var signY = Math.abs(dy)/dy;
+				var signX=1;
+				var signY=1;
+				if(dx!=0){
+					var signX = Math.abs(dx)/dx;
+				}
+				if(dy!=0){
+					var signY = Math.abs(dy)/dy;
+				}
 				var nextX = weight.pos.x + this.moveSpeed*dirUV.dx;
 				var nextY = weight.pos.y + this.moveSpeed*dirUV.dy;
 				weight.pos.x = signX*Math.min(signX*dest.x, signX*nextX);
@@ -329,8 +335,14 @@ DragWeights.prototype = {
 			var dy = dest.y()-weight.pos.y;
 			if (dx!=0 || dy!=0){
 				var dirUV = V(dx,dy).UV();
-				var signX = Math.abs(dx)/dx;
-				var signY = Math.abs(dy)/dy;
+				var signX=1;
+				var signY=1;
+				if(dx!=0){
+					var signX = Math.abs(dx)/dx;
+				}
+				if(dy!=0){
+					var signY = Math.abs(dy)/dy;
+				}
 				var nextX = weight.pos.x + this.moveSpeed*dirUV.dx;
 				var nextY = weight.pos.y + this.moveSpeed*dirUV.dy;		
 				weight.pos.x = signX*Math.min(signX*dest.x, signX*nextX);
