@@ -115,6 +115,7 @@ Graph.prototype = {
 			var yPt = this.data.y[this.data.y.length-1]
 			this.drawPt(xPt, yPt);
 		}
+		this.flashLast();
 	},
 	plotData: function(xVals, yVals){
 		if (xVals.length==yVals.length && xVals.length>1){
@@ -136,7 +137,7 @@ Graph.prototype = {
 				var yPt = this.data.y[this.data.y.length-1]
 				this.drawPt(xPt, yPt);
 			}
-			//this.flashLast();
+			
 
 		} else if (xVals.length!=yVals.length){
 			console.log("xVals has ", xVals.length, "entries");
