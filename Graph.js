@@ -15,11 +15,9 @@ function Graph(x, y, width, height, xLabel, yLabel, pointColor, flashColor){
 	this.data = {x:[], y:[]};
 	this.xRange = {min:0, max:0};
 	this.yRange = {min:0, max:0};
-	this.xAxisMin;
-	this.xAxisMax;
+	this.xAxisRange = {min:0, max:0};
+	this.yAxisRange = {min:0, max:0};
 	this.xStepSize;
-	this.yAxisMin;
-	this.yAxisMax;
 	this.yStepSize;
 	this.gridCol = "#484848";
 	this.textCol = "white";
@@ -151,12 +149,12 @@ Graph.prototype = {
 			var unroundStepX = rangeX/(this.numXGridLines-1);
 			var expStepX = Math.pow(10, Math.floor(log10(unroundStepX)))
 			this.xStepSize = Math.ceil(unroundStepX/expStepX)*expStepX;
-			this.xAxisMin = Math.floor(this.xRange.min/this.xStepSize)*this.xStepSize;
-			this.xAxisMax = this.xAxisMin + this.numXGridLines*this.xStepSize;
+			this.xAxisRange.min = Math.floor(this.xRange.min/this.xStepSize)*this.xStepSize;
+			this.xAxisRange.max = this.xAxisRange.min + this.numXGridLines*this.xStepSize;
 		}else{
-			this.xAxisMin = Math.floor(this.xRange.min);
+			this.xAxisRange.min = Math.floor(this.xRange.min);
 			this.xStepSize = .2;
-			this.xAxisMax = this.xAxisMin + this.xStepSize*this.numXGridLines;	
+			this.xAxisRange.max = this.xAxisRange.min + this.xStepSize*this.numXGridLines;	
 		}
 		
 		var rangeY = Math.abs(this.yRange.max-this.yRange.min);
@@ -164,12 +162,12 @@ Graph.prototype = {
 			var unroundStepY = rangeY/(this.numYGridLines-1);
 			var expStepY = Math.pow(10, Math.floor(log10(unroundStepY)))
 			this.yStepSize = Math.ceil(unroundStepY/expStepY)*expStepY;
-			this.yAxisMin = Math.floor(this.yRange.min/this.yStepSize)*this.yStepSize;
-			this.yAxisMax = this.yAxisMin + this.numYGridLines*this.yStepSize;
+			this.yAxisRange.min = Math.floor(this.yRange.min/this.yStepSize)*this.yStepSize;
+			this.yAxisRange.max = this.yAxisRange.min + this.numYGridLines*this.yStepSize;
 		}else{
-			this.yAxisMin = Math.floor(this.yRange.min);
+			this.yAxisRange.min = Math.floor(this.yRange.min);
 			this.yStepSize = .2;
-			this.yAxisMax = this.yAxisMin + this.yStepSize*this.numYGridLines;	
+			this.yAxisRange.max = this.yAxisRange.min + this.yStepSize*this.numYGridLines;	
 			
 		}
 	},
@@ -178,7 +176,7 @@ Graph.prototype = {
 		for (var xGridIdx=0; xGridIdx<this.numXGridLines; xGridIdx++){
 			var xPos = this.xStart*this.width + this.gridSpacing*xGridIdx;
 			var yPos = this.yStart*this.height + this.hashMarkLen + 10;
-			var val = String(round(this.xAxisMin + this.xStepSize*xGridIdx, 1));
+			var val = String(round(this.xAxisRange.min + this.xStepSize*xGridIdx, 1));
 			this.axisVals.push(this.graph.text(xPos, yPos, val));
 			var last = this.axisVals[this.axisVals.length-1]
 			last.attr("fill", this.textCol);
@@ -187,7 +185,7 @@ Graph.prototype = {
 		for (var yGridIdx=0; yGridIdx<this.numYGridLines; yGridIdx++){
 			var yPos = this.yStart*this.height - this.gridSpacing*yGridIdx;
 			var xPos = this.xStart*this.width - this.hashMarkLen - 10;
-			var val = String(round(this.yAxisMin + this.yStepSize*yGridIdx,1));
+			var val = String(round(this.yAxisRange.min + this.yStepSize*yGridIdx,1));
 			this.axisVals.push(this.graph.text(xPos, yPos, val));
 			var last = this.axisVals[this.axisVals.length-1]
 			last.attr("fill", this.textCol);
@@ -212,10 +210,10 @@ Graph.prototype = {
 		}
 	},
 	drawPt: function(xVal, yVal){
-		var xRange = this.xAxisMax-this.xAxisMin;
-		var yRange = this.yAxisMax-this.yAxisMin;
-		var xPt = Math.abs(this.xEnd-this.xStart)*this.width*(xVal-this.xAxisMin)/xRange + this.xStart*this.width;
-		var yPt = this.height - (1-this.yStart)*this.height - Math.abs(this.yEnd-this.yStart)*this.height*(yVal-this.yAxisMin)/yRange;
+		var xRange = this.xAxisRange.max-this.xAxisRange.min;
+		var yRange = this.yAxisRange.max-this.yAxisRange.min;
+		var xPt = Math.abs(this.xEnd-this.xStart)*this.width*(xVal-this.xAxisRange.min)/xRange + this.xStart*this.width;
+		var yPt = this.height - (1-this.yStart)*this.height - Math.abs(this.yEnd-this.yStart)*this.height*(yVal-this.yAxisRange.min)/yRange;
 		this.pts.push(this.graph.circle(xPt, yPt, this.pointSize));
 		var last = this.pts[this.pts.length-1]
 		last.attr("fill",this.pointCol);
