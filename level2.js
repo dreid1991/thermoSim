@@ -169,10 +169,13 @@ level2.prototype = {
 	dataRun: function(){
 		this.data.p.push(this.dataHandler.pressure(this.fTurn));
 		this.data.t.push(this.dataHandler.temp());
-		this.data.v.push(this.dataHandler.volOneWall());
+		this.data.v.push(this.dataHandler.volPolyWall());
 		this.fTurn = 0;
-		this.pVSv.plotData(this.data.v, this.data.p);
-		this.tVSv.plotData(this.data.v, this.data.t);
+		vLast = this.data.v[this.data.v.length-1];
+		pLast = this.data.p[this.data.p.length-1];
+		tLast = this.data.t[this.data.t.length-1];
+		this.pVSv.addPt(vLast, pLast);
+		this.tVSv.addPt(vLast, tLast);
 	},
 	changeWallSetPt: function(event, ui){
 		this.wallSetPt = ui.value;

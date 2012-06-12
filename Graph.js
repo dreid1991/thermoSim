@@ -12,14 +12,9 @@ function Graph(x, y, width, height, xLabel, yLabel, pointColor, flashColor){
 	this.numYGridLines = Math.ceil(this.height*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
 	this.axisVals = [];
 	this.pts = [];
-	this.xMin;
-	this.xMax;
-	this.yMin;
-	this.yMax;
-	this.xMinLast;
-	this.xMaxLast;
-	this.yMinLast;
-	this.yMaxLast;
+	this.data = {x:[], y:[]};
+	this.xRange = {min:0, max:0};
+	this.yRange = {min:0, max:0};
 	this.xAxisMin;
 	this.xAxisMax;
 	this.xStepSize;
@@ -98,27 +93,48 @@ Graph.prototype = {
 		this.xLabel.attr("font-size",this.axisLabelFontSize);	
 		this.yLabel.attr("font-size",this.axisLabelFontSize);	
 	},
+	addPt: function(x, y){
+		this.data.x.push(x);
+		this.data.y.push(y);
+		var mustRedraw = new Boolean();
+		mustRedraw = false;
+		if(x>this.xRange.max || x<this.xRange.min){
+			this.xRange = this.range(this.data.x);
+			mustRedraw = true;
+		}
+		if(y>this.yRange.max || y<this.yRange.min){
+			this.yRange = this.range(this.data.y);
+			mustRedraw = true;
+		}
+		if(mustRedraw){
+			this.getAxisBounds();
+			this.drawAxisVals();
+			this.drawPts();		
+		} else{
+			var xPt = this.data.x[this.data.x.length-1]
+			var yPt = this.data.y[this.data.y.length-1]
+			this.drawPt(xPt, yPt);
+		}
+	},
 	plotData: function(xVals, yVals){
 		if (xVals.length==yVals.length && xVals.length>1){
-			var xRange = this.range(xVals);
-			this.xMinLast = this.xMin;
-			this.xMaxLast = this.xMax;
-			this.yMinLast = this.yMin;
-			this.yMaxLast = this.yMax;
-			this.xMin = xRange[0];
-			this.xMax = xRange[1];
-			var yRange = this.range(yVals);
-			this.yMin = yRange[0];
-			this.yMax = yRange[1];
-			if(this.xMinLast!=this.xMin || this.xMaxLast!=this.xMax || this.yMinLast!=this.yMin || this.yMaxLast!=this.yMax){
+			this.data.x = xVals;
+			this.data.y = yVals;
+			var xRange = this.range(this.data.x);
+			var yRange = this.range(this.data.y);
+			var mustRedraw = new Boolean();
+			mustRedraw = (xRange.min!=this.xRange.min || xRange.max!=this.xRange.max || yRange.min!=this.yRange.min || yRange.max!=this.yRange.max);
+			if(mustRedraw){
+				this.xRange = xRange;
+				this.yRange = yRange;
 				this.getAxisBounds();
 				this.drawAxisVals();
-				this.drawPts(xVals, yVals);
+				this.drawPts();
 
 			} else{
-				var xVal = xVals[xVals.length-1];
-				var yVal = yVals[yVals.length-1];
-				this.drawPt(xVal, yVal);
+				var xPt = this.data.x[this.data.x.length-1]
+				var yPt = this.data.y[this.data.y.length-1]
+				this.drawPt(xPt, yPt);
 			}
 			//this.flashLast();
 
@@ -128,29 +144,29 @@ Graph.prototype = {
 			console.log("UH-OH");
 		};
 	},
-	getAxisBounds: function(){		/*tr means truncated*/
-		var rangeX = this.xMax-this.xMin;
+	getAxisBounds: function(){		
+		var rangeX = this.xRange.max-this.xRange.min;
 		if(rangeX!=0){
 			var unroundStepX = rangeX/(this.numXGridLines-1);
 			var expStepX = Math.pow(10, Math.floor(log10(unroundStepX)))
 			this.xStepSize = Math.ceil(unroundStepX/expStepX)*expStepX;
-			this.xAxisMin = Math.floor(this.xMin/this.xStepSize)*this.xStepSize;
+			this.xAxisMin = Math.floor(this.xRange.min/this.xStepSize)*this.xStepSize;
 			this.xAxisMax = this.xAxisMin + this.numXGridLines*this.xStepSize;
 		}else{
-			this.xAxisMin = Math.floor(this.xMin);
+			this.xAxisMin = Math.floor(this.xRange.min);
 			this.xStepSize = .2;
 			this.xAxisMax = this.xAxisMin + this.xStepSize*this.numXGridLines;	
 		}
 		
-		var rangeY = Math.abs(this.yMax-this.yMin);
+		var rangeY = Math.abs(this.yRange.max-this.yRange.min);
 		if(rangeY!=0){
 			var unroundStepY = rangeY/(this.numYGridLines-1);
 			var expStepY = Math.pow(10, Math.floor(log10(unroundStepY)))
 			this.yStepSize = Math.ceil(unroundStepY/expStepY)*expStepY;
-			this.yAxisMin = Math.floor(this.yMin/this.yStepSize)*this.yStepSize;
+			this.yAxisMin = Math.floor(this.yRange.min/this.yStepSize)*this.yStepSize;
 			this.yAxisMax = this.yAxisMin + this.numYGridLines*this.yStepSize;
 		}else{
-			this.yAxisMin = Math.floor(this.yMin);
+			this.yAxisMin = Math.floor(this.yRange.min);
 			this.yStepSize = .2;
 			this.yAxisMax = this.yAxisMin + this.yStepSize*this.numYGridLines;	
 			
@@ -186,11 +202,11 @@ Graph.prototype = {
 		}
 		this.axisVals = [];
 	},
-	drawPts: function(xVals, yVals){
+	drawPts: function(){
 		this.removePts();
-		for (var ptIdx=0; ptIdx<xVals.length; ptIdx++){
-			var xVal = xVals[ptIdx];
-			var yVal = yVals[ptIdx];
+		for (var ptIdx=0; ptIdx<this.data.x.length; ptIdx++){
+			var xVal = this.data.x[ptIdx];
+			var yVal = this.data.y[ptIdx];
 			this.drawPt(xVal, yVal);
 		}
 	},
@@ -224,7 +240,7 @@ Graph.prototype = {
 			min = Math.min(min, listVal);
 			max = Math.max(max, listVal);
 		}
-		return [min, max];
+		return {min:min, max:max};
 	},
 	remove: function(){
 		this.removePts();

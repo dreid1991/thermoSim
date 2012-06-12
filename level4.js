@@ -19,8 +19,8 @@ function level4(){
 	this.savedVals = {};
 	this.curQ = 0;
 	this.qa=[
-		{q:'Alligators: Snout or prickles?  Explain using incomplete sentences.'},
-		{q:'How many spots does a proper Irishman have?'},
+		{q:"I'm a question"},
+		{q:"I'm another question"},
 	]
 	this.g = 100*updateInterval/1000;
 	var heaterX = 200;
@@ -194,8 +194,11 @@ level4.prototype = {
 		this.data.t.push(this.dataHandler.temp());
 		this.data.v.push(this.dataHandler.volPolyWall());
 		this.fTurn = 0;
-		this.pVSv.plotData(this.data.v, this.data.p);
-		this.tVSv.plotData(this.data.v, this.data.t);
+		vLast = this.data.v[this.data.v.length-1];
+		pLast = this.data.p[this.data.p.length-1];
+		tLast = this.data.t[this.data.t.length-1];
+		this.pVSv.addPt(vLast, pLast);
+		this.tVSv.addPt(vLast, tLast);
 	},
 	vol: function(){
 		return walls.area(0);// - walls.area(1);
@@ -229,16 +232,6 @@ level4.prototype = {
 			dyWeight = unboundedY - lastY;
 		}
 		walls.setupWall(0);
-	},
-	changeTemp: function(sliderVal){
-		this.heater.changeTemp(sliderVal);
-	},
-	changeWeightSetPt: function(event, ui){
-		this.weightSetPt = ui.value;
-		emptyListener(this, 'update');
-		addListener(this, 'update', 'updateChangeWeight', this.updateRunChangeWeight, this);
-		var diff = this.weightSetPt - this.weight.weight;
-		this.weightDir = Math.abs(diff)/diff;
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();
