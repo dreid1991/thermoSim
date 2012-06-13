@@ -18,8 +18,8 @@ function level2(){
 	this.savedVals = {};
 	this.curQ = 0;
 	this.qa=[
-		{q:'Or is it just a ruse?  Answer in nearly complete sentances.'},
-		{q:'Is this really level 2?'},
+		{q:'A tricky question'},
+		{q:'An even trickier question'},
 	]
 	walls.setup();
 	this.yMin = 25;
@@ -169,7 +169,7 @@ level2.prototype = {
 	dataRun: function(){
 		this.data.p.push(this.dataHandler.pressure(this.fTurn));
 		this.data.t.push(this.dataHandler.temp());
-		this.data.v.push(this.dataHandler.volPolyWall());
+		this.data.v.push(this.dataHandler.volOneWall());
 		this.fTurn = 0;
 		vLast = this.data.v[this.data.v.length-1];
 		pLast = this.data.p[this.data.p.length-1];

@@ -22,12 +22,11 @@ function Graph(x, y, width, height, xLabel, yLabel, pointColor, flashColor){
 	this.gridCol = "#484848";
 	this.textCol = "white";
 	this.pointCol = pointColor;
-	this.flashCol = flashColor;
+	this.flash = {col:flashColor, size: 1.5};
 	this.graphBoundCol = "white";
-	this.pointSize = 4;
+	this.rectSideLen = 8;
 	this.axisLabelFontSize = 15;
 	this.axisValFontSize = 11;
-	this.flashAnim = Raphael.animation({r: this.pointSize, fill:this.pointCol}, .15e3)
 	this.graph = Raphael(x, y, this.width, this.height);
 	this.drawBGRect()
 	this.drawBounds()
@@ -119,24 +118,11 @@ Graph.prototype = {
 		if (xVals.length==yVals.length && xVals.length>1){
 			this.data.x = xVals;
 			this.data.y = yVals;
-			var xRange = this.range(this.data.x);
-			var yRange = this.range(this.data.y);
-			var mustRedraw = new Boolean();
-			mustRedraw = (xRange.min!=this.xRange.min || xRange.max!=this.xRange.max || yRange.min!=this.yRange.min || yRange.max!=this.yRange.max);
-			if(mustRedraw){
-				this.xRange = xRange;
-				this.yRange = yRange;
-				this.getAxisBounds();
-				this.drawAxisVals();
-				this.drawPts();
-
-			} else{
-				var xPt = this.data.x[this.data.x.length-1]
-				var yPt = this.data.y[this.data.y.length-1]
-				this.drawPt(xPt, yPt);
-			}
-			
-
+			this.xRange = this.range(this.data.x);
+			this.yRange = this.range(this.data.y);
+			this.getAxisBounds();
+			this.drawAxisVals();
+			this.drawPts();
 		} else if (xVals.length!=yVals.length){
 			console.log("xVals has ", xVals.length, "entries");
 			console.log("yVals has ", yVals.length, "entries");
@@ -214,15 +200,27 @@ Graph.prototype = {
 		var yRange = this.yAxisRange.max-this.yAxisRange.min;
 		var xPt = Math.abs(this.xEnd-this.xStart)*this.width*(xVal-this.xAxisRange.min)/xRange + this.xStart*this.width;
 		var yPt = this.height - (1-this.yStart)*this.height - Math.abs(this.yEnd-this.yStart)*this.height*(yVal-this.yAxisRange.min)/yRange;
-		this.pts.push(this.graph.circle(xPt, yPt, this.pointSize));
+		var halfSideLen = this.rectSideLen/2;
+		this.pts.push(this.graph.rect(xPt-halfSideLen, yPt-halfSideLen, this.rectSideLen, this.rectSideLen,1));
 		var last = this.pts[this.pts.length-1]
 		last.attr("fill",this.pointCol);
+		var trans = 'r45,'+xPt+','+yPt;
+		last.transform(trans);
 	},
 	flashLast: function(){
 		var pt = this.pts[this.pts.length-1];
-		pt.attr({r:1.5*this.pointSize, fill:this.flashCol});
-		pt.animate(this.flashAnim);
-		pt.attr({r:this.pointSize, fill:this.pointCol});
+		var height = pt.attrs.height;
+		var width = pt.attrs.width;
+		var changeDim = (this.flash.size-1)*height/2;
+		var x = pt.attrs.x;
+		var y = pt.attrs.y;
+		pt.attr({x:x-changeDim, y:y-changeDim, height:this.flash.size*height, width:this.flash.size*width, fill:this.flash.col})
+		var anim = this.animToNorm(x, y, width, height)
+		pt.animate(anim);
+		pt.attr({x:x, y:y, width:width, height:height, fill:this.pointCol});
+	},
+	animToNorm: function(x, y, width, height){
+		return Raphael.animation({x:x, y:y, width:width, height:height, fill:this.pointCol}, .15e3);
 	},
 	removePts: function(){
 		for (var ptIdx=0; ptIdx<this.pts.length; ptIdx++){
