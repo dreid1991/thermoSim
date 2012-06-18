@@ -7,7 +7,7 @@ function level4(){
 	this.data.v = [];
 	this.data.e = [];
 	this.numUpdates = 0;
-	walls = new WallHandler([[P(10,75), P(540,75), P(540,440), P(10,440)]])
+	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
 	this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
 	this.SAPExt = getLen(this.extPressurePts);
 	this.forceInternal = 0;
@@ -31,15 +31,17 @@ function level4(){
 	var heaterWidth = 50;
 	var heaterHeight = 30;
 	
-	this.dragWeights = new DragWeights([{name:'sml', count:15, weight:4}, 
-									{name:'med', count:5, weight:12}, 
-									{name:'lrg', count:2, weight:30}
+	this.dragWeights = new DragWeights([{name:'sml', count:15, mass:4}, 
+									{name:'med', count:5, mass:12}, 
+									{name:'lrg', count:2, mass:30}
 									],
 									walls.pts[0][2].y,
 									function(){return walls.pts[0][0].y},
 									myCanvas.height-15,
+									20,
 									Col(218, 187, 41),
-									Col(150, 150, 150)
+									Col(150, 150, 150),
+									function(){return curLevel.g}//This may not work.  curLevel if does not
 									);
 	this.mass = function(){return this.dragWeights.pistonWeight};
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
@@ -170,7 +172,7 @@ level4.prototype = {
 				var vo1Sqr = vo1*vo1;
 				var vo2Sqr = vo2*vo2;
 				
-				var scalar = Math.pow(Math.abs(vo2)+.3, .1);
+				var scalar = Math.pow(Math.abs(vo2)+.1, .2);
 				var scalarSqr = scalar*scalar
 				
 				var a = m1*(1 + m1/(scalarSqr*m2));
@@ -197,8 +199,8 @@ level4.prototype = {
 		//populate("spc1", 15, 15, myCanvas.width-400, myCanvas.height-150, 200, 4);
 		//populate("spc2", 75, 75, myCanvas.width-400, myCanvas.height-150, 20, 4);
 		//populate("spc3", 15, 15, myCanvas.width-400, myCanvas.height-150, 400, 4);		
-		populate("spc1", 20, 80, 500, 300, 800, 300);
-		populate("spc3", 20, 80, 500, 300, 600, 300);		
+		populate("spc1", 35, 80, 460, 350, 800, 300);
+		populate("spc3", 35, 80, 460, 350, 600, 300);		
 		//populate("spc2", 20, 80, 500, 300, 20, 300);
 	},
 	dataRun: function(){
