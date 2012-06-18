@@ -526,7 +526,7 @@ DragWeights.prototype = {
 		var dh = yMin-yMax;
 		var m = this.weightGroups[this.eBar.weight.name].mass;
 		var g = this.g();
-		this.drawEBarText(yDraw-15, round(m*g*dh/1000,1));
+		this.drawEBarText(this.pistonY()-15, round(m*g*dh/1000,1));
 		this.drawEBar(yMin, yMax, m, g);
 	},
 	pickup: function(weight){
