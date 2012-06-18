@@ -113,7 +113,6 @@ Graph.prototype = {
 		this.yLabel.attr("font-size",this.axisLabelFontSize);	
 	},
 	addPt: function(x, y, address){
-		console.log(address);
 		var data = this.data[address]
 		data.x.push(x);
 		data.y.push(y);
@@ -256,7 +255,6 @@ Graph.prototype = {
 	},
 	removePts: function(){
 		for (var set in this.data){
-			console.log(set);
 			var pts = this.data[set].pts;
 			for (var ptIdx=0; ptIdx<pts.length; ptIdx++){
 				pts[ptIdx].remove();

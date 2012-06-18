@@ -194,6 +194,13 @@ WallHandler.prototype = {
 		dot.x -= wallUV.dy
 		dot.y += wallUV.dx
 	},
+	impactNewExitV: function(dot, wallUV, perpV, exitV){
+		dot.v.dx -= wallUV.dy*(perpV+exitV);
+		dot.v.dy += wallUV.dx*(perpV+exitV);
+		dot.x -= wallUV.dy;
+		dot.y += wallUV.dx;
+		//console.log('x ', dot.x, ' y ',dot.y);
+	},
 	haveChecked: function(wall, list){
 		for (var listIdx=0; listIdx<list.length; listIdx++){
 			if(list[listIdx][0]==wall[0] && list[listIdx][1]==wall[1]){

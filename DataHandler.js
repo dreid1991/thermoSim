@@ -3,14 +3,10 @@ function DataHandler(){
 }
 DataHandler.prototype = {
 	pressureInt: function(forceInternal, numUpdates, SA){
-		var p = this.pConst*forceInternal/(numUpdates*SA);
-		console.log('pInt ',p);
-		return p;
+		return this.pConst*forceInternal/(numUpdates*SA);
 	},
 	pressureExt: function(weight, g, SA){
-		var p = this.pConst*weight*g/SA;
-		console.log('pExt ',p);
-		return p;
+		return this.pConst*weight*g/SA;
 	},
 	temp: function(){
 		//console.log("new");

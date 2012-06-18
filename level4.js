@@ -11,6 +11,8 @@ function level4(){
 	this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
 	this.SAPExt = getLen(this.extPressurePts);
 	this.forceInternal = 0;
+	this.wallVDrag = .80;
+	this.fricStore = 0;
 	this.wallV = 0;
 	this.updateListeners = {};//{run:this.updateRun, compress:this.updateCompress, expand:this.updateExpand, pause:this.updatePause};
 	this.dataListeners = {};//{run:this.dataRun, pause:this.dataPause};
@@ -124,6 +126,7 @@ level4.prototype = {
 		move();
 		this.moveWalls();
 		this.addGravity();	
+		this.wallDrag();
 		this.checkDotHits(); 
 		this.checkWallHits();
 		this.dragWeights.moveWeightsOnPiston();
@@ -131,6 +134,15 @@ level4.prototype = {
 	},
 	addGravity: function(){
 		this.wallV += this.g;
+	},
+	wallDrag: function(){
+		if(Math.abs(this.wallV)>1){
+			var eBefore = .5*this.wallV*this.wallV*this.mass();
+			this.wallV = this.wallV*this.wallVDrag*Math.abs(this.wallV)/Math.abs(this.wallV);
+			var eAfter = .5*this.wallV*this.wallV*this.mass();
+			this.fricStore+=eBefore - eAfter;
+		}
+		console.log(this.fricStore);
 	},
 	drawRun: function(){
 		draw.clear();
@@ -163,34 +175,19 @@ level4.prototype = {
 		*/
 		
 		if(line[0]==0 && line[1]==0){
-			if(Math.abs(this.wallV)>1.0){
-				var vo1 = dot.v.dy;
-				var vo2 = this.wallV;
-				var m1 = dot.m;
-				var m2 = this.mass();
-				var vo1Sqr = vo1*vo1;
-				var vo2Sqr = vo2*vo2;
-				
-				var scalar = Math.pow(Math.abs(vo2), .1);
-				var scalarSqr = scalar*scalar
-				
-				var a = m1*(1 + m1/(scalarSqr*m2));
-				var b = -2*m1*(vo1*m1/(m2) + vo2)/scalarSqr;
-				var c = (m1*(m1*vo1Sqr/m2 + 2*vo2*vo1) + m2*vo2Sqr)/scalarSqr - m1*vo1Sqr - m2*vo2Sqr;
-				
-				dot.v.dy = (-b + Math.pow(b*b - 4*a*c,.5))/(2*a);
-				dot.y = dot.y+dot.r;
-				this.wallV = (m1*vo1 + m2*vo2 - m1*dot.v.dy)/(m2*scalar);
-			}else{
-				var pt = walls.pts[line[0]][line[1]];
-				var dotVo = dot.v.dy;
-				var wallVo = this.wallV;
-				dot.v.dy = (dotVo*(dot.m-this.mass())+2*this.mass()*wallVo)/(dot.m+this.mass());
-				this.wallV = (wallVo*(this.mass()-dot.m)+2*dot.m*dotVo)/(this.mass()+dot.m);
-				dot.y = pt.y+dot.r;			
-			}
+			var pt = walls.pts[line[0]][line[1]];
+			var dotVo = dot.v.dy;
+			var wallVo = this.wallV;
+			dot.v.dy = (dotVo*(dot.m-this.mass())+2*this.mass()*wallVo)/(dot.m+this.mass());
+			this.wallV = (wallVo*(this.mass()-dot.m)+2*dot.m*dotVo)/(this.mass()+dot.m);
+			dot.y = pt.y+dot.r;			
+			
 		}else{
-			walls.impactStd(dot, wallUV, perpV);
+			var eChange = Math.min(2, this.fricStore);
+			this.fricStore-=eChange;
+			var exitV = Math.sqrt(perpV*perpV + 2*eChange/dot.m);
+			//walls.impactStd(dot, wallUV, perpV);
+			walls.impactNewExitV(dot, wallUV, perpV, exitV);
 			this.forceInternal += 2*dot.m*Math.abs(perpV);
 		}
 	},
@@ -208,7 +205,6 @@ level4.prototype = {
 		this.data.pExt.push(this.dataHandler.pressureExt(this.mass(), this.g, this.SAPExt));
 		this.data.t.push(this.dataHandler.temp());
 		this.data.v.push(this.dataHandler.volPolyWall());
-		console.log('force internal ',this.forceInternal);
 		this.forceInternal = 0;
 		vLast = this.data.v[this.data.v.length-1];
 		pIntLast = this.data.pInt[this.data.pInt.length-1];

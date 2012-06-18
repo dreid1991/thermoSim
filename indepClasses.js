@@ -80,6 +80,6 @@ Dot.prototype = {
 		return .5*this.m*vSqr;
 	},
 	temp: function(){
-		return this.KE()*updateInterval*updateInterval/tempScalar;
+		return this.KE()/tempScalar;
 	}
 }
