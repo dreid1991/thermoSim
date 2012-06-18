@@ -80,7 +80,7 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, weightCol, binCol){
 	this.binY = binY;
 	this.weightCol = weightCol;
 	this.binCol = binCol;
-	this.binHeight = 100;
+	this.binHeight = 70;
 	this.binSlant = 1.3;
 	this.dropBinWidth = 110;
 	this.dropBinSpacing = 60;
@@ -88,9 +88,9 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, weightCol, binCol){
 	this.pistonBinSpacing = 15;
 	this.blockSpacing = 2;
 	this.weightDimRatio = .5;
-	this.weightScalar = 80;
+	this.weightScalar = 40;
 	this.moveSpeed = 20;
-	this.pistonWeight = 10;
+	this.pistonWeight = 20;
 	this.moveToDropOrders = [];
 	this.moveToPistonOrders = [];
 	this.weightsOnPiston = [];
@@ -477,6 +477,6 @@ DragWeights.prototype = {
 		return true;
 	},
 	writeWeight: function(){
-		$('#dashRun').html('PUT ELSEWHERE.  Current weight: ' + String(this.pistonWeight))
+		//$('#dashRun').html('PUT ELSEWHERE.  Current weight: ' + String(this.pistonWeight))
 	}
 }
