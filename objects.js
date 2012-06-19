@@ -131,10 +131,9 @@ DragWeights.prototype = {
 			weightGroup.dims = weightDims[weightGroup.name];
 			weightGroup.mass = weightDef.mass;
 			weightGroup.weights = [];
-			//Yo yo, have a total weight variable in curLevel or weights.  Just have it reget the total piston weight every time blocks are moved.
 			for (var weightIdx=0; weightIdx<weightDef.count; weightIdx++){
 				var weight = {};
-				weight.pos = P(0,0);
+				weight.pos = P(300,500);
 				weight.name = weightDef.name;
 				weight.status = '';
 				weightGroup.weights.push(weight)
@@ -259,7 +258,12 @@ DragWeights.prototype = {
 			var weightGroup = this.weightGroups[group];
 			for (var weightIdx=0; weightIdx<weightGroup.weights.length; weightIdx++){
 				var weight = weightGroup.weights[weightIdx];
-				this.dropIntoBin(weight);
+				if(weight.status!='inBin'){
+					if(weight.status=='onPiston'){
+						this.takeOffPiston(weight);
+					}
+					this.dropIntoBin(weight);
+				}
 			}
 		}
 	},

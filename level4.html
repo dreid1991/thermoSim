@@ -31,7 +31,7 @@
 	</div>
 	<div id='dashRun' class='dashShort'>
 		<center>
-			<button id='another'>Another button</button>
+			<button id='reset'>Reset experiment</button>
 			<button id='clearGraphs'>Clear graphs</button>
 			
 		</center>
@@ -76,6 +76,7 @@ $(function(){
 	$('#toSim').click(function(){curLevel.startSim()});
 	$('#submit').click(function(){submit()});
 	$('#clearGraphs').click(function(){curLevel.clearGraphs()});
+	$('#reset').click(function(){curLevel.reset()});
 });
 
 myCanvas.width = $('#main').width();

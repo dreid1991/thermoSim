@@ -4,8 +4,8 @@ function CollideHandler(){
 CollideHandler.prototype = {
 	check: function(){
 		this.grid = $.extend(true,[],this.gridBlank);
-		for (var spcIdx=0; spcIdx<spcs.length; spcIdx++){
-			var spc = spcs[spcIdx];
+		for (var spcName in spcs){
+			var spc = spcs[spcName];
 			for (var dotIdx=0; dotIdx<spc.dots.length; dotIdx++){
 				var dot = spc.dots[dotIdx];
 				var gridX = Math.floor(dot.x/this.gridSize);
@@ -13,8 +13,7 @@ CollideHandler.prototype = {
 				for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, this.xSpan); x++){
 					for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, this.ySpan); y++){
 						for (var neighborIdx=0; neighborIdx<this.grid[x][y].length; neighborIdx++){
-							var neighborAddress = this.grid[x][y][neighborIdx];
-							var neighbor = spcs[neighborAddress[0]].dots[neighborAddress[1]];
+							var neighbor = this.grid[x][y][neighborIdx];
 							var dx = dot.x-neighbor.x;
 							var dy = dot.y-neighbor.y;
 							var distSqr = dx*dx+dy*dy;
@@ -29,7 +28,7 @@ CollideHandler.prototype = {
 					}
 				}
 				if(gridX>=0 && gridY>=0 && gridX<this.grid.length && gridY<this.grid[0].length){
-					this.grid[gridX][gridY].push([spcIdx, dotIdx]);
+					this.grid[gridX][gridY].push(dot);
 				}
 				
 			}
@@ -77,8 +76,8 @@ CollideHandler.prototype = {
 	},
 	getMaxR: function(){
 		var maxR = 0;
-		for (var spcIdx=0; spcIdx<spcs.length; spcIdx++){
-			var spc = spcs[spcIdx];
+		for (var spcName in spcs){
+			var spc = spcs[spcName];
 			maxR = Math.max(maxR, spc.r);
 		}
 		return maxR;	

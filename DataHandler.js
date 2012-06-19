@@ -12,8 +12,8 @@ DataHandler.prototype = {
 		//console.log("new");
 		var t=0;
 		var numDots = 0;
-		for (var spcIdx=0; spcIdx<spcs.length; spcIdx++){
-			spc = spcs[spcIdx];
+		for (var spcName in spcs){
+			spc = spcs[spcName];
 			var numInSpc = spc.dots.length;
 			numDots += numInSpc;
 			for (var dotIdx=0; dotIdx<numInSpc; dotIdx++){

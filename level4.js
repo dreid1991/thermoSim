@@ -1,4 +1,5 @@
 function level4(){
+	
 	this.dataHandler = new DataHandler();
 	this.data = {};
 	this.data.t = [];
@@ -6,6 +7,7 @@ function level4(){
 	this.data.pExt = [];
 	this.data.v = [];
 	this.data.e = [];
+	
 	this.numUpdates = 0;
 	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
 	this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
@@ -25,31 +27,21 @@ function level4(){
 		{q:"I'm a question"},
 		{q:"I'm another question"},
 	]
+	
 	this.g = 50*updateInterval/1000;
 	var heaterX = 200;
 	var heaterY = 400;
 	var heaterWidth = 50;
 	var heaterHeight = 30;
-	
-	this.dragWeights = new DragWeights([{name:'sml', count:15, mass:4}, 
-									{name:'med', count:5, mass:12}, 
-									{name:'lrg', count:2, mass:30}
-									],
-									walls.pts[0][2].y,
-									function(){return walls.pts[0][0].y},
-									myCanvas.height-15,
-									20,
-									Col(218, 187, 41),
-									Col(150, 150, 150),
-									function(){return curLevel.g}//This may not work.  curLevel if does not
-									);
+	this.dragWeights = this.makeDragWeights();
 	this.mass = function(){return this.dragWeights.pistonWeight};
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
 	walls.setup();
 	this.minY = 25;
 	this.maxY = walls.pts[0][2].y-75;
-	addSpecies(["spc1", "spc3"]);
+	addSpecies(['spc1', 'spc3']);
 	collide.setup();
+
 }
 
 level4.prototype = {
@@ -85,9 +77,9 @@ level4.prototype = {
 		$('#dashRun').show();
 		$('#base').show();
 		showCurQ();
-		emptyListener(this, "data");
+		emptyListener(this, 'data');
 		addListener(this, 'update', 'run', this.updateRun, this);
-		addListener(this, "data", "run", this.dataRun, this);
+		addListener(this, 'data', 'run', this.dataRun, this);
 		addListener(this, 'wallImpact', 'moving', this.onWallImpact, this);
 		addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
 		this.graphs.pVSv = new Graph(575,8,400,300, "Volume", "Pressure");
@@ -107,6 +99,21 @@ level4.prototype = {
 		$('#dashOutro').show();
 		removeListener(this, 'update', 'run');
 		emptyListener(this, "data");
+	},
+	makeDragWeights: function(){
+		var dragWeights = new DragWeights([{name:'sml', count:15, mass:4}, 
+									{name:'med', count:5, mass:12}, 
+									{name:'lrg', count:2, mass:30}
+									],
+									walls.pts[0][2].y,
+									function(){return walls.pts[0][0].y},
+									myCanvas.height-15,
+									20,
+									Col(218, 187, 41),
+									Col(150, 150, 150),
+									function(){return curLevel.g}//This may not work.  curLevel if does not
+									);
+		return dragWeights;
 	},
 	update: function(){
 		this.numUpdates++;
@@ -196,6 +203,7 @@ level4.prototype = {
 		}
 	},
 	addDots: function(){
+		
 		//populate("spc1", 15, 15, myCanvas.width-400, myCanvas.height-150, 200, 4);
 		//populate("spc2", 75, 75, myCanvas.width-400, myCanvas.height-150, 20, 4);
 		//populate("spc3", 15, 15, myCanvas.width-400, myCanvas.height-150, 400, 4);		
@@ -255,6 +263,28 @@ level4.prototype = {
 		for (var graph in this.graphs){
 			this.graphs[graph].clear();
 		}
+	},
+	reset: function(){
+		for (var spcName in spcs){
+			depopulate(spcName);
+		}
+		this.addDots();
+		this.numUpdates = 0;
+		walls = undefined;
+		walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
+		walls.setup();
+		
+		this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
+		this.SAPExt = getLen(this.extPressurePts);
+		this.forceInternal = 0;
+		this.wallV = 0;
+		this.updateListeners = {};//{run:this.updateRun, compress:this.updateCompress, expand:this.updateExpand, pause:this.updatePause};
+		this.dataListeners = {};//{run:this.dataRun, pause:this.dataPause};
+		this.wallImpactListeners = {};
+		this.dotImpactListeners = {};
+		this.dragWeights.dropAllInBins();
+		this.clearGraphs();
+		this.startSim();
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();

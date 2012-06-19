@@ -1,4 +1,5 @@
 drawingTools.prototype = {
+
 	clear: function(){
 		var width = myCanvas.width;
 		var height = myCanvas.height;
@@ -7,12 +8,12 @@ drawingTools.prototype = {
 		c.fillRect(0,0, width, height);	
 	},
 	dots: function(){
-		for (var spcIdx = 0; spcIdx<spcs.length; spcIdx++){
-			c.fillStyle = "rgb(" + spcs[spcIdx].cols.r + "," + spcs[spcIdx].cols.g + "," + spcs[spcIdx].cols.b + ")";
-			for (var dotIdx = 0; dotIdx<spcs[spcIdx].dots.length; dotIdx++){
-				var dot = spcs[spcIdx].dots[dotIdx];
+		for (var spc in spcs){
+			c.fillStyle = "rgb(" + spcs[spc].cols.r + "," + spcs[spc].cols.g + "," + spcs[spc].cols.b + ")";
+			var dots = spcs[spc].dots;
+			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
 				c.beginPath();
-				c.arc(spcs[spcIdx].dots[dotIdx].x,spcs[spcIdx].dots[dotIdx].y,spcs[spcIdx].dots[dotIdx].r,0,Math.PI*2,true);
+				c.arc(dots[dotIdx].x,dots[dotIdx].y,dots[dotIdx].r,0,Math.PI*2,true);
 				c.closePath();
 				c.fill();	
 			}
@@ -42,25 +43,16 @@ drawingTools.prototype = {
 		c.closePath();
 		c.fill();
 	},
+
 }
 function move(){
-	//var wallPE = (curLevel.maxY-walls.pts[0][0].y)*curLevel.weight.weight*curLevel.g;
-	//var wallKE = .5*curLevel.weight.weight*curLevel.wallV*curLevel.wallV;
-	//console.log("wallPE: ",wallPE);
-	//console.log("wallKE: ",wallKE);
-	//console.log("wall e ", String(wallKE+wallPE));
-	//var dotKE = 0;
-	for (var spcIdx = 0; spcIdx<spcs.length; spcIdx++){
-		var spc = spcs[spcIdx];
-		for (var dotIdx = 0; dotIdx<spc.dots.length; dotIdx++){
-			var dot = spc.dots[dotIdx];
-			//dotKE += .5*dot.m*dot.v.magSqr();
-			dot.x += dot.v.dx;
-			dot.y += dot.v.dy;
+	for (var spc in spcs){
+		var dots = spcs[spc].dots;
+		for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
+			dots[dotIdx].x += dots[dotIdx].v.dx;
+			dots[dotIdx].y += dots[dotIdx].v.dy;
 		}
 	}
-	//console.log("total e ", String(wallKE+wallPE+dotKE));
-	
 }
 function gauss(avg, stdev){
 	var numStdev = (Math.random() + Math.random() + Math.random())-1.5;
@@ -69,51 +61,36 @@ function gauss(avg, stdev){
 
 function addSpecies(toAdd){
 	if (String(toAdd)===toAdd){
-		var name = toAdd;
-		for (var defIdx=0; defIdx<speciesDefs.length; defIdx++){
-			spcDef = speciesDefs[defIdx];
-			if(spcDef.name==name){
-				spcs.push(new Species(spcDef.name, spcDef.m, spcDef.r, spcDef.cols)) 
-			} 
-		}		
+		var def = speciesDefs[toAdd];
+		spcs[toAdd] = new Species(def.m, def.r, def.cols);
 	} else{
 		for (var toAddIdx=0; toAddIdx<toAdd.length; toAddIdx++){
 			var name = toAdd[toAddIdx];
-			for (var defIdx=0; defIdx<speciesDefs.length; defIdx++){
-				spcDef = speciesDefs[defIdx];
-				if(spcDef.name==name){
-					spcs.push(new Species(spcDef.name, spcDef.m, spcDef.r, spcDef.cols))
-				} 
-			}	
+			var def = speciesDefs[name];
+			spcs[name] = new Species(def.m, def.r, def.cols);
 		}
 	}
 }
 function populate(name, x, y, width, height, num, temp){
-	var spcSource = null;
-	var spcTarget = null;
 	var vStdev = .1;
-	for (var spcDefIdx=0; spcDefIdx<speciesDefs.length; spcDefIdx++){
-		var spc = speciesDefs[spcDefIdx];
-		if(name==spc.name){
-			spcSource = spc;
+	var spc = spcs[name];
+	if(spc===undefined){
+		alert('Tried to populate undefined species');
+	}else{
+		for (var i=0; i<num; i++){
+			var placeX = x + Math.random()*width;
+			var placeY = y + Math.random()*height;
+			var v = tempToV(spc.m, temp)*gauss(1,vStdev);
+			var angle = Math.random()*2*Math.PI;
+			var vx = v * Math.cos(angle);
+			var vy = v * Math.sin(angle);
+			spc.dots.push(D(placeX, placeY, V(vx, vy), spc.m, spc.r, spc.name));
 		}
 	}
-	for (var spcIdx=0; spcIdx<spcs.length; spcIdx++){
-		var spc = spcs[spcIdx];
-		if(name==spc.name){
-			spcTarget = spc;
-		}
-	}
-	for (var i=0; i<num; i++){
-		var placeX = x + Math.random()*width;
-		var placeY = y + Math.random()*height;
-		var v = tempToV(spcSource.m, temp)*gauss(1,vStdev);
-		var angle = Math.random()*2*Math.PI;
-		var vx = v * Math.cos(angle);
-		var vy = v * Math.sin(angle);
-		spcTarget.dots.push(D(placeX, placeY, V(vx, vy), spcSource.m, spcSource.r, spcSource.name));
-	}
-	
+}
+function depopulate(name){
+	var spc = spcs[name];
+	spc.dots = [];
 }
 function tempToV(mass, temp){
 	temp*=tempScalar/(updateInterval*updateInterval);
@@ -269,7 +246,7 @@ $(document).mouseup(function(e){
 	}	
 })
 
-var spcs = [];
+spcs = {};
 draw = new drawingTools();
 collide = new CollideHandler();
 

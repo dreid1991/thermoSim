@@ -1,10 +1,3 @@
-function SpeciesDef(name, mass, radius, colors){
-	this.name = name;
-	this.m = mass;
-	this.r = radius;
-	this.cols = colors;
-}
-
-speciesDefs = [new SpeciesDef("spc1", 3, 2, Col(200,0,0)),
-new SpeciesDef("spc2", 5, 6, Col(0, 200, 200)),
-new SpeciesDef("spc3", 1, 1, Col(225, 0, 225))]
+speciesDefs = 	{spc1: {m:3, r:2, cols: Col(200,0,0)},
+				spc2: {m:5, r:6, cols: Col(0,200,200)},
+				spc3: {m:1, r:1, cols: Col(225, 0, 225)}};

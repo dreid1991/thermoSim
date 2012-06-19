@@ -131,8 +131,8 @@ WallHandler.prototype = {
 		return false;
 	},
 	check: function(){
-		for (var spcIdx=0; spcIdx<spcs.length; spcIdx++){
-			var spc = spcs[spcIdx];
+		for (var spcName in spcs){
+			var spc = spcs[spcName];
 			for (var dotIdx=0; dotIdx<spc.dots.length; dotIdx++){
 				var dot = spc.dots[dotIdx];
 				var checkedWalls = [];

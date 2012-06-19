@@ -8,12 +8,12 @@ function Dot(x, y, v, mass, radius, name){
 	this.r = radius;
 	this.name = name;
 }
-function Species(name, mass, radius, colors){
-	this.name = name;
+function Species( mass, radius, colors){
 	this.m = mass;
 	this.r = radius;
 	this.cols = colors;
 	this.dots = [];
+	return this;
 }
 function Point(x, y){
 	this.x = x;
