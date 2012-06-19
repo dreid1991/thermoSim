@@ -29,17 +29,13 @@ function level4(){
 	]
 	
 	this.g = 50*updateInterval/1000;
-	var heaterX = 200;
-	var heaterY = 400;
-	var heaterWidth = 50;
-	var heaterHeight = 30;
 	this.dragWeights = this.makeDragWeights();
 	this.mass = function(){return this.dragWeights.pistonWeight};
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
 	walls.setup();
 	this.minY = 25;
 	this.maxY = walls.pts[0][2].y-75;
-	addSpecies(['spc1', 'spc3']);
+	addSpecies(['spc1', 'spc2', 'spc3']);
 	collide.setup();
 
 }
@@ -171,6 +167,7 @@ level4.prototype = {
 		v2 = (m1*vo1 + m2*vo2 - m1*v1)/(m2*A)
 		*/
 		if(line[0]==0 && line[1]==0){
+			
 			if(Math.abs(this.wallV)>1.0){
 				var vo1 = dot.v.dy;
 				var vo2 = this.wallV;
@@ -209,7 +206,7 @@ level4.prototype = {
 		//populate("spc3", 15, 15, myCanvas.width-400, myCanvas.height-150, 400, 4);		
 		populate("spc1", 35, 80, 460, 350, 800, 300);
 		populate("spc3", 35, 80, 460, 350, 600, 300);		
-		//populate("spc2", 20, 80, 500, 300, 20, 300);
+		populate("spc2", 35, 80, 460, 300, 20, 300);
 	},
 	dataRun: function(){
 		var SAPInt = getLen([walls.pts[0][1], walls.pts[0][2], walls.pts[0][3], walls.pts[0][4]])
@@ -218,10 +215,10 @@ level4.prototype = {
 		this.data.t.push(this.dataHandler.temp());
 		this.data.v.push(this.dataHandler.volPolyWall());
 		this.forceInternal = 0;
-		vLast = this.data.v[this.data.v.length-1];
-		pIntLast = this.data.pInt[this.data.pInt.length-1];
-		pExtLast = this.data.pExt[this.data.pExt.length-1];
-		tLast = this.data.t[this.data.t.length-1];
+		var vLast = this.data.v[this.data.v.length-1];
+		var pIntLast = this.data.pInt[this.data.pInt.length-1];
+		var pExtLast = this.data.pExt[this.data.pExt.length-1];
+		var tLast = this.data.t[this.data.t.length-1];
 		this.graphs.pVSv.addPt(vLast, pExtLast, 'pExt');
 		this.graphs.pVSv.addPt(vLast, pIntLast, 'pInt');
 		this.graphs.tVSv.addPt(vLast, tLast, 't');

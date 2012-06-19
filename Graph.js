@@ -134,7 +134,7 @@ Graph.prototype = {
 			var pointCol = data.pointCol
 			data.pts.push(this.graphPt(xPt, yPt, pointCol));
 		}
-		this.flash(data.pts[data.pts.length-1], data.pointCol, data.flashCol);
+		//this.flash(data.pts[data.pts.length-1], data.pointCol, data.flashCol);
 	},
 	rangeIsSame: function(a, b){
 		return !(a.x.max!=b.x.max || a.x.min!=b.x.min || a.y.max!=b.y.max || a.y.min!=b.y.min);

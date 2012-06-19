@@ -6,6 +6,8 @@ function WallHandler(pts){
 	this.wallGrids = [];
 	this.xSpan = Math.floor(myCanvas.width/this.gridDim);
 	this.ySpan = Math.floor(myCanvas.height/this.gridDim);
+	this.numCols = Math.ceil(myCanvas.width/this.gridDim);
+	this.numRows = Math.ceil(myCanvas.height/this.gridDim);
 };
 WallHandler.prototype = {
 	setup: function(){
@@ -50,13 +52,13 @@ WallHandler.prototype = {
 		return wallUVs;
 	},
 	getSubwallGrid: function(wallIdx){
-		var subwallGrid = [];
-		for (var x=0; x<Math.ceil(myCanvas.width/this.gridDim); x++){ //HEY - you changed this from .floor +1
-			var column = []
-			for (var y=0; y<Math.ceil(myCanvas.height/this.gridDim); y++){
-				column.push(this.getSubwallsInGrid(wallIdx, x, y));
+		var subwallGrid = new Array(this.numCols);
+		for (var x=0; x<this.numCols; x++){ //HEY - you changed this from .floor +1
+			var column = new Array(this.numRows);
+			for (var y=0; y<this.numRows; y++){
+				column[y] = (this.getSubwallsInGrid(wallIdx, x, y));
 			}
-			subwallGrid.push(column);
+			subwallGrid[x] = (column);
 		}
 		return subwallGrid;
 		

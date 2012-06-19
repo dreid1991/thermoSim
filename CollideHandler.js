@@ -3,7 +3,7 @@ function CollideHandler(){
 }
 CollideHandler.prototype = {
 	check: function(){
-		this.grid = $.extend(true,[],this.gridBlank);
+		this.grid = this.makeGrid();
 		for (var spcName in spcs){
 			var spc = spcs[spcName];
 			for (var dotIdx=0; dotIdx<spc.dots.length; dotIdx++){
@@ -59,18 +59,19 @@ CollideHandler.prototype = {
 	},
 	setup: function(){
 		this.gridSize = 2*this.getMaxR();
-		this.gridBlank = this.makeGrid();
+		this.numCols = Math.ceil(myCanvas.width/this.gridSize+1);
+		this.numRows = Math.ceil(myCanvas.height/this.gridSize+1);
 		this.xSpan = Math.floor(myCanvas.width/this.gridSize);
 		this.ySpan = Math.floor(myCanvas.height/this.gridSize);
 	},
 	makeGrid: function(){
-		var grid = [];
-		for (var colIdx=0; colIdx<myCanvas.width/this.gridSize+1; colIdx++){
-			var col = []
-			for (var rowIdx=0; rowIdx<myCanvas.height/this.gridSize+1;rowIdx++){
-				col.push([]);
+		var grid = new Array(this.numCols)
+		for (var colIdx=0; colIdx<this.numCols; colIdx++){
+			var col = new Array(this.numRows)
+			for (var rowIdx=0; rowIdx<this.numRows;rowIdx++){
+				col[rowIdx] = [];
 			}
-			grid.push(col);
+			grid[colIdx] = col;
 		}
 		return grid;
 	},
