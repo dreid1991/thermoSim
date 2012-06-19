@@ -179,7 +179,7 @@ level4.prototype = {
 		}else{
 			walls.impactStd(dot, wallUV, perpV)		
 		}
-		this.fTurn += dot.m*perpV;
+		this.fTurn += dot.m*perpV; //*2?
 	},
 	addDots: function(){
 		//populate("spc1", 15, 15, myCanvas.width-400, myCanvas.height-150, 200, 4);
