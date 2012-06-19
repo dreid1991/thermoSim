@@ -4,25 +4,22 @@ function Graph(x, y, width, height, xLabel, yLabel, pointColor, flashColor){
 	this.borderSpacing = 70;
 	this.xStart = this.borderSpacing/width;
 	this.yStart = 1-this.borderSpacing/height;
-	this.xEnd = .95;
-	this.yEnd = .05
+	this.legendWidth = 80;
+	this.xEnd = (this.width - (this.legendWidth+8))/this.width;
+	this.yEnd = .05;
 	this.gridSpacing = 40;
 	this.hashMarkLen = 10;
 	this.numXGridLines = Math.ceil(this.width*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing);
 	this.numYGridLines = Math.ceil(this.height*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
 	this.axisVals = [];
-	this.pts = [];
-	this.data = {x:[], y:[]};
-	this.xRange = {min:0, max:0};
-	this.yRange = {min:0, max:0};
-	this.xAxisRange = {min:0, max:0};
-	this.yAxisRange = {min:0, max:0};
-	this.xStepSize;
-	this.yStepSize;
+	this.data = {};
+	this.legend = {};
+	this.resetRanges();
+	this.stepSize = {x:0, y:0};
 	this.gridCol = "#484848";
 	this.textCol = "white";
 	this.pointCol = pointColor;
-	this.flash = {col:flashColor, size: 1.5};
+	this.flashSize = 1.5;
 	this.graphBoundCol = "white";
 	this.rectSideLen = 8;
 	this.axisLabelFontSize = 15;
@@ -34,6 +31,31 @@ function Graph(x, y, width, height, xLabel, yLabel, pointColor, flashColor){
 	this.drawLabels(xLabel, yLabel);
 }
 Graph.prototype = {
+	addSet: function(address, label, pointCol, flashCol){
+		var set = {};
+		set.label = label;
+		set.x = [];
+		set.y = [];
+		set.pts = [];
+		set.pointCol = pointCol;
+		set.flashCol = flashCol;
+		this.makeLegendEntry(set, address);
+		this.data[address] = set;
+	},
+	makeLegendEntry: function(set, address){
+		var x = this.width-this.legendWidth;
+		var y = 30;
+		for (var entryIdx in this.legend){
+			y+=30;
+		}
+		var legendEntry = {};
+		legendEntry.text = this.graph.text(x+9, y, set.label);
+		legendEntry.text.attr({'text-anchor':'start', 
+								'fill':this.textCol, 
+								'font-size':this.axisLabelFontSize});
+		legendEntry.pt = this.draw(x, y, set.pointCol);
+		this.legend[address] = legendEntry;
+	},
 	drawBGRect: function(){
 		this.bgRect = this.graph.rect(0,0,this.width,this.height,10);
 		this.bgRect.attr("fill","#05111a");
@@ -90,39 +112,42 @@ Graph.prototype = {
 		this.xLabel.attr("font-size",this.axisLabelFontSize);	
 		this.yLabel.attr("font-size",this.axisLabelFontSize);	
 	},
-	addPt: function(x, y){
-		this.data.x.push(x);
-		this.data.y.push(y);
-		var mustRedraw = new Boolean();
-		mustRedraw = false;
-		if(x>this.xRange.max || x<this.xRange.min){
-			this.xRange = this.range(this.data.x);
-			mustRedraw = true;
-		}
-		if(y>this.yRange.max || y<this.yRange.min){
-			this.yRange = this.range(this.data.y);
-			mustRedraw = true;
-		}
+	addPt: function(x, y, address){
+		var data = this.data[address]
+		data.x.push(x);
+		data.y.push(y);
+		var oldRange = {x:{min:this.valRange.x.min, max:this.valRange.x.max}, y:{min:this.valRange.y.min, max:this.valRange.y.max}};
+		this.valRange.x.max = Math.max(this.valRange.x.max, x);
+		this.valRange.x.min = Math.min(this.valRange.x.min, x);		
+		this.valRange.y.max = Math.max(this.valRange.y.max, y);
+		this.valRange.y.min = Math.min(this.valRange.y.min, y);
+		
+		var mustRedraw = !this.rangeIsSame(oldRange, this.valRange);
+		
 		if(mustRedraw){
 			this.getAxisBounds();
 			this.drawAxisVals();
-			this.drawPts();		
+			this.graphPts();		
 		} else{
-			var xPt = this.data.x[this.data.x.length-1]
-			var yPt = this.data.y[this.data.y.length-1]
-			this.drawPt(xPt, yPt);
+			var xPt = data.x[data.x.length-1]
+			var yPt = data.y[data.y.length-1]
+			var pointCol = data.pointCol
+			data.pts.push(this.graphPt(xPt, yPt, pointCol));
 		}
-		this.flashLast();
+		this.flash(data.pts[data.pts.length-1], data.pointCol, data.flashCol);
 	},
-	plotData: function(xVals, yVals){
+	rangeIsSame: function(a, b){
+		return !(a.x.max!=b.x.max || a.x.min!=b.x.min || a.y.max!=b.y.max || a.y.min!=b.y.min);
+	},
+	plotData: function(xVals, yVals, address){
 		if (xVals.length==yVals.length && xVals.length>1){
-			this.data.x = xVals;
-			this.data.y = yVals;
-			this.xRange = this.range(this.data.x);
-			this.yRange = this.range(this.data.y);
+			this.data[address].x = xVals;
+			this.data[address].y = yVals;
+			this.valRange.x = this.getRange('x');
+			this.valRange.y = this.getRange('y');
 			this.getAxisBounds();
 			this.drawAxisVals();
-			this.drawPts();
+			this.graphPts();
 		} else if (xVals.length!=yVals.length){
 			console.log("xVals has ", xVals.length, "entries");
 			console.log("yVals has ", yVals.length, "entries");
@@ -130,30 +155,30 @@ Graph.prototype = {
 		};
 	},
 	getAxisBounds: function(){		
-		var rangeX = this.xRange.max-this.xRange.min;
+		var rangeX = this.valRange.x.max-this.valRange.x.min;
 		if(rangeX!=0){
 			var unroundStepX = rangeX/(this.numXGridLines-1);
 			var expStepX = Math.pow(10, Math.floor(log10(unroundStepX)))
-			this.xStepSize = Math.ceil(unroundStepX/expStepX)*expStepX;
-			this.xAxisRange.min = Math.floor(this.xRange.min/this.xStepSize)*this.xStepSize;
-			this.xAxisRange.max = this.xAxisRange.min + this.numXGridLines*this.xStepSize;
+			this.stepSize.x = Math.ceil(unroundStepX/expStepX)*expStepX;
+			this.axisRange.x.min = Math.floor(this.valRange.x.min/this.stepSize.x)*this.stepSize.x;
+			this.axisRange.x.max = this.axisRange.x.min + this.numXGridLines*this.stepSize.x;
 		}else{
-			this.xAxisRange.min = Math.floor(this.xRange.min);
-			this.xStepSize = .2;
-			this.xAxisRange.max = this.xAxisRange.min + this.xStepSize*this.numXGridLines;	
+			this.axisRange.x.min = Math.floor(this.valRange.x.min);
+			this.stepSize.x = .2;
+			this.axisRange.x.max = this.axisRange.x.min + this.stepSize.x*this.numXGridLines;	
 		}
 		
-		var rangeY = Math.abs(this.yRange.max-this.yRange.min);
+		var rangeY = Math.abs(this.valRange.y.max-this.valRange.y.min);
 		if(rangeY!=0){
 			var unroundStepY = rangeY/(this.numYGridLines-1);
 			var expStepY = Math.pow(10, Math.floor(log10(unroundStepY)))
-			this.yStepSize = Math.ceil(unroundStepY/expStepY)*expStepY;
-			this.yAxisRange.min = Math.floor(this.yRange.min/this.yStepSize)*this.yStepSize;
-			this.yAxisRange.max = this.yAxisRange.min + this.numYGridLines*this.yStepSize;
+			this.stepSize.y = Math.ceil(unroundStepY/expStepY)*expStepY;
+			this.axisRange.y.min = Math.floor(this.valRange.y.min/this.stepSize.y)*this.stepSize.y;
+			this.axisRange.y.max = this.axisRange.y.min + this.numYGridLines*this.stepSize.y;
 		}else{
-			this.yAxisRange.min = Math.floor(this.yRange.min);
-			this.yStepSize = .2;
-			this.yAxisRange.max = this.yAxisRange.min + this.yStepSize*this.numYGridLines;	
+			this.axisRange.y.min = Math.floor(this.valRange.y.min);
+			this.stepSize.y = .2;
+			this.axisRange.y.max = this.axisRange.y.min + this.stepSize.y*this.numYGridLines;	
 			
 		}
 	},
@@ -162,7 +187,7 @@ Graph.prototype = {
 		for (var xGridIdx=0; xGridIdx<this.numXGridLines; xGridIdx++){
 			var xPos = this.xStart*this.width + this.gridSpacing*xGridIdx;
 			var yPos = this.yStart*this.height + this.hashMarkLen + 10;
-			var val = String(round(this.xAxisRange.min + this.xStepSize*xGridIdx, 1));
+			var val = String(round(this.axisRange.x.min + this.stepSize.x*xGridIdx, 1));
 			this.axisVals.push(this.graph.text(xPos, yPos, val));
 			var last = this.axisVals[this.axisVals.length-1]
 			last.attr("fill", this.textCol);
@@ -171,7 +196,7 @@ Graph.prototype = {
 		for (var yGridIdx=0; yGridIdx<this.numYGridLines; yGridIdx++){
 			var yPos = this.yStart*this.height - this.gridSpacing*yGridIdx;
 			var xPos = this.xStart*this.width - this.hashMarkLen - 10;
-			var val = String(round(this.yAxisRange.min + this.yStepSize*yGridIdx,1));
+			var val = String(round(this.axisRange.y.min + this.stepSize.y*yGridIdx,1));
 			this.axisVals.push(this.graph.text(xPos, yPos, val));
 			var last = this.axisVals[this.axisVals.length-1]
 			last.attr("fill", this.textCol);
@@ -187,57 +212,82 @@ Graph.prototype = {
 		}
 		this.axisVals = [];
 	},
-	drawPts: function(){
+	graphPts: function(){
 		this.removePts();
-		for (var ptIdx=0; ptIdx<this.data.x.length; ptIdx++){
-			var xVal = this.data.x[ptIdx];
-			var yVal = this.data.y[ptIdx];
-			this.drawPt(xVal, yVal);
+		for (var set in this.data){
+			var data = this.data[set];
+			var col = data.pointCol;
+			for (var ptIdx=0; ptIdx<data.x.length; ptIdx++){
+				var xVal = data.x[ptIdx];
+				var yVal = data.y[ptIdx];
+				data.pts.push(this.graphPt(xVal, yVal, col));
+			}
 		}
 	},
-	drawPt: function(xVal, yVal){
-		var xRange = this.xAxisRange.max-this.xAxisRange.min;
-		var yRange = this.yAxisRange.max-this.yAxisRange.min;
-		var xPt = Math.abs(this.xEnd-this.xStart)*this.width*(xVal-this.xAxisRange.min)/xRange + this.xStart*this.width;
-		var yPt = this.height - (1-this.yStart)*this.height - Math.abs(this.yEnd-this.yStart)*this.height*(yVal-this.yAxisRange.min)/yRange;
-		var halfSideLen = this.rectSideLen/2;
-		this.pts.push(this.graph.rect(xPt-halfSideLen, yPt-halfSideLen, this.rectSideLen, this.rectSideLen,1));
-		var last = this.pts[this.pts.length-1]
-		last.attr("fill",this.pointCol);
-		var trans = 'r45,'+xPt+','+yPt;
-		last.transform(trans);
+	graphPt: function(xVal, yVal, col){
+		var xRange = this.axisRange.x.max-this.axisRange.x.min;
+		var yRange = this.axisRange.y.max-this.axisRange.y.min;
+		var xPt = Math.abs(this.xEnd-this.xStart)*this.width*(xVal-this.axisRange.x.min)/xRange + this.xStart*this.width;
+		var yPt = this.height - (1-this.yStart)*this.height - Math.abs(this.yEnd-this.yStart)*this.height*(yVal-this.axisRange.y.min)/yRange;
+		return this.draw(xPt, yPt, col);
 	},
-	flashLast: function(){
-		var pt = this.pts[this.pts.length-1];
+	draw: function(x, y, col){
+		var halfSideLen = this.rectSideLen/2;
+		var pt = this.graph.rect(x-halfSideLen, y-halfSideLen, this.rectSideLen, this.rectSideLen,1);
+		pt.attr("fill",col);
+		var trans = 'r45,'+x+','+y;
+		pt.transform(trans);
+		return pt;
+	},
+	flash: function(pt, pointCol, flashCol){
 		var height = pt.attrs.height;
 		var width = pt.attrs.width;
-		var changeDim = (this.flash.size-1)*height/2;
+		var changeDim = (this.flashSize-1)*height/2;
 		var x = pt.attrs.x;
 		var y = pt.attrs.y;
-		pt.attr({x:x-changeDim, y:y-changeDim, height:this.flash.size*height, width:this.flash.size*width, fill:this.flash.col})
-		var anim = this.animToNorm(x, y, width, height)
+		pt.attr({x:x-changeDim, y:y-changeDim, height:this.flashSize*height, width:this.flashSize*width, fill:flashCol})
+		var anim = this.animToNorm(x, y, width, height, pointCol)
 		pt.animate(anim);
-		pt.attr({x:x, y:y, width:width, height:height, fill:this.pointCol});
+		pt.attr({x:x, y:y, width:width, height:height, fill:pointCol});
 	},
-	animToNorm: function(x, y, width, height){
-		return Raphael.animation({x:x, y:y, width:width, height:height, fill:this.pointCol}, .15e3);
+	animToNorm: function(x, y, width, height, pointCol){
+		return Raphael.animation({x:x, y:y, width:width, height:height, fill:pointCol}, .15e3);
 	},
 	removePts: function(){
-		for (var ptIdx=0; ptIdx<this.pts.length; ptIdx++){
-			var pt = this.pts[ptIdx];
-			pt.remove();
+		for (var set in this.data){
+			var pts = this.data[set].pts;
+			for (var ptIdx=0; ptIdx<pts.length; ptIdx++){
+				pts[ptIdx].remove();
+			}
+			this.data[set].pts = []
 		}
-		this.pts = [];
 	},
-	range: function(list){
+	getRange: function(axis){
 		var min = Number.MAX_VALUE;
 		var max = -Number.MAX_VALUE;
-		for (var listIdx=0; listIdx<list.length; listIdx++){
-			var listVal = list[listIdx]
-			min = Math.min(min, listVal);
-			max = Math.max(max, listVal);
+		for (var set in this.data){
+			var data = this.data[set][axis];
+			for (var dataIdx=0; dataIdx<data.length; dataIdx++){
+				var datum = data[dataIdx];
+				min = Math.min(min, datum);
+				max = Math.max(max, datum);
+			}
 		}
 		return {min:min, max:max};
+	},
+	resetRanges: function(){
+		this.axisRange = {x:{min:Number.MAX_VALUE, max:-Number.MAX_VALUE}, y:{min:Number.MAX_VALUE, max:-Number.MAX_VALUE}};
+		this.valRange = {x:{min:Number.MAX_VALUE, max:-Number.MAX_VALUE}, y:{min:Number.MAX_VALUE, max:-Number.MAX_VALUE}};
+	},
+	clear: function(){
+		for (var set in this.data){
+			var data = this.data[set];
+			data.x = [];
+			data.y = [];
+			
+		}
+		this.removePts();
+		this.resetRanges();
 	},
 	remove: function(){
 		this.removePts();

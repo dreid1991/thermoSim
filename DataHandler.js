@@ -1,9 +1,16 @@
 function DataHandler(){
-
+	this.pConst = 25;
 }
 DataHandler.prototype = {
-	pressure: function(fTurn){
-		return fTurn*1000/(dataInterval*walls.surfArea());
+	pressureInt: function(forceInternal, numUpdates, SA){
+		var p = this.pConst*forceInternal/(numUpdates*SA);
+		console.log('pInt ',p);
+		return p;
+	},
+	pressureExt: function(weight, g, SA){
+		var p = this.pConst*weight*g/SA;
+		console.log('pExt ',p);
+		return p;
 	},
 	temp: function(){
 		//console.log("new");

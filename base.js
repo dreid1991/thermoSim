@@ -227,6 +227,13 @@ function submit(){
 function log10(val){
 	return Math.log(val)/Math.log(10);
 }
+function getLen(pts){
+	var len = 0;
+	for (var ptIdx=0; ptIdx<pts.length-1; ptIdx++){
+		len+=pts[ptIdx].distTo(pts[ptIdx+1]);
+	}
+	return len;
+}
 //function loadVals(level){
 //	for (sliderName in level.slider){
 //		level.sliders[sliderName].val=level.savedVals[sliderName];
@@ -268,7 +275,7 @@ collide = new CollideHandler();
 
 tempScalar = 100;
 updateInterval = 35;
-dataInterval = 1000;
+dataInterval = 2000;
 
 
 

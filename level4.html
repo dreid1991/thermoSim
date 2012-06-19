@@ -29,11 +29,16 @@
 		</center>
 		
 	</div>
-	<div id='dashRun' class='bottomRound'>
+	<div id='dashRun' class='dashShort'>
+		<center>
+			<button id='another'>Another button</button>
+			<button id='clearGraphs'>Clear graphs</button>
+			
+		</center>
 	</div>
 	<div id='dashOutro' class='dash'>
 		<center>
-			<button id='toSim'>racecar noitalumis eht oT</button>
+			<button id='toSim'>noitalumis eht oT</button>
 		</center>
 	</div>
 	
@@ -61,7 +66,7 @@
 <script src = 'raphael-min.js'></script>
 <script type = 'text/javascript'>
 var curLevel;
-canvasHeight = 560;
+canvasHeight = 530;
 $(function(){
 	myCanvas.height = canvasHeight;
 	curLevel = new level4();
@@ -70,6 +75,7 @@ $(function(){
 	$('button').button();
 	$('#toSim').click(function(){curLevel.startSim()});
 	$('#submit').click(function(){submit()});
+	$('#clearGraphs').click(function(){curLevel.clearGraphs()});
 });
 
 myCanvas.width = $('#main').width();
