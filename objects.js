@@ -260,6 +260,7 @@ DragWeights.prototype = {
 				var weight = weightGroup.weights[weightIdx];
 				if(weight.status!='inBin'){
 					if(weight.status=='onPiston'){
+						weight.slot.isFull = false;
 						this.takeOffPiston(weight);
 					}
 					this.dropIntoBin(weight);
