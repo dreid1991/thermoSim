@@ -137,31 +137,45 @@ Graph.prototype = {
 		draw.text(xLabel, xLabelPos, this.labelFont, this.textCol, 'center',  0, this.graph);
 		draw.text(yLabel, yLabelPos, this.labelFont, this.textCol, 'center', -Math.PI/2, this.graph);
 	},
-	addPt: function(x, y, address){
-		var data = this.data[address]
-		data.x.push(x);
-		data.y.push(y);
-		var oldRange = {x:{min:this.valRange.x.min, max:this.valRange.x.max}, y:{min:this.valRange.y.min, max:this.valRange.y.max}};
-		this.valRange.x.max = Math.max(this.valRange.x.max, x);
-		this.valRange.x.min = Math.min(this.valRange.x.min, x);		
-		this.valRange.y.max = Math.max(this.valRange.y.max, y);
-		this.valRange.y.min = Math.min(this.valRange.y.min, y);
+	addPts: function(toAdd){
 		
-		var mustRedraw = !this.rangeIsSame(oldRange, this.valRange);
-		
+		var mustRedraw = new Boolean;
+		mustRedraw = false;
+		for (var addIdx=0; addIdx<toAdd.length; addIdx++){
+			var address = toAdd[addIdx].address;
+			var x = toAdd[addIdx].x;
+			var y = toAdd[addIdx].y;
+			var data = this.data[address]
+			data.x.push(x);
+			data.y.push(y);
+			var oldRange = {x:{min:this.valRange.x.min, max:this.valRange.x.max}, y:{min:this.valRange.y.min, max:this.valRange.y.max}};
+			this.valRange.x.max = Math.max(this.valRange.x.max, x);
+			this.valRange.x.min = Math.min(this.valRange.x.min, x);		
+			this.valRange.y.max = Math.max(this.valRange.y.max, y);
+			this.valRange.y.min = Math.min(this.valRange.y.min, y);
+			
+			var mustRedrawMe = !this.rangeIsSame(oldRange, this.valRange);
+			if(mustRedrawMe){
+				mustRedraw = true;
+			}
+		}	
 		if(mustRedraw){
 			this.valRange.x = this.getRange('x');
 			this.valRange.y = this.getRange('y');
 			this.getAxisBounds();
 			this.drawAllData();
 		} else{
-			var xPt = data.x[data.x.length-1]
-			var yPt = data.y[data.y.length-1]
-			var pointCol = data.pointCol
-			this.graphPt(xPt, yPt, pointCol);
+			for (var addIdx=0; addIdx<toAdd.length; addIdx++){
+				var data = this.data[toAdd[addIdx].address];
+				var xPt = data.x[data.x.length-1]
+				var yPt = data.y[data.y.length-1]
+				var pointCol = data.pointCol
+				this.graphPt(xPt, yPt, pointCol);
+			}
 		}
-		
-		//this.flash(data.pts[data.pts.length-1], data.pointCol, data.flashCol);
+		/*
+		this.flash(data.pts[data.pts.length-1], data.pointCol, data.flashCol);
+		*/
 	},
 	rangeIsSame: function(a, b){
 		return !(a.x.max!=b.x.max || a.x.min!=b.x.min || a.y.max!=b.y.max || a.y.min!=b.y.min);
