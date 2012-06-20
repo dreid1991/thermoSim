@@ -78,11 +78,11 @@ level4.prototype = {
 		addListener(this, 'data', 'run', this.dataRun, this);
 		addListener(this, 'wallImpact', 'moving', this.onWallImpact, this);
 		addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
-		this.graphs.pVSv = new Graph(575,8,400,300, "Volume", "Pressure");
-		this.graphs.tVSv = new Graph(575,8+30+this.graphs.pVSv.height, 400, 300,"Volume", "Temperature");
-		this.graphs.pVSv.addSet('pInt', 'P Int.', '#383eff', '#aaace6');
-		this.graphs.pVSv.addSet('pExt', 'P Ext.', '#00ff29', '#a2e2ad');
-		this.graphs.tVSv.addSet('t', 'Sys Temp', '#b70000', '#f89494');
+		this.graphs.pVSv = new Graph('pVSv', 400,300, "Volume", "Pressure");
+		this.graphs.tVSv = new Graph('tVSv', 400, 300,"Volume", "Temperature");
+		this.graphs.pVSv.addSet('pInt', 'P Int.', Col(0,0,255), Col(255,255,0));
+		this.graphs.pVSv.addSet('pExt', 'P Ext.', Col(0,255,0), Col(255,255,0));
+		this.graphs.tVSv.addSet('t', 'Sys Temp', Col(255,0,0), Col(255,255,0));
 	},
 	startOutro: function(){
 		saveVals(this);
@@ -141,7 +141,7 @@ level4.prototype = {
 		draw.clear();
 		draw.dots();
 		draw.walls(walls);
-		//draw.fillPts(walls.pts[1], this.heater.col);
+		//draw.fillPts(walls.pts[1], this.heater.col, c);
 		this.dragWeights.draw();
 	},
 	checkDotHits: function(){

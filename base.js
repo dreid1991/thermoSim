@@ -32,16 +32,71 @@ drawingTools.prototype = {
 		}
 		c.stroke();
 	},
-	fillPts: function(pts, col){
-		c.fillStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
-		c.beginPath();
-		c.moveTo(pts[0].x, pts[1].y);
+	fillPts: function(pts, col, drawCanvas){
+		drawCanvas.fillStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
+		drawCanvas.beginPath();
+		drawCanvas.moveTo(pts[0].x, pts[1].y);
 		for (var ptIdx=1; ptIdx<pts.length; ptIdx++){
 			var pt = pts[ptIdx];
-			c.lineTo(pt.x, pt.y);
+			drawCanvas.lineTo(pt.x, pt.y);
 		}
-		c.closePath();
-		c.fill();
+		drawCanvas.closePath();
+		drawCanvas.fill();
+	},
+	fillPtsStroke: function(pts, fillCol, strokeCol, drawCanvas){
+		drawCanvas.fillStyle = "rgb(" + Math.floor(fillCol.r) + "," + Math.floor(fillCol.g) + "," + Math.floor(fillCol.b) + ")";
+		drawCanvas.strokeStyle = "rgb(" + Math.floor(strokeCol.r) + "," + Math.floor(strokeCol.g) + "," + Math.floor(strokeCol.b) + ")";
+		drawCanvas.beginPath();
+		drawCanvas.moveTo(pts[0].x, pts[1].y);
+		for (var ptIdx=1; ptIdx<pts.length; ptIdx++){
+			var pt = pts[ptIdx];
+			drawCanvas.lineTo(pt.x, pt.y);
+		}
+		drawCanvas.closePath();
+		drawCanvas.stroke();
+		drawCanvas.fill();
+	},
+	roundedRect: function(pos, dims, r, col, drawCanvas){
+		var x = pos.x;
+		var y = pos.y;
+		var width = dims.dx;
+		var height = dims.dy;
+		drawCanvas.fillStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
+		drawCanvas.beginPath();
+		drawCanvas.moveTo(x+r, y);
+		this.curvedLine(P(x+width-r, y), P(x+width, y), P(x+width, y+r), drawCanvas);
+		this.curvedLine(P(x+width, y+height-r), P(x+width, y+height), P(x+width-r, y+height), drawCanvas);
+		this.curvedLine(P(x+r, y+height), P(x, y+height), P(x, y+height-r), drawCanvas);
+		this.curvedLine(P(x, y+r), P(x, y), P(x+r, y), drawCanvas);
+		drawCanvas.closePath();
+		drawCanvas.fill();
+		
+	},
+	strokeRect: function(corner, dims, col, drawCanvas){
+		drawCanvas.strokeStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
+		drawCanvas.strokeRect(corner.x, corner.y, dims.dx, dims.dy);
+	},
+	line: function(p1, p2, col, drawCanvas){
+		drawCanvas.strokeStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
+		drawCanvas.beginPath();
+		drawCanvas.moveTo(p1.x, p1.y);
+		drawCanvas.lineTo(p2.x, p2.y);
+		drawCanvas.closePath();
+		drawCanvas.stroke();
+	},
+	curvedLine: function(line, curvePt, quadEnd, drawCanvas){
+		drawCanvas.lineTo(line.x, line.y);
+		drawCanvas.quadraticCurveTo(curvePt.x, curvePt.y, quadEnd.x, quadEnd.y);
+	},
+	text: function(text, pos, font, col, align, rotation, drawCanvas){
+		drawCanvas.save();
+		drawCanvas.translate(pos.x, pos.y);
+		drawCanvas.rotate(rotation);
+		drawCanvas.fillStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
+		drawCanvas.font = font;
+		drawCanvas.textAlign = align;
+		drawCanvas.fillText(text, 0, 0);
+		drawCanvas.restore();
 	},
 
 }

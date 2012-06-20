@@ -1,6 +1,14 @@
-function Graph(x, y, width, height, xLabel, yLabel, pointColor, flashColor){
+function Graph(name, width, height, xLabel, yLabel, pointColor, flashColor){
 	this.width = width;
 	this.height = height;
+	this.xLabel = xLabel;
+	this.yLabel = yLabel;
+	this.labelFontSize = 15;
+	this.legendFontSize = 12;
+	this.axisValFontSize = 11;
+	this.labelFont = this.labelFontSize+ 'pt calibri';
+	this.legendFont = this.legendFontSize+ 'pt calibri';
+	this.axisValFont = this.axisValFontSize+ 'pt calibri';
 	this.borderSpacing = 70;
 	this.xStart = this.borderSpacing/width;
 	this.yStart = 1-this.borderSpacing/height;
@@ -16,101 +24,118 @@ function Graph(x, y, width, height, xLabel, yLabel, pointColor, flashColor){
 	this.legend = {};
 	this.resetRanges();
 	this.stepSize = {x:0, y:0};
-	this.gridCol = "#484848";
-	this.textCol = "white";
+	this.bgCol = Col(5, 17, 26);
+	this.gridCol = Col(72,72,72);
+	this.textCol = Col(255, 255, 255);
 	this.pointCol = pointColor;
 	this.flashSize = 1.5;
-	this.graphBoundCol = "white";
+	this.graphBoundCol = Col(255,255,255);
+	this.ptStroke = Col(0,0,0);
 	this.rectSideLen = 8;
-	this.axisLabelFontSize = 15;
-	this.axisValFontSize = 11;
-	this.graph = Raphael(x, y, this.width, this.height);
-	this.drawBGRect()
-	this.drawBounds()
-	this.drawGrid();
-	this.drawLabels(xLabel, yLabel);
+	this.triSideLen = Math.sqrt(Math.pow(this.rectSideLen, 2)/2);
+	
+	//this.graph = Raphael(x, y, this.width, this.height);
+	this.makeCanvas(name);
+	this.drawAllBG();
+
 }
 Graph.prototype = {
+	makeCanvas: function(name){
+		var str = "<div class='graphSpacer'></div><div id = '" + name + "div'><canvas id ='" + name + "Graph' width=" + this.width + " height=" + this.height+ "></canvas></div>"
+		var canvasDiv = $(str);
+		$('#graphs').append(canvasDiv);
+		var graphCanvas = document.getElementById(name+'Graph');
+		this.graph = graphCanvas.getContext('2d');
+		
+		
+	},	
 	addSet: function(address, label, pointCol, flashCol){
 		var set = {};
 		set.label = label;
 		set.x = [];
 		set.y = [];
-		set.pts = [];
 		set.pointCol = pointCol;
 		set.flashCol = flashCol;
 		this.makeLegendEntry(set, address);
 		this.data[address] = set;
+		this.drawAllBG();
 	},
 	makeLegendEntry: function(set, address){
-		var x = this.width-this.legendWidth;
+		var x = this.width-this.legendWidth+5;
 		var y = 30;
 		for (var entryIdx in this.legend){
 			y+=30;
 		}
 		var legendEntry = {};
-		legendEntry.text = this.graph.text(x+9, y, set.label);
-		legendEntry.text.attr({'text-anchor':'start', 
-								'fill':this.textCol, 
-								'font-size':this.axisLabelFontSize});
-		legendEntry.pt = this.draw(x, y, set.pointCol);
+		legendEntry.text = {text:set.label, x:x+10, y:y+this.legendFontSize/2};
+		
+		legendEntry.pt = {x:x, y:y, col:set.pointCol}
 		this.legend[address] = legendEntry;
+		this.drawAllBG();
+	},
+	drawAllBG: function(){
+		this.drawBGRect();
+		this.drawGrid();
+		this.drawBounds();
+		this.drawLegend();
+		this.drawLabels(this.xLabel, this.yLabel);
+		this.bg = this.graph.getImageData(0, 0, this.width, this.height);
+	},
+	drawAllData: function(){
+		this.graph.putImageData(this.bg, 0, 0);
+		this.drawAxisVals();
+		this.graphPts();
+	},
+	drawLegend: function(){
+		for (var legendName in this.legend){
+			var legend = this.legend[legendName];
+			var text = legend.text;
+			var pt = legend.pt;
+			var font = this.legendFont
+			draw.text(text.text, P(text.x, text.y),  this.legendFont, this.textCol, 'left', 0, this.graph);
+			this.drawPt(pt.x, pt.y, pt.col);
+		}
 	},
 	drawBGRect: function(){
-		this.bgRect = this.graph.rect(0,0,this.width,this.height,10);
-		this.bgRect.attr("fill","#05111a");
+		this.graph.fillStyle = "rgb(200,50,50)";
+		draw.roundedRect(P(0,0), V(this.width, this.height), 20, this.bgCol, this.graph); 
 	},
 	drawBounds: function(){
 		var ptOrigin = P(this.xStart*this.width, this.yStart*this.height);
-		var ptYAxis = P(this.xStart*this.width, this.yEnd*this.height);
-		var ptXAxis = P(this.xEnd*this.width, this.yStart*this.height);
-		//var path = "M"+String(ptOrigin.x)+","+String(ptOrigin.y)+"L"+String(ptXAxis.x)+","+String(ptXAxis.y)+"L"+String(ptXAxis.x)+","+String(ptYAxis.y)+"L"+String(ptYAxis.x)+","+String(ptYAxis.y)+"L"+String(ptOrigin.x)+","+String(ptOrigin.y);
-		var path = [P(ptOrigin.x, ptOrigin.y), P(ptXAxis.x,ptXAxis.y), P(ptXAxis.x, ptYAxis.y), P(ptYAxis.x, ptYAxis.y), P(ptOrigin.x,ptOrigin.y)]
-		this.graphBounds = this.graph.path(makePath(path));
-		this.graphBounds.attr("stroke",this.graphBoundCol);
+		var width = this.width*(this.xEnd-this.xStart);
+		var height = this.height*(this.yEnd - this.yStart);
+		var dims = V(width, height);
+		draw.strokeRect(ptOrigin, dims, this.graphBoundCol, this.graph);
 	},
 	removeBounds: function(){
 		this.graphBounds.remove();
 	},
 	drawGrid: function(){
-		this.xGrid = [];
-		this.yGrid = [];
 		for (var xGridIdx=0; xGridIdx<this.numXGridLines; xGridIdx++){
-			var xPos = String(this.xStart*this.width + this.gridSpacing*xGridIdx);
-			var yEnd = String(this.yEnd*this.height);
-			var yAxis = String(this.yStart*this.height + this.hashMarkLen);
-			this.xGrid.push(this.graph.path(makePath([P(xPos,yAxis),P(xPos,yEnd)])));
-			this.xGrid[this.xGrid.length-1].attr("stroke",this.gridCol);
+			var x = this.xStart*this.width + this.gridSpacing*xGridIdx;
+			var yEnd = this.yEnd*this.height;
+			var yAxis = this.yStart*this.height + this.hashMarkLen;
+			var p1 = P(x, yAxis);
+			var p2 = P(x, yEnd);
+			draw.line(p1, p2, this.gridCol, this.graph);
 		}
 		for (var yGridIdx=0; yGridIdx<this.numYGridLines; yGridIdx++){
-			var yPos = String(this.yStart*this.height - this.gridSpacing*yGridIdx);
-			var xEnd = String(this.xEnd*this.width);
-			var xAxis = String(this.xStart*this.width - this.hashMarkLen);
-			this.yGrid.push(this.graph.path(makePath([P(xAxis, yPos), P(xEnd, yPos)])));
-			this.yGrid[this.yGrid.length-1].attr("stroke",this.gridCol);
+			var y = this.yStart*this.height - this.gridSpacing*yGridIdx;
+			var xEnd = this.xEnd*this.width;
+			var xAxis = this.xStart*this.width - this.hashMarkLen;
+			var p1 = P(xAxis, y);
+			var p2 = P(xEnd, y);			
+			draw.line(p1, p2, this.gridCol, this.graph);
 		}
 		
-	},
-	removeGrid: function(){
-		for (var gridIdx=0; gridIdx<this.xGrid.length; gridIdx++){
-			this.xGrid[gridIdx].remove();
-		}
-		for (var gridIdx=0; gridIdx<this.yGrid.length; gridIdx++){
-			this.yGrid[gridIdx].remove();
-		}
-		this.xGrid = null;
-		this.yGrid = null;
 	},
 	drawLabels: function(xLabel, yLabel){
 		var xLabelPos = P(this.width*(this.xStart+this.xEnd)/2, Math.min(this.height*this.yStart+50, this.height-20))
 		var yLabelPos = P(Math.max(this.width*this.xStart-50, 20),this.height*(this.yStart+this.yEnd)/2)
-		this.xLabel = this.graph.text(xLabelPos.x, xLabelPos.y, xLabel);
-		this.yLabel = this.graph.text(yLabelPos.x, yLabelPos.y, yLabel);
-		this.yLabel.rotate(-90);
-		this.xLabel.attr("fill",this.textCol);
-		this.yLabel.attr("fill",this.textCol);
-		this.xLabel.attr("font-size",this.axisLabelFontSize);	
-		this.yLabel.attr("font-size",this.axisLabelFontSize);	
+		xLabelPos.y+=this.labelFontSize/2;
+		yLabelPos.y+=this.labelFontSize/2;
+		draw.text(xLabel, xLabelPos, this.labelFont, this.textCol, 'center',  0, this.graph);
+		draw.text(yLabel, yLabelPos, this.labelFont, this.textCol, 'center', -Math.PI/2, this.graph);
 	},
 	addPt: function(x, y, address){
 		var data = this.data[address]
@@ -125,15 +150,17 @@ Graph.prototype = {
 		var mustRedraw = !this.rangeIsSame(oldRange, this.valRange);
 		
 		if(mustRedraw){
+			this.valRange.x = this.getRange('x');
+			this.valRange.y = this.getRange('y');
 			this.getAxisBounds();
-			this.drawAxisVals();
-			this.graphPts();		
+			this.drawAllData();
 		} else{
 			var xPt = data.x[data.x.length-1]
 			var yPt = data.y[data.y.length-1]
 			var pointCol = data.pointCol
-			data.pts.push(this.graphPt(xPt, yPt, pointCol));
+			this.graphPt(xPt, yPt, pointCol);
 		}
+		
 		//this.flash(data.pts[data.pts.length-1], data.pointCol, data.flashCol);
 	},
 	rangeIsSame: function(a, b){
@@ -146,8 +173,7 @@ Graph.prototype = {
 			this.valRange.x = this.getRange('x');
 			this.valRange.y = this.getRange('y');
 			this.getAxisBounds();
-			this.drawAxisVals();
-			this.graphPts();
+			this.drawAllData();
 		} else if (xVals.length!=yVals.length){
 			console.log("xVals has ", xVals.length, "entries");
 			console.log("yVals has ", yVals.length, "entries");
@@ -183,44 +209,28 @@ Graph.prototype = {
 		}
 	},
 	drawAxisVals: function(){
-		this.removeAxisVals();
 		for (var xGridIdx=0; xGridIdx<this.numXGridLines; xGridIdx++){
 			var xPos = this.xStart*this.width + this.gridSpacing*xGridIdx;
-			var yPos = this.yStart*this.height + this.hashMarkLen + 10;
-			var val = String(round(this.axisRange.x.min + this.stepSize.x*xGridIdx, 1));
-			this.axisVals.push(this.graph.text(xPos, yPos, val));
-			var last = this.axisVals[this.axisVals.length-1]
-			last.attr("fill", this.textCol);
-			last.attr("font-size", this.axisValFontSize);
+			var yPos = this.yStart*this.height + this.hashMarkLen + 10 + this.axisValFontSize/2;
+			var text = String(round(this.axisRange.x.min + this.stepSize.x*xGridIdx, 1));
+			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', 0, this.graph);
 		}
 		for (var yGridIdx=0; yGridIdx<this.numYGridLines; yGridIdx++){
 			var yPos = this.yStart*this.height - this.gridSpacing*yGridIdx;
 			var xPos = this.xStart*this.width - this.hashMarkLen - 10;
-			var val = String(round(this.axisRange.y.min + this.stepSize.y*yGridIdx,1));
-			this.axisVals.push(this.graph.text(xPos, yPos, val));
-			var last = this.axisVals[this.axisVals.length-1]
-			last.attr("fill", this.textCol);
-			last.attr("font-size", this.axisValFontSize);
-			last.rotate(-90);
+			var text = String(round(this.axisRange.y.min + this.stepSize.y*yGridIdx,1));
+			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', -Math.PI/2, this.graph);
 		}		
 		
 	},
-	removeAxisVals: function(){
-		for (var valIdx=0; valIdx<this.axisVals.length; valIdx++){
-			val = this.axisVals[valIdx];
-			val.remove();
-		}
-		this.axisVals = [];
-	},
 	graphPts: function(){
-		this.removePts();
 		for (var set in this.data){
 			var data = this.data[set];
 			var col = data.pointCol;
 			for (var ptIdx=0; ptIdx<data.x.length; ptIdx++){
 				var xVal = data.x[ptIdx];
 				var yVal = data.y[ptIdx];
-				data.pts.push(this.graphPt(xVal, yVal, col));
+				this.graphPt(xVal, yVal, col);
 			}
 		}
 	},
@@ -229,15 +239,16 @@ Graph.prototype = {
 		var yRange = this.axisRange.y.max-this.axisRange.y.min;
 		var xPt = Math.abs(this.xEnd-this.xStart)*this.width*(xVal-this.axisRange.x.min)/xRange + this.xStart*this.width;
 		var yPt = this.height - (1-this.yStart)*this.height - Math.abs(this.yEnd-this.yStart)*this.height*(yVal-this.axisRange.y.min)/yRange;
-		return this.draw(xPt, yPt, col);
+		this.drawPt(xPt, yPt, col);
 	},
-	draw: function(x, y, col){
-		var halfSideLen = this.rectSideLen/2;
-		var pt = this.graph.rect(x-halfSideLen, y-halfSideLen, this.rectSideLen, this.rectSideLen,1);
-		pt.attr("fill",col);
-		var trans = 'r45,'+x+','+y;
-		pt.transform(trans);
-		return pt;
+	drawPt: function(x, y, col){
+		var len = this.triSideLen;
+		var pt1 = P(x-len, y);
+		var pt2 = P(x, y-len);
+		var pt3 = P(x+len, y);
+		var pt4 = P(x, y+len);
+		var pts = [pt1, pt1, pt2, pt3, pt4];
+		draw.fillPtsStroke(pts, col, this.ptStroke, this.graph);
 	},
 	flash: function(pt, pointCol, flashCol){
 		var height = pt.attrs.height;
@@ -252,15 +263,6 @@ Graph.prototype = {
 	},
 	animToNorm: function(x, y, width, height, pointCol){
 		return Raphael.animation({x:x, y:y, width:width, height:height, fill:pointCol}, .15e3);
-	},
-	removePts: function(){
-		for (var set in this.data){
-			var pts = this.data[set].pts;
-			for (var ptIdx=0; ptIdx<pts.length; ptIdx++){
-				pts[ptIdx].remove();
-			}
-			this.data[set].pts = []
-		}
 	},
 	getRange: function(axis){
 		var min = Number.MAX_VALUE;
@@ -289,15 +291,4 @@ Graph.prototype = {
 		this.removePts();
 		this.resetRanges();
 	},
-	remove: function(){
-		this.removePts();
-		this.removeAxisVals();
-		this.xLabel.remove();
-		this.yLabel.remove();
-		this.removeGrid();
-		this.removeBounds();
-		this.bgRect.remove();
-		this.graph.remove();
-	},
-
 }

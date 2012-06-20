@@ -403,7 +403,7 @@ DragWeights.prototype = {
 	drawBins: function(){
 		for (var binName in this.dropBins){
 			var pts =  this.dropBins[binName].pts;
-			draw.fillPts(pts, this.binCol);
+			draw.fillPts(pts, this.binCol, c);
 		}
 	},
 
@@ -412,7 +412,7 @@ DragWeights.prototype = {
 		var x1 = this.eBar.x - mass*this.eBar.scalar/2;
 		var x2 = this.eBar.x + mass*this.eBar.scalar/2;
 		var pts = [P(x1,yStart), P(x1,yStart), P(x1,yEnd), P(x2, yEnd), P(x2, yStart), P(x2,yStart)];
-		draw.fillPts(pts,this.eBarCol);
+		draw.fillPts(pts,this.eBarCol, c);
 	},
 	drawEBarText: function(y, energy){
 		c.font = '12pt Calibri';

@@ -1,5 +1,13 @@
 .main{
 	width:550px;
+	float:left;
+	/*display:inline-block;*/
+}
+.graphs{
+	margin-left:570px;
+}
+.graph{
+	padding:20px;
 }
 .header{
 	height:25px;
@@ -53,6 +61,9 @@
 	color:white;
 	padding:10px;
 }
+.graphSpacer{
+	height:10px;
+}
 .borderedBlock{
 	background-color:#05111a;
 	border-top: 3px solid;
@@ -65,6 +76,8 @@
 	padding:10px;
 }
 .base{
+	padding-top:10px;
+	display:inline-block;
 	width:700px;
 }
 .answerDiv{
