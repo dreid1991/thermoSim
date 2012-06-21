@@ -36,7 +36,7 @@ drawingTools.prototype = {
 	fillPts: function(pts, col, drawCanvas){
 		drawCanvas.fillStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
 		drawCanvas.beginPath();
-		drawCanvas.moveTo(pts[0].x, pts[1].y);
+		drawCanvas.moveTo(pts[0].x, pts[0].y);
 		for (var ptIdx=1; ptIdx<pts.length; ptIdx++){
 			var pt = pts[ptIdx];
 			drawCanvas.lineTo(pt.x, pt.y);
@@ -48,7 +48,7 @@ drawingTools.prototype = {
 		drawCanvas.fillStyle = "rgb(" + Math.floor(fillCol.r) + "," + Math.floor(fillCol.g) + "," + Math.floor(fillCol.b) + ")";
 		drawCanvas.strokeStyle = "rgb(" + Math.floor(strokeCol.r) + "," + Math.floor(strokeCol.g) + "," + Math.floor(strokeCol.b) + ")";
 		drawCanvas.beginPath();
-		drawCanvas.moveTo(pts[0].x, pts[1].y);
+		drawCanvas.moveTo(pts[0].x, pts[0].y);
 		for (var ptIdx=1; ptIdx<pts.length; ptIdx++){
 			var pt = pts[ptIdx];
 			drawCanvas.lineTo(pt.x, pt.y);
@@ -187,6 +187,9 @@ function addListener(object, typeName, funcName, func, destObj){
 }
 function removeListener(object, typeName, funcName){
 	delete object[typeName + 'Listeners'][funcName];
+}
+function listenerExists(object, typeName, funcName){
+	return object[typeName + 'Listeners'][funcName]!==undefined;
 }
 function emptyListener(object, typeName){
 	for (var listenerName in object[typeName + 'Listeners']){

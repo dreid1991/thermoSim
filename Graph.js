@@ -96,7 +96,6 @@ Graph.prototype = {
 		}
 	},
 	drawBGRect: function(){
-		this.graph.fillStyle = "rgb(200,50,50)";
 		draw.roundedRect(P(0,0), V(this.dims.dx, this.dims.dy), 20, this.bgCol, this.graph); 
 	},
 	drawBounds: function(){
@@ -266,7 +265,7 @@ Graph.prototype = {
 		var pt2 = P(x, y-len);
 		var pt3 = P(x+len, y);
 		var pt4 = P(x, y+len);
-		var pts = [pt1, pt1, pt2, pt3, pt4];
+		var pts = [pt1, pt2, pt3, pt4];
 		draw.fillPtsStroke(pts, col, this.ptStroke, this.graph);
 	},
 	flashInit: function(pts){

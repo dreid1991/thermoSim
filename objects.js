@@ -98,6 +98,14 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.moveToPistonOrders = [];
 	this.weightsOnPiston = [];
 	this.tempWeightDefs = weightDefs;
+	this.readoutFont = '13pt calibri';
+	this.readoutFontCol = Col(255,255,255);
+	this.readouts = this.makeReadouts([ {name:'eIn',   text:'E in: ', units:'u', initVal:0},
+										{name:'eOut',  text:'E out: ', units:'u', initVal:0},
+										{name:'delE',  text:'Sys. deltaE: ', units:'u', initVal:0},
+										{name:'weight',text:'Weight: ', units:'kg', initVal:this.pistonWeight}
+										],
+										25);
 }
 
 DragWeights.prototype = {
@@ -182,8 +190,6 @@ DragWeights.prototype = {
 	getBinpts: function(posX){
 		var pts = []
 		var thickness = 5;
-		//I had to put in the first point twice or it wouldn't draw right.
-		pts.push(P(posX - this.binSlant*this.dropBinWidth/2, this.binY - this.binHeight));
 		pts.push(P(posX - this.binSlant*this.dropBinWidth/2, this.binY - this.binHeight));
 		pts.push(P(posX - this.dropBinWidth/2, this.binY));
 		pts.push(P(posX + this.dropBinWidth/2, this.binY));
@@ -249,6 +255,21 @@ DragWeights.prototype = {
 	},
 	newSlot: function(isFull, x, fy, name, type, row, col){
 		return {isFull:isFull, x:x, y:fy, name:name, type:type, row:row, col:col};
+	},
+	makeReadouts: function(toMake, y){
+		var readouts = {}
+		var width = myCanvas.width-130;
+		var spacing = Math.floor(width/(toMake.length-1))
+		var xInit = 5;
+		for (var toMakeIdx=0; toMakeIdx<toMake.length; toMakeIdx++){
+			var makeOrder = toMake[toMakeIdx];
+			var xPos = xInit + toMakeIdx*spacing;
+			readouts[makeOrder.name] = this.makeReadout(makeOrder.name, makeOrder.text, P(xPos, y), makeOrder.initVal, makeOrder.units);
+		}
+		return readouts;
+	},
+	makeReadout: function(name, text, pos, val, units){
+		return {name:name, text:text, pos:pos, val:val, units:units};
 	},
 	pistonMinusVal: function(val){
 		return function(){return walls.pts[0][0].y - val}
@@ -387,6 +408,7 @@ DragWeights.prototype = {
 	draw: function(){
 		this.drawWeights();
 		this.drawBins();
+		this.drawReadouts();
 	},
 	drawWeights: function(){
 		c.fillStyle = "rgb(" + Math.floor(this.weightCol.r) + "," + Math.floor(this.weightCol.g) + "," + Math.floor(this.weightCol.b) + ")";
@@ -406,7 +428,14 @@ DragWeights.prototype = {
 			draw.fillPts(pts, this.binCol, c);
 		}
 	},
-
+	drawReadouts: function(){
+		for (var readoutName in this.readouts){
+			var readout = this.readouts[readoutName];
+			var pos = readout.pos;
+			var text = readout.text+readout.val+readout.units;
+			draw.text(text, pos, this.readoutFont, this.readoutFontCol, 'left', 0, c);
+		}
+	},
 	drawEBar: function(yStart, yEnd, mass){
 		this.eBarY = Math.min(yStart, yEnd);
 		var x1 = this.eBar.x - mass*this.eBar.scalar/2;
@@ -451,20 +480,54 @@ DragWeights.prototype = {
 			this.drawEBarText(this.eBar.yText, this.eBar.eChange);
 			if(this.eBarY==this.zeroY){
 				removeListener(curLevel, 'update', 'removeEBar');
+				this.floatText();
 				this.eBar.eChange = undefined;
 				this.eBar.weight = undefined;
 				this.eBar.initStatus = undefined;
 				this.eBar.yMin = undefined;
 				this.eBar.yText = undefined;
+				
+				
 			}
 		}
 		
 	},
+	tickReadout: function(init, setPt, readoutName){
+		var step = (setPt - init)/10;
+		var readout = this.readouts[readoutName];
+		var tickFunc = this.makeTickFunc(readout, step, setPt);
+		if(!listenerExists(curLevel, 'update', readout.name)){
+			addListener(curLevel, 'update', readout.name, tickFunc, '');
+		}else{
+			removeListener(curLevel, 'update', readout.name);
+			addListener(curLevel, 'update', readout.name, tickFunc, '');
+		}
+	},
+	makeTickFunc: function(readout, step, setPt){
+		return function(){
+			var sign;
+			if(step!=0){
+				sign = Math.abs(step)/step;
+			}
+			var temp = readout.val*sign;
+			var signSetPt = setPt*sign;
+			temp+=step;
+			temp = round(sign*Math.min(temp, signSetPt),1);
+			readout.val = temp;
+			if(readout.val==setPt){
+				removeListener(curLevel, 'update', readout.name);
+			}
+		}
+	},
+	floatText: function(){
+		
+	},
 	putOnPiston: function(weight){
 		this.weightsOnPiston.push(weight);
+		var prevWeight = this.pistonWeight;
 		this.pistonWeight+=this.weightGroups[weight.name].mass;
 		weight.status = 'onPiston';
-		this.writeWeight()
+		this.tickReadout(prevWeight, this.pistonWeight, 'weight');
 	},	
 	takeOffPiston: function(weight){
 		for (var idx=0; idx<this.weightsOnPiston.length; idx++){
@@ -472,8 +535,9 @@ DragWeights.prototype = {
 				this.weightsOnPiston.splice([idx],1);
 			}
 		}
+		var prevWeight = this.pistonWeight;
 		this.pistonWeight-=this.weightGroups[weight.name].mass;
-		this.writeWeight();
+		this.tickReadout(prevWeight, this.pistonWeight, weight);
 	},
 	mousedown: function(){
 		var clicked = this.getClicked();
