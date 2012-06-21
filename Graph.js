@@ -1,6 +1,6 @@
-function Graph(name, width, height, xLabel, yLabel, pointColor, flashColor){
-	this.width = width;
-	this.height = height;
+function Graph(name, width, height, xLabel, yLabel){
+	this.name = name;
+	this.dims = V(width, height);
 	this.xLabel = xLabel;
 	this.yLabel = yLabel;
 	this.labelFontSize = 15;
@@ -13,12 +13,12 @@ function Graph(name, width, height, xLabel, yLabel, pointColor, flashColor){
 	this.xStart = this.borderSpacing/width;
 	this.yStart = 1-this.borderSpacing/height;
 	this.legendWidth = 80;
-	this.xEnd = (this.width - (this.legendWidth+8))/this.width;
+	this.xEnd = (this.dims.dx - (this.legendWidth+8))/this.dims.dx;
 	this.yEnd = .05;
 	this.gridSpacing = 40;
 	this.hashMarkLen = 10;
-	this.numXGridLines = Math.ceil(this.width*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing);
-	this.numYGridLines = Math.ceil(this.height*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
+	this.numXGridLines = Math.ceil(this.dims.dx*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing);
+	this.numYGridLines = Math.ceil(this.dims.dy*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
 	this.axisVals = [];
 	this.data = {};
 	this.legend = {};
@@ -27,21 +27,20 @@ function Graph(name, width, height, xLabel, yLabel, pointColor, flashColor){
 	this.bgCol = Col(5, 17, 26);
 	this.gridCol = Col(72,72,72);
 	this.textCol = Col(255, 255, 255);
-	this.pointCol = pointColor;
-	this.flashSize = 1.5;
+	this.flashMult = 1.5;
+	this.flashRate = .1;
 	this.graphBoundCol = Col(255,255,255);
 	this.ptStroke = Col(0,0,0);
 	this.rectSideLen = 8;
 	this.triSideLen = Math.sqrt(Math.pow(this.rectSideLen, 2)/2);
-	
-	//this.graph = Raphael(x, y, this.width, this.height);
-	this.makeCanvas(name);
+
+	this.makeCanvas(this.name);
 	this.drawAllBG();
 
 }
 Graph.prototype = {
 	makeCanvas: function(name){
-		var str = "<div class='graphSpacer'></div><div id = '" + name + "div'><canvas id ='" + name + "Graph' width=" + this.width + " height=" + this.height+ "></canvas></div>"
+		var str = "<div class='graphSpacer'></div><div id = '" + name + "div'><canvas id ='" + name + "Graph' width=" + this.dims.dx + " height=" + this.dims.dy+ "></canvas></div>"
 		var canvasDiv = $(str);
 		$('#graphs').append(canvasDiv);
 		var graphCanvas = document.getElementById(name+'Graph');
@@ -61,7 +60,7 @@ Graph.prototype = {
 		this.drawAllBG();
 	},
 	makeLegendEntry: function(set, address){
-		var x = this.width-this.legendWidth+5;
+		var x = this.dims.dx-this.legendWidth+5;
 		var y = 30;
 		for (var entryIdx in this.legend){
 			y+=30;
@@ -79,7 +78,7 @@ Graph.prototype = {
 		this.drawBounds();
 		this.drawLegend();
 		this.drawLabels(this.xLabel, this.yLabel);
-		this.bg = this.graph.getImageData(0, 0, this.width, this.height);
+		this.bg = this.graph.getImageData(0, 0, this.dims.dx, this.dims.dy);
 	},
 	drawAllData: function(){
 		this.graph.putImageData(this.bg, 0, 0);
@@ -93,17 +92,17 @@ Graph.prototype = {
 			var pt = legend.pt;
 			var font = this.legendFont
 			draw.text(text.text, P(text.x, text.y),  this.legendFont, this.textCol, 'left', 0, this.graph);
-			this.drawPt(pt.x, pt.y, pt.col);
+			this.drawPt(pt.x, pt.y, pt.col, this.triSideLen);
 		}
 	},
 	drawBGRect: function(){
 		this.graph.fillStyle = "rgb(200,50,50)";
-		draw.roundedRect(P(0,0), V(this.width, this.height), 20, this.bgCol, this.graph); 
+		draw.roundedRect(P(0,0), V(this.dims.dx, this.dims.dy), 20, this.bgCol, this.graph); 
 	},
 	drawBounds: function(){
-		var ptOrigin = P(this.xStart*this.width, this.yStart*this.height);
-		var width = this.width*(this.xEnd-this.xStart);
-		var height = this.height*(this.yEnd - this.yStart);
+		var ptOrigin = P(this.xStart*this.dims.dx, this.yStart*this.dims.dy);
+		var width = this.dims.dx*(this.xEnd-this.xStart);
+		var height = this.dims.dy*(this.yEnd - this.yStart);
 		var dims = V(width, height);
 		draw.strokeRect(ptOrigin, dims, this.graphBoundCol, this.graph);
 	},
@@ -112,17 +111,17 @@ Graph.prototype = {
 	},
 	drawGrid: function(){
 		for (var xGridIdx=0; xGridIdx<this.numXGridLines; xGridIdx++){
-			var x = this.xStart*this.width + this.gridSpacing*xGridIdx;
-			var yEnd = this.yEnd*this.height;
-			var yAxis = this.yStart*this.height + this.hashMarkLen;
+			var x = this.xStart*this.dims.dx + this.gridSpacing*xGridIdx;
+			var yEnd = this.yEnd*this.dims.dy;
+			var yAxis = this.yStart*this.dims.dy + this.hashMarkLen;
 			var p1 = P(x, yAxis);
 			var p2 = P(x, yEnd);
 			draw.line(p1, p2, this.gridCol, this.graph);
 		}
 		for (var yGridIdx=0; yGridIdx<this.numYGridLines; yGridIdx++){
-			var y = this.yStart*this.height - this.gridSpacing*yGridIdx;
-			var xEnd = this.xEnd*this.width;
-			var xAxis = this.xStart*this.width - this.hashMarkLen;
+			var y = this.yStart*this.dims.dy - this.gridSpacing*yGridIdx;
+			var xEnd = this.xEnd*this.dims.dx;
+			var xAxis = this.xStart*this.dims.dx - this.hashMarkLen;
 			var p1 = P(xAxis, y);
 			var p2 = P(xEnd, y);			
 			draw.line(p1, p2, this.gridCol, this.graph);
@@ -130,15 +129,14 @@ Graph.prototype = {
 		
 	},
 	drawLabels: function(xLabel, yLabel){
-		var xLabelPos = P(this.width*(this.xStart+this.xEnd)/2, Math.min(this.height*this.yStart+50, this.height-20))
-		var yLabelPos = P(Math.max(this.width*this.xStart-50, 20),this.height*(this.yStart+this.yEnd)/2)
+		var xLabelPos = P(this.dims.dx*(this.xStart+this.xEnd)/2, Math.min(this.dims.dy*this.yStart+50, this.dims.dy-20))
+		var yLabelPos = P(Math.max(this.dims.dx*this.xStart-50, 20),this.dims.dy*(this.yStart+this.yEnd)/2)
 		xLabelPos.y+=this.labelFontSize/2;
 		yLabelPos.y+=this.labelFontSize/2;
 		draw.text(xLabel, xLabelPos, this.labelFont, this.textCol, 'center',  0, this.graph);
 		draw.text(yLabel, yLabelPos, this.labelFont, this.textCol, 'center', -Math.PI/2, this.graph);
 	},
 	addPts: function(toAdd){
-		
 		var mustRedraw = new Boolean;
 		mustRedraw = false;
 		for (var addIdx=0; addIdx<toAdd.length; addIdx++){
@@ -153,7 +151,6 @@ Graph.prototype = {
 			this.valRange.x.min = Math.min(this.valRange.x.min, x);		
 			this.valRange.y.max = Math.max(this.valRange.y.max, y);
 			this.valRange.y.min = Math.min(this.valRange.y.min, y);
-			
 			var mustRedrawMe = !this.rangeIsSame(oldRange, this.valRange);
 			if(mustRedrawMe){
 				mustRedraw = true;
@@ -173,9 +170,9 @@ Graph.prototype = {
 				this.graphPt(xPt, yPt, pointCol);
 			}
 		}
-		/*
-		this.flash(data.pts[data.pts.length-1], data.pointCol, data.flashCol);
-		*/
+		
+		this.flashInit(toAdd);
+		
 	},
 	rangeIsSame: function(a, b){
 		return !(a.x.max!=b.x.max || a.x.min!=b.x.min || a.y.max!=b.y.max || a.y.min!=b.y.min);
@@ -224,14 +221,14 @@ Graph.prototype = {
 	},
 	drawAxisVals: function(){
 		for (var xGridIdx=0; xGridIdx<this.numXGridLines; xGridIdx++){
-			var xPos = this.xStart*this.width + this.gridSpacing*xGridIdx;
-			var yPos = this.yStart*this.height + this.hashMarkLen + 10 + this.axisValFontSize/2;
+			var xPos = this.xStart*this.dims.dx + this.gridSpacing*xGridIdx;
+			var yPos = this.yStart*this.dims.dy + this.hashMarkLen + 10 + this.axisValFontSize/2;
 			var text = String(round(this.axisRange.x.min + this.stepSize.x*xGridIdx, 1));
 			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', 0, this.graph);
 		}
 		for (var yGridIdx=0; yGridIdx<this.numYGridLines; yGridIdx++){
-			var yPos = this.yStart*this.height - this.gridSpacing*yGridIdx;
-			var xPos = this.xStart*this.width - this.hashMarkLen - 10;
+			var yPos = this.yStart*this.dims.dy - this.gridSpacing*yGridIdx;
+			var xPos = this.xStart*this.dims.dx - this.hashMarkLen - 10;
 			var text = String(round(this.axisRange.y.min + this.stepSize.y*yGridIdx,1));
 			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', -Math.PI/2, this.graph);
 		}		
@@ -249,14 +246,22 @@ Graph.prototype = {
 		}
 	},
 	graphPt: function(xVal, yVal, col){
-		var xRange = this.axisRange.x.max-this.axisRange.x.min;
-		var yRange = this.axisRange.y.max-this.axisRange.y.min;
-		var xPt = Math.abs(this.xEnd-this.xStart)*this.width*(xVal-this.axisRange.x.min)/xRange + this.xStart*this.width;
-		var yPt = this.height - (1-this.yStart)*this.height - Math.abs(this.yEnd-this.yStart)*this.height*(yVal-this.axisRange.y.min)/yRange;
-		this.drawPt(xPt, yPt, col);
+		var xPt = this.translateValToCoord(xVal, 'x');
+		var yPt = this.translateValToCoord(yVal, 'y');
+		this.drawPt(xPt, yPt, col, this.triSideLen);
 	},
-	drawPt: function(x, y, col){
-		var len = this.triSideLen;
+	translateValToCoord: function(val, axis){
+		var range = this.axisRange[axis].max - this.axisRange[axis].min;
+		var coord;
+		if(axis=='x'){
+			coord = Math.abs(this.xEnd-this.xStart)*this.dims.dx*(val-this.axisRange.x.min)/range + this.xStart*this.dims.dx;
+		}else if(axis=='y'){
+			coord = this.dims.dy - (1-this.yStart)*this.dims.dy - Math.abs(this.yEnd-this.yStart)*this.dims.dy*(val-this.axisRange.y.min)/range;
+		}
+		return coord;
+	},	
+	drawPt: function(x, y, col, triSideLen){
+		var len = triSideLen;
 		var pt1 = P(x-len, y);
 		var pt2 = P(x, y-len);
 		var pt3 = P(x+len, y);
@@ -264,19 +269,83 @@ Graph.prototype = {
 		var pts = [pt1, pt1, pt2, pt3, pt4];
 		draw.fillPtsStroke(pts, col, this.ptStroke, this.graph);
 	},
-	flash: function(pt, pointCol, flashCol){
-		var height = pt.attrs.height;
-		var width = pt.attrs.width;
-		var changeDim = (this.flashSize-1)*height/2;
-		var x = pt.attrs.x;
-		var y = pt.attrs.y;
-		pt.attr({x:x-changeDim, y:y-changeDim, height:this.flashSize*height, width:this.flashSize*width, fill:flashCol})
-		var anim = this.animToNorm(x, y, width, height, pointCol)
-		pt.animate(anim);
-		pt.attr({x:x, y:y, width:width, height:height, fill:pointCol});
+	flashInit: function(pts){
+		this.flashers = new Array(pts.length);
+		for (var flashIdx=0; flashIdx<this.flashers.length; flashIdx++){
+			var pt = pts[flashIdx];
+			var x = this.translateValToCoord(pt.x, 'x');
+			var y = this.translateValToCoord(pt.y, 'y');
+			var pos = P(x, y);
+			var pointCol = this.data[pt.address].pointCol;
+			var flashCol = this.data[pt.address].flashCol;
+			var curCol = Col(flashCol.r, flashCol.g, flashCol.b);
+			var imagePos = P(x - this.triSideLen*this.flashMult-1, y - this.triSideLen*this.flashMult-1);
+			var len = this.triSideLen*2*this.flashMult+2;
+			var curTriSideLen = this.triSideLen*this.flashMult;
+			var imageData = this.graph.getImageData(imagePos.x, imagePos.y, len, len);
+			this.flashers[flashIdx] = {pos:pos, pointCol:pointCol, flashCol:flashCol, curCol:curCol, curTriSideLen:curTriSideLen, imagePos:imagePos, imageData:imageData};
+		}
+		addListener(curLevel, 'update', 'flash'+this.name, this.flashRun, this);
 	},
-	animToNorm: function(x, y, width, height, pointCol){
-		return Raphael.animation({x:x, y:y, width:width, height:height, fill:pointCol}, .15e3);
+	flashRun: function(){
+		this.eraseFlashers();
+
+		for (var flasherIdx=0; flasherIdx<this.flashers.length; flasherIdx++){
+			var flasher = this.flashers[flasherIdx];
+			this.drawPt(flasher.pos.x, flasher.pos.y, flasher.curCol, flasher.curTriSideLen);
+			this.flasherNextStep(flasher);
+		}
+		if(this.doneFlashing()){
+			removeListener(curLevel, 'update', 'flash'+this.name);
+			this.eraseFlashers();
+		}
+	},
+	eraseFlashers: function(){
+		for (var flasherIdx=0; flasherIdx<this.flashers.length; flasherIdx++){
+			var flasher = this.flashers[flasherIdx];
+			this.graph.putImageData(flasher.imageData, flasher.imagePos.x, flasher.imagePos.y);
+		}
+	},
+	flasherNextStep: function(flasher){
+		flasher.curTriSideLen = Math.max(this.triSideLen, flasher.curTriSideLen*(1-this.flashRate));
+		var col = flasher.curCol;
+		for (var valName in col){
+			var val = col[valName];
+			var init = flasher.flashCol[valName];
+			var setPt = flasher.pointCol[valName];
+			var diff = setPt - init;
+			var sign;
+			if(diff!=0){
+				sign = diff/Math.abs(diff);
+			}else{
+				sign=1;
+			}
+			val*=sign;
+			setPt*=sign;
+			diff*=sign;
+			val = Math.min(val + diff*this.flashRate, setPt);
+			val*=sign;
+			col[valName] = val;
+		}	
+	},
+	doneFlashing: function(){
+		var amDone = new Boolean();
+		amDone = true;
+		for (var flasherIdx=0; flasherIdx<this.flashers.length; flasherIdx++){
+			var flasher = this.flashers[flasherIdx];
+			var la = flasher.curTriSideLen;
+			var lb = this.triSideLen;
+			var ra = flasher.curCol.r;
+			var rb = flasher.pointCol.r;		
+			var ga = flasher.curCol.g;
+			var gb = flasher.pointCol.g;		
+			var ba = flasher.curCol.b;
+			var bb = flasher.pointCol.b;
+			if(la!=lb || ra!=rb || ga!=gb || ba!=bb){
+				amDone = false;
+			}
+		}
+		return amDone;
 	},
 	getRange: function(axis){
 		var min = Number.MAX_VALUE;
@@ -302,7 +371,7 @@ Graph.prototype = {
 			data.y = [];
 			
 		}
-		this.removePts();
+		this.graph.putImageData(this.bg, 0, 0);
 		this.resetRanges();
 	},
 }
