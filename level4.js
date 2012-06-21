@@ -33,7 +33,7 @@ function level4(){
 	this.mass = function(){return this.dragWeights.pistonWeight};
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
 	walls.setup();
-	this.minY = 25;
+	this.minY = 50;
 	this.maxY = walls.pts[0][2].y-75;
 	addSpecies(['spc1', 'spc2', 'spc3']);
 	collide.setup();
