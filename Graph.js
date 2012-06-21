@@ -298,6 +298,7 @@ Graph.prototype = {
 		if(this.doneFlashing()){
 			removeListener(curLevel, 'update', 'flash'+this.name);
 			this.eraseFlashers();
+			this.flashers = undefined;
 		}
 	},
 	eraseFlashers: function(){
