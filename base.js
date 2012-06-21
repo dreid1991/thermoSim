@@ -20,7 +20,7 @@ drawingTools.prototype = {
 		}
 	},
 	walls: function(walls){
-		c.beginPath()
+		c.beginPath();
 		//alert(c.strokeStyle);
 		for (var wallIdx=0; wallIdx<walls.pts.length; wallIdx++){
 			var wall = walls.pts[wallIdx];
@@ -30,6 +30,7 @@ drawingTools.prototype = {
 				c.lineTo(pt.x, pt.y);
 			}
 		}
+		c.closePath();
 		c.stroke();
 	},
 	fillPts: function(pts, col, drawCanvas){
