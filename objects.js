@@ -506,7 +506,7 @@ DragWeights.prototype = {
 	makeTickFunc: function(readout, step, setPt){
 		return function(){
 			readout.val = round(boundedStep(readout.val, setPt, step),1);
-			if(readout.val==setPt){
+			if(readout.val==round(setPt,1)){
 				removeListener(curLevel, 'update', readout.name);
 			}
 		}
