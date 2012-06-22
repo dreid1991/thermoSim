@@ -36,7 +36,7 @@ function level4(){
 	walls.setup();
 	this.minY = 60;
 	this.maxY = walls.pts[0][2].y-75;
-	addSpecies(['spc1', 'spc2', 'spc3']);
+	addSpecies(['spc1', 'spc3']);
 	collide.setup();
 
 }
@@ -209,7 +209,7 @@ level4.prototype = {
 		//populate("spc3", 15, 15, myCanvas.width-400, myCanvas.height-150, 400, 4);		
 		populate("spc1", 35, 80, 460, 350, 800, 250);
 		populate("spc3", 35, 80, 460, 350, 600, 250);		
-		populate("spc2", 35, 80, 460, 300, 20, 250);
+		//populate("spc2", 35, 80, 460, 300, 20, 250);
 	},
 	dataRun: function(){
 		var SAPInt = getLen([walls.pts[0][1], walls.pts[0][2], walls.pts[0][3], walls.pts[0][4]])
