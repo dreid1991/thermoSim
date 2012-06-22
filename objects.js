@@ -547,32 +547,11 @@ DragWeights.prototype = {
 				posCur.y = boundedStep(posCur.y, posDest.y, dir.dy*self.flySpeed);
 				if(posCur.x==posDest.x && posCur.y==posDest.y){
 					removeListener(curLevel, 'update', flyName);
-					//self.fadeText(text, posCur, self.eBarFont, self.eBarFontCol, curLevel.bgCol, 'center', 0, flyName+'Fade');
 				}
 			},
 		'');
 		
 				
-	},
-	fadeText: function(text, pos, font, colInit, colDest, align, rotation, listenerName  ){
-		var turn = 0;
-		var numTurns = 5;
-		var stepR = Math.ceil((colDest.r-colInit.r)/numTurns);
-		var stepG = Math.ceil((colDest.g-colInit.g)/numTurns);
-		var stepB = Math.ceil((colDest.b-colInit.b)/numTurns);
-		var curCol = colInit.copy();
-		addListener(curLevel, 'update', listenerName, 
-			function(){
-				draw.text(text, pos, font, curCol, align, rotation, c)
-				curCol.r = boundedStep(curCol.r, colDest.r, stepR);
-				curCol.g = boundedStep(curCol.g, colDest.g, stepG);
-				curCol.b = boundedStep(curCol.b, colDest.b, stepB);
-				if(curCol.r==colDest.r&&curCol.g==colDest.g&&curCol.b==colDest.b){
-					removeListener(curLevel, 'update', listenerName);
-				}
-			},
-		'');
-		
 	},
 	putOnPiston: function(weight){
 		this.weightsOnPiston.push(weight);
