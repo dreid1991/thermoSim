@@ -98,6 +98,9 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.moveToPistonOrders = [];
 	this.weightsOnPiston = [];
 	this.tempWeightDefs = weightDefs;
+	this.flySpeed = 20;
+	this.eBarFont = '12pt Calibri';
+	this.eBarFontCol = Col(255,255,255);
 	this.readoutFont = '13pt calibri';
 	this.readoutFontCol = Col(255,255,255);
 	this.readouts = this.makeReadouts([ {name:'eIn',   text:'E in: ', units:'u', initVal:0},
@@ -443,12 +446,13 @@ DragWeights.prototype = {
 		var pts = [P(x1,yStart), P(x1,yStart), P(x1,yEnd), P(x2, yEnd), P(x2, yStart), P(x2,yStart)];
 		draw.fillPts(pts,this.eBarCol, c);
 	},
-	drawEBarText: function(y, energy){
-		c.font = '12pt Calibri';
-		c.fillStyle = 'white';
-		c.textAlign = 'center';
+	drawEBarText: function(pos, energy){
 		this.eBar.eChange = energy
-		c.fillText(this.eBar.eChange + ' u',this.eBar.x, y);
+		var text = this.eText(this.eBar.eChange)
+		draw.text(text, pos, this.eBarFont, this.eBarFontCol, 'center', 0, c);
+	},
+	eText: function(energy){
+		return energy + ' ' + curLevel.eUnits;
 	},
 	eBarUp: function(){
 		yMin = this.pistonY();
@@ -458,13 +462,13 @@ DragWeights.prototype = {
 		var dh = yMax-yDraw;
 		var m = this.weightGroups[this.eBar.weight.name].mass;
 		var g = this.g();
-		this.drawEBarText(yDraw-15, round(m*g*dh/1000,1));
+		this.drawEBarText(P(this.eBar.x, yDraw-15), round(m*g*dh/1000,1));
 		this.drawEBar(yMax, yDraw, m);
 	},
 	eBarDown: function(){
 		yMax = this.zeroY;
 		var m = this.weightGroups[this.eBar.weight.name].mass;
-		this.drawEBarText(this.eBar.yText, this.eBar.eChange);
+		this.drawEBarText(P(this.eBar.x, this.eBar.yText), this.eBar.eChange);
 		this.drawEBar(this.eBar.yMin, yMax, m);
 	},
 	removeEBar: function(){
@@ -476,7 +480,7 @@ DragWeights.prototype = {
 		} else{
 			this.eBarY = Math.min(this.eBarY + 2*this.moveSpeed, this.zeroY);
 			this.drawEBar(this.zeroY, this.eBarY, this.weightGroups[this.eBar.weight.name].mass)
-			this.drawEBarText(this.eBar.yText, this.eBar.eChange);
+			//this.drawEBarText(P(this.eBar.x, this.eBar.yText), this.eBar.eChange);
 			if(this.eBarY==this.zeroY){
 				removeListener(curLevel, 'update', 'removeEBar');
 				
@@ -535,8 +539,61 @@ DragWeights.prototype = {
 			}
 		}
 	},
-	floatText: function(){
+	flyText: function(){
+		//need unique listener name;
+		var flyName = this.eBar.weight.name + Math.floor(Math.random()*10000);
+		var yInit = this.pistonY()-15;
+		var posInit = P(this.eBar.x, yInit);
+		var posCur = P(posInit.x, posInit.y);
+		var posDest;
+		if(this.eBar.eChange>0){
+			posDest = P(this.readouts.eIn.pos.x+40, this.readouts.eIn.pos.y+15);
+		}else{
+			posDest = P(this.readouts.eOut.pos.x+40, this.readouts.eOut.pos.y+15);
+		}
+
+		var dir = V(posDest.x-posInit.x, posDest.y-posInit.y).UV();
+		var signX=1;
+		var signY=1;
+		if(dir.dx!=0){
+			signX = Math.abs(dir.dx)/dir.dx;
+		}
+		if(dir.dy!=0){
+			signY = Math.abs(dir.dy)/dir.dy;
+		}
+		var text = this.eText(Math.abs(this.eBar.eChange));
+		var self = this;
+		addListener(curLevel, 'update', flyName, 
+			function(){
+				draw.text(text, posCur, self.eBarFont, self.eBarFontCol, 'center', 0, c);
+				var x = posCur.x*signX;
+				var y = posCur.y*signY;
+				var destX = posDest.x*signX;
+				var destY = posDest.y*signY;
+				var dx = dir.dx*self.flySpeed*signX;
+				var dy = dir.dy*self.flySpeed*signY;
+				posCur.x = signX*Math.min(x+dx, destX);
+				posCur.y = signY*Math.min(y+dy, destY);
+				
+				if(posCur.x==posDest.x && posCur.y==posDest.y){
+					removeListener(curLevel, 'update', flyName);
+					/*
+					var turn=0;
+					
+					addListener(curLevel, 'update', flyName+'Fade',
+						function(){
+							var numTurns = 15;				
+							turn++;
+							if(turn==numTurns){
+								removeListener(curLevel, 'update', flyName+'Fade');
+							}
+						},
+					'');*/
+				}
+			},
+		'');
 		
+				
 	},
 	putOnPiston: function(weight){
 		this.weightsOnPiston.push(weight);
@@ -563,12 +620,12 @@ DragWeights.prototype = {
 					var self = this;
 					this.eBar.weight = this.selected;
 					this.eBar.initStatus = this.eBar.weight.status;
-					
 					addListener(curLevel, 'mouseup', 'switchToRemove', 
 						function(){	
 							removeListener(curLevel, 'update', eBarType);
 							removeListener(curLevel, 'mouseup', 'switchToRemove');
 							addListener(curLevel, 'update', 'removeEBar', self.removeEBar, self);
+							self.flyText();
 							var yText = self.pistonY()-15;
 							self.eBar.yText = yText;
 						}, 
@@ -591,6 +648,7 @@ DragWeights.prototype = {
 						function(){
 							removeListener(curLevel, 'update', eBarType);
 							removeListener(curLevel, 'mouseup', 'switchToFall');
+							self.flyText();
 							addListener(curLevel, 'update', 'removeEBar', self.removeEBar, self);
 						},
 					'');
