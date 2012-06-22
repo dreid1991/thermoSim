@@ -1,4 +1,4 @@
-function Graph(name, width, height, xLabel, yLabel){
+function Graph(name, width, height, xLabel, yLabel, axisInit){
 	this.name = name;
 	this.dims = V(width, height);
 	this.xLabel = xLabel;
@@ -17,9 +17,13 @@ function Graph(name, width, height, xLabel, yLabel){
 	this.yEnd = .05;
 	this.gridSpacing = 40;
 	this.hashMarkLen = 10;
-	this.numXGridLines = Math.ceil(this.dims.dx*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing);
-	this.numYGridLines = Math.ceil(this.dims.dy*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
-	this.axisVals = [];
+	
+	var numGridLinesX = Math.ceil(this.dims.dx*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing);
+	var numGridLinesY = Math.ceil(this.dims.dy*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
+	this.numGridLines = {x:numGridLinesX, y:numGridLinesY};
+	this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*this.numGridLines.x}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*this.numGridLines.y}};
+	var a = this.axisInit;
+	this.axisRange = {x:{min:0, max:0}, y:{min:0, max:0}};
 	this.data = {};
 	this.legend = {};
 	this.resetRanges();
@@ -109,7 +113,7 @@ Graph.prototype = {
 		this.graphBounds.remove();
 	},
 	drawGrid: function(){
-		for (var xGridIdx=0; xGridIdx<this.numXGridLines; xGridIdx++){
+		for (var xGridIdx=0; xGridIdx<this.numGridLines.x; xGridIdx++){
 			var x = this.xStart*this.dims.dx + this.gridSpacing*xGridIdx;
 			var yEnd = this.yEnd*this.dims.dy;
 			var yAxis = this.yStart*this.dims.dy + this.hashMarkLen;
@@ -117,7 +121,7 @@ Graph.prototype = {
 			var p2 = P(x, yEnd);
 			draw.line(p1, p2, this.gridCol, this.graph);
 		}
-		for (var yGridIdx=0; yGridIdx<this.numYGridLines; yGridIdx++){
+		for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
 			var y = this.yStart*this.dims.dy - this.gridSpacing*yGridIdx;
 			var xEnd = this.xEnd*this.dims.dx;
 			var xAxis = this.xStart*this.dims.dx - this.hashMarkLen;
@@ -136,8 +140,10 @@ Graph.prototype = {
 		draw.text(yLabel, yLabelPos, this.labelFont, this.textCol, 'center', -Math.PI/2, this.graph);
 	},
 	addPts: function(toAdd){
-		var mustRedraw = new Boolean;
+		var mustRedraw = new Boolean()
 		mustRedraw = false;
+		var val = this.valRange;
+		var oldValRange = {x:{min:val.x.min, max:val.x.max}, y:{min:val.y.min, max:val.y.max}};
 		for (var addIdx=0; addIdx<toAdd.length; addIdx++){
 			var address = toAdd[addIdx].address;
 			var x = toAdd[addIdx].x;
@@ -145,20 +151,22 @@ Graph.prototype = {
 			var data = this.data[address]
 			data.x.push(x);
 			data.y.push(y);
-			var oldRange = {x:{min:this.valRange.x.min, max:this.valRange.x.max}, y:{min:this.valRange.y.min, max:this.valRange.y.max}};
+
 			this.valRange.x.max = Math.max(this.valRange.x.max, x);
 			this.valRange.x.min = Math.min(this.valRange.x.min, x);		
 			this.valRange.y.max = Math.max(this.valRange.y.max, y);
 			this.valRange.y.min = Math.min(this.valRange.y.min, y);
-			var mustRedrawMe = !this.rangeIsSame(oldRange, this.valRange);
-			if(mustRedrawMe){
-				mustRedraw = true;
-			}
-		}	
+		}
+		var old = this.axisRange;
+		var oldAxisRange = {x:{min:old.x.min, max:old.x.max}, y:{min:old.y.min, max:old.y.max}};
+		this.setAxisBounds(oldValRange);
+		if(!this.rangeIsSame(oldAxisRange.x, this.axisRange.x) || !this.rangeIsSame(oldAxisRange.y, this.axisRange.y)){
+			mustRedraw = true;
+		}
+		
 		if(mustRedraw){
 			this.valRange.x = this.getRange('x');
 			this.valRange.y = this.getRange('y');
-			this.getAxisBounds();
 			this.drawAllData();
 		} else{
 			for (var addIdx=0; addIdx<toAdd.length; addIdx++){
@@ -173,8 +181,27 @@ Graph.prototype = {
 		this.flashInit(toAdd);
 		
 	},
+	setAxisBounds: function(oldRange){
+		var a = this.axisInit;
+		var b = this.valRange;
+		if(!(a.x.min<b.x.min && a.x.max>b.x.max)){
+			if(!this.rangeIsSame(oldRange.x, this.valRange.x)){
+				this.getXBounds();
+			}
+		} else{
+			this.setAxisToInit('x');
+		}
+		if(!(a.y.min<b.y.min && a.y.max>b.y.max)){
+			if(!this.rangeIsSame(oldRange.y, this.valRange.y)){
+				this.getYBounds();
+			}
+			this.getYBounds();
+		} else{
+			this.setAxisToInit('y');
+		}		
+	},
 	rangeIsSame: function(a, b){
-		return !(a.x.max!=b.x.max || a.x.min!=b.x.min || a.y.max!=b.y.max || a.y.min!=b.y.min);
+		return !(a.max!=b.max || a.min!=b.min);
 	},
 	plotData: function(xVals, yVals, address){
 		if (xVals.length==yVals.length && xVals.length>1){
@@ -190,42 +217,56 @@ Graph.prototype = {
 			console.log("UH-OH");
 		};
 	},
-	getAxisBounds: function(){		
+	setAxisToInit: function(axis){
+		var curRange = this.axisRange[axis];
+		var init = this.axisInit[axis];
+		var numGridLines = this.numGridLines[axis];
+		curRange.min = init.min;
+		curRange.max = init.max;
+		var range = curRange.max-curRange.min;
+		this.stepSize[axis] = range/numGridLines;
+	},
+	getAxisBounds: function(){
+		this.getXBounds();
+		this.getYBounds();
+	},
+	getXBounds: function(){
 		var rangeX = this.valRange.x.max-this.valRange.x.min;
 		if(rangeX!=0){
-			var unroundStepX = rangeX/(this.numXGridLines-1);
+			var unroundStepX = rangeX/(this.numGridLines.x-1);
 			var expStepX = Math.pow(10, Math.floor(log10(unroundStepX)))
 			this.stepSize.x = Math.ceil(unroundStepX/expStepX)*expStepX;
 			this.axisRange.x.min = Math.floor(this.valRange.x.min/this.stepSize.x)*this.stepSize.x;
-			this.axisRange.x.max = this.axisRange.x.min + this.numXGridLines*this.stepSize.x;
+			this.axisRange.x.max = this.axisRange.x.min + this.numGridLines.x*this.stepSize.x;
 		}else{
 			this.axisRange.x.min = Math.floor(this.valRange.x.min);
 			this.stepSize.x = .2;
-			this.axisRange.x.max = this.axisRange.x.min + this.stepSize.x*this.numXGridLines;	
+			this.axisRange.x.max = this.axisRange.x.min + this.stepSize.x*this.numGridLines.x;	
 		}
-		
+	},
+	getYBounds: function(){
 		var rangeY = Math.abs(this.valRange.y.max-this.valRange.y.min);
 		if(rangeY!=0){
-			var unroundStepY = rangeY/(this.numYGridLines-1);
+			var unroundStepY = rangeY/(this.numGridLines.y-1);
 			var expStepY = Math.pow(10, Math.floor(log10(unroundStepY)))
 			this.stepSize.y = Math.ceil(unroundStepY/expStepY)*expStepY;
 			this.axisRange.y.min = Math.floor(this.valRange.y.min/this.stepSize.y)*this.stepSize.y;
-			this.axisRange.y.max = this.axisRange.y.min + this.numYGridLines*this.stepSize.y;
+			this.axisRange.y.max = this.axisRange.y.min + this.numGridLines.y*this.stepSize.y;
 		}else{
 			this.axisRange.y.min = Math.floor(this.valRange.y.min);
 			this.stepSize.y = .2;
-			this.axisRange.y.max = this.axisRange.y.min + this.stepSize.y*this.numYGridLines;	
+			this.axisRange.y.max = this.axisRange.y.min + this.stepSize.y*this.numGridLines.y;	
 			
 		}
 	},
 	drawAxisVals: function(){
-		for (var xGridIdx=0; xGridIdx<this.numXGridLines; xGridIdx++){
+		for (var xGridIdx=0; xGridIdx<this.numGridLines.x; xGridIdx++){
 			var xPos = this.xStart*this.dims.dx + this.gridSpacing*xGridIdx;
 			var yPos = this.yStart*this.dims.dy + this.hashMarkLen + 10 + this.axisValFontSize/2;
 			var text = String(round(this.axisRange.x.min + this.stepSize.x*xGridIdx, 1));
 			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', 0, this.graph);
 		}
-		for (var yGridIdx=0; yGridIdx<this.numYGridLines; yGridIdx++){
+		for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
 			var yPos = this.yStart*this.dims.dy - this.gridSpacing*yGridIdx;
 			var xPos = this.xStart*this.dims.dx - this.hashMarkLen - 10;
 			var text = String(round(this.axisRange.y.min + this.stepSize.y*yGridIdx,1));

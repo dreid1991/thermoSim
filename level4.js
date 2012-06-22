@@ -50,8 +50,10 @@ level4.prototype = {
 		this.hideBase();
 		this.startIntro();
 		this.dragWeights.init();
-		this.graphs.pVSv = new Graph('pVSv', 400,300, "Volume", "Pressure");
-		this.graphs.tVSv = new Graph('tVSv', 400, 300,"Volume", "Temperature");
+		this.graphs.pVSv = new Graph('pVSv', 400,300, "Volume", "Pressure",
+							{x:{min:50, step:25}, y:{min:0, step:3}});
+		this.graphs.tVSv = new Graph('tVSv', 400, 300,"Volume", "Temperature",
+							{x:{min:50, step:25}, y:{min:100, step:60}});
 		this.graphs.pVSv.addSet('pInt', 'P Int.', Col(0,0,255), Col(200,200,255));
 		this.graphs.pVSv.addSet('pExt', 'P Ext.', Col(0,255,0), Col(200,255,200));
 		this.graphs.tVSv.addSet('t', 'Sys Temp', Col(255,0,0), Col(255,200,200));		
