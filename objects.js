@@ -476,11 +476,10 @@ DragWeights.prototype = {
 		} else{
 			this.eBarY = Math.min(this.eBarY + 2*this.moveSpeed, this.zeroY);
 			this.drawEBar(this.zeroY, this.eBarY, this.weightGroups[this.eBar.weight.name].mass)
-			//var yText = this.pistonY()-15;
 			this.drawEBarText(this.eBar.yText, this.eBar.eChange);
 			if(this.eBarY==this.zeroY){
 				removeListener(curLevel, 'update', 'removeEBar');
-				this.floatText();
+				
 				this.eBar.eChange = undefined;
 				this.eBar.weight = undefined;
 				this.eBar.initStatus = undefined;
@@ -491,6 +490,12 @@ DragWeights.prototype = {
 			}
 		}
 		
+	},
+	doEBarReadout: function(readoutName, change){
+		var readout = this.readouts[readoutName];
+		var init = readout.val;
+		var setPt = init + change;
+		this.tickReadout(init, setPt, readoutName);
 	},
 	tickReadout: function(init, setPt, readoutName){
 		var step = (setPt - init)/10;
@@ -511,7 +516,7 @@ DragWeights.prototype = {
 			}
 			var temp = readout.val*sign;
 			var signSetPt = setPt*sign;
-			temp+=step;
+			temp+=step*sign;
 			temp = round(sign*Math.min(temp, signSetPt),1);
 			readout.val = temp;
 			if(readout.val==setPt){
@@ -524,10 +529,8 @@ DragWeights.prototype = {
 	},
 	putOnPiston: function(weight){
 		this.weightsOnPiston.push(weight);
-		var prevWeight = this.pistonWeight;
 		this.pistonWeight+=this.weightGroups[weight.name].mass;
 		weight.status = 'onPiston';
-		this.tickReadout(prevWeight, this.pistonWeight, 'weight');
 	},	
 	takeOffPiston: function(weight){
 		for (var idx=0; idx<this.weightsOnPiston.length; idx++){
@@ -537,7 +540,6 @@ DragWeights.prototype = {
 		}
 		var prevWeight = this.pistonWeight;
 		this.pistonWeight-=this.weightGroups[weight.name].mass;
-		this.tickReadout(prevWeight, this.pistonWeight, weight);
 	},
 	mousedown: function(){
 		var clicked = this.getClicked();
@@ -560,9 +562,6 @@ DragWeights.prototype = {
 							self.eBar.yText = yText;
 						}, 
 					self);
-					//addListener(curLevel, 'mouseup', 'setYText',
-					//	function(){
-					//		removeListener(curLevel, 'mouseup', 'setYText')
 				}
 				if(this.selected.status=='onPiston'){
 					var eBarType = 'eBarDown';
@@ -602,15 +601,28 @@ DragWeights.prototype = {
 	mouseup: function(){
 		removeListener(curLevel, 'mousemove', 'weights');
 		removeListener(curLevel, 'mouseup', 'weights');
-		if(this.selected.pos.y<this.pistonY()){
-			this.dropIntoPistonBin(this.selected)
+		if(this.selected.status == 'onPiston'){
+			this.doEBarReadout('eOut', Math.abs(this.eBar.eChange));
+			this.doEBarReadout('delE', this.eBar.eChange);
+			var mass = this.weightGroups[this.eBar.weight.name].mass;
+			this.doEBarReadout('weight', -mass);
+			this.dropIntoBin(this.selected);
 		}else{
-			this.dropIntoBin(this.selected)
+			if(this.selected.pos.y<this.pistonY()){
+				this.doEBarReadout('eIn', Math.abs(this.eBar.eChange));
+				this.doEBarReadout('delE', this.eBar.eChange);
+				var mass = this.weightGroups[this.eBar.weight.name].mass;
+				this.doEBarReadout('weight', mass);
+				this.dropIntoPistonBin(this.selected)
+			}else{
+				this.dropIntoBin(this.selected)
+			}
 		}
 		delete this.origPos;
 		this.selected = undefined;
 
 	},
+
 	pickup: function(weight){
 		
 		if (weight.slot!==undefined){
