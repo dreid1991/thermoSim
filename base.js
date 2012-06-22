@@ -114,7 +114,19 @@ function gauss(avg, stdev){
 	var numStdev = (Math.random() + Math.random() + Math.random())-1.5;
 	return avg + numStdev*stdev;
 }
-
+function boundedStep(cur, dest, step){
+	var sign = 1;
+	if(cur==dest){
+		return cur;
+	}else{
+		var dist = dest-cur;
+		sign = Math.abs(dist)/dist;
+	}
+	cur*=sign;
+	dest*=sign;
+	step*=sign;
+	return sign*Math.min(cur+step, dest);
+}
 function addSpecies(toAdd){
 	if (String(toAdd)===toAdd){
 		var def = speciesDefs[toAdd];

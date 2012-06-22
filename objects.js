@@ -118,7 +118,6 @@ DragWeights.prototype = {
 		this.pistonBins = this.makePistonBins();
 		this.dropAllInBins();
 		addListener(curLevel, 'mousedown', 'weights', this.mousedown, this);
-		this.writeWeight(this.pistonWeight);
 		delete this.tempWeightDefs;
 	},
 	getWeightDims: function(weightDefs){
@@ -342,18 +341,9 @@ DragWeights.prototype = {
 			var dy = dest.y-weight.pos.y;
 			if(dx!=0 || dy!=0){
 				var dirUV = V(dx,dy).UV();
-				var signX=1;
-				var signY=1;
-				if(dx!=0){
-					var signX = Math.abs(dx)/dx;
-				}
-				if(dy!=0){
-					var signY = Math.abs(dy)/dy;
-				}
-				var nextX = weight.pos.x + this.moveSpeed*dirUV.dx;
-				var nextY = weight.pos.y + this.moveSpeed*dirUV.dy;
-				weight.pos.x = signX*Math.min(signX*dest.x, signX*nextX);
-				weight.pos.y = signY*Math.min(signY*dest.y, signY*nextY);
+				weight.pos.x = boundedStep(weight.pos.x, dest.x, dirUV.dx*this.moveSpeed);
+				weight.pos.y = boundedStep(weight.pos.y, dest.y, dirUV.dy*this.moveSpeed);
+
 			}
 			if(weight.pos.x == dest.x){
 				weight.status = 'inBin';
@@ -369,22 +359,13 @@ DragWeights.prototype = {
 			var order = this.moveToPistonOrders[orderIdx];
 			var weight = order.weight;
 			var dest = weight.slot;
+
 			var dx = dest.x-weight.pos.x;
 			var dy = dest.y()-weight.pos.y;
 			if (dx!=0 || dy!=0){
 				var dirUV = V(dx,dy).UV();
-				var signX=1;
-				var signY=1;
-				if(dx!=0){
-					var signX = Math.abs(dx)/dx;
-				}
-				if(dy!=0){
-					var signY = Math.abs(dy)/dy;
-				}
-				var nextX = weight.pos.x + this.moveSpeed*dirUV.dx;
-				var nextY = weight.pos.y + this.moveSpeed*dirUV.dy;		
-				weight.pos.x = signX*Math.min(signX*dest.x, signX*nextX);
-				weight.pos.y = signY*Math.min(signY*dest.y(), signY*nextY);	
+				weight.pos.x = boundedStep(weight.pos.x, dest.x, this.moveSpeed*dirUV.dx);
+				weight.pos.y = boundedStep(weight.pos.y, dest.y(), this.moveSpeed*dirUV.dy);
 			}
 			if(weight.pos.x == dest.x && weight.pos.y == dest.y()){
 				this.moveToPistonOrders.splice(orderIdx,1);
@@ -435,7 +416,7 @@ DragWeights.prototype = {
 		for (var readoutName in this.readouts){
 			var readout = this.readouts[readoutName];
 			var pos = readout.pos;
-			var text = readout.text+readout.val+readout.units;
+			var text = readout.text+readout.val+' '+readout.units;
 			draw.text(text, pos, this.readoutFont, this.readoutFontCol, 'left', 0, c);
 		}
 	},
@@ -506,7 +487,6 @@ DragWeights.prototype = {
 			var readout = this.readouts[readoutName];
 			var curVal = readout.val;
 			var setPt = readout.initVal;
-			//readout.val = setPt;
 			this.tickReadout(curVal, setPt, readoutName);
 		}
 	},
@@ -525,15 +505,7 @@ DragWeights.prototype = {
 	},
 	makeTickFunc: function(readout, step, setPt){
 		return function(){
-			var sign;
-			if(step!=0){
-				sign = Math.abs(step)/step;
-			}
-			var temp = readout.val*sign;
-			var signSetPt = setPt*sign;
-			temp+=step*sign;
-			temp = round(sign*Math.min(temp, signSetPt),1);
-			readout.val = temp;
+			readout.val = round(boundedStep(readout.val, setPt, step),1);
 			if(readout.val==setPt){
 				removeListener(curLevel, 'update', readout.name);
 			}
@@ -553,47 +525,41 @@ DragWeights.prototype = {
 		}
 
 		var dir = V(posDest.x-posInit.x, posDest.y-posInit.y).UV();
-		var signX=1;
-		var signY=1;
-		if(dir.dx!=0){
-			signX = Math.abs(dir.dx)/dir.dx;
-		}
-		if(dir.dy!=0){
-			signY = Math.abs(dir.dy)/dir.dy;
-		}
 		var text = this.eText(Math.abs(this.eBar.eChange));
 		var self = this;
 		addListener(curLevel, 'update', flyName, 
 			function(){
 				draw.text(text, posCur, self.eBarFont, self.eBarFontCol, 'center', 0, c);
-				var x = posCur.x*signX;
-				var y = posCur.y*signY;
-				var destX = posDest.x*signX;
-				var destY = posDest.y*signY;
-				var dx = dir.dx*self.flySpeed*signX;
-				var dy = dir.dy*self.flySpeed*signY;
-				posCur.x = signX*Math.min(x+dx, destX);
-				posCur.y = signY*Math.min(y+dy, destY);
-				
+				posCur.x = boundedStep(posCur.x, posDest.x, dir.dx*self.flySpeed);
+				posCur.y = boundedStep(posCur.y, posDest.y, dir.dy*self.flySpeed);
 				if(posCur.x==posDest.x && posCur.y==posDest.y){
 					removeListener(curLevel, 'update', flyName);
-					/*
-					var turn=0;
-					
-					addListener(curLevel, 'update', flyName+'Fade',
-						function(){
-							var numTurns = 15;				
-							turn++;
-							if(turn==numTurns){
-								removeListener(curLevel, 'update', flyName+'Fade');
-							}
-						},
-					'');*/
+					self.fadeText(text, posCur, self.eBarFont, self.eBarFontCol, curLevel.bgCol, 'center', 0, flyName+'Fade');
 				}
 			},
 		'');
 		
 				
+	},
+	fadeText: function(text, pos, font, colInit, colDest, align, rotation, listenerName  ){
+		var turn = 0;
+		var numTurns = 15;
+		var stepR = Math.ceil((colDest.r-colInit.r)/numTurns);
+		var stepG = Math.ceil((colDest.g-colInit.g)/numTurns);
+		var stepB = Math.ceil((colDest.b-colInit.b)/numTurns);
+		var curCol = colInit.copy();
+		addListener(curLevel, 'update', listenerName, 
+			function(){
+				draw.text(text, pos, font, curCol, align, rotation, c)
+				curCol.r = boundedStep(curCol.r, colDest.r, stepR);
+				curCol.g = boundedStep(curCol.g, colDest.g, stepG);
+				curCol.b = boundedStep(curCol.b, colDest.b, stepB);
+				if(curCol.r==colDest.r&&curCol.g==colDest.g&&curCol.b==colDest.b){
+					removeListener(curLevel, 'update', listenerName);
+				}
+			},
+		'');
+		
 	},
 	putOnPiston: function(weight){
 		this.weightsOnPiston.push(weight);
@@ -625,7 +591,6 @@ DragWeights.prototype = {
 							removeListener(curLevel, 'update', eBarType);
 							removeListener(curLevel, 'mouseup', 'switchToRemove');
 							addListener(curLevel, 'update', 'removeEBar', self.removeEBar, self);
-							self.flyText();
 							var yText = self.pistonY()-15;
 							self.eBar.yText = yText;
 						}, 
@@ -648,7 +613,6 @@ DragWeights.prototype = {
 						function(){
 							removeListener(curLevel, 'update', eBarType);
 							removeListener(curLevel, 'mouseup', 'switchToFall');
-							self.flyText();
 							addListener(curLevel, 'update', 'removeEBar', self.removeEBar, self);
 						},
 					'');
@@ -675,6 +639,7 @@ DragWeights.prototype = {
 			this.doEBarReadout('delE', this.eBar.eChange);
 			var mass = this.weightGroups[this.eBar.weight.name].mass;
 			this.doEBarReadout('weight', -mass);
+			this.flyText()
 			this.dropIntoBin(this.selected);
 		}else{
 			if(this.selected.pos.y<this.pistonY()){
@@ -682,6 +647,7 @@ DragWeights.prototype = {
 				this.doEBarReadout('delE', this.eBar.eChange);
 				var mass = this.weightGroups[this.eBar.weight.name].mass;
 				this.doEBarReadout('weight', mass);
+				this.flyText();
 				this.dropIntoPistonBin(this.selected)
 			}else{
 				this.dropIntoBin(this.selected)
@@ -731,7 +697,4 @@ DragWeights.prototype = {
 		}
 		return true;
 	},
-	writeWeight: function(){
-		//$('#dashRun').html('PUT ELSEWHERE.  Current weight: ' + String(this.pistonWeight))
-	}
 }

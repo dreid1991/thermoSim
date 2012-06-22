@@ -24,7 +24,7 @@ function Graph(name, width, height, xLabel, yLabel){
 	this.legend = {};
 	this.resetRanges();
 	this.stepSize = {x:0, y:0};
-	this.bgCol = Col(5, 17, 26);
+	this.bgCol = curLevel.bgCol
 	this.gridCol = Col(72,72,72);
 	this.textCol = Col(255, 255, 255);
 	this.flashMult = 1.5;

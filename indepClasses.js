@@ -57,6 +57,14 @@ Vector.prototype = {
 	magSqr: function(){
 		return this.dx*this.dx + this.dy*this.dy;
 	},
+	copy: function(){
+		return V(this.dx, this.dy);
+	}
+}
+Color.prototype = {
+	copy: function(){
+		return Col(this.r, this.g, this.b);
+	},
 }
 Point.prototype = {
 	distTo: function(pTo){
@@ -72,6 +80,9 @@ Point.prototype = {
 		var sideVec = V(b.x-this.x, b.y-this.y);
 		var height = Math.abs(basePerp.dotProd(sideVec));
 		return .5*width*height;
+	},
+	copy: function(){
+		return P(this.x, this.y);
 	}
 }
 Dot.prototype = {

@@ -8,6 +8,7 @@ function level4(){
 	this.data.v = [];
 	this.data.e = [];
 	this.eUnits = 'u';
+	this.bgCol = Col(5, 17, 26);
 	this.numUpdates = 0;
 	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
 	this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
