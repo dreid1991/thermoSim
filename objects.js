@@ -269,7 +269,7 @@ DragWeights.prototype = {
 		return readouts;
 	},
 	makeReadout: function(name, text, pos, val, units){
-		return {name:name, text:text, pos:pos, val:val, units:units};
+		return {name:name, text:text, pos:pos, initVal:val, val:val, units:units};
 	},
 	pistonMinusVal: function(val){
 		return function(){return walls.pts[0][0].y - val}
@@ -497,15 +497,26 @@ DragWeights.prototype = {
 		var setPt = init + change;
 		this.tickReadout(init, setPt, readoutName);
 	},
+	resetReadouts: function(){
+		for(var readoutName in this.readouts){
+			var readout = this.readouts[readoutName];
+			var curVal = readout.val;
+			var setPt = readout.initVal;
+			//readout.val = setPt;
+			this.tickReadout(curVal, setPt, readoutName);
+		}
+	},
 	tickReadout: function(init, setPt, readoutName){
 		var step = (setPt - init)/10;
-		var readout = this.readouts[readoutName];
-		var tickFunc = this.makeTickFunc(readout, step, setPt);
-		if(!listenerExists(curLevel, 'update', readout.name)){
-			addListener(curLevel, 'update', readout.name, tickFunc, '');
-		}else{
-			removeListener(curLevel, 'update', readout.name);
-			addListener(curLevel, 'update', readout.name, tickFunc, '');
+		if(step!=0){
+			var readout = this.readouts[readoutName];
+			var tickFunc = this.makeTickFunc(readout, step, setPt);
+			if(!listenerExists(curLevel, 'update', readout.name)){
+				addListener(curLevel, 'update', readout.name, tickFunc, '');
+			}else{
+				removeListener(curLevel, 'update', readout.name);
+				addListener(curLevel, 'update', readout.name, tickFunc, '');
+			}
 		}
 	},
 	makeTickFunc: function(readout, step, setPt){
