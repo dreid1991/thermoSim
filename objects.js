@@ -515,26 +515,39 @@ DragWeights.prototype = {
 		//need unique listener name;
 		var flyName = this.eBar.weight.name + Math.floor(Math.random()*10000);
 		var yInit = this.pistonY()-15;
+
 		var posInit = P(this.eBar.x, yInit);
 		var posCur = P(posInit.x, posInit.y);
 		var posDest;
 		if(this.eBar.eChange>0){
-			posDest = P(this.readouts.eIn.pos.x+40, this.readouts.eIn.pos.y+15);
+			posDest = P(this.readouts.eIn.pos.x+40, this.readouts.eIn.pos.y);
 		}else{
-			posDest = P(this.readouts.eOut.pos.x+40, this.readouts.eOut.pos.y+15);
+			posDest = P(this.readouts.eOut.pos.x+40, this.readouts.eOut.pos.y);
 		}
 
 		var dir = V(posDest.x-posInit.x, posDest.y-posInit.y).UV();
 		var text = this.eText(Math.abs(this.eBar.eChange));
 		var self = this;
+		var colInit = this.eBarFontCol;
+		var colDest = curLevel.bgCol;
+		var curCol = colInit.copy();
+		var dx = Math.abs(posDest.x-posInit.x);
+		var dy = Math.abs(posDest.y-posInit.y);
+		var numTurns = Math.max(dx/self.flySpeed, dy/self.flySpeed);
+		var stepR = Math.ceil((colDest.r-colInit.r)/numTurns);
+		var stepG = Math.ceil((colDest.g-colInit.g)/numTurns);
+		var stepB = Math.ceil((colDest.b-colInit.b)/numTurns);
 		addListener(curLevel, 'update', flyName, 
 			function(){
-				draw.text(text, posCur, self.eBarFont, self.eBarFontCol, 'center', 0, c);
+				draw.text(text, posCur, self.eBarFont, curCol, 'center', 0, c);
+				curCol.r = boundedStep(curCol.r, colDest.r, stepR);
+				curCol.g = boundedStep(curCol.g, colDest.g, stepG);
+				curCol.b = boundedStep(curCol.b, colDest.b, stepB);
 				posCur.x = boundedStep(posCur.x, posDest.x, dir.dx*self.flySpeed);
 				posCur.y = boundedStep(posCur.y, posDest.y, dir.dy*self.flySpeed);
 				if(posCur.x==posDest.x && posCur.y==posDest.y){
 					removeListener(curLevel, 'update', flyName);
-					self.fadeText(text, posCur, self.eBarFont, self.eBarFontCol, curLevel.bgCol, 'center', 0, flyName+'Fade');
+					//self.fadeText(text, posCur, self.eBarFont, self.eBarFontCol, curLevel.bgCol, 'center', 0, flyName+'Fade');
 				}
 			},
 		'');
@@ -543,7 +556,7 @@ DragWeights.prototype = {
 	},
 	fadeText: function(text, pos, font, colInit, colDest, align, rotation, listenerName  ){
 		var turn = 0;
-		var numTurns = 15;
+		var numTurns = 5;
 		var stepR = Math.ceil((colDest.r-colInit.r)/numTurns);
 		var stepG = Math.ceil((colDest.g-colInit.g)/numTurns);
 		var stepB = Math.ceil((colDest.b-colInit.b)/numTurns);
