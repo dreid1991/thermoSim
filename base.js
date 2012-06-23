@@ -73,6 +73,12 @@ drawingTools.prototype = {
 		drawCanvas.fill();
 		
 	},
+	fillStrokeRect: function(corner, dims, fillCol, strokeCol, drawCanvas){
+		drawCanvas.strokeStyle = "rgb(" + Math.floor(strokeCol.r) + "," + Math.floor(strokeCol.g) + "," + Math.floor(strokeCol.b) + ")";
+		drawCanvas.fillStyle = "rgb(" + Math.floor(fillCol.r) + "," + Math.floor(fillCol.g) + "," + Math.floor(fillCol.b) + ")";
+		drawCanvas.fillRect(corner.x, corner.y, dims.dx, dims.dy);
+		drawCanvas.strokeRect( corner.x, corner.y, dims.dx, dims.dy);
+	},
 	strokeRect: function(corner, dims, col, drawCanvas){
 		drawCanvas.strokeStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
 		drawCanvas.strokeRect(corner.x, corner.y, dims.dx, dims.dy);
@@ -293,6 +299,10 @@ function getLen(pts){
 	}
 	return len;
 }
+function inRect(pos, dims, curCanvas){
+	var mousePos = mouseOffset(curCanvas);
+	return mousePos.x>=pos.x && mousePos.x<=(pos.x+dims.dx) && mousePos.y>=pos.y && mousePos.y<=(pos.y+dims.dy);
+}
 //function loadVals(level){
 //	for (sliderName in level.slider){
 //		level.sliders[sliderName].val=level.savedVals[sliderName];
@@ -307,8 +317,8 @@ $(function(){
 })
 
 globalMousePos = P(0,0)
-function mouseOffset(canvas){
-	return P(globalMousePos.x - canvas.offsetLeft, globalMousePos.y - canvas.offsetTop);
+function mouseOffset(curCanvas){
+	return P(globalMousePos.x - curCanvas.offsetLeft, globalMousePos.y - curCanvas.offsetTop);
 }
 $(document).mousemove(function(e){
 	globalMousePos.x = e.pageX//-myCanvas.offsetLeft;

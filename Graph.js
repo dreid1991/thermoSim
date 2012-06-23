@@ -30,6 +30,7 @@ function Graph(name, width, height, xLabel, yLabel, axisInit){
 	this.stepSize = {x:0, y:0};
 	this.bgCol = curLevel.bgCol
 	this.gridCol = Col(72,72,72);
+	this.toggleCol = Col(150,150,150);
 	this.textCol = Col(255, 255, 255);
 	this.flashMult = 1.5;
 	this.flashRate = .1;
@@ -47,8 +48,9 @@ Graph.prototype = {
 		var str = "<div class='graphSpacer'></div><div id = '" + name + "div'><canvas id ='" + name + "Graph' width=" + this.dims.dx + " height=" + this.dims.dy+ "></canvas></div>"
 		var canvasDiv = $(str);
 		$('#graphs').append(canvasDiv);
-		var graphCanvas = document.getElementById(name+'Graph');
-		this.graph = graphCanvas.getContext('2d');
+
+		this.graphHTMLElement = document.getElementById(name+'Graph');
+		this.graph = this.graphHTMLElement.getContext('2d');
 		
 		
 	},	
@@ -59,23 +61,49 @@ Graph.prototype = {
 		set.y = [];
 		set.pointCol = pointCol;
 		set.flashCol = flashCol;
-		this.makeLegendEntry(set, address);
+		set.show = true;
 		this.data[address] = set;
+		this.makeLegendEntry(set, address);
 		this.drawAllBG();
 	},
 	makeLegendEntry: function(set, address){
 		var x = this.dims.dx-this.legendWidth+5;
 		var y = 30;
 		for (var entryIdx in this.legend){
-			y+=30;
+			y+=35;
 		}
 		var legendEntry = {};
 		legendEntry.text = {text:set.label, x:x+10, y:y+this.legendFontSize/2};
-		
 		legendEntry.pt = {x:x, y:y, col:set.pointCol}
+		var togglePos = P(this.dims.dx-18, y-5);
+		var toggleDims = V(13, 13);
+		legendEntry.togglePos = togglePos;
+		legendEntry.toggleDims = toggleDims;
+		var self = this;
+		legendEntry.toggle = function(){
+								if($('#graphs').is(':visible') && inRect(togglePos, toggleDims, self.graphHTMLElement)){
+									if(set.show){
+										set.show = false;
+										self.drawAllBG();
+										self.drawAllData();
+									}else{
+										set.show = true;
+										self.drawAllBG();
+										self.drawAllData();
+									}
+								}
+							};
+							
+		addListener(curLevel, 'mouseup', 'toggle'+address, legendEntry.toggle, '');
 		this.legend[address] = legendEntry;
 		this.drawAllBG();
 	},
+	/*
+	makeToggle: function(set, address, x, y){
+		this.drawToggle(set.show);
+		addListener(curLevel, 'mouseup', 'toggle'+address, this.makeToggleFunc(set, address, self), '');
+	},
+	*/
 	drawAllBG: function(){
 		this.drawBGRect();
 		this.drawGrid();
@@ -90,14 +118,29 @@ Graph.prototype = {
 		this.graphPts();
 	},
 	drawLegend: function(){
-		for (var legendName in this.legend){
-			var legend = this.legend[legendName];
-			var text = legend.text;
-			var pt = legend.pt;
+		for (var entryName in this.legend){
+			var entry = this.legend[entryName];
+			var text = entry.text;
+			var pt = entry.pt;
+			this.drawLegendToggle(entryName);
 			var font = this.legendFont
 			draw.text(text.text, P(text.x, text.y),  this.legendFont, this.textCol, 'left', 0, this.graph);
 			this.drawPt(pt.x, pt.y, pt.col, this.triSideLen);
 		}
+	},
+	drawLegendToggle: function(entryName){
+		var entry = this.legend[entryName];
+		draw.fillStrokeRect(entry.togglePos, entry.toggleDims, Col(100,100,100), Col(255,255,255), this.graph);
+		var dataSet = this.data[entryName];
+		var spacing = 2;
+		if(dataSet.show){
+			var p1 = P(entry.togglePos.x+spacing, entry.togglePos.y + entry.toggleDims.dy/2);
+			var p2 = P(entry.togglePos.x + entry.toggleDims.dx-spacing, entry.togglePos.y + entry.toggleDims.dy/2);
+			draw.line(p1, p2, this.toggleCol, this.graph);
+		}else{
+			
+		}
+		
 	},
 	drawBGRect: function(){
 		draw.roundedRect(P(0,0), V(this.dims.dx, this.dims.dy), 20, this.bgCol, this.graph); 
@@ -148,9 +191,9 @@ Graph.prototype = {
 			var address = toAdd[addIdx].address;
 			var x = toAdd[addIdx].x;
 			var y = toAdd[addIdx].y;
-			var data = this.data[address]
-			data.x.push(x);
-			data.y.push(y);
+			var dataSet = this.data[address]
+			dataSet.x.push(x);
+			dataSet.y.push(y);
 
 			this.valRange.x.max = Math.max(this.valRange.x.max, x);
 			this.valRange.x.min = Math.min(this.valRange.x.min, x);		
@@ -170,11 +213,14 @@ Graph.prototype = {
 			this.drawAllData();
 		} else{
 			for (var addIdx=0; addIdx<toAdd.length; addIdx++){
-				var data = this.data[toAdd[addIdx].address];
-				var xPt = data.x[data.x.length-1]
-				var yPt = data.y[data.y.length-1]
-				var pointCol = data.pointCol
-				this.graphPt(xPt, yPt, pointCol);
+				var dataSet = this.data[toAdd[addIdx].address];
+				if(dataSet.show){
+
+					var xPt = dataSet.x[dataSet.x.length-1]
+					var yPt = dataSet.y[dataSet.y.length-1]
+					var pointCol = dataSet.pointCol
+					this.graphPt(xPt, yPt, pointCol);
+				}
 			}
 		}
 		
@@ -274,13 +320,15 @@ Graph.prototype = {
 		
 	},
 	graphPts: function(){
-		for (var set in this.data){
-			var data = this.data[set];
-			var col = data.pointCol;
-			for (var ptIdx=0; ptIdx<data.x.length; ptIdx++){
-				var xVal = data.x[ptIdx];
-				var yVal = data.y[ptIdx];
-				this.graphPt(xVal, yVal, col);
+		for (var setName in this.data){
+			var dataSet = this.data[setName];
+				if(dataSet.show){
+				var col = dataSet.pointCol;
+				for (var ptIdx=0; ptIdx<dataSet.x.length; ptIdx++){
+					var xVal = dataSet.x[ptIdx];
+					var yVal = dataSet.y[ptIdx];
+					this.graphPt(xVal, yVal, col);
+				}
 			}
 		}
 	},

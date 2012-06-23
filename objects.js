@@ -568,7 +568,7 @@ DragWeights.prototype = {
 		this.pistonWeight-=this.weightGroups[weight.name].mass;
 	},
 	mousedown: function(){
-		var clicked = this.getClicked();
+		var clicked = new Boolean(); clicked=false;//this.getClicked();
 		if(clicked){
 			this.pickup(clicked);
 			if(this.eBar.weight===undefined){
@@ -668,7 +668,7 @@ DragWeights.prototype = {
 			var group = this.weightGroups[group];
 			for(var weightIdx=0; weightIdx<group.weights.length; weightIdx++){
 				var weight = group.weights[weightIdx];
-				if(this.mouseOnWeight(group.dims, weight.pos) && this.isOnTop(weight)){
+				if(inRect(P(weight.pos.x, weight.pos.y-group.dims.dy), group.dims, myCanvas) && this.isOnTop(weight)){
 					return weight;
 				}
 			}
