@@ -15,8 +15,8 @@ function level4(){
 	this.SAPExt = getLen(this.extPressurePts);
 	this.forceInternal = 0;
 	this.wallV = 0;
-	this.updateListeners = {};//{run:this.updateRun, compress:this.updateCompress, expand:this.updateExpand, pause:this.updatePause};
-	this.dataListeners = {};//{run:this.dataRun, pause:this.dataPause};
+	this.updateListeners = {};
+	this.dataListeners = {};
 	this.wallImpactListeners = {};
 	this.dotImpactListeners = {};
 	this.mousedownListeners = {};

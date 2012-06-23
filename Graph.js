@@ -21,7 +21,7 @@ function Graph(name, width, height, xLabel, yLabel, axisInit){
 	var numGridLinesX = Math.ceil(this.dims.dx*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing);
 	var numGridLinesY = Math.ceil(this.dims.dy*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
 	this.numGridLines = {x:numGridLinesX, y:numGridLinesY};
-	this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*this.numGridLines.x}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*this.numGridLines.y}};
+	this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1)}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1)}};
 	var a = this.axisInit;
 	this.axisRange = {x:{min:0, max:0}, y:{min:0, max:0}};
 	this.data = {};
@@ -195,7 +195,6 @@ Graph.prototype = {
 			if(!this.rangeIsSame(oldRange.y, this.valRange.y)){
 				this.getYBounds();
 			}
-			this.getYBounds();
 		} else{
 			this.setAxisToInit('y');
 		}		
@@ -224,7 +223,7 @@ Graph.prototype = {
 		curRange.min = init.min;
 		curRange.max = init.max;
 		var range = curRange.max-curRange.min;
-		this.stepSize[axis] = range/numGridLines;
+		this.stepSize[axis] = range/(numGridLines-1);
 	},
 	getAxisBounds: function(){
 		this.getXBounds();
@@ -237,7 +236,7 @@ Graph.prototype = {
 			var expStepX = Math.pow(10, Math.floor(log10(unroundStepX)))
 			this.stepSize.x = Math.ceil(unroundStepX/expStepX)*expStepX;
 			this.axisRange.x.min = Math.floor(this.valRange.x.min/this.stepSize.x)*this.stepSize.x;
-			this.axisRange.x.max = this.axisRange.x.min + this.numGridLines.x*this.stepSize.x;
+			this.axisRange.x.max = this.axisRange.x.min + (this.numGridLines.x-1)*this.stepSize.x;
 		}else{
 			this.axisRange.x.min = Math.floor(this.valRange.x.min);
 			this.stepSize.x = .2;
@@ -251,7 +250,7 @@ Graph.prototype = {
 			var expStepY = Math.pow(10, Math.floor(log10(unroundStepY)))
 			this.stepSize.y = Math.ceil(unroundStepY/expStepY)*expStepY;
 			this.axisRange.y.min = Math.floor(this.valRange.y.min/this.stepSize.y)*this.stepSize.y;
-			this.axisRange.y.max = this.axisRange.y.min + this.numGridLines.y*this.stepSize.y;
+			this.axisRange.y.max = this.axisRange.y.min + (this.numGridLines.y-1)*this.stepSize.y;
 		}else{
 			this.axisRange.y.min = Math.floor(this.valRange.y.min);
 			this.stepSize.y = .2;
