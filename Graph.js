@@ -28,6 +28,7 @@ function Graph(name, width, height, xLabel, yLabel, axisInit){
 	this.legend = {};
 	this.resetRanges();
 	this.stepSize = {x:0, y:0};
+	this.checkMarkOversize = 3;
 	this.bgCol = curLevel.bgCol
 	this.gridCol = Col(72,72,72);
 	this.toggleCol = Col(255,255,255);
@@ -137,13 +138,13 @@ Graph.prototype = {
 		draw.fillStrokeRect(entry.togglePos, entry.toggleDims, this.gridCol, this.toggleCol, this.graph);
 		var dataSet = this.data[entryName];
 		if(dataSet.show){
-			var overSize = 3;
+			var oversize = this.checkMarkOversize;
 			var checkPt = entry.togglePos.copy();
 			var checkDims = entry.toggleDims.copy();
-			checkPt.x-=overSize;
-			checkPt.y-=overSize;
-			checkDims.dx+=2*overSize;
-			checkDims.dy+=2*overSize;
+			checkPt.x-=oversize;
+			checkPt.y-=oversize;
+			checkDims.dx+=2*oversize;
+			checkDims.dy+=2*oversize;
 			draw.checkMark(checkPt, checkDims, this.toggleCol, Col(0,0,0), this.graph);
 		}
 
@@ -471,6 +472,8 @@ Graph.prototype = {
 			data.y = [];
 			
 		}
+		this.flashers = [];
+		removeListener(curLevel, 'update', 'flash'+this.name);
 		this.graph.putImageData(this.bg, 0, 0);
 		this.resetRanges();
 	},
