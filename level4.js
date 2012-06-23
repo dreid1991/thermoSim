@@ -54,8 +54,8 @@ level4.prototype = {
 							{x:{min:50, step:25}, y:{min:0, step:3}});
 		this.graphs.tVSv = new Graph('tVSv', 400, 300,"Volume", "Temperature",
 							{x:{min:50, step:25}, y:{min:100, step:60}});
-		//this.graphs.pVSv.addSet('pInt', 'P Int.', Col(0,0,255), Col(200,200,255));
-		//this.graphs.pVSv.addSet('pExt', 'P Ext.', Col(0,255,0), Col(200,255,200));
+		this.graphs.pVSv.addSet('pInt', 'P Int.', Col(0,0,255), Col(200,200,255));
+		this.graphs.pVSv.addSet('pExt', 'P Ext.', Col(0,255,0), Col(200,255,200));
 		this.graphs.tVSv.addSet('t', 'Sys\nTemp', Col(255,0,0), Col(255,200,200));		
 		$('#myCanvas').show();
 	},
@@ -224,8 +224,8 @@ level4.prototype = {
 		var pIntLast = this.data.pInt[this.data.pInt.length-1];
 		var pExtLast = this.data.pExt[this.data.pExt.length-1];
 		var tLast = this.data.t[this.data.t.length-1];
-		//this.graphs.pVSv.addPts([{x:vLast, y:pExtLast, address:'pExt'}, 
-		//						{x:vLast, y:pIntLast, address:'pInt'}]);
+		this.graphs.pVSv.addPts([{x:vLast, y:pExtLast, address:'pExt'}, 
+								{x:vLast, y:pIntLast, address:'pInt'}]);
 		this.graphs.tVSv.addPts([{x:vLast, y:tLast, address:'t'}]);
 		
 	},

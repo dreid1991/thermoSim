@@ -30,7 +30,7 @@ function Graph(name, width, height, xLabel, yLabel, axisInit){
 	this.stepSize = {x:0, y:0};
 	this.bgCol = curLevel.bgCol
 	this.gridCol = Col(72,72,72);
-	this.toggleCol = Col(150,150,150);
+	this.toggleCol = Col(255,255,255);
 	this.textCol = Col(255, 255, 255);
 	this.flashMult = 1.5;
 	this.flashRate = .1;
@@ -84,10 +84,14 @@ Graph.prototype = {
 								if($('#graphs').is(':visible') && inRect(togglePos, toggleDims, self.graphHTMLElement)){
 									if(set.show){
 										set.show = false;
+										self.flashers = [];
+										removeListener(curLevel, 'update', 'flash'+self.name);
 										self.drawAllBG();
 										self.drawAllData();
 									}else{
 										set.show = true;
+										self.flashers = [];
+										removeListener(curLevel, 'update', 'flash'+self.name);
 										self.drawAllBG();
 										self.drawAllData();
 									}
@@ -130,15 +134,22 @@ Graph.prototype = {
 	},
 	drawLegendToggle: function(entryName){
 		var entry = this.legend[entryName];
-		draw.fillStrokeRect(entry.togglePos, entry.toggleDims, Col(100,100,100), Col(255,255,255), this.graph);
+		draw.fillStrokeRect(entry.togglePos, entry.toggleDims, this.gridCol, this.toggleCol, this.graph);
 		var dataSet = this.data[entryName];
 		var spacing = 2;
-		if(dataSet.show){
-			var p1 = P(entry.togglePos.x+spacing, entry.togglePos.y + entry.toggleDims.dy/2);
-			var p2 = P(entry.togglePos.x + entry.toggleDims.dx-spacing, entry.togglePos.y + entry.toggleDims.dy/2);
-			draw.line(p1, p2, this.toggleCol, this.graph);
-		}else{
-			
+		var xLeft = entry.togglePos.x+spacing;
+		var xRight = entry.togglePos.x + entry.toggleDims.dx-spacing;
+		var xMid = entry.togglePos.x + entry.toggleDims.dx/2;		
+		var yTop = entry.togglePos.y+spacing;
+		var yBottom = entry.togglePos.y + entry.toggleDims.dy-spacing;
+		var yMid = entry.togglePos.y + entry.toggleDims.dy/2;
+		var p1 = P(xLeft, yMid);
+		var p2 = P(xRight, yMid);
+		draw.line(p1, p2, this.toggleCol, this.graph);
+		if(!dataSet.show){
+			var p3 = P(xMid, yTop);
+			var p4 = P(xMid, yBottom);
+			draw.line(p3, p4, this.toggleCol, this.graph);
 		}
 		
 	},
@@ -323,11 +334,11 @@ Graph.prototype = {
 		for (var setName in this.data){
 			var dataSet = this.data[setName];
 				if(dataSet.show){
-				var col = dataSet.pointCol;
-				for (var ptIdx=0; ptIdx<dataSet.x.length; ptIdx++){
-					var xVal = dataSet.x[ptIdx];
-					var yVal = dataSet.y[ptIdx];
-					this.graphPt(xVal, yVal, col);
+					var col = dataSet.pointCol;
+					for (var ptIdx=0; ptIdx<dataSet.x.length; ptIdx++){
+						var xVal = dataSet.x[ptIdx];
+						var yVal = dataSet.y[ptIdx];
+						this.graphPt(xVal, yVal, col);
 				}
 			}
 		}
@@ -357,22 +368,26 @@ Graph.prototype = {
 		draw.fillPtsStroke(pts, col, this.ptStroke, this.graph);
 	},
 	flashInit: function(pts){
-		this.flashers = new Array(pts.length);
-		for (var flashIdx=0; flashIdx<this.flashers.length; flashIdx++){
+		this.flashers = [];
+		for (var flashIdx=0; flashIdx<pts.length; flashIdx++){
 			var pt = pts[flashIdx];
-			var x = this.translateValToCoord(pt.x, 'x');
-			var y = this.translateValToCoord(pt.y, 'y');
-			var pos = P(x, y);
-			var pointCol = this.data[pt.address].pointCol;
-			var flashCol = this.data[pt.address].flashCol;
-			var curCol = Col(flashCol.r, flashCol.g, flashCol.b);
-			var imagePos = P(x - this.triSideLen*this.flashMult-1, y - this.triSideLen*this.flashMult-1);
-			var len = this.triSideLen*2*this.flashMult+2;
-			var curTriSideLen = this.triSideLen*this.flashMult;
-			var imageData = this.graph.getImageData(imagePos.x, imagePos.y, len, len);
-			this.flashers[flashIdx] = {pos:pos, pointCol:pointCol, flashCol:flashCol, curCol:curCol, curTriSideLen:curTriSideLen, imagePos:imagePos, imageData:imageData};
+			if(this.data[pt.address].show){
+				var x = this.translateValToCoord(pt.x, 'x');
+				var y = this.translateValToCoord(pt.y, 'y');
+				var pos = P(x, y);
+				var pointCol = this.data[pt.address].pointCol;
+				var flashCol = this.data[pt.address].flashCol;
+				var curCol = Col(flashCol.r, flashCol.g, flashCol.b);
+				var imagePos = P(x - this.triSideLen*this.flashMult-1, y - this.triSideLen*this.flashMult-1);
+				var len = this.triSideLen*2*this.flashMult+2;
+				var curTriSideLen = this.triSideLen*this.flashMult;
+				var imageData = this.graph.getImageData(imagePos.x, imagePos.y, len, len);
+				this.flashers.push({pos:pos, pointCol:pointCol, flashCol:flashCol, curCol:curCol, curTriSideLen:curTriSideLen, imagePos:imagePos, imageData:imageData});
+			}
 		}
-		addListener(curLevel, 'update', 'flash'+this.name, this.flashRun, this);
+		if(this.flashers.length>0){
+			addListener(curLevel, 'update', 'flash'+this.name, this.flashRun, this);
+		}
 	},
 	flashRun: function(){
 		this.eraseFlashers();

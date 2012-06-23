@@ -568,7 +568,7 @@ DragWeights.prototype = {
 		this.pistonWeight-=this.weightGroups[weight.name].mass;
 	},
 	mousedown: function(){
-		var clicked = new Boolean(); clicked=false;//this.getClicked();
+		var clicked = this.getClicked();
 		if(clicked){
 			this.pickup(clicked);
 			if(this.eBar.weight===undefined){
