@@ -293,9 +293,9 @@ Graph.prototype = {
 		var range = this.axisRange[axis].max - this.axisRange[axis].min;
 		var coord;
 		if(axis=='x'){
-			coord = Math.abs(this.xEnd-this.xStart)*this.dims.dx*(val-this.axisRange.x.min)/range + this.xStart*this.dims.dx;
+			coord = this.gridSpacing*(this.numGridLines.x-1)*(val-this.axisRange.x.min)/range + this.xStart*this.dims.dx;
 		}else if(axis=='y'){
-			coord = this.dims.dy - (1-this.yStart)*this.dims.dy - Math.abs(this.yEnd-this.yStart)*this.dims.dy*(val-this.axisRange.y.min)/range;
+			coord = this.dims.dy - (this.gridSpacing*(this.numGridLines.y-1)*(val-this.axisRange.y.min)/range + (1-this.yStart)*this.dims.dy);
 		}
 		return coord;
 	},	

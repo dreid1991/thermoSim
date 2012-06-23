@@ -224,9 +224,11 @@ level4.prototype = {
 		var pIntLast = this.data.pInt[this.data.pInt.length-1];
 		var pExtLast = this.data.pExt[this.data.pExt.length-1];
 		var tLast = this.data.t[this.data.t.length-1];
+		/*
 		this.graphs.pVSv.addPts([{x:vLast, y:pExtLast, address:'pExt'}, 
 								{x:vLast, y:pIntLast, address:'pInt'}]);
 		this.graphs.tVSv.addPts([{x:vLast, y:tLast, address:'t'}]);
+		*/
 	},
 	vol: function(){
 		return walls.area(0);// - walls.area(1);
