@@ -90,13 +90,24 @@ drawingTools.prototype = {
 		drawCanvas.quadraticCurveTo(curvePt.x, curvePt.y, quadEnd.x, quadEnd.y);
 	},
 	text: function(text, pos, font, col, align, rotation, drawCanvas){
+		
 		drawCanvas.save();
 		drawCanvas.translate(pos.x, pos.y);
 		drawCanvas.rotate(rotation);
 		drawCanvas.fillStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
 		drawCanvas.font = font;
 		drawCanvas.textAlign = align;
-		drawCanvas.fillText(text, 0, 0);
+		var fontSize = parseFloat(font);
+		var yOffset = 0;
+		var breakIdx = text.indexOf('\n');
+		while (breakIdx!=-1){
+			var toPrint = text.slice(0, breakIdx);
+			drawCanvas.fillText(toPrint, 0, yOffset);
+			yOffset+=fontSize+2;
+			text = text.slice(breakIdx+1, text.length);
+			breakIdx = text.indexOf('\n');
+		}
+		drawCanvas.fillText(text, 0, yOffset);
 		drawCanvas.restore();
 	},
 
@@ -295,10 +306,13 @@ $(function(){
 	c.strokeStyle = 'white';
 })
 
-mousePos = P(0,0)
+globalMousePos = P(0,0)
+function mouseOffset(canvas){
+	return P(globalMousePos.x - canvas.offsetLeft, globalMousePos.y - canvas.offsetTop);
+}
 $(document).mousemove(function(e){
-	mousePos.x = e.pageX-myCanvas.offsetLeft;
-	mousePos.y = e.pageY-myCanvas.offsetTop;
+	globalMousePos.x = e.pageX//-myCanvas.offsetLeft;
+	globalMousePos.y = e.pageY//-myCanvas.offsetTop;
 	for (var mousemoveListener in curLevel.mousemoveListeners){
 		var listener = curLevel.mousemoveListeners[mousemoveListener]
 		listener.func.apply(listener.obj);

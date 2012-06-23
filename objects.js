@@ -616,6 +616,7 @@ DragWeights.prototype = {
 
 	},
 	mousemove: function(){
+		var mousePos = mouseOffset(myCanvas);
 		var dx = mousePos.x - this.origPos.mouseX;
 		var dy = mousePos.y - this.origPos.mouseY;
 		var newX = this.origPos.weightX + dx;
@@ -651,7 +652,7 @@ DragWeights.prototype = {
 	},
 
 	pickup: function(weight){
-		
+		var mousePos = mouseOffset(myCanvas);
 		if (weight.slot!==undefined){
 			weight.slot.isFull = false;
 		}
@@ -675,6 +676,7 @@ DragWeights.prototype = {
 		return false
 	},
 	mouseOnWeight: function(dims, weightPos){
+		var mousePos = mouseOffset(myCanvas);
 		return mousePos.x>=weightPos.x && mousePos.x<=weightPos.x+dims.dx && mousePos.y<=weightPos.y && mousePos.y>=weightPos.y-dims.dy 
 	},
 	isOnTop: function(weight){
