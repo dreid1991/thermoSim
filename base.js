@@ -83,6 +83,16 @@ drawingTools.prototype = {
 		drawCanvas.strokeStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
 		drawCanvas.strokeRect(corner.x, corner.y, dims.dx, dims.dy);
 	},
+	checkMark: function(corner, dims, col, stroke, drawCanvas){
+		var a = corner;
+		var b = dims;
+		var p1 = P(a.x			, a.y+b.dy*.6	);
+		var p2 = P(a.x+b.dx*.4	, a.y+b.dy		);
+		var p3 = P(a.x+b.dx		, a.y			);
+		var p4 = P(a.x+b.dx*.35	, a.y+b.dy*.75	);
+		var pts = [p1, p2, p3, p4];
+		draw.fillPtsStroke(pts, col, stroke, drawCanvas);
+	},
 	line: function(p1, p2, col, drawCanvas){
 		drawCanvas.strokeStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
 		drawCanvas.beginPath();

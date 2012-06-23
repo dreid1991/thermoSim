@@ -136,21 +136,18 @@ Graph.prototype = {
 		var entry = this.legend[entryName];
 		draw.fillStrokeRect(entry.togglePos, entry.toggleDims, this.gridCol, this.toggleCol, this.graph);
 		var dataSet = this.data[entryName];
-		var spacing = 2;
-		var xLeft = entry.togglePos.x+spacing;
-		var xRight = entry.togglePos.x + entry.toggleDims.dx-spacing;
-		var xMid = entry.togglePos.x + entry.toggleDims.dx/2;		
-		var yTop = entry.togglePos.y+spacing;
-		var yBottom = entry.togglePos.y + entry.toggleDims.dy-spacing;
-		var yMid = entry.togglePos.y + entry.toggleDims.dy/2;
-		var p1 = P(xLeft, yMid);
-		var p2 = P(xRight, yMid);
-		draw.line(p1, p2, this.toggleCol, this.graph);
-		if(!dataSet.show){
-			var p3 = P(xMid, yTop);
-			var p4 = P(xMid, yBottom);
-			draw.line(p3, p4, this.toggleCol, this.graph);
+		if(dataSet.show){
+			var overSize = 3;
+			var checkPt = entry.togglePos.copy();
+			var checkDims = entry.toggleDims.copy();
+			checkPt.x-=overSize;
+			checkPt.y-=overSize;
+			checkDims.dx+=2*overSize;
+			checkDims.dy+=2*overSize;
+			draw.checkMark(checkPt, checkDims, this.toggleCol, Col(0,0,0), this.graph);
 		}
+
+		
 		
 	},
 	drawBGRect: function(){
