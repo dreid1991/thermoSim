@@ -112,7 +112,7 @@ level4.prototype = {
 									myCanvas.height-15,
 									20,
 									Col(218, 187, 41),
-									Col(255, 200, 41),
+									Col(180, 140, 30),
 									Col(150, 150, 150),
 									function(){return curLevel.g}//This may not work.  curLevel if does not
 									);
