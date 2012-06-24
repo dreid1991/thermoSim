@@ -55,13 +55,14 @@ Graph.prototype = {
 		
 		
 	},	
-	addSet: function(address, label, pointCol, flashCol){
+	addSet: function(address, label, pointCol, flashCol, getLast){
 		var set = {};
 		set.label = label;
 		set.x = [];
 		set.y = [];
 		set.pointCol = pointCol;
 		set.flashCol = flashCol;
+		set.getLast = getLast;
 		set.show = true;
 		this.data[address] = set;
 		this.makeLegendEntry(set, address);
@@ -184,6 +185,14 @@ Graph.prototype = {
 		yLabelPos.y+=this.labelFontSize/2;
 		draw.text(xLabel, xLabelPos, this.labelFont, this.textCol, 'center',  0, this.graph);
 		draw.text(yLabel, yLabelPos, this.labelFont, this.textCol, 'center', -Math.PI/2, this.graph);
+	},
+	addLast: function(){
+		var toAdd = [];
+		for (var setName in this.data){
+			var dataSet = this.data[setName];
+			toAdd.push(dataSet.getLast());
+		}
+		this.addPts(toAdd);
 	},
 	addPts: function(toAdd){
 		var mustRedraw = new Boolean()

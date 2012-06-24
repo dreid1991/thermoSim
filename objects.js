@@ -74,12 +74,11 @@ Weight.prototype = {
 	},
 }
 
-function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, weightStrokeCol, binCol, g){
+function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g){
 	this.zeroY = zeroY;
 	this.pistonY = pistonY;
 	this.binY = binY;
 	this.weightCol = weightCol;
-	this.weightStrokeCol = weightStrokeCol;
 	this.eBarCol = this.weightCol;
 	this.g = g;
 	this.eBar = {x:eBarX, scalar: .7};
@@ -403,7 +402,7 @@ DragWeights.prototype = {
 				var weight = weights[weightIdx];
 				var y = weight.pos.y-dims.dy;
 				var pos = P(weight.pos.x, y)
-				draw.fillStrokeRect(pos, dims, this.weightCol, this.weightStrokeCol, c);
+				draw.fillRect(pos, dims, this.weightCol, c);
 			}
 		}
 	},
@@ -423,10 +422,9 @@ DragWeights.prototype = {
 	},
 	drawEBar: function(yStart, yEnd, mass){
 		this.eBarY = Math.min(yStart, yEnd);
-		var x1 = this.eBar.x - mass*this.eBar.scalar/2;
-		var x2 = this.eBar.x + mass*this.eBar.scalar/2;
-		var pts = [P(x1,yStart), P(x1,yStart), P(x1,yEnd), P(x2, yEnd), P(x2, yStart), P(x2,yStart)];
-		draw.fillPts(pts,this.eBarCol, c);
+		var corner = P(this.eBar.x - mass*this.eBar.scalar/2, this.eBarY);
+		var dims = V(mass*this.eBar.scalar, yStart-yEnd);
+		draw.fillRect(corner, dims, this.eBarCol, c);
 	},
 	drawEBarText: function(pos, energy){
 		this.eBar.eChange = energy

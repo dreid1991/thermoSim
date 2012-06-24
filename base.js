@@ -73,11 +73,15 @@ drawingTools.prototype = {
 		drawCanvas.fill();
 		
 	},
+	fillRect: function(corner, dims, fillCol, drawCanvas){
+		drawCanvas.fillStyle = "rgb(" + Math.floor(fillCol.r) + "," + Math.floor(fillCol.g) + "," + Math.floor(fillCol.b) + ")";
+		drawCanvas.fillRect(corner.x, corner.y, dims.dx, dims.dy);
+	},
 	fillStrokeRect: function(corner, dims, fillCol, strokeCol, drawCanvas){
 		drawCanvas.strokeStyle = "rgb(" + Math.floor(strokeCol.r) + "," + Math.floor(strokeCol.g) + "," + Math.floor(strokeCol.b) + ")";
 		drawCanvas.fillStyle = "rgb(" + Math.floor(fillCol.r) + "," + Math.floor(fillCol.g) + "," + Math.floor(fillCol.b) + ")";
 		drawCanvas.fillRect(corner.x, corner.y, dims.dx, dims.dy);
-		drawCanvas.strokeRect( corner.x, corner.y, dims.dx, dims.dy);
+		drawCanvas.strokeRect(corner.x, corner.y, dims.dx, dims.dy);
 	},
 	strokeRect: function(corner, dims, col, drawCanvas){
 		drawCanvas.strokeStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
