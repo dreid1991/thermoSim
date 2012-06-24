@@ -103,12 +103,6 @@ Graph.prototype = {
 		this.legend[address] = legendEntry;
 		this.drawAllBG();
 	},
-	/*
-	makeToggle: function(set, address, x, y){
-		this.drawToggle(set.show);
-		addListener(curLevel, 'mouseup', 'toggle'+address, this.makeToggleFunc(set, address, self), '');
-	},
-	*/
 	drawAllBG: function(){
 		this.drawBGRect();
 		this.drawGrid();
@@ -287,7 +281,7 @@ Graph.prototype = {
 	getXBounds: function(){
 		var rangeX = this.valRange.x.max-this.valRange.x.min;
 		if(rangeX!=0){
-			var unroundStepX = rangeX/(this.numGridLines.x-1);
+			var unroundStepX = rangeX/(this.numGridLines.x-2);
 			var expStepX = Math.pow(10, Math.floor(log10(unroundStepX)))
 			this.stepSize.x = Math.ceil(unroundStepX/expStepX)*expStepX;
 			this.axisRange.x.min = Math.floor(this.valRange.x.min/this.stepSize.x)*this.stepSize.x;
@@ -301,7 +295,7 @@ Graph.prototype = {
 	getYBounds: function(){
 		var rangeY = Math.abs(this.valRange.y.max-this.valRange.y.min);
 		if(rangeY!=0){
-			var unroundStepY = rangeY/(this.numGridLines.y-1);
+			var unroundStepY = rangeY/(this.numGridLines.y-2);
 			var expStepY = Math.pow(10, Math.floor(log10(unroundStepY)))
 			this.stepSize.y = Math.ceil(unroundStepY/expStepY)*expStepY;
 			this.axisRange.y.min = Math.floor(this.valRange.y.min/this.stepSize.y)*this.stepSize.y;

@@ -74,11 +74,12 @@ Weight.prototype = {
 	},
 }
 
-function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g){
+function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, weightStrokeCol, binCol, g){
 	this.zeroY = zeroY;
 	this.pistonY = pistonY;
 	this.binY = binY;
 	this.weightCol = weightCol;
+	this.weightStrokeCol = weightStrokeCol;
 	this.eBarCol = this.weightCol;
 	this.g = g;
 	this.eBar = {x:eBarX, scalar: .7};
@@ -395,15 +396,15 @@ DragWeights.prototype = {
 		this.drawReadouts();
 	},
 	drawWeights: function(){
-		c.fillStyle = "rgb(" + Math.floor(this.weightCol.r) + "," + Math.floor(this.weightCol.g) + "," + Math.floor(this.weightCol.b) + ")";
 		for (var group in this.weightGroups){
 			var weights = this.weightGroups[group].weights;
 			var dims = this.weightGroups[group].dims;
 			for (var weightIdx=0; weightIdx<weights.length; weightIdx++){
 				var weight = weights[weightIdx];
-				c.fillRect(weight.pos.x, weight.pos.y - dims.dy, dims.dx, dims.dy);
+				var y = weight.pos.y-dims.dy;
+				var pos = P(weight.pos.x, y)
+				draw.fillStrokeRect(pos, dims, this.weightCol, this.weightStrokeCol, c);
 			}
-			
 		}
 	},
 	drawBins: function(){

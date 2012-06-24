@@ -9,6 +9,7 @@ function level4(){
 	this.data.e = [];
 	this.eUnits = 'u';
 	this.bgCol = Col(5, 17, 26);
+	this.wallCol = Col(255,255,255);
 	this.numUpdates = 0;
 	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
 	this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
@@ -111,6 +112,7 @@ level4.prototype = {
 									myCanvas.height-15,
 									20,
 									Col(218, 187, 41),
+									Col(255, 200, 41),
 									Col(150, 150, 150),
 									function(){return curLevel.g}//This may not work.  curLevel if does not
 									);
@@ -143,9 +145,9 @@ level4.prototype = {
 		this.wallV += this.g;
 	},
 	drawRun: function(){
-		draw.clear();
+		draw.clear(this.bgCol);
 		draw.dots();
-		draw.walls(walls);
+		draw.walls(walls, this.wallCol);
 		//draw.fillPts(walls.pts[1], this.heater.col, c);
 		this.dragWeights.draw();
 	},

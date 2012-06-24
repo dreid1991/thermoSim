@@ -1,10 +1,10 @@
 drawingTools.prototype = {
 
-	clear: function(){
+	clear: function(col){
 		var width = myCanvas.width;
 		var height = myCanvas.height;
 		c.clearRect(0, 0, width, height);
-		c.fillStyle = "#05111a";
+		c.fillStyle = "rgb(" + col.r + "," + col.g + "," + col.b + ")";
 		c.fillRect(0,0, width, height);	
 	},
 	dots: function(){
@@ -19,9 +19,9 @@ drawingTools.prototype = {
 			}
 		}
 	},
-	walls: function(walls){
+	walls: function(walls, col){
 		c.beginPath();
-		//alert(c.strokeStyle);
+		c.strokeStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";		
 		for (var wallIdx=0; wallIdx<walls.pts.length; wallIdx++){
 			var wall = walls.pts[wallIdx];
 			c.moveTo(wall[0].x, wall[0].y);
@@ -323,7 +323,6 @@ var c;
 $(function(){
 	canvas = document.getElementById("myCanvas");
 	c = canvas.getContext("2d");
-	c.strokeStyle = 'white';
 })
 
 globalMousePos = P(0,0)
