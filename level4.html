@@ -4,40 +4,40 @@
 <link type='text/css' href = 'styles.css' rel='stylesheet'/>
 <script src = 'js/jquery-1.7.2.min.js'></script>
 <script src = 'js/jquery-ui-1.8.20.custom.min.js'></script>
-<div>
-	<div id='main' class='main'>
-		<div id='mainHseader' class='header'>
+<div class='noSelect'>
+	<div id='main' class='main noSelect'>
+		<div id='mainHseader' class='header noSelect'>
 			Title
 		</div>
-		<div id='canvasDiv' class='canvasDiv'>
+		<div id='canvasDiv' class='canvasDiv noSelect'>
 			<canvas id='myCanvas'>
 			</canvas>
 		</div>
-		<div id='display' class='display'>
+		<div id='display' class='display noSelect'>
 			
-			<div id='textIntro' class='displayText'>
+			<div id='textIntro' class='displayText noSelect'>
 				An intro can go here.  There can be pictures, bullets, tables, whathaveyou.
 			</div>
-			<div id='textOutro' class='displayText'>
+			<div id='textOutro' class='displayText noSelect'>
 				BYE EVERYONE!
 			</div>
 		</div>
 
 
-		<div id='dashIntro' class='dash'>
+		<div id='dashIntro' class='dash noSelect'>
 			<center>
-				<button id='toSim'>To the simulation</button>
+				<button id='toSim' class='noSelect'>To the simulation</button>
 			</center>
 			
 		</div>
-		<div id='dashRun' class='dashShort'>
+		<div id='dashRun' class='dashShort noSelect'>
 			<center>
-				<button id='reset'>Reset experiment</button>
-				<button id='clearGraphs'>Clear graphs</button>
+				<button id='reset' class='noSelect'>Reset experiment</button>
+				<button id='clearGraphs' class='noSelect'>Clear graphs</button>
 				
 			</center>
 		</div>
-		<div id='dashOutro' class='dash'>
+		<div id='dashOutro' class='dash noSelect'>
 			<center>
 				<button id='toSim'>noitalumis eht oT</button>
 			</center>
@@ -49,13 +49,13 @@
 	</div>
 </div>
 <br>
-<div id='base' class='base'>
-	<div id='baseHeader' class='header'>Hello</div>
-	<div class='borderedBlock'>
-		<div id='quesHolder'>
+<div id='base' class='base noSelect'>
+	<div id='baseHeader' class='header noSelect'>Hello</div>
+	<div class='borderedBlock noSelect'>
+		<div id='quesHolder noSelect'>
 		</div>
-		<div style='padding:10px'>
-			<div id='answerDiv' class='answerDiv'>
+		<div style='padding:10px' class='noSelect'>
+			<div id='answerDiv' class='answerDiv noSelect'>
 				<textarea id='answer' cols='60' rows='5'>Type your answer here.</textarea>
 			</div>
 			<div id='submitDiv' class='submit'>
@@ -64,9 +64,8 @@
 		</div>
 	</div>
 
-	<div id='baseDash' class='dashShort'>I'm a footer</div>
+	<div id='baseDash' class='dashShort noSelect'>I'm a footer</div>
 </div>
-
 <script type = 'text/javascript'>
 var curLevel;
 canvasHeight = 530;

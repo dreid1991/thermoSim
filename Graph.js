@@ -46,7 +46,7 @@ function Graph(name, width, height, xLabel, yLabel, axisInit){
 }
 Graph.prototype = {
 	makeCanvas: function(name){
-		var str = "<div class='graphSpacer'></div><div id = '" + name + "div'><canvas id ='" + name + "Graph' width=" + this.dims.dx + " height=" + this.dims.dy+ "></canvas></div>"
+		var str = "<div class='graphSpacer noSelect'></div><div id = '" + name + "div'><canvas id ='" + name + "Graph' width=" + this.dims.dx + " height=" + this.dims.dy+ " class='noSelect'></canvas></div>"
 		var canvasDiv = $(str);
 		$('#graphs').append(canvasDiv);
 

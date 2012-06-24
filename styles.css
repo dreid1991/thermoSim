@@ -9,6 +9,14 @@
 .graph{
 	padding:20px;
 }
+
+.noSelect{
+	-moz-user-select: none; 
+	-khtml-user-select: none; 
+	-webkit-user-select: none; 
+	-o-user-select: none; 
+}
+
 .header{
 	height:25px;
 	border-top-left-radius:20px;
