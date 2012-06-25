@@ -179,7 +179,7 @@ function populate(name, x, y, width, height, num, temp){
 		for (var i=0; i<num; i++){
 			var placeX = x + Math.random()*width;
 			var placeY = y + Math.random()*height;
-			var v = tempToV(spc.m, temp)*gauss(1,vStdev);
+			var v = tempToV(spc.m, temp)
 			var angle = Math.random()*2*Math.PI;
 			var vx = v * Math.cos(angle);
 			var vy = v * Math.sin(angle);
@@ -192,7 +192,7 @@ function depopulate(name){
 	spc.dots = [];
 }
 function tempToV(mass, temp){
-	temp*=tempScalar/(updateInterval*updateInterval);
+	temp = 2*Math.max(0, temp/tConst*gauss(1,.1));
 	return Math.sqrt(temp/mass);
 }
 function returnEscapist(dot){
@@ -358,7 +358,9 @@ spcs = {};
 draw = new drawingTools();
 collide = new CollideHandler();
 
-tempScalar = 100;
+vConst = 1/10000;
+pConst = 25;
+tConst = 1;
 updateInterval = 35;
 dataInterval = 2000;
 

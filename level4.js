@@ -53,9 +53,9 @@ level4.prototype = {
 		this.dragWeights.init();
 		var self = this;
 		this.graphs.pVSv = new Graph('pVSv', 400,300, "Volume", "Pressure",
-							{x:{min:50, step:25}, y:{min:0, step:3}});
+							{x:{min:0, step:4}, y:{min:0, step:3}});
 		this.graphs.tVSv = new Graph('tVSv', 400, 300,"Volume", "Temperature",
-							{x:{min:50, step:25}, y:{min:100, step:60}});
+							{x:{min:0, step:4}, y:{min:100, step:60}});
 		this.graphs.pVSv.addSet('pInt', 'P Int.', Col(0,0,255), Col(200,200,255),
 								function(){
 									var pLast = self.data.pInt[self.data.pInt.length-1];
@@ -238,7 +238,8 @@ level4.prototype = {
 		this.data.pInt.push(this.dataHandler.pressureInt(this.forceInternal, this.numUpdates, SAPInt));
 		this.data.pExt.push(this.dataHandler.pressureExt(this.mass(), this.g, this.SAPExt));
 		this.data.t.push(this.dataHandler.temp());
-		this.data.v.push(this.dataHandler.volPolyWall());
+		this.data.v.push(this.dataHandler.volOneWall());
+		console.log(this.data.v[this.data.v.length-1]);
 		this.forceInternal = 0;
 		for(var graphName in this.graphs){
 			this.graphs[graphName].addLast();

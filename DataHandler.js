@@ -1,16 +1,14 @@
 function DataHandler(){
-	this.pConst = 25;
 }
 DataHandler.prototype = {
 	pressureInt: function(forceInternal, numUpdates, SA){
-		return this.pConst*forceInternal/(numUpdates*SA);
+		return pConst*forceInternal/(numUpdates*SA);
 	},
 	pressureExt: function(weight, g, SA){
-		return this.pConst*weight*g/SA;
+		return pConst*weight*g/SA;
 	},
 	temp: function(){
-		//console.log("new");
-		var t=0;
+		var sumKE = 0
 		var numDots = 0;
 		for (var spcName in spcs){
 			spc = spcs[spcName];
@@ -18,20 +16,18 @@ DataHandler.prototype = {
 			numDots += numInSpc;
 			for (var dotIdx=0; dotIdx<numInSpc; dotIdx++){
 				var dot = spc.dots[dotIdx];
-				var temp = dot.temp();
-				//console.log(temp);
-				t+=temp
-				//t+=temp*temp;
+				sumKE += dot.KE();
 			}
 		}
+		t = sumKE*tConst;
 		t/=(numDots);
-		return t //Math.sqrt(t);
+		return t;
 		
 	},
 	volOneWall: function(){
-		return walls.area(0)/1000;
+		return walls.area(0)*vConst;
 	},
 	volPolyWall: function(){
-		return curLevel.vol()/1000;
+		return curLevel.vol()*vConst;
 	}
 }
