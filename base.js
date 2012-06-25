@@ -359,10 +359,10 @@ draw = new drawingTools();
 collide = new CollideHandler();
 
 vConst = 1/10000;
-pConst = 25;
-tConst = 1;
+pConst = 10.315;
+tConst = 13;
 updateInterval = 35;
-dataInterval = 2000;
+dataInterval = 50000;//was 2000
 
 
 
