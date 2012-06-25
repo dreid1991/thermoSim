@@ -449,7 +449,7 @@ DragWeights.prototype = {
 		yBottom = this.zeroY;
 		var m = this.weightGroups[this.eBar.weight.name].mass;
 		this.drawEBarText(P(this.eBar.x, this.eBar.yText), this.eBar.eChange);
-		this.drawEBar(this.eBar.yMin, yBottom, m);
+		this.drawEBar(yBottom,this.eBar.yTop, m);
 	},
 	removeEBar: function(){
 		if(this.eBar.finalStatus==this.eBar.initStatus){
@@ -467,7 +467,7 @@ DragWeights.prototype = {
 				this.eBar.eChange = undefined;
 				this.eBar.weight = undefined;
 				this.eBar.initStatus = undefined;
-				this.eBar.yMin = undefined;
+				this.eBar.yTop = undefined;
 				this.eBar.yText = undefined;
 				
 				
@@ -593,12 +593,12 @@ DragWeights.prototype = {
 					var self = this;
 					this.eBar.weight = this.selected;
 					this.eBar.initStatus = this.eBar.weight.cameFrom;
-					this.eBar.yMin = this.pistonY();
-					var yText = this.eBar.yMin-15;
+					this.eBar.yTop = this.pistonY();
+					var yText = this.eBar.yTop-15;
 					this.eBar.yText = yText;
 					var m = this.weightGroups[this.eBar.weight.name].mass;
 					var g = this.g();
-					var dh = this.eBar.yMin - this.zeroY;
+					var dh = this.eBar.yTop - this.zeroY;
 					this.eBar.eChange = round(m*g*dh/1000,1);
 					addListener(curLevel, 'mouseup', 'switchToFall',
 						function(){
