@@ -75,7 +75,7 @@ level4.prototype = {
 									var vLast = self.data.v[self.data.v.length-1];
 									var tLast = self.data.t[self.data.t.length-1];
 									var address = 't';
-									return {x:vLast, t:tLast, address: address};
+									return {x:vLast, y:tLast, address: address};
 								});		
 		$('#myCanvas').show();
 	},
@@ -123,7 +123,7 @@ level4.prototype = {
 	},
 	makeDragWeights: function(){
 		var dragWeights = new DragWeights([{name:'sml', count:15, mass:4}, 
-									{name:'med', count:5, mass:12}, 
+									{name:'med', count:6, mass:10}, 
 									{name:'lrg', count:2, mass:30}
 									],
 									walls.pts[0][2].y,

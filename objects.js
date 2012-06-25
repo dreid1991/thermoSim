@@ -345,7 +345,7 @@ DragWeights.prototype = {
 				weight.pos.y = boundedStep(weight.pos.y, dest.y, dirUV.dy*this.moveSpeed);
 
 			}
-			if(weight.pos.x == dest.x){
+			if(weight.pos.x == dest.x && weight.pos.y == dest.y){
 				weight.status = 'inBin';
 				this.moveToDropOrders.splice(orderIdx,1);
 			}
@@ -420,10 +420,10 @@ DragWeights.prototype = {
 			draw.text(text, pos, this.readoutFont, this.readoutFontCol, 'left', 0, c);
 		}
 	},
-	drawEBar: function(yStart, yEnd, mass){
-		this.eBarY = Math.min(yStart, yEnd);
+	drawEBar: function(yBottom, yTop, mass){
+		this.eBarY = yTop;
 		var corner = P(this.eBar.x - mass*this.eBar.scalar/2, this.eBarY);
-		var dims = V(mass*this.eBar.scalar, yStart-yEnd);
+		var dims = V(mass*this.eBar.scalar, yBottom-yTop);
 		draw.fillRect(corner, dims, this.eBarCol, c);
 	},
 	drawEBarText: function(pos, energy){
@@ -446,10 +446,10 @@ DragWeights.prototype = {
 		this.drawEBar(yMax, yDraw, m);
 	},
 	eBarDown: function(){
-		yMax = this.zeroY;
+		yBottom = this.zeroY;
 		var m = this.weightGroups[this.eBar.weight.name].mass;
 		this.drawEBarText(P(this.eBar.x, this.eBar.yText), this.eBar.eChange);
-		this.drawEBar(this.eBar.yMin, yMax, m);
+		this.drawEBar(this.eBar.yMin, yBottom, m);
 	},
 	removeEBar: function(){
 		if(this.eBar.finalStatus==this.eBar.initStatus){
@@ -523,7 +523,7 @@ DragWeights.prototype = {
 		}else{
 			posDest = P(this.readouts.eOut.pos.x+40, this.readouts.eOut.pos.y);
 		}
-
+		//so for bars taking off piston, ebarY is the bottom point.  Should be the top.
 		var dir = V(posDest.x-posInit.x, posDest.y-posInit.y).UV();
 		var text = this.eText(Math.abs(this.eBar.eChange));
 		var self = this;
@@ -568,15 +568,15 @@ DragWeights.prototype = {
 	},
 	mousedown: function(){
 		var clicked = this.getClicked();
-		if(clicked){
+		if(clicked && clicked.status!='inTransit'){
 			this.pickup(clicked);
 			if(this.eBar.weight===undefined){
-				if(this.selected.status=='inBin'){
+				if(this.selected.cameFrom=='inBin'){
 					var eBarType = 'eBarUp';
 					addListener(curLevel, 'update', eBarType, this.eBarUp, this);
 					var self = this;
 					this.eBar.weight = this.selected;
-					this.eBar.initStatus = this.eBar.weight.status;
+					this.eBar.initStatus = this.eBar.weight.cameFrom;
 					addListener(curLevel, 'mouseup', 'switchToRemove', 
 						function(){	
 							removeListener(curLevel, 'update', eBarType);
@@ -587,12 +587,12 @@ DragWeights.prototype = {
 						}, 
 					self);
 				}
-				if(this.selected.status=='onPiston'){
+				if(this.selected.cameFrom=='onPiston'){
 					var eBarType = 'eBarDown';
 					addListener(curLevel, 'update', eBarType, this.eBarDown, this);
 					var self = this;
 					this.eBar.weight = this.selected;
-					this.eBar.initStatus = this.eBar.weight.status;
+					this.eBar.initStatus = this.eBar.weight.cameFrom;
 					this.eBar.yMin = this.pistonY();
 					var yText = this.eBar.yMin-15;
 					this.eBar.yText = yText;
@@ -626,7 +626,7 @@ DragWeights.prototype = {
 	mouseup: function(){
 		removeListener(curLevel, 'mousemove', 'weights');
 		removeListener(curLevel, 'mouseup', 'weights');
-		if(this.selected.status == 'onPiston'){
+		if(this.selected.cameFrom == 'onPiston'){
 			this.doEBarReadout('eOut', Math.abs(this.eBar.eChange));
 			this.doEBarReadout('delE', this.eBar.eChange);
 			var mass = this.weightGroups[this.eBar.weight.name].mass;
@@ -661,6 +661,8 @@ DragWeights.prototype = {
 		delete weight.slot;
 		this.selected = weight;
 		this.origPos = {mouseX:mousePos.x, mouseY:mousePos.y, weightX:weight.pos.x, weightY:weight.pos.y};
+		weight.cameFrom = weight.status;
+		weight.status = 'inTransit';
 	},
 	getClicked: function(){
 		for(var group in this.weightGroups){
