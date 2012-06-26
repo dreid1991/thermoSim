@@ -1,4 +1,4 @@
-function level4(){
+function workCorrelating(){
 	
 	this.dataHandler = new DataHandler();
 	this.data = {};
@@ -30,7 +30,7 @@ function level4(){
 		{q:"I'm another question"},
 	]
 	
-	this.g = 50*updateInterval/1000;
+	this.g = 1.75;
 	this.dragWeights = this.makeDragWeights();
 	this.mass = function(){return this.dragWeights.pistonWeight};
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
@@ -42,7 +42,7 @@ function level4(){
 
 }
 
-level4.prototype = {
+workCorrelating.prototype = {
 
 	init: function(){
 		this.addDots();
@@ -124,7 +124,7 @@ level4.prototype = {
 	makeDragWeights: function(){
 		var dragWeights = new DragWeights([{name:'sml', count:15, mass:4}, 
 									{name:'med', count:6, mass:10}, 
-									{name:'lrg', count:2, mass:30}
+									{name:'lrg', count:1, mass:50}
 									],
 									walls.pts[0][2].y,
 									function(){return walls.pts[0][0].y},
@@ -133,7 +133,7 @@ level4.prototype = {
 									Col(218, 187, 41),
 									Col(150, 150, 150),
 									function(){return curLevel.g},
-									20
+									35
 									);
 		return dragWeights;
 	},
@@ -213,6 +213,7 @@ level4.prototype = {
 				dot.y = dot.y+dot.r;
 				this.wallV = (m1*vo1 + m2*vo2 - m1*dot.v.dy)/(m2*scalar);
 			}else{
+			
 				var pt = walls.pts[line[0]][line[1]];
 				var dotVo = dot.v.dy;
 				var wallVo = this.wallV;
@@ -240,7 +241,6 @@ level4.prototype = {
 		this.data.pExt.push(this.dataHandler.pressureExt(this.mass(), this.g, this.SAPExt));
 		this.data.t.push(this.dataHandler.temp());
 		this.data.v.push(this.dataHandler.volOneWall());
-		console.log(this.data.v[this.data.v.length-1]);
 		this.forceInternal = 0;
 		for(var graphName in this.graphs){
 			this.graphs[graphName].addLast();

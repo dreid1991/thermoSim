@@ -1,0 +1,102 @@
+<html>
+<body>
+<link type='text/css' href = 'css/sunny/jquery-ui-1.8.20.custom.css' rel='stylesheet' />
+<link type='text/css' href = 'styles.css' rel='stylesheet'/>
+<script src = 'js/jquery-1.7.2.min.js'></script>
+<script src = 'js/jquery-ui-1.8.20.custom.min.js'></script>
+<div class='noSelect'>
+	<div id='main' class='main noSelect'>
+		<div id='mainHseader' class='header noSelect'>
+			Title
+		</div>
+		<div id='canvasDiv' class='canvasDiv noSelect'>
+			<canvas id='myCanvas'>
+			</canvas>
+		</div>
+		<div id='display' class='display noSelect'>
+			
+			<div id='textIntro' class='displayText noSelect'>
+				An intro can go here.  There can be pictures, bullets, tables, whathaveyou.
+			</div>
+			<div id='textOutro' class='displayText noSelect'>
+				BYE EVERYONE!
+			</div>
+		</div>
+
+
+		<div id='dashIntro' class='dash noSelect'>
+			<center>
+				<button id='toSim' class='noSelect'>To the simulation</button>
+			</center>
+			
+		</div>
+		<div id='dashRun' class='dashShort noSelect'>
+			<center>
+				<button id='reset' class='noSelect'>Reset experiment</button>
+				<button id='clearGraphs' class='noSelect'>Clear graphs</button>
+				
+			</center>
+		</div>
+		<div id='dashOutro' class='dash noSelect'>
+			<center>
+				<button id='toSim'>noitalumis eht oT</button>
+			</center>
+		</div>
+		
+
+	</div>
+	<div id='graphs' class='graphs'>
+	</div>
+</div>
+<br>
+<div id='base' class='base noSelect'>
+	<div id='baseHeader' class='header noSelect'>Hello</div>
+	<div class='borderedBlock noSelect'>
+		<div id='quesHolder noSelect'>
+		</div>
+		<div style='padding:10px' class='noSelect'>
+			<div id='answerDiv' class='answerDiv noSelect'>
+				<textarea id='answer' cols='60' rows='5'>Type your answer here.</textarea>
+			</div>
+			<div id='submitDiv' class='submit'>
+				<button id = 'submit'>Submit</button>
+			</div>
+		</div>
+	</div>
+
+	<div id='baseDash' class='dashShort noSelect'>I'm a footer</div>
+</div>
+<script type = 'text/javascript'>
+var curLevel;
+canvasHeight = 530;
+$(function(){
+	myCanvas.height = canvasHeight;
+	curLevel = new workCorrelating();
+	curLevel.init();
+	addQDivs();
+	$('button').button();
+	$('#toSim').click(function(){curLevel.startSim()});
+	$('#submit').click(function(){submit()});
+	$('#clearGraphs').click(function(){curLevel.clearGraphs()});
+	$('#reset').click(function(){curLevel.reset()});
+});
+
+myCanvas.width = $('#main').width();
+
+
+</script>
+
+
+
+<script src = 'indepClasses.js'></script>
+<script src = 'Graph.js'></script>
+<script src = 'SpeciesDefs.js'></script>
+<script src = 'CollideHandler.js'></script>
+<script src = 'DataHandler.js'></script>
+<script src = 'WallHandler.js'></script>
+<script src = 'objects.js'></script>
+<script src = 'workCorrelating.js'></script>
+<script src = 'base.js'></script>
+
+</body>
+</html>

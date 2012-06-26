@@ -74,7 +74,7 @@ Weight.prototype = {
 	},
 }
 
-function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g){
+function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g, deadWeight){
 	this.zeroY = zeroY;
 	this.pistonY = pistonY;
 	this.binY = binY;
@@ -93,7 +93,7 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.weightDimRatio = .5;
 	this.weightScalar = 40;
 	this.moveSpeed = 20;
-	this.pistonWeight = 20;
+	this.pistonWeight = deadWeight;
 	this.moveToDropOrders = [];
 	this.moveToPistonOrders = [];
 	this.weightsOnPiston = [];
@@ -103,9 +103,9 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.eBarFontCol = Col(255,255,255);
 	this.readoutFont = '13pt calibri';
 	this.readoutFontCol = Col(255,255,255);
-	this.readouts = this.makeReadouts([ {name:'eIn',   text:'E in: ', units:'u', initVal:0},
-										{name:'eOut',  text:'E out: ', units:'u', initVal:0},
-										{name:'delE',  text:'Sys. deltaE: ', units:'u', initVal:0},
+	this.readouts = this.makeReadouts([ {name:'eIn',   text:'E in: ', units:'kJ', initVal:0},
+										{name:'eOut',  text:'E out: ', units:'kJ', initVal:0},
+										{name:'delE',  text:'Sys. deltaE: ', units:'kJ', initVal:0},
 										{name:'weight',text:'Weight: ', units:'kg', initVal:this.pistonWeight}
 										],
 										25);
@@ -442,7 +442,7 @@ DragWeights.prototype = {
 		var dh = yMax-yDraw;
 		var m = this.weightGroups[this.eBar.weight.name].mass;
 		var g = this.g();
-		this.drawEBarText(P(this.eBar.x, yDraw-15), round(m*g*dh/1000,1));
+		this.drawEBarText(P(this.eBar.x, yDraw-15), round(workConst*m*g*dh,1));
 		this.drawEBar(yMax, yDraw, m);
 	},
 	eBarDown: function(){
@@ -599,7 +599,7 @@ DragWeights.prototype = {
 					var m = this.weightGroups[this.eBar.weight.name].mass;
 					var g = this.g();
 					var dh = this.eBar.yTop - this.zeroY;
-					this.eBar.eChange = round(m*g*dh/1000,1);
+					this.eBar.eChange = round(workConst*m*g*dh,1);
 					addListener(curLevel, 'mouseup', 'switchToFall',
 						function(){
 							removeListener(curLevel, 'update', eBarType);
