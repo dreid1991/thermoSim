@@ -246,17 +246,7 @@ function saveVals(level){
 		}
 	}
 }
-function makePath(pts){
-	var path = "M"+String(pts[0].x)+","+String(pts[0].y);
-	for (var ptIdx=1; ptIdx<pts.length; ptIdx++){
-		var pt = pts[ptIdx];
-		path+="L";
-		path+=String(pt.x);
-		path+=",";
-		path+=String(pt.y);
-	}
-	return path;
-}
+
 function makeSlider(id, attrs, handlers){
 	//var newDiv = $('<div>');
 	//newDiv.attr({id:id});
@@ -312,6 +302,13 @@ function getLen(pts){
 		len+=pts[ptIdx].distTo(pts[ptIdx+1]);
 	}
 	return len;
+}
+function byAttr(list, attrVal, attr){
+	for(var listIdx=0; listIdx<list.length; listIdx++){
+		if(list[listIdx][attr]==attrVal){
+			return list[listIdx];
+		}
+	}
 }
 function inRect(pos, dims, curCanvas){
 	var mousePos = mouseOffset(curCanvas);

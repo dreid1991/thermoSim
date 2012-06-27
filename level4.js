@@ -23,6 +23,7 @@ function level4(){
 	this.mousedownListeners = {};
 	this.mouseupListeners = {};
 	this.mousemoveListeners = {};
+	this.readout = new Readout(15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255));
 	this.graphs = {}
 	this.curQ = 0;
 	this.qa=[
@@ -45,6 +46,7 @@ function level4(){
 level4.prototype = {
 
 	init: function(){
+		
 		this.addDots();
 		this.hideDash();
 		this.hideText();
@@ -96,6 +98,7 @@ level4.prototype = {
 	startSim: function(){
 		this.hideDash();
 		this.hideText();
+		
 		$('#graphs').show()
 		$('#canvasDiv').show()
 		$('#display').hide();
@@ -107,6 +110,7 @@ level4.prototype = {
 		addListener(this, 'data', 'run', this.dataRun, this);
 		addListener(this, 'wallImpact', 'moving', this.onWallImpact, this);
 		addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
+		this.readout.init();  //Must go after adding updateRun or it will get cleared in the main draw func
 
 	},
 	startOutro: function(){
@@ -133,7 +137,8 @@ level4.prototype = {
 									Col(218, 187, 41),
 									Col(150, 150, 150),
 									function(){return curLevel.g},
-									20
+									20,
+									this.readout
 									);
 		return dragWeights;
 	},
@@ -240,7 +245,6 @@ level4.prototype = {
 		this.data.pExt.push(this.dataHandler.pressureExt(this.mass(), this.g, this.SAPExt));
 		this.data.t.push(this.dataHandler.temp());
 		this.data.v.push(this.dataHandler.volOneWall());
-		console.log(this.data.v[this.data.v.length-1]);
 		this.forceInternal = 0;
 		for(var graphName in this.graphs){
 			this.graphs[graphName].addLast();

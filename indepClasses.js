@@ -59,7 +59,10 @@ Vector.prototype = {
 	},
 	copy: function(){
 		return V(this.dx, this.dy);
-	}
+	},
+	mult: function(scalar){
+		return V(this.dx*scalar, this.dy*scalar);
+	},
 }
 Color.prototype = {
 	copy: function(){

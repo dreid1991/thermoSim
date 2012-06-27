@@ -74,7 +74,7 @@ Weight.prototype = {
 	},
 }
 
-function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g, deadWeight){
+function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g, deadWeight, readout){
 	this.zeroY = zeroY;
 	this.pistonY = pistonY;
 	this.binY = binY;
@@ -94,6 +94,7 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.weightScalar = 40;
 	this.moveSpeed = 20;
 	this.pistonWeight = deadWeight;
+	this.readout = readout;
 	this.moveToDropOrders = [];
 	this.moveToPistonOrders = [];
 	this.weightsOnPiston = [];
@@ -101,14 +102,7 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.flySpeed = 20;
 	this.eBarFont = '12pt Calibri';
 	this.eBarFontCol = Col(255,255,255);
-	this.readoutFont = '13pt calibri';
-	this.readoutFontCol = Col(255,255,255);
-	this.readouts = this.makeReadouts([ {name:'eIn',   text:'E in: ', units:'kJ', initVal:0},
-										{name:'eOut',  text:'E out: ', units:'kJ', initVal:0},
-										{name:'delE',  text:'Sys. deltaE: ', units:'kJ', initVal:0},
-										{name:'weight',text:'Weight: ', units:'kg', initVal:this.pistonWeight}
-										],
-										25);
+	this.addReadoutEntries();
 }
 
 DragWeights.prototype = {
@@ -119,6 +113,11 @@ DragWeights.prototype = {
 		this.dropAllInBins();
 		addListener(curLevel, 'mousedown', 'weights', this.mousedown, this);
 		delete this.tempWeightDefs;
+	},
+	addReadoutEntries: function(){
+		this.readout.addEntry('eAdd', 'E Added:', 'kJ', 0);
+		this.readout.addEntry('work', 'Work done:', 'kJ', 0);
+		this.readout.addEntry('weight', 'Weight:', 'kg', this.pistonWeight);
 	},
 	getWeightDims: function(weightDefs){
 		var dims = {};
@@ -258,21 +257,6 @@ DragWeights.prototype = {
 	newSlot: function(isFull, x, fy, name, type, row, col){
 		return {isFull:isFull, x:x, y:fy, name:name, type:type, row:row, col:col};
 	},
-	makeReadouts: function(toMake, y){
-		var readouts = {}
-		var width = myCanvas.width-130;
-		var spacing = Math.floor(width/(toMake.length-1))
-		var xInit = 5;
-		for (var toMakeIdx=0; toMakeIdx<toMake.length; toMakeIdx++){
-			var makeOrder = toMake[toMakeIdx];
-			var xPos = xInit + toMakeIdx*spacing;
-			readouts[makeOrder.name] = this.makeReadout(makeOrder.name, makeOrder.text, P(xPos, y), makeOrder.initVal, makeOrder.units);
-		}
-		return readouts;
-	},
-	makeReadout: function(name, text, pos, val, units){
-		return {name:name, text:text, pos:pos, initVal:val, val:val, units:units};
-	},
 	pistonMinusVal: function(val){
 		return function(){return walls.pts[0][0].y - val}
 	},
@@ -392,7 +376,6 @@ DragWeights.prototype = {
 	draw: function(){
 		this.drawWeights();
 		this.drawBins();
-		this.drawReadouts();
 	},
 	drawWeights: function(){
 		for (var group in this.weightGroups){
@@ -410,14 +393,6 @@ DragWeights.prototype = {
 		for (var binName in this.dropBins){
 			var pts =  this.dropBins[binName].pts;
 			draw.fillPts(pts, this.binCol, c);
-		}
-	},
-	drawReadouts: function(){
-		for (var readoutName in this.readouts){
-			var readout = this.readouts[readoutName];
-			var pos = readout.pos;
-			var text = readout.text+readout.val+' '+readout.units;
-			draw.text(text, pos, this.readoutFont, this.readoutFontCol, 'left', 0, c);
 		}
 	},
 	drawEBar: function(yBottom, yTop, mass){
@@ -476,82 +451,13 @@ DragWeights.prototype = {
 		
 	},
 	doEBarReadout: function(readoutName, change){
-		var readout = this.readouts[readoutName];
+		var readout = byAttr(this.readout.entries, readoutName, 'name')
 		var init = readout.val;
 		var setPt = init + change;
-		this.tickReadout(init, setPt, readoutName);
-	},
-	resetReadouts: function(){
-		for(var readoutName in this.readouts){
-			var readout = this.readouts[readoutName];
-			var curVal = readout.val;
-			var setPt = readout.initVal;
-			this.tickReadout(curVal, setPt, readoutName);
-		}
-	},
-	tickReadout: function(init, setPt, readoutName){
-		var step = (setPt - init)/10;
-		if(step!=0){
-			var readout = this.readouts[readoutName];
-			var tickFunc = this.makeTickFunc(readout, step, setPt);
-			if(!listenerExists(curLevel, 'update', readout.name)){
-				addListener(curLevel, 'update', readout.name, tickFunc, '');
-			}else{
-				removeListener(curLevel, 'update', readout.name);
-				addListener(curLevel, 'update', readout.name, tickFunc, '');
-			}
-		}
-	},
-	makeTickFunc: function(readout, step, setPt){
-		return function(){
-			readout.val = round(boundedStep(readout.val, setPt, step),1);
-			if(readout.val==round(setPt,1)){
-				removeListener(curLevel, 'update', readout.name);
-			}
-		}
-	},
-	flyText: function(){
-		//need unique listener name;
-		var flyName = this.eBar.weight.name + Math.floor(Math.random()*10000);
-		var yInit = this.pistonY()-15;
-
-		var posInit = P(this.eBar.x, yInit);
-		var posCur = P(posInit.x, posInit.y);
-		var posDest;
-		if(this.eBar.eChange>0){
-			posDest = P(this.readouts.eIn.pos.x+40, this.readouts.eIn.pos.y);
-		}else{
-			posDest = P(this.readouts.eOut.pos.x+40, this.readouts.eOut.pos.y);
-		}
-		//so for bars taking off piston, ebarY is the bottom point.  Should be the top.
-		var dir = V(posDest.x-posInit.x, posDest.y-posInit.y).UV();
-		var text = this.eText(Math.abs(this.eBar.eChange));
-		var self = this;
-		var colInit = this.eBarFontCol;
-		var colDest = curLevel.bgCol;
-		var curCol = colInit.copy();
-		var dx = Math.abs(posDest.x-posInit.x);
-		var dy = Math.abs(posDest.y-posInit.y);
-		var numTurns = Math.max(dx/self.flySpeed, dy/self.flySpeed);
-		var stepR = Math.ceil((colDest.r-colInit.r)/numTurns);
-		var stepG = Math.ceil((colDest.g-colInit.g)/numTurns);
-		var stepB = Math.ceil((colDest.b-colInit.b)/numTurns);
-		addListener(curLevel, 'update', flyName, 
-			function(){
-				draw.text(text, posCur, self.eBarFont, curCol, 'center', 0, c);
-				curCol.r = boundedStep(curCol.r, colDest.r, stepR);
-				curCol.g = boundedStep(curCol.g, colDest.g, stepG);
-				curCol.b = boundedStep(curCol.b, colDest.b, stepB);
-				posCur.x = boundedStep(posCur.x, posDest.x, dir.dx*self.flySpeed);
-				posCur.y = boundedStep(posCur.y, posDest.y, dir.dy*self.flySpeed);
-				if(posCur.x==posDest.x && posCur.y==posDest.y){
-					removeListener(curLevel, 'update', flyName);
-				}
-			},
-		'');
+		this.readout.tick(init, setPt, readoutName);
 		
-				
 	},
+
 	putOnPiston: function(weight){
 		this.weightsOnPiston.push(weight);
 		this.pistonWeight+=this.weightGroups[weight.name].mass;
@@ -627,19 +533,17 @@ DragWeights.prototype = {
 		removeListener(curLevel, 'mousemove', 'weights');
 		removeListener(curLevel, 'mouseup', 'weights');
 		if(this.selected.cameFrom == 'onPiston'){
-			this.doEBarReadout('eOut', Math.abs(this.eBar.eChange));
-			this.doEBarReadout('delE', this.eBar.eChange);
+			this.doEBarReadout('eAdd', this.eBar.eChange);
 			var mass = this.weightGroups[this.eBar.weight.name].mass;
 			this.doEBarReadout('weight', -mass);
-			this.flyText()
+			this.animText()
 			this.dropIntoBin(this.selected);
 		}else{
 			if(this.selected.pos.y<this.pistonY()){
-				this.doEBarReadout('eIn', Math.abs(this.eBar.eChange));
-				this.doEBarReadout('delE', this.eBar.eChange);
+				this.doEBarReadout('eAdd', this.eBar.eChange);
 				var mass = this.weightGroups[this.eBar.weight.name].mass;
 				this.doEBarReadout('weight', mass);
-				this.flyText();
+				this.animText();
 				this.dropIntoPistonBin(this.selected)
 			}else{
 				this.dropIntoBin(this.selected)
@@ -649,7 +553,14 @@ DragWeights.prototype = {
 		this.selected = undefined;
 
 	},
-
+	animText: function(){
+		var destEntry = byAttr(this.readout.entries, 'eAdd', 'name');
+		destPos = destEntry.pos.copy();
+		destPos.x+=40;
+		animText({pos:P(this.eBar.x,this.pistonY()-15), size: 13, rotation:0, col:Col(255,255,255)},
+			{pos:destPos, col:curLevel.bgCol},
+			'calibri', this.eText(this.eBar.eChange), 'center', 500, c)
+	},
 	pickup: function(weight){
 		var mousePos = mouseOffset(myCanvas);
 		if (weight.slot!==undefined){
