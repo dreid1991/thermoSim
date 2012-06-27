@@ -26,7 +26,7 @@ function level4(){
 	this.graphs = {}
 	this.promptIdx = 0;
 	this.prompts=[
-		"I'm a question",
+		"Okay, let’s get oriented!  Here we have a container filled with a gas that follows the <a href = http://en.wikipedia.org/wiki/Hard_spheres>hard sphere model</a>, which is like the ideal gas model but the molecules take up some space.  There are some weights in bins below the containers.  You can drag the weights onto or off of the container to compress or expand it.  Dragging a weight up takes energy since you’re increasing its height.  ",
 		"I'm another question",
 		"I am the FINAL QUESTION.  NONE SHALL PASS"
 	]
@@ -302,19 +302,19 @@ level4.prototype = {
 		walls = undefined;
 		walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
 		walls.setup();
-		
 		this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
-		this.SAPExt = getLen(this.extPressurePts);
+		
+		//this.SAPExt = getLen(this.extPressurePts);
 		this.forceInternal = 0;
 		this.wallV = 0;
-		this.updateListeners = {};//{run:this.updateRun, compress:this.updateCompress, expand:this.updateExpand, pause:this.updatePause};
-		this.dataListeners = {};//{run:this.dataRun, pause:this.dataPause};
+		this.updateListeners = {};
+		this.dataListeners = {};
 		this.wallImpactListeners = {};
 		this.dotImpactListeners = {};
+		this.readout.resetAll();
 		this.clearGraphs();
 		this.startSim();
 		this.dragWeights.dropAllInBins();
-		this.dragWeights.resetReadouts();
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();
