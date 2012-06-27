@@ -26,7 +26,6 @@ function animText(init, dest, font, text, align, time, drawCanvas){
 	var speedChangeCol = {};
 	var speedRotate;
 	var speedSizeChange;
-	//FINISH MAKING SPEEDS IN THIS DOMAIN, NOT IN THE IF's DOMAINS
 	if(moving){
 		var path = V(dest.pos.x - init.pos.x, dest.pos.y - init.pos.y)
 		var dir = path.UV();
@@ -80,6 +79,4 @@ function animText(init, dest, font, text, align, time, drawCanvas){
 			turn++;
 		},
 	'');
-	
-			
 }

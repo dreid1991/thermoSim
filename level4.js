@@ -31,11 +31,18 @@ function level4(){
 		{q:"I'm another question"},
 	]
 	
-	this.g = 50*updateInterval/1000;
+	this.g = 1.75;
 	this.dragWeights = this.makeDragWeights();
 	this.mass = function(){return this.dragWeights.pistonWeight};
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
 	walls.setup();
+	var self = this;
+	this.workTracker = new WorkTracker(function(){return walls.area(0)},
+										function(){return self.mass()},
+										function(){return self.g},
+										function(){return getLen([walls.pts[0][0], walls.pts[0][1]])},
+										{readout:this.readout, idx:1}
+										)
 	this.minY = 60;
 	this.maxY = walls.pts[0][2].y-75;
 	addSpecies(['spc1', 'spc3']);
@@ -44,9 +51,7 @@ function level4(){
 }
 
 level4.prototype = {
-
 	init: function(){
-		
 		this.addDots();
 		this.hideDash();
 		this.hideText();
@@ -93,12 +98,10 @@ level4.prototype = {
 		$('#dashIntro').show();
 		emptyListener(this, "update");
 		emptyListener(this, "data");
-		
 	},
 	startSim: function(){
 		this.hideDash();
 		this.hideText();
-		
 		$('#graphs').show()
 		$('#canvasDiv').show()
 		$('#display').hide();
@@ -111,7 +114,7 @@ level4.prototype = {
 		addListener(this, 'wallImpact', 'moving', this.onWallImpact, this);
 		addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
 		this.readout.init();  //Must go after adding updateRun or it will get cleared in the main draw func
-
+		this.workTracker.init();
 	},
 	startOutro: function(){
 		saveVals(this);

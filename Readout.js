@@ -18,10 +18,15 @@ Readout.prototype = {
 			draw.text(text, pos, this.font, this.fontCol, 'left', 0, c);
 		}		
 	},
-	tick: function(init, setPt, name){
+	hardUpdate: function(setPt, name){
+		var entry = byAttr(this.entries, name, 'name');
+		entry.val = round(setPt, 1);
+	},
+	tick: function(setPt, name){
+		var entry = byAttr(this.entries, name, 'name');
+		var init = entry.val
 		var step = (setPt - init)/10;
 		if(step!=0){
-			var entry = byAttr(this.entries, name, 'name');
 			var tickFunc = this.makeTickFunc(entry, step, setPt);
 			removeListener(curLevel, 'update', entry.name);
 			addListener(curLevel, 'update', entry.name, tickFunc, '');
@@ -36,9 +41,13 @@ Readout.prototype = {
 			}
 		}
 	},
-	addEntry: function(name, text, units, initVal){
+	addEntry: function(name, text, units, initVal, idx){
 		var entry = {name:name, text:text, units:units, val: initVal, initVal:initVal};
-		this.entries.push(entry);
+		if(idx){
+			this.entries.splice(idx, 0, entry);
+		}else{
+			this.entries.push(entry);
+		}
 		this.positionEntries();
 		
 	},
@@ -71,7 +80,7 @@ Readout.prototype = {
 			var name = entry.name;
 			var curVal = entry.val;
 			var setPt = entry.initVal;
-			this.tickReadout(curVal, setPt, name);
+			this.tick(setPt, name);
 		}
 	},
 

@@ -115,9 +115,8 @@ DragWeights.prototype = {
 		delete this.tempWeightDefs;
 	},
 	addReadoutEntries: function(){
-		this.readout.addEntry('eAdd', 'E Added:', 'kJ', 0);
-		this.readout.addEntry('work', 'Work done:', 'kJ', 0);
-		this.readout.addEntry('weight', 'Weight:', 'kg', this.pistonWeight);
+		this.readout.addEntry('eAdd', 'E Added:', 'kJ', 0, undefined);
+		this.readout.addEntry('weight', 'Weight:', 'kg', this.pistonWeight, undefined);
 	},
 	getWeightDims: function(weightDefs){
 		var dims = {};
@@ -454,7 +453,7 @@ DragWeights.prototype = {
 		var readout = byAttr(this.readout.entries, readoutName, 'name')
 		var init = readout.val;
 		var setPt = init + change;
-		this.readout.tick(init, setPt, readoutName);
+		this.readout.tick(setPt, readoutName);
 		
 	},
 
