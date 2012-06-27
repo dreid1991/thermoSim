@@ -1,5 +1,4 @@
 function level4(){
-	
 	this.dataHandler = new DataHandler();
 	this.data = {};
 	this.data.t = [];
@@ -140,7 +139,7 @@ level4.prototype = {
 									Col(218, 187, 41),
 									Col(150, 150, 150),
 									function(){return curLevel.g},
-									20,
+									25,
 									this.readout
 									);
 		return dragWeights;
@@ -238,8 +237,8 @@ level4.prototype = {
 		//populate("spc1", 15, 15, myCanvas.width-400, myCanvas.height-150, 200, 4);
 		//populate("spc2", 75, 75, myCanvas.width-400, myCanvas.height-150, 20, 4);
 		//populate("spc3", 15, 15, myCanvas.width-400, myCanvas.height-150, 400, 4);		
-		populate("spc1", 35, 80, 460, 350, 800, 250);
-		populate("spc3", 35, 80, 460, 350, 600, 250);		
+		populate("spc1", 35, 80, 460, 350, 800, 230);
+		populate("spc3", 35, 80, 460, 350, 600, 230);		
 		//populate("spc2", 35, 80, 460, 300, 20, 250);
 	},
 	dataRun: function(){
