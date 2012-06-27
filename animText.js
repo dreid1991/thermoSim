@@ -10,7 +10,7 @@ function animText(init, dest, font, text, align, time, drawCanvas){
 	
 	moving = dest.pos!==undefined;
 	changingCol = dest.col!==undefined;
-	rotating = dest.rotaion!==undefined;
+	rotating = dest.rotation!==undefined;
 	changingSize = dest.size!==undefined;
 	var cur = {};
 	cur.pos = init.pos.copy();
@@ -23,43 +23,46 @@ function animText(init, dest, font, text, align, time, drawCanvas){
 	var funcRot = function(){};
 	var funcSize = function(){};
 	var speedMove;
+	var speedChangeCol = {};
+	var speedRotate;
+	var speedSizeChange;
 	//FINISH MAKING SPEEDS IN THIS DOMAIN, NOT IN THE IF's DOMAINS
 	if(moving){
 		var path = V(dest.pos.x - init.pos.x, dest.pos.y - init.pos.y)
-		var dist = path.UV();
-		var speedMove = dist.mult(path.mag())/numTurns;
+		var dir = path.UV();
+		var speedMove = dir.mult(path.mag()/numTurns);
 		funcMove = function(){
 			cur.pos.x += speedMove.dx;
 			cur.pos.y += speedMove.dy;
 		}
 	}
 	if(changingCol){
-		var stepR = Math.ceil((dest.col.r-init.col.r)/numTurns);
-		var stepG = Math.ceil((dest.col.g-init.col.g)/numTurns);
-		var stepB = Math.ceil((dest.col.b-init.col.b)/numTurns);
+		speedChangeCol.r = Math.ceil((dest.col.r-init.col.r)/numTurns);
+		speedChangeCol.g = Math.ceil((dest.col.g-init.col.g)/numTurns);
+		speedChangeCol.b = Math.ceil((dest.col.b-init.col.b)/numTurns);
 		funcCol = function(){
-			cur.col.r += stepR;
-			cur.col.g += stepG;
-			cur.col.b += stepB;
+			cur.col.r += speedChangeCol.r;
+			cur.col.g += speedChangeCol.g;
+			cur.col.b += speedChangeCol.b;
 		}
 	}
+	
 	if(rotating){
 		var arcLen = dest.rotation-init.rotation;
-		var stepRot;
 		if(arcLen<=Math.PI){
-			stepRot = arcLen/numTurns;
+			speedRotate = arcLen/numTurns;
 		}else{
-			stepRot = -arcLen/numTurns;
+			speedRotate = -arcLen/numTurns;
 		}
 		funcRot = function(){
-			cur.rot += stepRot;
+			cur.rot += speedRotate;
 		}
 	}
 	if(changingSize){
 		var sizeChange = dest.size - init.size;
-		var stepSize = sizeChange/numTurns;
+		speedSizeChange = sizeChange/numTurns;
 		funcSize = function(){
-			cur.size+=stepSize;
+			cur.size+=speedSizeChange;
 		}
 	}
 	var turn = 0

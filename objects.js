@@ -558,8 +558,8 @@ DragWeights.prototype = {
 		destPos = destEntry.pos.copy();
 		destPos.x+=40;
 		animText({pos:P(this.eBar.x,this.pistonY()-15), size: 13, rotation:0, col:Col(255,255,255)},
-			{pos:destPos, col:curLevel.bgCol},
-			'calibri', this.eText(this.eBar.eChange), 'center', 500, c)
+			{pos:destPos, col:curLevel.bgCol, size:10},
+			'calibri', this.eText(this.eBar.eChange), 'center', 300, c)
 	},
 	pickup: function(weight){
 		var mousePos = mouseOffset(myCanvas);
