@@ -24,10 +24,11 @@ function level4(){
 	this.mousemoveListeners = {};
 	this.readout = new Readout(15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255));
 	this.graphs = {}
-	this.curQ = 0;
-	this.qa=[
-		{q:"I'm a question"},
-		{q:"I'm another question"},
+	this.promptIdx = 0;
+	this.prompts=[
+		"I'm a question",
+		"I'm another question",
+		"I am the FINAL QUESTION.  NONE SHALL PASS"
 	]
 	
 	this.g = 1.75;
@@ -58,10 +59,10 @@ level4.prototype = {
 		this.startIntro();
 		this.dragWeights.init();
 		var self = this;
-		this.graphs.pVSv = new Graph('pVSv', 400,300, "Volume", "Pressure",
+		this.graphs.pVSv = new Graph('pVSv', 400,300, "Volume (L)", "Pressure (atm)",
 							{x:{min:0, step:4}, y:{min:0, step:3}});
-		this.graphs.tVSv = new Graph('tVSv', 400, 300,"Volume", "Temperature",
-							{x:{min:0, step:4}, y:{min:100, step:60}});
+		this.graphs.tVSv = new Graph('tVSv', 400, 300,"Volume (L)", "Temperature (K)",
+							{x:{min:0, step:4}, y:{min:200, step:60}});
 		this.graphs.pVSv.addSet('pInt', 'P Int.', Col(0,0,255), Col(200,200,255),
 								function(){
 									var pLast = self.data.pInt[self.data.pInt.length-1];
@@ -106,7 +107,7 @@ level4.prototype = {
 		$('#display').hide();
 		$('#dashRun').show();
 		$('#base').show();
-		showCurQ();
+		showPrompt(this.promptIdx);
 		emptyListener(this, 'data');
 		addListener(this, 'update', 'run', this.updateRun, this);
 		addListener(this, 'data', 'run', this.dataRun, this);
@@ -286,6 +287,7 @@ level4.prototype = {
 		}
 		walls.setupWall(0);
 	},
+	
 	clearGraphs: function(){
 		for (var graph in this.graphs){
 			this.graphs[graph].clear();

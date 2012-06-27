@@ -267,31 +267,18 @@ function makeSlider(id, attrs, handlers){
 	}
 	return div;
 }
-function addQDivs(){
-	for (var qIdx=0; qIdx<curLevel.qa.length; qIdx++){
-		var q = curLevel.qa[qIdx].q;
-		var qDiv = $('<div>');
-		var id='q'+String(qIdx);
-		qDiv.attr({id:id,class:'question'});
-		qDiv.html(q);
-		$('#quesHolder').append(qDiv);
-	}
+
+function showPrompt(idx){
+	var str = curLevel.prompts[idx];
+	$('#prompt').html(str);
 }
-function showCurQ(){
-	for (var qIdx=0; qIdx<curLevel.qa.length; qIdx++){
-		if(qIdx==curLevel.curQ){
-			$('#q'+String(qIdx)).show();
-		}else{
-			$('#q'+String(qIdx)).hide();
-		}
-	}
+function nextPrompt(){
+	curLevel.promptIdx = Math.min(curLevel.prompts.length-1, curLevel.promptIdx+1);
+	showPrompt(curLevel.promptIdx);
 }
-function submit(){
-	if(curLevel.curQ<curLevel.qa.length-1){
-		curLevel.curQ++;
-	}
-	showCurQ();
-	curLevel.qa[curLevel.curQ].a = $('textarea#answer').val();
+function prevPrompt(){
+	curLevel.promptIdx = Math.max(0, curLevel.promptIdx-1);
+	showPrompt(curLevel.promptIdx);
 }
 function log10(val){
 	return Math.log(val)/Math.log(10);

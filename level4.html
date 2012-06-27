@@ -7,7 +7,7 @@
 <div class='noSelect'>
 	<div id='main' class='main noSelect'>
 		<div id='mainHseader' class='header noSelect'>
-			Title
+			Origins of reversibility
 		</div>
 		<div id='canvasDiv' class='canvasDiv noSelect'>
 			<canvas id='myCanvas'>
@@ -16,11 +16,11 @@
 		<div id='display' class='display noSelect'>
 			
 			<div id='textIntro' class='displayText noSelect'>
-				<p>Let’s look at reversibility.  When someone says a compression is reversible, they mean that all of the work done to compress the system can be gotten back out by expanding the container back to its original volume.  This means that the system experiences no net energy change after going through the compression/expansion cycle.</p>
+				<p>Let’s look at reversibility.  When someone says a compression is reversible, they mean that all of the work done to compress the system can be gotten back out by expanding the container back to its original volume.  This means that the system experiences no net energy or temperature change after going through the compression/expansion cycle.</p>
 				<p>Conversely, an irreversible compression is one where you can’t get all of the energy used in compression back out and the system is hotter after going through the cycle.</p>
-				<p>Mathematically, in a reversible compression P<sub>interal</sub> always equals P<sub>external</sub>, so work equals </p>
+				<p>Mathematically, in a reversible compression P<sub>interal</sub>, the pressure exerted by the gas on the walls of the container, always equals P<sub>external</sub>, the pressure from an outside force, so starting from the definition of work, we get </p>
 				<center><img src = img/reversibility1.jpg></img></center><br>
-				We’re going to try to make physical sense of these equations in this simulation. 
+				In this simulation, we're going to try to figure out a physical explaination for why internal and external pressures always need to be equal to make a compression reversible.
 			</div>
 			<div id='textOutro' class='displayText noSelect'>
 				BYE EVERYONE!
@@ -30,7 +30,7 @@
 
 		<div id='dashIntro' class='dash noSelect'>
 			<center>
-				<button id='toSim' class='noSelect'>To the simulation</button>
+				<button id='toSim' class='noSelect'>To the simulation!</button>
 			</center>
 			
 		</div>
@@ -54,21 +54,25 @@
 </div>
 <br>
 <div id='base' class='base noSelect'>
-	<div id='baseHeader' class='header noSelect'>Hello</div>
+	<div id='baseHeader' class='header noSelect'>Current thing</div>
 	<div class='borderedBlock noSelect'>
 		<div id='quesHolder noSelect'>
 		</div>
-		<div style='padding:10px' class='noSelect'>
-			<div id='answerDiv' class='answerDiv noSelect'>
-				<textarea id='answer' cols='60' rows='5'>Type your answer here.</textarea>
+		<div style='padding:10px' class='displayText noSelect'>
+			<div id='prompt'>
+			
 			</div>
-			<div id='submitDiv' class='submit'>
-				<button id = 'submit'>Submit</button>
+		
+			<div id='submitDiv' align='right'>
+				<button id = 'previous'>Previous thing</button>
+				<button id = 'next'>Next thing</button>
 			</div>
+
+			<!/align>
 		</div>
 	</div>
 
-	<div id='baseDash' class='dashShort noSelect'>I'm a footer</div>
+	<div id='baseDash' class='bottomRound noSelect'></div>
 </div>
 <script type = 'text/javascript'>
 var curLevel;
@@ -77,9 +81,10 @@ $(function(){
 	myCanvas.height = canvasHeight;
 	curLevel = new level4();
 	curLevel.init();
-	addQDivs();
 	$('button').button();
 	$('#toSim').click(function(){curLevel.startSim()});
+	$('#previous').click(function(){prevPrompt()});
+	$('#next').click(function(){nextPrompt()});
 	$('#submit').click(function(){submit()});
 	$('#clearGraphs').click(function(){curLevel.clearGraphs()});
 	$('#reset').click(function(){curLevel.reset()});

@@ -63,7 +63,7 @@
 	padding:10px;
 }	
 .bottomRound{
-	height:10px;
+	height:0px;
 	border-bottom-left-radius:20px;
 	border-bottom-right-radius:20px;
 	background-color:#05111a;
