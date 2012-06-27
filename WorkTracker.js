@@ -12,17 +12,17 @@ function WorkTracker(vol, mass, g, SA, readoutData){
 WorkTracker.prototype = {
 	init: function(){
 		addListener(curLevel, 'update', 'workTracker', this.updateVal, this);
-		addListener(curLevel, 'data', 'workTracker', this.updateReadout, this);
+		//addListener(curLevel, 'data', 'workTracker', this.updateReadout, this);
 	},
 	updateVal: function(){
 		var volCur = this.vol();
-		var p = this.mass()*this.g()/this.SA();
-		var dV = volCur - this.volLast;
-		this.work -= p*dV;
+		var p = ATMtoPA*pConst*this.mass()*this.g()/this.SA();
+		var dV = LtoM3*vConst*(volCur - this.volLast);
+		this.work -= JtoKJ*p*dV;
 		this.volLast = volCur;
-		
+		this.readout.hardUpdate(this.work, 'work');
 	},
 	updateReadout: function(){
-		this.readout.tick(this.work, 'work');
+		//this.readout.tick(this.work, 'work');
 	}
 }

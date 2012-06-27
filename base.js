@@ -357,8 +357,11 @@ collide = new CollideHandler();
 
 vConst = 1/10000;
 pConst = 16.1423;
+LtoM3 = .001;
+ATMtoPA = 101325;
+JtoKJ = .001;
 tConst = 20;
-workConst = .431e-3;//for kJ;
+workConst = .158e-3;//for kJ;
 updateInterval = 30;
 dataInterval = 2000;
 
