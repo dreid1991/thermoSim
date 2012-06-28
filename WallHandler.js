@@ -173,8 +173,8 @@ WallHandler.prototype = {
 		var distFromWall = perpUV.dotProd(dotVec);
 		var perpV = perpUV.dotProd(dot.v);
 		if (distFromWall>0 && distFromWall<30 && this.isBetween(dot, line, wallUV)){
-			for (wallImpactListener in curLevel.wallImpactListeners){
-				var listener = curLevel.wallImpactListeners[wallImpactListener]
+			for (wallImpactListener in curLevel.wallImpactListeners.listeners){
+				var listener = curLevel.wallImpactListeners.listeners[wallImpactListener]
 				listener.func.apply(listener.obj,[dot, line, wallUV, perpV]);
 			}
 		}

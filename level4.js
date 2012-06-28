@@ -15,13 +15,13 @@ function level4(){
 	this.SAPExt = getLen(this.extPressurePts);
 	this.forceInternal = 0;
 	this.wallV = 0;
-	this.updateListeners = {};
-	this.dataListeners = {};
-	this.wallImpactListeners = {};
-	this.dotImpactListeners = {};
-	this.mousedownListeners = {};
-	this.mouseupListeners = {};
-	this.mousemoveListeners = {};
+	this.updateListeners = {listeners:{}, save:{}};
+	this.dataListeners = {listeners:{}, save:{}};
+	this.wallImpactListeners = {listeners:{}, save:{}};
+	this.dotImpactListeners = {listeners:{}, save:{}};
+	this.mousedownListeners = {listeners:{}, save:{}};
+	this.mouseupListeners = {listeners:{}, save:{}};
+	this.mousemoveListeners = {listeners:{}, save:{}};
 	this.readout = new Readout(15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255));
 	this.graphs = {}
 	this.promptIdx = 0;
@@ -93,7 +93,6 @@ level4.prototype = {
 		$('#myCanvas').show();
 	},
 	startIntro: function(){
-		saveVals(this);
 		this.hideDash();
 		this.hideText();
 		this.hideBase();
@@ -124,7 +123,8 @@ level4.prototype = {
 		this.workTracker.init();
 	},
 	startOutro: function(){
-		saveVals(this);
+		saveListener(this, 'update');
+		saveListener(this, 'data');
 		this.hideDash();
 		this.hideText();
 		this.hideBase();
@@ -132,8 +132,20 @@ level4.prototype = {
 		$('#display').show();
 		$('#textOutro').show();	
 		$('#dashOutro').show();
-		removeListener(this, 'update', 'run');
-		emptyListener(this, "data");
+		emptyListener(this, 'update');
+		emptyListener(this, 'data');
+	},
+	backToSim: function(){
+		this.promptIdx = this.prompts.length-1;
+		this.hideDash();
+		this.hideText();
+		$('#graphs').show()
+		$('#canvasDiv').show()
+		$('#display').hide();
+		$('#dashRun').show();
+		$('#base').show();	
+		loadListener(this, 'update');
+		loadListener(this, 'data');
 	},
 	makeDragWeights: function(){
 		var dragWeights = new DragWeights([{name:'sml', count:12, mass:5}, 
@@ -154,14 +166,14 @@ level4.prototype = {
 	},
 	update: function(){
 		this.numUpdates++;
-		for (var updateListener in this.updateListeners){
-			var listener = this.updateListeners[updateListener]
+		for (var updateListener in this.updateListeners.listeners){
+			var listener = this.updateListeners.listeners[updateListener]
 			listener.func.apply(listener.obj);
 		}
 	},
 	addData: function(){
-		for (var dataListener in this.dataListeners){
-			var listener = this.dataListeners[dataListener];
+		for (var dataListener in this.dataListeners.listeners){
+			var listener = this.dataListeners.listeners[dataListener];
 			listener.func.apply(listener.obj);
 		}
 		this.numUpdates = 0;
@@ -314,10 +326,10 @@ level4.prototype = {
 		//this.SAPExt = getLen(this.extPressurePts);
 		this.forceInternal = 0;
 		this.wallV = 0;
-		this.updateListeners = {};
-		this.dataListeners = {};
-		this.wallImpactListeners = {};
-		this.dotImpactListeners = {};
+		emptyListener(this, 'update');
+		emptyListener(this, 'wallImpact');
+		emptyListener(this, 'dotImpact');
+		emptyListener(this, 'data');
 		this.readout.resetAll();
 		this.clearGraphs();
 		this.startSim();

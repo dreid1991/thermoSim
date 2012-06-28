@@ -35,6 +35,14 @@
 	border-color:#b3b2b1;
 	
 }
+.foo{
+	text-align:center;
+	position:absolute;
+	bottom:0;
+	left:0;
+	right:0;
+
+}
 .canvasDiv{
 	border-top: 3px solid;
 	border-bottom:3px solid;
@@ -45,7 +53,10 @@
 	color:white;
 	padding:5px;
 }
-
+.bottomAlign{
+	vertical-align:bottom;
+	position:relative;
+}
 .dash{
 	height:130px;
 	border-bottom-left-radius:20px;

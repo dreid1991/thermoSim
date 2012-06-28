@@ -19,8 +19,8 @@ CollideHandler.prototype = {
 							var distSqr = dx*dx+dy*dy;
 							var rSqr = (dot.r+neighbor.r)*(dot.r+neighbor.r);
 							if(distSqr<=rSqr){
-								for (dotImpactListener in curLevel.dotImpactListeners){
-									var listener = curLevel.dotImpactListeners[dotImpactListener]
+								for (dotImpactListener in curLevel.dotImpactListeners.listeners){
+									var listener = curLevel.dotImpactListeners.listeners[dotImpactListener]
 									listener.func.apply(listener.obj,[dot, neighbor]);
 								}
 							}

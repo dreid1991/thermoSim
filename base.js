@@ -226,25 +226,35 @@ function makeButton(text, id){
 	return newDiv;
 } 
 function addListener(object, typeName, funcName, func, destObj){
-	object[typeName + 'Listeners'][funcName] = {func:func, obj:destObj};
+	object[typeName + 'Listeners'].listeners[funcName] = {func:func, obj:destObj};
 }
 function removeListener(object, typeName, funcName){
-	delete object[typeName + 'Listeners'][funcName];
+	delete object[typeName + 'Listeners'].listeners[funcName];
 }
 function listenerExists(object, typeName, funcName){
-	return object[typeName + 'Listeners'][funcName]!==undefined;
+	return object[typeName + 'Listeners'].listeners[funcName]!==undefined;
 }
 function emptyListener(object, typeName){
-	for (var listenerName in object[typeName + 'Listeners']){
-		delete object[typeName + 'Listeners'][listenerName];
+	for (var listenerName in object[typeName + 'Listeners'].listeners){
+			delete object[typeName + 'Listeners'].listeners[listenerName];
 	}
 }
-function saveVals(level){
-	for (sliderName in level.sliders){
-		if (!(level.sliders[sliderName].val===undefined)){
-			level.savedVals[sliderName] = level.sliders[sliderName].val;
-		}
+function saveListener(object, typeName){
+	var listener = object[typeName+'Listeners']
+	var save = listener.save;
+	var listeners = listener.listeners;
+	for (var listenerName in listeners){
+		save[listenerName] = listeners[listenerName];
 	}
+}
+function loadListener(object, typeName){
+	var listener = object[typeName+'Listeners']
+	var save = listener.save;
+	var listeners = listener.listeners;
+	for (var saveName in save){
+		listeners[saveName] = save[saveName];
+	}
+	
 }
 
 function makeSlider(id, attrs, handlers){
@@ -334,20 +344,20 @@ function mouseOffset(curCanvas){
 $(document).mousemove(function(e){
 	globalMousePos.x = e.pageX//-myCanvas.offsetLeft;
 	globalMousePos.y = e.pageY//-myCanvas.offsetTop;
-	for (var mousemoveListener in curLevel.mousemoveListeners){
-		var listener = curLevel.mousemoveListeners[mousemoveListener]
+	for (var mousemoveListener in curLevel.mousemoveListeners.listeners){
+		var listener = curLevel.mousemoveListeners.listeners[mousemoveListener]
 		listener.func.apply(listener.obj);
 	}	
 })
 $(document).mousedown(function(e){
-	for (var mousedownListener in curLevel.mousedownListeners){
-		var listener = curLevel.mousedownListeners[mousedownListener]
+	for (var mousedownListener in curLevel.mousedownListeners.listeners){
+		var listener = curLevel.mousedownListeners.listeners[mousedownListener]
 		listener.func.apply(listener.obj);
 	}		
 })
 $(document).mouseup(function(e){
-	for (var mouseupListener in curLevel.mouseupListeners){
-		var listener = curLevel.mouseupListeners[mouseupListener]
+	for (var mouseupListener in curLevel.mouseupListeners.listeners){
+		var listener = curLevel.mouseupListeners.listeners[mouseupListener]
 		listener.func.apply(listener.obj);
 	}	
 })
