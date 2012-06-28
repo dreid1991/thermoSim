@@ -268,17 +268,31 @@ function makeSlider(id, attrs, handlers){
 	return div;
 }
 
-function showPrompt(idx){
-	var str = curLevel.prompts[idx];
+function showPrompt(str, reset){
 	$('#prompt').html(str);
+	if (reset){
+		curLevel.reset();
+	}
 }
 function nextPrompt(){
-	curLevel.promptIdx = Math.min(curLevel.prompts.length-1, curLevel.promptIdx+1);
-	showPrompt(curLevel.promptIdx);
+	curLevel.promptIdx = curLevel.promptIdx+1;
+	if(curLevel.promptIdx==curLevel.prompts.length){
+		curLevel.startOutro();
+	}else{
+		var promptIdx = curLevel.promptIdx;
+		var prompt = curLevel.prompts[promptIdx];
+		var str = prompt.text;
+		var reset = prompt.reset.forward;
+		showPrompt(str, reset);
+	}
 }
 function prevPrompt(){
 	curLevel.promptIdx = Math.max(0, curLevel.promptIdx-1);
-	showPrompt(curLevel.promptIdx);
+	var promptIdx = curLevel.promptIdx;
+	var prompt = curLevel.prompts[promptIdx];
+	var str = prompt.text;
+	var reset = prompt.reset.backward;
+	showPrompt(str, reset);
 }
 function log10(val){
 	return Math.log(val)/Math.log(10);

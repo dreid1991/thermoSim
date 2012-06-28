@@ -11,6 +11,7 @@ function WorkTracker(vol, mass, g, SA, readoutData){
 }
 WorkTracker.prototype = {
 	init: function(){
+		removeListener(curLevel, 'update', 'workTracker');
 		this.work=0;
 		this.volLast = this.vol();
 		this.volCur = this.vol();

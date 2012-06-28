@@ -80,7 +80,7 @@ Readout.prototype = {
 			var name = entry.name;
 			var curVal = entry.val;
 			var setPt = entry.initVal;
-			this.tick(setPt, name);
+			this.hardUpdate(setPt, name);
 		}
 	},
 

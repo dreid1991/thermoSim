@@ -375,6 +375,7 @@ DragWeights.prototype = {
 	draw: function(){
 		this.drawWeights();
 		this.drawBins();
+		this.drawBinLabels()
 	},
 	drawWeights: function(){
 		for (var group in this.weightGroups){
@@ -392,6 +393,16 @@ DragWeights.prototype = {
 		for (var binName in this.dropBins){
 			var pts =  this.dropBins[binName].pts;
 			draw.fillPts(pts, this.binCol, c);
+		}
+	},
+	drawBinLabels: function(){
+		for(var binName in this.dropBins){
+			var bin = this.dropBins[binName];
+			var x = bin.x + this.dropBinWidth/2
+			var y = bin.y - this.binHeight+20;
+			var mass = this.weightGroups[binName].mass;
+			var text = mass + ' kg each';
+			draw.text(text, P(x, y), this.eBarFont, this.eBarFontCol, 'center', 0, c);
 		}
 	},
 	drawEBar: function(yBottom, yTop, mass){

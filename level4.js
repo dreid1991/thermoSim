@@ -26,9 +26,14 @@ function level4(){
 	this.graphs = {}
 	this.promptIdx = 0;
 	this.prompts=[
-		"Okay, let’s get oriented!  Here we have a container filled with a gas that follows the <a href = http://en.wikipedia.org/wiki/Hard_spheres>hard sphere model</a>, which is like the ideal gas model but the molecules take up some space.  There are some weights in bins below the containers.  You can drag the weights onto or off of the container to compress or expand it.  Dragging a weight up takes energy since you’re increasing its height.  ",
-		"I'm another question",
-		"I am the FINAL QUESTION.  NONE SHALL PASS"
+		{reset: {backward:false, forward:false}, text:"Okay, let’s get oriented!  Here we have a container filled with a gas that follows the <a href = http://en.wikipedia.org/wiki/Hard_spheres>hard sphere model</a>, which is like the ideal gas model but the molecules take up some space.  There are some weights in bins below the container.  You can drag the weights onto or off of the container to compress or expand it.  Using our battery analogy, imagine you drain the battery by moving a weight up since you’re adding potential energy, and that you recharge the batteries by dropping the weights.  Take a minute to figure out how everything works. "},
+		{reset: {backward:false, forward:true},  text:"Say you want to compress this container but you only have a couple of big blocks.  Try picking up the biggest blocks and putting them on the piston.  You’ll notice you have to put a lot of energy into lifting those.  Now for the compression to be reversible, you need to be able to get all of that energy back out of the system for a net work of zero.  Can you do that?"},
+		{reset: {backward:true, foward: false},  text:"Hopefully you found that with the large blocks, you couldn’t get all of the energy back out, making it an <i>irreversible</i> compression and expansion cycle.  From the graphs, I think there are two ways we can verify of this.  What might they be?"},
+		{reset: {backward:false, forward:true},  text:"All of the containers have the same total weight in them.  Try to compress the container with one bin’s worth of weight, but using less energy than you did to compress with the largest blocks."},
+		{reset: {backward:false, forward:false}, text:"If you found one, why did it take less energy this time?  If you didn’t, try harder.  This is a key question to understanding reversibility, so give it some thought.  Thinking about potential energy may be helpful."},
+		{reset: {backward:true, forward:false},  text:"If you take all of the weight back off, how does the total energy added in this cycle compare to the energy added in a cycle using the big blocks.  Your clever answer to the previous question may help you understand why they are different."},
+		{reset: {backward:false, forward:true},  text:"Now that you’ve found a way to add less energy than you had to with the big blocks, try to compress with one bin’s worth of weight adding the <i>least</i> energy that you can.  You may have done this in the previous experiment.  If you did, well done, but do verify that you did by trying something else."},
+		{reset: {backward:false, forward:true},  text:"If you take all of the weight back off, how does the total energy added in <i>this</i> cycle compare to the energy added in the cycle using the big blocks.  Also, consider the pressure vs. volume graph.  Looks less ‘steppy’, doesn’t it?  How might we relate this to the condition for reversibility, P<sub>int</sub> = P<sub>ext</sub>?"},
 	]
 	
 	this.g = 1.75;
@@ -96,6 +101,7 @@ level4.prototype = {
 		$('#display').show();
 		$('#textIntro').show();
 		$('#dashIntro').show();
+		showPrompt(this.prompts[this.promptIdx].text, false);
 		emptyListener(this, "update");
 		emptyListener(this, "data");
 	},
@@ -107,7 +113,7 @@ level4.prototype = {
 		$('#display').hide();
 		$('#dashRun').show();
 		$('#base').show();
-		showPrompt(this.promptIdx);
+		
 		emptyListener(this, 'data');
 		addListener(this, 'update', 'run', this.updateRun, this);
 		addListener(this, 'data', 'run', this.dataRun, this);
@@ -129,7 +135,7 @@ level4.prototype = {
 		emptyListener(this, "data");
 	},
 	makeDragWeights: function(){
-		var dragWeights = new DragWeights([{name:'sml', count:15, mass:4}, 
+		var dragWeights = new DragWeights([{name:'sml', count:12, mass:5}, 
 									{name:'med', count:6, mass:10}, 
 									{name:'lrg', count:2, mass:30}
 									],

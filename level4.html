@@ -15,15 +15,18 @@
 		</div>
 		<div id='display' class='display noSelect'>
 			
-			<div id='textIntro' class='displayText noSelect'>
-				<p>Let’s look at reversibility.  When someone says a compression is reversible, they mean that all of the work done to compress the system can be gotten back out by expanding the container back to its original volume.  This means that the system experiences no net energy or temperature change after going through the compression/expansion cycle.</p>
-				<p>Conversely, an irreversible compression is one where you can’t get all of the energy used in compression back out and the system is hotter after going through the cycle.</p>
-				<p>Mathematically, in a reversible compression P<sub>interal</sub>, the pressure exerted by the gas on the walls of the container, always equals P<sub>external</sub>, the pressure from an outside force, so starting from the definition of work, we get </p>
-				<center><img src = img/reversibility1.jpg></img></center><br>
-				In this simulation, we're going to try to figure out a physical explaination for why internal and external pressures always need to be equal to make a compression reversible.
+			<div id='textIntro' class='displayText no Select'>
+				Let’s look at reversibility.  When someone says a process is reversible, they mean that all of the work done to compress (or expand) the system can be gotten back out by bringing the container back to its original volume.  This means that the system experiences no net energy or temperature change after going through the compression/expansion cycle.</p>
+				<p>magine that you have a battery that works to compress your container.  It uses energy when compressing the container and gets energy back when the container expands.  In a reversible cycle, you could compress and expand as long as you like and the battery will always have the same amount of charge at a point.  In an irreversible cycle, your battery will gradually drain and the system will gradually gain energy.</p>
+				<p>The definition of a reversible process says that P<sub>internal</sub>, the pressure exerted by the gas on the walls of the container, always equals P<sub>external</sub>, the pressure from an outside force, so starting from the definition of work, we get</p>
+				<center><img src = img/reversibility1.gif></img></center><br>
+				In this simulation, we're going to try to figure out a physical model of how reversibility works.
 			</div>
 			<div id='textOutro' class='displayText noSelect'>
-				BYE EVERYONE!
+				Now we must journey into the land of abstraction.  You may have picked up on a trend that the smaller your block size, the more reversibile your cycle becomes.  If a smaller block size makes a cycle more reversible, what block size would make a process completely reversible, such that we can get all of the energy back out?</p>
+				<p>Infinitely small blocks, you say?  Yes, that’s correct!  Let’s go through why.  When you lifted the big block on to the uncompressed piston, you did more work than you had to.  In fact, all the work you had to do was to lift a tiny weight, like a grain of sand (or a <a href = http://en.wikipedia.org/wiki/Differential_(infinitesimal)>differential element</a> if you want to get precise), and put it on top so that P<sub>ext</sub> > P<sub>int</sub>. </p>
+				<p>If we’re in abstraction land and using differential weights to compress our system, with each new element we put on top, the system compresses by a differential amount, which corresponds to a height, and thus potential energy change of zero.  That means that we can take that element back off the piston and get all the energy we put in back out.  If we’re using weights of any non-zero size, this isn’t true, since the piston will have compressed some non-zero amount, making the height at which we can take it off lower than the height at which we put it on.  That energy we can’t get back out stays in the system.</p>
+				<p>So, can any real process be reversible?  Hint: No, you can only approach reversibility.  Even if you compress with gas very slowly, you’re still adding one gas molecule at a time, and that creates a very small, but still non-zero pressure change.</p>
 			</div>
 		</div>
 
