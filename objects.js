@@ -413,7 +413,8 @@ DragWeights.prototype = {
 	},
 	drawEBarText: function(pos, energy){
 		this.eBar.eChange = energy
-		var text = this.eText(this.eBar.eChange)
+		var rounded = round(this.eBar.eChange,1)
+		var text = this.eText(rounded)
 		draw.text(text, pos, this.eBarFont, this.eBarFontCol, 'center', 0, c);
 	},
 	eText: function(energy){
@@ -427,7 +428,7 @@ DragWeights.prototype = {
 		var dh = yMax-yDraw;
 		var m = this.weightGroups[this.eBar.weight.name].mass;
 		var g = this.g();
-		this.drawEBarText(P(this.eBar.x, yDraw-15), round(workConst*m*g*dh,1));
+		this.drawEBarText(P(this.eBar.x, yDraw-15), workConst*m*g*dh);
 		this.drawEBar(yMax, yDraw, m);
 	},
 	eBarDown: function(){
@@ -513,7 +514,7 @@ DragWeights.prototype = {
 					var m = this.weightGroups[this.eBar.weight.name].mass;
 					var g = this.g();
 					var dh = this.eBar.yTop - this.zeroY;
-					this.eBar.eChange = round(workConst*m*g*dh,1);
+					this.eBar.eChange = workConst*m*g*dh;
 					addListener(curLevel, 'mouseup', 'switchToFall',
 						function(){
 							removeListener(curLevel, 'update', eBarType);
@@ -567,7 +568,7 @@ DragWeights.prototype = {
 		destPos.x+=40;
 		animText({pos:P(this.eBar.x,this.pistonY()-15), size: 13, rotation:0, col:Col(255,255,255)},
 			{pos:destPos, col:curLevel.bgCol, size:10},
-			'calibri', this.eText(this.eBar.eChange), 'center', 300, c)
+			'calibri', this.eText(round(this.eBar.eChange,1)), 'center', 300, c)
 	},
 	pickup: function(weight){
 		var mousePos = mouseOffset(myCanvas);
