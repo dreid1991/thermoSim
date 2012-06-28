@@ -454,8 +454,6 @@ DragWeights.prototype = {
 				this.eBar.initStatus = undefined;
 				this.eBar.yTop = undefined;
 				this.eBar.yText = undefined;
-				
-				
 			}
 		}
 		

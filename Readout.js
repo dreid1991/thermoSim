@@ -14,7 +14,7 @@ Readout.prototype = {
 		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++){
 			var entry = this.entries[entryIdx];
 			var pos = entry.pos;
-			var text = entry.text+' '+entry.val+' '+entry.units;
+			var text = entry.text+' '+round(entry.val,1)+' '+entry.units;
 			draw.text(text, pos, this.font, this.fontCol, 'left', 0, c);
 		}		
 	},
@@ -35,8 +35,8 @@ Readout.prototype = {
 	},
 	makeTickFunc: function(entry, step, setPt){
 		return function(){
-			entry.val = round(boundedStep(entry.val, setPt, step),1);
-			if(entry.val==round(setPt,1)){
+			entry.val = boundedStep(entry.val, setPt, step);
+			if(round(entry.val,2)==round(setPt,2)){
 				removeListener(curLevel, 'update', entry.name);
 			}
 		}
