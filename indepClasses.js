@@ -55,7 +55,9 @@ Vector.prototype = {
 		return Math.sqrt(this.dx*this.dx + this.dy*this.dy);
 	},
 	add: function(b){
-		return V(this.dx+b.dx, this.dy+b.dy);
+		this.dx+=b.dx;
+		this.dy+=b.dy;
+		return this;
 	},
 	neg: function(){
 		this.dx*=-1;
@@ -72,7 +74,9 @@ Vector.prototype = {
 		return V(this.dx, this.dy);
 	},
 	mult: function(scalar){
-		return V(this.dx*scalar, this.dy*scalar);
+		this.dx*=scalar; 
+		this.dy*=scalar;
+		return this;
 	},
 	adjust: function(ddx, ddy){
 		this.dx+=ddx;
@@ -112,12 +116,9 @@ Point.prototype = {
 	copy: function(){
 		return P(this.x, this.y);
 	},
-	move: function(v){
-		return P(this.x+v.dx,this.y+v.dy);
-	},
-	moveSelf: function(v){
+	movePt: function(v){
 		this.x+=v.dx;
-		this.y+=x.dy;
+		this.y+=v.dy;
 		return this;
 	},
 	position: function(p){

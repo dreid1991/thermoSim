@@ -337,8 +337,8 @@ function border(pts, thickness, col, drawCanvas){
 	for (var ptIdx=0; ptIdx<pts.length; ptIdx++){
 		borderPts.push(pts[ptIdx]);
 	}
-	var lastAdj = perpUVs[perpUVs.length-1].mult(thickness)
-	borderPts.push(pts[pts.length-1].move(lastAdj));
+	var lastAdj = perpUVs[perpUVs.length-1].copy().mult(thickness)
+	borderPts.push(pts[pts.length-1].copy().movePt(lastAdj));
 	for (var ptIdx=pts.length-2; ptIdx>0; ptIdx-=1){
 		var UVs = [perpUVs[ptIdx], perpUVs[ptIdx-1]];
 		var pt = pts[ptIdx];
@@ -346,7 +346,7 @@ function border(pts, thickness, col, drawCanvas){
 	}
 	var borderNum = Math.round(Math.random()*10000);
 	var firstAdj = perpUVs[0].mult(thickness)
-	borderPts.push(pts[0].move(firstAdj));
+	borderPts.push(pts[0].copy().movePt(firstAdj));
 	borderPts.push(pts[0]);
 	addListener(curLevel, 'update', 'drawBorder' + borderNum, 
 		function(){
@@ -358,7 +358,7 @@ function spacedPt(pt, UVs, thickness){
 	var UV1 = UVs[0];
 	var UV2 = UVs[1];
 	var adjust = UV1.add(UV2)
-	return pt.move(adjust.mult(thickness));
+	return pt.copy().movePt(adjust.mult(thickness));
 }
 //function loadVals(level){
 //	for (sliderName in level.slider){
