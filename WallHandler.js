@@ -132,6 +132,7 @@ WallHandler.prototype = {
 		}
 		return false;
 	},
+
 	check: function(){
 		for (var spcName in spcs){
 			var spc = spcs[spcName];

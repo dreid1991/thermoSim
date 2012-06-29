@@ -1,7 +1,7 @@
 function animText(init, dest, font, text, align, time, drawCanvas){
 	//need unique listener name;
 	var numTurns = Math.floor(time/updateInterval);
-	var animName = 'anim' + Math.floor(Math.random()*10000);
+	var animName = 'anim' + Math.round(Math.random()*10000);
 	
 	var moving = new Boolean();
 	var changingCol = new Boolean();

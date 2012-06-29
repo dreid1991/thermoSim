@@ -11,7 +11,7 @@ function level4(){
 	this.wallCol = Col(255,255,255);
 	this.numUpdates = 0;
 	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
-	//walls.border([1, 2, 3], 5, this.wallCol.copy().adjust(-100,-100,-100));
+	
 	this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
 	this.SAPExt = getLen(this.extPressurePts);
 	this.forceInternal = 0;
@@ -67,8 +67,9 @@ level4.prototype = {
 		this.hideDash();
 		this.hideText();
 		this.hideBase();
-		this.startIntro();
+		this.startIntro();		
 		this.dragWeights.init();
+		
 		var self = this;
 		this.graphs.pVSv = new Graph('pVSv', 400,300, "Volume (L)", "Pressure (atm)",
 							{x:{min:0, step:4}, y:{min:0, step:3}});
@@ -98,6 +99,8 @@ level4.prototype = {
 		$('#myCanvas').show();
 	},
 	startIntro: function(){
+		var ptsToBorder = this.getPtsToBorder();
+		border(ptsToBorder, 5, this.wallCol.copy().adjust(0,0,-100), c);
 		saveListener(this, 'update');
 		saveListener(this, 'data');
 		saveListener(this, 'wallImpact');
@@ -128,6 +131,7 @@ level4.prototype = {
 		loadListener(this, 'data');		
 		loadListener(this, 'wallImpact');
 		loadListener(this, 'dotImpact');
+		
 		this.readout.init();  //Must go after adding updateRun or it will get cleared in the main draw func
 		this.workTracker.init();
 	},
@@ -156,6 +160,15 @@ level4.prototype = {
 		$('#base').show();	
 		loadListener(this, 'update');
 		loadListener(this, 'data');
+	},
+	getPtsToBorder: function(){
+		var pts = [];
+		var wallPts = walls.pts[0];
+		pts.push(wallPts[1].copy().position({y:this.minY}))
+		pts.push(wallPts[2].copy());
+		pts.push(wallPts[3].copy());
+		pts.push(wallPts[4].copy().position({y:this.minY}));
+		return pts;
 	},
 	makeDragWeights: function(){
 		var dragWeights = new DragWeights([{name:'sml', count:12, mass:5}, 

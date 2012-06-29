@@ -325,6 +325,42 @@ function inRect(pos, dims, curCanvas){
 	var mousePos = mouseOffset(curCanvas);
 	return mousePos.x>=pos.x && mousePos.x<=(pos.x+dims.dx) && mousePos.y>=pos.y && mousePos.y<=(pos.y+dims.dy);
 }
+function border(pts, thickness, col, drawCanvas){
+	var perpUVs = [];
+	var borderPts = [];
+	for (var ptIdx=0; ptIdx<pts.length-1; ptIdx++){
+		var curPt = pts[ptIdx];
+		var nextPt = pts[ptIdx+1];
+		var UV = curPt.VTo(nextPt).UV();
+		perpUVs.push(V(UV.dy, -UV.dx));
+	}
+	for (var ptIdx=0; ptIdx<pts.length; ptIdx++){
+		borderPts.push(pts[ptIdx]);
+	}
+	var lastAdj = perpUVs[perpUVs.length-1].mult(thickness)
+	borderPts.push(pts[pts.length-1].move(lastAdj));
+	for (var ptIdx=pts.length-2; ptIdx>0; ptIdx-=1){
+		var UVs = [perpUVs[ptIdx], perpUVs[ptIdx-1]];
+		var pt = pts[ptIdx];
+		borderPts.push(spacedPt(pt, UVs, thickness));
+	}
+	var borderNum = Math.round(Math.random()*10000);
+	var firstAdj = perpUVs[0].mult(thickness)
+	borderPts.push(pts[0].move(firstAdj));
+	borderPts.push(pts[0]);
+	addListener(curLevel, 'update', 'drawBorder' + borderNum, 
+		function(){
+			draw.fillPts(borderPts, col, drawCanvas);
+		}
+	,'');
+}
+function spacedPt(pt, UVs, thickness){
+	var UV1 = UVs[0];
+	var UV2 = UVs[1];
+	var adjust = UV1.add(UV2)
+	var foo = adjust.UV().mult(thickness);
+	return pt.move(foo);
+}
 //function loadVals(level){
 //	for (sliderName in level.slider){
 //		level.sliders[sliderName].val=level.savedVals[sliderName];
@@ -332,10 +368,14 @@ function inRect(pos, dims, curCanvas){
 //}
 var canvas;
 var c; 
-$(function(){
+/*
+HEY - I MADE IT SO THIS RUNS ON LOAD RATHER THAN AFTER EVERYTHING ELSE IS LOADED.
+SEEMS TO WORK AND MAKES IT SO I CAN SEND CANVASES AROUND IN INIT
+*/
+//$(function(){
 	canvas = document.getElementById("myCanvas");
 	c = canvas.getContext("2d");
-})
+//})
 
 globalMousePos = P(0,0)
 function mouseOffset(curCanvas){

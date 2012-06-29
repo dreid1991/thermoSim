@@ -18,15 +18,18 @@ function Species( mass, radius, colors){
 function Point(x, y){
 	this.x = x;
 	this.y = y;
+	return this;
 }
 function Vector(dx, dy){
 	this.dx = dx;
 	this.dy = dy;
+	return this;
 }
 function Color(r, g, b){
 	this.r = r;
 	this.g = g;
 	this.b = b;
+	return this;
 }
 function drawingTools(){};
 
@@ -52,7 +55,7 @@ Vector.prototype = {
 		return Math.sqrt(this.dx*this.dx + this.dy*this.dy);
 	},
 	add: function(b){
-		return V(this.dx+b.dx, this.dy+this.dy);
+		return V(this.dx+b.dx, this.dy+b.dy);
 	},
 	neg: function(){
 		this.dx*=-1;
@@ -71,6 +74,11 @@ Vector.prototype = {
 	mult: function(scalar){
 		return V(this.dx*scalar, this.dy*scalar);
 	},
+	adjust: function(ddx, ddy){
+		this.dx+=ddx;
+		this.dy+=ddy;
+		return this;
+	}
 }
 Color.prototype = {
 	adjust: function(dr, dg, db){
@@ -89,6 +97,9 @@ Point.prototype = {
 		var dy = this.y-pTo.y;
 		return Math.sqrt(dx*dx + dy*dy);
 	},
+	VTo: function(b){
+		return V(b.x-this.x, b.y-this.y);
+	},
 	area: function(a, b){
 		var baseV = V(a.x-this.x, a.y-this.y);
 		var baseUV = baseV.UV();
@@ -100,7 +111,24 @@ Point.prototype = {
 	},
 	copy: function(){
 		return P(this.x, this.y);
-	}
+	},
+	move: function(v){
+		return P(this.x+v.dx,this.y+v.dy);
+	},
+	moveSelf: function(v){
+		this.x+=v.dx;
+		this.y+=x.dy;
+		return this;
+	},
+	position: function(p){
+		if(p.x!==undefined){
+			this.x=p.x;
+		}
+		if(p.y!==undefined){
+			this.y=p.y;
+		}
+		return this;
+	},
 }
 Dot.prototype = {
 	KE: function(){
