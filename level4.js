@@ -100,7 +100,7 @@ level4.prototype = {
 	},
 	startIntro: function(){
 		var ptsToBorder = this.getPtsToBorder();
-		border(ptsToBorder, 5, this.wallCol.copy().adjust(0,0,-100), c);
+		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), c);
 		saveListener(this, 'update');
 		saveListener(this, 'data');
 		saveListener(this, 'wallImpact');
