@@ -28,7 +28,7 @@
 	padding:2px;
 }
 .display{
-	height:450px;
+	height:510px;
 	background-color:#05111a;
 	border-top: 3px solid;
 	border-bottom:3px solid;
@@ -59,6 +59,14 @@
 }
 .dash{
 	height:130px;
+	border-bottom-left-radius:20px;
+	border-bottom-right-radius:20px;
+	background-color:#05111a;
+	color:white;
+	padding:10px;
+}
+.dashMed{
+	height:70px;
 	border-bottom-left-radius:20px;
 	border-bottom-right-radius:20px;
 	background-color:#05111a;
