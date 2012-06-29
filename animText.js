@@ -40,9 +40,7 @@ function animText(init, dest, font, text, align, time, drawCanvas){
 		speedChangeCol.g = Math.ceil((dest.col.g-init.col.g)/numTurns);
 		speedChangeCol.b = Math.ceil((dest.col.b-init.col.b)/numTurns);
 		funcCol = function(){
-			cur.col.r += speedChangeCol.r;
-			cur.col.g += speedChangeCol.g;
-			cur.col.b += speedChangeCol.b;
+			cur.col.adjust(speedChangeCol.r, speedChangeCol.g, speedChangeCol.b);
 		}
 	}
 	

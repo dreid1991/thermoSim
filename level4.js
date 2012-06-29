@@ -11,6 +11,7 @@ function level4(){
 	this.wallCol = Col(255,255,255);
 	this.numUpdates = 0;
 	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
+	//walls.border([1, 2, 3], 5, this.wallCol.copy().adjust(-100,-100,-100));
 	this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
 	this.SAPExt = getLen(this.extPressurePts);
 	this.forceInternal = 0;
@@ -34,7 +35,7 @@ function level4(){
 		{reset: {backward:false, forward:false}, text:"If you found a way, why did it take less energy this time?  If you didn’t, try harder.  This is a key question to understanding reversibility, so give it some thought.  Thinking about potential energy may be helpful."},
 		{reset: {backward:true, forward:false},  text:"If you take all of the weight back off, how does the total energy added in this cycle compare to the energy added in the cycle using the big blocks.  Your clever answer to the previous question may help you understand why they are different."},
 		{reset: {backward:false, forward:true},  text:"Now that you’ve found a way to add less energy than you had to with the big blocks, try to compress with one bin’s worth of weight using the <i>least</i> energy that you can.  You may have done this in the previous experiment.  If you did, well done, but do verify that you did by trying something else."},
-		{reset: {backward:false, forward:false},  text:"If you take all of the weight back off, how does the total energy added in <i>this</i> cycle compare to the energy added in the cycle using the big blocks.  Also, consider the pressure vs. volume graph.  Looks less ‘steppy’, doesn’t it?  How might we relate this to the condition for reversibility, P<sub>int</sub> = P<sub>ext</sub>?"},
+		{reset: {backward:false, forward:false}, text:"If you take all of the weight back off, how does the total energy added in <i>this</i> cycle compare to the energy added in the cycle using the big blocks.  Also, consider the pressure vs. volume graph.  Looks less ‘steppy’, doesn’t it?  How might we relate this to the condition for reversibility, P<sub>int</sub> = P<sub>ext</sub>?"},
 	]
 	
 	this.g = 1.75;
@@ -53,6 +54,10 @@ function level4(){
 	this.maxY = walls.pts[0][2].y-75;
 	addSpecies(['spc1', 'spc3']);
 	collide.setup();
+	addListener(this, 'update', 'run', this.updateRun, this);
+	addListener(this, 'data', 'run', this.dataRun, this);
+	addListener(this, 'wallImpact', 'moving', this.onWallImpact, this);
+	addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
 
 }
 
@@ -93,6 +98,12 @@ level4.prototype = {
 		$('#myCanvas').show();
 	},
 	startIntro: function(){
+		saveListener(this, 'update');
+		saveListener(this, 'data');
+		saveListener(this, 'wallImpact');
+		saveListener(this, 'dotImpact');
+		emptyListener(this, "update");
+		emptyListener(this, "data");
 		this.hideDash();
 		this.hideText();
 		this.hideBase();
@@ -102,10 +113,10 @@ level4.prototype = {
 		$('#textIntro').show();
 		$('#dashIntro').show();
 		showPrompt(this.prompts[this.promptIdx].text, false);
-		emptyListener(this, "update");
-		emptyListener(this, "data");
+		
 	},
 	startSim: function(){
+
 		this.hideDash();
 		this.hideText();
 		$('#graphs').show()
@@ -113,18 +124,18 @@ level4.prototype = {
 		$('#display').hide();
 		$('#dashRun').show();
 		$('#base').show();
-		
-		emptyListener(this, 'data');
-		addListener(this, 'update', 'run', this.updateRun, this);
-		addListener(this, 'data', 'run', this.dataRun, this);
-		addListener(this, 'wallImpact', 'moving', this.onWallImpact, this);
-		addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
+		loadListener(this, 'update');
+		loadListener(this, 'data');		
+		loadListener(this, 'wallImpact');
+		loadListener(this, 'dotImpact');
 		this.readout.init();  //Must go after adding updateRun or it will get cleared in the main draw func
 		this.workTracker.init();
 	},
 	startOutro: function(){
 		saveListener(this, 'update');
 		saveListener(this, 'data');
+		emptyListener(this, 'update');
+		emptyListener(this, 'data');
 		this.hideDash();
 		this.hideText();
 		this.hideBase();
@@ -132,8 +143,7 @@ level4.prototype = {
 		$('#display').show();
 		$('#textOutro').show();	
 		$('#dashOutro').show();
-		emptyListener(this, 'update');
-		emptyListener(this, 'data');
+
 	},
 	backToSim: function(){
 		this.promptIdx = this.prompts.length-1;

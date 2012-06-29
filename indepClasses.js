@@ -51,6 +51,14 @@ Vector.prototype = {
 	mag: function(){
 		return Math.sqrt(this.dx*this.dx + this.dy*this.dy);
 	},
+	add: function(b){
+		return V(this.dx+b.dx, this.dy+this.dy);
+	},
+	neg: function(){
+		this.dx*=-1;
+		this.dy*=-1;
+		return this;
+	},
 	dotProd: function(b){
 		return this.dx*b.dx + this.dy*b.dy;
 	},
@@ -65,6 +73,12 @@ Vector.prototype = {
 	},
 }
 Color.prototype = {
+	adjust: function(dr, dg, db){
+		this.r = Math.round(Math.min(255, Math.max(0, this.r+dr)));
+		this.g = Math.round(Math.min(255, Math.max(0, this.g+dg)));
+		this.b = Math.round(Math.min(255, Math.max(0, this.b+db)));
+		return this;
+	},
 	copy: function(){
 		return Col(this.r, this.g, this.b);
 	},

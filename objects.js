@@ -83,7 +83,7 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.g = g;
 	this.eBar = {x:eBarX, scalar: .7};
 	this.binCol = binCol;
-	this.binHeight = 70;
+	this.binHeight = 65;
 	this.binSlant = 1.3;
 	this.dropBinWidth = 110;
 	this.dropBinSpacing = 60;
