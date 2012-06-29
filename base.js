@@ -358,8 +358,7 @@ function spacedPt(pt, UVs, thickness){
 	var UV1 = UVs[0];
 	var UV2 = UVs[1];
 	var adjust = UV1.add(UV2)
-	var foo = adjust.mult(thickness);
-	return pt.move(foo);
+	return pt.move(adjust.mult(thickness));
 }
 //function loadVals(level){
 //	for (sliderName in level.slider){

@@ -14,13 +14,15 @@ Readout.prototype = {
 		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++){
 			var entry = this.entries[entryIdx];
 			var pos = entry.pos;
-			var text = entry.text+' '+round(entry.val,1)+' '+entry.units;
+			var decPlaces = entry.decPlaces
+			var text = entry.text+' '+round(entry.val,decPlaces)+' '+entry.units;
 			draw.text(text, pos, this.font, this.fontCol, 'left', 0, c);
 		}		
 	},
 	hardUpdate: function(setPt, name){
 		var entry = byAttr(this.entries, name, 'name');
-		entry.val = round(setPt, 1);
+		var decPlaces = entry.decPlaces;
+		entry.val = round(setPt, decPlaces);
 	},
 	tick: function(setPt, name){
 		var entry = byAttr(this.entries, name, 'name');
@@ -36,13 +38,14 @@ Readout.prototype = {
 	makeTickFunc: function(entry, step, setPt){
 		return function(){
 			entry.val = boundedStep(entry.val, setPt, step);
-			if(round(entry.val,2)==round(setPt,2)){
+			var decPlaces = entry.decPlaces
+			if(round(entry.val,decPlaces+1)==round(setPt,decPlaces+1)){
 				removeListener(curLevel, 'update', entry.name);
 			}
 		}
 	},
-	addEntry: function(name, text, units, initVal, idx){
-		var entry = {name:name, text:text, units:units, val: initVal, initVal:initVal};
+	addEntry: function(name, text, units, initVal, idx, decPlaces){
+		var entry = {name:name, text:text, units:units, val: initVal, initVal:initVal, decPlaces:decPlaces};
 		if(idx){
 			this.entries.splice(idx, 0, entry);
 		}else{

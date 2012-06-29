@@ -5,7 +5,7 @@ function WorkTracker(vol, mass, g, SA, readoutData){
 	this.SA = SA;
 	this.work = 0;
 	this.readout = readoutData.readout;
-	this.readout.addEntry('work', 'Work:', 'kJ', 0, readoutData.idx);
+	this.readout.addEntry('work', 'Work:', 'kJ', 0, readoutData.idx, 1);
 	
 	this.volLast = this.vol();
 }

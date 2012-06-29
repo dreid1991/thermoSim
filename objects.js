@@ -115,8 +115,8 @@ DragWeights.prototype = {
 		delete this.tempWeightDefs;
 	},
 	addReadoutEntries: function(){
-		this.readout.addEntry('eAdd', 'E Added:', 'kJ', 0, undefined);
-		this.readout.addEntry('weight', 'Weight:', 'kg', this.pistonWeight, undefined);
+		this.readout.addEntry('eAdd', 'E Added:', 'kJ', 0, undefined, 1);
+		this.readout.addEntry('weight', 'Weight:', 'kg', this.pistonWeight, undefined, 0);
 	},
 	getWeightDims: function(weightDefs){
 		var dims = {};
