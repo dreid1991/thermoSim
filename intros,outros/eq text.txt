@@ -1,1 +1,1 @@
-w=\int_{v_{1}}^{v_{2}}P_{ext}\ = \int_{v_{1}}^{v_{2}}P_{int}\ =\int_{v_{1}}^{v_{2}}\frac{nRT}{V}}
+w=\int_{V_{1}}^{V_{2}}P_{ext}dV\ = \int_{V_{1}}^{V_{2}}P_{int}dV\ =\int_{V_{1}}^{V_{2}}\frac{nRT}{V}}dV
