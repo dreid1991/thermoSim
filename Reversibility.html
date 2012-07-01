@@ -7,13 +7,13 @@
 <div class='noSelect'>
 	<div id='main' class='main noSelect'>
 		<div id='mainHseader' class='header noSelect'>
-			Origins of reversibility
+			Origins of Reversibility
 		</div>
 		<div id='canvasDiv' class='canvasDiv noSelect'>
 			<canvas id='myCanvas'>
 			</canvas>
 		</div>
-		<div id='display' class='display noSelect'>
+		<div id='display' class='displayLong noSelect'>
 			
 			<div id='textIntro' class='displayText no Select'>
 				Let’s look at reversibility.  When someone says a process is reversible, they mean that all of the work done to compress (or expand) the system can be recovered by bringing the container back to its original volume.  This means that the system experiences no net energy or temperature change after going through the compression/expansion cycle.</p>
@@ -59,7 +59,7 @@
 </div>
 <br>
 <div id='base' class='base noSelect'>
-	<div id='baseHeader' class='header noSelect'>Current step</div>
+	<div id='baseHeader' class='header noSelect'></div>
 	<div class='borderedBlock noSelect'>
 		<div id='quesHolder noSelect'>
 		</div>
@@ -73,7 +73,6 @@
 				<button id = 'next'>Next</button>
 			</div>
 
-			<!/align>
 		</div>
 	</div>
 
@@ -84,7 +83,7 @@ var curLevel;
 canvasHeight = 530;
 $(function(){
 	myCanvas.height = canvasHeight;
-	curLevel = new level4();
+	curLevel = new Reversibility();
 	curLevel.init();
 	$('button').button();
 	$('#toSim').click(function(){curLevel.startSim()});
@@ -113,7 +112,7 @@ myCanvas.width = $('#main').width();
 <script src = 'animText.js'></script>
 <script src = 'Readout.js'></script>
 <script src = 'WorkTracker.js'></script>
-<script src = 'level4.js'></script>
+<script src = 'Reversibility.js'></script>
 <script src = 'base.js'></script>
 
 </body>

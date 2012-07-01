@@ -87,16 +87,7 @@ drawingTools.prototype = {
 		drawCanvas.strokeStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
 		drawCanvas.strokeRect(corner.x, corner.y, dims.dx, dims.dy);
 	},
-	checkMark: function(corner, dims, col, stroke, drawCanvas){
-		var a = corner;
-		var b = dims;
-		var p1 = P(a.x			, a.y+b.dy*.6	);
-		var p2 = P(a.x+b.dx*.4	, a.y+b.dy		);
-		var p3 = P(a.x+b.dx		, a.y			);
-		var p4 = P(a.x+b.dx*.35	, a.y+b.dy*.75	);
-		var pts = [p1, p2, p3, p4];
-		draw.fillPtsStroke(pts, col, stroke, drawCanvas);
-	},
+
 	line: function(p1, p2, col, drawCanvas){
 		drawCanvas.strokeStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
 		drawCanvas.beginPath();
@@ -131,6 +122,24 @@ drawingTools.prototype = {
 		drawCanvas.restore();
 	},
 
+}
+function CheckMark(corner, dims, col, stroke, drawCanvas){
+	var a = corner;
+	var b = dims;
+	var p1 = P(a.x			, a.y+b.dy*.6	);
+	var p2 = P(a.x+b.dx*.4	, a.y+b.dy		);
+	var p3 = P(a.x+b.dx		, a.y			);
+	var p4 = P(a.x+b.dx*.35	, a.y+b.dy*.75	);
+	var pts = [p1, p2, p3, p4];
+	this.pts = pts;
+	this.col = col;
+	this.stroke = stroke;
+	this.drawCanvas = drawCanvas;
+}
+CheckMark.prototype = {
+	draw: function(){
+		draw.fillPtsStroke(this.pts, this.col, this.stroke, this.drawCanvas);
+	}
 }
 function move(){
 	for (var spc in spcs){
@@ -278,11 +287,13 @@ function makeSlider(id, attrs, handlers){
 	return div;
 }
 
-function showPrompt(str, reset){
-	$('#prompt').html(str);
+function showPrompt(text, title, reset, func){
+	$('#prompt').html(text);
+	$('#baseHeader').html(title);
 	if (reset){
 		curLevel.reset();
 	}
+	func.apply(curLevel);
 }
 function nextPrompt(){
 	curLevel.promptIdx = curLevel.promptIdx+1;
@@ -291,18 +302,22 @@ function nextPrompt(){
 	}else{
 		var promptIdx = curLevel.promptIdx;
 		var prompt = curLevel.prompts[promptIdx];
-		var str = prompt.text;
+		var text = prompt.text;
+		var title = prompt.title;
+		var func = prompt.func;
 		var reset = prompt.reset.forward;
-		showPrompt(str, reset);
+		showPrompt(text, title, reset, func);
 	}
 }
 function prevPrompt(){
 	curLevel.promptIdx = Math.max(0, curLevel.promptIdx-1);
 	var promptIdx = curLevel.promptIdx;
 	var prompt = curLevel.prompts[promptIdx];
-	var str = prompt.text;
+	var text = prompt.text;
+	var title = prompt.title;
+	var func = prompt.func;
 	var reset = prompt.reset.backward;
-	showPrompt(str, reset);
+	showPrompt(text, title, reset, func);
 }
 function log10(val){
 	return Math.log(val)/Math.log(10);
@@ -325,7 +340,7 @@ function inRect(pos, dims, curCanvas){
 	var mousePos = mouseOffset(curCanvas);
 	return mousePos.x>=pos.x && mousePos.x<=(pos.x+dims.dx) && mousePos.y>=pos.y && mousePos.y<=(pos.y+dims.dy);
 }
-function border(pts, thickness, col, drawCanvas){
+function border(pts, thickness, col, name, drawCanvas){
 	var perpUVs = [];
 	var borderPts = [];
 	for (var ptIdx=0; ptIdx<pts.length-1; ptIdx++){
@@ -344,11 +359,10 @@ function border(pts, thickness, col, drawCanvas){
 		var pt = pts[ptIdx];
 		borderPts.push(spacedPt(pt, UVs, thickness));
 	}
-	var borderNum = Math.round(Math.random()*10000);
 	var firstAdj = perpUVs[0].mult(thickness)
 	borderPts.push(pts[0].copy().movePt(firstAdj));
 	borderPts.push(pts[0]);
-	addListener(curLevel, 'update', 'drawBorder' + borderNum, 
+	addListener(curLevel, 'update', 'drawBorder' + name, 
 		function(){
 			draw.fillPts(borderPts, col, drawCanvas);
 		}

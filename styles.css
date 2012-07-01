@@ -27,8 +27,15 @@
 	color:white;
 	padding:2px;
 }
-.display{
+.displayLong{
 	height:510px;
+	background-color:#05111a;
+	border-top: 3px solid;
+	border-bottom:3px solid;
+	border-color:#b3b2b1;
+}
+.display{
+	height:450px;
 	background-color:#05111a;
 	border-top: 3px solid;
 	border-bottom:3px solid;

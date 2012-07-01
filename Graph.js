@@ -66,6 +66,7 @@ Graph.prototype = {
 		set.show = true;
 		this.data[address] = set;
 		this.makeLegendEntry(set, address);
+		
 		this.drawAllBG();
 	},
 	makeLegendEntry: function(set, address){
@@ -102,7 +103,19 @@ Graph.prototype = {
 							
 		addListener(curLevel, 'mouseup', 'toggle'+address, legendEntry.toggle, '');
 		this.legend[address] = legendEntry;
+		this.legend[address]['check'] = this.makeCheck(address);
 		this.drawAllBG();
+	},
+	makeCheck: function(address){
+		var entry = this.legend[address];
+		var oversize = this.checkMarkOversize;
+		var checkPt = entry.togglePos.copy();
+		var checkDims = entry.toggleDims.copy();
+		checkPt.x-=oversize;
+		checkPt.y-=oversize;
+		checkDims.dx+=2*oversize;
+		checkDims.dy+=2*oversize;	
+		return new CheckMark(checkPt, checkDims, this.toggleCol, Col(0,0,0), this.graph);
 	},
 	drawAllBG: function(){
 		this.drawBGRect();
@@ -133,6 +146,9 @@ Graph.prototype = {
 		draw.fillStrokeRect(entry.togglePos, entry.toggleDims, this.gridCol, this.toggleCol, this.graph);
 		var dataSet = this.data[entryName];
 		if(dataSet.show){
+			this.legend[entryName]['check'].draw();
+			
+			/*
 			var oversize = this.checkMarkOversize;
 			var checkPt = entry.togglePos.copy();
 			var checkDims = entry.toggleDims.copy();
@@ -141,6 +157,7 @@ Graph.prototype = {
 			checkDims.dx+=2*oversize;
 			checkDims.dy+=2*oversize;
 			draw.checkMark(checkPt, checkDims, this.toggleCol, Col(0,0,0), this.graph);
+			*/
 		}
 
 		
