@@ -613,3 +613,127 @@ DragWeights.prototype = {
 		return true;
 	},
 }
+
+function DragArrow(pos, rotation, cols, width, height, name, drawCanvas, canvasElement, listeners){
+	this.pos = pos;
+	this.rotation = rotation;
+	this.cols = cols;
+	this.width = width;
+	this.height = height;
+	this.name = name;
+	this.listeners = listeners;
+	this.drawCanvas = drawCanvas;
+	this.canvasElement = canvasElement;
+	this.pts = {}
+	this.pts.outer = [];
+	this.pts.inner = [];
+	this.pts.outer.push(P(0,0));
+	this.pts.outer.push(P(width, -height/2));
+	this.pts.outer.push(P(.8*width, 0));
+	this.pts.outer.push(P(width, height/2));
+	this.pts.outer.push(P(0,0));
+	this.makeDrawFunc();
+	this.makeListenerFuncs();
+}
+DragArrow.prototype = {
+
+	makeDrawFunc: function(){
+		this.draw = function(){};
+		var self = this;
+		var init = function(){
+			self.drawCanvas.save();
+			self.drawCanvas.translate(self.pos.x, self.pos.y);
+			self.drawCanvas.rotate(self.rotation);
+		}
+		this.draw = extend(this.draw, init);
+		if(this.cols.stroke){
+			var strokeFill = function(){draw.fillPtsStroke(self.pts.outer, self.cols.outer, self.cols.stroke, self.drawCanvas)};
+			this.draw = extend(this.draw, strokeFill);
+		}else{
+			var fill = function(){draw.fillPts(self.pts.outer, self.cols.outer, self.drawCanvas)};
+			this.draw = extend(this.draw, fill);
+		}
+		if(this.cols.inner){
+			for (var ptIdx=0; ptIdx<this.pts.outer.length; ptIdx++){
+				var newPt = this.pts.outer[ptIdx].copy().movePt({dx:-this.width/2}).scale(.6,P(0,0)).movePt({dx:this.width/2});
+				this.pts.inner.push(newPt)
+			}
+			var fill = function(){draw.fillPts(self.pts.inner, self.cols.inner, self.drawCanvas)};
+			this.draw = extend(this.draw, fill);
+		}
+		var restore = function(){self.drawCanvas.restore()};
+		this.draw = extend(this.draw, restore);
+	},
+	
+	makeListenerFuncs: function(){
+		var listeners = this.listeners;
+		var self = this;
+		var amSelected = new Boolean();
+		if(listeners.onDown||listeners.onMove||listeners.onUp){
+			
+			var onDown = function(){
+				amSeclected = self.checkSelected();
+				console.log('CLICKED');
+				if(amSelected){
+					console.log('SELECTED');
+					self.posInit = self.pos.copy();
+					self.mouseInit = mouseOffset(self.canvasElement);
+				}
+			}
+			onDown = extend(onDown, function(){if(amSelected){listeners.onDown}});
+			var onMove = this.makeMoveListenerFunc(self);
+			onDown = extend(onDown, function(){if(amSelected){onMove()}})
+
+			if(listeners.onUp){
+				//var onUp = this.makeUpListenerFunc(self);
+				//onDown = extend(onDown, function(){if(amSelected){onUp()}})
+			}
+			addListener(curLevel, 'mousedown', 'dragArrow'+this.name, onDown, '');
+		}
+
+	},
+	makeMoveListenerFunc: function(self){
+		var listeners = self.listeners;
+		var moveFunc = function(){
+			var mousePos = mouseOffset(self.canvasElement);
+			var dMouseX = mousePos.x - self.mouseInit.x;
+			var dMouseY = mousePos.y - self.mouseInit.y
+			self.pos.x = self.posInit.x + dMouseX*Math.abs(Math.sin(self.rotation));
+			self.pos.y = self.posInit.y + dMouseY*Math.abs(Math.cos(self.rotation));
+			console.log('MOOOVING');
+		}
+		if(listeners.onMove){
+			moveFunc = extend(moveFunc, listeners.onMove);
+		}
+		var addMoveListeners = function(){addListener(curLevel, 'mousemove', 'dragArrow'+self.name, moveFunc, '')};
+		
+		var removeMoveListeners = function(){
+			addListener(curLevel, 'mouseup', 'dragArrow'+self.name+'RemoveMove',
+				function(){
+					console.log('here');
+					removeListener(curLevel, 'mousemove', 'dragArrow'+self.name);
+					removeListener(curLevel, 'mouseup', 'dragArrow'+self.name+'RemoveMove');
+				},
+			'');
+		}
+
+		var toReturn = function(){
+			addMoveListeners();
+			
+			removeMoveListeners();
+		}
+		
+		return toReturn;
+	},
+	makeUpListenerFunc: function(self){
+	
+	},
+	show: function(){
+		//probably click too
+		addListener(curLevel, 'update', 'drawArrow'+this.name, this.draw, '');
+	},
+	checkSelected: function(){
+		return true;
+	},
+
+}

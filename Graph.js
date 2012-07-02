@@ -147,21 +147,7 @@ Graph.prototype = {
 		var dataSet = this.data[entryName];
 		if(dataSet.show){
 			this.legend[entryName]['check'].draw();
-			
-			/*
-			var oversize = this.checkMarkOversize;
-			var checkPt = entry.togglePos.copy();
-			var checkDims = entry.toggleDims.copy();
-			checkPt.x-=oversize;
-			checkPt.y-=oversize;
-			checkDims.dx+=2*oversize;
-			checkDims.dy+=2*oversize;
-			draw.checkMark(checkPt, checkDims, this.toggleCol, Col(0,0,0), this.graph);
-			*/
 		}
-
-		
-		
 	},
 	drawBGRect: function(){
 		draw.roundedRect(P(0,0), V(this.dims.dx, this.dims.dy), 20, this.bgCol, this.graph); 

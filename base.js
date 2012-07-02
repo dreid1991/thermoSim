@@ -390,13 +390,20 @@ SEEMS TO WORK AND MAKES IT SO I CAN SEND CANVASES AROUND IN INIT
 	c = canvas.getContext("2d");
 //})
 
-globalMousePos = P(0,0)
+function extend(old, add){
+	return function(){
+		old();
+		return add();
+	}
+}
+
+globalMousePos = P(0,0);
 function mouseOffset(curCanvas){
 	return P(globalMousePos.x - curCanvas.offsetLeft, globalMousePos.y - curCanvas.offsetTop);
 }
 $(document).mousemove(function(e){
-	globalMousePos.x = e.pageX//-myCanvas.offsetLeft;
-	globalMousePos.y = e.pageY//-myCanvas.offsetTop;
+	globalMousePos.x = e.pageX;
+	globalMousePos.y = e.pageY;
 	for (var mousemoveListener in curLevel.mousemoveListeners.listeners){
 		var listener = curLevel.mousemoveListeners.listeners[mousemoveListener]
 		listener.func.apply(listener.obj);

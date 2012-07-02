@@ -117,8 +117,12 @@ Point.prototype = {
 		return P(this.x, this.y);
 	},
 	movePt: function(v){
-		this.x+=v.dx;
-		this.y+=v.dy;
+		if(v.dx!==undefined){
+			this.x+=v.dx;
+		}
+		if(v.dy!==undefined){
+			this.y+=v.dy;
+		}
 		return this;
 	},
 	position: function(p){
@@ -128,6 +132,13 @@ Point.prototype = {
 		if(p.y!==undefined){
 			this.y=p.y;
 		}
+		return this;
+	},
+	scale: function(val, around){
+		var dx = this.x - around.x;
+		var dy = this.y - around.y;
+		this.x = around.x + dx*val;
+		this.y = around.y + dy*val;
 		return this;
 	},
 }
