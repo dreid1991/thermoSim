@@ -119,17 +119,19 @@ Orientation.prototype = {
 		var pos = walls.pts[0][1].copy()
 		var rotation = 0;
 		var cols = {};
-		cols.outer = Col(218,187,41);
-		cols.inner = Col(175,140,20);
-		cols.onClick = Col(255,255,255);
-		var dims = V(30, 20);
+		cols.outer = Col(247, 240,9);
+		cols.onClick = Col(247, 240,9);
+		cols.inner = this.bgCol;
+		//cols.onClick = Col(255,255,255);
+		//cols.stroke = Col(218,218,0);
+		var dims = V(25, 15);
 		var name = 'volDragger';
 		var drawCanvas = c;
 		var canvasElement = canvas;
 		var listeners = {};
 		listeners.onDown = function(){};
 		listeners.onMove = function(){curLevel.changeWallSetPt(this.pos.y)};
-		listeners.onUp = function(){console.log(this)};
+		listeners.onUp = function(){};
 		bounds = {y:{min:this.minY, max:this.maxY}};
 		return new DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds);
 	},
@@ -143,23 +145,29 @@ Orientation.prototype = {
 		return pts;
 	},
 	changeWallSetPt: function(dest){
+		var wall = walls.pts[0]
+		console.log('new');
+		console.log(curLevel.updateListeners.listeners);
+		removeListener(curLevel, 'update', 'moveWall');
 		var setY = function(curY){
-			walls.pts[0][0].y = curY;
-			walls.pts[0][1].y = curY;
-			walls.pts[0][4].y = curY;
+			wall[0].y = curY;
+			wall[1].y = curY;
+			wall[wall.length-1].y = curY;
 		}
 		var getY = function(){
 			return walls.pts[0][0].y;
 		}
 		
-		var dist = getY()-dest;
+		var dist = dest-getY();
 		if(dist!=0){
 			var sign = 1;
+			sign = Math.abs(dist)/dist;		
 			this.wallV = this.wallSpeed*sign;
-			sign = Math.abs(dist)/dist;
+		
 			addListener(curLevel, 'update', 'moveWall',
 				function(){
 					setY(boundedStep(getY(), dest, this.wallV))
+					walls.setupWall(0);
 					if(round(getY(),2)==round(dest,2)){
 						removeListener(curLevel, 'update', 'moveWall');
 						this.wallV = 0;
@@ -213,7 +221,6 @@ Orientation.prototype = {
 	addDots: function(){
 		populate("spc1", 35, 80, 460, 350, 800, 230);
 		populate("spc3", 35, 80, 460, 350, 600, 230);		
-		//populate("spc2", 35, 80, 460, 300, 20, 250);
 	},
 	dataRun: function(){
 		var SAPInt = getLen([walls.pts[0][1], walls.pts[0][2], walls.pts[0][3], walls.pts[0][4]])
@@ -251,6 +258,7 @@ Orientation.prototype = {
 		emptyListener(this, 'wallImpact');
 		emptyListener(this, 'dotImpact');
 		emptyListener(this, 'data');
+		this.dragArrow.reset();
 		this.startSim();
 	},
 	hideDash: function(){

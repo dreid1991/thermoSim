@@ -617,7 +617,7 @@ DragWeights.prototype = {
 function DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds){
 	this.pos = pos;
 	this.rotation = rotation;
-	
+	this.posInit = this.pos.copy()
 	this.cols = cols;
 	this.dims = dims
 	this.name = name;
@@ -637,15 +637,15 @@ function DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, l
 	} else{
 		this.bounds.y = {min:0, max:canvasElement.height - dims.dy};
 	}
-	this.pts = {}
+	this.pts = {};
 	this.pts.outer = [];
 	this.pts.inner = [];
 	var width = this.dims.dx;
 	var height = this.dims.dy;
 	this.pts.outer.push(P(0,0));
-	this.pts.outer.push(P(width, -height/2));
-	this.pts.outer.push(P(.8*width, 0));
-	this.pts.outer.push(P(width, height/2));
+	this.pts.outer.push(P(.9*width, -height/2));
+	this.pts.outer.push(P(width, 0));
+	this.pts.outer.push(P(.9*width, height/2));
 	this.pts.outer.push(P(0,0));
 	this.makeDrawFunc();
 	this.clickListeners = this.makeListenerFuncs();
@@ -708,7 +708,7 @@ DragArrow.prototype = {
 				onClick = extend(onClick, changeInnerCol);
 			}
 			
-			onClick = extend(onClick, function(){listeners.onDown.apply(self)});//NEED ()?
+			onClick = extend(onClick, function(){listeners.onDown.apply(self)});
 			var onMove = this.makeMoveListenerFunc(self);
 			onClick = extend(onClick, onMove)
 
@@ -717,7 +717,6 @@ DragArrow.prototype = {
 				onClick = extend(onClick, onUp)
 			}
 			return onDown;
-			//addListener(curLevel, 'mousedown', 'dragArrow'+this.name, onDown, '');
 		}
 
 	},
@@ -795,6 +794,10 @@ DragArrow.prototype = {
 	hide: function(){
 		removeListener(curLevel, 'mousedown', 'dragArrow'+this.name);
 		removeListener(curLevel, 'update', 'drawArrow'+this.name);	
+	},
+	reset: function(){
+		this.pos = this.posInit.copy();
+		removeListener(curLevel, 'update', 'moveWall');
 	},
 	checkSelected: function(){
 		var mousePos = mouseOffset(this.canvasElement);
