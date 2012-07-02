@@ -617,6 +617,7 @@ DragWeights.prototype = {
 function DragArrow(pos, rotation, cols, width, height, name, drawCanvas, canvasElement, listeners){
 	this.pos = pos;
 	this.rotation = rotation;
+	
 	this.cols = cols;
 	this.width = width;
 	this.height = height;
@@ -638,6 +639,7 @@ function DragArrow(pos, rotation, cols, width, height, name, drawCanvas, canvasE
 DragArrow.prototype = {
 
 	makeDrawFunc: function(){
+		this.dirUV = V(Math.cos(this.rotation+Math.PI/2), Math.sin(this.rotation+Math.PI/2));
 		this.draw = function(){};
 		var self = this;
 		var init = function(){
@@ -697,9 +699,15 @@ DragArrow.prototype = {
 		var moveFunc = function(){
 			var mousePos = mouseOffset(self.canvasElement);
 			var dMouseX = mousePos.x - self.mouseInit.x;
-			var dMouseY = mousePos.y - self.mouseInit.y
-			self.pos.x = self.posInit.x + dMouseX*Math.abs(Math.sin(self.rotation));
-			self.pos.y = self.posInit.y + dMouseY*Math.abs(Math.cos(self.rotation));
+			var dMouseY = mousePos.y - self.mouseInit.y;
+			var signX=1;
+			var signY=1;
+			if(dMouseX!=0){signX = Math.abs(signX)/signX};
+			if(dMouseY!=0){signY = Math.abs(signY)/signY};
+			var mouseDist = V(dMouseX, dMouseY);
+			var arrowDist = mouseDist.dotProd(self.dirUV);
+			self.pos.x = self.posInit.x + (arrowDist*Math.cos(self.rotation+Math.PI/2));
+			self.pos.y = self.posInit.y + (arrowDist*Math.sin(self.rotation+Math.PI/2));
 			console.log('MOOOVING');
 		}
 		if(listeners.onMove){
