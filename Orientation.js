@@ -29,11 +29,10 @@ function Orientation(){
 		{reset: {backward:true, foward: false},  title: "pattern breaker!",					func: function(){}, text:"3"},
 
 	]
-	
-
 	walls.setup();
 	this.minY = 60;
 	this.maxY = walls.pts[0][2].y-75;
+	this.dragArrow = this.makeDragArrow();
 	addSpecies(['spc1', 'spc3']);
 	collide.setup();
 	addListener(this, 'update', 'run', this.updateRun, this);
@@ -75,7 +74,6 @@ Orientation.prototype = {
 		
 	},
 	startSim: function(){
-
 		this.hideDash();
 		this.hideText();
 		$('#graphs').show()
@@ -87,6 +85,7 @@ Orientation.prototype = {
 		loadListener(this, 'data');		
 		loadListener(this, 'wallImpact');
 		loadListener(this, 'dotImpact');
+		this.dragArrow.show();
 		this.readout.init();  //Must go after adding updateRun or it will get cleared in the main draw func
 	},
 	startOutro: function(){
@@ -114,6 +113,24 @@ Orientation.prototype = {
 		$('#base').show();	
 		loadListener(this, 'update');
 		loadListener(this, 'data');
+	},
+	makeDragArrow: function(){
+		var pos = walls.pts[0][1].copy()
+		var rotation = 0;
+		var cols = {};
+		cols.outer = Col(218,187,41);
+		cols.inner = Col(175,140,20);
+		cols.onClick = Col(255,255,255);
+		var dims = V(30, 20);
+		var name = 'volDragger';
+		var drawCanvas = c;
+		var canvasElement = canvas;
+		var listeners = {};
+		listeners.onDown = function(){};
+		listeners.onMove = function(){console.log(this.pos.y)};
+		listeners.onUp = function(){console.log(this)};
+		bounds = {y:{min:this.minY, max:this.maxY}};
+		return new DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds);
 	},
 	getPtsToBorder: function(){
 		var pts = [];

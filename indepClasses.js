@@ -134,11 +134,21 @@ Point.prototype = {
 		}
 		return this;
 	},
-	scale: function(val, around){
+	scale: function(around, val){
 		var dx = this.x - around.x;
 		var dy = this.y - around.y;
 		this.x = around.x + dx*val;
 		this.y = around.y + dy*val;
+		return this;
+	},
+	rotate: function(around, rad){
+		var origin = V(around.x, around.y)
+		this.movePt(origin.copy().neg());
+		var x = this.x;
+		var y = this.y;
+		this.x = x*Math.cos(rad) - y*Math.sin(rad);
+		this.y = x*Math.sin(rad) + y*Math.cos(rad);
+		this.movePt(origin);
 		return this;
 	},
 }

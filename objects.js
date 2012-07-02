@@ -614,27 +614,41 @@ DragWeights.prototype = {
 	},
 }
 
-function DragArrow(pos, rotation, cols, width, height, name, drawCanvas, canvasElement, listeners){
+function DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds){
 	this.pos = pos;
 	this.rotation = rotation;
 	
 	this.cols = cols;
-	this.width = width;
-	this.height = height;
+	this.dims = dims
 	this.name = name;
 	this.listeners = listeners;
 	this.drawCanvas = drawCanvas;
 	this.canvasElement = canvasElement;
+	this.bounds = bounds;
+	if(this.bounds.x){
+		if(!this.bounds.x.max){this.bounds.x.max = canvasElement.width - dims.dx;}
+		if(!this.bounds.x.min){this.bounds.x.min = 0;}
+	} else{
+		this.bounds.x = {min:0, max:canvasElement.width - dims.dx};
+	}
+	if(this.bounds.y){
+		if(!this.bounds.y.max){this.bounds.y.max = canvasElement.height - dims.dy;}
+		if(!this.bounds.y.min){this.bounds.y.min = 0;}
+	} else{
+		this.bounds.y = {min:0, max:canvasElement.height - dims.dy};
+	}
 	this.pts = {}
 	this.pts.outer = [];
 	this.pts.inner = [];
+	var width = this.dims.dx;
+	var height = this.dims.dy;
 	this.pts.outer.push(P(0,0));
 	this.pts.outer.push(P(width, -height/2));
 	this.pts.outer.push(P(.8*width, 0));
 	this.pts.outer.push(P(width, height/2));
 	this.pts.outer.push(P(0,0));
 	this.makeDrawFunc();
-	this.makeListenerFuncs();
+	this.clickListeners = this.makeListenerFuncs();
 }
 DragArrow.prototype = {
 
@@ -655,12 +669,18 @@ DragArrow.prototype = {
 			var fill = function(){draw.fillPts(self.pts.outer, self.cols.outer, self.drawCanvas)};
 			this.draw = extend(this.draw, fill);
 		}
-		if(this.cols.inner){
+		if(this.cols.inner || this.cols.onClick){
 			for (var ptIdx=0; ptIdx<this.pts.outer.length; ptIdx++){
-				var newPt = this.pts.outer[ptIdx].copy().movePt({dx:-this.width/2}).scale(.6,P(0,0)).movePt({dx:this.width/2});
+				var newPt = this.pts.outer[ptIdx].copy().movePt({dx:-this.dims.dx/2}).scale(P(0,0),.6).movePt({dx:this.dims.dx/2});
 				this.pts.inner.push(newPt)
 			}
-			var fill = function(){draw.fillPts(self.pts.inner, self.cols.inner, self.drawCanvas)};
+			if(this.cols.inner){
+				this.cols.curInner = this.cols.inner;
+			}else{
+				this.cols.curInner = this.cols.outer;
+			}
+			
+			var fill = function(){draw.fillPts(self.pts.inner, self.cols.curInner, self.drawCanvas)};
 			this.draw = extend(this.draw, fill);
 		}
 		var restore = function(){self.drawCanvas.restore()};
@@ -670,27 +690,34 @@ DragArrow.prototype = {
 	makeListenerFuncs: function(){
 		var listeners = this.listeners;
 		var self = this;
-		var amSelected = new Boolean();
+		self.amSelected = new Boolean();
 		if(listeners.onDown||listeners.onMove||listeners.onUp){
-			
+			var onClick = function(){}
 			var onDown = function(){
-				amSeclected = self.checkSelected();
-				console.log('CLICKED');
-				if(amSelected){
-					console.log('SELECTED');
+				self.amSelected = self.checkSelected();
+				if(self.amSelected){
 					self.posInit = self.pos.copy();
 					self.mouseInit = mouseOffset(self.canvasElement);
+					onClick();
 				}
 			}
-			onDown = extend(onDown, function(){if(amSelected){listeners.onDown}});
+			if(self.cols.onClick){
+				var changeInnerCol = function(){
+					self.cols.curInner = self.cols.onClick
+				}
+				onClick = extend(onClick, changeInnerCol);
+			}
+			
+			onClick = extend(onClick, function(){listeners.onDown.apply(self)});//NEED ()?
 			var onMove = this.makeMoveListenerFunc(self);
-			onDown = extend(onDown, function(){if(amSelected){onMove()}})
+			onClick = extend(onClick, onMove)
 
 			if(listeners.onUp){
-				//var onUp = this.makeUpListenerFunc(self);
-				//onDown = extend(onDown, function(){if(amSelected){onUp()}})
+				var onUp = this.makeUpListenerFunc(self);
+				onClick = extend(onClick, onUp)
 			}
-			addListener(curLevel, 'mousedown', 'dragArrow'+this.name, onDown, '');
+			return onDown;
+			//addListener(curLevel, 'mousedown', 'dragArrow'+this.name, onDown, '');
 		}
 
 	},
@@ -700,25 +727,21 @@ DragArrow.prototype = {
 			var mousePos = mouseOffset(self.canvasElement);
 			var dMouseX = mousePos.x - self.mouseInit.x;
 			var dMouseY = mousePos.y - self.mouseInit.y;
-			var signX=1;
-			var signY=1;
-			if(dMouseX!=0){signX = Math.abs(signX)/signX};
-			if(dMouseY!=0){signY = Math.abs(signY)/signY};
 			var mouseDist = V(dMouseX, dMouseY);
 			var arrowDist = mouseDist.dotProd(self.dirUV);
-			self.pos.x = self.posInit.x + (arrowDist*Math.cos(self.rotation+Math.PI/2));
-			self.pos.y = self.posInit.y + (arrowDist*Math.sin(self.rotation+Math.PI/2));
-			console.log('MOOOVING');
+			var unBoundedX = self.posInit.x + (arrowDist*Math.cos(self.rotation+Math.PI/2));
+			var unBoundedY = self.posInit.y + (arrowDist*Math.sin(self.rotation+Math.PI/2));
+			self.pos.x = Math.max(self.bounds.x.min, Math.min(unBoundedX, self.bounds.x.max));
+			self.pos.y = Math.max(self.bounds.y.min, Math.min(unBoundedY, self.bounds.y.max));
 		}
 		if(listeners.onMove){
-			moveFunc = extend(moveFunc, listeners.onMove);
+			moveFunc = extend(moveFunc, function(){listeners.onMove.apply(self)});
 		}
 		var addMoveListeners = function(){addListener(curLevel, 'mousemove', 'dragArrow'+self.name, moveFunc, '')};
 		
 		var removeMoveListeners = function(){
 			addListener(curLevel, 'mouseup', 'dragArrow'+self.name+'RemoveMove',
 				function(){
-					console.log('here');
 					removeListener(curLevel, 'mousemove', 'dragArrow'+self.name);
 					removeListener(curLevel, 'mouseup', 'dragArrow'+self.name+'RemoveMove');
 				},
@@ -734,14 +757,50 @@ DragArrow.prototype = {
 		return toReturn;
 	},
 	makeUpListenerFunc: function(self){
+		var upFunc = function(){
+			addListener(curLevel, 'mouseup', 'mouseup'+self.name, function(){self.listeners.onUp.apply(self)}, '');
+			addListener(curLevel, 'mouseup', 'mouseup'+self.name+'remove', 
+				function(){
+					removeListener(curLevel, 'mouseup', 'mouseup'+self.name);
+					removeListener(curLevel, 'mouseup', 'mouseup'+self.name+'remove');
+				},
+			'');
+		}
+
+		if(self.cols.onClick){
+			var revertCols = function(){};
+			if(self.cols.inner){
+				revertCols = extend(revertCols, function(){self.cols.curInner = self.cols.inner;});
+			}else{
+				revertCols = extend(revertCols, function(){self.cols.curInner = self.cols.outer;});
+			}
+			var revertColsListener = function(){
+				addListener(curLevel, 'mouseup', 'revertCols'+self.name,
+					function(){
+						revertCols();
+						removeListener(curLevel, 'mouseup', 'revertCols'+self.name);
+					},
+				'');
+			}
+			upFunc = extend(upFunc, revertColsListener)
+		}
 	
+		
+		return upFunc;
 	},
 	show: function(){
-		//probably click too
+		addListener(curLevel, 'mousedown', 'dragArrow'+this.name, this.clickListeners, '');
 		addListener(curLevel, 'update', 'drawArrow'+this.name, this.draw, '');
 	},
+	hide: function(){
+		removeListener(curLevel, 'mousedown', 'dragArrow'+this.name);
+		removeListener(curLevel, 'update', 'drawArrow'+this.name);	
+	},
 	checkSelected: function(){
-		return true;
+		var mousePos = mouseOffset(this.canvasElement);
+		var unRotated = mousePos.rotate(this.pos, -this.rotation);
+		var ULCorner = this.pos.copy().movePt({dy:-this.dims.dy/2});
+		return ptInRect(ULCorner, this.dims, unRotated);
 	},
 
 }

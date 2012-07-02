@@ -340,6 +340,9 @@ function inRect(pos, dims, curCanvas){
 	var mousePos = mouseOffset(curCanvas);
 	return mousePos.x>=pos.x && mousePos.x<=(pos.x+dims.dx) && mousePos.y>=pos.y && mousePos.y<=(pos.y+dims.dy);
 }
+function ptInRect(pos, dims, pt){
+	return pt.x>=pos.x && pt.x<=(pos.x+dims.dx) && pt.y>=pos.y && pt.y<=(pos.y+dims.dy);
+}
 function border(pts, thickness, col, name, drawCanvas){
 	var perpUVs = [];
 	var borderPts = [];
@@ -392,8 +395,12 @@ SEEMS TO WORK AND MAKES IT SO I CAN SEND CANVASES AROUND IN INIT
 
 function extend(old, add){
 	return function(){
-		old();
-		return add();
+		return add(old());
+	}
+}
+function extendVar(old, add, obj){
+	return function(){
+		old(add(obj));
 	}
 }
 
