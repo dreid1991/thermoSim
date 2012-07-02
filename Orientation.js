@@ -12,6 +12,7 @@ function Orientation(){
 	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
 	this.forceInternal = 0;
 	this.wallV = 0;
+	this.wallSpeed = 1;
 	this.updateListeners = {listeners:{}, save:{}};
 	this.dataListeners = {listeners:{}, save:{}};
 	this.wallImpactListeners = {listeners:{}, save:{}};
@@ -127,7 +128,7 @@ Orientation.prototype = {
 		var canvasElement = canvas;
 		var listeners = {};
 		listeners.onDown = function(){};
-		listeners.onMove = function(){console.log(this.pos.y)};
+		listeners.onMove = function(){curLevel.changeWallSetPt(this.pos.y)};
 		listeners.onUp = function(){console.log(this)};
 		bounds = {y:{min:this.minY, max:this.maxY}};
 		return new DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds);
@@ -140,6 +141,32 @@ Orientation.prototype = {
 		pts.push(wallPts[3].copy());
 		pts.push(wallPts[4].copy().position({y:this.minY}));
 		return pts;
+	},
+	changeWallSetPt: function(dest){
+		var setY = function(curY){
+			walls.pts[0][0].y = curY;
+			walls.pts[0][1].y = curY;
+			walls.pts[0][4].y = curY;
+		}
+		var getY = function(){
+			return walls.pts[0][0].y;
+		}
+		
+		var dist = getY()-dest;
+		if(dist!=0){
+			var sign = 1;
+			this.wallV = this.wallSpeed*sign;
+			sign = Math.abs(dist)/dist;
+			addListener(curLevel, 'update', 'moveWall',
+				function(){
+					setY(boundedStep(getY(), dest, this.wallV))
+					if(round(getY(),2)==round(dest,2)){
+						removeListener(curLevel, 'update', 'moveWall');
+						this.wallV = 0;
+					}
+				},
+			this);
+		}
 	},
 	update: function(){
 		this.numUpdates++;
@@ -173,8 +200,14 @@ Orientation.prototype = {
 		walls.check();
 	},
 	onWallImpact: function(dot, line, wallUV, perpV){
-		walls.impactStd(dot, wallUV, perpV);
-		this.forceInternal += 2*dot.m*Math.abs(perpV);
+		if(line[0]==0 && line[1]==0){
+			var pt = walls.pts[line[0]][line[1]]; 
+			dot.v.dy = -dot.v.dy + 2*this.wallV;
+			dot.y = pt.y+dot.r;	
+		}else{
+			walls.impactStd(dot, wallUV, perpV);
+			this.forceInternal += 2*dot.m*Math.abs(perpV);
+		}
 
 	},
 	addDots: function(){
