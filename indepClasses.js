@@ -82,7 +82,14 @@ Vector.prototype = {
 		this.dx+=ddx;
 		this.dy+=ddy;
 		return this;
-	}
+	},
+	rotate: function(rad){
+		var dx = this.dx;
+		var dy = this.dy;
+		this.dx = dx*Math.cos(rad) - dy*Math.sin(rad);
+		this.dy = dx*Math.sin(rad) + dy*Math.cos(rad);
+		return this;
+	},
 }
 Color.prototype = {
 	adjust: function(dr, dg, db){

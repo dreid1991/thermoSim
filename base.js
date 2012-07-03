@@ -139,7 +139,34 @@ function CheckMark(corner, dims, col, stroke, drawCanvas){
 CheckMark.prototype = {
 	draw: function(){
 		draw.fillPtsStroke(this.pts, this.col, this.stroke, this.drawCanvas);
-	}
+	},
+}
+function Arrow(pts, col, drawCanvas){
+	var rotate = .5;
+	this.pts = {line:pts, arrow: new Array(3)}
+	this.col = col;
+	this.drawCanvas = drawCanvas;
+	var ptLast = this.pts.line[this.pts.line.length-1];
+	var ptNextLast = this.pts.line[this.pts.line.length-2];
+	var dirBack = ptLast.VTo(ptNextLast).UV();
+	var dirSide1 = dirBack.copy().rotate(rotate);
+	var dirSide2 = dirBack.copy().rotate(-rotate);
+
+	this.pts.arrow[0] = ptLast.copy().movePt(dirSide1.mult(5));
+	this.pts.arrow[1] = ptLast;
+	this.pts.arrow[2] = ptLast.copy().movePt(dirSide2.mult(5));
+}	
+Arrow.prototype = {
+	draw: function(){
+		for(var ptName in this.pts){
+			var pts = this.pts[ptName];
+			for(var ptIdx=0; ptIdx<pts.length-1; ptIdx++){
+				var p1 = pts[ptIdx];
+				var p2 = pts[ptIdx+1];
+				draw.line(p1, p2, this.col, this.drawCanvas);
+			}	
+		}
+	},
 }
 function move(){
 	for (var spc in spcs){
@@ -396,11 +423,6 @@ SEEMS TO WORK AND MAKES IT SO I CAN SEND CANVASES AROUND IN INIT
 function extend(old, add){
 	return function(){
 		return add(old());
-	}
-}
-function extendVar(old, add, obj){
-	return function(){
-		old(add(obj));
 	}
 }
 

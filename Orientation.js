@@ -25,20 +25,29 @@ function Orientation(){
 	this.promptIdx = 0;
 	this.prompts=[
 		{reset: {backward:false, forward:false}, title: "one fish", 						func: function(){}, text:"0"},
-		{reset: {backward:false, forward:false}, title: "two fish", 						func: function(){}, text:"1"},
+		{reset: {backward:false, forward:false}, title: "two fish", 						func: function(){
+																												removeListener(curLevel, 'wallImpact', 'std'); 
+																												addListener(curLevel, 'wallImpact', 'arrow', this.onWallImpactArrow, this)
+																											}, 
+																											text:"1"},
 		{reset: {backward:false, forward:true},  title: "red fish", 						func: function(){}, text:"2"},
 		{reset: {backward:true, foward: false},  title: "pattern breaker!",					func: function(){}, text:"3"},
+		{reset: {backward:true, foward: false},  title: "laala",							func: function(){}, text:"3"},
+		{reset: {backward:true, foward: false},  title: "Quality filler",					func: function(){}, text:"3"},
+		{reset: {backward:true, foward: false},  title: "made with real goat cheese",		func: function(){}, text:"3"},
+		{reset: {backward:true, foward: false},  title: "From all volunteer goats",			func: function(){}, text:"3"},
+		{reset: {backward:true, foward: false},  title: "Really.",							func: function(){}, text:"3"},
 
 	]
 	walls.setup();
 	this.minY = 60;
 	this.maxY = walls.pts[0][2].y-75;
 	this.dragArrow = this.makeDragArrow();
-	addSpecies(['spc1', 'spc3']);
+	addSpecies(['spc1', 'spc2', 'spc3']);
 	collide.setup();
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
-	addListener(this, 'wallImpact', 'moving', this.onWallImpact, this);
+	addListener(this, 'wallImpact', 'std', this.onWallImpact, this);
 	addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
 
 }
@@ -122,7 +131,7 @@ Orientation.prototype = {
 		cols.outer = Col(247, 240,9);
 		cols.onClick = Col(247, 240,9);
 		cols.inner = this.bgCol;
-		//cols.onClick = Col(255,255,255);
+
 		//cols.stroke = Col(218,218,0);
 		var dims = V(25, 15);
 		var name = 'volDragger';
@@ -146,8 +155,6 @@ Orientation.prototype = {
 	},
 	changeWallSetPt: function(dest){
 		var wall = walls.pts[0]
-		console.log('new');
-		console.log(curLevel.updateListeners.listeners);
 		removeListener(curLevel, 'update', 'moveWall');
 		var setY = function(curY){
 			wall[0].y = curY;
@@ -208,19 +215,45 @@ Orientation.prototype = {
 		walls.check();
 	},
 	onWallImpact: function(dot, line, wallUV, perpV){
+		var vo = dot.v.copy();
 		if(line[0]==0 && line[1]==0){
+			
 			var pt = walls.pts[line[0]][line[1]]; 
 			dot.v.dy = -dot.v.dy + 2*this.wallV;
 			dot.y = pt.y+dot.r;	
+			
 		}else{
 			walls.impactStd(dot, wallUV, perpV);
 			this.forceInternal += 2*dot.m*Math.abs(perpV);
 		}
-
+		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}
+	},
+	onWallImpactArrow: function(dot, line, wallUV, perpV){
+		var hitResult = this.onWallImpact(dot, line, wallUV, perpV);
+		var arrowPts = new Array(3);
+		arrowPts[0] = hitResult.pos.copy().movePt(hitResult.vo.mult(10).neg());
+		arrowPts[1] = hitResult.pos;
+		arrowPts[2] = hitResult.pos.copy().movePt(hitResult.vf.mult(10));
+		var lifeSpan = 50;
+		var arrowTurn = 0;
+		var arrow = new Arrow(arrowPts, Col(255,0,0),c);
+		addListener(curLevel, 'update', 'drawArrow'+hitResult.pos.x+hitResult.pos.y,
+			
+			function(){
+				arrow.draw();
+				arrowTurn++;
+				if(arrowTurn==lifeSpan){
+					removeListener(curLevel, 'update', 'drawArrow'+hitResult.pos.x+hitResult.pos.y);
+				}
+			},
+		'');
+		
+		
 	},
 	addDots: function(){
-		populate("spc1", 35, 80, 460, 350, 800, 230);
-		populate("spc3", 35, 80, 460, 350, 600, 230);		
+		//populate("spc1", 35, 80, 460, 350, 800, 230);
+		populate("spc2", 35, 80, 460, 350, 1, 230);
+		//populate("spc3", 35, 80, 460, 350, 600, 230);		
 	},
 	dataRun: function(){
 		var SAPInt = getLen([walls.pts[0][1], walls.pts[0][2], walls.pts[0][3], walls.pts[0][4]])
