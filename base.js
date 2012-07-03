@@ -318,36 +318,46 @@ function makeSlider(id, attrs, handlers){
 	return div;
 }
 
-function showPrompt(prompt){
+function showPrompt(prev, prompt){
+	if(prev && prev.cleanUp){
+		prev.cleanUp.apply(curLevel);
+	}
 	var block = prompt.block;
 	var text = prompt.text;
 	var func = prompt.func;
 	var title = prompt.title;
 	if(block!=curLevel.curBlock){
 		curLevel.reset.apply(curLevel);
-		curLevel['block'+block].apply(curLevel);
+		if(curLevel['block'+block]){
+			curLevel['block'+block].apply(curLevel);
+		}
 		curLevel.curBlock = block;
 	}
 	$('#prompt').html(text);
 	$('#baseHeader').html(title);
-	func.apply(curLevel);
+	if(func){
+		func.apply(curLevel);
+	}
+	
 
 }
 function nextPrompt(){
+	var prev = curLevel.prompts[curLevel.promptIdx];
 	curLevel.promptIdx = curLevel.promptIdx+1;
 	if(curLevel.promptIdx==curLevel.prompts.length){
 		curLevel.startOutro();
 	}else{
 		var promptIdx = curLevel.promptIdx;
 		var prompt = curLevel.prompts[promptIdx];
-		showPrompt(prompt);
+		showPrompt(prev, prompt);
 	}
 }
 function prevPrompt(){
+	var prev = curLevel.prompts[curLevel.promptIdx];
 	curLevel.promptIdx = Math.max(0, curLevel.promptIdx-1);
 	var promptIdx = curLevel.promptIdx;
 	var prompt = curLevel.prompts[promptIdx];
-	showPrompt(prompt);
+	showPrompt(prev, prompt);
 }
 function log10(val){
 	return Math.log(val)/Math.log(10);
