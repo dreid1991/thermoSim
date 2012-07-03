@@ -74,7 +74,7 @@ Weight.prototype = {
 	},
 }
 
-function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g, deadWeight, readout){
+function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g, deadWeight, readout, obj){
 	this.zeroY = zeroY;
 	this.pistonY = pistonY;
 	this.binY = binY;
@@ -103,6 +103,7 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.eBarFont = '12pt Calibri';
 	this.eBarFontCol = Col(255,255,255);
 	this.addReadoutEntries();
+	addListener(obj, 'init', 'dragWeights', this.init, this);
 	
 }
 
@@ -111,7 +112,7 @@ DragWeights.prototype = {
 		this.weightGroups = this.makeWeights(this.tempWeightDefs);
 		this.dropBins = this.makeDropBins();
 		this.pistonBins = this.makePistonBins();
-		this.dropAllInBins();
+		//this.dropAllInBins();
 		addListener(curLevel, 'mousedown', 'weights', this.mousedown, this);
 		addListener(curLevel, 'reset', 'dragWeights', this.reset, this);
 		delete this.tempWeightDefs;

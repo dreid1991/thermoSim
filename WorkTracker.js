@@ -1,4 +1,4 @@
-function WorkTracker(vol, mass, g, SA, readoutData){
+function WorkTracker(vol, mass, g, SA, readoutData, obj){
 	this.vol = vol;
 	this.mass = mass;
 	this.g = g;
@@ -6,16 +6,15 @@ function WorkTracker(vol, mass, g, SA, readoutData){
 	this.work = 0;
 	this.readout = readoutData.readout;
 	this.readout.addEntry('work', 'Work:', 'kJ', 0, readoutData.idx, 1);
-	
 	this.volLast = this.vol();
+	addListener(obj, 'init', 'workTracker', this.init, this);
 }
 WorkTracker.prototype = {
 	init: function(){
-		removeListener(curLevel, 'update', 'workTracker');
 		this.work=0;
 		this.volLast = this.vol();
 		this.volCur = this.vol();
-		addListener(curLevel, 'update', 'workTracker', this.updateVal, this);
+		addListener(curLevel, 'reset', 'workTracker', this.reset, this);
 		//addListener(curLevel, 'data', 'workTracker', this.updateReadout, this);
 	},
 	updateVal: function(){
@@ -28,5 +27,11 @@ WorkTracker.prototype = {
 	},
 	updateReadout: function(){
 		//this.readout.tick(this.work, 'work');
+	},
+	reset: function(){
+		addListener(curLevel, 'update', 'workTracker', this.updateVal, this);
+		this.work=0;
+		this.volLast = this.vol();
+		this.volCur = this.vol();
 	},
 }

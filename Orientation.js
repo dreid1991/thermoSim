@@ -9,7 +9,6 @@ function Orientation(){
 	this.bgCol = Col(5, 17, 26);
 	this.wallCol = Col(255,255,255);
 	this.numUpdates = 0;
-	//walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
 	this.forceInternal = 0;
 	this.wallV = 0;
 	this.wallSpeed = 1;
@@ -23,7 +22,7 @@ function Orientation(){
 	this.resetListeners = {listeners:{}, save:{}};
 	this.readout = new Readout(15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255));
 	this.graphs = {}
-	this.promptIdx = 0;
+	this.promptIdx = -1;
 	this.curBlock=-1;
 	this.prompts=[
 		{block:0, title: "one fish", 						func: {entering:this.step1, leaving:function(){}, text:"0"},
@@ -105,7 +104,7 @@ Orientation.prototype = {
 		loadListener(this, 'wallImpact');
 		loadListener(this, 'dotImpact');
 		//this.dragArrow.show();
-		this.readout.init();  //Must go after adding updateRun or it will get cleared in the main draw func
+		//this.readout.init();  //Must go after adding updateRun or it will get cleared in the main draw func
 	},
 	startOutro: function(){
 		saveListener(this, 'update');

@@ -86,7 +86,7 @@ $(function(){
 	curLevel = new Reversibility();
 	curLevel.init();
 	$('button').button();
-	$('#toSim').click(function(){curLevel.startSim()});
+	$('#toSim').click(function(){curLevel.toSim()});
 	$('#toLastStep').click(function(){curLevel.backToSim()});
 	$('#previous').click(function(){prevPrompt()});
 	$('#next').click(function(){nextPrompt()});

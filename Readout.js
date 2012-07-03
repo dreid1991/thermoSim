@@ -1,15 +1,14 @@
-function Readout(leftBound, rightBound, y, font, fontCol){
+function Readout(leftBound, rightBound, y, font, fontCol, obj){
 	this.font = font;
 	this.fontCol = fontCol;
 	this.leftBound = leftBound;
 	this.rightBound = rightBound;
 	this.y = y;
 	this.entries = [];
-	
+	addListener(obj, 'init', 'Readout', this.init, this);
 }
 Readout.prototype = {
 	init: function(){
-		addListener(curLevel, 'update', 'drawReadout', this.draw, this);
 		addListener(curLevel, 'reset', 'resetReadout', this.resetAll, this);
 	},
 	draw: function(){
@@ -87,6 +86,7 @@ Readout.prototype = {
 			var setPt = entry.initVal;
 			this.hardUpdate(setPt, name);
 		}
+		addListener(curLevel, 'update', 'drawReadout', this.draw, this);
 	},
 
 }

@@ -24,10 +24,11 @@ function Reversibility(){
 	this.mouseupListeners = {listeners:{}, save:{}};
 	this.mousemoveListeners = {listeners:{}, save:{}};
 	this.resetListeners = {listeners:{}, save:{}};
-	this.readout = new Readout(15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255));
+	this.initListeners = {listeners:{}, save:{}};
+	this.readout = new Readout(15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), this);
 	this.graphs = {}
 	this.promptIdx = -1;
-	this.curBlock=0;
+	this.curBlock=-1;
 	this.prompts=[
 		{block:0, title: "Current step", 		text:"Okay, let’s get oriented!  Here we have a container filled with a gas that follows the <a href = http://en.wikipedia.org/wiki/Hard_spheres>hard sphere model</a>, which is like the ideal gas model but the molecules take up some space.  There are some weights in bins below the container.  You can drag the weights on top of or off of the container to compress or expand it."},
 		{block:0, title: "Current step", 		text:"Imagine that the energy to lift a block comes from a battery.  When lifting a block, the battery is drained.  When dropping a block, the battery is replenished.  The energy changes correspond to the potential energies gained or lost by the block.  This energy is shown in the E Added dialog.  In a reversible cycle, you could compress and expand as long as you like and the battery will always have the same amount of charge at given volume.  In an irreversible cycle, your battery will gradually drain and the system will gradually gain energy.  Take a minute now to figure out how everything works. "},
@@ -50,7 +51,8 @@ function Reversibility(){
 										function(){return self.mass()},
 										function(){return self.g},
 										function(){return getLen([walls.pts[0][0], walls.pts[0][1]])},
-										{readout:this.readout, idx:1}
+										{readout:this.readout, idx:1},
+										this
 										)
 	this.minY = 60;
 	this.maxY = walls.pts[0][2].y-75;
@@ -69,9 +71,12 @@ Reversibility.prototype = {
 		this.hideDash();
 		this.hideText();
 		this.hideBase();
-		this.startIntro();		
-		this.dragWeights.init();
-		
+		this.startIntro();
+		for (var initListenerName in this.initListeners.listeners){
+			var func = this.initListeners.listeners[initListenerName].func;
+			var obj = this.initListeners.listeners[initListenerName].obj;
+			func.apply(obj);
+		}
 		var self = this;
 		this.graphs.pVSv = new Graph('pVSv', 400,300, "Volume (L)", "Pressure (atm)",
 							{x:{min:0, step:4}, y:{min:0, step:3}});
@@ -99,7 +104,7 @@ Reversibility.prototype = {
 									return {x:vLast, y:tLast, address: address};
 								});		
 		$('#myCanvas').show();
-		nextPrompt();
+		
 	},
 	startIntro: function(){
 		var ptsToBorder = this.getPtsToBorder();
@@ -135,8 +140,8 @@ Reversibility.prototype = {
 		loadListener(this, 'wallImpact');
 		loadListener(this, 'dotImpact');
 		
-		this.readout.init();  //Must go after adding updateRun or it will get cleared in the main draw func
-		this.workTracker.init();
+		
+		
 	},
 	startOutro: function(){
 		saveListener(this, 'update');
@@ -151,6 +156,9 @@ Reversibility.prototype = {
 		$('#textOutro').show();	
 		$('#dashOutro').show();
 
+	},
+	toSim: function(){
+		nextPrompt();
 	},
 	backToSim: function(){
 		this.promptIdx = this.prompts.length-1;
@@ -186,7 +194,8 @@ Reversibility.prototype = {
 									Col(150, 150, 150),
 									function(){return curLevel.g},
 									25,
-									this.readout
+									this.readout,
+									this
 									);
 		return dragWeights;
 	},
