@@ -322,14 +322,17 @@ function showPrompt(prev, prompt){
 	if(prev && prev.cleanUp){
 		prev.cleanUp.apply(curLevel);
 	}
-	var block = prompt.block;
+	var block = prompt.block
 	var text = prompt.text;
 	var func = prompt.func;
 	var title = prompt.title;
 	if(block!=curLevel.curBlock){
+		if(prev && curLevel['block'+prev.block+'CleanUp']){
+			curLevel['block'+prev.block+'CleanUp'].apply(curLevel);
+		}
 		curLevel.reset.apply(curLevel);
-		if(curLevel['block'+block]){
-			curLevel['block'+block].apply(curLevel);
+		if(curLevel['block'+block+'Start']){
+			curLevel['block'+block+'Start'].apply(curLevel);
 		}
 		curLevel.curBlock = block;
 	}

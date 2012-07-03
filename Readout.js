@@ -5,7 +5,9 @@ function Readout(leftBound, rightBound, y, font, fontCol, obj){
 	this.rightBound = rightBound;
 	this.y = y;
 	this.entries = [];
-	addListener(obj, 'init', 'Readout', this.init, this);
+	if(obj){
+		addListener(obj, 'init', 'Readout', this.init, this);
+	}
 }
 Readout.prototype = {
 	init: function(){

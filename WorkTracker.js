@@ -7,7 +7,9 @@ function WorkTracker(vol, mass, g, SA, readoutData, obj){
 	this.readout = readoutData.readout;
 	this.readout.addEntry('work', 'Work:', 'kJ', 0, readoutData.idx, 1);
 	this.volLast = this.vol();
-	addListener(obj, 'init', 'workTracker', this.init, this);
+	if(obj){
+		addListener(obj, 'init', 'workTracker', this.init, this);
+	}
 }
 WorkTracker.prototype = {
 	init: function(){
