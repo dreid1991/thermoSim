@@ -23,19 +23,21 @@ function Reversibility(){
 	this.mousedownListeners = {listeners:{}, save:{}};
 	this.mouseupListeners = {listeners:{}, save:{}};
 	this.mousemoveListeners = {listeners:{}, save:{}};
+	this.resetListeners = {listeners:{}, save:{}};
 	this.readout = new Readout(15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255));
 	this.graphs = {}
 	this.promptIdx = 0;
+	this.curBlock=0;
 	this.prompts=[
-		{reset: {backward:false, forward:false}, title: "Current step", 	func: function(){}, text:"Okay, let’s get oriented!  Here we have a container filled with a gas that follows the <a href = http://en.wikipedia.org/wiki/Hard_spheres>hard sphere model</a>, which is like the ideal gas model but the molecules take up some space.  There are some weights in bins below the container.  You can drag the weights on top of or off of the container to compress or expand it."},
-		{reset: {backward:false, forward:false}, title: "Current step", 	func: function(){}, text:"Imagine that the energy to lift a block comes from a battery.  When lifting a block, the battery is drained.  When dropping a block, the battery is replenished.  The energy changes correspond to the potential energies gained or lost by the block.  This energy is shown in the E Added dialog.  In a reversible cycle, you could compress and expand as long as you like and the battery will always have the same amount of charge at given volume.  In an irreversible cycle, your battery will gradually drain and the system will gradually gain energy.  Take a minute now to figure out how everything works. "},
-		{reset: {backward:false, forward:true},  title: "Current step", 	func: function(){}, text:"Say you want to compress this container but you only have a couple of big blocks.  Try it.  You’ll notice you have to put a lot of energy into lifting those.  Make a note of that amount for later.  Now for the compression to be reversible, you need to be able to get all of that energy back out of the system for a net work of zero.  Do you think that’s possible?  Test your idea!  What does this say about the reversibility of the process?"},
-		{reset: {backward:true, foward: false},  title: "Current step",		func: function(){}, text:"Hopefully you found that with the large blocks, you couldn’t get all of the energy back out, making this an <i>irreversible</i> compression and expansion cycle.  From the graphs, I think there are two ways we can verify of this.  What might they be?"},
-		{reset: {backward:false, forward:true},  title: "Current step", 	func: function(){}, text:"Each bin has the same total weight in it.  Try to compress the container with one bin’s worth of weight, but using less energy than you did to compress with the largest blocks."},
-		{reset: {backward:false, forward:false}, title: "Current step",		func: function(){}, text:"If you found a way, why did it take less energy this time?  If you didn’t, try harder.  This is a key question to understanding reversibility, so give it some thought.  Thinking about potential energy may be helpful."},
-		{reset: {backward:true, forward:false},  title: "Current step",		func: function(){}, text:"If you take all of the weight back off, how does the total energy added in this cycle compare to the energy added in the cycle using the big blocks?  Why is it different?"},
-		{reset: {backward:false, forward:true},  title: "Current step",		func: function(){}, text:"Now that you’ve found a way to add less energy than you had to with the big blocks, try to compress with one bin’s worth of weight using the <i>least</i> energy that you can.  You may have done this in the previous experiment.  If you did, well done, but do verify that you did by trying something else."},
-		{reset: {backward:false, forward:false}, title: "Current step", 	func: function(){}, text:"If you take all of the weight back off, how does the total energy added in <i>this</i> cycle compare to the energy added in the cycle using the big blocks.  Also, consider the pressure vs. volume graph.  Looks less ‘steppy’, doesn’t it?  How might we relate this to the condition for reversibility, P<sub>int</sub> = P<sub>ext</sub>?"},
+		{block:0, title: "Current step", 	func: function(){}, text:"Okay, let’s get oriented!  Here we have a container filled with a gas that follows the <a href = http://en.wikipedia.org/wiki/Hard_spheres>hard sphere model</a>, which is like the ideal gas model but the molecules take up some space.  There are some weights in bins below the container.  You can drag the weights on top of or off of the container to compress or expand it."},
+		{block:0, title: "Current step", 	func: function(){}, text:"Imagine that the energy to lift a block comes from a battery.  When lifting a block, the battery is drained.  When dropping a block, the battery is replenished.  The energy changes correspond to the potential energies gained or lost by the block.  This energy is shown in the E Added dialog.  In a reversible cycle, you could compress and expand as long as you like and the battery will always have the same amount of charge at given volume.  In an irreversible cycle, your battery will gradually drain and the system will gradually gain energy.  Take a minute now to figure out how everything works. "},
+		{block:1,  title: "Current step", 	func: function(){}, text:"Say you want to compress this container but you only have a couple of big blocks.  Try it.  You’ll notice you have to put a lot of energy into lifting those.  Make a note of that amount for later.  Now for the compression to be reversible, you need to be able to get all of that energy back out of the system for a net work of zero.  Do you think that’s possible?  Test your idea!  What does this say about the reversibility of the process?"},
+		{block:1,  title: "Current step",		func: function(){}, text:"Hopefully you found that with the large blocks, you couldn’t get all of the energy back out, making this an <i>irreversible</i> compression and expansion cycle.  From the graphs, I think there are two ways we can verify of this.  What might they be?"},
+		{block:2,  title: "Current step", 	func: function(){}, text:"Each bin has the same total weight in it.  Try to compress the container with one bin’s worth of weight, but using less energy than you did to compress with the largest blocks."},
+		{block:2, title: "Current step",		func: function(){}, text:"If you found a way, why did it take less energy this time?  If you didn’t, try harder.  This is a key question to understanding reversibility, so give it some thought.  Thinking about potential energy may be helpful."},
+		{block:2,  title: "Current step",		func: function(){}, text:"If you take all of the weight back off, how does the total energy added in this cycle compare to the energy added in the cycle using the big blocks?  Why is it different?"},
+		{block:3,  title: "Current step",		func: function(){}, text:"Now that you’ve found a way to add less energy than you had to with the big blocks, try to compress with one bin’s worth of weight using the <i>least</i> energy that you can.  You may have done this in the previous experiment.  If you did, well done, but do verify that you did by trying something else."},
+		{block:3, title: "Current step", 	func: function(){}, text:"If you take all of the weight back off, how does the total energy added in <i>this</i> cycle compare to the energy added in the cycle using the big blocks.  Also, consider the pressure vs. volume graph.  Looks less ‘steppy’, doesn’t it?  How might we relate this to the condition for reversibility, P<sub>int</sub> = P<sub>ext</sub>?"},
 	]
 	
 	this.g = 1.75;
@@ -116,7 +118,7 @@ Reversibility.prototype = {
 		$('#textIntro').show();
 		$('#dashIntro').show();
 		var prompt = this.prompts[this.promptIdx];
-		showPrompt(prompt.text, prompt.title, false, prompt.func);
+		showPrompt(prompt);
 		
 	},
 	startSim: function(){
@@ -162,6 +164,10 @@ Reversibility.prototype = {
 		loadListener(this, 'update');
 		loadListener(this, 'data');
 	},
+	block0:function(){console.log('0');},
+	block1:function(){console.log('1');},
+	block2:function(){console.log('2');},
+	block3:function(){console.log('3');},
 	getPtsToBorder: function(){
 		var pts = [];
 		var wallPts = walls.pts[0];
@@ -277,13 +283,8 @@ Reversibility.prototype = {
 		}
 	},
 	addDots: function(){
-		
-		//populate("spc1", 15, 15, myCanvas.width-400, myCanvas.height-150, 200, 4);
-		//populate("spc2", 75, 75, myCanvas.width-400, myCanvas.height-150, 20, 4);
-		//populate("spc3", 15, 15, myCanvas.width-400, myCanvas.height-150, 400, 4);		
-		populate("spc1", 35, 80, 460, 350, 800, 230);
-		populate("spc3", 35, 80, 460, 350, 600, 230);		
-		//populate("spc2", 35, 80, 460, 300, 20, 250);
+		populate("spc1", P(35, 80), V(460, 350), 800, 230);
+		populate("spc3", P(35, 80), V(460, 350), 600, 230);		
 	},
 	dataRun: function(){
 		var SAPInt = getLen([walls.pts[0][1], walls.pts[0][2], walls.pts[0][3], walls.pts[0][4]])
@@ -346,18 +347,17 @@ Reversibility.prototype = {
 		walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
 		walls.setup();
 		this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
-		
-		//this.SAPExt = getLen(this.extPressurePts);
 		this.forceInternal = 0;
-		this.wallV = 0;
 		emptyListener(this, 'update');
 		emptyListener(this, 'wallImpact');
 		emptyListener(this, 'dotImpact');
 		emptyListener(this, 'data');
-		this.readout.resetAll();
-		this.clearGraphs();
 		this.startSim();
-		this.dragWeights.dropAllInBins();
+		for (resetListenerName in this.resetListeners.listeners){
+			var func = this.resetListeners.listeners[resetListenerName].func;
+			var obj = this.resetListeners.listeners[resetListenerName].obj;
+			func.apply(obj);
+		}
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();

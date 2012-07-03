@@ -103,6 +103,7 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.eBarFont = '12pt Calibri';
 	this.eBarFontCol = Col(255,255,255);
 	this.addReadoutEntries();
+	
 }
 
 DragWeights.prototype = {
@@ -112,7 +113,9 @@ DragWeights.prototype = {
 		this.pistonBins = this.makePistonBins();
 		this.dropAllInBins();
 		addListener(curLevel, 'mousedown', 'weights', this.mousedown, this);
+		addListener(curLevel, 'reset', 'dragWeights', this.reset, this);
 		delete this.tempWeightDefs;
+		
 	},
 	addReadoutEntries: function(){
 		this.readout.addEntry('eAdd', 'E Added:', 'kJ', 0, undefined, 1);
@@ -612,6 +615,10 @@ DragWeights.prototype = {
 		}
 		return true;
 	},
+	reset: function(){
+		this.dropAllInBins();
+		curLevel.wallV=0;
+	}
 }
 
 function DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds){

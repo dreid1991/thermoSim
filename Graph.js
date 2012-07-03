@@ -42,7 +42,7 @@ function Graph(name, width, height, xLabel, yLabel, axisInit){
 
 	this.makeCanvas(this.name);
 	this.drawAllBG();
-
+	addListener(curLevel, 'reset', 'clearGraph'+name, this.clear, this);
 }
 Graph.prototype = {
 	makeCanvas: function(name){

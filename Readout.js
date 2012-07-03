@@ -5,10 +5,12 @@ function Readout(leftBound, rightBound, y, font, fontCol){
 	this.rightBound = rightBound;
 	this.y = y;
 	this.entries = [];
+	
 }
 Readout.prototype = {
 	init: function(){
 		addListener(curLevel, 'update', 'drawReadout', this.draw, this);
+		addListener(curLevel, 'reset', 'resetReadout', this.resetAll, this);
 	},
 	draw: function(){
 		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++){

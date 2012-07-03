@@ -206,8 +206,12 @@ function addSpecies(toAdd){
 		}
 	}
 }
-function populate(name, x, y, width, height, num, temp){
+function populate(name, pos, dims, num, temp){
 	var vStdev = .1;
+	var x = pos.x;
+	var y = pos.y;
+	var width = dims.dx;
+	var height = dims.dy;
 	var spc = spcs[name];
 	if(spc===undefined){
 		alert('Tried to populate undefined species');
@@ -314,13 +318,20 @@ function makeSlider(id, attrs, handlers){
 	return div;
 }
 
-function showPrompt(text, title, reset, func){
+function showPrompt(prompt){
+	var block = prompt.block;
+	var text = prompt.text;
+	var func = prompt.func;
+	var title = prompt.title;
+	if(block!=curLevel.curBlock){
+		curLevel.reset.apply(curLevel);
+		curLevel['block'+block].apply(curLevel);
+		curLevel.curBlock = block;
+	}
 	$('#prompt').html(text);
 	$('#baseHeader').html(title);
-	if (reset){
-		curLevel.reset();
-	}
 	func.apply(curLevel);
+
 }
 function nextPrompt(){
 	curLevel.promptIdx = curLevel.promptIdx+1;
@@ -329,22 +340,14 @@ function nextPrompt(){
 	}else{
 		var promptIdx = curLevel.promptIdx;
 		var prompt = curLevel.prompts[promptIdx];
-		var text = prompt.text;
-		var title = prompt.title;
-		var func = prompt.func;
-		var reset = prompt.reset.forward;
-		showPrompt(text, title, reset, func);
+		showPrompt(prompt);
 	}
 }
 function prevPrompt(){
 	curLevel.promptIdx = Math.max(0, curLevel.promptIdx-1);
 	var promptIdx = curLevel.promptIdx;
 	var prompt = curLevel.prompts[promptIdx];
-	var text = prompt.text;
-	var title = prompt.title;
-	var func = prompt.func;
-	var reset = prompt.reset.backward;
-	showPrompt(text, title, reset, func);
+	showPrompt(prompt);
 }
 function log10(val){
 	return Math.log(val)/Math.log(10);

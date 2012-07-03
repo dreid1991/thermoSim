@@ -9,7 +9,7 @@ function Orientation(){
 	this.bgCol = Col(5, 17, 26);
 	this.wallCol = Col(255,255,255);
 	this.numUpdates = 0;
-	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
+	//walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
 	this.forceInternal = 0;
 	this.wallV = 0;
 	this.wallSpeed = 1;
@@ -20,30 +20,32 @@ function Orientation(){
 	this.mousedownListeners = {listeners:{}, save:{}};
 	this.mouseupListeners = {listeners:{}, save:{}};
 	this.mousemoveListeners = {listeners:{}, save:{}};
+	this.resetListeners = {listeners:{}, save:{}};
 	this.readout = new Readout(15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255));
 	this.graphs = {}
 	this.promptIdx = 0;
+	this.curBlock=-1;
 	this.prompts=[
-		{reset: {backward:false, forward:false}, title: "one fish", 						func: function(){}, text:"0"},
-		{reset: {backward:false, forward:false}, title: "two fish", 						func: function(){
+		{block:0, title: "one fish", 						func: {entering:this.step1, leaving:function(){}, text:"0"},
+		{block:0, title: "two fish", 						func: function(){
 																												removeListener(curLevel, 'wallImpact', 'std'); 
 																												addListener(curLevel, 'wallImpact', 'arrow', this.onWallImpactArrow, this)
 																											}, 
 																											text:"1"},
-		{reset: {backward:false, forward:true},  title: "red fish", 						func: function(){}, text:"2"},
-		{reset: {backward:true, foward: false},  title: "pattern breaker!",					func: function(){}, text:"3"},
-		{reset: {backward:true, foward: false},  title: "laala",							func: function(){}, text:"3"},
-		{reset: {backward:true, foward: false},  title: "Quality filler",					func: function(){}, text:"3"},
-		{reset: {backward:true, foward: false},  title: "made with real goat cheese",		func: function(){}, text:"3"},
-		{reset: {backward:true, foward: false},  title: "From all volunteer goats",			func: function(){}, text:"3"},
-		{reset: {backward:true, foward: false},  title: "Really.",							func: function(){}, text:"3"},
+		{block:0,  title: "red fish", 						func: function(){}, text:"2"},
+		{block:1,  title: "pattern breaker!",					func: function(){}, text:"3"},
+		{block:1,  title: "laala",							func: function(){}, text:"3"},
+		{block:1,  title: "Quality filler",					func: function(){}, text:"3"},
+		{block:2,  title: "made with real goat cheese",		func: function(){}, text:"3"},
+		{block:2,  title: "From all volunteer goats",			func: function(){}, text:"3"},
+		{block:3,  title: "Really.",							func: function(){}, text:"3"},
 
 	]
-	walls.setup();
-	this.minY = 60;
-	this.maxY = walls.pts[0][2].y-75;
-	this.dragArrow = this.makeDragArrow();
-	addSpecies(['spc1', 'spc2', 'spc3']);
+	//walls.setup();
+	//this.minY = 60;
+	//this.maxY = walls.pts[0][2].y-75;
+	//this.dragArrow = this.makeDragArrow();
+	addSpecies(['spc1', 'spc3', 'spc4']);
 	collide.setup();
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
@@ -54,7 +56,6 @@ function Orientation(){
 
 Orientation.prototype = {
 	init: function(){
-		this.addDots();
 		this.hideDash();
 		this.hideText();
 		this.hideBase();
@@ -63,8 +64,8 @@ Orientation.prototype = {
 		$('#myCanvas').show();
 	},
 	startIntro: function(){
-		var ptsToBorder = this.getPtsToBorder();
-		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container',c);
+		//var ptsToBorder = this.getPtsToBorder();
+		//border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container',c);
 		saveListener(this, 'update');
 		saveListener(this, 'data');
 		saveListener(this, 'wallImpact');
@@ -83,6 +84,14 @@ Orientation.prototype = {
 		showPrompt(prompt.text, prompt.title, false, prompt.func);
 		
 	},
+	block0: function(){
+		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
+			[P(300,30), P(510,30), P(510,440), P(300,440)]]);
+		walls.setup();
+		populate('spc4', P(45, 80), V(200, 300), 200, 600);
+		populate('spc4', P(305,75), V(200, 300), 200, 100);
+		
+	},
 	startSim: function(){
 		this.hideDash();
 		this.hideText();
@@ -95,7 +104,7 @@ Orientation.prototype = {
 		loadListener(this, 'data');		
 		loadListener(this, 'wallImpact');
 		loadListener(this, 'dotImpact');
-		this.dragArrow.show();
+		//this.dragArrow.show();
 		this.readout.init();  //Must go after adding updateRun or it will get cleared in the main draw func
 	},
 	startOutro: function(){
@@ -250,11 +259,6 @@ Orientation.prototype = {
 		
 		
 	},
-	addDots: function(){
-		//populate("spc1", 35, 80, 460, 350, 800, 230);
-		populate("spc2", 35, 80, 460, 350, 1, 230);
-		//populate("spc3", 35, 80, 460, 350, 600, 230);		
-	},
 	dataRun: function(){
 		var SAPInt = getLen([walls.pts[0][1], walls.pts[0][2], walls.pts[0][3], walls.pts[0][4]])
 		this.data.pInt.push(this.dataHandler.pressureInt(this.forceInternal, this.numUpdates, SAPInt));
@@ -280,19 +284,21 @@ Orientation.prototype = {
 		for (var spcName in spcs){
 			depopulate(spcName);
 		}
-		this.addDots();
 		this.numUpdates = 0;
-		walls = undefined;
-		walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
-		walls.setup();
+
 		this.forceInternal = 0;
 		this.wallV = 0;
 		emptyListener(this, 'update');
 		emptyListener(this, 'wallImpact');
 		emptyListener(this, 'dotImpact');
 		emptyListener(this, 'data');
-		this.dragArrow.reset();
+
 		this.startSim();
+		for (resetListenerName in this.resetListeners.listeners){
+			var func = this.resetListeners.listeners[resetListenerName].func;
+			var obj = this.resetListeners.listeners[resetListenerName].obj;
+			func.apply(obj);
+		}
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();
