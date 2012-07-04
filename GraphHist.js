@@ -2,24 +2,21 @@ function GraphScatter(name, width, height, xLabel, yLabel, axisInit){
 	this.base = new GraphBase(this);
 	this.name = name;
 	this.dims = V(width, height);
-	
 	this.xLabel = xLabel;
 	this.yLabel = yLabel;
 	this.labelFontSize = 15;
-	this.legendFontSize = 12;
 	this.axisValFontSize = 11;
 	this.labelFont = this.labelFontSize+ 'pt calibri';
-	this.legendFont = this.legendFontSize+ 'pt calibri';
 	this.axisValFont = this.axisValFontSize+ 'pt calibri';
 	this.borderSpacing = 70;
 	this.xStart = this.borderSpacing/width;
 	this.yStart = 1-this.borderSpacing/height;
 	this.legendWidth = 80;
-	this.xEnd = (this.dims.dx - (this.legendWidth+8))/this.dims.dx;
+	this.xEnd = .95;
 	this.yEnd = .05;
 	this.gridSpacing = 40;
 	this.hashMarkLen = 10;
-	
+	this.numBins = 8;
 	var numGridLinesX = Math.ceil(this.dims.dx*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing);
 	var numGridLinesY = Math.ceil(this.dims.dy*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
 	this.numGridLines = {x:numGridLinesX, y:numGridLinesY};
@@ -29,37 +26,33 @@ function GraphScatter(name, width, height, xLabel, yLabel, axisInit){
 	this.legend = {};
 	this.base.resetRanges();
 	this.stepSize = {x:0, y:0};
-	this.checkMarkOversize = 3;
 	this.bgCol = curLevel.bgCol
 	this.gridCol = Col(72,72,72);
-	this.toggleCol = Col(255,255,255);
 	
 	this.textCol = Col(255, 255, 255);
-	this.flashMult = 1.5;
-	this.flashRate = .1;
 	this.graphBoundCol = Col(255,255,255);
 	this.ptStroke = Col(0,0,0);
-	this.rectSideLen = 8;
-	this.characLen = Math.sqrt(Math.pow(this.rectSideLen, 2)/2);
-	//characLen, characteristic length, is the radius of the shape being used
+
 	var canvasData = this.base.makeCanvas(this.name, this.dims);
 	this.graph = canvasData.graph;
 	this.graphHTMLElement = canvasData.HTMLElement;
 	this.base.drawAllBG();
 	addListener(curLevel, 'reset', 'clearGraph'+name, this.clear, this);
 }
+/*Good evening:  I am keeping histogram data in data.someName, not just data, even though there is only one for now.
+Trying to make functions where base references data.someName as reusable as possible
+and leaving open possibility of multiple sets (though that would probably look confusing)
+*/
 GraphScatter.prototype = {
-	addSet: function(address, label, pointCol, flashCol, dataPaths){
+	addSet: function(address, label, barCol, dataPath){
 		var set = {};
 		set.label = label;
 		set.x = [];
 		set.y = [];
 		set.pointCol = pointCol;
 		set.flashCol = flashCol;
-		set.getLast = this.base.makePtDataGrabFunc(dataPaths);
-		set.show = true;
+		set.getLast = this.base.makeHistDataGrabFunc(dataPath);
 		this.data[address] = set;
-		this.base.makeLegendEntry(set, address);
 		this.base.drawAllBG();
 	},
 	drawAllData: function(){
@@ -67,85 +60,67 @@ GraphScatter.prototype = {
 		this.base.drawAxisVals();
 		this.graphPts();
 	},
-
+	drawLastData: function(toAdd){
+		for (var addIdx=0; addIdx<toAdd.length; addIdx++){
+			var dataSet = this.data[toAdd[addIdx].address];
+			if(dataSet.show){
+				var xPt = dataSet.x[dataSet.x.length-1]
+				var yPt = dataSet.y[dataSet.y.length-1]
+				var pointCol = dataSet.pointCol
+				this.graphPt(xPt, yPt, pointCol);
+			}
+		}	
+	},
 
 
 	addLast: function(){
 		var toAdd = [];
+		var theOnlyAddress = '';
+		var last;
 		for (var address in this.data){
-			var dataSet = this.data[address];
-			toAdd.push(dataSet.getLast(address));
+			theOnlyAddress = address;
+			last = this.data[theOnlyAddress].getLast();
 		}
-		this.addPts(toAdd);
-	},
-	addPts: function(toAdd){
-		var mustRedraw = new Boolean()
-		mustRedraw = false;
-		var val = this.valRange;
-		var oldValRange = {x:{min:val.x.min, max:val.x.max}, y:{min:val.y.min, max:val.y.max}};
-		for (var addIdx=0; addIdx<toAdd.length; addIdx++){
-			var address = toAdd[addIdx].address;
-			var x = toAdd[addIdx].x;
-			var y = toAdd[addIdx].y;
-			var dataSet = this.data[address]
-			dataSet.x.push(x);
-			dataSet.y.push(y);
-
-			this.valRange.x.max = Math.max(this.valRange.x.max, x);
-			this.valRange.x.min = Math.min(this.valRange.x.min, x);		
-			this.valRange.y.max = Math.max(this.valRange.y.max, y);
-			this.valRange.y.min = Math.min(this.valRange.y.min, y);
-		}
-		var old = this.axisRange;
-		var oldAxisRange = {x:{min:old.x.min, max:old.x.max}, y:{min:old.y.min, max:old.y.max}};
-		this.base.setAxisBounds(oldValRange);
-		if(!this.base.rangeIsSame(oldAxisRange.x, this.axisRange.x) || !this.base.rangeIsSame(oldAxisRange.y, this.axisRange.y)){
-			mustRedraw = true;
-		}
-		
-		if(mustRedraw){
-			//this.valRange.x = this.base.getRange('x');
-			//this.valRange.y = this.base.getRange('y');
-			this.drawAllData();
-		} else{
-			for (var addIdx=0; addIdx<toAdd.length; addIdx++){
-				var dataSet = this.data[toAdd[addIdx].address];
-				if(dataSet.show){
-
-					var xPt = dataSet.x[dataSet.x.length-1]
-					var yPt = dataSet.y[dataSet.y.length-1]
-					var pointCol = dataSet.pointCol
-					this.graphPt(xPt, yPt, pointCol);
-				}
-			}
-		}
-		
-		this.base.flashInit(toAdd);
-		
+		this.data[theOnlyAddress].x = this.data[theOnlyAddress].x.concat(last);
+		this.makeBins;
 	},
 
-
-	plotData: function(xVals, yVals, address){
-		if (xVals.length==yVals.length && xVals.length>1){
-			this.data[address].x = xVals;
-			this.data[address].y = yVals;
-			this.valRange.x = this.base.getRange('x');
-			this.valRange.y = this.base.getRange('y');
-			this.getAxisBounds();
-			this.drawAllData();
-		} else if (xVals.length!=yVals.length){
-			console.log("xVals has ", xVals.length, "entries");
-			console.log("yVals has ", yVals.length, "entries");
-			console.log("UH-OH");
-		};
+	plotData: function(vals){
+		var theOnlyAddress = '';
+		for(var address in this.data){
+			theOnlyAddress = address;
+		}
+		this.data[theOnlyAddress].x = vals;
+		this.makeBins()
 	},
-
 	getAxisBounds: function(){
 		this.base.getXBounds();
 		this.base.getYBounds();
 	},
-
-
+	makeBins: function(){
+		this.valRange.x = this.base.getRange('x');
+		this.base.setAxisBoundsX();
+		this.bins = this.makeBins(this.data[theOnlyAddress].x);
+		this.populateBins(this.data[theOnlyAddress].x);
+		this.drawAllData();
+	},
+	makeBinBlanks: function(data, numBins){
+		var bins = {};
+		this.binWidth = round((this.axisRange.max - this.axisRange.min)/(this.numBins+1),1);
+		for(var binIdx=0; binIdx<bins.length; binIdx++){
+			min = this.axisRange.min + binWidth*binIdx;
+			bins[String(min)] = 0;
+		}
+		return bins;
+	},
+	populateBins: function(data){
+		for (var dataIdx=0; dataIdx<data.length; dataIdx++){
+			var min = this.axisRange.min;
+			var val = data[dataIdx];
+			var binIdx = Math.floor((val-min)/this.binWidth)*this.binWidth;
+			this.bins[String(binIdx)]++;
+		}
+	}
 	graphPts: function(){
 		for (var setName in this.data){
 			var dataSet = this.data[setName];

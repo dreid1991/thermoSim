@@ -27,7 +27,9 @@ GraphBase.prototype = {
 		this.drawBGRect();
 		this.drawGrid();
 		this.drawBounds();
-		this.drawLegend();
+		if(this.G.legend){
+			this.drawLegend();
+		}
 		this.drawLabels();
 		this.G.bg = this.graph.getImageData(0, 0, this.G.dims.dx, this.G.dims.dy);
 	},	
@@ -78,12 +80,50 @@ GraphBase.prototype = {
 			this.G.drawPtStd(pt.x, pt.y, pt.col);
 		}
 	},
+	addPts: function(toAdd){
+		var mustRedraw = new Boolean()
+		mustRedraw = false;
+		var val = this.G.valRange;
+		var oldValRange = {x:{min:val.x.min, max:val.x.max}, y:{min:val.y.min, max:val.y.max}};
+		for (var addIdx=0; addIdx<toAdd.length; addIdx++){
+			var address = toAdd[addIdx].address;
+			var x = toAdd[addIdx].x;
+			var y = toAdd[addIdx].y;
+			var dataSet = this.G.data[address]
+			dataSet.x.push(x);
+			dataSet.y.push(y);
+			this.G.valRange.x.max = Math.max(this.G.valRange.x.max, x);
+			this.G.valRange.x.min = Math.min(this.G.valRange.x.min, x);		
+			this.G.valRange.y.max = Math.max(this.G.valRange.y.max, y);
+			this.G.valRange.y.min = Math.min(this.G.valRange.y.min, y);
+		}
+		var old = this.G.axisRange;
+		var oldAxisRange = {x:{min:old.x.min, max:old.x.max}, y:{min:old.y.min, max:old.y.max}};
+		this.setAxisBounds(oldValRange);
+		if(!this.rangeIsSame(oldAxisRange.x, this.G.axisRange.x) || !this.rangeIsSame(oldAxisRange.y, this.G.axisRange.y)){
+			mustRedraw = true;
+		}
+		
+		if(mustRedraw){
+			this.G.drawAllData();
+		} else{
+			this.G.drawLastData(toAdd)
+
+		}
+		
+		this.flashInit(toAdd);
+		
+	},
 	rangeIsSame: function(a, b){
 		return !(a.max!=b.max || a.min!=b.min);
 	},
 	setAxisBounds: function(oldRange){
+		this.setAxisBoundsX(oldRange);
+		this.setAxisBoundsY(oldRange);
+	},
+	setAxisBoundsX: function(oldRange){
 		var a = this.G.axisInit;
-		var b = this.G.valRange;
+		var b = this.G.valRange;	
 		if(!(a.x.min<b.x.min && a.x.max>b.x.max)){
 			if(!this.rangeIsSame(oldRange.x, this.G.valRange.x)){
 				this.getXBounds();
@@ -91,6 +131,10 @@ GraphBase.prototype = {
 		} else{
 			this.setAxisToInit('x');
 		}
+	},
+	setAxisBoundsY: function(oldRange){
+		var a = this.G.axisInit;
+		var b = this.G.valRange;	
 		if(!(a.y.min<b.y.min && a.y.max>b.y.max)){
 			if(!this.rangeIsSame(oldRange.y, this.G.valRange.y)){
 				this.getYBounds();
@@ -237,6 +281,12 @@ GraphBase.prototype = {
 			var xLast = xData[xData.length-1];
 			var yLast = yData[yData.length-1];
 			return {x:xLast, y:yLast, address:address};
+		}
+	},
+	makeHistDataGrabFunc: function(path){
+		return function(address){
+			var data = paths.data;
+			return {address:address, data:data[data.length-1]};
 		}
 	},
 	translateValToCoord: function(val, axis){

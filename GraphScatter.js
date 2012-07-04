@@ -67,7 +67,17 @@ GraphScatter.prototype = {
 		this.base.drawAxisVals();
 		this.graphPts();
 	},
-
+	drawLastData: function(toAdd){
+		for (var addIdx=0; addIdx<toAdd.length; addIdx++){
+			var dataSet = this.data[toAdd[addIdx].address];
+			if(dataSet.show){
+				var xPt = dataSet.x[dataSet.x.length-1]
+				var yPt = dataSet.y[dataSet.y.length-1]
+				var pointCol = dataSet.pointCol
+				this.graphPt(xPt, yPt, pointCol);
+			}
+		}	
+	},
 
 
 	addLast: function(){
@@ -76,52 +86,9 @@ GraphScatter.prototype = {
 			var dataSet = this.data[address];
 			toAdd.push(dataSet.getLast(address));
 		}
-		this.addPts(toAdd);
+		this.base.addPts(toAdd);
 	},
-	addPts: function(toAdd){
-		var mustRedraw = new Boolean()
-		mustRedraw = false;
-		var val = this.valRange;
-		var oldValRange = {x:{min:val.x.min, max:val.x.max}, y:{min:val.y.min, max:val.y.max}};
-		for (var addIdx=0; addIdx<toAdd.length; addIdx++){
-			var address = toAdd[addIdx].address;
-			var x = toAdd[addIdx].x;
-			var y = toAdd[addIdx].y;
-			var dataSet = this.data[address]
-			dataSet.x.push(x);
-			dataSet.y.push(y);
-			this.valRange.x.max = Math.max(this.valRange.x.max, x);
-			this.valRange.x.min = Math.min(this.valRange.x.min, x);		
-			this.valRange.y.max = Math.max(this.valRange.y.max, y);
-			this.valRange.y.min = Math.min(this.valRange.y.min, y);
-		}
-		var old = this.axisRange;
-		var oldAxisRange = {x:{min:old.x.min, max:old.x.max}, y:{min:old.y.min, max:old.y.max}};
-		this.base.setAxisBounds(oldValRange);
-		if(!this.base.rangeIsSame(oldAxisRange.x, this.axisRange.x) || !this.base.rangeIsSame(oldAxisRange.y, this.axisRange.y)){
-			mustRedraw = true;
-		}
-		
-		if(mustRedraw){
-			//this.valRange.x = this.base.getRange('x');
-			//this.valRange.y = this.base.getRange('y');
-			this.drawAllData();
-		} else{
-			for (var addIdx=0; addIdx<toAdd.length; addIdx++){
-				var dataSet = this.data[toAdd[addIdx].address];
-				if(dataSet.show){
 
-					var xPt = dataSet.x[dataSet.x.length-1]
-					var yPt = dataSet.y[dataSet.y.length-1]
-					var pointCol = dataSet.pointCol
-					this.graphPt(xPt, yPt, pointCol);
-				}
-			}
-		}
-		
-		this.base.flashInit(toAdd);
-		
-	},
 
 
 	plotData: function(xVals, yVals, address){
@@ -176,9 +143,6 @@ GraphScatter.prototype = {
 		var pts = [pt1, pt2, pt3, pt4];
 		draw.fillPtsStroke(pts, col, this.ptStroke, this.graph);
 	},
-
-
-
 	clear: function(){
 		this.base.clear()
 	},
