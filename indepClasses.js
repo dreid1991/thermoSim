@@ -98,6 +98,12 @@ Color.prototype = {
 		this.b = Math.round(Math.min(255, Math.max(0, this.b+db)));
 		return this;
 	},
+	set: function(col){
+		if(col.r!==undefined){this.r = col.r;};
+		if(col.g!==undefined){this.g = col.g;};
+		if(col.b!==undefined){this.b = col.b;};
+		return this;
+	},
 	copy: function(){
 		return Col(this.r, this.g, this.b);
 	},

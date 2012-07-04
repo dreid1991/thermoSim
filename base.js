@@ -181,18 +181,18 @@ function gauss(avg, stdev){
 	var numStdev = (Math.random() + Math.random() + Math.random())-1.5;
 	return avg + numStdev*stdev;
 }
-function boundedStep(cur, dest, step){
+function boundedStep(cur, setPt, step){
 	var sign = 1;
-	if(cur==dest){
+	if(cur==setPt){
 		return cur;
 	}else{
-		var dist = dest-cur;
+		var dist = setPt-cur;
 		sign = Math.abs(dist)/dist;
 	}
 	cur*=sign;
-	dest*=sign;
+	setPt*=sign;
 	step*=sign;
-	return sign*Math.min(cur+step, dest);
+	return sign*Math.min(cur+step, setPt);
 }
 function addSpecies(toAdd){
 	if (String(toAdd)===toAdd){
@@ -451,7 +451,11 @@ function extend(old, add){
 		return add(old());
 	}
 }
-
+function inherit(reciever, object){
+	for	(var objectName in object){
+		reciever[objectName] = object[objectName];
+	}
+}
 globalMousePos = P(0,0);
 function mouseOffset(curCanvas){
 	return P(globalMousePos.x - curCanvas.offsetLeft, globalMousePos.y - curCanvas.offsetTop);

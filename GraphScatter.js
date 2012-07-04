@@ -90,7 +90,6 @@ GraphScatter.prototype = {
 			var dataSet = this.data[address]
 			dataSet.x.push(x);
 			dataSet.y.push(y);
-
 			this.valRange.x.max = Math.max(this.valRange.x.max, x);
 			this.valRange.x.min = Math.min(this.valRange.x.min, x);		
 			this.valRange.y.max = Math.max(this.valRange.y.max, y);

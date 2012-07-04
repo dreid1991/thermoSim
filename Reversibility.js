@@ -78,31 +78,18 @@ Reversibility.prototype = {
 			func.apply(obj);
 		}
 		var self = this;
-		this.graphs.pVSv = new Graph('pVSv', 400,300, "Volume (L)", "Pressure (atm)",
+		this.graphs.pVSv = new GraphScatter('pVSv', 400,300, "Volume (L)", "Pressure (atm)",
 							{x:{min:0, step:4}, y:{min:0, step:3}});
-		this.graphs.tVSv = new Graph('tVSv', 400, 300,"Volume (L)", "Temperature (K)",
+		this.graphs.tVSv = new GraphScatter('tVSv', 400, 300,"Volume (L)", "Temperature (K)",
 							{x:{min:0, step:4}, y:{min:200, step:60}});
 		this.graphs.pVSv.addSet('pInt', 'P Int.', Col(0,0,255), Col(200,200,255),
-								function(){
-									var pLast = self.data.pInt[self.data.pInt.length-1];
-									var vLast = self.data.v[self.data.v.length-1];
-									var address = 'pInt';
-									return {x:vLast, y:pLast, address:address};
-								});
+								{data:this.data, x:'v', y:'pInt'});
 		this.graphs.pVSv.addSet('pExt', 'P Ext.', Col(0,255,0), Col(200,255,200),
-								function(){
-									var pLast = self.data.pExt[self.data.pExt.length-1];
-									var vLast = self.data.v[self.data.v.length-1];
-									var address = 'pExt';
-									return {x:vLast, y:pLast, address:address};
-								});
+								{data:this.data, x:'v', y:'pExt'});
 		this.graphs.tVSv.addSet('t', 'Sys\nTemp', Col(255,0,0), Col(255,200,200),
-								function(){
-									var vLast = self.data.v[self.data.v.length-1];
-									var tLast = self.data.t[self.data.t.length-1];
-									var address = 't';
-									return {x:vLast, y:tLast, address: address};
-								});		
+								{data:this.data, x:'v', y:'t'});		
+		
+		
 		$('#myCanvas').show();
 		
 	},
