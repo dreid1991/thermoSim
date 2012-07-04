@@ -1,4 +1,4 @@
-function Graph(name, width, height, xLabel, yLabel, axisInit){
+function Graph(name, width, height, xLabel, yLabel, axisInit, type){
 	this.name = name;
 	this.dims = V(width, height);
 	this.xLabel = xLabel;
@@ -22,7 +22,6 @@ function Graph(name, width, height, xLabel, yLabel, axisInit){
 	var numGridLinesY = Math.ceil(this.dims.dy*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
 	this.numGridLines = {x:numGridLinesX, y:numGridLinesY};
 	this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1)}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1)}};
-	var a = this.axisInit;
 	this.axisRange = {x:{min:0, max:0}, y:{min:0, max:0}};
 	this.data = {};
 	this.legend = {};

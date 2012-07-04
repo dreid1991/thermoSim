@@ -165,6 +165,9 @@ Dot.prototype = {
 		return .5*this.m*vSqr;
 	},
 	temp: function(){
-		return this.KE()*updateInterval*updateInterval/tempScalar;
+		return this.KE()*tConst;
+	},
+	speed: function(){
+		return pxToMS*Math.sqrt(this.temp()/(this.m*10));
 	}
 }

@@ -57,15 +57,32 @@ Readout.prototype = {
 		this.positionEntries();
 		
 	},
+	removeEntry: function(toRemove){
+		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++){
+			if(this.entries[entryIdx].name==toRemove){
+				this.entries.splice(entryIdx,1);
+				this.positionEntries();
+				return this;
+			}
+		}
+		console.log('Entry does not exist');
+	},
 	positionEntries: function(){
 		var width = this.rightBound - this.leftBound;
-		var spacing = Math.floor(width/(this.getNumEntries()-1));
-		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++){
-			var entry = this.entries[entryIdx];
-			var x = this.leftBound + spacing*entryIdx;
-			var y = this.y;
-			entry.pos = P(x, y);
+		var numEntries = this.entries.length;
+		var spacing;
+		if(numEntries>1){
+			spacing = Math.floor(width/(numEntries-1));
+		} else{
+			spacing=width;
+			entryIdx=.5;
 		}
+			for (var entryIdx=0; entryIdx<numEntries; entryIdx++){
+				var entry = this.entries[entryIdx];
+				var x = this.leftBound + spacing*entryIdx;
+				var y = this.y;
+				entry.pos = P(x, y);
+			}
 	},
 	getNumEntries: function(){
 		var count = 0;

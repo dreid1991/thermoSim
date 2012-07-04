@@ -231,6 +231,13 @@ function depopulate(name){
 	var spc = spcs[name];
 	spc.dots = [];
 }
+function changeDotTemp(dot, temp){
+	var curTemp = dot.temp();
+	var velRatio = Math.sqrt(temp/curTemp);
+	dot.v.dx*=velRatio;
+	dot.v.dy*=velRatio;
+	return dot;
+}
 function tempToV(mass, temp){
 	temp = 2*Math.max(0, temp/tConst*gauss(1,.1));
 	return Math.sqrt(temp/mass);
@@ -297,7 +304,7 @@ function loadListener(object, typeName){
 	
 }
 
-function makeSlider(id, attrs, handlers){
+function makeSlider(id, attrs, handlers, initVisibility){
 	//var newDiv = $('<div>');
 	//newDiv.attr({id:id});
 	var div = $('#' + id);
@@ -315,6 +322,9 @@ function makeSlider(id, attrs, handlers){
 			div.bind(eventType, function(event, ui){func.apply(obj, [event,ui])});
 		}
 	}
+	if(initVisibility){
+		div[initVisibility]();
+	}
 	return div;
 }
 
@@ -324,9 +334,9 @@ function showPrompt(prev, prompt){
 	}
 	var block = prompt.block
 	var text = prompt.text;
-	var func = prompt.func;
+	var func = prompt.start;
 	var title = prompt.title;
-	if(block!=curLevel.curBlock){
+	if(block!=curLevel.blockIdx){
 		if(prev && curLevel['block'+prev.block+'CleanUp']){
 			curLevel['block'+prev.block+'CleanUp'].apply(curLevel);
 		}
@@ -334,7 +344,7 @@ function showPrompt(prev, prompt){
 		if(curLevel['block'+block+'Start']){
 			curLevel['block'+block+'Start'].apply(curLevel);
 		}
-		curLevel.curBlock = block;
+		curLevel.blockIdx = block;
 	}
 	$('#prompt').html(text);
 	$('#baseHeader').html(title);
@@ -476,6 +486,8 @@ pConst = 16.1423;
 LtoM3 = .001;
 ATMtoPA = 101325;
 JtoKJ = .001;
+//To get nice numbers with this, 1 mass in here coresponds to weight of 10 H 
+pxToMS = 157.9;
 tConst = 20;
 workConst = .158e-3;//for kJ;
 updateInterval = 30;

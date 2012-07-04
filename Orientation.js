@@ -21,17 +21,13 @@ function Orientation(){
 	this.mousemoveListeners = {listeners:{}, save:{}};
 	this.resetListeners = {listeners:{}, save:{}};
 	this.initListeners = {listeners:{}, save:{}};
-	this.readout = new Readout(15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255),this);
+	this.readout = new Readout(30, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255),this);
 	this.graphs = {}
 	this.promptIdx = -1;
-	this.curBlock=-1;
+	this.blockIdx=-1;
 	this.prompts=[
-		{block:0, title: "one fish", text:"0"},
-		{block:1, title: "two fish", func: function(){
-										removeListener(curLevel, 'wallImpact', 'std'); 
-										addListener(curLevel, 'wallImpact', 'arrow', this.onWallImpactArrow, this)
-									}, 
-									text:"1"},
+		{block:0, title: "one fish", text:"Alright, let’s figure out what temperature looks like.  Above, we have one molecule, and I submit to you that this molecule has a temperature.  The equation for a molecule’s temperature is as follows: 1.5kT = .5mv<sup>2</sup>, where k in the boltzmann constant, T is temperature, m in the molecule’s mass, and v is its velocity.  The slider above changes that molecule’s temperature.  If you double the molecule’s temperature, how will its speed increase?  Try drawing a graph of a hydrogen atom’s velocity with respect to its temperature.  "},
+		{block:1, title: "two fish", text:"1"},
 		{block:1,  title: "red fish", text:"2"},
 	]
 	addSpecies(['spc1', 'spc3', 'spc4']);
@@ -74,10 +70,27 @@ Orientation.prototype = {
 		$('#display').show();
 		$('#textIntro').show();
 		$('#dashIntro').show();
-
-		
 	},
 	block0Start: function(){
+		$('#sliderTemp').show();
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]]);
+		walls.setup();
+		populate('spc4', P(45,35), V(450, 350), 1, 300);
+		var dot = spcs.spc4.dots[0]
+		this.readout.addEntry('temp', "Molecule's temperature:", 'K', this.dataHandler.temp(), 0, 0);
+		this.readout.addEntry('speed', "speed:", 'm/s', dot.speed(),0,0);
+	},
+	block0CleanUp: function(){
+		this.readout.removeEntry('speed');
+		this.readout.removeEntry('temp');
+		$('#sliderTemp').hide();
+	},
+	block1Start: function(){
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]]);
+		walls.setup();
+		populate('spc4', P(45,35), V(450, 350), 400, 200);
+	},
+	block2Start: function(){
 		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
 			[P(300,30), P(510,30), P(510,440), P(300,440)]]);
 		walls.setup();
@@ -85,9 +98,7 @@ Orientation.prototype = {
 		populate('spc4', P(305,75), V(200, 300), 200, 100);
 		
 	},
-	block0CleanUp: function(){
-		alert('omg');
-	},
+
 	startSim: function(){
 		this.hideDash();
 		this.hideText();
@@ -251,8 +262,6 @@ Orientation.prototype = {
 				}
 			},
 		'');
-		
-		
 	},
 	dataRun: function(){
 		var SAPInt = getLen([walls.pts[0][1], walls.pts[0][2], walls.pts[0][3], walls.pts[0][4]])
@@ -268,14 +277,27 @@ Orientation.prototype = {
 	vol: function(){
 		return walls.area(0);// - walls.area(1);
 	},
-
-	
-	clearGraphs: function(){
-		for (var graph in this.graphs){
-			this.graphs[graph].clear();
+	changeTempSlider: function(event, ui){
+		var temp = ui.value;
+		var dot = spcs.spc4.dots[0];
+		for(var spc in spcs){
+			var dots = spcs[spc].dots;
+			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
+				var dot = dots[dotIdx];
+				changeDotTemp(dot, temp);
+			}
 		}
+		this.readout.hardUpdate(temp, 'temp');
+		this.readout.hardUpdate(dot.speed(), 'speed');
 	},
 	reset: function(){
+		var curPrompt = this.prompts[this.promptIdx];
+		if(this['block'+this.blockIdx+'CleanUp']){
+			this['block'+this.blockIdx+'CleanUp']()
+		}
+		if(curPrompt.cleanUp){
+			curPrompt.cleanUp();
+		}	
 		for (var spcName in spcs){
 			depopulate(spcName);
 		}
@@ -287,13 +309,21 @@ Orientation.prototype = {
 		emptyListener(this, 'wallImpact');
 		emptyListener(this, 'dotImpact');
 		emptyListener(this, 'data');
-
+		
 		this.startSim();
 		for (resetListenerName in this.resetListeners.listeners){
 			var func = this.resetListeners.listeners[resetListenerName].func;
 			var obj = this.resetListeners.listeners[resetListenerName].obj;
 			func.apply(obj);
 		}
+		if(this['block'+this.blockIdx+'Start']){
+			this['block'+this.blockIdx+'Start']()
+		}
+		
+		if(curPrompt.start){
+			curPrompt.start();
+		}	
+		
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();

@@ -336,12 +336,6 @@ Reversibility.prototype = {
 		}
 		walls.setupWall(0);
 	},
-	
-	clearGraphs: function(){
-		for (var graph in this.graphs){
-			this.graphs[graph].clear();
-		}
-	},
 	reset: function(){
 		for (var spcName in spcs){
 			depopulate(spcName);
