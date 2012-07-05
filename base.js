@@ -337,10 +337,13 @@ function showPrompt(prev, prompt){
 	var func = prompt.start;
 	var title = prompt.title;
 	if(block!=curLevel.blockIdx){
+		for (var spcName in spcs){
+			depopulate(spcName);
+		}
 		if(prev && curLevel['block'+prev.block+'CleanUp']){
 			curLevel['block'+prev.block+'CleanUp'].apply(curLevel);
 		}
-		curLevel.reset.apply(curLevel);
+
 		if(curLevel['block'+block+'Start']){
 			curLevel['block'+block+'Start'].apply(curLevel);
 		}
@@ -455,6 +458,14 @@ function inherit(reciever, object){
 	for	(var objectName in object){
 		reciever[objectName] = object[objectName];
 	}
+}
+function rms(vals){
+	var sum=0;
+	for (var valIdx=0; valIdx<vals.length; valIdx++){
+		sum+=vals[valIdx]*vals[valIdx]		
+	}
+	sum/=vals.length;
+	return Math.sqrt(sum);
 }
 globalMousePos = P(0,0);
 function mouseOffset(curCanvas){

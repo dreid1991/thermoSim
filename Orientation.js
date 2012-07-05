@@ -21,16 +21,19 @@ function Orientation(){
 	this.mousemoveListeners = {listeners:{}, save:{}};
 	this.resetListeners = {listeners:{}, save:{}};
 	this.initListeners = {listeners:{}, save:{}};
-	this.readout = new Readout(30, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255),this);
+	this.readout = new Readout(30, myCanvas.width-180, 25, '13pt calibri', Col(255,255,255),this);
 	this.graphs = {}
 	this.promptIdx = -1;
 	this.blockIdx=-1;
 	this.prompts=[
-		{block:0, title: "one fish", text:"Alright, let’s figure out what temperature looks like.  Above, we have one molecule, and I submit to you that this molecule has a temperature.  The equation for a molecule’s temperature is as follows: 1.5kT = .5mv<sup>2</sup>, where k in the boltzmann constant, T is temperature, m in the molecule’s mass, and v is its velocity.  The slider above changes that molecule’s temperature.  If you double the molecule’s temperature, how will its speed increase?  Try drawing a graph of a hydrogen atom’s velocity with respect to its temperature.  "},
-		{block:1, title: "two fish", text:"1"},
-		{block:1,  title: "red fish", text:"2"},
+		{block:0, title: "one fish", text:"Alright, let’s figure out what temperature looks like.  Above, we have one molecule, and I submit to you that this molecule has a temperature.  The equation for a molecule’s temperature is as follows: 1.5kT = 0.5mv<sup>2</sup>, where k in the boltzmann constant, T is temperature, m in the molecule’s mass, and v is its velocity.  This tells us that temperature is an expression of molecular kinetic energy.  The slider above changes that molecule’s temperature.  If you double the molecule’s temperature, by what factor will its speed increase?  Try drawing a graph of a hydrogen atom’s velocity with respect to its temperature.  "},
+		{block:1, title: "two fish", text:"Now suppose we have many molecules.  We know from before that we can assign a temperature to each molecule based on its speed and velocity.  We also know that the system as a whole must have a temperature since a thermometer gives only one number.  We can guess that the bulk temperature must be based on the individual molecules’ temperatures, and we’d be right.  The bulk temperature is the average of all the molecules’ temperatures."},
+		{block:2,  title: "red fish", text:"These two containers hold the same type of molecule.  Just so we're on the same page, which of the containers has a higher temperature and why?"},
+		{block:3,  title: "bloo fish", text:"Hopefully you said the one one the left was hotter.  Now how do the temperatures of these two new systems compare?  The masses of the particles are 1 g/mol and 8 g/mol respectively.  Rms (above) stands for root mean squared, which is the average of the square of all of the velocities, square rooted.  This can definitely be related to kinetic energy."},
+		{block:4,  title: "too fish", text:"Okay, last one, I promise.  How do the temperatures of these two compare?  The masses are 2 g/mol and 8 g/mol.  "},
+		//{block:3,  title: "bloo fish", text:"Okay, last one, I promise.  How do the temperatures of these two compare.  The masses are 2 g/mol and 8 g/mol."},
 	]
-	addSpecies(['spc1', 'spc3', 'spc4']);
+	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
 	collide.setup();
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
@@ -79,10 +82,14 @@ Orientation.prototype = {
 		var dot = spcs.spc4.dots[0]
 		this.readout.addEntry('temp', "Molecule's temperature:", 'K', this.dataHandler.temp(), 0, 0);
 		this.readout.addEntry('speed', "speed:", 'm/s', dot.speed(),0,0);
+		this.readout.resetAll();
+		this.readout.show();
+		var temp = spcs.spc4.dots[0].temp();
+		$('#sliderTemp').slider('option', {value:temp});
 	},
 	block0CleanUp: function(){
-		this.readout.removeEntry('speed');
-		this.readout.removeEntry('temp');
+		this.readout.removeAllEntries();
+		this.readout.hide();
 		$('#sliderTemp').hide();
 	},
 	block1Start: function(){
@@ -97,6 +104,40 @@ Orientation.prototype = {
 		populate('spc4', P(45, 80), V(200, 300), 200, 600);
 		populate('spc4', P(305,75), V(200, 300), 200, 100);
 		
+	},
+	block3Start: function(){
+		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
+			[P(300,30), P(510,30), P(510,440), P(300,440)]]);
+		walls.setup();
+		populate('spc3', P(45, 80), V(200, 300), 200, 300);
+		populate('spc5', P(305,75), V(200, 300), 100, 300);
+
+		this.readout.addEntry('rmsV1', 'rms(V1):', 'm/s', rms(this.dataHandler.velocities('spc3')), undefined, 0);
+		
+		this.readout.addEntry('rmsV2', 'rms(V2):', 'm/s', rms(this.dataHandler.velocities('spc5')), undefined, 0);
+
+		this.readout.show();
+	},
+	block3CleanUp: function(){
+		this.readout.removeAllEntries();
+		this.readout.hide();
+	},
+	block4Start: function(){
+		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
+			[P(300,30), P(510,30), P(510,440), P(300,440)]]);
+		walls.setup();
+		populate('spc1', P(45, 80), V(200, 300), 200, 300);
+		populate('spc5', P(305,75), V(200, 300), 100, 800);
+
+		this.readout.addEntry('rmsV1', 'rms(V1):', 'm/s', rms(this.dataHandler.velocities('spc1')), undefined, 0);
+		
+		this.readout.addEntry('rmsV2', 'rms(V2):', 'm/s', rms(this.dataHandler.velocities('spc5')), undefined, 0);
+
+		this.readout.show();
+	},
+	block4CleanUp: function(){
+		this.readout.removeAllEntries();
+		this.readout.hide();
 	},
 
 	startSim: function(){
@@ -127,6 +168,7 @@ Orientation.prototype = {
 
 	},
 	toSim: function(){
+		this.startSim();
 		nextPrompt();
 	},
 	backToSim: function(){

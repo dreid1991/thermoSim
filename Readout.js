@@ -67,6 +67,9 @@ Readout.prototype = {
 		}
 		console.log('Entry does not exist');
 	},
+	removeAllEntries: function(){
+		this.entries = [];
+	},
 	positionEntries: function(){
 		var width = this.rightBound - this.leftBound;
 		var numEntries = this.entries.length;
@@ -105,7 +108,13 @@ Readout.prototype = {
 			var setPt = entry.initVal;
 			this.hardUpdate(setPt, name);
 		}
+		
+	},
+	show: function(){
 		addListener(curLevel, 'update', 'drawReadout', this.draw, this);
 	},
+	hide: function(){
+		removeListener(curLevel, 'update', 'drawReadout');
+	}
 
 }
