@@ -125,7 +125,11 @@ GraphBase.prototype = {
 		var a = this.G.axisInit;
 		var b = this.G.valRange;	
 		if(!(a.x.min<b.x.min && a.x.max>b.x.max)){
-			if(!this.rangeIsSame(oldRange.x, this.G.valRange.x)){
+			if(oldRange){
+				if(!this.rangeIsSame(oldRange.x, this.G.valRange.x)){
+					this.getXBounds();
+				}
+			} else{
 				this.getXBounds();
 			}
 		} else{
@@ -136,7 +140,11 @@ GraphBase.prototype = {
 		var a = this.G.axisInit;
 		var b = this.G.valRange;	
 		if(!(a.y.min<b.y.min && a.y.max>b.y.max)){
-			if(!this.rangeIsSame(oldRange.y, this.G.valRange.y)){
+			if(oldRange){
+				if(!this.rangeIsSame(oldRange.y, this.G.valRange.y)){
+					this.getYBounds();
+				}
+			} else{
 				this.getYBounds();
 			}
 		} else{
@@ -285,7 +293,8 @@ GraphBase.prototype = {
 	},
 	makeHistDataGrabFunc: function(path){
 		return function(address){
-			var data = paths.data;
+			var data = path.data[path.x];
+			
 			return {address:address, data:data[data.length-1]};
 		}
 	},

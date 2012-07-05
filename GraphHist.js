@@ -1,4 +1,4 @@
-function GraphScatter(name, width, height, xLabel, yLabel, axisInit){
+function GraphHist(name, width, height, xLabel, yLabel, axisInit, dataPath){
 	this.base = new GraphBase(this);
 	this.name = name;
 	this.dims = V(width, height);
@@ -31,26 +31,26 @@ function GraphScatter(name, width, height, xLabel, yLabel, axisInit){
 	
 	this.textCol = Col(255, 255, 255);
 	this.graphBoundCol = Col(255,255,255);
-	this.ptStroke = Col(0,0,0);
+	var barCol = Col(255,100,0);
 
 	var canvasData = this.base.makeCanvas(this.name, this.dims);
 	this.graph = canvasData.graph;
 	this.graphHTMLElement = canvasData.HTMLElement;
 	this.base.drawAllBG();
+	this.addSet('only', barCol, dataPath);
 	addListener(curLevel, 'reset', 'clearGraph'+name, this.clear, this);
 }
-/*Good evening:  I am keeping histogram data in data.someName, not just data, even though there is only one for now.
+/*
+Good evening:  I am keeping histogram data in data.someName, not just data, even though there is only one for now.
 Trying to make functions where base references data.someName as reusable as possible
 and leaving open possibility of multiple sets (though that would probably look confusing)
 */
-GraphScatter.prototype = {
-	addSet: function(address, label, barCol, dataPath){
+GraphHist.prototype = {
+	addSet: function(address, barCol, dataPath){
 		var set = {};
-		set.label = label;
 		set.x = [];
 		set.y = [];
-		set.pointCol = pointCol;
-		set.flashCol = flashCol;
+		set.barCol = barCol;
 		set.getLast = this.base.makeHistDataGrabFunc(dataPath);
 		this.data[address] = set;
 		this.base.drawAllBG();
@@ -58,7 +58,7 @@ GraphScatter.prototype = {
 	drawAllData: function(){
 		this.graph.putImageData(this.bg, 0, 0);
 		this.base.drawAxisVals();
-		this.graphPts();
+		this.graphBins();
 	},
 	drawLastData: function(toAdd){
 		for (var addIdx=0; addIdx<toAdd.length; addIdx++){
@@ -81,8 +81,8 @@ GraphScatter.prototype = {
 			theOnlyAddress = address;
 			last = this.data[theOnlyAddress].getLast();
 		}
-		this.data[theOnlyAddress].x = this.data[theOnlyAddress].x.concat(last);
-		this.makeBins;
+		this.data[theOnlyAddress].x = this.data[theOnlyAddress].x.concat(last.data);
+		this.makeBins(theOnlyAddress);
 	},
 
 	plotData: function(vals){
@@ -91,55 +91,65 @@ GraphScatter.prototype = {
 			theOnlyAddress = address;
 		}
 		this.data[theOnlyAddress].x = vals;
-		this.makeBins()
+		this.makeBins(theOnlyAddress)
 	},
 	getAxisBounds: function(){
 		this.base.getXBounds();
 		this.base.getYBounds();
 	},
-	makeBins: function(){
+	makeBins: function(theOnlyAddress){
 		this.valRange.x = this.base.getRange('x');
 		this.base.setAxisBoundsX();
-		this.bins = this.makeBins(this.data[theOnlyAddress].x);
+		this.bins = this.makeBinBlanks(this.data[theOnlyAddress].x);
 		this.populateBins(this.data[theOnlyAddress].x);
+		this.setYAxis();
 		this.drawAllData();
 	},
-	makeBinBlanks: function(data, numBins){
+	makeBinBlanks: function(data){
 		var bins = {};
-		this.binWidth = round((this.axisRange.max - this.axisRange.min)/(this.numBins+1),1);
-		for(var binIdx=0; binIdx<bins.length; binIdx++){
-			min = this.axisRange.min + binWidth*binIdx;
-			bins[String(min)] = 0;
+		this.binWidth = round((this.valRange.x.max - this.valRange.x.min)/(this.numBins-1),1);
+		for(var binIdx=0; binIdx<this.numBins; binIdx++){
+			min = this.valRange.x.min + this.binWidth*binIdx;
+			bins[String(min)] = 0; // hey - if this has a decimal in it, it may break things
 		}
 		return bins;
 	},
 	populateBins: function(data){
 		for (var dataIdx=0; dataIdx<data.length; dataIdx++){
-			var min = this.axisRange.min;
+			var min = this.valRange.x.min;
 			var val = data[dataIdx];
-			var binIdx = Math.floor((val-min)/this.binWidth)*this.binWidth;
+			var binIdx = Math.floor((val-min)/this.binWidth)*this.binWidth + min;
 			this.bins[String(binIdx)]++;
 		}
-	}
-	graphPts: function(){
-		for (var setName in this.data){
-			var dataSet = this.data[setName];
-				if(dataSet.show){
-					var col = dataSet.pointCol;
-					for (var ptIdx=0; ptIdx<dataSet.x.length; ptIdx++){
-						var xVal = dataSet.x[ptIdx];
-						var yVal = dataSet.y[ptIdx];
-						this.graphPt(xVal, yVal, col);
-				}
-			}
+	},
+	setYAxis: function(){
+		var maxCount = 0;
+		for (var binName in this.bins){
+			maxCount = Math.max(this.bins[binName], maxCount);
+		}
+		this.valRange.y.min=0;
+		this.valRange.y.max = maxCount;
+		this.base.setAxisBoundsY();
+	},
+	graphBins: function(){
+		var theData = '';
+		for (var dataName in this.data){
+			theData = dataName;
+		}
+		var barCol = this.data[theData].barCol
+		for (var binName in this.bins){
+			var xULPt = parseFloat(binName);
+			var yULPt = this.bins[binName];
+			var xLRPt = parseFloat(binName) + this.binWidth;
+			var yLRPt = 0;
+			
+			var ULCoord = P(this.base.translateValToCoord(xULPt, 'x'), this.base.translateValToCoord(yULPt, 'y'));
+			var LRCoord = P(this.base.translateValToCoord(xLRPt, 'x'), this.base.translateValToCoord(yLRPt, 'y'));
+			var dims = ULCoord.VTo(LRCoord);
+			
+			draw.fillStrokeRect(ULCoord, dims, barCol, this.bgCol, this.graph);
 		}
 	},
-	graphPt: function(xVal, yVal, col){
-		var xPt = this.base.translateValToCoord(xVal, 'x');
-		var yPt = this.base.translateValToCoord(yVal, 'y');
-		this.drawPtStd(xPt, yPt, col);
-	},
-
 	drawPtStd: function(x, y, col){
 		this.drawPt(x, y, col, this.characLen);
 	},
@@ -152,9 +162,6 @@ GraphScatter.prototype = {
 		var pts = [pt1, pt2, pt3, pt4];
 		draw.fillPtsStroke(pts, col, this.ptStroke, this.graph);
 	},
-
-
-
 	clear: function(){
 		this.base.clear()
 	},
