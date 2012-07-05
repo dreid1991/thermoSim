@@ -30,8 +30,8 @@ function Orientation(){
 		{block:1, title: "two fish", text:"Now suppose we have many molecules.  We know from before that we can assign a temperature to each molecule based on its speed and velocity.  We also know that the system as a whole must have a temperature since a thermometer gives only one number.  We can guess that the bulk temperature must be based on the individual molecules’ temperatures, and we’d be right.  The bulk temperature is the average of all the molecules’ temperatures."},
 		{block:2,  title: "red fish", text:"These two containers hold the same type of molecule.  Just so we're on the same page, which of the containers has a higher temperature and why?"},
 		{block:3,  title: "bloo fish", text:"Hopefully you said the one one the left was hotter.  Now how do the temperatures of these two new systems compare?  The masses of the particles are 1 g/mol and 8 g/mol respectively.  Rms (above) stands for root mean squared, which is the average of the square of all of the velocities, square rooted.  This can definitely be related to kinetic energy."},
-		{block:4,  title: "too fish", text:"Okay, last one, I promise.  How do the temperatures of these two compare?  The masses are 2 g/mol and 8 g/mol.  "},
-		//{block:3,  title: "bloo fish", text:"Okay, last one, I promise.  How do the temperatures of these two compare.  The masses are 2 g/mol and 8 g/mol."},
+		{block:4,  title: "too fish", text:"Okay, last one, I promise.  How do the temperatures of these two compare?  The masses are 3 g/mol and 8 g/mol."},
+		{block:5,  title: "", text:""},
 	]
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
 	collide.setup();
@@ -75,6 +75,7 @@ Orientation.prototype = {
 		$('#dashIntro').show();
 	},
 	block0Start: function(){
+		$('#clearGraphs').hide();
 		$('#sliderTemp').show();
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]]);
 		walls.setup();
@@ -139,7 +140,24 @@ Orientation.prototype = {
 		this.readout.removeAllEntries();
 		this.readout.hide();
 	},
-
+	block5Start: function(){
+		saveListener(curLevel, 'update');
+		emptyListener(curLevel, 'update');
+		$('#reset').hide();
+		$('#canvasDiv').hide();
+		$('#display').show();
+		$('#intText').show();
+		$('#intText').html("Okay, we had three comparisons.  In the first, we had identical gases where the molecule in one chamber moved more quickly.  The fast moving one was hotter here because it had a higher average kinetic energy. </p><p>In the second set, with a light gas and a heavy gas, the root mean squareds of the velocities were different, but if you computed 0.5*m*rms(V)<sup>2</sup>, you found that the kinetic energies of the two were equal, showing that they were the same temperature.  So, molecular speed alone doesn’t tell us about temperature.  We need to know the particle mass as well.</p><p>Finally, we had the two containers with equal speeds but different masses.  The temperatures can be calculated like in the last set, but that’s not necessary.  We can know that since temperature is an expression of <i>energy</i>, and since their speeds were the same, the one with less mass must have less energy and thus a lower temperature. </p><p>To restate, higher temperature doesn’t necessarily mean your gas is moving at a higher speed.  It means your gas is moving with <i>more energy</i>.</p>");
+	},
+	block5CleanUp: function(){
+		loadListener(curLevel, 'update');
+		$('#reset').show();
+		$('#canvasDiv').show();
+		$('#display').hide();
+		$('#intText').hide();
+		$('#intText').html("");	
+	},
+	
 	startSim: function(){
 		this.hideDash();
 		this.hideText();
@@ -371,6 +389,7 @@ Orientation.prototype = {
 		$('#dashOutro').hide();
 	},
 	hideText: function(){
+		$('#intText').hide();
 		$('#textIntro').hide();
 		$('#textOutro').hide();
 	},
