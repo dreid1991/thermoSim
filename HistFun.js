@@ -1,10 +1,7 @@
-function Orientation(){
+function HistFun(){
 	this.dataHandler = new DataHandler();
 	this.data = {};
-	this.data.t = [];
-	this.data.pInt = [];
 	this.data.v = [];
-	this.data.e = [];
 	this.eUnits = 'kJ';
 	this.bgCol = Col(5, 17, 26);
 	this.wallCol = Col(255,255,255);
@@ -30,7 +27,7 @@ function Orientation(){
 		{block:1, title: "two fish", text:"1"},
 		{block:1,  title: "red fish", text:"2"},
 	]
-	addSpecies(['spc1', 'spc3', 'spc4']);
+	addSpecies(['spc1']);
 	collide.setup();
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
@@ -39,7 +36,7 @@ function Orientation(){
 
 }
 
-Orientation.prototype = {
+HistFun.prototype = {
 	init: function(){
 		this.hideDash();
 		this.hideText();
@@ -75,29 +72,16 @@ Orientation.prototype = {
 		$('#sliderTemp').show();
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]]);
 		walls.setup();
-		populate('spc4', P(45,35), V(450, 350), 1, 300);
-		var dot = spcs.spc4.dots[0]
-		this.readout.addEntry('temp', "Molecule's temperature:", 'K', this.dataHandler.temp(), 0, 0);
-		this.readout.addEntry('speed', "speed:", 'm/s', dot.speed(),0,0);
+		populate('spc1', P(45,35), V(450, 350), 1000, 300);
+		this.graphs.vHist = new GraphHist('v', 400, 300, 'v', 'num', {x:{min:0, step:4}, y:{min:0, step:4}}, {data:curLevel.data, x:'v'});
 	},
 	block0CleanUp: function(){
 		this.readout.removeEntry('speed');
 		this.readout.removeEntry('temp');
 		$('#sliderTemp').hide();
 	},
-	block1Start: function(){
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]]);
-		walls.setup();
-		populate('spc4', P(45,35), V(450, 350), 400, 200);
-	},
-	block2Start: function(){
-		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
-			[P(300,30), P(510,30), P(510,440), P(300,440)]]);
-		walls.setup();
-		populate('spc4', P(45, 80), V(200, 300), 200, 600);
-		populate('spc4', P(305,75), V(200, 300), 200, 100);
-		
-	},
+
+
 
 	startSim: function(){
 		this.hideDash();
@@ -232,14 +216,12 @@ Orientation.prototype = {
 	onWallImpact: function(dot, line, wallUV, perpV){
 		var vo = dot.v.copy();
 		if(line[0]==0 && line[1]==0){
-			
-			var pt = walls.pts[line[0]][line[1]]; 
+				var pt = walls.pts[line[0]][line[1]]; 
 			dot.v.dy = -dot.v.dy + 2*this.wallV;
 			dot.y = pt.y+dot.r;	
 			
 		}else{
 			walls.impactStd(dot, wallUV, perpV);
-			this.forceInternal += 2*dot.m*Math.abs(perpV);
 		}
 		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}
 	},
@@ -253,6 +235,7 @@ Orientation.prototype = {
 		var arrowTurn = 0;
 		var arrow = new Arrow(arrowPts, Col(255,0,0),c);
 		addListener(curLevel, 'update', 'drawArrow'+hitResult.pos.x+hitResult.pos.y,
+			
 			function(){
 				arrow.draw();
 				arrowTurn++;
@@ -263,14 +246,10 @@ Orientation.prototype = {
 		'');
 	},
 	dataRun: function(){
-		var SAPInt = getLen([walls.pts[0][1], walls.pts[0][2], walls.pts[0][3], walls.pts[0][4]])
-		this.data.pInt.push(this.dataHandler.pressureInt(this.forceInternal, this.numUpdates, SAPInt));
-		this.data.t.push(this.dataHandler.temp());
-		this.data.v.push(this.dataHandler.volOneWall());
-		this.forceInternal = 0;
-		for(var graphName in this.graphs){
-			this.graphs[graphName].addLast();
-		}
+		this.data.v.push(this.dataHandler.velocities('spc1'));
+		this.graphs.vHist.addLast();
+		
+		
 	},
 	vol: function(){
 		return walls.area(0);// - walls.area(1);

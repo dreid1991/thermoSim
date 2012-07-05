@@ -24,6 +24,17 @@ DataHandler.prototype = {
 		return t;
 		
 	},
+	velocities: function(spcName){
+		var spc = spcs[spcName];
+		var numDots = spc.dots.length
+		var velocities = new Array(numDots);
+		
+		for (var dotIdx=0; dotIdx<numDots; dotIdx++){
+			var dot = spc.dots[dotIdx];
+			velocities[dotIdx] = dot.speed();
+		}
+		return velocities;
+	},
 	volOneWall: function(){
 		return walls.area(0)*vConst;
 	},

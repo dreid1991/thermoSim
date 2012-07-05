@@ -16,7 +16,7 @@ function GraphHist(name, width, height, xLabel, yLabel, axisInit, dataPath){
 	this.yEnd = .05;
 	this.gridSpacing = 40;
 	this.hashMarkLen = 10;
-	this.numBins = 8;
+	this.numBins = 18;
 	var numGridLinesX = Math.ceil(this.dims.dx*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing);
 	var numGridLinesY = Math.ceil(this.dims.dy*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
 	this.numGridLines = {x:numGridLinesX, y:numGridLinesY};
@@ -71,8 +71,6 @@ GraphHist.prototype = {
 			}
 		}	
 	},
-
-
 	addLast: function(){
 		var toAdd = [];
 		var theOnlyAddress = '';
@@ -84,7 +82,6 @@ GraphHist.prototype = {
 		this.data[theOnlyAddress].x = this.data[theOnlyAddress].x.concat(last.data);
 		this.makeBins(theOnlyAddress);
 	},
-
 	plotData: function(vals){
 		var theOnlyAddress = '';
 		for(var address in this.data){
@@ -149,18 +146,6 @@ GraphHist.prototype = {
 			
 			draw.fillStrokeRect(ULCoord, dims, barCol, this.bgCol, this.graph);
 		}
-	},
-	drawPtStd: function(x, y, col){
-		this.drawPt(x, y, col, this.characLen);
-	},
-	drawPt: function(x, y, col, characLen){
-		var len = characLen;
-		var pt1 = P(x-len, y);
-		var pt2 = P(x, y-len);
-		var pt3 = P(x+len, y);
-		var pt4 = P(x, y+len);
-		var pts = [pt1, pt2, pt3, pt4];
-		draw.fillPtsStroke(pts, col, this.ptStroke, this.graph);
 	},
 	clear: function(){
 		this.base.clear()

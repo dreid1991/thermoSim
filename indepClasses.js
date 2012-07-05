@@ -174,6 +174,7 @@ Dot.prototype = {
 		return this.KE()*tConst;
 	},
 	speed: function(){
-		return pxToMS*Math.sqrt(this.temp()/(this.m*10));
+		return this.v.mag()*pxToMS;
+		//return pxToMS*Math.sqrt(this.temp()/(this.m*10));
 	}
 }
