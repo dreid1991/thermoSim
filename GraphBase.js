@@ -1,6 +1,6 @@
 function GraphBase(parent){
 	this.G = parent;
-	this.checkMarkOversize = 3;
+	addListener(curLevel, 'reset', 'clearGraph'+this.G.name, this.clear, this);
 };
 GraphBase.prototype = {
 	makeCanvas: function(name, dims){
@@ -77,7 +77,7 @@ GraphBase.prototype = {
 			this.drawLegendToggle(entryName);
 			var font = this.G.legendFont
 			draw.text(text.text, P(text.x, text.y),  this.G.legendFont, this.G.textCol, 'left', 0, this.G.graph);
-			this.G.drawPtStd(pt.x, pt.y, pt.col);
+			this.G.drawPtStd(pt, pt.col);
 		}
 	},
 	addPts: function(toAdd){
@@ -298,24 +298,23 @@ GraphBase.prototype = {
 			return {address:address, data:data[data.length-1]};
 		}
 	},
-	translateValToCoord: function(val, axis){
-		var range = this.G.axisRange[axis].max - this.G.axisRange[axis].min;
-		var coord;
-		if(axis=='x'){
-			coord = this.G.gridSpacing*(this.G.numGridLines.x-1)*(val-this.G.axisRange.x.min)/range + this.G.xStart*this.G.dims.dx;
-		}else if(axis=='y'){
-			coord = this.G.dims.dy - (this.G.gridSpacing*(this.G.numGridLines.y-1)*(val-this.G.axisRange.y.min)/range + (1-this.G.yStart)*this.G.dims.dy);
-		}
-		return coord;
+	translateValToCoord: function(val){
+		var rangeX = this.G.axisRange.x.max - this.G.axisRange.x.min;
+		var rangeY = this.G.axisRange.y.max - this.G.axisRange.y.min;
+		var x = this.G.gridSpacing*(this.G.numGridLines.x-1)*(val.x-this.G.axisRange.x.min)/rangeX + this.G.xStart*this.G.dims.dx;
+		var y = this.G.dims.dy - (this.G.gridSpacing*(this.G.numGridLines.y-1)*(val.y-this.G.axisRange.y.min)/rangeY + (1-this.G.yStart)*this.G.dims.dy);
+		return P(x,y);
 	},
 	flashInit: function(pts){
 		this.flashers = [];
 		for (var flashIdx=0; flashIdx<pts.length; flashIdx++){
 			var pt = pts[flashIdx];
 			if(this.G.data[pt.address].show){
-				var x = this.translateValToCoord(pt.x, 'x');
-				var y = this.translateValToCoord(pt.y, 'y');
-				var pos = P(x, y);
+
+
+				var pos = this.translateValToCoord(pt);
+				var x = pos.x;
+				var y = pos.y;
 				var pointCol = this.G.data[pt.address].pointCol;
 				var flashCol = this.G.data[pt.address].flashCol;
 				var curCol = Col(flashCol.r, flashCol.g, flashCol.b);
@@ -335,7 +334,7 @@ GraphBase.prototype = {
 
 		for (var flasherIdx=0; flasherIdx<this.flashers.length; flasherIdx++){
 			var flasher = this.flashers[flasherIdx];
-			this.G.drawPt(flasher.pos.x, flasher.pos.y, flasher.curCol, flasher.curCharacLen);
+			this.G.drawPt(flasher.pos, flasher.curCol, flasher.curCharacLen);
 			this.flasherNextStep(flasher);
 		}
 		if(this.doneFlashing()){

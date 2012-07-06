@@ -140,8 +140,8 @@ GraphHist.prototype = {
 			var xLRPt = parseFloat(binName) + this.binWidth;
 			var yLRPt = 0;
 			
-			var ULCoord = P(this.base.translateValToCoord(xULPt, 'x'), this.base.translateValToCoord(yULPt, 'y'));
-			var LRCoord = P(this.base.translateValToCoord(xLRPt, 'x'), this.base.translateValToCoord(yLRPt, 'y'));
+			var ULCoord = this.base.translateValToCoord(P(xULPt,yULPt));
+			var LRCoord = this.base.translateValToCoord(P(xLRPt,yLRPt));
 			var dims = ULCoord.VTo(LRCoord);
 			
 			draw.fillStrokeRect(ULCoord, dims, barCol, this.bgCol, this.graph);

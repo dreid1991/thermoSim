@@ -1,6 +1,6 @@
 function GraphScatter(name, width, height, xLabel, yLabel, axisInit){
-	this.base = new GraphBase(this);
 	this.name = name;
+	this.base = new GraphBase(this);
 	this.dims = V(width, height);
 	
 	this.xLabel = xLabel;
@@ -46,7 +46,7 @@ function GraphScatter(name, width, height, xLabel, yLabel, axisInit){
 	this.graph = canvasData.graph;
 	this.graphHTMLElement = canvasData.HTMLElement;
 	this.base.drawAllBG();
-	addListener(curLevel, 'reset', 'clearGraph'+name, this.clear, this);
+	
 }
 GraphScatter.prototype = {
 	addSet: function(address, label, pointCol, flashCol, dataPaths){
@@ -126,15 +126,16 @@ GraphScatter.prototype = {
 		}
 	},
 	graphPt: function(xVal, yVal, col){
-		var xPt = this.base.translateValToCoord(xVal, 'x');
-		var yPt = this.base.translateValToCoord(yVal, 'y');
-		this.drawPtStd(xPt, yPt, col);
+		var pt = this.base.translateValToCoord(P(xVal,yVal));
+		this.drawPtStd(pt, col);
 	},
 
-	drawPtStd: function(x, y, col){
-		this.drawPt(x, y, col, this.characLen);
+	drawPtStd: function(pt, col){
+		this.drawPt(pt, col, this.characLen);
 	},
-	drawPt: function(x, y, col, characLen){
+	drawPt: function(pt, col, characLen){
+		var x = pt.x;
+		var y = pt.y;
 		var len = characLen;
 		var pt1 = P(x-len, y);
 		var pt2 = P(x, y-len);

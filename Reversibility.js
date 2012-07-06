@@ -113,6 +113,24 @@ Reversibility.prototype = {
 		
 		
 	},
+	block0Start: function(){
+		this.addDots();
+
+		this.numUpdates = 0;
+		walls = undefined;
+		walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
+		walls.setup();
+		this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
+		this.forceInternal = 0;
+		for (resetListenerName in this.resetListeners.listeners){
+			var func = this.resetListeners.listeners[resetListenerName].func;
+			var obj = this.resetListeners.listeners[resetListenerName].obj;
+			func.apply(obj);
+		}	
+	},	
+	block1Start: function(){this.block0Start();},	
+	block2Start: function(){this.block0Start();},
+	block3Start: function(){this.block0Start();},
 	startSim: function(){
 
 		this.hideDash();
@@ -145,6 +163,7 @@ Reversibility.prototype = {
 
 	},
 	toSim: function(){
+		this.startSim();
 		nextPrompt();
 	},
 	backToSim: function(){
@@ -324,10 +343,8 @@ Reversibility.prototype = {
 		walls.setupWall(0);
 	},
 	reset: function(){
-		for (var spcName in spcs){
-			depopulate(spcName);
-		}
 		this.addDots();
+		this.dragWeights.dropAllInBins();
 		this.numUpdates = 0;
 		walls = undefined;
 		walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
@@ -339,11 +356,13 @@ Reversibility.prototype = {
 		emptyListener(this, 'dotImpact');
 		emptyListener(this, 'data');
 		this.startSim();
+		
 		for (resetListenerName in this.resetListeners.listeners){
 			var func = this.resetListeners.listeners[resetListenerName].func;
 			var obj = this.resetListeners.listeners[resetListenerName].obj;
 			func.apply(obj);
 		}
+		
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();
