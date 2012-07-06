@@ -29,9 +29,11 @@ function Orientation(){
 		{block:0, title: "one fish", text:"Alright, let’s figure out what temperature looks like.  Above, we have one molecule, and I submit to you that this molecule has a temperature.  The equation for a molecule’s temperature is as follows: 1.5kT = 0.5mv<sup>2</sup>, where k in the boltzmann constant, T is temperature, m in the molecule’s mass, and v is its velocity.  This tells us that temperature is an expression of molecular kinetic energy.  The slider above changes that molecule’s temperature.  If you double the molecule’s temperature, by what factor will its speed increase?  Try drawing a graph of a hydrogen atom’s velocity with respect to its temperature.  "},
 		{block:1, title: "two fish", text:"Now suppose we have many molecules.  We know from before that we can assign a temperature to each molecule based on its speed and velocity.  We also know that the system as a whole must have a temperature since a thermometer gives only one number.  We can guess that the bulk temperature must be based on the individual molecules’ temperatures, and we’d be right.  The bulk temperature is the average of all the molecules’ temperatures."},
 		{block:2,  title: "red fish", text:"These two containers hold the same type of molecule.  Just so we're on the same page, which of the containers has a higher temperature and why?"},
-		{block:3,  title: "bloo fish", text:"Hopefully you said the one one the left was hotter.  Now how do the temperatures of these two new systems compare?  The masses of the particles are 1 g/mol and 8 g/mol respectively.  Rms (above) stands for root mean squared, which is the average of the square of all of the velocities, square rooted.  This can definitely be to calculate kinetic energy."},
+		{block:3,  title: "bloo fish", text:"Hopefully you said the one one the left was hotter.  Now how do the temperatures of these two new systems compare?  The masses of the particles are 1 g/mol and 8 g/mol respectively.  Rms (above) stands for <a href=http://en.wikipedia.org/wiki/Root_mean_square>root mean squared</a>, which is the average of the square of all of the velocities, square rooted.  This can definitely be used to calculate kinetic energy. "},
 		{block:4,  title: "too fish", text:"Okay, last one, I promise.  How do the temperatures of these two compare?  The masses are 3 g/mol and 8 g/mol."},
 		{block:5,  title: "", text:""},
+		{block:6,  title: "zoo fish", text:"Let’s start with pressure.  As you can see, this gas has some pressure.  It’s easy to think of pressure as being caused by an amorphous blob of gas pushing generally out against its container, but I don’t think that’s the most useful way to frame it.  Like we did with temperature, we’re going to build up the concept of pressure starting from one molecule."},
+		{block:7,  title: "quail", text:"YOU GET NO TEXT"},
 	]
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
 	collide.setup();
@@ -147,7 +149,7 @@ Orientation.prototype = {
 		$('#canvasDiv').hide();
 		$('#display').show();
 		$('#intText').show();
-		$('#intText').html("So, we had three comparisons.  In the first, we had identical gases where the molecule in one chamber moved more quickly.  The fast moving one was hotter here because it had a higher average kinetic energy. </p><p>In the second set, with a light gas and a heavy gas, the root mean squareds of the velocities were different, but if you computed 0.5*m*rms(V)<sup>2</sup>, you found that the kinetic energies of the two were equal, showing that they were the same temperature.  So, molecular speed alone doesn’t tell us about temperature.  We need to know the particle mass as well.</p><p>Finally, we had the two containers with equal speeds but different masses.  The temperatures can be calculated like in the last set, but that’s not necessary.  We can know that since temperature is an expression of <i>energy</i>, and since their speeds were the same, the one with less mass must have less energy and thus a lower temperature. </p><p>To restate, higher temperature doesn’t necessarily mean your gas is moving at a higher speed.  It means your gas molecules are moving with <i>more energy</i>.</p>");
+		$('#intText').html("So, we had three comparisons.  In the first, we had identical gases where the molecules in one chamber moved more quickly.  The fast moving one was hotter here because its molecules had a higher average kinetic energy. </p><p>In the second set, with a light gas and a heavy gas, the root mean squareds of the velocities were different, but if you computed 0.5*m*rms(V)<sup>2</sup>, you found that the kinetic energies of the two were equal, showing that they were the same temperature.  So, molecular speed alone doesn’t tell us about temperature.  We need to know the particle mass as well.</p><p>Finally, we had the two containers with equal speeds but different masses.  The temperatures can be calculated like in the last set, but that’s not necessary.  We can know that since temperature is an expression of <i>energy</i>, and since their speeds were the same, the one with less mass must have less energy and thus a lower temperature. </p><p>To restate, higher temperature doesn’t necessarily mean your gas is moving at a higher speed.  It means your gas molecules are moving with <i>more energy</i>.</p>");
 	},
 	block5CleanUp: function(){
 		loadListener(curLevel, 'update');
@@ -157,7 +159,43 @@ Orientation.prototype = {
 		$('#intText').hide();
 		$('#intText').html("");	
 	},
-	
+	block6Start: function(){
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]]);
+		walls.setup();
+		populate('spc1', P(45,35), V(450, 350), 600, 300);
+		populate('spc3', P(45,35), V(450, 350), 800, 300);
+		this.forceInternal=0;
+		this.numUpdates=0;
+		this.readout.addEntry('pressure', 'Pressure:', 'atm', 0, 0, 1);
+		this.readout.show();
+		addListener(curLevel, 'data', 'recordPressure', 
+			function(){
+				var SAPInt = walls.surfArea()
+				var newP = this.dataHandler.pressureInt(this.forceInternal, this.numUpdates, SAPInt);
+				this.data.pInt.push(newP);
+				this.readout.tick(newP, 'pressure')
+			},
+			this);
+	},
+	block6CleanUp: function(){
+		this.readout.removeAllEntries();
+		this.readout.show();
+		removeListener(curLevel, 'data', 'recordPressure');
+	},
+	block7Start: function(){
+		walls = new WallHandler([[P(50,75), P(75,50), P(400,50), P(425,75), P(425,300), P(400,325), P(75,325), P(50,300)]]);
+		walls.setup();
+		populate('spc4', P(100,100), V(300,200), 1, 700);
+		removeListener(curLevel, 'wallImpact', 'std');
+		addListener(curLevel, 'wallImpact', 'arrow', this.onWallImpactArrow, this);
+		$('#sliderPressure').show();
+		
+	},
+	block7CleanUp: function(){
+		$('#sliderPressure').hide();
+		removeListener(curLevel, 'wallImpact', 'arrow');
+		addListener(curLevel, 'wallImpact', 'std', this.onWallImpact, this);
+	},
 	startSim: function(){
 		this.hideDash();
 		this.hideText();
@@ -271,6 +309,7 @@ Orientation.prototype = {
 			listener.func.apply(listener.obj);
 		}
 		this.numUpdates = 0;
+		this.forceInternal = 0;
 	},
 	updateRun: function(){
 		move();
@@ -291,16 +330,8 @@ Orientation.prototype = {
 	},
 	onWallImpact: function(dot, line, wallUV, perpV){
 		var vo = dot.v.copy();
-		if(line[0]==0 && line[1]==0){
-			
-			var pt = walls.pts[line[0]][line[1]]; 
-			dot.v.dy = -dot.v.dy + 2*this.wallV;
-			dot.y = pt.y+dot.r;	
-			
-		}else{
-			walls.impactStd(dot, wallUV, perpV);
-			this.forceInternal += 2*dot.m*Math.abs(perpV);
-		}
+		walls.impactStd(dot, wallUV, perpV);
+		this.forceInternal += 2*dot.m*Math.abs(perpV);
 		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}
 	},
 	onWallImpactArrow: function(dot, line, wallUV, perpV){
@@ -323,11 +354,10 @@ Orientation.prototype = {
 		'');
 	},
 	dataRun: function(){
-		var SAPInt = getLen([walls.pts[0][1], walls.pts[0][2], walls.pts[0][3], walls.pts[0][4]])
-		this.data.pInt.push(this.dataHandler.pressureInt(this.forceInternal, this.numUpdates, SAPInt));
+
 		this.data.t.push(this.dataHandler.temp());
 		this.data.v.push(this.dataHandler.volOneWall());
-		this.forceInternal = 0;
+		
 		for(var graphName in this.graphs){
 			this.graphs[graphName].addLast();
 		}
@@ -337,16 +367,14 @@ Orientation.prototype = {
 	},
 	changeTempSlider: function(event, ui){
 		var temp = ui.value;
+		changeAllTemp(temp);
 		var dot = spcs.spc4.dots[0];
-		for(var spc in spcs){
-			var dots = spcs[spc].dots;
-			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
-				var dot = dots[dotIdx];
-				changeDotTemp(dot, temp);
-			}
-		}
 		this.readout.hardUpdate(temp, 'temp');
 		this.readout.hardUpdate(dot.speed(), 'speed');
+	},
+	changePressureSlider: function(event, ui){
+		var temp = ui.value;
+		changeAllTemp(temp);
 	},
 	reset: function(){
 		var curPrompt = this.prompts[this.promptIdx];

@@ -38,6 +38,7 @@
 				<button id='clearGraphs' class='noSelect'>Clear graphs</button>
 				<br>
 				<div id='sliderTemp' style='width:300px'></div>
+				<div id='sliderPressure' style='width:300px'></div>
 			</center>
 		</div>
 
@@ -93,12 +94,24 @@ $(function(){
 	makeSlider(
 		"sliderTemp", 
 		{
-		min:100, 
-		max:2000, 
-		value:300, 
+			min:100, 
+			max:2000, 
+			value:300, 
 		},
 		[
-		{eventType:'slide', obj:curLevel, func:curLevel.changeTempSlider},
+			{eventType:'slide', obj:curLevel, func:curLevel.changeTempSlider},
+		],
+		'hide'
+	);
+	makeSlider(
+		"sliderPressure",
+		{
+			min:100,
+			max:2000,
+			value:300,
+		},
+		[
+			{eventType:'slide', obj:curLevel, func:curLevel.changePressureSlider},
 		],
 		'hide'
 	);

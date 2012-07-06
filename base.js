@@ -231,6 +231,15 @@ function depopulate(name){
 	var spc = spcs[name];
 	spc.dots = [];
 }
+function changeAllTemp(temp){
+	for(var spc in spcs){
+		var dots = spcs[spc].dots;
+		for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
+			var dot = dots[dotIdx];
+			changeDotTemp(dot, temp);
+		}
+	}
+}
 function changeDotTemp(dot, temp){
 	var curTemp = dot.temp();
 	var velRatio = Math.sqrt(temp/curTemp);
