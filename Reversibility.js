@@ -127,6 +127,8 @@ Reversibility.prototype = {
 			var obj = this.resetListeners.listeners[resetListenerName].obj;
 			func.apply(obj);
 		}	
+		//HEY - MAKE CLEAR GRAPHS AND RESET WORK
+		this.readout.show();
 	},	
 	block1Start: function(){this.block0Start();},	
 	block2Start: function(){this.block0Start();},
@@ -363,6 +365,11 @@ Reversibility.prototype = {
 			func.apply(obj);
 		}
 		
+	},
+	clearGraphs: function(){
+		for (var graphName in this.graphs){
+			this.graphs[graphName].clear();
+		}
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();

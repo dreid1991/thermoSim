@@ -264,9 +264,10 @@ GraphBase.prototype = {
 	clear: function(){
 		for (var set in this.G.data){
 			var data = this.G.data[set];
-			for(var dataBit in data){
+			for(var dataBitName in data){
+				var dataBit = data[dataBitName];
 				if(dataBit instanceof Array){
-					data[dataBit]=[];
+					data[dataBitName]=[];
 				}
 			}
 		}

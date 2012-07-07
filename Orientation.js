@@ -28,12 +28,14 @@ function Orientation(){
 	this.prompts=[
 		{block:0, title: "one fish", text:"Alright, let’s figure out what temperature looks like.  Above, we have one molecule, and I submit to you that this molecule has a temperature.  The equation for a molecule’s temperature is as follows: 1.5kT = 0.5mv<sup>2</sup>, where k in the boltzmann constant, T is temperature, m in the molecule’s mass, and v is its velocity.  This tells us that temperature is an expression of molecular kinetic energy.  The slider above changes that molecule’s temperature.  If you double the molecule’s temperature, by what factor will its speed increase?  Try drawing a graph of a hydrogen atom’s velocity with respect to its temperature.  "},
 		{block:1, title: "two fish", text:"Now suppose we have many molecules.  We know from before that we can assign a temperature to each molecule based on its speed and velocity.  We also know that the system as a whole must have a temperature since a thermometer gives only one number.  We can guess that the bulk temperature must be based on the individual molecules’ temperatures, and we’d be right.  The bulk temperature is the average of all the molecules’ temperatures."},
-		{block:2,  title: "red fish", text:"These two containers hold the same type of molecule.  Just so we're on the same page, which of the containers has a higher temperature and why?"},
-		{block:3,  title: "bloo fish", text:"Hopefully you said the one one the left was hotter.  Now how do the temperatures of these two new systems compare?  The masses of the particles are 1 g/mol and 8 g/mol respectively.  Rms (above) stands for <a href=http://en.wikipedia.org/wiki/Root_mean_square>root mean squared</a>, which is the average of the square of all of the velocities, square rooted.  This can definitely be used to calculate kinetic energy. "},
-		{block:4,  title: "too fish", text:"Okay, last one, I promise.  How do the temperatures of these two compare?  The masses are 3 g/mol and 8 g/mol."},
-		{block:5,  title: "", text:""},
-		{block:6,  title: "zoo fish", text:"Let’s start with pressure.  As you can see, this gas has some pressure.  It’s easy to think of pressure as being caused by an amorphous blob of gas pushing generally out against its container, but I don’t think that’s the most useful way to frame it.  Like we did with temperature, we’re going to build up the concept of pressure starting from one molecule."},
-		{block:7,  title: "quail", text:"YOU GET NO TEXT"},
+		{block:2, title: "red fish", text:"These two containers hold the same type of molecule.  Just so we're on the same page, which of the containers has a higher temperature and why?"},
+		{block:3, title: "bloo fish", text:"Hopefully you said the one one the left was hotter.  Now how do the temperatures of these two new systems compare?  The masses of the particles are 1 g/mol and 8 g/mol respectively.  Rms (above) stands for <a href=http://en.wikipedia.org/wiki/Root_mean_square#Definition>root mean squared</a>, which is the average of the square of all of the velocities, square rooted.  This can definitely be used to calculate kinetic energy. "},
+		{block:4, title: "too fish", text:"Okay, last one, I promise.  How do the temperatures of these two compare?  The masses are 3 g/mol and 8 g/mol."},
+		{block:5, title: "", text:""},
+		{block:6, title: "zoo fish", text:"Okay, let’s look at pressure.  A pressure is a force per area.  This tells us that gases at non-zero pressure must exert a force on their container.  In the system above, what event causes a force to be exerted on the wall?"},
+		{block:7, title: "quail", text:"It might be simpler if we look at just one molecule.  Every time the molecule hits the wall, its momentum changes.  A force is a momentum change per time.  If we want an average pressure, we can define time as the average time between collisions.  How would the momentum change and the frequency of collision change with velocity?  When you’re done playing here, we can go through the math on the next page."},
+		{block:8, title: "", text:"", start:this.block80Start},
+		{block:8, title: "", text:"", start:this.block81Start},
 	]
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
 	collide.setup();
@@ -149,7 +151,10 @@ Orientation.prototype = {
 		$('#canvasDiv').hide();
 		$('#display').show();
 		$('#intText').show();
-		$('#intText').html("So, we had three comparisons.  In the first, we had identical gases where the molecules in one chamber moved more quickly.  The fast moving one was hotter here because its molecules had a higher average kinetic energy. </p><p>In the second set, with a light gas and a heavy gas, the root mean squareds of the velocities were different, but if you computed 0.5*m*rms(V)<sup>2</sup>, you found that the kinetic energies of the two were equal, showing that they were the same temperature.  So, molecular speed alone doesn’t tell us about temperature.  We need to know the particle mass as well.</p><p>Finally, we had the two containers with equal speeds but different masses.  The temperatures can be calculated like in the last set, but that’s not necessary.  We can know that since temperature is an expression of <i>energy</i>, and since their speeds were the same, the one with less mass must have less energy and thus a lower temperature. </p><p>To restate, higher temperature doesn’t necessarily mean your gas is moving at a higher speed.  It means your gas molecules are moving with <i>more energy</i>.</p>");
+		$('#intText').html("So, we had three comparisons.  In the first, we had identical gases where the molecules in one chamber moved more quickly.  The fast moving one was hotter here because its molecules had a higher average kinetic energy. </p>"+
+		"<p>In the second set, with a light gas and a heavy gas, the root mean squareds of the velocities were different, but if you computed 0.5*m*rms(V)<sup>2</sup>, you found that the kinetic energies of the two were equal, showing that they were the same temperature.  So, molecular speed alone doesn’t tell us about temperature.  We need to know the particle mass as well.</p>"+
+		"<p>Finally, we had the two containers with equal speeds but different masses.  The temperatures can be calculated like in the last set, but that’s not necessary.  We can know that since temperature is an expression of <i>energy</i>, and since their speeds were the same, the one with less mass must have less energy and thus a lower temperature. </p>"+
+		"<p>To restate, higher temperature doesn’t necessarily mean your gas is moving at a higher speed.  It means your gas molecules are moving with <i>more energy</i>.</p>");
 	},
 	block5CleanUp: function(){
 		loadListener(curLevel, 'update');
@@ -195,6 +200,46 @@ Orientation.prototype = {
 		$('#sliderPressure').hide();
 		removeListener(curLevel, 'wallImpact', 'arrow');
 		addListener(curLevel, 'wallImpact', 'std', this.onWallImpact, this);
+	},
+	block8Start: function(){
+		saveListener(curLevel, 'update');
+		emptyListener(curLevel, 'update');
+		$('#reset').hide();
+		$('#canvasDiv').hide();
+		$('#display').show();
+		$('#intText').show();
+		
+	},
+	block80Start: function(){
+		$('#intText').html("Okay, math time!  We're going to solve for pressure exerted by a molecule on one wall.<br>"+
+			"Say we have a molecule of mass m moving as follows:"+
+			"<center><img src=img/pressureSetup.gif></img></center>"+
+			"Then starting from"+
+			"<center><img src=img/pggfa.gif></img> and <img src = img/fma.gif></center>"+
+			"We can integrate F=ma over time to get"+
+			"<center><img src=img/momentum.gif></img></center>"+
+			"We know that the change in velocity is 2V<sub>x</sub> it leaves with the inverse of the velocity it arrived with.<br>"+
+			"Substituting in F, we get"+
+			"<center><img src=img/pdelt.gif></center>"+
+			"Continued on next page..."
+			);
+	},
+	block81Start: function(){
+		$('#intText').html("<center><img src=img/pressureSetup.gif></img></center>"+
+		"Because we're looking for an average pressure, we're averaging out the momentum change over the whole time between impacts, which is given by"+
+		"<center><img src=img/delt.gif></img></center>"+
+		"Then we put it all together and get"+
+		"<center><img src=img/last.gif></img></center>"+
+		"Now hold on!  Remember the T is preportional to mV<sup>2</sup> as well!  The means that we have just derived that <i>P is directly proportional to T</i> from a simple model of balls bouncing around!  Does this sound familiar to the ideal gas law or what?"
+		
+		);
+	},
+	block8CleanUp: function(){
+		$('#intText').html('');
+		$('#reset').show();
+		$('#canvasDiv').show();
+		$('#display').hide();
+		$('#intText').hide();
 	},
 	startSim: function(){
 		this.hideDash();
@@ -337,9 +382,9 @@ Orientation.prototype = {
 	onWallImpactArrow: function(dot, line, wallUV, perpV){
 		var hitResult = this.onWallImpact(dot, line, wallUV, perpV);
 		var arrowPts = new Array(3);
-		arrowPts[0] = hitResult.pos.copy().movePt(hitResult.vo.mult(10).neg());
+		arrowPts[0] = hitResult.pos.copy().movePt(hitResult.vo.copy().mult(10).neg());
 		arrowPts[1] = hitResult.pos;
-		arrowPts[2] = hitResult.pos.copy().movePt(hitResult.vf.mult(10));
+		arrowPts[2] = hitResult.pos.copy().movePt(hitResult.vf.copy().mult(10));
 		var lifeSpan = 50;
 		var arrowTurn = 0;
 		var arrow = new Arrow(arrowPts, Col(255,0,0),c);
@@ -352,6 +397,11 @@ Orientation.prototype = {
 				}
 			},
 		'');
+		var textPos = hitResult.pos.copy().movePt(hitResult.vf.mult(15));
+		var delV = 2*perpV*pxToMS;
+		animText({pos:textPos, col:Col(255,255,255), rotation:0, size:13}, 
+				{pos:textPos.copy().movePt({dy:-20}), col:this.bgCol},
+				'calibri', 'deltaV = '+round(delV,1)+'m/s', 'center', 3000, c);
 	},
 	dataRun: function(){
 
