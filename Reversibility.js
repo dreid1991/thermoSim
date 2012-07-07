@@ -364,13 +364,13 @@ Reversibility.prototype = {
 		emptyListener(this, 'dotImpact');
 		emptyListener(this, 'data');
 		this.startSim();
-		/*
+		
 		for (resetListenerName in this.resetListeners.listeners){
 			var func = this.resetListeners.listeners[resetListenerName].func;
 			var obj = this.resetListeners.listeners[resetListenerName].obj;
 			func.apply(obj);
 		}
-		*/
+		
 		if(this['block'+this.blockIdx+'Start']){
 			this['block'+this.blockIdx+'Start']()
 		}		

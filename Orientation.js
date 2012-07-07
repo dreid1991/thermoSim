@@ -448,15 +448,13 @@ Orientation.prototype = {
 		emptyListener(this, 'data');
 		
 		this.startSim();
-		/*
+		
 		for (resetListenerName in this.resetListeners.listeners){
 			var func = this.resetListeners.listeners[resetListenerName].func;
 			var obj = this.resetListeners.listeners[resetListenerName].obj;
 			func.apply(obj);
 		}
-		OKAY - so this seems like it should be here, but in reversibility,
-		something about doing dropAllInBins twice in a row makes it take the weight off
-		twice, giving negative weight*/
+
 		if(this['block'+this.blockIdx+'Start']){
 			this['block'+this.blockIdx+'Start']()
 		}

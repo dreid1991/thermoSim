@@ -269,13 +269,14 @@ DragWeights.prototype = {
 			var weightGroup = this.weightGroups[group];
 			for (var weightIdx=0; weightIdx<weightGroup.weights.length; weightIdx++){
 				var weight = weightGroup.weights[weightIdx];
-				if(weight.status!='inBin'){
-					if(weight.status=='onPiston'){
-						weight.slot.isFull = false;
-						this.takeOffPiston(weight);
-					}
+				if(weight.status=='onPiston'){
+					weight.slot.isFull = false;
+					this.takeOffPiston(weight);
+					this.dropIntoBin(weight);
+				}else if(weight.status=='' ){
 					this.dropIntoBin(weight);
 				}
+				
 			}
 		}
 	},
@@ -483,7 +484,7 @@ DragWeights.prototype = {
 				this.weightsOnPiston.splice([idx],1);
 			}
 		}
-		//weight.status = 'inTransit'
+		weight.status = 'inTransit'
 		var prevWeight = this.pistonWeight;
 		this.pistonWeight-=this.weightGroups[weight.name].mass;
 	},
