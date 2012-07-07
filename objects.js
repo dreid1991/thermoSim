@@ -483,6 +483,7 @@ DragWeights.prototype = {
 				this.weightsOnPiston.splice([idx],1);
 			}
 		}
+		//weight.status = 'inTransit'
 		var prevWeight = this.pistonWeight;
 		this.pistonWeight-=this.weightGroups[weight.name].mass;
 	},

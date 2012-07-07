@@ -127,7 +127,7 @@ Reversibility.prototype = {
 			var obj = this.resetListeners.listeners[resetListenerName].obj;
 			func.apply(obj);
 		}	
-		//HEY - MAKE CLEAR GRAPHS AND RESET WORK
+		//HEY - RESET HAPPENS TWICE (here and 
 		this.readout.show();
 	},	
 	block1Start: function(){this.block0Start();},	
@@ -345,12 +345,18 @@ Reversibility.prototype = {
 		walls.setupWall(0);
 	},
 	reset: function(){
-		this.addDots();
-		this.dragWeights.dropAllInBins();
+		
+		var curPrompt = this.prompts[this.promptIdx];
+		if(this['block'+this.blockIdx+'CleanUp']){
+			this['block'+this.blockIdx+'CleanUp']()
+		}
+		if(curPrompt.cleanUp){
+			curPrompt.cleanUp();
+		}	
+		for (var spcName in spcs){
+			depopulate(spcName);
+		}		
 		this.numUpdates = 0;
-		walls = undefined;
-		walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
-		walls.setup();
 		this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
 		this.forceInternal = 0;
 		emptyListener(this, 'update');
@@ -358,12 +364,17 @@ Reversibility.prototype = {
 		emptyListener(this, 'dotImpact');
 		emptyListener(this, 'data');
 		this.startSim();
-		
+		/*
 		for (resetListenerName in this.resetListeners.listeners){
 			var func = this.resetListeners.listeners[resetListenerName].func;
 			var obj = this.resetListeners.listeners[resetListenerName].obj;
 			func.apply(obj);
 		}
+		*/
+		if(this['block'+this.blockIdx+'Start']){
+			this['block'+this.blockIdx+'Start']()
+		}		
+
 		
 	},
 	clearGraphs: function(){

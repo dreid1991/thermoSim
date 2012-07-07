@@ -34,8 +34,8 @@ function Orientation(){
 		{block:5, title: "", text:""},
 		{block:6, title: "zoo fish", text:"Okay, let’s look at pressure.  A pressure is a force per area.  This tells us that gases at non-zero pressure must exert a force on their container.  In the system above, what event causes a force to be exerted on the wall?"},
 		{block:7, title: "quail", text:"It might be simpler if we look at just one molecule.  Every time the molecule hits the wall, its momentum changes.  A force is a momentum change per time.  If we want an average pressure, we can define time as the average time between collisions.  How would the momentum change and the frequency of collision change with velocity?  When you’re done playing here, we can go through the math on the next page."},
-		{block:8, title: "", text:"", start:this.block80Start},
-		{block:8, title: "", text:"", start:this.block81Start},
+		{block:8, title: "", text:"", start:this.block8aStart},
+		{block:8, title: "", text:"", start:this.block8bStart},
 	]
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
 	collide.setup();
@@ -210,7 +210,7 @@ Orientation.prototype = {
 		$('#intText').show();
 		
 	},
-	block80Start: function(){
+	block8aStart: function(){
 		$('#intText').html("Okay, math time!  We're going to solve for pressure exerted by a molecule on one wall.<br>"+
 			"Say we have a molecule of mass m moving as follows:"+
 			"<center><img src=img/pressureSetup.gif></img></center>"+
@@ -224,7 +224,7 @@ Orientation.prototype = {
 			"Continued on next page..."
 			);
 	},
-	block81Start: function(){
+	block8bStart: function(){
 		$('#intText').html("<center><img src=img/pressureSetup.gif></img></center>"+
 		"Because we're looking for an average pressure, we're averaging out the momentum change over the whole time between impacts, which is given by"+
 		"<center><img src=img/delt.gif></img></center>"+
@@ -235,6 +235,7 @@ Orientation.prototype = {
 		);
 	},
 	block8CleanUp: function(){
+		loadListener(curLevel, 'update');
 		$('#intText').html('');
 		$('#reset').show();
 		$('#canvasDiv').show();
@@ -447,11 +448,15 @@ Orientation.prototype = {
 		emptyListener(this, 'data');
 		
 		this.startSim();
+		/*
 		for (resetListenerName in this.resetListeners.listeners){
 			var func = this.resetListeners.listeners[resetListenerName].func;
 			var obj = this.resetListeners.listeners[resetListenerName].obj;
 			func.apply(obj);
 		}
+		OKAY - so this seems like it should be here, but in reversibility,
+		something about doing dropAllInBins twice in a row makes it take the weight off
+		twice, giving negative weight*/
 		if(this['block'+this.blockIdx+'Start']){
 			this['block'+this.blockIdx+'Start']()
 		}
