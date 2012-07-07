@@ -93,7 +93,8 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.weightDimRatio = .5;
 	this.weightScalar = 40;
 	this.moveSpeed = 20;
-	this.pistonWeight = deadWeight;
+	this.pistonMass = deadWeight;
+	this.eAdded = 0;
 	this.readout = readout;
 	this.moveToDropOrders = [];
 	this.moveToPistonOrders = [];
@@ -121,7 +122,7 @@ DragWeights.prototype = {
 	},
 	addReadoutEntries: function(){
 		this.readout.addEntry('eAdd', 'E Added:', 'kJ', 0, undefined, 1);
-		this.readout.addEntry('weight', 'Weight:', 'kg', this.pistonWeight, undefined, 0);
+		this.readout.addEntry('weight', 'Weight:', 'kg', this.pistonMass, undefined, 0);
 	},
 	getWeightDims: function(weightDefs){
 		var dims = {};
@@ -465,17 +466,16 @@ DragWeights.prototype = {
 		}
 		
 	},
-	doEBarReadout: function(readoutName, change){
-		var readout = byAttr(this.readout.entries, readoutName, 'name')
-		var init = readout.val;
-		var setPt = init + change;
+	doEBarReadout: function(readoutName, setPt){
+		//var readout = byAttr(this.readout.entries, readoutName, 'name')
+		
 		this.readout.tick(setPt, readoutName);
 		
 	},
 
 	putOnPiston: function(weight){
 		this.weightsOnPiston.push(weight);
-		this.pistonWeight+=this.weightGroups[weight.name].mass;
+		this.pistonMass+=this.weightGroups[weight.name].mass;
 		weight.status = 'onPiston';
 	},	
 	takeOffPiston: function(weight){
@@ -485,8 +485,8 @@ DragWeights.prototype = {
 			}
 		}
 		weight.status = 'inTransit'
-		var prevWeight = this.pistonWeight;
-		this.pistonWeight-=this.weightGroups[weight.name].mass;
+		var prevWeight = this.pistonMass;
+		this.pistonMass-=this.weightGroups[weight.name].mass;
 	},
 	mousedown: function(){
 		var clicked = this.getClicked();
@@ -549,16 +549,19 @@ DragWeights.prototype = {
 		removeListener(curLevel, 'mousemove', 'weights');
 		removeListener(curLevel, 'mouseup', 'weights');
 		if(this.selected.cameFrom == 'onPiston'){
-			this.doEBarReadout('eAdd', this.eBar.eChange);
+			this.eAdded+=this.eBar.eChange;
+			this.doEBarReadout('eAdd', this.eAdded);
 			var mass = this.weightGroups[this.eBar.weight.name].mass;
-			this.doEBarReadout('weight', -mass);
+			
+			this.doEBarReadout('weight', this.pistonMass);
 			this.animText()
 			this.dropIntoBin(this.selected);
 		}else{
 			if(this.selected.pos.y<this.pistonY()){
-				this.doEBarReadout('eAdd', this.eBar.eChange);
-				var mass = this.weightGroups[this.eBar.weight.name].mass;
-				this.doEBarReadout('weight', mass);
+				this.eAdded+=this.eBar.eChange;
+				this.doEBarReadout('eAdd', this.eAdded);
+				var mass = this.weightGroups[this.eBar.weight.name].mass
+				this.doEBarReadout('weight', this.pistonMass+mass);
 				this.animText();
 				this.dropIntoPistonBin(this.selected)
 			}else{
@@ -578,6 +581,7 @@ DragWeights.prototype = {
 			'calibri', this.eText(round(this.eBar.eChange,1)), 'center', 300, c)
 	},
 	pickup: function(weight){
+		weight.cameFrom = weight.status;
 		var mousePos = mouseOffset(myCanvas);
 		if (weight.slot!==undefined){
 			weight.slot.isFull = false;
@@ -588,7 +592,7 @@ DragWeights.prototype = {
 		delete weight.slot;
 		this.selected = weight;
 		this.origPos = {mouseX:mousePos.x, mouseY:mousePos.y, weightX:weight.pos.x, weightY:weight.pos.y};
-		weight.cameFrom = weight.status;
+		
 		weight.status = 'inTransit';
 	},
 	getClicked: function(){

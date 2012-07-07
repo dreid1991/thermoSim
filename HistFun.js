@@ -112,6 +112,7 @@ HistFun.prototype = {
 	},
 	toSim: function(){
 		nextPrompt();
+		this.startSim();
 	},
 	backToSim: function(){
 		this.promptIdx = this.prompts.length-1;

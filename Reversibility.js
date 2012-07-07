@@ -43,7 +43,7 @@ function Reversibility(){
 	
 	this.g = 1.75;
 	this.dragWeights = this.makeDragWeights();
-	this.mass = function(){return this.dragWeights.pistonWeight};
+	this.mass = function(){return this.dragWeights.pistonMass};
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
 	walls.setup();
 	var self = this;
