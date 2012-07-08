@@ -82,6 +82,8 @@
 var curLevel;
 canvasHeight = 530;
 $(function(){
+	inherit(GraphScatter.prototype, GraphBase.prototype)
+	inherit(GraphHist.prototype, GraphBase.prototype)
 	myCanvas.height = canvasHeight;
 	curLevel = new Reversibility();
 	curLevel.init();
@@ -103,8 +105,8 @@ myCanvas.width = $('#main').width();
 
 
 <script src = 'indepClasses.js'></script>
-<script src = 'GraphScatter.js'></script>
 <script src = 'GraphBase.js'></script>
+<script src = 'GraphScatter.js'></script>
 <script src = 'SpeciesDefs.js'></script>
 <script src = 'CollideHandler.js'></script>
 <script src = 'DataHandler.js'></script>

@@ -1,5 +1,4 @@
 function GraphHist(name, width, height, xLabel, yLabel, axisInit, dataPath){
-	this.base = new GraphBase(this);
 	this.name = name;
 	this.dims = V(width, height);
 	this.xLabel = xLabel;
@@ -24,7 +23,7 @@ function GraphHist(name, width, height, xLabel, yLabel, axisInit, dataPath){
 	this.axisRange = {x:{min:0, max:0}, y:{min:0, max:0}};
 	this.data = {};
 	this.legend = {};
-	this.base.resetRanges();
+	this.resetRanges();
 	this.stepSize = {x:0, y:0};
 	this.bgCol = curLevel.bgCol
 	this.gridCol = Col(72,72,72);
@@ -33,10 +32,8 @@ function GraphHist(name, width, height, xLabel, yLabel, axisInit, dataPath){
 	this.graphBoundCol = Col(255,255,255);
 	var barCol = Col(255,100,0);
 
-	var canvasData = this.base.makeCanvas(this.name, this.dims);
-	this.graph = canvasData.graph;
-	this.graphHTMLElement = canvasData.HTMLElement;
-	this.base.drawAllBG();
+	var canvasData = this.makeCanvas(this.name, this.dims);
+	this.drawAllBG();
 	this.addSet('only', barCol, dataPath);
 	addListener(curLevel, 'reset', 'clearGraph'+name, this.clear, this);
 }
@@ -51,13 +48,13 @@ GraphHist.prototype = {
 		set.x = [];
 		set.y = [];
 		set.barCol = barCol;
-		set.getLast = this.base.makeHistDataGrabFunc(dataPath);
+		set.getLast = this.makeHistDataGrabFunc(dataPath);
 		this.data[address] = set;
-		this.base.drawAllBG();
+		this.drawAllBG();
 	},
 	drawAllData: function(){
 		this.graph.putImageData(this.bg, 0, 0);
-		this.base.drawAxisVals();
+		this.drawAxisVals();
 		this.graphBins();
 	},
 	drawLastData: function(toAdd){
@@ -91,12 +88,12 @@ GraphHist.prototype = {
 		this.makeBins(theOnlyAddress)
 	},
 	getAxisBounds: function(){
-		this.base.getXBounds();
-		this.base.getYBounds();
+		this.getXBounds();
+		this.getYBounds();
 	},
 	makeBins: function(theOnlyAddress){
-		this.valRange.x = this.base.getRange('x');
-		this.base.setAxisBoundsX();
+		this.valRange.x = this.getRange('x');
+		this.setAxisBoundsX();
 		this.bins = this.makeBinBlanks(this.data[theOnlyAddress].x);
 		this.populateBins(this.data[theOnlyAddress].x);
 		this.setYAxis();
@@ -126,7 +123,7 @@ GraphHist.prototype = {
 		}
 		this.valRange.y.min=0;
 		this.valRange.y.max = maxCount;
-		this.base.setAxisBoundsY();
+		this.setAxisBoundsY();
 	},
 	graphBins: function(){
 		var theData = '';
@@ -140,15 +137,15 @@ GraphHist.prototype = {
 			var xLRPt = parseFloat(binName) + this.binWidth;
 			var yLRPt = 0;
 			
-			var ULCoord = this.base.translateValToCoord(P(xULPt,yULPt));
-			var LRCoord = this.base.translateValToCoord(P(xLRPt,yLRPt));
+			var ULCoord = this.translateValToCoord(P(xULPt,yULPt));
+			var LRCoord = this.translateValToCoord(P(xLRPt,yLRPt));
 			var dims = ULCoord.VTo(LRCoord);
 			
 			draw.fillStrokeRect(ULCoord, dims, barCol, this.bgCol, this.graph);
 		}
 	},
 	clear: function(){
-		this.base.clear()
+		this.clear()
 	},
 }
 

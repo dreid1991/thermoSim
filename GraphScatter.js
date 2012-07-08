@@ -1,6 +1,6 @@
 function GraphScatter(name, width, height, xLabel, yLabel, axisInit){
 	this.name = name;
-	this.base = new GraphBase(this);
+	//this.base = new GraphBase(this);
 	this.dims = V(width, height);
 	
 	this.xLabel = xLabel;
@@ -27,7 +27,7 @@ function GraphScatter(name, width, height, xLabel, yLabel, axisInit){
 	this.axisRange = {x:{min:0, max:0}, y:{min:0, max:0}};
 	this.data = {};
 	this.legend = {};
-	this.base.resetRanges();
+	this.resetRanges();
 	this.stepSize = {x:0, y:0};
 	this.checkMarkOversize = 3;
 	this.bgCol = curLevel.bgCol
@@ -42,12 +42,12 @@ function GraphScatter(name, width, height, xLabel, yLabel, axisInit){
 	this.rectSideLen = 8;
 	this.characLen = Math.sqrt(Math.pow(this.rectSideLen, 2)/2);
 	//characLen, characteristic length, is the radius of the shape being used
-	var canvasData = this.base.makeCanvas(this.name, this.dims);
-	this.graph = canvasData.graph;
-	this.graphHTMLElement = canvasData.HTMLElement;
-	this.base.drawAllBG();
+	this.makeCanvas(this.name, this.dims);
+
+	this.drawAllBG();
 	
 }
+
 GraphScatter.prototype = {
 	addSet: function(address, label, pointCol, flashCol, dataPaths){
 		var set = {};
@@ -56,15 +56,15 @@ GraphScatter.prototype = {
 		set.y = [];
 		set.pointCol = pointCol;
 		set.flashCol = flashCol;
-		set.getLast = this.base.makePtDataGrabFunc(dataPaths);
+		set.getLast = this.makePtDataGrabFunc(dataPaths);
 		set.show = true;
 		this.data[address] = set;
-		this.base.makeLegendEntry(set, address);
-		this.base.drawAllBG();
+		this.makeLegendEntry(set, address);
+		this.drawAllBG();
 	},
 	drawAllData: function(){
 		this.graph.putImageData(this.bg, 0, 0);
-		this.base.drawAxisVals();
+		this.drawAxisVals();
 		this.graphPts();
 	},
 	drawLastData: function(toAdd){
@@ -86,7 +86,7 @@ GraphScatter.prototype = {
 			var dataSet = this.data[address];
 			toAdd.push(dataSet.getLast(address));
 		}
-		this.base.addPts(toAdd);
+		this.addPts(toAdd);
 	},
 
 
@@ -95,8 +95,8 @@ GraphScatter.prototype = {
 		if (xVals.length==yVals.length && xVals.length>1){
 			this.data[address].x = xVals;
 			this.data[address].y = yVals;
-			this.valRange.x = this.base.getRange('x');
-			this.valRange.y = this.base.getRange('y');
+			this.valRange.x = this.getRange('x');
+			this.valRange.y = this.getRange('y');
 			this.getAxisBounds();
 			this.drawAllData();
 		} else if (xVals.length!=yVals.length){
@@ -107,8 +107,8 @@ GraphScatter.prototype = {
 	},
 
 	getAxisBounds: function(){
-		this.base.getXBounds();
-		this.base.getYBounds();
+		this.getXBounds();
+		this.getYBounds();
 	},
 
 
@@ -126,7 +126,7 @@ GraphScatter.prototype = {
 		}
 	},
 	graphPt: function(xVal, yVal, col){
-		var pt = this.base.translateValToCoord(P(xVal,yVal));
+		var pt = this.translateValToCoord(P(xVal,yVal));
 		this.drawPtStd(pt, col);
 	},
 
@@ -145,7 +145,7 @@ GraphScatter.prototype = {
 		draw.fillPtsStroke(pts, col, this.ptStroke, this.graph);
 	},
 	clear: function(){
-		this.base.clear()
+		this.clear()
 	},
 }
 

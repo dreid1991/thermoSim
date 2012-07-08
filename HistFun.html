@@ -77,6 +77,8 @@
 var curLevel;
 canvasHeight = 450;
 $(function(){
+	inherit(GraphScatter.prototype, GraphBase.prototype)
+	inherit(GraphHist.prototype, GraphBase.prototype)
 	myCanvas.height = canvasHeight;
 	curLevel = new HistFun();
 	curLevel.init();

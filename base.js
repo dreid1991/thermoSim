@@ -461,9 +461,9 @@ function extend(old, add){
 		return add(old());
 	}
 }
-function inherit(reciever, object){
-	for	(var objectName in object){
-		reciever[objectName] = object[objectName];
+function inherit(reciever, giver){
+	for	(var objectName in giver){
+		reciever[objectName] = giver[objectName];
 	}
 }
 function rms(vals){
