@@ -90,6 +90,23 @@ Vector.prototype = {
 		this.dy = dx*Math.sin(rad) + dy*Math.cos(rad);
 		return this;
 	},
+	perp: function(dir){
+		var dxOld = this.dx;
+		var dyOld = this.dy;
+		if(dir){
+			if(dir=='cw'){
+				this.dx = dyOld;
+				this.dy = -dxOld;
+			}else{
+				this.dx = -dyOld;
+				this.dy = dxOld;
+			}
+		}else{
+			this.dx = dyOld;
+			this.dy = -dxOld;		
+		}
+		return this;
+	}
 }
 Color.prototype = {
 	adjust: function(dr, dg, db){

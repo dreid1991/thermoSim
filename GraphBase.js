@@ -2,13 +2,20 @@ function GraphBase(){};
 GraphBase.prototype = {
 	makeCanvas: function(name, dims){
 		addListener(curLevel, 'reset', 'clearGraph'+this.name, this.clear, this);
-		var str = "<div class='graphSpacer noSelect'></div><div id = '" + name + "div'><canvas id ='" + name + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas></div>"
+		var str = "<div class='graphSpacer noSelect' id='"+this.name + "GraphSpacer'></div><div id = '" + this.name +"GraphDiv'><canvas id ='" + this.name + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas></div>"
 		var canvasDiv = $(str);
 		$('#graphs').append(canvasDiv);
 		
 		this.graphHTMLElement = document.getElementById(name+'Graph');
 		this.graph = this.graphHTMLElement.getContext('2d');
 		
+	},
+	remove: function(){
+		removeListener(curLevel, 'reset', 'clearGraph'+this.name);
+		removeListener(curLevel, 'update', 'flash' + this.name);
+		$('#'+this.name+'GraphDiv').remove();
+		$('#'+this.name+'GraphSpacer').remove();
+		delete this;//DOESN'T DO ANYTHING
 	},
 	makeCheck: function(address, legend, toggleCol){
 		var entry = legend[address];

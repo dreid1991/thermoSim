@@ -285,6 +285,13 @@ function addListener(object, typeName, funcName, func, destObj){
 function removeListener(object, typeName, funcName){
 	delete object[typeName + 'Listeners'].listeners[funcName];
 }
+function removeListenerByName(object, typeName, funcNameToRemove){
+	for (thisFuncName in object[typeName+'Listeners'].listeners){
+		if(thisFuncName.indexOf(funcNameToRemove)>=0){
+			delete object[typeName+'Listeners'].listeners[thisFuncName]
+		}
+	}
+}
 function listenerExists(object, typeName, funcName){
 	return object[typeName + 'Listeners'].listeners[funcName]!==undefined;
 }

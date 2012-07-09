@@ -804,15 +804,20 @@ DragArrow.prototype = {
 	},
 	show: function(){
 		addListener(curLevel, 'mousedown', 'dragArrow'+this.name, this.clickListeners, '');
-		addListener(curLevel, 'update', 'drawArrow'+this.name, this.draw, '');
+		addListener(curLevel, 'update', 'drawDragArrow'+this.name, this.draw, '');
 	},
 	hide: function(){
 		removeListener(curLevel, 'mousedown', 'dragArrow'+this.name);
-		removeListener(curLevel, 'update', 'drawArrow'+this.name);	
+		removeListener(curLevel, 'update', 'drawDragArrow'+this.name);	
 	},
 	reset: function(){
 		this.pos = this.posInit.copy();
 		removeListener(curLevel, 'update', 'moveWall');
+	},
+	remove: function(){
+		removeListener(curLevel, 'mousedown', 'dragArrow'+this.name);
+		removeListener(curLevel, 'update', 'drawDragArrow'+this.name);
+		delete this;//DOESN'T DO ANYTHING
 	},
 	checkSelected: function(){
 		var mousePos = mouseOffset(this.canvasElement);

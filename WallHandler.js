@@ -34,20 +34,21 @@ WallHandler.prototype = {
 	},
 	getPerpUVs: function(wallIdx){
 		var wallUVSet = this.wallUVs[wallIdx];
-		var perpUVs = [];
+		var perpUVs = new Array(wallUVSet.length);
 		for (var wallUVIdx=0; wallUVIdx<wallUVSet.length; wallUVIdx++){
 			var wallUV = wallUVSet[wallUVIdx];
-			perpUVs.push(V(wallUV.dy, -wallUV.dx));
+			perpUVs[wallUVIdx] = V(wallUV.dy, -wallUV.dx);
 		}
 		return perpUVs;
 	},
 	getWallUV: function(wallIdx){
 		var wall = walls.pts[wallIdx];
-		var wallUVs = [];
-		for (var ptIdx=0; ptIdx<wall.length-1; ptIdx++){
+		var numUVs = wall.length-1
+		var wallUVs = new Array(numUVs);
+		for (var ptIdx=0; ptIdx<numUVs; ptIdx++){
 			var ptA = wall[ptIdx];
 			var ptB = wall[ptIdx+1];
-			wallUVs.push(V(ptB.x-ptA.x, ptB.y-ptA.y).UV())
+			wallUVs[ptIdx] = V(ptB.x-ptA.x, ptB.y-ptA.y).UV();
 		}
 		return wallUVs;
 	},
