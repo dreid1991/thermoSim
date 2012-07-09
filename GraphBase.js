@@ -1,6 +1,4 @@
-function GraphBase(){
-
-};
+function GraphBase(){};
 GraphBase.prototype = {
 	makeCanvas: function(name, dims){
 		addListener(curLevel, 'reset', 'clearGraph'+this.name, this.clear, this);
@@ -261,7 +259,7 @@ GraphBase.prototype = {
 		}
 		return {min:min, max:max};
 	},
-	clear: function(){
+	clearStd: function(){
 		for (var set in this.data){
 			var data = this.data[set];
 			for(var dataBitName in data){

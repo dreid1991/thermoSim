@@ -1,8 +1,6 @@
 function GraphScatter(name, width, height, xLabel, yLabel, axisInit){
 	this.name = name;
-	//this.base = new GraphBase(this);
 	this.dims = V(width, height);
-	
 	this.xLabel = xLabel;
 	this.yLabel = yLabel;
 	this.labelFontSize = 15;
@@ -47,106 +45,106 @@ function GraphScatter(name, width, height, xLabel, yLabel, axisInit){
 	this.drawAllBG();
 	
 }
-
-GraphScatter.prototype = {
-	addSet: function(address, label, pointCol, flashCol, dataPaths){
-		var set = {};
-		set.label = label;
-		set.x = [];
-		set.y = [];
-		set.pointCol = pointCol;
-		set.flashCol = flashCol;
-		set.getLast = this.makePtDataGrabFunc(dataPaths);
-		set.show = true;
-		this.data[address] = set;
-		this.makeLegendEntry(set, address);
-		this.drawAllBG();
-	},
-	drawAllData: function(){
-		this.graph.putImageData(this.bg, 0, 0);
-		this.drawAxisVals();
-		this.graphPts();
-	},
-	drawLastData: function(toAdd){
-		for (var addIdx=0; addIdx<toAdd.length; addIdx++){
-			var dataSet = this.data[toAdd[addIdx].address];
-			if(dataSet.show){
-				var xPt = dataSet.x[dataSet.x.length-1]
-				var yPt = dataSet.y[dataSet.y.length-1]
-				var pointCol = dataSet.pointCol
-				this.graphPt(xPt, yPt, pointCol);
-			}
-		}	
-	},
-
-
-	addLast: function(){
-		var toAdd = [];
-		for (var address in this.data){
-			var dataSet = this.data[address];
-			toAdd.push(dataSet.getLast(address));
-		}
-		this.addPts(toAdd);
-	},
-
-
-
-	plotData: function(xVals, yVals, address){
-		if (xVals.length==yVals.length && xVals.length>1){
-			this.data[address].x = xVals;
-			this.data[address].y = yVals;
-			this.valRange.x = this.getRange('x');
-			this.valRange.y = this.getRange('y');
-			this.getAxisBounds();
-			this.drawAllData();
-		} else if (xVals.length!=yVals.length){
-			console.log("xVals has ", xVals.length, "entries");
-			console.log("yVals has ", yVals.length, "entries");
-			console.log("UH-OH");
-		};
-	},
-
-	getAxisBounds: function(){
-		this.getXBounds();
-		this.getYBounds();
-	},
-
-
-	graphPts: function(){
-		for (var setName in this.data){
-			var dataSet = this.data[setName];
+_.extend(GraphScatter.prototype, GraphBase.prototype, 
+	{
+		addSet: function(address, label, pointCol, flashCol, dataPaths){
+			var set = {};
+			set.label = label;
+			set.x = [];
+			set.y = [];
+			set.pointCol = pointCol;
+			set.flashCol = flashCol;
+			set.getLast = this.makePtDataGrabFunc(dataPaths);
+			set.show = true;
+			this.data[address] = set;
+			this.makeLegendEntry(set, address);
+			this.drawAllBG();
+		},
+		drawAllData: function(){
+			this.graph.putImageData(this.bg, 0, 0);
+			this.drawAxisVals();
+			this.graphPts();
+		},
+		drawLastData: function(toAdd){
+			for (var addIdx=0; addIdx<toAdd.length; addIdx++){
+				var dataSet = this.data[toAdd[addIdx].address];
 				if(dataSet.show){
-					var col = dataSet.pointCol;
-					for (var ptIdx=0; ptIdx<dataSet.x.length; ptIdx++){
-						var xVal = dataSet.x[ptIdx];
-						var yVal = dataSet.y[ptIdx];
-						this.graphPt(xVal, yVal, col);
+					var xPt = dataSet.x[dataSet.x.length-1]
+					var yPt = dataSet.y[dataSet.y.length-1]
+					var pointCol = dataSet.pointCol
+					this.graphPt(xPt, yPt, pointCol);
+				}
+			}	
+		},
+
+
+		addLast: function(){
+			var toAdd = [];
+			for (var address in this.data){
+				var dataSet = this.data[address];
+				toAdd.push(dataSet.getLast(address));
+			}
+			this.addPts(toAdd);
+		},
+
+
+
+		plotData: function(xVals, yVals, address){
+			if (xVals.length==yVals.length && xVals.length>1){
+				this.data[address].x = xVals;
+				this.data[address].y = yVals;
+				this.valRange.x = this.getRange('x');
+				this.valRange.y = this.getRange('y');
+				this.getAxisBounds();
+				this.drawAllData();
+			} else if (xVals.length!=yVals.length){
+				console.log("xVals has ", xVals.length, "entries");
+				console.log("yVals has ", yVals.length, "entries");
+				console.log("UH-OH");
+			};
+		},
+
+		getAxisBounds: function(){
+			this.getXBounds();
+			this.getYBounds();
+		},
+
+
+		graphPts: function(){
+			for (var setName in this.data){
+				var dataSet = this.data[setName];
+					if(dataSet.show){
+						var col = dataSet.pointCol;
+						for (var ptIdx=0; ptIdx<dataSet.x.length; ptIdx++){
+							var xVal = dataSet.x[ptIdx];
+							var yVal = dataSet.y[ptIdx];
+							this.graphPt(xVal, yVal, col);
+					}
 				}
 			}
-		}
-	},
-	graphPt: function(xVal, yVal, col){
-		var pt = this.translateValToCoord(P(xVal,yVal));
-		this.drawPtStd(pt, col);
-	},
+		},
+		graphPt: function(xVal, yVal, col){
+			var pt = this.translateValToCoord(P(xVal,yVal));
+			this.drawPtStd(pt, col);
+		},
 
-	drawPtStd: function(pt, col){
-		this.drawPt(pt, col, this.characLen);
-	},
-	drawPt: function(pt, col, characLen){
-		var x = pt.x;
-		var y = pt.y;
-		var len = characLen;
-		var pt1 = P(x-len, y);
-		var pt2 = P(x, y-len);
-		var pt3 = P(x+len, y);
-		var pt4 = P(x, y+len);
-		var pts = [pt1, pt2, pt3, pt4];
-		draw.fillPtsStroke(pts, col, this.ptStroke, this.graph);
-	},
-	clear: function(){
-		this.clear()
-	},
-}
-
+		drawPtStd: function(pt, col){
+			this.drawPt(pt, col, this.characLen);
+		},
+		drawPt: function(pt, col, characLen){
+			var x = pt.x;
+			var y = pt.y;
+			var len = characLen;
+			var pt1 = P(x-len, y);
+			var pt2 = P(x, y-len);
+			var pt3 = P(x+len, y);
+			var pt4 = P(x, y+len);
+			var pts = [pt1, pt2, pt3, pt4];
+			draw.fillPtsStroke(pts, col, this.ptStroke, this.graph);
+		},
+		clear: function(){
+			this.clearStd()
+		},
+	}
+)
 

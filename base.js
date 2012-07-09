@@ -440,11 +440,7 @@ function spacedPt(pt, UVs, thickness){
 	var adjust = UV1.add(UV2)
 	return pt.copy().movePt(adjust.mult(thickness));
 }
-//function loadVals(level){
-//	for (sliderName in level.slider){
-//		level.sliders[sliderName].val=level.savedVals[sliderName];
-//	}
-//}
+
 var canvas;
 var c; 
 /*
@@ -459,11 +455,6 @@ SEEMS TO WORK AND MAKES IT SO I CAN SEND CANVASES AROUND IN INIT
 function extend(old, add){
 	return function(){
 		return add(old());
-	}
-}
-function inherit(reciever, giver){
-	for	(var objectName in giver){
-		reciever[objectName] = giver[objectName];
 	}
 }
 function rms(vals){

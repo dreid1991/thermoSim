@@ -2,6 +2,7 @@
 <body>
 <link type='text/css' href = 'css/sunny/jquery-ui-1.8.20.custom.css' rel='stylesheet' />
 <link type='text/css' href = 'styles.css' rel='stylesheet'/>
+<script src = 'underscore-min.js'></script>
 <script src = 'js/jquery-1.7.2.min.js'></script>
 <script src = 'js/jquery-ui-1.8.20.custom.min.js'></script>
 <div class='noSelect'>
@@ -82,8 +83,6 @@
 var curLevel;
 canvasHeight = 530;
 $(function(){
-	inherit(GraphScatter.prototype, GraphBase.prototype)
-	inherit(GraphHist.prototype, GraphBase.prototype)
 	myCanvas.height = canvasHeight;
 	curLevel = new Reversibility();
 	curLevel.init();
