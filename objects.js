@@ -262,6 +262,58 @@ DragWeights.prototype = {
 	newSlot: function(isFull, x, fy, name, type, row, col){
 		return {isFull:isFull, x:x, y:fy, name:name, type:type, row:row, col:col};
 	},
+	binIsFull: function(type, size){
+		var bin = this[type+'Bins'][size];
+		var rows = bin.slots;
+		for (rowIdx=0; rowIdx<rows.length; rowIdx++){
+			var row = rows[rowIdx];
+			for (var colIdx=0; colIdx<row.length; colIdx++){
+				var slot = row[colIdx]
+				if(!slot.isFull){
+					return false;
+				}
+			}
+			
+		}
+		return true;
+	},
+	binIsEmpty: function(type, size){
+		var bin = this[type+'Bins'][size];
+		var rows = bin.slots;
+		for (rowIdx=0; rowIdx<rows.length; rowIdx++){
+			var row = rows[rowIdx];
+			for (var colIdx=0; colIdx<row.length; colIdx++){
+				var slot = row[colIdx]
+				if(slot.isFull){
+					return false;
+				}
+			}
+			
+		}
+		return true;			
+	},
+	allEmpty: function(type){
+		var allEmpty = new Boolean();
+		allEmpty = true;
+		for (var binName in this[type + 'Bins']){
+			allEmpty = Math.min(allEmpty, this.binIsEmpty(type, binName));
+		}
+		return allEmpty;
+	},
+	weightCount: function(type, size){
+		var bin = this[type+'Bins'][size];
+		var rows = bin.slots;
+		var count = 0;
+		for (rowIdx=0; rowIdx<rows.length; rowIdx++){
+			var row = rows[rowIdx];
+			for (var colIdx=0; colIdx<row.length; colIdx++){
+				var slot = row[colIdx]
+				count+=slot.isFull;
+			}
+			
+		}
+		return count;
+	},
 	pistonMinusVal: function(val){
 		return function(){return walls.pts[0][0].y - val}
 	},
