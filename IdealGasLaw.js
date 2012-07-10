@@ -1,5 +1,5 @@
-function Orientation(){
-	this.dataHandler = new DataHandler();
+function IdealGasLaw(){
+	dataHandler = new DataHandler();
 	this.data = {};
 	this.data.t = [];
 	this.data.pInt = [];
@@ -27,21 +27,21 @@ function Orientation(){
 	this.promptIdx = -1;
 	this.blockIdx=-1;
 	this.prompts=[
-		{block:0, title: "one fish", text:"Alright, let’s figure out what temperature looks like.  Above, we have one molecule, and I submit to you that this molecule has a temperature.  The equation for a molecule’s temperature is as follows: 1.5kT = 0.5mv<sup>2</sup>, where k in the boltzmann constant, T is temperature, m is the molecule’s mass, and v is its speed.  This tells us that temperature is an expression of molecular kinetic energy.  The slider above changes the molecule’s temperature.  If you double the molecule’s temperature, by what factor will its speed increase?  Try drawing a graph of a hydrogen atom’s velocity with respect to its temperature."},
-		{block:1, title: "two fish", text:"Now suppose we have many molecules.  We know from before that we can assign a temperature to each molecule based on its mass and speed.  We also know that the system as a whole must have a temperature since a thermometer gives only one number.  We can guess that the bulk temperature must be based on the individual molecules’ temperatures, and we’d be right.  The bulk temperature is the average of all the molecules’ temperatures."},
-		{block:2, title: "red fish", text:"These two containers hold the same type of molecule.  Just so we're on the same page, which of the containers has a higher temperature and why?"},
-		{block:3, title: "bloo fish", text:"Hopefully you said the one one the left was hotter.  Now how do the temperatures of these two new systems compare?  The masses of the particles are 1 g/mol and 8 g/mol respectively.  Rms (above) stands for <a href=http://en.wikipedia.org/wiki/Root_mean_square#Definition>root mean squared</a>, which is the average of the square of all of the velocities, square rooted.  This can definitely be used to calculate kinetic energy. "},
-		{block:4, title: "too fish", text:"Okay, last one, I promise.  How do the temperatures of these two compare?  The masses are 3 g/mol and 8 g/mol."},
-		{block:5, title: "", text:""},
-		{block:6, title: "zoo fish", text:"Okay, let’s look at pressure.  A pressure is a force per area.  This tells us that gases at non-zero pressure must exert a force on their container.  In the system above, what event causes a force to be exerted on the wall?"},
-		{block:7, title: "quail", text:"It might be simpler if we look at just one molecule.  Every time the molecule hits the wall, its momentum changes.  A force is a momentum change per time.  If we want an average pressure, we can define time as the average time between collisions.  How would the momentum change and the frequency of collision change with velocity?  When you’re done playing here, we can go through the math on the next page."},
-		{block:8, title: "", text:"", start:this.block8aStart},
-		{block:8, title: "", text:"", start:this.block8bStart},
-		{block:8, title: "", text:"", start:this.block8cStart},
-		{block:9, title: "sprocket", start:this.block9aStart, cleanUp: this.block9aCleanUp, text:"So let’s consider a constant temperature container.  You can use the arrow to change the container volume.  Try havling the volume of this container.  We know from the ideal gas law that if you halve the volume and hold the temperature constant, the pressure will double, right?  Can you explain why this happens in terms of the number of molecular collisions with the wall?"},
-		{block:9, title: "sprocket", start:this.block9bStart, cleanUp: this.block9bCleanUp, text:"Now try halving the volume again.  What does pressure do this time, and does that seem correct?"},
-		{block:10, title: "", text: ""},
-		{block:11, title: "", text: ""},
+		{block:0, title: "Temperature 1", finished: false, text:"Alright, let’s figure out what temperature looks like.  Above, we have one molecule, and I submit to you that this molecule has a temperature.  The equation for a molecule’s temperature is as follows: 1.5kT = 0.5mv<sup>2</sup>, where k in the boltzmann constant, T is temperature, m is the molecule’s mass, and v is its speed.  This tells us that temperature is an expression of molecular kinetic energy.  The slider above changes the molecule’s temperature.  If you double the molecule’s temperature, by what factor will its speed increase?  Try drawing a graph of a hydrogen atom’s velocity with respect to its temperature."},
+		{block:1, title: "Temperature 2", finished: false, text:"Now suppose we have many molecules.  We know from before that we can assign a temperature to each molecule based on its mass and speed.  We also know that the system as a whole must have a temperature since a thermometer gives only one number.  We can guess that the bulk temperature must be based on the individual molecules’ temperatures, and we’d be right.  The bulk temperature is the average of all the molecules’ temperatures."},
+		{block:2, title: "Temperature 3", finished: false, text:"These two containers hold the same type of molecule.  Just so we're on the same page, which of the containers has a higher temperature and why?"},
+		{block:3, title: "Temperature 4", finished: false, text:"Hopefully you said the one the left was hotter.  Now how do the temperatures of these two new systems compare?  The masses of the particles are 3 g/mol and 8 g/mol respectively.  Rms (above) stands for <a href=http://en.wikipedia.org/wiki/Root_mean_square#Definition>root mean squared</a>, which is the average of the square of all of the velocities, square rooted.  This can definitely be used to calculate kinetic energy. "},
+		{block:4, title: "Temperature 5", finished: false, conditions: this.block4Conditions, text:"Slidey McSpeedsalot"},
+		{block:5, title: "Temperature 6", finished: false, text:""},
+		{block:6, title: "Pressure 1", finished: false, text:"Okay, let’s look at pressure.  A pressure is a force per area.  This tells us that gases at non-zero pressure must exert a force on their container.  In the system above, what event causes a force to be exerted on the wall?"},
+		{block:7, title: "Pressure 2", finished: false, text:"It might be simpler if we look at just one molecule.  Every time the molecule hits the wall, its momentum changes.  If we average that change out over the time between hitting the wall, we get an average force applied.  How would the momentum change and the frequency of collision change with speed?  You can use the slider to change the molecule’s temperature to check your ideas.  When you’re done playing here, we can go through the math on the next page."},
+		{block:8, title: "Pressure 3", finished: false, text:"", start:this.block8aStart},
+		{block:8, title: "Pressure 4", finished: false, text:"", start:this.block8bStart},
+		{block:8, title: "Pressure 5)", finished: false, text:"", start:this.block8cStart},
+		{block:9, title: "Volume 1", finished: false, conditions: this.block9aConditions, start:this.block9aStart, cleanUp: this.block9aCleanUp, text:"So let’s consider a constant temperature container.  You can use the yellow arrow to change the container volume.  Try havling the volume of this container.  We know from the ideal gas law that if you halve the volume and hold the temperature constant, the pressure will double, right?  Can you explain why this happens in terms of the number of molecular collisions with the wall?"},
+		{block:9, title: "Volume 2", finished: false, conditions: this.block9bConditions, start:this.block9bStart, cleanUp: this.block9bCleanUp, text:"Now try halving the volume again.  What does pressure do this time, and does that seem correct?"},
+		{block:10, title: "Volume 3", finished: false, text: ""},
+		{block:11, title: "", finished: false, text: ""},
 	]
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
 	this.minY = 30;
@@ -54,7 +54,7 @@ function Orientation(){
 
 }
 
-Orientation.prototype = {
+IdealGasLaw.prototype = {
 	init: function(){
 		this.hideDash();
 		this.hideText();
@@ -93,7 +93,7 @@ Orientation.prototype = {
 		walls.setup();
 		populate('spc4', P(45,35), V(450, 350), 1, 300);
 		var dot = spcs.spc4.dots[0]
-		this.readout.addEntry('temp', "Molecule's temperature:", 'K', this.dataHandler.temp(), 0, 0);
+		this.readout.addEntry('temp', "Molecule's temperature:", 'K', dataHandler.temp(), 0, 0);
 		this.readout.addEntry('speed', "speed:", 'm/s', dot.speed(),0,0);
 		this.readout.resetAll();
 		this.readout.show();
@@ -118,16 +118,17 @@ Orientation.prototype = {
 		populate('spc4', P(305,75), V(200, 300), 200, 100);
 		
 	},
+
 	block3Start: function(){
 		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
 			[P(300,30), P(510,30), P(510,440), P(300,440)]]);
 		walls.setup();
-		populate('spc3', P(45, 80), V(200, 300), 200, 300);
-		populate('spc5', P(305,75), V(200, 300), 100, 300);
+		populate('spc1', P(45, 80), V(200, 300), 200, 300);
+		populate('spc5', P(305,75), V(200, 300), 100, 800);
 
-		this.readout.addEntry('rmsV1', 'rms(V1):', 'm/s', rms(this.dataHandler.velocities('spc3')), undefined, 0);
+		this.readout.addEntry('rmsLeft', 'rms(V1):', 'm/s', rms(dataHandler.velocities('spc1')), undefined, 0);
 		
-		this.readout.addEntry('rmsV2', 'rms(V2):', 'm/s', rms(this.dataHandler.velocities('spc5')), undefined, 0);
+		this.readout.addEntry('rmsRight', 'rms(V2):', 'm/s', rms(dataHandler.velocities('spc5')), undefined, 0);
 
 		this.readout.show();
 	},
@@ -139,27 +140,49 @@ Orientation.prototype = {
 		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
 			[P(300,30), P(510,30), P(510,440), P(300,440)]]);
 		walls.setup();
-		populate('spc1', P(45, 80), V(200, 300), 200, 300);
-		populate('spc5', P(305,75), V(200, 300), 100, 800);
-
-		this.readout.addEntry('rmsV1', 'rms(V1):', 'm/s', rms(this.dataHandler.velocities('spc1')), undefined, 0);
+		var sliderMin = $('#sliderSpeedLeft').slider('option', 'min');
+		var sliderMax = $('#sliderSpeedLeft').slider('option', 'max');
+		this.spcA = 'spc3';
+		this.spcB = 'spc5'
+		var rmsInitA = Math.random()*(sliderMax-sliderMin)+sliderMin;
+		var rmsInitB = Math.random()*(sliderMax-sliderMin)+sliderMin;
+		var mA = spcs[this.spcA].m;
+		var mB = spcs[this.spcB].m;
+		populate(this.spcA, P(45, 80), V(200, 300), 200, VToTemp(mA, rmsInitA/pxToMS));
+		populate(this.spcB, P(305,75), V(200, 300), 100, VToTemp(mB, rmsInitB/pxToMS));
 		
-		this.readout.addEntry('rmsV2', 'rms(V2):', 'm/s', rms(this.dataHandler.velocities('spc5')), undefined, 0);
-
+		$('#sliderSpeedLeft').show().slider('option', {value:rmsInitA});
+		$('#sliderSpeedRight').show().slider('option', {value:rmsInitB});
+		this.readout.addEntry('rmsLeft', 'rms(left):', 'm/s', rmsInitA, undefined, 0);
+		this.readout.addEntry('rmsRight', 'rms(right):', 'm/s', rmsInitB, undefined, 0);
 		this.readout.show();
+	},
+	block4Conditions: function(){
+		var TA = dataHandler.temp(this.spcA);
+		var TB = dataHandler.temp(this.spcB);
+		if(fracDiff(TA, TB)<.1){
+			return {result:true}
+		} else{
+			return {result:false, alert:"Your temperatures aren't within the 10% tolerance of each other"} 
+		}
 	},
 	block4CleanUp: function(){
 		this.readout.removeAllEntries();
 		this.readout.hide();
+		$('#sliderSpeedLeft').hide()
+		$('#sliderSpeedRight').hide()
 	},
 	block5Start: function(){
+
+		this.spcA = undefined;
+		this.spcB = undefined;
 		saveListener(curLevel, 'update');
 		emptyListener(curLevel, 'update');
 		$('#reset').hide();
 		$('#canvasDiv').hide();
 		$('#display').show();
 		$('#intText').show();
-		$('#intText').html("So, we had three comparisons.  In the first, we had identical gases where the molecules in one chamber moved more quickly.  The fast moving one was hotter here because its molecules had a higher average kinetic energy. </p>"+
+		$('#intText').html("So, we had three comparisons.  In the first, we had identical gases where the molecules in one chamber moved more quickly.  The fast moving one was hotter because its molecules had a higher average kinetic energy.</p>"+
 		"<p>In the second set, with a light gas and a heavy gas, the root mean squareds of the velocities were different, but if you computed 0.5*m*rms(V)<sup>2</sup>, you found that the kinetic energies of the two were equal, showing that they were the same temperature.  So, molecular speed alone doesn’t tell us about temperature.  We need to know the particle mass as well.</p>"+
 		"<p>Finally, we had the two containers with equal speeds but different masses.  The temperatures can be calculated like in the last set, but that’s not necessary.  We can know that since temperature is an expression of <i>energy</i>, and since their speeds were the same, the one with less mass must have less energy and thus a lower temperature. </p>"+
 		"<p>To restate, higher temperature doesn’t necessarily mean your gas molecules are moving at a higher speed.  It means your gas molecules are moving with <i>more energy</i>.</p>");
@@ -184,7 +207,7 @@ Orientation.prototype = {
 		addListener(curLevel, 'data', 'recordPressure', 
 			function(){
 				var SAPInt = walls.surfArea()
-				var newP = this.dataHandler.pressureInt(this.forceInternal, this.numUpdates, SAPInt);
+				var newP = dataHandler.pressureInt(this.forceInternal, this.numUpdates, SAPInt);
 				this.data.pInt.push(newP);
 				this.readout.tick(newP, 'pressure')
 			},
@@ -229,7 +252,7 @@ Orientation.prototype = {
 			"<center><img src=img/pggfa.gif></img> and <img src = img/fma.gif></center>"+
 			"We can integrate F=ma over time to get"+
 			"<center><img src=img/momentum.gif></img></center>"+
-			"We know that the change in velocity is 2V<sub>x</sub> it leaves with the inverse of the velocity it arrived with.<br>"+
+			"We know that the change in velocity is 2V<sub>x</sub> because it leaves with the inverse of the velocity it arrived with.<br>"+
 			"Substituting in F, we get"+
 			"<center><img src=img/pdelt.gif></center>"+
 			"Continued on next page..."
@@ -237,17 +260,17 @@ Orientation.prototype = {
 	},
 	block8bStart: function(){
 		$('#intText').html("<center><img src=img/pressureSetup.gif></img></center>"+
-		"Because we're looking for an average pressure, we're averaging out the momentum change over the whole time between impacts, which is given by"+
+		"Because we're looking for an average pressure, we average out the momentum change over the whole time between impacts, which is given by"+
 		"<center><img src=img/delt.gif></img></center>"+
 		"Then we put it all together and get"+
 		"<center><img src=img/last.gif></img></center>"+
-		"Now hold on!  Remember the T is preportional to mV<sup>2</sup> as well!  The means that we have just derived that <i>P is directly proportional to T</i> from a simple model of balls bouncing around!  Does this sound familiar to the ideal gas law or what?"
+		"Now hold on!  Remember the T is preportional to mV<sup>2</sup> as well!  This means that we have just derived that <i>P is directly proportional to T</i> from a simple model of balls bouncing around!  Does this sound familiar to the ideal gas law or what?"
 		
 		);
 	},
 	block8cStart:function(){
-		$('#intText').html("<p>So we started with two ideas:</p><p>The harder your molecules hit the wall, the more force they exert on it.</p>"+
-		"<p>Second, the faster they're moving, the more often they hit the wall.</p>"+
+		$('#intText').html("<p>So we started with two ideas:</p><p><ul><li>First, the harder your molecules hit the wall, the more force they exert on it.</p>"+
+		"<p><li>Second, the faster they're moving, the more often they hit the wall.</ul></p>"+
 		"<p>Both of these things are <i>linearly</i> dependant on molecular speed</p>"+
 		"<p>Since total force applied to the walls by the molecules is product of these two, we get that pressure is proportional to speed squared, or to temperature.</p>"+
 		"<p>So there are <i>two factors</i> that influence pressure: force of collisions and number of collisions</p>"
@@ -285,15 +308,16 @@ Orientation.prototype = {
 		addListener(curLevel, 'data', 'recordPressure', 
 			function(){
 				var SAPInt = walls.surfArea()
-				var newP = this.dataHandler.pressureInt(this.forceInternal, this.numUpdates, SAPInt);
+				var newP = dataHandler.pressureInt(this.forceInternal, this.numUpdates, SAPInt);
 				this.data.pInt.push(newP);
 				this.readout.tick(newP, 'pressure')
 			},
 		this);
 	},
 	block9aStart: function(){
+		this.halfY = 235
 		var arrowVolInit = new Arrow([P(545, 30), P(510, 30)], Col(255,255,0), c);
-		var arrowVolHalf = new Arrow([P(545, 235), P(510, 235)], Col(0,255,0), c);
+		var arrowVolHalf = new Arrow([P(545, this.halfY), P(510, this.halfY)], Col(0,255,0), c);
 		addListener(curLevel, 'update', 'drawVolArrows', 
 			function(){
 				arrowVolInit.draw();
@@ -301,12 +325,20 @@ Orientation.prototype = {
 			},
 		'');	
 	},
+	block9aConditions: function(){
+		if(fracDiff(walls.pts[0][0].y, this.halfY)<.07){
+			return {result:true}
+		}else{
+			return {result:false, alert:'Closer!'}
+		}
+	},
 	block9aCleanUp: function(){
 		removeListenerByName(curLevel, 'update', 'drawVolArrows');
 	},
 	block9bStart: function(){
+		this.halfY = 337
 		var arrowVolInit = new Arrow([P(545, 235), P(510, 235)], Col(255,255,0), c);
-		var arrowVolHalf = new Arrow([P(545, 337), P(510, 337)], Col(0,255,0), c);
+		var arrowVolHalf = new Arrow([P(545, this.halfY), P(510, this.halfY)], Col(0,255,0), c);
 		addListener(curLevel, 'update', 'drawVolArrows', 
 			function(){
 				arrowVolInit.draw();
@@ -314,6 +346,13 @@ Orientation.prototype = {
 			},
 		'');	
 	
+	},
+	block9bConditions: function(){
+		if(fracDiff(walls.pts[0][0].y, this.halfY)<.07){
+			return {result:true}
+		}else{
+			return {result:false, alert:'Closer!'}
+		}	
 	},
 	block9bCleanUp: function(){
 		removeListenerByName(curLevel, 'update', 'drawVolArrows');
@@ -343,7 +382,7 @@ Orientation.prototype = {
 		$('#canvasDiv').hide();
 		$('#display').show();
 		$('#intText').show();
-		$('#intText').html("<p>Each time you halved the volume, you doubled the number of collisions that happen with the wall. This means that you doubled the pressure.  Might we propose the following:</p><p><center><img src=img/orientPalphaV.gif></img></center></p><p>Similarly, might we say that if we double the number of molecules, we would double the number of collisions and thus double pressure?  So we get</p><p><center><img src=img/orientPalphaN.gif></img></center></p>");
+		$('#intText').html("<p>Remember how we looked at the side length of a container, L<sub>x</sub> to find the time between collisions?  If you imagine that L<sub>x</sub> is the vertical dimension of this box, every time you halve it, you halve the average time between collisions.  This means that every time you halved the volume, you doubled the number of collisions per time with the wall. This means that you doubled the pressure.  From this inverse relationship, might we propose the following:</p><p><center><img src=img/orientPalphaV.gif></img></center></p><p>Similarly, might we say that if we double the number of molecules, we would double the number of collisions per time and thus double pressure?  So we get</p><p><center><img src=img/orientPalphaN.gif></img></center></p>");
 	},
 	block10CleanUp: function(){
 		loadListener(curLevel, 'update');
@@ -389,6 +428,7 @@ Orientation.prototype = {
 		loadListener(this, 'dotImpact');
 	},
 	startOutro: function(){
+		curLevel.blockIdx++;
 		saveListener(this, 'update');
 		saveListener(this, 'data');
 		emptyListener(this, 'update');
@@ -407,7 +447,7 @@ Orientation.prototype = {
 		nextPrompt();
 	},
 	backToSim: function(){
-		this.promptIdx = this.prompts.length-1;
+		
 		this.hideDash();
 		this.hideText();
 		$('#graphs').show()
@@ -417,6 +457,8 @@ Orientation.prototype = {
 		$('#base').show();	
 		loadListener(this, 'update');
 		loadListener(this, 'data');
+		curLevel.promptIdx-=1;
+		showPrompt(undefined, this.prompts[curLevel.promptIdx]);
 	},
 	makeDragArrow: function(bounds){
 		var pos = walls.pts[0][1].copy()
@@ -564,8 +606,8 @@ Orientation.prototype = {
 	},
 	dataRun: function(){
 
-		this.data.t.push(this.dataHandler.temp());
-		this.data.v.push(this.dataHandler.volOneWall());
+		this.data.t.push(dataHandler.temp());
+		this.data.v.push(dataHandler.volOneWall());
 		
 		for(var graphName in this.graphs){
 			this.graphs[graphName].addLast();
@@ -580,6 +622,16 @@ Orientation.prototype = {
 		var dot = spcs.spc4.dots[0];
 		this.readout.hardUpdate(temp, 'temp');
 		this.readout.hardUpdate(dot.speed(), 'speed');
+	},
+	changeTempSpc3: function(event, ui){
+		var rms = ui.value;
+		changeRMS('spc3', rms);
+		this.readout.hardUpdate(rms, 'rmsLeft');
+	},
+	changeTempSpc5: function(event, ui){
+		var rms = ui.value;
+		changeRMS('spc5', rms);	
+		this.readout.hardUpdate(rms, 'rmsRight');		
 	},
 	changePressureSlider: function(event, ui){
 		var temp = ui.value;

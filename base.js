@@ -240,6 +240,15 @@ function changeAllTemp(temp){
 		}
 	}
 }
+function changeRMS(spcName, newRMS){
+	var dots = spcs[spcName].dots;
+	var curRMS = rms(dataHandler.velocities(spcName));
+	var ratio = newRMS/curRMS;
+	for (var dotIdx=0; dotIdx<dots.length; dotIdx++){
+		var dot = dots[dotIdx];
+		dot.v.mult(ratio);
+	}
+}
 function changeDotTemp(dot, temp){
 	var curTemp = dot.temp();
 	var velRatio = Math.sqrt(temp/curTemp);
@@ -248,8 +257,12 @@ function changeDotTemp(dot, temp){
 	return dot;
 }
 function tempToV(mass, temp){
+	//T/tConst = 0.5*m*v^2
 	temp = 2*Math.max(0, temp/tConst*gauss(1,.1));
 	return Math.sqrt(temp/mass);
+}
+function VToTemp(mass, v){
+	return .5*mass*v*v*tConst;
 }
 function returnEscapist(dot){
 	var pt1 = walls.pts[0][0];
@@ -343,32 +356,60 @@ function makeSlider(id, attrs, handlers, initVisibility){
 }
 
 function showPrompt(prev, prompt){
-	if(prev && prev.cleanUp){
-		prev.cleanUp.apply(curLevel);
+	var finishedPrev = new Boolean();
+	var forward = new Boolean();
+	var didWin = new Boolean();
+	if(prev){
+		var finishedPrev = prev.finished;
+	} else{
+		finishedPrev = true;
 	}
-	var block = prompt.block
-	var text = prompt.text;
-	var func = prompt.start;
-	var title = prompt.title;
-	if(block!=curLevel.blockIdx){
-		for (var spcName in spcs){
-			depopulate(spcName);
+	didWin = true;
+	var indexOfPrev = _.indexOf(curLevel.prompts, prev);
+	var indexOfCur = _.indexOf(curLevel.prompts, prompt);
+	forward = indexOfCur>indexOfPrev;
+	if(!finishedPrev && forward && prev && prev.conditions){
+		var condResult = prev.conditions.apply(curLevel);
+		didWin = condResult.result;
+		if(!didWin){
+			curLevel.promptIdx-=1;
 		}
-		if(prev && curLevel['block'+prev.block+'CleanUp']){
-			curLevel['block'+prev.block+'CleanUp'].apply(curLevel);
+		if(condResult.alert){
+			alert(condResult.alert);
 		}
+	}
+	if(didWin || finishedPrev){
+		if(prev){
+			if(forward){
+				prev.finished = true;
+			}
+			if(prev.cleanUp){
+				prev.cleanUp.apply(curLevel);
+			}
+		}
+		var block = prompt.block
+		var text = prompt.text;
+		var func = prompt.start;
+		var title = prompt.title;
+		if(block!=curLevel.blockIdx){
+			for (var spcName in spcs){
+				depopulate(spcName);
+			}
+			if(prev && curLevel['block'+prev.block+'CleanUp']){
+				curLevel['block'+prev.block+'CleanUp'].apply(curLevel);
+			}
 
-		if(curLevel['block'+block+'Start']){
-			curLevel['block'+block+'Start'].apply(curLevel);
+			if(curLevel['block'+block+'Start']){
+				curLevel['block'+block+'Start'].apply(curLevel);
+			}
+			curLevel.blockIdx = block;
 		}
-		curLevel.blockIdx = block;
+		$('#prompt').html(text);
+		$('#baseHeader').html(title);
+		if(func){
+			func.apply(curLevel);
+		}
 	}
-	$('#prompt').html(text);
-	$('#baseHeader').html(title);
-	if(func){
-		func.apply(curLevel);
-	}
-	
 
 }
 function nextPrompt(){
@@ -391,6 +432,9 @@ function prevPrompt(){
 }
 function log10(val){
 	return Math.log(val)/Math.log(10);
+}
+function fracDiff(a, b){
+	return Math.abs(a-b)/Math.min(Math.abs(a), Math.abs(b));
 }
 function getLen(pts){
 	var len = 0;
@@ -496,7 +540,11 @@ $(document).mouseup(function(e){
 		listener.func.apply(listener.obj);
 	}	
 })
-
+function UNLOCK(){
+	for (var promptIdx in curLevel.prompts){
+		curLevel.prompts[promptIdx].finished=true;
+	}
+}
 spcs = {};
 draw = new drawingTools();
 collide = new CollideHandler();
@@ -506,7 +554,7 @@ pConst = 16.1423;
 LtoM3 = .001;
 ATMtoPA = 101325;
 JtoKJ = .001;
-//To get nice numbers with this, 1 mass in here coresponds to weight of 10 H 
+//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
 pxToMS = 157.9;
 tConst = 20;
 workConst = .158e-3;//for kJ;

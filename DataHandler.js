@@ -7,16 +7,26 @@ DataHandler.prototype = {
 	pressureExt: function(weight, g, SA){
 		return pConst*weight*g/SA;
 	},
-	temp: function(){
+	temp: function(spcName){
 		var sumKE = 0
 		var numDots = 0;
-		for (var spcName in spcs){
+		if(spcName){
 			spc = spcs[spcName];
 			var numInSpc = spc.dots.length;
-			numDots += numInSpc;
+			numDots += numInSpc; 
 			for (var dotIdx=0; dotIdx<numInSpc; dotIdx++){
 				var dot = spc.dots[dotIdx];
 				sumKE += dot.KE();
+			}		
+		}else{
+			for (var spcName in spcs){
+				spc = spcs[spcName];
+				var numInSpc = spc.dots.length;
+				numDots += numInSpc; 
+				for (var dotIdx=0; dotIdx<numInSpc; dotIdx++){
+					var dot = spc.dots[dotIdx];
+					sumKE += dot.KE();
+				}
 			}
 		}
 		t = sumKE*tConst;

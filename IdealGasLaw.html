@@ -38,9 +38,13 @@
 		</div>
 		<div id='dashRun' class='dashMed noSelect'>
 			<center>
-				<button id='reset' class='noSelect'>Reset experiment</button>
-				<button id='clearGraphs' class='noSelect'>Clear graphs</button>
-				<br>
+				<div>
+					<div id='sliderSpeedLeft' style='display:inline-block; width:150px'></div>
+					<button id='reset' class='noSelect'>Reset experiment</button>
+					<button id='clearGraphs' class='noSelect'>Clear graphs</button>
+					<div id='sliderSpeedRight' style='display:inline-block; width:150px'></div>
+				</div>
+				
 				<div id='sliderTemp' style='width:300px'></div>
 				<div id='sliderPressure' style='width:300px'></div>
 			</center>
@@ -85,7 +89,7 @@ var curLevel;
 canvasHeight = 450;
 $(function(){
 	myCanvas.height = canvasHeight;
-	curLevel = new Orientation();
+	curLevel = new IdealGasLaw();
 	curLevel.init();
 	$('button').button();
 	$('#toSim').click(function(){curLevel.toSim()});
@@ -119,6 +123,30 @@ $(function(){
 		],
 		'hide'
 	);
+	makeSlider(
+		"sliderSpeedLeft",
+		{
+			min:50,
+			max:1500,
+			value:300,
+		},
+		[
+			{eventType:'slide', obj:curLevel, func:curLevel.changeTempSpc3},
+		],
+		'hide'
+	);
+	makeSlider(
+		"sliderSpeedRight",
+		{
+			min:50,
+			max:1500,
+			value:300,
+		},
+		[
+			{eventType:'slide', obj:curLevel, func:curLevel.changeTempSpc5},
+		],
+		'hide'
+	);
 });
 
 myCanvas.width = $('#main').width();
@@ -140,7 +168,7 @@ myCanvas.width = $('#main').width();
 <script src = 'animText.js'></script>
 <script src = 'Readout.js'></script>
 <script src = 'WorkTracker.js'></script>
-<script src = 'Orientation.js'></script>
+<script src = 'IdealGasLaw.js'></script>
 <script src = 'base.js'></script>
 
 </body>
