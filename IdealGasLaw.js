@@ -348,7 +348,7 @@ IdealGasLaw.prototype = {
 		populate('spc3', P(45,35), V(450, 350), 800, 300);	
 		this.dragArrow = this.makeDragArrow();
 		this.dragArrow.show();
-		var arrowVolInit = new Arrow([P(545, 30), P(510, 30)], Col(255,255,0), c);
+		var arrowVolInit = new Arrow([P(545, 30), P(510, 30)], Col(255,0,0), c);
 		var arrowVolHalf = new Arrow([P(545, 235), P(510, 235)], Col(0,255,0), c);
 		addListener(curLevel, 'update', 'drawVolArrows', 
 			function(){

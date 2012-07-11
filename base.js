@@ -368,17 +368,15 @@ function showPrompt(prev, prompt){
 	var indexOfPrev = _.indexOf(curLevel.prompts, prev);
 	var indexOfCur = _.indexOf(curLevel.prompts, prompt);
 	forward = indexOfCur>indexOfPrev;
-	if(!finishedPrev && forward && prev && prev.conditions){
+	if(!finishedPrev && forward && prev.conditions){
 		var condResult = prev.conditions.apply(curLevel);
 		didWin = condResult.result;
-		if(!didWin){
-			curLevel.promptIdx-=1;
-		}
 		if(condResult.alert){
 			alert(condResult.alert);
 		}
 	}
 	if(didWin || finishedPrev){
+		curLevel.promptIdx = indexOfCur;
 		if(prev){
 			if(forward){
 				prev.finished = true;
@@ -414,19 +412,18 @@ function showPrompt(prev, prompt){
 }
 function nextPrompt(){
 	var prev = curLevel.prompts[curLevel.promptIdx];
-	curLevel.promptIdx = curLevel.promptIdx+1;
-	if(curLevel.promptIdx==curLevel.prompts.length){
+
+	if(curLevel.promptIdx+1==curLevel.prompts.length){
 		curLevel.startOutro();
 	}else{
-		var promptIdx = curLevel.promptIdx;
+		var promptIdx = curLevel.promptIdx+1;
 		var prompt = curLevel.prompts[promptIdx];
 		showPrompt(prev, prompt);
 	}
 }
 function prevPrompt(){
 	var prev = curLevel.prompts[curLevel.promptIdx];
-	curLevel.promptIdx = Math.max(0, curLevel.promptIdx-1);
-	var promptIdx = curLevel.promptIdx;
+	var promptIdx = Math.max(0, curLevel.promptIdx-1);;
 	var prompt = curLevel.prompts[promptIdx];
 	showPrompt(prev, prompt);
 }
