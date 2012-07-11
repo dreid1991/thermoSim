@@ -677,6 +677,7 @@ DragWeights.prototype = {
 	},
 	reset: function(){
 		this.dropAllInBins();
+		this.eAdded=0;
 		curLevel.wallV=0;
 	}
 }

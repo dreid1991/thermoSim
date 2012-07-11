@@ -39,10 +39,17 @@
 		<div id='dashRun' class='dashMed noSelect'>
 			<center>
 				<div>
-					<div id='sliderSpeedLeft' style='display:inline-block; width:150px'></div>
+					<div id='sliderSpeedLeftHolder' style='display:inline-block'>
+						RMS(v) Left
+						<div id='sliderSpeedLeft' style='width:150px'></div>
+					</div>
 					<button id='reset' class='noSelect'>Reset experiment</button>
+					<button id='checkAns' class='noSelect'>Check answer</button>
 					<button id='clearGraphs' class='noSelect'>Clear graphs</button>
-					<div id='sliderSpeedRight' style='display:inline-block; width:150px'></div>
+					<div id='sliderSpeedRightHolder' style='display:inline-block'>
+						RMS(v) Right
+						<div id='sliderSpeedRight' style='width:150px'></div>
+					</div>
 				</div>
 				
 				<div id='sliderTemp' style='width:300px'></div>
@@ -91,12 +98,16 @@ $(function(){
 	myCanvas.height = canvasHeight;
 	curLevel = new IdealGasLaw();
 	curLevel.init();
+	$('#sliderSpeedLeftHolder').hide();
+	$('#sliderSpeedRightHolder').hide();
+	$('#checkAns').hide();
 	$('button').button();
 	$('#toSim').click(function(){curLevel.toSim()});
 	$('#toLastStep').click(function(){curLevel.backToSim()});
 	$('#previous').click(function(){prevPrompt()});
 	$('#next').click(function(){nextPrompt()});
 	$('#submit').click(function(){submit()});
+	$('#checkAns').click(function(){curLevel.checkAnsTemp()});
 	$('#clearGraphs').click(function(){curLevel.clearGraphs()});
 	$('#reset').click(function(){curLevel.reset()});
 	makeSlider(
@@ -133,7 +144,7 @@ $(function(){
 		[
 			{eventType:'slide', obj:curLevel, func:curLevel.changeTempSpc3},
 		],
-		'hide'
+		'show'
 	);
 	makeSlider(
 		"sliderSpeedRight",
@@ -145,7 +156,7 @@ $(function(){
 		[
 			{eventType:'slide', obj:curLevel, func:curLevel.changeTempSpc5},
 		],
-		'hide'
+		'show'
 	);
 });
 

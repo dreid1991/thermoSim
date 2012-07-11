@@ -491,7 +491,17 @@ function spacedPt(pt, UVs, thickness){
 	var adjust = UV1.add(UV2)
 	return pt.copy().movePt(adjust.mult(thickness));
 }
-
+function replaceString(source, oldStr, newStr){
+	var start = source.indexOf(oldStr);
+	if(start!=-1){
+		oldLen = oldStr.length;
+		var a = source.substring(0, start);
+		var b = newStr;
+		var c = source.substring(start+oldLen, source.length)
+		source = a+b+c;
+	}
+	return source;
+} 
 var canvas;
 var c; 
 /*

@@ -27,20 +27,20 @@ function IdealGasLaw(){
 	this.promptIdx = -1;
 	this.blockIdx=-1;
 	this.prompts=[
-		{block:0, title: "Temperature 1", finished: false, text:"Alright, let’s figure out what temperature looks like.  Above, we have one molecule, and I submit to you that this molecule has a temperature.  The equation for a molecule’s temperature is as follows: 1.5kT = 0.5mv<sup>2</sup>, where k in the boltzmann constant, T is temperature, m is the molecule’s mass, and v is its speed.  This tells us that temperature is an expression of molecular kinetic energy.  The slider above changes the molecule’s temperature.  If you double the molecule’s temperature, by what factor will its speed increase?  Try drawing a graph of a hydrogen atom’s velocity with respect to its temperature."},
-		{block:1, title: "Temperature 2", finished: false, text:"Now suppose we have many molecules.  We know from before that we can assign a temperature to each molecule based on its mass and speed.  We also know that the system as a whole must have a temperature since a thermometer gives only one number.  We can guess that the bulk temperature must be based on the individual molecules’ temperatures, and we’d be right.  The bulk temperature is the average of all the molecules’ temperatures."},
-		{block:2, title: "Temperature 3", finished: false, text:"These two containers hold the same type of molecule.  Just so we're on the same page, which of the containers has a higher temperature and why?"},
-		{block:3, title: "Temperature 4", finished: false, text:"Hopefully you said the one the left was hotter.  Now how do the temperatures of these two new systems compare?  The masses of the particles are 3 g/mol and 8 g/mol respectively.  Rms (above) stands for <a href=http://en.wikipedia.org/wiki/Root_mean_square#Definition>root mean squared</a>, which is the average of the square of all of the velocities, square rooted.  This can definitely be used to calculate kinetic energy. "},
-		{block:4, title: "Temperature 5", finished: false, conditions: this.block4Conditions, text:"Slidey McSpeedsalot"},
-		{block:5, title: "Temperature 6", finished: false, text:""},
-		{block:6, title: "Pressure 1", finished: false, text:"Okay, let’s look at pressure.  A pressure is a force per area.  This tells us that gases at non-zero pressure must exert a force on their container.  In the system above, what event causes a force to be exerted on the wall?"},
-		{block:7, title: "Pressure 2", finished: false, text:"It might be simpler if we look at just one molecule.  Every time the molecule hits the wall, its momentum changes.  If we average that change out over the time between hitting the wall, we get an average force applied.  How would the momentum change and the frequency of collision change with speed?  You can use the slider to change the molecule’s temperature to check your ideas.  When you’re done playing here, we can go through the math on the next page."},
-		{block:8, title: "Pressure 3", finished: false, text:"", start:this.block8aStart},
-		{block:8, title: "Pressure 4", finished: false, text:"", start:this.block8bStart},
-		{block:8, title: "Pressure 5)", finished: false, text:"", start:this.block8cStart},
-		{block:9, title: "Volume 1", finished: false, conditions: this.block9aConditions, start:this.block9aStart, cleanUp: this.block9aCleanUp, text:"So let’s consider a constant temperature container.  You can use the yellow arrow to change the container volume.  Try havling the volume of this container.  We know from the ideal gas law that if you halve the volume and hold the temperature constant, the pressure will double, right?  Can you explain why this happens in terms of the number of molecular collisions with the wall?"},
-		{block:9, title: "Volume 2", finished: false, conditions: this.block9bConditions, start:this.block9bStart, cleanUp: this.block9bCleanUp, text:"Now try halving the volume again.  What does pressure do this time, and does that seem correct?"},
-		{block:10, title: "Volume 3", finished: false, text: ""},
+		{block:0, title: "Current step", finished: false, conditions: this.block0Conditions, text:"Alright, let’s figure out what temperature looks like.  Above, we have one molecule, and I submit to you that this molecule has a temperature.  The equation for a molecule’s temperature is as follows: 1.5kT = 0.5mv<sup>2</sup>, where k in the boltzmann constant, T is temperature, m is the molecule’s mass, and v is its speed.  This tells us that temperature is an expression of molecular kinetic energy.  The slider above changes the molecule’s temperature.  If you double the molecule’s temperature, by what factor will its speed increase?  Try drawing a graph of a hydrogen atom’s velocity with respect to its temperature."},
+		{block:1, title: "Current step", finished: false, text:"Now suppose we have many molecules.  We know from before that we can assign a temperature to each molecule based on its mass and speed.  We also know that the system as a whole must have a temperature since a thermometer gives only one number.  We can guess that the bulk temperature must be based on the individual molecules’ temperatures, and we’d be right.  The bulk temperature is the average of all the molecules’ temperatures."},
+		{block:2, title: "Current step", finished: false, text:"These two containers hold the same type of molecule.  Just so we're on the same page, which of the containers has a higher temperature and why?"},
+		{block:3, title: "Current step", finished: false, text:"Hopefully you said the one the left was hotter.  Now how do the temperatures of these two new systems compare?  The masses of the particles are 3 g/mol and 8 g/mol respectively.  RMS (above) stands for <a href=http://en.wikipedia.org/wiki/Root_mean_square#Definition>root mean squared</a>, which is the average of the squares of all of the velocities, square rooted.  This can definitely be used to calculate average kinetic energy. "},
+		{block:4, title: "Current step", finished: false, conditions: this.block4Conditions, text:"Slidey McSpeedsalot"},
+		{block:5, title: "", 			 finished: false, text:""},
+		{block:6, title: "Current step", finished: false, text:"Okay, let’s look at pressure.  A pressure is a force per area.  This tells us that gases at non-zero pressure must exert a force on their container.  In the system above, what event causes a force to be exerted on the wall?"},
+		{block:7, title: "Current step", finished: false, conditions: this.block7Conditions, text:"It might be simpler if we look at just one molecule.  Every time the molecule hits the wall, its momentum changes.  If we average that change out over the time between hitting the wall, we get an average force applied.  How would the momentum change and the frequency of collision change with speed?  You can use the slider to change the molecule’s temperature to check your ideas.  When you’re done playing here, we can go through the math on the next page."},
+		{block:8, title: "Current step", finished: false, text:"", start:this.block8aStart},
+		{block:8, title: "Current step", finished: false, text:"", start:this.block8bStart},
+		{block:8, title: "", 			 finished: false, text:"", start:this.block8cStart},
+		{block:9, title: "Current step", finished: false, conditions: this.block9aConditions, start:this.block9aStart, cleanUp: this.block9aCleanUp, text:"So let’s consider a constant temperature container.  You can use the yellow arrow to change the container volume.  Try havling the volume of this container.  We know from the ideal gas law that if you halve the volume and hold the temperature constant, the pressure will double, right?  Can you explain why this happens in terms of the number of molecular collisions with the wall?"},
+		{block:9, title: "Current step", finished: false, conditions: this.block9bConditions, start:this.block9bStart, cleanUp: this.block9bCleanUp, text:"Now try halving the volume again.  How do the pressure and number of collisions behave this time?"},
+		{block:10, title: "Current step", finished: false, text: ""},
 		{block:11, title: "", finished: false, text: ""},
 	]
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
@@ -66,7 +66,6 @@ IdealGasLaw.prototype = {
 			func.apply(obj);
 		}		
 		var self = this;
-		$('#myCanvas').show();
 	},
 	startIntro: function(){
 		//var ptsToBorder = this.getPtsToBorder();
@@ -87,6 +86,8 @@ IdealGasLaw.prototype = {
 		$('#dashIntro').show();
 	},
 	block0Start: function(){
+		this.playedWithSlider = new Boolean();
+		this.playedWithSlider = false;
 		$('#clearGraphs').hide();
 		$('#sliderTemp').show();
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]]);
@@ -100,7 +101,15 @@ IdealGasLaw.prototype = {
 		var temp = spcs.spc4.dots[0].temp();
 		$('#sliderTemp').slider('option', {value:temp});
 	},
+	block0Conditions: function(){
+		if(this.playedWithSlider){
+			return {result:true};
+		}else{
+			return {result:false, alert:'Play with the slider, I insist'};
+		}
+	},
 	block0CleanUp: function(){
+		this.playedWithSlider = undefined;
 		this.readout.removeAllEntries();
 		this.readout.hide();
 		$('#sliderTemp').hide();
@@ -126,9 +135,9 @@ IdealGasLaw.prototype = {
 		populate('spc1', P(45, 80), V(200, 300), 200, 300);
 		populate('spc5', P(305,75), V(200, 300), 100, 800);
 
-		this.readout.addEntry('rmsLeft', 'rms(V1):', 'm/s', rms(dataHandler.velocities('spc1')), undefined, 0);
+		this.readout.addEntry('rmsLeft', 'RMS(V1):', 'm/s', rms(dataHandler.velocities('spc1')), undefined, 0);
 		
-		this.readout.addEntry('rmsRight', 'rms(V2):', 'm/s', rms(dataHandler.velocities('spc5')), undefined, 0);
+		this.readout.addEntry('rmsRight', 'RMS(V2):', 'm/s', rms(dataHandler.velocities('spc5')), undefined, 0);
 
 		this.readout.show();
 	},
@@ -144,33 +153,54 @@ IdealGasLaw.prototype = {
 		var sliderMax = $('#sliderSpeedLeft').slider('option', 'max');
 		this.spcA = 'spc3';
 		this.spcB = 'spc5'
-		var rmsInitA = Math.random()*(sliderMax-sliderMin)+sliderMin;
-		var rmsInitB = Math.random()*(sliderMax-sliderMin)+sliderMin;
 		var mA = spcs[this.spcA].m;
 		var mB = spcs[this.spcB].m;
-		populate(this.spcA, P(45, 80), V(200, 300), 200, VToTemp(mA, rmsInitA/pxToMS));
-		populate(this.spcB, P(305,75), V(200, 300), 100, VToTemp(mB, rmsInitB/pxToMS));
+		var tempA = 1;
+		var tempB = 1;
+		while (fracDiff(tempA, tempB)<.1){
+			var rmsInitA = Math.random()*(sliderMax-sliderMin)+sliderMin;
+			var rmsInitB = Math.random()*(sliderMax-sliderMin)+sliderMin;
+			var tempA = VToTemp(mA, rmsInitA/pxToMS);
+			var tempB = VToTemp(mB, rmsInitB/pxToMS);
+		}
+		populate(this.spcA, P(45, 80), V(200, 300), 200, tempA);
+		populate(this.spcB, P(305,75), V(200, 300), 100, tempB);
 		
-		$('#sliderSpeedLeft').show().slider('option', {value:rmsInitA});
-		$('#sliderSpeedRight').show().slider('option', {value:rmsInitB});
-		this.readout.addEntry('rmsLeft', 'rms(left):', 'm/s', rmsInitA, undefined, 0);
-		this.readout.addEntry('rmsRight', 'rms(right):', 'm/s', rmsInitB, undefined, 0);
+		$('#sliderSpeedLeft').slider('option', {value:rmsInitA});
+		$('#sliderSpeedRight').slider('option', {value:rmsInitB});
+		$('#sliderSpeedLeftHolder').show();
+		$('#sliderSpeedRightHolder').show();
+		$('#reset').hide();
+		$('#checkAns').show();
+		this.readout.addEntry('rmsLeft', 'RMS(v) Left:', 'm/s', rmsInitA, undefined, 0);
+		this.readout.addEntry('rmsRight', 'RMS(v) Right:', 'm/s', rmsInitB, undefined, 0);
 		this.readout.show();
 	},
 	block4Conditions: function(){
-		var TA = dataHandler.temp(this.spcA);
-		var TB = dataHandler.temp(this.spcB);
-		if(fracDiff(TA, TB)<.1){
+		var tempA = dataHandler.temp(this.spcA);
+		var tempB = dataHandler.temp(this.spcB);
+		if(fracDiff(tempA, tempB)<.1){
 			return {result:true}
 		} else{
 			return {result:false, alert:"Your temperatures aren't within the 10% tolerance of each other"} 
 		}
 	},
+	checkAnsTemp: function(){
+		var tempA = dataHandler.temp(this.spcA);
+		var tempB = dataHandler.temp(this.spcB);
+		if(fracDiff(tempA, tempB)<.1){
+			alert('Your temperatures are ' + round(tempA,0) + ' K and ' + round(tempB,0) + ' K. Close enough, well done.');
+		}else{
+			alert("Your temperatures aren't the same.");
+		}
+	},
 	block4CleanUp: function(){
 		this.readout.removeAllEntries();
 		this.readout.hide();
-		$('#sliderSpeedLeft').hide()
-		$('#sliderSpeedRight').hide()
+		$('#reset').show();
+		$('#checkAns').hide();
+		$('#sliderSpeedLeftHolder').hide()
+		$('#sliderSpeedRightHolder').hide()
 	},
 	block5Start: function(){
 
@@ -219,7 +249,9 @@ IdealGasLaw.prototype = {
 		removeListener(curLevel, 'data', 'recordPressure');
 	},
 	block7Start: function(){
-		walls = new WallHandler([[P(50,75), P(75,50), P(400,50), P(425,75), P(425,300), P(400,325), P(75,325), P(50,300)]]);
+		this.playedWithSlider = new Boolean();
+		this.playedWithSlider = false;
+		walls = new WallHandler([[P(50,75), P(75,50), P(475,50), P(500,75), P(500,300), P(475,325), P(75,325), P(50,300)]]);
 		walls.setup();
 		populate('spc4', P(100,100), V(300,200), 1, 700);
 		removeListener(curLevel, 'wallImpact', 'std');
@@ -227,7 +259,11 @@ IdealGasLaw.prototype = {
 		$('#sliderPressure').show();
 		
 	},
+	block7Conditions: function(){
+		return this.block0Conditions();
+	},
 	block7CleanUp: function(){
+		this.playedWithSlider = undefined;
 		$('#sliderPressure').hide();
 		removeListener(curLevel, 'wallImpact', 'arrow');
 		removeListenerByName(curLevel, 'update', 'drawArrow');
@@ -329,7 +365,7 @@ IdealGasLaw.prototype = {
 		if(fracDiff(walls.pts[0][0].y, this.halfY)<.07){
 			return {result:true}
 		}else{
-			return {result:false, alert:'Closer!'}
+			return {result:false, alert:'Halve the volume!'}
 		}
 	},
 	block9aCleanUp: function(){
@@ -351,21 +387,13 @@ IdealGasLaw.prototype = {
 		if(fracDiff(walls.pts[0][0].y, this.halfY)<.07){
 			return {result:true}
 		}else{
-			return {result:false, alert:'Closer!'}
+			return {result:false, alert:'Halve the volume!'}
 		}	
 	},
 	block9bCleanUp: function(){
 		removeListenerByName(curLevel, 'update', 'drawVolArrows');
 	},
-	getPtsToBorder: function(){
-		var pts = [];
-		var wallPts = walls.pts[0];
-		pts.push(wallPts[1].copy())
-		pts.push(wallPts[2].copy());
-		pts.push(wallPts[3].copy());
-		pts.push(wallPts[4].copy());
-		return pts;
-	},
+
 	block9CleanUp: function(){
 		
 		removeListenerByName(curLevel, 'update', 'drawBorder');
@@ -382,7 +410,7 @@ IdealGasLaw.prototype = {
 		$('#canvasDiv').hide();
 		$('#display').show();
 		$('#intText').show();
-		$('#intText').html("<p>Remember how we looked at the side length of a container, L<sub>x</sub> to find the time between collisions?  If you imagine that L<sub>x</sub> is the vertical dimension of this box, every time you halve it, you halve the average time between collisions.  This means that every time you halved the volume, you doubled the number of collisions per time with the wall. This means that you doubled the pressure.  From this inverse relationship, might we propose the following:</p><p><center><img src=img/orientPalphaV.gif></img></center></p><p>Similarly, might we say that if we double the number of molecules, we would double the number of collisions per time and thus double pressure?  So we get</p><p><center><img src=img/orientPalphaN.gif></img></center></p>");
+		$('#intText').html("<p>Remember how we looked at the side length of a container, L<sub>x</sub> to find the time between collisions?  If you imagine that L<sub>x</sub> is the vertical dimension of the previous container, every time you halve L<sub>x</sub>, you halve the average time between collisions, doubling the number of wall impacts per time and thus doubling pressure.   From this inverse relationship, might we propose the following:</p><p><center><img src=img/orientPalphaV.gif></img></center></p><p>Similarly, might we say that if we double the number of molecules, we would double the number of collisions per time and thus double pressure?  So we get</p><p><center><img src=img/orientPalphaN.gif></img></center></p><p>Would the above relationships be true if temperature were not held constant?  Try to relate your answer to frequency and momentum of collisions with the wall.</p>");
 	},
 	block10CleanUp: function(){
 		loadListener(curLevel, 'update');
@@ -459,6 +487,15 @@ IdealGasLaw.prototype = {
 		loadListener(this, 'data');
 		curLevel.promptIdx-=1;
 		showPrompt(undefined, this.prompts[curLevel.promptIdx]);
+	},
+	getPtsToBorder: function(){
+		var pts = [];
+		var wallPts = walls.pts[0];
+		pts.push(wallPts[1].copy())
+		pts.push(wallPts[2].copy());
+		pts.push(wallPts[3].copy());
+		pts.push(wallPts[4].copy());
+		return pts;
 	},
 	makeDragArrow: function(bounds){
 		var pos = walls.pts[0][1].copy()
@@ -617,11 +654,17 @@ IdealGasLaw.prototype = {
 		return walls.area(0);// - walls.area(1);
 	},
 	changeTempSlider: function(event, ui){
+		this.playedWithSlider = true;
 		var temp = ui.value;
 		changeAllTemp(temp);
 		var dot = spcs.spc4.dots[0];
 		this.readout.hardUpdate(temp, 'temp');
 		this.readout.hardUpdate(dot.speed(), 'speed');
+	},
+	changePressureSlider: function(event, ui){
+		this.playedWithSlider = true;
+		var temp = ui.value;
+		changeAllTemp(temp);
 	},
 	changeTempSpc3: function(event, ui){
 		var rms = ui.value;
@@ -633,10 +676,7 @@ IdealGasLaw.prototype = {
 		changeRMS('spc5', rms);	
 		this.readout.hardUpdate(rms, 'rmsRight');		
 	},
-	changePressureSlider: function(event, ui){
-		var temp = ui.value;
-		changeAllTemp(temp);
-	},
+
 	reset: function(){
 		var curPrompt = this.prompts[this.promptIdx];
 		if(this['block'+this.blockIdx+'CleanUp']){
