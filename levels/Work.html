@@ -8,7 +8,7 @@
 <div class='noSelect wrapper'>
 	<div id='main' class='main noSelect'>
 		<div id='mainHeader' class='header noSelect'>
-			Origins of Thermodynamic Properties
+			Work
 		</div>
 		<div id='canvasDiv' class='canvasDiv noSelect'>
 			<canvas id='myCanvas'>
@@ -34,6 +34,7 @@
 		<div id='dashRun' class='dashMed noSelect'>
 			<center>
 				<div>
+					<div id='sliderSnap' style='width:150px'></div>
 					<button id='reset' class='noSelect'>Reset experiment</button>
 					<button id='checkAns' class='noSelect'>Check answer</button>
 					<button id='clearGraphs' class='noSelect'>Clear graphs</button>
@@ -92,6 +93,18 @@ $(function(){
 	$('#checkAns').click(function(){curLevel.checkAnsTemp()});
 	$('#clearGraphs').click(function(){curLevel.clearGraphs()});
 	$('#reset').click(function(){curLevel.reset()});
+	makeSlider(
+		"sliderSnap", 
+		{
+			min:100, 
+			max:2000, 
+			value:300, 
+		},
+		[
+			{eventType:'slidestop', obj:curLevel, func:function(){$('#sliderSnap').slider('option', {value:500});}},
+		],
+		'show'
+	);
 });
 
 myCanvas.width = $('#main').width();
