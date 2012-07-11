@@ -198,13 +198,25 @@ function addSpecies(toAdd){
 	if (String(toAdd)===toAdd){
 		var def = speciesDefs[toAdd];
 		spcs[toAdd] = new Species(def.m, def.r, def.cols);
-	} else{
+	} else if (toAdd instanceof Array){
 		for (var toAddIdx=0; toAddIdx<toAdd.length; toAddIdx++){
 			var name = toAdd[toAddIdx];
 			var def = speciesDefs[name];
 			spcs[name] = new Species(def.m, def.r, def.cols);
 		}
 	}
+	collide.setup();
+}
+function removeSpecies(toRem){
+	if (String(toRemove)===toRemove){
+		spcs[toRemove] = undefined;
+	} else if(toRem instanceof Array){
+		for (var toRemIdx=0; toRemIdx<toRem.length; toRemIdx++){
+			var name = toAdd[toRemIdx];
+			spcs[name] = undefined
+		}
+	}
+	collide.setup();
 }
 function populate(name, pos, dims, num, temp){
 	var vStdev = .1;

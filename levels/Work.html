@@ -1,11 +1,11 @@
 <html>
 <body>
-<link type='text/css' href = 'css/sunny/jquery-ui-1.8.20.custom.css' rel='stylesheet' />
-<link type='text/css' href = 'styles.css' rel='stylesheet'/>
-<script src = 'underscore-min.js'></script>
-<script src = 'js/jquery-1.7.2.min.js'></script>
-<script src = 'js/jquery-ui-1.8.20.custom.min.js'></script>
-<div class='noSelect'>
+<link type='text/css' href = '../css/sunny/jquery-ui-1.8.20.custom.css' rel='stylesheet' />
+<link type='text/css' href = '../styles.css' rel='stylesheet'/>
+<script src = '../underscore-min.js'></script>
+<script src = '../js/jquery-1.7.2.min.js'></script>
+<script src = '../js/jquery-ui-1.8.20.custom.min.js'></script>
+<div class='noSelect wrapper'>
 	<div id='main' class='main noSelect'>
 		<div id='mainHeader' class='header noSelect'>
 			Origins of Thermodynamic Properties
@@ -17,14 +17,14 @@
 		<div id='display' class='display noSelect'>
 			
 			<div id='textIntro' class='displayText no Select'>
-				We are sentances.  Together we are strong.  Together are are paragraphs.</p>
+				Fancy pantsy intro.  
 			</div>
 			<div id='textOutro' class='displayText noSelect'>
-				This sentance is at the end of the simulation.  The HUMON should be oriented now</p>
+				Zoop dee doo!
+			</div>
+			<div id='intText' class='displayText noSelect'>
 			</div>
 		</div>
-
-
 		<div id='dashIntro' class='dashMed noSelect'>
 			<center>
 				<button id='toSim' class='noSelect'>To the simulation!</button>
@@ -33,10 +33,11 @@
 		</div>
 		<div id='dashRun' class='dashMed noSelect'>
 			<center>
-				<button id='reset' class='noSelect'>Reset experiment</button>
-				<button id='clearGraphs' class='noSelect'>Clear graphs</button>
-				<br>
-				<div id='sliderTemp' style='width:300px'></div>
+				<div>
+					<button id='reset' class='noSelect'>Reset experiment</button>
+					<button id='checkAns' class='noSelect'>Check answer</button>
+					<button id='clearGraphs' class='noSelect'>Clear graphs</button>
+				</div>
 			</center>
 		</div>
 
@@ -50,7 +51,7 @@
 		
 
 	</div>
-	<div id='graphs' class='graphs'>
+	<div id='graphs' class='graphs noSelect'>
 	</div>
 </div>
 <br>
@@ -79,28 +80,18 @@ var curLevel;
 canvasHeight = 450;
 $(function(){
 	myCanvas.height = canvasHeight;
-	curLevel = new HistFun();
+	curLevel = new Work();
 	curLevel.init();
+	$('#checkAns').hide();
 	$('button').button();
 	$('#toSim').click(function(){curLevel.toSim()});
 	$('#toLastStep').click(function(){curLevel.backToSim()});
 	$('#previous').click(function(){prevPrompt()});
 	$('#next').click(function(){nextPrompt()});
 	$('#submit').click(function(){submit()});
+	$('#checkAns').click(function(){curLevel.checkAnsTemp()});
 	$('#clearGraphs').click(function(){curLevel.clearGraphs()});
 	$('#reset').click(function(){curLevel.reset()});
-	makeSlider(
-		"sliderTemp", 
-		{
-		min:100, 
-		max:2000, 
-		value:300, 
-		},
-		[
-		{eventType:'slide', obj:curLevel, func:curLevel.changeTempSlider},
-		],
-		'hide'
-	);
 });
 
 myCanvas.width = $('#main').width();
@@ -110,20 +101,20 @@ myCanvas.width = $('#main').width();
 
 
 
-<script src = 'indepClasses.js'></script>
-<script src = 'GraphScatter.js'></script>
-<script src = 'GraphBase.js'></script>
-<script src = 'GraphHist.js'></script>
-<script src = 'SpeciesDefs.js'></script>
-<script src = 'CollideHandler.js'></script>
-<script src = 'DataHandler.js'></script>
-<script src = 'WallHandler.js'></script>
-<script src = 'objects.js'></script>
-<script src = 'animText.js'></script>
-<script src = 'Readout.js'></script>
-<script src = 'WorkTracker.js'></script>
-<script src = 'HistFun.js'></script>
-<script src = 'base.js'></script>
+<script src = '../indepClasses.js'></script>
+<script src = '../GraphBase.js'></script>
+<script src = '../GraphScatter.js'></script>
+<script src = '../GraphHist.js'></script>
+<script src = '../SpeciesDefs.js'></script>
+<script src = '../CollideHandler.js'></script>
+<script src = '../DataHandler.js'></script>
+<script src = '../WallHandler.js'></script>
+<script src = '../objects.js'></script>
+<script src = '../animText.js'></script>
+<script src = '../Readout.js'></script>
+<script src = '../WorkTracker.js'></script>
+<script src = '../Work.js'></script>
+<script src = '../base.js'></script>
 
 </body>
 </html>

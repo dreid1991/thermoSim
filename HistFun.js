@@ -28,7 +28,6 @@ function HistFun(){
 		{block:1,  title: "red fish", text:"2"},
 	]
 	addSpecies(['spc1']);
-	collide.setup();
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
 	addListener(this, 'wallImpact', 'std', this.onWallImpact, this);
