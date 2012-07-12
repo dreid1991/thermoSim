@@ -33,7 +33,7 @@ function IdealGasLaw(){
 		{block:3, title: "Current step", finished: false, text:"These two containers hold the same type of molecule.  Just so we're on the same page, which of the containers has a higher temperature and why?"},
 		{block:4, title: "Current step", finished: false, text:"Now how do the temperatures of these two new systems compare?  The masses of the particles are 3 g/mol and 8 g/mol respectively.  RMS (above) stands for <a href=http://en.wikipedia.org/wiki/Root_mean_square#Definition target='_blank'>root mean squared</a>, which is the average of the squares of all of the velocities, square rooted.  Since we know that temperature is proportional to average kinetic energy, this can definitely be used to calculate average kinetic energy."},
 		{block:5, title: "", 			 finished: false, text:""},
-		{block:6, title: "Current step", finished: false, conditions: this.block6Conditions, text:"Now I have a challenge for you: Make the gases in these two containers be the same temperature.  The molecular masses are 1 g/mol and 8 g/mol respectively.  The two sliders change the RMS of the velocities of their corresponding molecules.  Remember, temperature is proportional to average kinetic energy.<br>Note: A correct answer can be calculated, you don't need to guess and check."},
+		{block:6, title: "Current step", finished: false, conditions: this.block6Conditions, text:"Now I have a challenge for you: Make the gases in these two containers be the same temperature.  The molecular masses are 2 g/mol and 8 g/mol respectively.  The two sliders change the RMS of the velocities of their corresponding molecules.  Remember, temperature is proportional to average kinetic energy.<br>Note: A correct answer can be calculated, you don't need to guess and check."},
 		{block:7, title: "Current step", finished: false, text:""},
 		{block:8, title: "Current step", finished: false, text:"Okay, let’s look at pressure.  A pressure is a force per area.  This tells us that gases at non-zero pressure must exert a force on their container.  In the system above, what event causes a force to be exerted on the wall?"},
 		{block:9, title: "Current step", finished: false, conditions: this.block9Conditions, text:"It might be simpler if we look at just one molecule.  Every time the molecule hits the wall, its momentum changes.  If we average that change out over the time between hitting the wall, we get an average force applied which can then be related to a pressure.  How would the momentum change of collision and the frequency of collision change with speed, and how might this relate to pressure?  You can use the slider to change the molecule’s temperature to check your ideas.  When you’re done playing here, we can go through the math on the next page."},
@@ -46,7 +46,7 @@ function IdealGasLaw(){
 		{block:13, title: "", finished: false, text: ""},
 		{block:14, title: "", finished: false, text: ""},
 	]
-	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
+	addSpecies(['spc1', 'spc3', 'spc4', 'spc5', 'spc6']);
 	this.minY = 30;
 	this.maxY = 350;
 	addListener(this, 'update', 'run', this.updateRun, this);
@@ -70,8 +70,6 @@ IdealGasLaw.prototype = {
 		//border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container',c);
 		saveListener(this, 'update');
 		saveListener(this, 'data');
-		saveListener(this, 'wallImpact');
-		saveListener(this, 'dotImpact');
 		emptyListener(this, "update");
 		emptyListener(this, "data");
 		this.hideDash();
@@ -184,7 +182,7 @@ IdealGasLaw.prototype = {
 		walls.setup();
 		var sliderMin = $('#sliderSpeedLeft').slider('option', 'min');
 		var sliderMax = $('#sliderSpeedLeft').slider('option', 'max');
-		this.spcA = 'spc3';
+		this.spcA = 'spc6';
 		this.spcB = 'spc5'
 		var mA = spcs[this.spcA].m;
 		var mB = spcs[this.spcB].m;
@@ -672,14 +670,14 @@ IdealGasLaw.prototype = {
 		var temp = ui.value;
 		changeAllTemp(temp);
 	},
-	changeTempSpc3: function(event, ui){
+	changeTempSpcA: function(event, ui){
 		var rms = ui.value;
-		changeRMS('spc3', rms);
+		changeRMS(this.spcA, rms);
 		this.readout.hardUpdate(rms, 'rmsLeft');
 	},
-	changeTempSpc5: function(event, ui){
+	changeTempSpcB: function(event, ui){
 		var rms = ui.value;
-		changeRMS('spc5', rms);	
+		changeRMS(this.spcB, rms);	
 		this.readout.hardUpdate(rms, 'rmsRight');		
 	},
 

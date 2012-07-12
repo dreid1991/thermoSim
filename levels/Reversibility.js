@@ -96,8 +96,6 @@ Reversibility.prototype = {
 	block0Start: function(){
 		saveListener(this, 'update');
 		saveListener(this, 'data');
-		saveListener(this, 'wallImpact');
-		saveListener(this, 'dotImpact');
 		emptyListener(this, "update");
 		emptyListener(this, "data");
 		this.hideDash();

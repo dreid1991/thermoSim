@@ -1,78 +1,6 @@
-function Heater(x, y, width, height, tMin, tMax){
-	this.x = x;
-	this.y = y;
-	this.width = width;
-	this.height = height;
-	this.tMin = tMin;
-	this.tMax = tMax;
-	this.t = (this.tMax+this.tMin)/2;
-	this.col = Col(0, 0, 0);
-	this.getCol();
-
-	this.pts = this.getPts(this.x, this.y, this.width, this.height)
-	walls.pts.push(this.pts);
-}
-Heater.prototype = {
-	getPts: function(x, y, width, height){
-		var pts = []
-		pts.push(P(x+.2*width, y+height));
-		pts.push(P(x+.8*width, y+height));
-		pts.push(P(x+width, y+.8*height));
-		pts.push(P(x+width, y+.2*height));
-		pts.push(P(x+.8*width, y));
-		pts.push(P(x+.2*width, y));
-		pts.push(P(x, y+.2*height));
-		pts.push(P(x, y+.8*height));
-		return pts;	
-	},
-	getCol: function(){
-		var percent = (this.t-this.tMin)/(this.tMax-this.tMin);
-		this.col.r = 255*percent;
-		this.col.g = 255*(.5-Math.abs(percent-.5))
-		this.col.b = 255*(1-percent);
-	},
-	changeTemp: function(percent){
-		this.t = this.tMin + (this.tMax-this.tMin)*percent;
-		this.getCol();
-	}
-
-}
-function Weight(xInit, yInit, dimRatio, weightMin, weightMax, weightInit){
-	this.x = xInit;
-	this.y = yInit-1;
-	this.dimRatio = dimRatio;
-	this.weightMin = weightMin;
-	this.weightMax = weightMax;
-	this.weight = weightInit
-	this.scalar = 80;//was 8
-
-	this.pts = [];
-	this.getPts();
-	this.col = Col(100,100,200);
-}
-Weight.prototype = {
-	getPts: function(){
-		var width = Math.sqrt(this.weight*this.scalar/this.dimRatio);
-		var height = width*this.dimRatio;
-		this.pts = [P(this.x-width/2,this.y), P(this.x+width/2,this.y), P(this.x+width/2, this.y-height), P(this.x-width/2, this.y-height)];
-	},
-	movePts: function(vector){
-		for (var ptIdx=0; ptIdx<this.pts.length; ptIdx++){
-			var pt = this.pts[ptIdx];
-			pt.x+=vector.dx;
-			pt.y+=vector.dy;
-		}
-	},
-	move: function(vector){
-		this.x+=vector.dx;
-		this.y+=vector.dy;
-		this.movePts(vector);
-	},
-	changeWeight: function(val){
-		this.weight = val;
-		this.getPts();
-	},
-}
+//////////////////////////////////////////////////////////////////////////
+//DRAG WEIGHTS
+//////////////////////////////////////////////////////////////////////////
 
 function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g, massInit, readout, obj){
 	this.zeroY = zeroY;
@@ -685,7 +613,9 @@ DragWeights.prototype = {
 		curLevel.wallV=0;
 	}
 }
-
+//////////////////////////////////////////////////////////////////////////
+//DRAG ARROW
+//////////////////////////////////////////////////////////////////////////
 function DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds){
 	this.pos = pos;
 	this.rotation = rotation;
@@ -882,5 +812,133 @@ DragArrow.prototype = {
 		var ULCorner = this.pos.copy().movePt({dy:-this.dims.dy/2});
 		return ptInRect(ULCorner, this.dims, unRotated);
 	},
+}
 
+//////////////////////////////////////////////////////////////////////////
+//PISTON
+//////////////////////////////////////////////////////////////////////////
+
+function Piston(handle, height, yInit, xLeftInit, width, drawCanvas, pInit, g){
+	this.y = yInit;
+	this.p = pInit;
+	this.g = g;
+	this.slant = .07;
+	
+	this.left = xLeftInit;
+	this.width = width;
+	this.setMass();
+	this.drawCanvas = drawCanvas;
+	this.draw = this.makeDrawFunc(height, this.left, this.width);
+	this.dataHolderLeft = this.left + this.width/2 + this.shaft.dims.dx/2;
+	this.dataHolderBottom = this.plateTop.pos.y;
+	this.dataSlotFont = '12pt Calibri';
+	this.dataSlotFontCol = Col(255,255,255);
+	this.pStep = .05;
+	var readoutLeft = this.left + this.width*this.slant;
+	var readoutRight = this.left + this.width - 2*this.width*this.slant;
+	var readoutY = this.plateBottom.pos.y-2+this.y;
+	var readoutFont = '12pt calibri';
+	var readoutFontCol = Col(255, 255, 255);
+	this.readout = new Readout(readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol);
+	
+}
+
+Piston.prototype = {
+	makeDrawFunc: function(height, left, pistonWidth){
+		var shaftThickness = 30;
+		var shaftLength = height - 40;
+		var plateTopHeight = 35;
+		var plateThickness = 10;
+
+		this.shaft = this.makeShaft(left, pistonWidth, shaftThickness, shaftLength, height);
+		var plateTopY = this.shaft.pos.y + this.shaft.dims.dy;
+		this.plateTop = this.makePlateTop(P(left, plateTopY), V(pistonWidth, plateTopHeight), plateThickness)
+		var plateBottomY = plateTopY + plateTopHeight;
+		this.plateBottom = this.makePlateBottom(P(left, plateBottomY), V(pistonWidth, plateThickness));
+		
+
+		
+		
+		
+		var self = this;
+		var drawFunc = function(){
+			self.drawCanvas.save();
+			self.drawCanvas.translate(0, self.y);
+			draw.fillRect(self.shaft.pos, self.shaft.dims, self.shaft.col, self.drawCanvas);
+			draw.fillPts(self.plateTop.pts, self.plateTop.col, self.drawCanvas);
+			draw.fillRect(self.plateBottom.pos, self.plateBottom.dims, self.plateBottom.col, self.drawCanvas);
+			self.drawCanvas.restore();
+		}
+		return drawFunc;
+	},
+	makeShaft: function(left, pistonWidth, thickness, length, yInit){
+		var x = left + pistonWidth/2 - thickness/2;
+		var y = -yInit;
+		var pos = P(x, y);
+		var dims = V(thickness, length);
+		var col = Col(150, 150, 150);
+		return {pos:pos, dims:dims, col:col};
+	},
+	makePlateTop: function(pos, dims,thick){
+		var slant = this.slant;
+		var slantLeft = slant;
+		var slantRight = 1-slant;
+		var pts = new Array(8);
+		pts[0] = P(pos.x,				pos.y+dims.dy);
+		pts[1] = P(pos.x+dims.dx*slantLeft, 	pos.y);
+		pts[2] = P(pos.x+dims.dx*slantRight, 	pos.y);
+		pts[3] = P(pos.x+dims.dx, 		pos.y+dims.dy);
+		pts[4] = P(pos.x+dims.dx-thick,	pos.y+dims.dy);
+		pts[5] = P(pos.x+dims.dx*slantRight-thick, pos.y+thick);
+		pts[6] = P(pos.x+dims.dx*slantLeft+thick, pos.y+thick);
+		pts[7] = P(pos.x+thick,			pos.y+dims.dy);
+		var col = Col(150, 150, 150);
+		return {pos:pos, pts:pts, col:col};
+	},
+	makePlateBottom: function(pos, dims){
+		var col = Col(100, 100, 100);
+		return {pos:pos, dims:dims, col:col};
+	},
+	show: function(){
+		addListener(curLevel, 'update', 'drawPiston'+this.handle, this.draw, '');
+		this.readout.show();
+	},
+	setP: function(p){
+		var pSetPt = p;
+		addListener(curLevel, 'update', 'piston'+this.handle+'adjP', 
+			function(){
+				this.p = boundedStep(this.p, pSetPt, this.pStep);
+				this.setMass();			
+				if(round(this.p,2)==pSetPt){
+					removeListener(curLevel, 'update', 'piston'+this.handle+'adjP');
+				}
+			},
+			this);
+		
+	},
+	setMass: function(){
+		this.mass = this.p*this.width/(pConst*this.g());
+	},
+	setY: function(y){
+		this.y = y;
+		this.readout.position({y:this.plateBottom.pos.y-2+this.y});
+	},
+	trackWork: function(){
+		addData('work', 'Work:', 0, 'kJ');
+		addListener(curLevel, 'update', 'piston' + this.handle + 'TrackWork', this);
+		
+	},
+	trackWorkStop: function(){
+	
+	},
+	reset: function(){
+		this.dataHandler.slots.work.value = 0;
+	},
+	addData: function(handle, label, value, units){
+		this.readout.addEntry(handle, label, units, value, undefined, 1);
+	},
+	setData: function(handle, value){
+		var slot = byAttr(this.dataHolder.slots, handle, 'handle');
+		slot.value = value;
+	},
 }

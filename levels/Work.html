@@ -86,9 +86,16 @@ $(function(){
 	//HEY - COULD PUT INIT STUFF HERE. 
 	myCanvas.height = canvasHeight;
 	curLevel = new Work();
-	curLevel.init();
+	
 	$('#sliderSpeedLeftHolder').hide();
 	$('#sliderSpeedRightHolder').hide();
+	$('#canvasDiv').hide();
+	$('#base').hide();
+	$('#dashIntro').hide();
+	$('#dashRun').hide();
+	$('#dashOutro').hide();
+	$('#display').hide();
+	$('#intText').hide();
 	$('#checkAns').hide();
 	$('button').button();
 	$('#longSliderHolder').hide();
@@ -101,6 +108,7 @@ $(function(){
 	$('#clearGraphs').click(function(){curLevel.clearGraphs()});
 	$('#reset').click(function(){curLevel.reset()});
 	$('#reset').hide();
+	curLevel.init();
 	makeSlider(
 		"sliderTemp", 
 		{

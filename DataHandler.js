@@ -4,8 +4,8 @@ DataHandler.prototype = {
 	pressureInt: function(forceInternal, numUpdates, SA){
 		return pConst*forceInternal/(numUpdates*SA);
 	},
-	pressureExt: function(weight, g, SA){
-		return pConst*weight*g/SA;
+	pressureExt: function(mass, g, SA){
+		return pConst*mass*g/SA;
 	},
 	temp: function(spcName){
 		var sumKE = 0

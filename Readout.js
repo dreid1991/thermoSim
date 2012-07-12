@@ -1,8 +1,9 @@
 function Readout(leftBound, rightBound, y, font, fontCol, obj){
+	this.drawCanvas = c;
 	this.font = font;
 	this.fontCol = fontCol;
 	this.leftBound = leftBound;
-	this.rightBound = rightBound;
+	this.width = rightBound - leftBound;
 	this.y = y;
 	this.entries = [];
 	if(obj){
@@ -14,13 +15,16 @@ Readout.prototype = {
 		addListener(curLevel, 'reset', 'resetReadout', this.resetAll, this);
 	},
 	draw: function(){
+		this.drawCanvas.save();
+		this.drawCanvas.translate(this.leftBound, this.y);
 		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++){
 			var entry = this.entries[entryIdx];
 			var pos = entry.pos;
 			var decPlaces = entry.decPlaces
 			var text = entry.text+' '+round(entry.val,decPlaces)+' '+entry.units;
-			draw.text(text, pos, this.font, this.fontCol, 'left', 0, c);
-		}		
+			draw.text(text, pos, this.font, this.fontCol, 'left', 0, this.drawCanvas);
+		}
+		this.drawCanvas.restore();
 	},
 	hardUpdate: function(setPt, name){
 		var entry = byAttr(this.entries, name, 'name');
@@ -71,19 +75,18 @@ Readout.prototype = {
 		this.entries = [];
 	},
 	positionEntries: function(){
-		var width = this.rightBound - this.leftBound;
 		var numEntries = this.entries.length;
 		var spacing;
 		if(numEntries>1){
-			spacing = Math.floor(width/(numEntries-1));
+			spacing = Math.floor(this.width/(numEntries-1));
 		} else{
-			spacing=width;
+			spacing=this.width;
 			entryIdx=.5;
 		}
 			for (var entryIdx=0; entryIdx<numEntries; entryIdx++){
 				var entry = this.entries[entryIdx];
-				var x = this.leftBound + spacing*entryIdx;
-				var y = this.y;
+				var x = spacing*entryIdx;
+				var y = 0;
 				entry.pos = P(x, y);
 			}
 	},
@@ -109,6 +112,14 @@ Readout.prototype = {
 			this.hardUpdate(setPt, name);
 		}
 		
+	},
+	position: function(p){
+		if(p.x!==undefined){
+			this.leftBound = p.x
+		}
+		if(p.y!==undefined){
+			this.y = p.y
+		}
 	},
 	show: function(){
 		addListener(curLevel, 'update', 'drawReadout', this.draw, this);
