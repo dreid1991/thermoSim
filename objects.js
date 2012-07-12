@@ -920,13 +920,20 @@ Piston.prototype = {
 		this.mass = this.p*this.width/(pConst*this.g());
 	},
 	setY: function(y){
+		this.lastY = this.y;
 		this.y = y;
 		this.readout.position({y:this.plateBottom.pos.y-2+this.y});
 	},
 	trackWork: function(){
-		addData('work', 'Work:', 0, 'kJ');
-		addListener(curLevel, 'update', 'piston' + this.handle + 'TrackWork', this);
-		
+		var self = this;
+		this.workTracker = new WorkTracker(
+						function(){return self.y},
+						this.width,
+						function(){return self.mass},
+						function(){return self.g()},
+						{readout:this.readout, idx:undefined}
+						);
+		this.workTracker.start();
 	},
 	trackWorkStop: function(){
 	

@@ -1,39 +1,39 @@
-function WorkTracker(vol, mass, g, SA, readoutData, obj){
-	this.vol = vol;
+function WorkTracker(height, width, mass, g, readoutData){
+	this.height = height;
+	this.width = width;
 	this.mass = mass;
 	this.g = g;
-	this.SA = SA;
 	this.work = 0;
 	this.readout = readoutData.readout;
 	this.readout.addEntry('work', 'Work:', 'kJ', 0, readoutData.idx, 1);
-	this.volLast = this.vol();
-	if(obj){
-		addListener(obj, 'init', 'workTracker', this.init, this);
-	}
+	this.heightLast = this.height();
+
 }
 WorkTracker.prototype = {
-	init: function(){
-		this.work=0;
-		this.volLast = this.vol();
-		this.volCur = this.vol();
-		addListener(curLevel, 'reset', 'workTracker', this.reset, this);
-		//addListener(curLevel, 'data', 'workTracker', this.updateReadout, this);
-	},
+
+	/*
+	YOUR ATTENTION PLEASE:
+	I made it so work tracker is based on heights and widths, not volumes.
+	To track, compression must happen from the top.
+	*/
 	updateVal: function(){
-		var volCur = this.vol();
-		var p = ATMtoPA*pConst*this.mass()*this.g()/this.SA();
-		var dV = LtoM3*vConst*(volCur - this.volLast);
+		var heightCur = this.height();
+		var p = ATMtoPA*pConst*this.mass()*this.g()/this.width;
+		var dV = LtoM3*vConst*(this.heightLast-heightCur)*this.width;
 		this.work -= JtoKJ*p*dV;
-		this.volLast = volCur;
+		this.heightLast = heightCur;
 		this.readout.hardUpdate(this.work, 'work');
 	},
 	updateReadout: function(){
 		//this.readout.tick(this.work, 'work');
 	},
 	reset: function(){
-		addListener(curLevel, 'update', 'workTracker', this.updateVal, this);
+		//addListener(curLevel, 'update', 'workTracker', this.updateVal, this);
 		this.work=0;
-		this.volLast = this.vol();
-		this.volCur = this.vol();
+		this.heightLast = this.height();
+	},
+	start: function(){
+		this.reset();
+		addListener(curLevel, 'update', 'workTracker', this.updateVal, this);
 	},
 }

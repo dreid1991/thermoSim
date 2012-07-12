@@ -59,6 +59,7 @@ Work.prototype = {
 		walls.setup();
 		this.myFancyPiston = new Piston('tootoo', 500, 300, 40, 470, c, 2, function(){return self.g});
 		this.myFancyPiston.show();
+		this.myFancyPiston.trackWork();
 		var ptsToBorder = this.getPtsToBorder();
 		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container', c);
 		populate('spc1', P(45,35), V(450, 350), 400, 300);
