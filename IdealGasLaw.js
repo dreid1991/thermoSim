@@ -86,6 +86,7 @@ IdealGasLaw.prototype = {
 		$('#dashIntro').show();
 	},
 	block0Start: function(){
+		$('#longSliderHolder').show();
 		this.playedWithSlider = new Boolean();
 		this.playedWithSlider = false;
 		$('#clearGraphs').hide();
@@ -112,6 +113,7 @@ IdealGasLaw.prototype = {
 		this.playedWithSlider = undefined;
 		this.readout.removeAllEntries();
 		this.readout.hide();
+		$('#longSliderHolder').hide();
 		$('#sliderTemp').hide();
 	},
 	block1Start: function(){
@@ -127,7 +129,6 @@ IdealGasLaw.prototype = {
 		populate('spc4', P(305,75), V(200, 300), 200, 100);
 		
 	},
-
 	block3Start: function(){
 		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
 			[P(300,30), P(510,30), P(510,440), P(300,440)]]);
@@ -151,7 +152,6 @@ IdealGasLaw.prototype = {
 		this.spcB = undefined;
 		saveListener(curLevel, 'update');
 		emptyListener(curLevel, 'update');
-		$('#reset').hide();
 		$('#canvasDiv').hide();
 		$('#display').show();
 		$('#intText').show();
@@ -162,7 +162,6 @@ IdealGasLaw.prototype = {
 	},
 	block4CleanUp: function(){
 		loadListener(curLevel, 'update');
-		$('#reset').show();
 		$('#canvasDiv').show();
 		$('#display').hide();
 		$('#intText').hide();
@@ -193,7 +192,6 @@ IdealGasLaw.prototype = {
 		$('#sliderSpeedRight').slider('option', {value:rmsInitB});
 		$('#sliderSpeedLeftHolder').show();
 		$('#sliderSpeedRightHolder').show();
-		$('#reset').hide();
 		$('#checkAns').show();
 		this.readout.addEntry('rmsLeft', 'RMS(v) Left:', 'm/s', rmsInitA, undefined, 0);
 		this.readout.addEntry('rmsRight', 'RMS(v) Right:', 'm/s', rmsInitB, undefined, 0);
@@ -220,7 +218,6 @@ IdealGasLaw.prototype = {
 	block5CleanUp: function(){
 		this.readout.removeAllEntries();
 		this.readout.hide();
-		$('#reset').show();
 		$('#checkAns').hide();
 		$('#sliderSpeedLeftHolder').hide()
 		$('#sliderSpeedRightHolder').hide()
@@ -229,7 +226,6 @@ IdealGasLaw.prototype = {
 	block6Start: function(){
 		saveListener(curLevel, 'update');
 		emptyListener(curLevel, 'update');
-		$('#reset').hide();
 		$('#canvasDiv').hide();
 		$('#display').show();
 		$('#intText').show();
@@ -237,7 +233,6 @@ IdealGasLaw.prototype = {
 	},
 	block6CleanUp: function(){
 		loadListener(curLevel, 'update');
-		$('#reset').show();
 		$('#canvasDiv').show();
 		$('#display').hide();
 		$('#intText').hide();
@@ -262,11 +257,13 @@ IdealGasLaw.prototype = {
 			this);
 	},
 	block7CleanUp: function(){
+
 		this.readout.removeAllEntries();
 		this.readout.hide();
 		removeListener(curLevel, 'data', 'recordPressure');
 	},
 	block8Start: function(){
+		$('#longSliderHolder').show();
 		this.playedWithSlider = new Boolean();
 		this.playedWithSlider = false;
 		walls = new WallHandler([[P(50,75), P(75,50), P(475,50), P(500,75), P(500,300), P(475,325), P(75,325), P(50,300)]]);
@@ -282,6 +279,7 @@ IdealGasLaw.prototype = {
 	},
 	block8CleanUp: function(){
 		this.playedWithSlider = undefined;
+		$('#longSliderHolder').hide();
 		$('#sliderPressure').hide();
 		removeListener(curLevel, 'wallImpact', 'arrow');
 		removeListenerByName(curLevel, 'update', 'drawArrow');
@@ -292,7 +290,6 @@ IdealGasLaw.prototype = {
 	block9Start: function(){
 		saveListener(curLevel, 'update');
 		emptyListener(curLevel, 'update');
-		$('#reset').hide();
 		$('#canvasDiv').hide();
 		$('#display').show();
 		$('#intText').show();
@@ -333,7 +330,6 @@ IdealGasLaw.prototype = {
 	block9CleanUp: function(){
 		loadListener(curLevel, 'update');
 		$('#intText').html('');
-		$('#reset').show();
 		$('#canvasDiv').show();
 		$('#display').hide();
 		$('#intText').hide();
@@ -413,7 +409,7 @@ IdealGasLaw.prototype = {
 	},
 
 	block10CleanUp: function(){
-		
+		removeListener(curLevel, 'update', 'drawVolArrows');
 		removeListenerByName(curLevel, 'update', 'drawBorder');
 		removeListener(curLevel, 'data', 'recordPressure');
 		this.readout.removeAllEntries();
@@ -424,7 +420,6 @@ IdealGasLaw.prototype = {
 	block11Start: function(){
 		saveListener(curLevel, 'update');
 		emptyListener(curLevel, 'update');
-		$('#reset').hide();
 		$('#canvasDiv').hide();
 		$('#display').show();
 		$('#intText').show();
@@ -433,7 +428,6 @@ IdealGasLaw.prototype = {
 	block11CleanUp: function(){
 		loadListener(curLevel, 'update');
 		$('#intText').html('');
-		$('#reset').show();
 		$('#canvasDiv').show();
 		$('#display').hide();
 		$('#intText').hide();	
@@ -441,7 +435,6 @@ IdealGasLaw.prototype = {
 	block12Start: function(){
 		saveListener(curLevel, 'update');
 		emptyListener(curLevel, 'update');
-		$('#reset').hide();
 		$('#canvasDiv').hide();
 		$('#display').show();
 		$('#intText').show();
@@ -455,7 +448,6 @@ IdealGasLaw.prototype = {
 	block12CleanUp: function(){
 		loadListener(curLevel, 'update');
 		$('#intText').html('');
-		$('#reset').show();
 		$('#canvasDiv').show();
 		$('#display').hide();
 		$('#intText').hide();		

@@ -50,9 +50,10 @@
 						<div id='sliderSpeedRight' style='width:150px'></div>
 					</div>
 				</div>
-				
-				<div id='sliderTemp' style='width:300px'></div>
-				<div id='sliderPressure' style='width:300px'></div>
+				<div id='longSliderHolder'><center>Molecule's temperature</center>
+					<div id='sliderTemp' style='width:300px'></div>
+					<div id='sliderPressure' style='width:300px'></div>
+				</div>
 			</center>
 		</div>
 
@@ -101,6 +102,7 @@ $(function(){
 	$('#sliderSpeedRightHolder').hide();
 	$('#checkAns').hide();
 	$('button').button();
+	$('#longSliderHolder').hide();
 	$('#toSim').click(function(){curLevel.toSim()});
 	$('#toLastStep').click(function(){curLevel.backToSim()});
 	$('#previous').click(function(){prevPrompt()});
@@ -109,6 +111,7 @@ $(function(){
 	$('#checkAns').click(function(){curLevel.checkAnsTemp()});
 	$('#clearGraphs').click(function(){curLevel.clearGraphs()});
 	$('#reset').click(function(){curLevel.reset()});
+	$('#reset').hide();
 	makeSlider(
 		"sliderTemp", 
 		{
