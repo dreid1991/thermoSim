@@ -74,7 +74,7 @@ Weight.prototype = {
 	},
 }
 
-function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g, deadWeight, readout, obj){
+function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g, massInit, readout, obj){
 	this.zeroY = zeroY;
 	this.pistonY = pistonY;
 	this.binY = binY;
@@ -93,7 +93,8 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.weightDimRatio = .5;
 	this.weightScalar = 40;
 	this.moveSpeed = 20;
-	this.pistonMass = deadWeight;
+	this.pistonMass = massInit;
+	this.massInit = massInit
 	this.eAdded = 0;
 	this.readout = readout;
 	this.moveToDropOrders = [];
@@ -674,6 +675,9 @@ DragWeights.prototype = {
 			}
 		}
 		return true;
+	},
+	mass: function(){
+		return this.pistonMass;
 	},
 	reset: function(){
 		this.dropAllInBins();

@@ -424,14 +424,10 @@ function showPrompt(prev, prompt){
 }
 function nextPrompt(){
 	var prev = curLevel.prompts[curLevel.promptIdx];
-
-	if(curLevel.promptIdx+1==curLevel.prompts.length){
-		curLevel.startOutro();
-	}else{
-		var promptIdx = curLevel.promptIdx+1;
-		var prompt = curLevel.prompts[promptIdx];
-		showPrompt(prev, prompt);
-	}
+	var promptIdx = Math.min(curLevel.promptIdx+1, curLevel.prompts.length-1);
+	var prompt = curLevel.prompts[promptIdx];
+	showPrompt(prev, prompt);
+	
 }
 function prevPrompt(){
 	var prev = curLevel.prompts[curLevel.promptIdx];

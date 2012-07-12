@@ -15,16 +15,11 @@
 			</canvas>
 		</div>
 		<div id='display' class='display noSelect'>
-			
-			<div id='textIntro' class='displayText no Select'>
-				Fancy pantsy intro.  
-			</div>
-			<div id='textOutro' class='displayText noSelect'>
-				Zoop dee doo!
-			</div>
-			<div id='intText' class='displayText noSelect'>
+				<div id='intText' class='displayText noSelect'>
 			</div>
 		</div>
+
+
 		<div id='dashIntro' class='dashMed noSelect'>
 			<center>
 				<button id='toSim' class='noSelect'>To the simulation!</button>
@@ -34,17 +29,28 @@
 		<div id='dashRun' class='dashMed noSelect'>
 			<center>
 				<div>
-					<div id='sliderSnap' style='width:150px'></div>
+					<div id='sliderSpeedLeftHolder' style='display:inline-block'>
+						RMS(v) Left
+						<div id='sliderSpeedLeft' style='width:150px'></div>
+					</div>
 					<button id='reset' class='noSelect'>Reset experiment</button>
 					<button id='checkAns' class='noSelect'>Check answer</button>
 					<button id='clearGraphs' class='noSelect'>Clear graphs</button>
+					<div id='sliderSpeedRightHolder' style='display:inline-block'>
+						RMS(v) Right
+						<div id='sliderSpeedRight' style='width:150px'></div>
+					</div>
+				</div>
+				<div id='longSliderHolder'><center>Molecule's temperature</center>
+					<div id='sliderTemp' style='width:300px'></div>
+					<div id='sliderPressure' style='width:300px'></div>
 				</div>
 			</center>
 		</div>
 
 		<div id='dashOutro' class='dash noSelect ' >
 			<center>
-				<button id='toLastStep'>Back to the simulation</button>
+				<button id='backToSim'>Back to the simulation</button>
 			</center>
 			
 			
@@ -83,25 +89,65 @@ $(function(){
 	myCanvas.height = canvasHeight;
 	curLevel = new Work();
 	curLevel.init();
+	$('#sliderSpeedLeftHolder').hide();
+	$('#sliderSpeedRightHolder').hide();
 	$('#checkAns').hide();
 	$('button').button();
-	$('#toSim').click(function(){curLevel.toSim()});
-	$('#toLastStep').click(function(){curLevel.backToSim()});
+	$('#longSliderHolder').hide();
+	$('#toSim').click(function(){nextPrompt()});
+	$('#backToSim').click(function(){prevPrompt()});
 	$('#previous').click(function(){prevPrompt()});
 	$('#next').click(function(){nextPrompt()});
 	$('#submit').click(function(){submit()});
 	$('#checkAns').click(function(){curLevel.checkAnsTemp()});
 	$('#clearGraphs').click(function(){curLevel.clearGraphs()});
 	$('#reset').click(function(){curLevel.reset()});
+	$('#reset').hide();
 	makeSlider(
-		"sliderSnap", 
+		"sliderTemp", 
 		{
 			min:100, 
 			max:2000, 
 			value:300, 
 		},
 		[
-			{eventType:'slidestop', obj:curLevel, func:function(){$('#sliderSnap').slider('option', {value:500});}},
+			{eventType:'slide', obj:curLevel, func:curLevel.changeTempSlider},
+		],
+		'hide'
+	);
+	makeSlider(
+		"sliderPressure",
+		{
+			min:100,
+			max:2000,
+			value:300,
+		},
+		[
+			{eventType:'slide', obj:curLevel, func:curLevel.changePressureSlider},
+		],
+		'hide'
+	);
+	makeSlider(
+		"sliderSpeedLeft",
+		{
+			min:50,
+			max:1200,
+			value:300,
+		},
+		[
+			{eventType:'slide', obj:curLevel, func:curLevel.changeTempSpc3},
+		],
+		'show'
+	);
+	makeSlider(
+		"sliderSpeedRight",
+		{
+			min:50,
+			max:1200,
+			value:300,
+		},
+		[
+			{eventType:'slide', obj:curLevel, func:curLevel.changeTempSpc5},
 		],
 		'show'
 	);
@@ -126,7 +172,7 @@ myCanvas.width = $('#main').width();
 <script src = '../animText.js'></script>
 <script src = '../Readout.js'></script>
 <script src = '../WorkTracker.js'></script>
-<script src = '../Work.js'></script>
+<script src = 'Work.js'></script>
 <script src = '../base.js'></script>
 
 </body>

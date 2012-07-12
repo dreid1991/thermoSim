@@ -15,16 +15,7 @@
 			</canvas>
 		</div>
 		<div id='display' class='display noSelect'>
-			
-			<div id='textIntro' class='displayText no Select'>
-				<p>Good morning!</p><p>Today, we’re going to consider the ideal gas law.  Specifically, we’re going to figure out why PV does in fact equal nRT, and we’re going to do so from a molecular perspective.  To do this, we’ll need to look at how temperature, pressure, and volume represent themselves on a molecular level. Once that’s understood, we can try to build the relations in the ideal gas law ourselves to get a better understanding of why they're true. </p><p>Let’s begin, shall we?</p>			</div>
-			<div id='textOutro' class='displayText noSelect'>
-				<p>If we multiply by the ideal gas constant, R, we can say</p><center><img src=img/ideal/orientPNRTV.gif></img></center>
-				<p>or</p>
-				<center><img src=img/ideal/orientPVNRT.gif></img></center>
-				<p>So we just developed the ideal gas law from a model of molecules being hard spheres that bounce around!  Yay!</p>
-			</div>
-			<div id='intText' class='displayText noSelect'>
+				<div id='intText' class='displayText noSelect'>
 			</div>
 		</div>
 
@@ -59,7 +50,7 @@
 
 		<div id='dashOutro' class='dash noSelect ' >
 			<center>
-				<button id='toLastStep'>Back to the simulation</button>
+				<button id='backToSim'>Back to the simulation</button>
 			</center>
 			
 			
@@ -103,8 +94,8 @@ $(function(){
 	$('#checkAns').hide();
 	$('button').button();
 	$('#longSliderHolder').hide();
-	$('#toSim').click(function(){curLevel.toSim()});
-	$('#toLastStep').click(function(){curLevel.backToSim()});
+	$('#toSim').click(function(){nextPrompt()});
+	$('#backToSim').click(function(){prevPrompt()});
 	$('#previous').click(function(){prevPrompt()});
 	$('#next').click(function(){nextPrompt()});
 	$('#submit').click(function(){submit()});
@@ -181,7 +172,7 @@ myCanvas.width = $('#main').width();
 <script src = '../animText.js'></script>
 <script src = '../Readout.js'></script>
 <script src = '../WorkTracker.js'></script>
-<script src = '../IdealGasLaw.js'></script>
+<script src = 'IdealGasLaw.js'></script>
 <script src = '../base.js'></script>
 
 </body>
