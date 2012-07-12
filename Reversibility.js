@@ -163,9 +163,9 @@ Reversibility.prototype = {
 			return {result: true};
 		}else{
 			if(!this.addedBigBlocks){
-				return {result:false, alert:'Put the big ones on!'};
+				return {result:false, alert:'Put the big blocks on!'};
 			}else{
-				return {result:false, alert:'Take the big ones back off!'};
+				return {result:false, alert:'Take the big blocks back off!'};
 			}
 			
 		}
