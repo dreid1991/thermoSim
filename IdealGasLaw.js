@@ -296,7 +296,7 @@ IdealGasLaw.prototype = {
 		
 	},
 	block9aStart: function(){
-		$('#intText').html("Hopefully you found that was you increased speed, your molecule hit the wall harder and more often, which would result in a higher pressure.  Let's express those ideas in some math and solve for pressure from molecular collsions.<br>"+
+		$('#intText').html("Hopefully you found that as you increased speed, your molecule hit the wall harder and more often, which would result in a higher pressure.  Let's express those ideas in some math and solve for pressure from molecular collsions.<br>"+
 			"Say we have a molecule of mass m moving as follows:"+
 			"<center><img src=img/ideal/pressureSetup.gif></img></center>"+
 			"Then starting from"+
