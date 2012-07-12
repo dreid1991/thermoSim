@@ -27,24 +27,8 @@ function Work(){
 	this.promptIdx = -1;
 	this.blockIdx=-1;
 	this.prompts=[
-		{block:0, title: "", finished: false, test:""},
-		{block:1, title: "Current step", finished: false, conditions: this.block1Conditions, text:"Alright, let’s figure out what temperature looks like.  Above, we have one molecule, and I submit to you that this molecule has a temperature.  The equation for a molecule’s temperature is as follows: 1.5k<sub>b</sub>T = 0.5mv<sup>2</sup>, where k<sub>b</sub> in the boltzmann constant, T is temperature, m is the molecule’s mass, and v is its speed.  This tells us that temperature is an expression of molecular kinetic energy.  The slider above changes the molecule’s temperature.  If you double the molecule’s temperature, by what factor will its speed increase?  What would a graph of this molecule’s speed with respect to temperature look like?"},
-		{block:2, title: "Current step", finished: false, text:"Now suppose we have many molecules.  We know from before that we can assign a temperature to each molecule based on its mass and speed.  We also know that the system as a whole must have a temperature since a thermometer gives only one number.  We can guess that the bulk temperature must be based on the individual molecules’ temperatures, and we’d be right.  The bulk temperature is the average of all the molecules’ temperatures."},
-		{block:3, title: "Current step", finished: false, text:"These two containers hold the same type of molecule.  Just so we're on the same page, which of the containers has a higher temperature and why?"},
-		{block:4, title: "Current step", finished: false, text:"Now how do the temperatures of these two new systems compare?  The masses of the particles are 3 g/mol and 8 g/mol respectively.  RMS (above) stands for <a href=http://en.wikipedia.org/wiki/Root_mean_square#Definition target='_blank'>root mean squared</a>, which is the average of the squares of all of the velocities, square rooted.  Since we know that temperature is proportional to average kinetic energy, this can definitely be used to calculate average kinetic energy."},
-		{block:5, title: "", 			 finished: false, text:""},
-		{block:6, title: "Current step", finished: false, conditions: this.block6Conditions, text:"Now I have a challenge for you: Make the gases in these two containers be the same temperature.  The molecular masses are 1 g/mol and 8 g/mol respectively.  The two sliders change the RMS of the velocities of their corresponding molecules.  Remember, temperature is proportional to average kinetic energy.<br>Note: A correct answer can be calculated, you don't need to guess and check."},
-		{block:7, title: "Current step", finished: false, text:""},
-		{block:8, title: "Current step", finished: false, text:"Okay, let’s look at pressure.  A pressure is a force per area.  This tells us that gases at non-zero pressure must exert a force on their container.  In the system above, what event causes a force to be exerted on the wall?"},
-		{block:9, title: "Current step", finished: false, conditions: this.block9Conditions, text:"It might be simpler if we look at just one molecule.  Every time the molecule hits the wall, its momentum changes.  If we average that change out over the time between hitting the wall, we get an average force applied which can then be related to a pressure.  How would the momentum change of collision and the frequency of collision change with speed, and how might this relate to pressure?  You can use the slider to change the molecule’s temperature to check your ideas.  When you’re done playing here, we can go through the math on the next page."},
-		{block:10, title: "Current step", finished: false, text:"", start:this.block10aStart},
-		{block:10, title: "Current step", finished: false, text:"", start:this.block10bStart},
-		{block:10, title: "", 			 finished: false, text:"", start:this.block10cStart},
-		{block:11, title: "Current step", finished: false, conditions: this.block11aConditions, start:this.block11aStart, cleanUp: this.block11aCleanUp, text:"So let’s consider a constant temperature container.  You can use the yellow arrow to change the container volume.  Try halving  the volume of this container.  We know from the ideal gas law that if you halve the volume and hold the temperature constant, the pressure will double, right?  Can you explain why this happens in terms of the number of molecular collisions with the wall?"},
-		{block:11, title: "Current step", finished: false, conditions: this.block11bConditions, start:this.block11bStart, cleanUp: this.block11bCleanUp, text:"Now try halving the volume again.  How do the pressure and number of collisions behave this time?"},
-		{block:12, title: "Current step", finished: false, text: ""},
-		{block:13, title: "", finished: false, text: ""},
-		{block:14, title: "", finished: false, text: ""},
+		{block:0, title: "testyMcKaw", finished: false, text:""},
+
 	]
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
 	this.minY = 30;

@@ -36,10 +36,7 @@
 					<button id='reset' class='noSelect'>Reset experiment</button>
 					<button id='checkAns' class='noSelect'>Check answer</button>
 					<button id='clearGraphs' class='noSelect'>Clear graphs</button>
-					<div id='sliderSpeedRightHolder' style='display:inline-block'>
-						RMS(v) Right
-						<div id='sliderSpeedRight' style='width:150px'></div>
-					</div>
+
 				</div>
 				<div id='longSliderHolder'><center>Molecule's temperature</center>
 					<div id='sliderTemp' style='width:300px'></div>
@@ -86,6 +83,7 @@
 var curLevel;
 canvasHeight = 450;
 $(function(){
+	//HEY - COULD PUT INIT STUFF HERE. 
 	myCanvas.height = canvasHeight;
 	curLevel = new Work();
 	curLevel.init();

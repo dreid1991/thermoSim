@@ -408,11 +408,10 @@ Reversibility.prototype = {
 		this.numUpdates = 0;
 		this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
 		this.forceInternal = 0;
-		emptyListener(this, 'update');
-		emptyListener(this, 'wallImpact');
-		emptyListener(this, 'dotImpact');
-		emptyListener(this, 'data');
-		this.startSim();
+		//emptyListener(this, 'update');
+		//emptyListener(this, 'wallImpact');
+		//emptyListener(this, 'dotImpact');
+		//emptyListener(this, 'data');
 		
 		for (resetListenerName in this.resetListeners.listeners){
 			var func = this.resetListeners.listeners[resetListenerName].func;
