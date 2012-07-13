@@ -10,7 +10,7 @@ function Reversibility(){
 	this.bgCol = Col(5, 17, 26);
 	this.wallCol = Col(255,255,255);
 	this.numUpdates = 0;
-	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], this.onWallImpact)
+	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], this.onWallImpactSides)
 	
 	this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
 	this.SAPExt = getLen(this.extPressurePts);
@@ -18,7 +18,7 @@ function Reversibility(){
 	this.wallV = 0;
 	this.updateListeners = {listeners:{}, save:{}};
 	this.dataListeners = {listeners:{}, save:{}};
-	this.wallImpactListeners = {listeners:{}, save:{}};
+	this.dotImpactListeners = {listeners:{}, save:{}};
 	this.dotImpactListeners = {listeners:{}, save:{}};
 	this.mousedownListeners = {listeners:{}, save:{}};
 	this.mouseupListeners = {listeners:{}, save:{}};
@@ -47,9 +47,10 @@ function Reversibility(){
 	this.g = 1.75;
 	this.massInit = 25;
 	this.dragWeights = this.makeDragWeights();
+	
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
 	walls.setup();
-	walls.setSubWallHandler(0, 0, this.onWallImpact);
+	walls.setSubWallHandler(0, 0, this.onWallImpactTop);
 	this.workTracker = new WorkTracker('tracky',
 										function(){return walls.pts[0][0].y},
 										walls.pts[0][1].x-walls.pts[0][0].x,
@@ -62,7 +63,6 @@ function Reversibility(){
 	addSpecies(['spc1', 'spc3']);
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
-	addListener(this, 'wallImpact', 'moving', this.onWallImpact, this);
 	addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
 
 }
@@ -120,8 +120,6 @@ Reversibility.prototype = {
 		$('#base').show();
 		loadListener(this, 'update');
 		loadListener(this, 'data');		
-		loadListener(this, 'wallImpact');
-		loadListener(this, 'dotImpact');
 	},
 	block1Start: function(){
 		this.addDots();
@@ -291,7 +289,7 @@ Reversibility.prototype = {
 	checkWallHits: function(){
 		walls.check();
 	},
-	onWallImpact: function(dot, line, wallUV, perpV){
+	onWallImpactTop: function(dot, line, wallUV, perpV){
 		/*
 		To dampen wall speed , doing:
 		1 = dot
@@ -307,38 +305,36 @@ Reversibility.prototype = {
 		v1 = (-b + (b^2 - 4*a*c)^.5)/2a
 		v2 = (m1*vo1 + m2*vo2 - m1*v1)/(m2*A)
 		*/
-		if(line[0]==0 && line[1]==0){
+		if(Math.abs(this.wallV)>1.0){
+			var vo1 = dot.v.dy;
+			var vo2 = this.wallV;
+			var m1 = dot.m;
+			var m2 = this.dragWeights.mass();
+			var vo1Sqr = vo1*vo1;
+			var vo2Sqr = vo2*vo2;
 			
-			if(Math.abs(this.wallV)>1.0){
-				var vo1 = dot.v.dy;
-				var vo2 = this.wallV;
-				var m1 = dot.m;
-				var m2 = this.dragWeights.mass();
-				var vo1Sqr = vo1*vo1;
-				var vo2Sqr = vo2*vo2;
-				
-				var scalar = Math.pow(Math.abs(vo2)+.1, .2);
-				var scalarSqr = scalar*scalar
-				
-				var a = m1*(1 + m1/(scalarSqr*m2));
-				var b = -2*m1*(vo1*m1/(m2) + vo2)/scalarSqr;
-				var c = (m1*(m1*vo1Sqr/m2 + 2*vo2*vo1) + m2*vo2Sqr)/scalarSqr - m1*vo1Sqr - m2*vo2Sqr;
-				
-				dot.v.dy = (-b + Math.pow(b*b - 4*a*c,.5))/(2*a);
-				dot.y = dot.y+dot.r;
-				this.wallV = (m1*vo1 + m2*vo2 - m1*dot.v.dy)/(m2*scalar);
-			}else{
-				var pt = walls.pts[line[0]][line[1]];
-				var dotVo = dot.v.dy;
-				var wallVo = this.wallV;
-				dot.v.dy = (dotVo*(dot.m-this.dragWeights.mass())+2*this.dragWeights.mass()*wallVo)/(dot.m+this.dragWeights.mass());
-				this.wallV = (wallVo*(this.dragWeights.mass()-dot.m)+2*dot.m*dotVo)/(this.dragWeights.mass()+dot.m);
-				dot.y = pt.y+dot.r;			
-			}
+			var scalar = Math.pow(Math.abs(vo2)+.1, .2);
+			var scalarSqr = scalar*scalar
+			
+			var a = m1*(1 + m1/(scalarSqr*m2));
+			var b = -2*m1*(vo1*m1/(m2) + vo2)/scalarSqr;
+			var c = (m1*(m1*vo1Sqr/m2 + 2*vo2*vo1) + m2*vo2Sqr)/scalarSqr - m1*vo1Sqr - m2*vo2Sqr;
+			
+			dot.v.dy = (-b + Math.pow(b*b - 4*a*c,.5))/(2*a);
+			dot.y = dot.y+dot.r;
+			this.wallV = (m1*vo1 + m2*vo2 - m1*dot.v.dy)/(m2*scalar);
 		}else{
-			walls.impactStd(dot, wallUV, perpV);
-			this.forceInternal += 2*dot.m*Math.abs(perpV);
+			var pt = walls.pts[line[0]][line[1]];
+			var dotVo = dot.v.dy;
+			var wallVo = this.wallV;
+			dot.v.dy = (dotVo*(dot.m-this.dragWeights.mass())+2*this.dragWeights.mass()*wallVo)/(dot.m+this.dragWeights.mass());
+			this.wallV = (wallVo*(this.dragWeights.mass()-dot.m)+2*dot.m*dotVo)/(this.dragWeights.mass()+dot.m);
+			dot.y = pt.y+dot.r;			
 		}
+	},
+	onWallImpactSides: function(dot, line, wallUV, perpV){
+		walls.impactStd(dot, wallUV, perpV);
+		this.forceInternal += 2*dot.m*Math.abs(perpV);
 	},
 	addDots: function(){
 		populate("spc1", P(35, 80), V(460, 350), 800, 230);
@@ -405,8 +401,6 @@ Reversibility.prototype = {
 		this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
 		this.forceInternal = 0;
 		//emptyListener(this, 'update');
-		//emptyListener(this, 'wallImpact');
-		//emptyListener(this, 'dotImpact');
 		//emptyListener(this, 'data');
 		
 		for (resetListenerName in this.resetListeners.listeners){

@@ -14,7 +14,6 @@ function IdealGasLaw(){
 	this.wallSpeed = 1;
 	this.updateListeners = {listeners:{}, save:{}};
 	this.dataListeners = {listeners:{}, save:{}};
-	this.wallImpactListeners = {listeners:{}, save:{}};
 	this.dotImpactListeners = {listeners:{}, save:{}};
 	this.mousedownListeners = {listeners:{}, save:{}};
 	this.mouseupListeners = {listeners:{}, save:{}};
@@ -51,7 +50,6 @@ function IdealGasLaw(){
 	this.maxY = 350;
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
-	addListener(this, 'wallImpact', 'std', this.onWallImpact, this);
 	addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
 
 }
@@ -91,7 +89,6 @@ IdealGasLaw.prototype = {
 		$('#base').show();
 		loadListener(this, 'update');
 		loadListener(this, 'data');		
-		loadListener(this, 'wallImpact');
 		loadListener(this, 'dotImpact');
 	},
 	block1Start: function(){
@@ -100,7 +97,7 @@ IdealGasLaw.prototype = {
 		this.playedWithSlider = false;
 		$('#clearGraphs').hide();
 		$('#sliderTemp').show();
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]]);
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], this.onWallImpact);
 		walls.setup();
 		populate('spc4', P(45,35), V(450, 350), 1, 300);
 		var dot = spcs.spc4.dots[0]
@@ -126,13 +123,13 @@ IdealGasLaw.prototype = {
 		$('#sliderTemp').hide();
 	},
 	block2Start: function(){
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]]);
-		walls.setup();
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], this.onWallImpact);
+		walls.setup();	
 		populate('spc4', P(45,35), V(450, 350), 400, 200);
 	},
 	block3Start: function(){
 		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
-			[P(300,30), P(510,30), P(510,440), P(300,440)]]);
+			[P(300,30), P(510,30), P(510,440), P(300,440)]], this.onWallImpact);
 		walls.setup();
 		populate('spc4', P(45, 80), V(200, 300), 200, 600);
 		populate('spc4', P(305,75), V(200, 300), 200, 100);
@@ -140,7 +137,7 @@ IdealGasLaw.prototype = {
 	},
 	block4Start: function(){
 		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
-			[P(300,30), P(510,30), P(510,440), P(300,440)]]);
+			[P(300,30), P(510,30), P(510,440), P(300,440)]], this.onWallImpact);
 		walls.setup();
 		populate('spc1', P(45, 80), V(200, 300), 200, 300);
 		populate('spc5', P(305,75), V(200, 300), 100, 800);
@@ -178,7 +175,7 @@ IdealGasLaw.prototype = {
 	},
 	block6Start: function(){
 		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
-			[P(300,30), P(510,30), P(510,440), P(300,440)]]);
+			[P(300,30), P(510,30), P(510,440), P(300,440)]], this.onWallImpact);
 		walls.setup();
 		var sliderMin = $('#sliderSpeedLeft').slider('option', 'min');
 		var sliderMax = $('#sliderSpeedLeft').slider('option', 'max');
@@ -249,7 +246,7 @@ IdealGasLaw.prototype = {
 		$('#intText').html("");	
 	},
 	block8Start: function(){
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]]);
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], this.onWallImpact);
 		walls.setup();
 		populate('spc1', P(45,35), V(450, 350), 600, 300);
 		populate('spc3', P(45,35), V(450, 350), 800, 300);
@@ -276,11 +273,11 @@ IdealGasLaw.prototype = {
 		$('#longSliderHolder').show();
 		this.playedWithSlider = new Boolean();
 		this.playedWithSlider = false;
-		walls = new WallHandler([[P(50,75), P(75,50), P(475,50), P(500,75), P(500,300), P(475,325), P(75,325), P(50,300)]]);
+		walls = new WallHandler([[P(50,75), P(75,50), P(475,50), P(500,75), P(500,300), P(475,325), P(75,325), P(50,300)]], this.onWallImpactArrow);
 		walls.setup();
 		populate('spc4', P(100,100), V(300,200), 1, 700);
 		removeListener(curLevel, 'wallImpact', 'std');
-		addListener(curLevel, 'wallImpact', 'arrow', this.onWallImpactArrow, this);
+		//addListener(curLevel, 'wallImpact', 'arrow', this.onWallImpactArrow, this);
 		$('#sliderPressure').show();
 		
 	},
@@ -345,8 +342,9 @@ IdealGasLaw.prototype = {
 		$('#intText').hide();
 	},
 	block11Start: function(){
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]]);
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], this.onWallImpact);
 		walls.setup();
+		walls.setSubWallHandler(0,0,this.onWallImpactIsothermal); 
 		var ptsToBorder = this.getPtsToBorder();
 		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container', c);
 		populate('spc1', P(45,35), V(450, 350), 600, 300);
