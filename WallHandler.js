@@ -33,11 +33,11 @@ WallHandler.prototype = {
 		
 	},
 	doInitHandlers: function(handlers){
-		if(typeof handlers == 'function'){
+		if(typeof handlers == 'object'){
 			this.setAllHandler(handlers);
 		}else if (handlers instanceof Array){//NOTE - HANDLERS HAD BETTER BE THE SAME LENGTH AT walls.pts.  I AM ASSUMING IT IS.
 			for (var handlerIdx=0; handlerIdx<handlers.length; handlerIdx++){
-				if(typeof handlers[handlerIdx] == 'function'){
+				if(typeof handlers[handlerIdx] == 'object'){
 					var handler = handlers[handlerIdx];
 					this.setWallHandler(handlerIdx, handler)
 				}else if(handlers[handlerIdx] instanceof Array){
@@ -257,7 +257,9 @@ WallHandler.prototype = {
 		var perpV = perpUV.dotProd(dot.v);
 		if (distFromWall>0 && distFromWall<30 && this.isBetween(dot, line, wallUV)){
 			var handler = this.handlers[line[0]][line[1]];
-			handler.apply(curLevel,[dot, line, wallUV, perpV]);
+			var func = handler.func;
+			var obj = handler.obj;
+			func.apply(obj,[dot, line, wallUV, perpV]);
 		}
 	},
 	isBetween: function(dot, line, wallUV){

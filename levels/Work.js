@@ -58,15 +58,16 @@ Work.prototype = {
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], this.onWallImpactSides);
 		walls.setup();
 		walls.setSubWallHandler(0, 0, this.onWallImpactTop);
-		this.heater = new Heater('spaceHeater', P(450,350), V(60,40), -Math.PI/2, 20, c);
-		this.heater.init();
+
 		this.piston = new Piston('tootoo', 500, function(){return walls.pts[0][0].y}, 40, 470, c, 2, function(){return self.g}, this);
 		this.piston.show();
 		this.piston.trackWork();
 		this.piston.trackPressure();
 		var ptsToBorder = this.getPtsToBorder();
 		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container', c);
-		populate('spc1', P(45,35), V(450, 350), 800, 300);
+		this.heater = new Heater('spaceHeater', P(40,425), V(470,10), 0, 20, c);
+		this.heater.init();
+		populate('spc1', P(45,35), V(460, 350), 800, 300);
 		populate('spc3', P(45,35), V(450, 350), 600, 300);
 	},
 

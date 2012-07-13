@@ -10,7 +10,7 @@ function Reversibility(){
 	this.bgCol = Col(5, 17, 26);
 	this.wallCol = Col(255,255,255);
 	this.numUpdates = 0;
-	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], this.onWallImpactSides)
+	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], {func:this.onWallImpactSides, obj:this})
 	
 	this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
 	this.SAPExt = getLen(this.extPressurePts);
@@ -50,7 +50,7 @@ function Reversibility(){
 	
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
 	walls.setup();
-	walls.setSubWallHandler(0, 0, this.onWallImpactTop);
+	walls.setSubWallHandler(0, 0, {func:this.onWallImpactTop, obj:this});
 	this.workTracker = new WorkTracker('tracky',
 										function(){return walls.pts[0][0].y},
 										walls.pts[0][1].x-walls.pts[0][0].x,
