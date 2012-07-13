@@ -50,12 +50,13 @@ function Reversibility(){
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
 	walls.setup();
 	
-	this.workTracker = new WorkTracker(function(){return walls.pts[0][0].y},
+	this.workTracker = new WorkTracker('tracky',
+										function(){return walls.pts[0][0].y},
 										walls.pts[0][1].x-walls.pts[0][0].x,
 										function(){return self.dragWeights.mass()},
 										function(){return self.g},
-										{readout:this.readout, idx:1}
-										);
+										{readout:this.readout, idx:1},
+										this);
 	this.minY = 60;
 	this.maxY = walls.pts[0][2].y-75;
 	addSpecies(['spc1', 'spc3']);

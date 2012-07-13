@@ -1,4 +1,5 @@
-function WorkTracker(height, width, mass, g, readoutData){
+function WorkTracker(handle, height, width, mass, g, readoutData, obj){
+	this.handle = handle;
 	this.height = height;
 	this.width = width;
 	this.mass = mass;
@@ -7,7 +8,9 @@ function WorkTracker(height, width, mass, g, readoutData){
 	this.readout = readoutData.readout;
 	this.readout.addEntry('work', 'Work:', 'kJ', 0, readoutData.idx, 1);
 	this.heightLast = this.height();
-
+	if(obj){
+		addListener(obj, 'reset', 'workTracker'+this.handle, this.reset, this);
+	}
 }
 WorkTracker.prototype = {
 
@@ -33,7 +36,12 @@ WorkTracker.prototype = {
 		this.heightLast = this.height();
 	},
 	start: function(){
-		this.reset();
-		addListener(curLevel, 'update', 'workTracker', this.updateVal, this);
+
+		addListener(curLevel, 'update', 'workTracker' + this.handle, this.updateVal, this);
 	},
+	stop: function(){
+		removeListener(curLevel, 'update', 'workTracker' + this.handle);
+		
+	},
+	
 }

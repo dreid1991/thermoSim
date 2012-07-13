@@ -1,4 +1,8 @@
-function Readout(leftBound, rightBound, y, font, fontCol, obj){
+function Readout(leftBound, rightBound, y, font, fontCol, obj, align){
+	this.align = 'left';
+	if(align){
+		this.align = align;
+	}
 	this.drawCanvas = c;
 	this.font = font;
 	this.fontCol = fontCol;
@@ -22,7 +26,7 @@ Readout.prototype = {
 			var pos = entry.pos;
 			var decPlaces = entry.decPlaces
 			var text = entry.text+' '+round(entry.val,decPlaces)+' '+entry.units;
-			draw.text(text, pos, this.font, this.fontCol, 'left', 0, this.drawCanvas);
+			draw.text(text, pos, this.font, this.fontCol, this.align, 0, this.drawCanvas);
 		}
 		this.drawCanvas.restore();
 	},
@@ -81,14 +85,28 @@ Readout.prototype = {
 			spacing = Math.floor(this.width/(numEntries-1));
 		} else{
 			spacing=this.width;
-			entryIdx=.5;
 		}
+
+		if(this.align=='center'){
+			spacing = this.width/(numEntries+1);
+			var center = this.leftBound + this.width/2;
+			var spaceNum = numEntries-1;
+			var sideSpace = spacing*spaceNum/2
 			for (var entryIdx=0; entryIdx<numEntries; entryIdx++){
 				var entry = this.entries[entryIdx];
-				var x = spacing*entryIdx;
+				var x = spacing*(entryIdx+1);
+				var y = 0;
+				entry.pos = P(x,y);
+			}
+		}else if(this.align=='left'){
+			for (var entryIdx=0; entryIdx<numEntries; entryIdx++){
+				var entry = this.entries[entryIdx];
+				var x = spacing*entryIdx
 				var y = 0;
 				entry.pos = P(x, y);
 			}
+		}
+
 	},
 	getNumEntries: function(){
 		var count = 0;

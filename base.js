@@ -182,6 +182,7 @@ function gauss(avg, stdev){
 	return avg + numStdev*stdev;
 }
 function boundedStep(cur, setPt, step){
+	step = Math.abs(step);
 	var sign = 1;
 	if(cur==setPt){
 		return cur;
@@ -191,7 +192,6 @@ function boundedStep(cur, setPt, step){
 	}
 	cur*=sign;
 	setPt*=sign;
-	step*=sign;
 	return sign*Math.min(cur+step, setPt);
 }
 function addSpecies(toAdd){

@@ -818,8 +818,9 @@ DragArrow.prototype = {
 //PISTON
 //////////////////////////////////////////////////////////////////////////
 
-function Piston(handle, height, yInit, xLeftInit, width, drawCanvas, pInit, g){
-	this.y = yInit;
+function Piston(handle, height, y, xLeftInit, width, drawCanvas, pInit, g, obj){
+	var self = this;
+	this.y = y;
 	this.p = pInit;
 	this.g = g;
 	this.slant = .07;
@@ -829,32 +830,34 @@ function Piston(handle, height, yInit, xLeftInit, width, drawCanvas, pInit, g){
 	this.setMass();
 	this.drawCanvas = drawCanvas;
 	this.draw = this.makeDrawFunc(height, this.left, this.width);
-	this.dataHolderLeft = this.left + this.width/2 + this.shaft.dims.dx/2;
-	this.dataHolderBottom = this.plateTop.pos.y;
 	this.dataSlotFont = '12pt Calibri';
 	this.dataSlotFontCol = Col(255,255,255);
 	this.pStep = .05;
 	var readoutLeft = this.left + this.width*this.slant;
-	var readoutRight = this.left + this.width - 2*this.width*this.slant;
-	var readoutY = this.plateBottom.pos.y-2+this.y;
+	var readoutRight = this.left + this.width - this.width*this.slant;
+	var readoutY = this.pistonBottom.pos.y-2+this.y();
 	var readoutFont = '12pt calibri';
 	var readoutFontCol = Col(255, 255, 255);
-	this.readout = new Readout(readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol);
-	
+	this.readout = new Readout(readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, undefined, 'center');
+	obj.mass = function(){return self.mass};
 }
 
 Piston.prototype = {
 	makeDrawFunc: function(height, left, pistonWidth){
 		var shaftThickness = 30;
-		var shaftLength = height - 40;
+		var shaftLength = height - 45;
 		var plateTopHeight = 35;
 		var plateThickness = 10;
 
-		this.shaft = this.makeShaft(left, pistonWidth, shaftThickness, shaftLength, height);
-		var plateTopY = this.shaft.pos.y + this.shaft.dims.dy;
-		this.plateTop = this.makePlateTop(P(left, plateTopY), V(pistonWidth, plateTopHeight), plateThickness)
+		this.pistonTop = this.makeTop(left, pistonWidth, shaftThickness, shaftLength, height, plateTopHeight, plateThickness);
+		
+		var plateTopY = -height + shaftLength
+		
+		//this.plateTop = this.makePlateTop(P(left, plateTopY), V(pistonWidth, plateTopHeight), plateThickness)
+		
 		var plateBottomY = plateTopY + plateTopHeight;
-		this.plateBottom = this.makePlateBottom(P(left, plateBottomY), V(pistonWidth, plateThickness));
+		
+		this.pistonBottom = this.makePlateBottom(P(left, plateBottomY), V(pistonWidth, plateThickness));
 		
 
 		
@@ -862,41 +865,46 @@ Piston.prototype = {
 		
 		var self = this;
 		var drawFunc = function(){
+			if(self.readout){
+				self.setReadoutY();
+			}
 			self.drawCanvas.save();
-			self.drawCanvas.translate(0, self.y);
-			draw.fillRect(self.shaft.pos, self.shaft.dims, self.shaft.col, self.drawCanvas);
-			draw.fillPts(self.plateTop.pts, self.plateTop.col, self.drawCanvas);
-			draw.fillRect(self.plateBottom.pos, self.plateBottom.dims, self.plateBottom.col, self.drawCanvas);
+			self.drawCanvas.translate(0, self.y());
+			draw.fillPts(self.pistonTop.pts, self.pistonTop.col, self.drawCanvas);
+			draw.fillRect(self.pistonBottom.pos, self.pistonBottom.dims, self.pistonBottom.col, self.drawCanvas);
 			self.drawCanvas.restore();
 		}
 		return drawFunc;
 	},
-	makeShaft: function(left, pistonWidth, thickness, length, yInit){
-		var x = left + pistonWidth/2 - thickness/2;
-		var y = -yInit;
-		var pos = P(x, y);
-		var dims = V(thickness, length);
-		var col = Col(150, 150, 150);
-		return {pos:pos, dims:dims, col:col};
-	},
-	makePlateTop: function(pos, dims,thick){
+	makeTop: function(left, pistonWidth, shaftThickness, length, yInit, plateHeight, plateThickness){
 		var slant = this.slant;
 		var slantLeft = slant;
 		var slantRight = 1-slant;
-		var pts = new Array(8);
-		pts[0] = P(pos.x,				pos.y+dims.dy);
-		pts[1] = P(pos.x+dims.dx*slantLeft, 	pos.y);
-		pts[2] = P(pos.x+dims.dx*slantRight, 	pos.y);
-		pts[3] = P(pos.x+dims.dx, 		pos.y+dims.dy);
-		pts[4] = P(pos.x+dims.dx-thick,	pos.y+dims.dy);
-		pts[5] = P(pos.x+dims.dx*slantRight-thick, pos.y+thick);
-		pts[6] = P(pos.x+dims.dx*slantLeft+thick, pos.y+thick);
-		pts[7] = P(pos.x+thick,			pos.y+dims.dy);
+		var pts = new Array(12);
+		var shaftX = left + pistonWidth/2 - shaftThickness/2;
+		var shaftY = -yInit;
+		var shaftPos = P(shaftX, shaftY);
 		var col = Col(150, 150, 150);
-		return {pos:pos, pts:pts, col:col};
+		var dims = V(pistonWidth, plateHeight)
+		var platePos = shaftPos.copy().movePt({dy:length}).position({x:left});;
+		pts[0] = P(platePos.x,							platePos.y+dims.dy+1);
+		pts[1] = P(platePos.x+dims.dx*slantLeft, 		platePos.y);
+		pts[2] = P(shaftPos.x,							platePos.y);
+		pts[3] = P(shaftPos.x,							shaftPos.y);
+		pts[4] = P(shaftPos.x + shaftThickness,			shaftPos.y);
+		pts[5] = P(shaftPos.x + shaftThickness,			platePos.y);
+		pts[6] = P(platePos.x+dims.dx*slantRight, 		platePos.y);
+		pts[7] = P(platePos.x+dims.dx, 					platePos.y+dims.dy+1);
+		pts[8] = P(platePos.x+dims.dx-plateThickness,			platePos.y+dims.dy+1);
+		pts[9] = P(platePos.x+dims.dx*slantRight-plateThickness, platePos.y+plateThickness);
+		pts[10] = P(platePos.x+dims.dx*slantLeft+plateThickness, 	platePos.y+plateThickness);
+		pts[11] = P(platePos.x+plateThickness,					platePos.y+dims.dy+1);
+		var col = Col(150, 150, 150);
+		return {pts:pts, col:col};
 	},
 	makePlateBottom: function(pos, dims){
 		var col = Col(100, 100, 100);
+		dims.adjust(0,1);
 		return {pos:pos, dims:dims, col:col};
 	},
 	show: function(){
@@ -905,10 +913,14 @@ Piston.prototype = {
 	},
 	setP: function(p){
 		var pSetPt = p;
+		var dp = pSetPt - this.p;
 		addListener(curLevel, 'update', 'piston'+this.handle+'adjP', 
 			function(){
 				this.p = boundedStep(this.p, pSetPt, this.pStep);
 				this.setMass();			
+				if(this.trackingP){
+					this.setDataVal(this.p, 'pressure');
+				}
 				if(round(this.p,2)==pSetPt){
 					removeListener(curLevel, 'update', 'piston'+this.handle+'adjP');
 				}
@@ -919,15 +931,14 @@ Piston.prototype = {
 	setMass: function(){
 		this.mass = this.p*this.width/(pConst*this.g());
 	},
-	setY: function(y){
-		this.lastY = this.y;
-		this.y = y;
-		this.readout.position({y:this.plateBottom.pos.y-2+this.y});
+	setReadoutY: function(){
+		this.readout.position({y:this.pistonBottom.pos.y-2+this.y()});
 	},
 	trackWork: function(){
 		var self = this;
 		this.workTracker = new WorkTracker(
-						function(){return self.y},
+						'pistonWorkTracker',
+						function(){return self.y()},
 						this.width,
 						function(){return self.mass},
 						function(){return self.g()},
@@ -935,8 +946,26 @@ Piston.prototype = {
 						);
 		this.workTracker.start();
 	},
+	trackWorkStart: function(){
+		this.workTracker.start();
+	},
 	trackWorkStop: function(){
-	
+		this.workTracker.stop();
+	},
+	trackPressure: function(){
+		this.addData('pressure', 'P:', this.p, 'atm');
+		this.trackingP = new Boolean();
+		this.trackingP = true;
+	},
+	trackPressureStart: function(){
+		if(!this.trackingP){
+			this.addData('pressure', 'P:', this.p, 'atm');
+			this.trackingP = true;
+		}
+	},
+	trackPressureStop: function(){
+		this.removeData('pressure')
+		this.trackingP = false;
 	},
 	reset: function(){
 		this.dataHandler.slots.work.value = 0;
@@ -944,8 +973,10 @@ Piston.prototype = {
 	addData: function(handle, label, value, units){
 		this.readout.addEntry(handle, label, units, value, undefined, 1);
 	},
-	setData: function(handle, value){
-		var slot = byAttr(this.dataHolder.slots, handle, 'handle');
-		slot.value = value;
+	removeData: function(handle){
+		this.readout.removeEntry(handle);
+	},
+	setDataVal: function(value, handle){
+		this.readout.hardUpdate(value, handle);
 	},
 }

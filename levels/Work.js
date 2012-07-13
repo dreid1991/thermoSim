@@ -11,7 +11,7 @@ function Work(){
 	this.numUpdates = 0;
 	this.forceInternal = 0;
 	this.wallV = 0;
-	this.wallSpeed = 1;
+
 	this.updateListeners = {listeners:{}, save:{}};
 	this.dataListeners = {listeners:{}, save:{}};
 	this.wallImpactListeners = {listeners:{}, save:{}};
@@ -36,7 +36,7 @@ function Work(){
 	this.maxY = 350;
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
-	addListener(this, 'wallImpact', 'std', this.onWallImpact, this);
+	addListener(this, 'wallImpact', 'static', this.onWallImpact, this);
 	addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
 
 }
@@ -55,15 +55,20 @@ Work.prototype = {
 		$('#canvasDiv').show();
 		$('#clearGraphs').hide();
 		$('#dashRun').show();
+		removeListener(curLevel, 'wallImpact', 'static')
+		addListener(curLevel, 'wallImpact', 'adiabatic', this.onWallImpactAdiabatic, this);
+		addListener(curLevel, 'update', 'moveWalls', this.moveWalls, this);
+		addListener(curLevel, 'update', 'addGravity', this.addGravity, this);
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]]);
 		walls.setup();
-		this.myFancyPiston = new Piston('tootoo', 500, 300, 40, 470, c, 2, function(){return self.g});
-		this.myFancyPiston.show();
-		this.myFancyPiston.trackWork();
+		this.piston = new Piston('tootoo', 500, function(){return walls.pts[0][0].y}, 40, 470, c, 2, function(){return self.g}, this);
+		this.piston.show();
+		this.piston.trackWork();
+		this.piston.trackPressure();
 		var ptsToBorder = this.getPtsToBorder();
 		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container', c);
-		populate('spc1', P(45,35), V(450, 350), 400, 300);
-		populate('spc3', P(45,35), V(450, 350), 400, 300);
+		populate('spc1', P(45,35), V(450, 350), 800, 300);
+		populate('spc3', P(45,35), V(450, 350), 600, 300);
 	},
 
 	block0CleanUp: function(){
@@ -110,38 +115,37 @@ Work.prototype = {
 		pts.push(wallPts[4].copy().position({y:this.minY}));
 		return pts;
 	},
-	changeWallSetPt: function(dest){
-		var wall = walls.pts[0]
-		removeListener(curLevel, 'update', 'moveWall');
-		var setY = function(curY){
-			wall[0].y = curY;
-			wall[1].y = curY;
-			wall[wall.length-1].y = curY;
+	moveWalls: function(){
+
+		var wall = walls.pts[0];
+		var lastY = wall[0].y
+		var unboundedY = lastY + this.wallV + .5*this.g;
+		var dyWeight = null;
+		if(unboundedY>this.maxY || unboundedY<this.minY){
+			var boundedY = Math.max(this.minY, Math.min(this.maxY, unboundedY));
+			var tHit = null;
+			if (boundedY==this.maxY){
+				var tHit = (-this.wallV + Math.sqrt(this.wallV*this.wallV + 2*this.g*(boundedY-lastY)))/this.g;
+			}else if (boundedY==this.minY){
+				var tHit = (-this.wallV - Math.sqrt(this.wallV*this.wallV + 2*this.g*(boundedY-lastY)))/this.g;
+			}
+			var vRebound = -(this.wallV + this.g*tHit);
+			var tLeft = 1 - tHit;
+			var nextY = boundedY + vRebound*tLeft + .5*this.g*tLeft*tLeft;
+			this.wallV += 2*this.g*tHit;
+			this.wallV = -this.wallV;
+			wall[0].y = nextY;
+			wall[1].y = nextY;
+			wall[wall.length-1].y = nextY;
+			dyWeight = nextY - lastY;
+		}else{
+			wall[0].y = unboundedY;
+			wall[1].y = unboundedY;
+			wall[wall.length-1].y = unboundedY;
+			dyWeight = unboundedY - lastY;
 		}
-		var getY = function(){
-			return walls.pts[0][0].y;
-		}
-		
-		var dist = dest-getY();
-		if(dist!=0){
-			var sign = 1;
-			sign = Math.abs(dist)/dist;		
-			this.wallV = this.wallSpeed*sign;
-			removeListener(curLevel, 'wallImpact', 'std');
-			addListener(curLevel, 'wallImpact', this.compMode, this['onWallImpact' + this.compMode], this);
-			addListener(curLevel, 'update', 'moveWall',
-				function(){
-					setY(boundedStep(getY(), dest, this.wallV))
-					walls.setupWall(0);
-					if(round(getY(),2)==round(dest,2)){
-						removeListener(curLevel, 'update', 'moveWall');
-						removeListener(curLevel, 'wallImpact', this.compMode)
-						addListener(curLevel, 'wallImpact', 'std', this.onWallImpact, this);
-						this.wallV = 0;
-					}
-				},
-			this);
-		}
+		walls.setupWall(0);
+	
 	},
 	update: function(){
 		this.numUpdates++;
@@ -164,6 +168,9 @@ Work.prototype = {
 		this.checkWallHits();
 		this.drawRun();
 	},
+	addGravity: function(){
+		this.wallV += this.g;
+	},
 	drawRun: function(){
 		draw.clear(this.bgCol);
 		draw.dots();
@@ -181,20 +188,54 @@ Work.prototype = {
 		this.forceInternal += 2*dot.m*Math.abs(perpV);
 		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}
 	},
-	onWallImpactIsothermal: function(dot, line, wallUV, perpV){
-		var vo = dot.v.copy();
-		var perpUV = walls.wallPerpUVs[line[0]][line[1]]
-		dot.y-=2*perpUV.dy;
-		walls.impactStd(dot, wallUV, perpV);
-		this.forceInternal += 2*dot.m*Math.abs(perpV);
-		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}	
-	},
+
 	onWallImpactAdiabatic: function(dot, line, wallUV, perpV){
 		var vo = dot.v.copy();
+		/*
+		To dampen wall speed , doing:
+		1 = dot
+		2 = wall
+		m1vo1^2 + m2vo2^2 = m1v1^2 + m2v2^2
+		m1vo1 + m2vo2 = m1v1 + A*m2v2
+		where A = (abs(wallV)+1)^(const, maybe .1 to .3)
+		leads to
+		a = m1 + m1^2/(A^2m2)
+		b = -2*vo1*m1^2/(A^2m2) - 2*vo2*m1/A^2
+		c = m1^2*vo1^2/(A^2*m2) + 2*m1*vo2*vo1/A^2 + m2*(vo2/A)^2 - m1*vo1^2 - m2*vo2^2
+		I recommend grouping squared terms in each block for faster computation
+		v1 = (-b + (b^2 - 4*a*c)^.5)/2a
+		v2 = (m1*vo1 + m2*vo2 - m1*v1)/(m2*A)
+		*/
 		if(line[0]==0 && line[1]==0){
-			dot.v.dy = -vo + 2*this.wallV;
-			this.forceInternal += dot.m*(perpV + dot.v.dy);
+			
+			if(Math.abs(this.wallV)>1.0){
+				var vo1 = dot.v.dy;
+				var vo2 = this.wallV;
+				var m1 = dot.m;
+				var m2 = this.mass();
+				var vo1Sqr = vo1*vo1;
+				var vo2Sqr = vo2*vo2;
+				
+				var scalar = Math.pow(Math.abs(vo2)+.1, .2);
+				var scalarSqr = scalar*scalar
+				
+				var a = m1*(1 + m1/(scalarSqr*m2));
+				var b = -2*m1*(vo1*m1/(m2) + vo2)/scalarSqr;
+				var c = (m1*(m1*vo1Sqr/m2 + 2*vo2*vo1) + m2*vo2Sqr)/scalarSqr - m1*vo1Sqr - m2*vo2Sqr;
+				
+				dot.v.dy = (-b + Math.pow(b*b - 4*a*c,.5))/(2*a);
+				dot.y = dot.y+dot.r;
+				this.wallV = (m1*vo1 + m2*vo2 - m1*dot.v.dy)/(m2*scalar);
+			}else{
+				var pt = walls.pts[line[0]][line[1]];
+				var dotVo = dot.v.dy;
+				var wallVo = this.wallV;
+				dot.v.dy = (dotVo*(dot.m-this.mass())+2*this.mass()*wallVo)/(dot.m+this.mass());
+				this.wallV = (wallVo*(this.mass()-dot.m)+2*dot.m*dotVo)/(this.mass()+dot.m);
+				dot.y = pt.y+dot.r;			
+			}
 		}else{
+		
 			walls.impactStd(dot, wallUV, perpV);
 			this.forceInternal += 2*dot.m*Math.abs(perpV);
 		}
@@ -236,28 +277,9 @@ Work.prototype = {
 	vol: function(){
 		return walls.area(0);// - walls.area(1);
 	},
-	changeTempSlider: function(event, ui){
-		this.playedWithSlider = true;
-		var temp = ui.value;
-		changeAllTemp(temp);
-		var dot = spcs.spc4.dots[0];
-		this.readout.hardUpdate(temp, 'temp');
-		this.readout.hardUpdate(dot.speed(), 'speed');
-	},
-	changePressureSlider: function(event, ui){
-		this.playedWithSlider = true;
-		var temp = ui.value;
-		changeAllTemp(temp);
-	},
-	changeTempSpc3: function(event, ui){
-		var rms = ui.value;
-		changeRMS('spc3', rms);
-		this.readout.hardUpdate(rms, 'rmsLeft');
-	},
-	changeTempSpc5: function(event, ui){
-		var rms = ui.value;
-		changeRMS('spc5', rms);	
-		this.readout.hardUpdate(rms, 'rmsRight');		
+
+	changePressure: function(event, ui){
+		this.piston.setP(ui.value);
 	},
 
 	reset: function(){

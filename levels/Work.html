@@ -29,18 +29,11 @@
 		<div id='dashRun' class='dashMed noSelect'>
 			<center>
 				<div>
-					<div id='sliderSpeedLeftHolder' style='display:inline-block'>
-						RMS(v) Left
-						<div id='sliderSpeedLeft' style='width:150px'></div>
-					</div>
+					<div id='sliderPressure' style='width:300px'></div>
 					<button id='reset' class='noSelect'>Reset experiment</button>
 					<button id='checkAns' class='noSelect'>Check answer</button>
 					<button id='clearGraphs' class='noSelect'>Clear graphs</button>
 
-				</div>
-				<div id='longSliderHolder'><center>Molecule's temperature</center>
-					<div id='sliderTemp' style='width:300px'></div>
-					<div id='sliderPressure' style='width:300px'></div>
 				</div>
 			</center>
 		</div>
@@ -110,53 +103,18 @@ $(function(){
 	$('#reset').hide();
 	curLevel.init();
 	makeSlider(
-		"sliderTemp", 
+		"sliderPressure", 
 		{
-			min:100, 
-			max:2000, 
-			value:300, 
+			min:2, 
+			max:15, 
+			value:2, 
 		},
 		[
-			{eventType:'slide', obj:curLevel, func:curLevel.changeTempSlider},
-		],
-		'hide'
-	);
-	makeSlider(
-		"sliderPressure",
-		{
-			min:100,
-			max:2000,
-			value:300,
-		},
-		[
-			{eventType:'slide', obj:curLevel, func:curLevel.changePressureSlider},
-		],
-		'hide'
-	);
-	makeSlider(
-		"sliderSpeedLeft",
-		{
-			min:50,
-			max:1200,
-			value:300,
-		},
-		[
-			{eventType:'slide', obj:curLevel, func:curLevel.changeTempSpc3},
+			{eventType:'slide', obj:curLevel, func:curLevel.changePressure},
 		],
 		'show'
 	);
-	makeSlider(
-		"sliderSpeedRight",
-		{
-			min:50,
-			max:1200,
-			value:300,
-		},
-		[
-			{eventType:'slide', obj:curLevel, func:curLevel.changeTempSpc5},
-		],
-		'show'
-	);
+
 });
 
 myCanvas.width = $('#main').width();
