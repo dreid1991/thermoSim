@@ -145,7 +145,7 @@ IdealGasLaw.prototype = {
 		populate('spc1', P(45, 80), V(200, 300), 200, 300);
 		populate('spc5', P(305,75), V(200, 300), 100, 800);
 
-		this.readout.addEntry('rmsLeft', 'RMS(v) Lef::', 'm/s', rms(dataHandler.velocities('spc1')), undefined, 0);
+		this.readout.addEntry('rmsLeft', 'RMS(v) Left:', 'm/s', rms(dataHandler.velocities('spc1')), undefined, 0);
 		
 		this.readout.addEntry('rmsRight', 'RMS(v) Right:', 'm/s', rms(dataHandler.velocities('spc5')), undefined, 0);
 

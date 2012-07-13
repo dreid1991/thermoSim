@@ -880,7 +880,7 @@ Piston.prototype = {
 		var slant = this.slant;
 		var slantLeft = slant;
 		var slantRight = 1-slant;
-		var pts = new Array(12);
+		var pts = new Array(14);
 		var shaftX = left + pistonWidth/2 - shaftThickness/2;
 		var shaftY = -yInit;
 		var shaftPos = P(shaftX, shaftY);
@@ -889,16 +889,18 @@ Piston.prototype = {
 		var platePos = shaftPos.copy().movePt({dy:length}).position({x:left});;
 		pts[0] = P(platePos.x,							platePos.y+dims.dy+1);
 		pts[1] = P(platePos.x+dims.dx*slantLeft, 		platePos.y);
-		pts[2] = P(shaftPos.x,							platePos.y);
-		pts[3] = P(shaftPos.x,							shaftPos.y);
-		pts[4] = P(shaftPos.x + shaftThickness,			shaftPos.y);
-		pts[5] = P(shaftPos.x + shaftThickness,			platePos.y);
-		pts[6] = P(platePos.x+dims.dx*slantRight, 		platePos.y);
-		pts[7] = P(platePos.x+dims.dx, 					platePos.y+dims.dy+1);
-		pts[8] = P(platePos.x+dims.dx-plateThickness,			platePos.y+dims.dy+1);
-		pts[9] = P(platePos.x+dims.dx*slantRight-plateThickness, platePos.y+plateThickness);
-		pts[10] = P(platePos.x+dims.dx*slantLeft+plateThickness, 	platePos.y+plateThickness);
-		pts[11] = P(platePos.x+plateThickness,					platePos.y+dims.dy+1);
+		pts[2] = P(shaftPos.x-dims.dx*slantLeft,		platePos.y);
+		pts[3] = P(shaftPos.x,							platePos.y-5*dims.dy*slantLeft);
+		pts[4] = P(shaftPos.x,							shaftPos.y);
+		pts[5] = P(shaftPos.x + shaftThickness,			shaftPos.y);
+		pts[6] = P(shaftPos.x + shaftThickness,			platePos.y-5*dims.dy*slantLeft);
+		pts[7] = P(shaftPos.x + shaftThickness+dims.dx*slantLeft,			platePos.y);
+		pts[8] = P(platePos.x+dims.dx*slantRight, 		platePos.y);
+		pts[9] = P(platePos.x+dims.dx, 					platePos.y+dims.dy+1);
+		pts[10] = P(platePos.x+dims.dx-plateThickness,			platePos.y+dims.dy+1);
+		pts[11] = P(platePos.x+dims.dx*slantRight-plateThickness, platePos.y+plateThickness);
+		pts[12] = P(platePos.x+dims.dx*slantLeft+plateThickness, 	platePos.y+plateThickness);
+		pts[13] = P(platePos.x+plateThickness,					platePos.y+dims.dy+1);
 		var col = Col(150, 150, 150);
 		return {pts:pts, col:col};
 	},
@@ -979,4 +981,18 @@ Piston.prototype = {
 	setDataVal: function(value, handle){
 		this.readout.hardUpdate(value, handle);
 	},
+}
+
+//////////////////////////////////////////////////////////////////////////
+//HEATER
+//////////////////////////////////////////////////////////////////////////
+function Heater(pos, dims, rotation){
+	this.pos = pos;
+	this.dims = dims;
+	this.rot = rotation;
+}
+
+Heater.prototype = {
+	
+
 }

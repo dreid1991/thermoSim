@@ -1,9 +1,13 @@
-function WallHandler(pts){
+function WallHandler(pts, handlers){
 	this.pts = pts;
 	this.gridDim=20;
 	this.wallUVs = [];
 	this.wallPerpUVs = [];
 	this.wallGrids = [];
+	this.handlers = this.makeBlankHandlers();
+	if(handlers){
+		this.doInitHandlers(handlers);
+	}
 	this.xSpan = Math.floor(myCanvas.width/this.gridDim);
 	this.ySpan = Math.floor(myCanvas.height/this.gridDim);
 	this.numCols = Math.ceil(myCanvas.width/this.gridDim);
@@ -12,21 +16,98 @@ function WallHandler(pts){
 WallHandler.prototype = {
 	setup: function(){
 		this.closeWalls();
+		this.ptsInit = [];
+		this.setPtsInit();
 		for (var wallIdx=0; wallIdx<walls.pts.length; wallIdx++){
 			this.setupWall(wallIdx);
 		}
 		
+	},
+	makeBlankHandlers: function(){
+		var blankHandlers = new Array(this.pts.length);
+		for(var ptIdx=0; ptIdx<this.pts.length; ptIdx++){
+			var subWall = this.pts[ptIdx];
+			blankHandlers[ptIdx] = new Array(subWall.length);
+		}
+		return blankHandlers;
+		
+	},
+	doInitHandlers: function(handlers){
+		if(typeof handlers == 'function'){
+			this.setAllHandler(handlers);
+		}else if (handlers instanceof Array){//NOTE - HANDLERS HAD BETTER BE THE SAME LENGTH AT walls.pts.  I AM ASSUMING IT IS.
+			for (var handlerIdx=0; handlerIdx<handlers.length; handlerIdx++){
+				if(typeof handlers[handlerIdx] == 'function'){
+					var handler = handlers[handlerIdx];
+					this.setWallHandler(handlerIdx, handler)
+				}else if(handlers[handlerIdx] instanceof Array){
+					var handlerArray = handlers[handlerIdx];
+					for (var subHandlerIdx=0; subHandlerIdx<handlerArray.length; subHandlerIdx++){
+						var subHandler = handlerArray[subHandlerIdx]
+						this.setSubWallHandler(handlerIdx, subHandlerIdx, subHandler);
+					}
+				}
+			}
+		}else{
+			console.log('YOU SEND POOR WALL HANDLERS.  THEY ARE NEITHER FUNCTION NOR ARRAY');
+		}
+	},
+	setAllHandler: function(handler){
+		for(var wallIdx=0; wallIdx<this.pts.length; wallIdx++){
+			this.setWallHandler(wallIdx, handler);
+		}
+	},
+	setWallHandler: function(wallIdx, handler){
+		for (var subWallIdx=0; subWallIdx<this.pts[wallIdx].length; subWallIdx++){
+			this.setSubWallHandler(wallIdx, subWallIdx, handler);
+		}
+	},
+	
+	setSubWallHandler: function(wallIdx, subWallIdx, handler){
+		this.handlers[wallIdx][subWallIdx] = handler;
 	},
 	setupWall: function(wallIdx){
 		this.wallUVs[wallIdx] = this.getWallUV(wallIdx);
 		this.wallPerpUVs[wallIdx] = this.getPerpUVs(wallIdx);
 		this.wallGrids[wallIdx] = this.getSubwallGrid(wallIdx);
 	},
+	addWall: function(pts, handler){
+		this.closeWall(pts);
+		this.pts.push(pts);
+		this.ptsInit[this.pts.length-1] = copyWall(this.pts[this.pts.length-1]);
+		this.setupWall(this.pts.length-1);
+		this.setWallHandler(this.pts.length-1, handler);
+	},
+	setPtsInit: function(){
+		for (var wallIdx=0; wallIdx<this.pts.length; wallIdx++){
+			this.ptsInit[wallIdx] = this.copyWall(this.pts[wallIdx]);
+		}
+	},
+	restoreWall: function(wallIdx){
+		var init = this.ptsInit[wallIdx];
+		this.pts[wallIdx] = this.copyWall(init);
+		this.setupWall(wallIdx);
+	},
+	copyWall: function(wall){
+		var len = wall.length;
+		var copy = new Array(len);
+		for (var ptIdx=0; ptIdx<len; ptIdx++){
+			copy[ptIdx] = wall[ptIdx].copy();
+		}
+		return copy;
+	},
+	removeWall: function(wallIdx){
+		this.pts.splice(wallIdx, 1);
+		this.ptsInit.splice(wallIdx, 1);
+		this.wallUVs.splice(wallIdx, 1);
+		this.wallPerpUVs.splice(wallIdx, 1);
+		this.wallGrids.splice(wallIdx, 1);
+		this.handlers.splice(wallIdx, 1);
+	},
 	closeWalls: function(){
 		for (var wallIdx=0; wallIdx<this.pts.length; wallIdx++){
 			var wall = this.pts[wallIdx];
 			this.closeWall(wall);
-			
 		}
 	},
 	closeWall: function(wall){
@@ -175,10 +256,8 @@ WallHandler.prototype = {
 		var distFromWall = perpUV.dotProd(dotVec);
 		var perpV = perpUV.dotProd(dot.v);
 		if (distFromWall>0 && distFromWall<30 && this.isBetween(dot, line, wallUV)){
-			for (wallImpactListener in curLevel.wallImpactListeners.listeners){
-				var listener = curLevel.wallImpactListeners.listeners[wallImpactListener]
-				listener.func.apply(listener.obj,[dot, line, wallUV, perpV]);
-			}
+			var handler = this.handlers[line[0]][line[1]];
+			handler.apply(curLevel,[dot, line, wallUV, perpV]);
 		}
 	},
 	isBetween: function(dot, line, wallUV){

@@ -10,7 +10,7 @@ function Reversibility(){
 	this.bgCol = Col(5, 17, 26);
 	this.wallCol = Col(255,255,255);
 	this.numUpdates = 0;
-	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
+	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], this.onWallImpact)
 	
 	this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
 	this.SAPExt = getLen(this.extPressurePts);
@@ -49,7 +49,7 @@ function Reversibility(){
 	this.dragWeights = this.makeDragWeights();
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
 	walls.setup();
-	
+	walls.setSubWallHandler(0, 0, this.onWallImpact);
 	this.workTracker = new WorkTracker('tracky',
 										function(){return walls.pts[0][0].y},
 										walls.pts[0][1].x-walls.pts[0][0].x,
@@ -89,7 +89,6 @@ Reversibility.prototype = {
 								{data:this.data, x:'v', y:'t'});		
 		
 		
-		//$('#myCanvas').show();
 		var ptsToBorder = this.getPtsToBorder();
 		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container', c);
 		nextPrompt();
@@ -128,9 +127,7 @@ Reversibility.prototype = {
 		this.addDots();
 
 		this.numUpdates = 0;
-		walls = undefined;
-		walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]])
-		walls.setup();
+		walls.restoreWall(0);
 		this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
 		this.forceInternal = 0;
 		for (resetListenerName in this.resetListeners.listeners){
