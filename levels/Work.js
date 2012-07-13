@@ -14,7 +14,6 @@ function Work(){
 
 	this.updateListeners = {listeners:{}, save:{}};
 	this.dataListeners = {listeners:{}, save:{}};
-	this.wallImpactListeners = {listeners:{}, save:{}};
 	this.dotImpactListeners = {listeners:{}, save:{}};
 	this.mousedownListeners = {listeners:{}, save:{}};
 	this.mouseupListeners = {listeners:{}, save:{}};
@@ -36,7 +35,6 @@ function Work(){
 	this.maxY = 350;
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
-	addListener(this, 'wallImpact', 'static', this.onWallImpact, this);
 	addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
 
 }
@@ -55,12 +53,13 @@ Work.prototype = {
 		$('#canvasDiv').show();
 		$('#clearGraphs').hide();
 		$('#dashRun').show();
-		removeListener(curLevel, 'wallImpact', 'static')
-		addListener(curLevel, 'wallImpact', 'adiabatic', this.onWallImpactAdiabatic, this);
 		addListener(curLevel, 'update', 'moveWalls', this.moveWalls, this);
 		addListener(curLevel, 'update', 'addGravity', this.addGravity, this);
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]]);
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], this.onWallImpactSides);
 		walls.setup();
+		walls.setSubWallHandler(0, 0, this.onWallImpactTop);
+		this.heater = new Heater('spaceHeater', P(450,350), V(60,40), -Math.PI/2, 20, c);
+		this.heater.init();
 		this.piston = new Piston('tootoo', 500, function(){return walls.pts[0][0].y}, 40, 470, c, 2, function(){return self.g}, this);
 		this.piston.show();
 		this.piston.trackWork();
@@ -189,8 +188,7 @@ Work.prototype = {
 		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}
 	},
 
-	onWallImpactAdiabatic: function(dot, line, wallUV, perpV){
-		var vo = dot.v.copy();
+	onWallImpactTop: function(dot, line, wallUV, perpV){
 		/*
 		To dampen wall speed , doing:
 		1 = dot
@@ -206,40 +204,40 @@ Work.prototype = {
 		v1 = (-b + (b^2 - 4*a*c)^.5)/2a
 		v2 = (m1*vo1 + m2*vo2 - m1*v1)/(m2*A)
 		*/
-		if(line[0]==0 && line[1]==0){
+		var vo = dot.v.copy();
+		if(Math.abs(this.wallV)>1.0){
+			var vo1 = dot.v.dy;
+			var vo2 = this.wallV;
+			var m1 = dot.m;
+			var m2 = this.mass();
+			var vo1Sqr = vo1*vo1;
+			var vo2Sqr = vo2*vo2;
 			
-			if(Math.abs(this.wallV)>1.0){
-				var vo1 = dot.v.dy;
-				var vo2 = this.wallV;
-				var m1 = dot.m;
-				var m2 = this.mass();
-				var vo1Sqr = vo1*vo1;
-				var vo2Sqr = vo2*vo2;
-				
-				var scalar = Math.pow(Math.abs(vo2)+.1, .2);
-				var scalarSqr = scalar*scalar
-				
-				var a = m1*(1 + m1/(scalarSqr*m2));
-				var b = -2*m1*(vo1*m1/(m2) + vo2)/scalarSqr;
-				var c = (m1*(m1*vo1Sqr/m2 + 2*vo2*vo1) + m2*vo2Sqr)/scalarSqr - m1*vo1Sqr - m2*vo2Sqr;
-				
-				dot.v.dy = (-b + Math.pow(b*b - 4*a*c,.5))/(2*a);
-				dot.y = dot.y+dot.r;
-				this.wallV = (m1*vo1 + m2*vo2 - m1*dot.v.dy)/(m2*scalar);
-			}else{
-				var pt = walls.pts[line[0]][line[1]];
-				var dotVo = dot.v.dy;
-				var wallVo = this.wallV;
-				dot.v.dy = (dotVo*(dot.m-this.mass())+2*this.mass()*wallVo)/(dot.m+this.mass());
-				this.wallV = (wallVo*(this.mass()-dot.m)+2*dot.m*dotVo)/(this.mass()+dot.m);
-				dot.y = pt.y+dot.r;			
-			}
+			var scalar = Math.pow(Math.abs(vo2)+.1, .2);
+			var scalarSqr = scalar*scalar
+			
+			var a = m1*(1 + m1/(scalarSqr*m2));
+			var b = -2*m1*(vo1*m1/(m2) + vo2)/scalarSqr;
+			var c = (m1*(m1*vo1Sqr/m2 + 2*vo2*vo1) + m2*vo2Sqr)/scalarSqr - m1*vo1Sqr - m2*vo2Sqr;
+			
+			dot.v.dy = (-b + Math.pow(b*b - 4*a*c,.5))/(2*a);
+			dot.y = dot.y+dot.r;
+			this.wallV = (m1*vo1 + m2*vo2 - m1*dot.v.dy)/(m2*scalar);
 		}else{
-		
-			walls.impactStd(dot, wallUV, perpV);
-			this.forceInternal += 2*dot.m*Math.abs(perpV);
+			var pt = walls.pts[line[0]][line[1]];
+			var dotVo = dot.v.dy;
+			var wallVo = this.wallV;
+			dot.v.dy = (dotVo*(dot.m-this.mass())+2*this.mass()*wallVo)/(dot.m+this.mass());
+			this.wallV = (wallVo*(this.mass()-dot.m)+2*dot.m*dotVo)/(this.mass()+dot.m);
+			dot.y = pt.y+dot.r;			
 		}
-		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}	
+		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}
+	},
+	onWallImpactSides: function(dot, line, wallUV, perpV){
+		var vo = dot.v.copy();
+		walls.impactStd(dot, wallUV, perpV);
+		this.forceInternal += 2*dot.m*Math.abs(perpV);
+		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)};
 	},
 	onWallImpactArrow: function(dot, line, wallUV, perpV){
 		var hitResult = this.onWallImpact(dot, line, wallUV, perpV);
@@ -281,7 +279,9 @@ Work.prototype = {
 	changePressure: function(event, ui){
 		this.piston.setP(ui.value);
 	},
-
+	changeTemp: function(event, ui){
+		this.heater.setTemp(ui.value);
+	},
 	reset: function(){
 		var curPrompt = this.prompts[this.promptIdx];
 		if(this['block'+this.blockIdx+'CleanUp']){

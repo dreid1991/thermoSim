@@ -30,6 +30,8 @@
 			<center>
 				<div>
 					<div id='sliderPressure' style='width:300px'></div>
+					<br>
+					<div id='sliderTemp' style = 'width:300px'></div>
 					<button id='reset' class='noSelect'>Reset experiment</button>
 					<button id='checkAns' class='noSelect'>Check answer</button>
 					<button id='clearGraphs' class='noSelect'>Clear graphs</button>
@@ -111,6 +113,18 @@ $(function(){
 		},
 		[
 			{eventType:'slide', obj:curLevel, func:curLevel.changePressure},
+		],
+		'show'
+	);
+	makeSlider(
+		"sliderTemp", 
+		{
+			min:-20, 
+			max:20, 
+			value:0, 
+		},
+		[
+			{eventType:'slide', obj:curLevel, func:curLevel.changeTemp},
 		],
 		'show'
 	);

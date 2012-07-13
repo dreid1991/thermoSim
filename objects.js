@@ -986,13 +986,81 @@ Piston.prototype = {
 //////////////////////////////////////////////////////////////////////////
 //HEATER
 //////////////////////////////////////////////////////////////////////////
-function Heater(pos, dims, rotation){
+function Heater(handle, pos, dims, rotation, tempMax, drawCanvas){
+	//dims.dx corresponds to long side w/ wires
+	//dims.dy corresponds to short side
+	this.handle = handle;
+	this.drawCanvas = drawCanvas;
+	this.cornerRound = .2;
+	this.temp = 0;
+	this.tempMax = tempMax;
 	this.pos = pos;
 	this.dims = dims;
 	this.rot = rotation;
+	var colMax = Col(255,0,0);
+	var colMin = Col(0,0,255);
+	var colDefault = Col(150, 150, 150);
+	this.draw = this.makeDrawFunc(colMin, colDefault, colMax)
 }
 
 Heater.prototype = {
-	
+	setTemp: function(val){
+		var sign = getSign(val)
+		this.temp = sign*Math.min(this.tempMax,sign*val);
+	},
+	makeDrawFunc: function(colMin, colDefault, colMax){
+		var pos = this.pos;
+		var dims = this.dims;
+		var rnd = this.cornerRound;
+		var center = this.pos.copy().movePt(dims.copy().mult(.5));
+		var pts = new Array(8);
+		pts[0] = pos.copy().movePt({dx:dims.dx*rnd								});
+		pts[1] = pos.copy().movePt({dx:dims.dx*(1-rnd)							});
+		pts[2] = pos.copy().movePt({dx:dims.dx, 		dy:dims.dy*rnd			});
+		pts[3] = pos.copy().movePt({dx:dims.dx, 		dy:dims.dy*(1-rnd)		});
+		pts[4] = pos.copy().movePt({dx:dims.dx*(1-rnd),	dy:dims.dy				});
+		pts[5] = pos.copy().movePt({dx:dims.dx*rnd,		dy:dims.dy				});
+		pts[6] = pos.copy().movePt({					dy:dims.dy*(1-rnd)		});
+		pts[7] = pos.copy().movePt({					dy:dims.dy*rnd			});
+		var wires = new Array(2);
+		wires[0] = new Array(2);
+		wires[1] = new Array(2);
+		var wireY1 = pos.y + .75*dims.dy;
+		var wireY2 = pos.y + 150;
+		var wireX1 = pos.x + .25*dims.dx;
+		var wireX2 = pos.x + .75*dims.dx;
+		wires[0][0] = P(wireX1, wireY1);
+		wires[0][1] = P(wireX1, wireY2);
+		wires[1][0] = P(wireX2, wireY1);
+		wires[1][1] = P(wireX2, wireY2);
+		rotatePts(pts, center, this.rot);
+		rotatePts(wires[0], center, this.rot);
+		rotatePts(wires[1], center, this.rot);
+		var colorSteps = this.getColorSteps(colMin, colDefault, colMax)
+		var self = this;
+		var drawFunc = function(){
+			var sign = getSign(self.temp);
+			var steps = colorSteps[String(sign)];
+			var fracToEnd = sign*self.temp/self.tempMax
+			var curCol = colDefault.copy().adjust(steps[0]*fracToEnd, steps[1]*fracToEnd, steps[2]*fracToEnd);
+			draw.fillPts(pts, curCol, self.drawCanvas);
+			for (var wireIdx=0; wireIdx<wires.length; wireIdx++){
+				draw.line(wires[wireIdx][0],wires[wireIdx][1], curCol, self.drawCanvas);
+			}
+		}
+		return drawFunc;
+	},
+	getColorSteps: function(min, def, max){
+		var steps = {};
+		var down = [min.r-def.r, min.g-def.g, min.b-def.b];
+		var up = [max.r-def.r, max.g-def.g, max.b-def.b];
+		steps['-1']=down;
+		steps['1']=up;
+		return steps;
+	},
+	init: function(){
+		addListener(curLevel, 'update', 'drawHeater'+this.handle, this.draw, '');
+	},
+
 
 }

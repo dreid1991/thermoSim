@@ -124,6 +124,12 @@ Color.prototype = {
 	copy: function(){
 		return Col(this.r, this.g, this.b);
 	},
+	mult: function(scalar){
+		this.r = Math.round(Math.min(255, Math.max(0, this.r*scalar)));
+		this.g = Math.round(Math.min(255, Math.max(0, this.g*scalar)));
+		this.b = Math.round(Math.min(255, Math.max(0, this.b*scalar)));
+		return this;
+	}
 }
 Point.prototype = {
 	distTo: function(pTo){
