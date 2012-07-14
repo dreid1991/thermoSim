@@ -1058,8 +1058,10 @@ Heater.prototype = {
 		this.setupWalls()
 	},
 	setupWalls: function(){
-		//walls.addWall(this.pts,
-	}
-
+		walls.addWall(this.pts, {func:this.OMG, obj:this});
+	},
+	hit: function(dot, line, wallUV, perpV){
+		
+	},
 
 }

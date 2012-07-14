@@ -55,9 +55,9 @@ Work.prototype = {
 		$('#dashRun').show();
 		addListener(curLevel, 'update', 'moveWalls', this.moveWalls, this);
 		addListener(curLevel, 'update', 'addGravity', this.addGravity, this);
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], this.onWallImpactSides);
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.onWallImpactSides, obj:this});
 		walls.setup();
-		walls.setSubWallHandler(0, 0, this.onWallImpactTop);
+		walls.setSubWallHandler(0, 0, {func:this.onWallImpactTop, obj:this});
 
 		this.piston = new Piston('tootoo', 500, function(){return walls.pts[0][0].y}, 40, 470, c, 2, function(){return self.g}, this);
 		this.piston.show();
@@ -67,8 +67,9 @@ Work.prototype = {
 		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container', c);
 		this.heater = new Heater('spaceHeater', P(40,425), V(470,10), 0, 20, c);
 		this.heater.init();
-		populate('spc1', P(45,35), V(460, 350), 800, 300);
-		populate('spc3', P(45,35), V(450, 350), 600, 300);
+		//populate('spc1', P(45,35), V(460, 350), 800, 300);
+		//populate('spc3', P(45,35), V(450, 350), 600, 300);
+		populate('spc3', P(45,35), V(450, 350), 1, 300);
 	},
 
 	block0CleanUp: function(){

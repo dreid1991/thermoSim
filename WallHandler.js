@@ -72,9 +72,10 @@ WallHandler.prototype = {
 		this.wallGrids[wallIdx] = this.getSubwallGrid(wallIdx);
 	},
 	addWall: function(pts, handler){
+		this.handlers.push(new Array(pts.length));
 		this.closeWall(pts);
 		this.pts.push(pts);
-		this.ptsInit[this.pts.length-1] = copyWall(this.pts[this.pts.length-1]);
+		this.ptsInit[this.pts.length-1] = this.copyWall(this.pts[this.pts.length-1]);
 		this.setupWall(this.pts.length-1);
 		this.setWallHandler(this.pts.length-1, handler);
 	},
@@ -257,9 +258,7 @@ WallHandler.prototype = {
 		var perpV = perpUV.dotProd(dot.v);
 		if (distFromWall>0 && distFromWall<30 && this.isBetween(dot, line, wallUV)){
 			var handler = this.handlers[line[0]][line[1]];
-			var func = handler.func;
-			var obj = handler.obj;
-			func.apply(obj,[dot, line, wallUV, perpV]);
+			handler.func.apply(handler.obj,[dot, line, wallUV, perpV]);
 		}
 	},
 	isBetween: function(dot, line, wallUV){
