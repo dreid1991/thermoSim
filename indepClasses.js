@@ -1,12 +1,13 @@
 
 
-function Dot(x, y, v, mass, radius, name){
+function Dot(x, y, v, mass, radius, name, idNum){
 	this.x = x;
 	this.y = y;
 	this.v = v;
 	this.m = mass;
 	this.r = radius;
 	this.name = name;
+	this.idNum = idNum;
 }
 function Species( mass, radius, colors){
 	this.m = mass;

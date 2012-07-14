@@ -11,8 +11,6 @@ function HistFun(){
 	this.wallSpeed = 1;
 	this.updateListeners = {listeners:{}, save:{}};
 	this.dataListeners = {listeners:{}, save:{}};
-	this.wallImpactListeners = {listeners:{}, save:{}};
-	this.dotImpactListeners = {listeners:{}, save:{}};
 	this.mousedownListeners = {listeners:{}, save:{}};
 	this.mouseupListeners = {listeners:{}, save:{}};
 	this.mousemoveListeners = {listeners:{}, save:{}};
@@ -30,9 +28,7 @@ function HistFun(){
 	addSpecies(['spc1']);
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
-	addListener(this, 'wallImpact', 'std', this.onWallImpact, this);
-	addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
-
+	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
 }
 
 HistFun.prototype = {
@@ -54,8 +50,6 @@ HistFun.prototype = {
 		//border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container',c);
 		saveListener(this, 'update');
 		saveListener(this, 'data');
-		saveListener(this, 'wallImpact');
-		saveListener(this, 'dotImpact');
 		emptyListener(this, "update");
 		emptyListener(this, "data");
 		this.hideDash();
@@ -69,7 +63,7 @@ HistFun.prototype = {
 	},
 	block0Start: function(){
 		$('#sliderTemp').show();
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]]);
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.onWallImpact, obj:this});
 		walls.setup();
 		populate('spc1', P(45,35), V(450, 350), 1000, 300);
 		this.graphs.vHist = new GraphHist('v', 400, 300, 'v', 'num', {x:{min:0, step:4}, y:{min:0, step:4}}, {data:curLevel.data, x:'v'});
@@ -92,8 +86,6 @@ HistFun.prototype = {
 		$('#base').show();
 		loadListener(this, 'update');
 		loadListener(this, 'data');		
-		loadListener(this, 'wallImpact');
-		loadListener(this, 'dotImpact');
 	},
 	startOutro: function(){
 		saveListener(this, 'update');
@@ -283,8 +275,6 @@ HistFun.prototype = {
 		this.forceInternal = 0;
 		this.wallV = 0;
 		emptyListener(this, 'update');
-		emptyListener(this, 'wallImpact');
-		emptyListener(this, 'dotImpact');
 		emptyListener(this, 'data');
 		
 		this.startSim();

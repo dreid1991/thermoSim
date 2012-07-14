@@ -18,8 +18,6 @@ function Reversibility(){
 	this.wallV = 0;
 	this.updateListeners = {listeners:{}, save:{}};
 	this.dataListeners = {listeners:{}, save:{}};
-	this.dotImpactListeners = {listeners:{}, save:{}};
-	this.dotImpactListeners = {listeners:{}, save:{}};
 	this.mousedownListeners = {listeners:{}, save:{}};
 	this.mouseupListeners = {listeners:{}, save:{}};
 	this.mousemoveListeners = {listeners:{}, save:{}};
@@ -63,7 +61,7 @@ function Reversibility(){
 	addSpecies(['spc1', 'spc3']);
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
-	addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
+	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
 
 }
 

@@ -14,7 +14,6 @@ function IdealGasLaw(){
 	this.wallSpeed = 1;
 	this.updateListeners = {listeners:{}, save:{}};
 	this.dataListeners = {listeners:{}, save:{}};
-	this.dotImpactListeners = {listeners:{}, save:{}};
 	this.mousedownListeners = {listeners:{}, save:{}};
 	this.mouseupListeners = {listeners:{}, save:{}};
 	this.mousemoveListeners = {listeners:{}, save:{}};
@@ -50,7 +49,7 @@ function IdealGasLaw(){
 	this.maxY = 350;
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
-	addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
+	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
 
 }
 
@@ -89,7 +88,6 @@ IdealGasLaw.prototype = {
 		$('#base').show();
 		loadListener(this, 'update');
 		loadListener(this, 'data');		
-		loadListener(this, 'dotImpact');
 	},
 	block1Start: function(){
 		$('#longSliderHolder').show();
@@ -691,7 +689,6 @@ IdealGasLaw.prototype = {
 		this.wallV = 0;
 		emptyListener(this, 'update');
 		emptyListener(this, 'wallImpact');
-		emptyListener(this, 'dotImpact');
 		emptyListener(this, 'data');
 
 		for (resetListenerName in this.resetListeners.listeners){

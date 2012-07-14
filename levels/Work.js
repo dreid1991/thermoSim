@@ -14,7 +14,6 @@ function Work(){
 
 	this.updateListeners = {listeners:{}, save:{}};
 	this.dataListeners = {listeners:{}, save:{}};
-	this.dotImpactListeners = {listeners:{}, save:{}};
 	this.mousedownListeners = {listeners:{}, save:{}};
 	this.mouseupListeners = {listeners:{}, save:{}};
 	this.mousemoveListeners = {listeners:{}, save:{}};
@@ -35,7 +34,7 @@ function Work(){
 	this.maxY = 350;
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
-	addListener(this, 'dotImpact', 'std', collide.impactStd, collide);
+	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
 
 }
 
@@ -67,9 +66,9 @@ Work.prototype = {
 		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container', c);
 		this.heater = new Heater('spaceHeater', P(40,425), V(470,10), 0, 20, c);
 		this.heater.init();
-		//populate('spc1', P(45,35), V(460, 350), 800, 300);
-		//populate('spc3', P(45,35), V(450, 350), 600, 300);
-		populate('spc3', P(45,35), V(450, 350), 1, 300);
+		populate('spc1', P(45,35), V(460, 350), 800, 300);
+		populate('spc3', P(45,35), V(450, 350), 600, 300);
+		//populate('spc3', P(45,35), V(450, 350), 1, 300);
 	},
 
 	block0CleanUp: function(){

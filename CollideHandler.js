@@ -1,34 +1,58 @@
 function CollideHandler(){
 	console.log("Made supercollider");
+	this.handlers = {};
 }
 CollideHandler.prototype = {
+	setDefaultHandler: function(handler){
+		var numSpcs = 0;
+		for (var spcName in speciesDefs){
+			numSpcs++;
+		}
+		for (var i=0; i<numSpcs; i++){
+			for (var j=i; j<numSpcs; j++){
+				this.handlers[i + '-' + j] = handler; //has func and obj
+			}
+		}
+	
+	},
+	setHandler: function(aName, bName, handler){
+		var idA = speciesDefs[aName].idNum;
+		var idB = speciesDefs[bName].idNum;
+		var min = Math.min(idA, idB);
+		var max = Math.max(idA, idB);
+		this.handlers[min + '-' + max] = handler;
+	},
 	check: function(){
-		this.grid = this.makeGrid();
+		var gridSize = this.gridSize;
+		var xSpan = this.xSpan;
+		var ySpan = this.ySpan;
+		var grid = this.makeGrid();
 		for (var spcName in spcs){
 			var spc = spcs[spcName];
 			for (var dotIdx=0; dotIdx<spc.dots.length; dotIdx++){
 				var dot = spc.dots[dotIdx];
-				var gridX = Math.floor(dot.x/this.gridSize);
-				var gridY = Math.floor(dot.y/this.gridSize);
-				for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, this.xSpan); x++){
-					for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, this.ySpan); y++){
-						for (var neighborIdx=0; neighborIdx<this.grid[x][y].length; neighborIdx++){
-							var neighbor = this.grid[x][y][neighborIdx];
+				var gridX = Math.floor(dot.x/gridSize);
+				var gridY = Math.floor(dot.y/gridSize);
+				for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){
+					for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, ySpan); y++){
+						for (var neighborIdx=0; neighborIdx<grid[x][y].length; neighborIdx++){
+							var neighbor = grid[x][y][neighborIdx];
 							var dx = dot.x-neighbor.x;
 							var dy = dot.y-neighbor.y;
 							var distSqr = dx*dx+dy*dy;
 							var rSqr = (dot.r+neighbor.r)*(dot.r+neighbor.r);
 							if(distSqr<=rSqr){
-								for (dotImpactListener in curLevel.dotImpactListeners.listeners){
-									var listener = curLevel.dotImpactListeners.listeners[dotImpactListener]
-									listener.func.apply(listener.obj,[dot, neighbor]);
-								}
+								var min = Math.min(dot.idNum, neighbor.idNum);
+								var max = Math.max(dot.idNum, neighbor.idNum);
+								var refStr = min + '-' + max;
+								var handler = this.handlers[refStr];
+								handler.func.apply(handler.obj, [dot, neighbor]);
 							}
 						}
 					}
-				}
-				if(gridX>=0 && gridY>=0 && gridX<this.grid.length && gridY<this.grid[0].length){
-					this.grid[gridX][gridY].push(dot);
+				}//OOH - do ORs instead so it doesn't have to check all if out of bounds
+				if(gridX>=0 && gridY>=0 && gridX<grid.length && gridY<grid[0].length){
+					grid[gridX][gridY].push(dot);
 				}
 				
 			}
@@ -65,10 +89,12 @@ CollideHandler.prototype = {
 		this.ySpan = Math.floor(myCanvas.height/this.gridSize);
 	},
 	makeGrid: function(){
-		var grid = new Array(this.numCols)
-		for (var colIdx=0; colIdx<this.numCols; colIdx++){
-			var col = new Array(this.numRows)
-			for (var rowIdx=0; rowIdx<this.numRows;rowIdx++){
+		var numCols = this.numCols;
+		var numRows = this.numRows;
+		var grid = new Array(numCols)
+		for (var colIdx=0; colIdx<numCols; colIdx++){
+			var col = new Array(numRows)
+			for (var rowIdx=0; rowIdx<numRows;rowIdx++){
 				col[rowIdx] = [];
 			}
 			grid[colIdx] = col;

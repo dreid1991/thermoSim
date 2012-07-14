@@ -8,12 +8,14 @@ drawingTools.prototype = {
 		c.fillRect(0,0, width, height);	
 	},
 	dots: function(){
-		for (var spc in spcs){
-			c.fillStyle = "rgb(" + spcs[spc].cols.r + "," + spcs[spc].cols.g + "," + spcs[spc].cols.b + ")";
-			var dots = spcs[spc].dots;
+		for (var spcName in spcs){
+			var spc = spcs[spcName];
+			c.fillStyle = "rgb(" + spc.cols.r + "," + spc.cols.g + "," + spc.cols.b + ")";
+			var dots = spc.dots;
 			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
+				var dot = dots[dotIdx];
 				c.beginPath();
-				c.arc(dots[dotIdx].x,dots[dotIdx].y,dots[dotIdx].r,0,Math.PI*2,true);
+				c.arc(dot.x,dot.y,dot.r,0,Math.PI*2,true);
 				c.closePath();
 				c.fill();	
 			}
@@ -172,8 +174,9 @@ function move(){
 	for (var spc in spcs){
 		var dots = spcs[spc].dots;
 		for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
-			dots[dotIdx].x += dots[dotIdx].v.dx;
-			dots[dotIdx].y += dots[dotIdx].v.dy;
+			var dot = dots[dotIdx];
+			dot.x += dot.v.dx;
+			dot.y += dot.v.dy;
 		}
 	}
 }
@@ -225,6 +228,7 @@ function populate(name, pos, dims, num, temp){
 	var width = dims.dx;
 	var height = dims.dy;
 	var spc = spcs[name];
+	var def = speciesDefs[name];
 	if(spc===undefined){
 		alert('Tried to populate undefined species');
 	}else{
@@ -235,7 +239,7 @@ function populate(name, pos, dims, num, temp){
 			var angle = Math.random()*2*Math.PI;
 			var vx = v * Math.cos(angle);
 			var vy = v * Math.sin(angle);
-			spc.dots.push(D(placeX, placeY, V(vx, vy), spc.m, spc.r, spc.name));
+			spc.dots.push(D(placeX, placeY, V(vx, vy), spc.m, spc.r, def.name, def.idNum));
 		}
 	}
 }
@@ -461,10 +465,18 @@ function getLen(pts){
 	}
 	return len;
 }
-function byAttr(list, attrVal, attr){
-	for(var listIdx=0; listIdx<list.length; listIdx++){
-		if(list[listIdx][attr]==attrVal){
-			return list[listIdx];
+function byAttr(obj, attrVal, attr){
+	if(obj instanceof Array){
+		for(var listIdx=0; listIdx<obj.length; listIdx++){
+			if(obj[listIdx][attr]==attrVal){
+				return obj[listIdx];
+			}
+		}
+	}else{
+		for(var name in obj){
+			if (obj[name][attr]==attrVal){
+				return obj[name];
+			}
 		}
 	}
 }

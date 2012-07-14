@@ -24,12 +24,13 @@ WallHandler.prototype = {
 		
 	},
 	makeBlankHandlers: function(){
-		var blankHandlers = new Array(this.pts.length);
+		return {};
+		/*var blankHandlers = new Array(this.pts.length);
 		for(var ptIdx=0; ptIdx<this.pts.length; ptIdx++){
 			var subWall = this.pts[ptIdx];
 			blankHandlers[ptIdx] = new Array(subWall.length);
 		}
-		return blankHandlers;
+		return blankHandlers;*/
 		
 	},
 	doInitHandlers: function(handlers){
@@ -64,7 +65,7 @@ WallHandler.prototype = {
 	},
 	
 	setSubWallHandler: function(wallIdx, subWallIdx, handler){
-		this.handlers[wallIdx][subWallIdx] = handler;
+		this.handlers[wallIdx+ '-' + subWallIdx] = handler;
 	},
 	setupWall: function(wallIdx){
 		this.wallUVs[wallIdx] = this.getWallUV(wallIdx);
@@ -72,7 +73,7 @@ WallHandler.prototype = {
 		this.wallGrids[wallIdx] = this.getSubwallGrid(wallIdx);
 	},
 	addWall: function(pts, handler){
-		this.handlers.push(new Array(pts.length));
+		//this.handlers.push(new Array(pts.length));
 		this.closeWall(pts);
 		this.pts.push(pts);
 		this.ptsInit[this.pts.length-1] = this.copyWall(this.pts[this.pts.length-1]);
@@ -217,24 +218,28 @@ WallHandler.prototype = {
 	},
 
 	check: function(){
+		var gridDim = this.gridDim;
+		var xSpan = this.xSpan;
+		var ySpan = this.ySpan;
+		var wallGrids = this.wallGrids;
 		for (var spcName in spcs){
 			var spc = spcs[spcName];
 			for (var dotIdx=0; dotIdx<spc.dots.length; dotIdx++){
 				var dot = spc.dots[dotIdx];
 				var checkedWalls = [];
-				var gridX = Math.floor(dot.x/this.gridDim);
-				var gridY = Math.floor(dot.y/this.gridDim);
-				if(gridX>this.xSpan || gridX<0 || gridY>this.ySpan || gridY<0){
+				var gridX = Math.floor(dot.x/gridDim);
+				var gridY = Math.floor(dot.y/gridDim);
+				if(gridX>xSpan || gridX<0 || gridY>ySpan || gridY<0){
 					returnEscapist(dot);
 					console.log("ball out of bounds");				
 				}
 				else{
-					for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, this.xSpan); x++){
-						for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, this.ySpan); y++){
+					for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){
+						for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, ySpan); y++){
 							
 							for (var subwallIdx=0; subwallIdx<walls.wallGrids.length; subwallIdx++){
-								for (var lineIdx=0; lineIdx<this.wallGrids[subwallIdx][x][y].length; lineIdx++){
-									var line = this.wallGrids[subwallIdx][x][y][lineIdx];
+								for (var lineIdx=0; lineIdx<wallGrids[subwallIdx][x][y].length; lineIdx++){
+									var line = wallGrids[subwallIdx][x][y][lineIdx];
 									if (!this.haveChecked([subwallIdx, line], checkedWalls)){
 										this.checkWallHit(dot, [subwallIdx, line]);
 										checkedWalls.push([subwallIdx, line]);
@@ -257,7 +262,7 @@ WallHandler.prototype = {
 		var distFromWall = perpUV.dotProd(dotVec);
 		var perpV = perpUV.dotProd(dot.v);
 		if (distFromWall>0 && distFromWall<30 && this.isBetween(dot, line, wallUV)){
-			var handler = this.handlers[line[0]][line[1]];
+			var handler = this.handlers[line[0] + '-' + line[1]];
 			handler.func.apply(handler.obj,[dot, line, wallUV, perpV]);
 		}
 	},
