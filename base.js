@@ -345,16 +345,24 @@ function makeSlider(id, attrs, handlers, initVisibility){
 		var eventType = handler.eventType;
 		var obj = handler.obj;
 		var func = handler.func;
+		console.log(func);
+		var event;
+		var ui;
+		var vars = [event, ui];
 		if(obj===undefined){
-			div.bind(eventType, function(event, ui){func.apply([event,ui])});
+			sliderBind(div, eventType, func, '');
 		}else{
-			div.bind(eventType, function(event, ui){func.apply(obj, [event,ui])});
+			sliderBind(div, eventType, func, obj);
 		}
+		
 	}
 	if(initVisibility){
 		div[initVisibility]();
 	}
 	return div;
+}
+function sliderBind(div, eventType, func, obj){
+	div.bind(eventType, function(event, ui){func.apply(obj, [event, ui])});
 }
 
 function showPrompt(prev, prompt){
