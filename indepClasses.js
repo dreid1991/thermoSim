@@ -191,6 +191,19 @@ Point.prototype = {
 		this.movePt(origin);
 		return this;
 	},
+	mirror: function(around, vec){
+		var UV = vec.UV();
+		var ptVec = around.VTo(this);
+		var perpVec = UV.perp('cw');
+		var mag = ptVec.dotProd(perpVec);
+		if(mag<0){
+			this.movePt(perpVec.mult(Math.abs(2*mag)));
+		}else if(mag>0){
+			this.movePt(perpVec.neg().mult(2*mag));
+		}
+		return this;
+		
+	},
 }
 Dot.prototype = {
 	KE: function(){

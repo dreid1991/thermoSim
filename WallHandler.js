@@ -254,7 +254,7 @@ WallHandler.prototype = {
 		var perpV = perpUV.dotProd(dot.v);
 		if (distFromWall<0 && distFromWall>-30 && this.isBetween(dot, line, wallUV)){
 			var handler = this.handlers[line[0] + '-' + line[1]];
-			handler.func.apply(handler.obj,[dot, line, wallUV, perpV]);
+			handler.func.apply(handler.obj,[dot, line, wallUV, perpV, perpUV]);
 		}
 	},
 	isBetween: function(dot, line, wallUV){

@@ -587,13 +587,13 @@ IdealGasLaw.prototype = {
 	checkWallHits: function(){
 		walls.check();
 	},
-	onWallImpact: function(dot, line, wallUV, perpV){
+	onWallImpact: function(dot, line, wallUV, perpV, perpUV){
 		var vo = dot.v.copy();
 		walls.impactStd(dot, wallUV, perpV);
 		this.forceInternal += 2*dot.m*Math.abs(perpV);
 		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}
 	},
-	onWallImpactIsothermal: function(dot, line, wallUV, perpV){
+	onWallImpactIsothermal: function(dot, line, wallUV, perpV, perpUV){
 		var vo = dot.v.copy();
 		var perpUV = walls.wallPerpUVs[line[0]][line[1]]
 		dot.y-=2*perpUV.dy;
@@ -601,7 +601,7 @@ IdealGasLaw.prototype = {
 		this.forceInternal += 2*dot.m*Math.abs(perpV);
 		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}	
 	},
-	onWallImpactAdiabatic: function(dot, line, wallUV, perpV){
+	onWallImpactAdiabatic: function(dot, line, wallUV, perpV, perpUV){
 		var vo = dot.v.copy();
 		if(line[0]==0 && line[1]==0){
 			dot.v.dy = -vo + 2*this.wallV;
@@ -612,8 +612,8 @@ IdealGasLaw.prototype = {
 		}
 		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}	
 	},
-	onWallImpactArrow: function(dot, line, wallUV, perpV){
-		var hitResult = this.onWallImpact(dot, line, wallUV, perpV);
+	onWallImpactArrow: function(dot, line, wallUV, perpV, perpUV){
+		var hitResult = this.onWallImpact(dot, line, wallUV, perpV, perpUV);
 		var arrowPts = new Array(3);
 		arrowPts[0] = hitResult.pos.copy().movePt(hitResult.vo.copy().mult(10).neg());
 		arrowPts[1] = hitResult.pos;

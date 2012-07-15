@@ -287,7 +287,7 @@ Reversibility.prototype = {
 	checkWallHits: function(){
 		walls.check();
 	},
-	onWallImpactTop: function(dot, line, wallUV, perpV){
+	onWallImpactTop: function(dot, line, wallUV, perpV, perpUV){
 		/*
 		To dampen wall speed , doing:
 		1 = dot
@@ -330,7 +330,7 @@ Reversibility.prototype = {
 			dot.y = pt.y+dot.r;			
 		}
 	},
-	onWallImpactSides: function(dot, line, wallUV, perpV){
+	onWallImpactSides: function(dot, line, wallUV, perpV, perpUV){
 		walls.impactStd(dot, wallUV, perpV);
 		this.forceInternal += 2*dot.m*Math.abs(perpV);
 	},

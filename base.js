@@ -345,10 +345,8 @@ function makeSlider(id, attrs, handlers, initVisibility){
 		var eventType = handler.eventType;
 		var obj = handler.obj;
 		var func = handler.func;
-		console.log(func);
 		var event;
 		var ui;
-		var vars = [event, ui];
 		if(obj===undefined){
 			sliderBind(div, eventType, func, '');
 		}else{
@@ -441,6 +439,12 @@ function rotatePts(pts, center, rotation){
 		var pt = pts[ptIdx];
 		pt.rotate(center, rotation);
 	}
+}
+function mirrorPts(pts, center, line){
+	for (var ptIdx=0; ptIdx<pts.length; ptIdx++){
+		pts[ptIdx].mirror(center, line);
+	}
+	return pts;
 }
 function getSign(val){
 	var sign=1;
@@ -582,12 +586,14 @@ function UNLOCK(){
 spcs = {};
 draw = new drawingTools();
 collide = new CollideHandler();
-
+R = 8.314;
 vConst = 1/10000;
 pConst = 16.1423;
 LtoM3 = .001;
 ATMtoPA = 101325;
 JtoKJ = .001;
+cp = 8.338;//joules/(kelvin*mole)
+N = 1000;//Avagadro's number
 //To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
 pxToMS = 157.9;
 tConst = 20;

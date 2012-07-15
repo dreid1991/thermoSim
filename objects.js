@@ -853,8 +853,6 @@ Piston.prototype = {
 		
 		var plateTopY = -height + shaftLength
 		
-		//this.plateTop = this.makePlateTop(P(left, plateTopY), V(pistonWidth, plateTopHeight), plateThickness)
-		
 		var plateBottomY = plateTopY + plateTopHeight;
 		
 		this.pistonBottom = this.makePlateBottom(P(left, plateBottomY), V(pistonWidth, plateThickness));
@@ -928,7 +926,6 @@ Piston.prototype = {
 				}
 			},
 			this);
-		
 	},
 	setMass: function(){
 		this.mass = this.p*this.width/(pConst*this.g());
@@ -987,8 +984,11 @@ Piston.prototype = {
 //HEATER
 //////////////////////////////////////////////////////////////////////////
 function Heater(handle, pos, dims, rotation, tempMax, drawCanvas){
-	//dims.dx corresponds to long side w/ wires
-	//dims.dy corresponds to short side
+	/*
+	dims.dx corresponds to long side w/ wires
+	dims.dy corresponds to short side
+	need to correlate Cp, Cv to get energy from temperature
+	*/
 	this.handle = handle;
 	this.drawCanvas = drawCanvas;
 	this.cornerRound = .2;
@@ -1000,7 +1000,8 @@ function Heater(handle, pos, dims, rotation, tempMax, drawCanvas){
 	var colMax = Col(200,0,0);
 	var colMin = Col(0,0,200);
 	var colDefault = Col(100, 100, 100);
-	this.draw = this.makeDrawFunc(colMin, colDefault, colMax)
+	this.draw = this.makeDrawFunc(colMin, colDefault, colMax);
+	this.eAdded=0;
 }
 
 Heater.prototype = {
@@ -1012,38 +1013,65 @@ Heater.prototype = {
 		var pos = this.pos;
 		var dims = this.dims;
 		var rnd = this.cornerRound;
-		var pipeThickness = 10;
-		var pT = pipeThickness;
+		var legThickness = 10;
+
 		var center = this.pos.copy().movePt(dims.copy().mult(.5));
-		this.pts = new Array(16);
-		this.pts[0] = pos.copy().movePt({dx:dims.dx*rnd									});
-		this.pts[1] = pos.copy().movePt({dx:dims.dx*(1-rnd)								});
-		this.pts[2] = pos.copy().movePt({dx:dims.dx, 			dy:dims.dy*rnd			});
-		this.pts[3] = pos.copy().movePt({dx:dims.dx, 			dy:dims.dy*(1-rnd)		});
-		this.pts[4] = pos.copy().movePt({dx:dims.dx*(1-rnd),	dy:dims.dy				});
-		this.pts[5] = pos.copy().movePt({dx:dims.dx*.75+pT/2,	dy:dims.dy				});
-		this.pts[6] = pos.copy().movePt({dx:dims.dx*.75+pT/2,	dy:dims.dy+150			});
-		this.pts[7] = pos.copy().movePt({dx:dims.dx*.75-pT/2,	dy:dims.dy+150			});
-		this.pts[8] = pos.copy().movePt({dx:dims.dx*.75-pT/2,	dy:dims.dy				});
-		this.pts[9] = pos.copy().movePt({dx:dims.dx*.25+pT/2,	dy:dims.dy				});
-		this.pts[10] = pos.copy().movePt({dx:dims.dx*.25+pT/2,	dy:dims.dy+150			});
-		this.pts[11] = pos.copy().movePt({dx:dims.dx*.25-pT/2,	dy:dims.dy+150			});
-		this.pts[12] = pos.copy().movePt({dx:dims.dx*.25-pT/2,	dy:dims.dy				});
-		this.pts[13] = pos.copy().movePt({dx:dims.dx*rnd,		dy:dims.dy				});
-		this.pts[14] = pos.copy().movePt({						dy:dims.dy*(1-rnd)		});
-		this.pts[15] = pos.copy().movePt({						dy:dims.dy*rnd			});
-		rotatePts(this.pts, center, this.rot);
+		this.bodyPts = this.getBodyPts(pos, dims, rnd);
+		this.legPts = this.getLegPts(pos, dims, legThickness, center);
+		rotatePts(this.bodyPts, center, this.rot);
+		rotatePts(this.legPts[0], center, this.rot);
+		rotatePts(this.legPts[1], center, this.rot);
 		var colorSteps = this.getColorSteps(colMin, colDefault, colMax)
 		var strokeCol = Col(0,0,0)
 		var self = this;
+		var bodyPts = this.bodyPts;
+		var leg1 = this.legPts[0];
+		var leg2 = this.legPts[1];
 		var drawFunc = function(){
 			var sign = getSign(self.temp);
 			var steps = colorSteps[String(sign)];
 			var fracToEnd = sign*self.temp/self.tempMax
 			var curCol = colDefault.copy().adjust(steps[0]*fracToEnd, steps[1]*fracToEnd, steps[2]*fracToEnd);
-			draw.fillPtsStroke(self.pts, curCol, curCol, self.drawCanvas);
+			draw.fillPtsStroke(bodyPts, curCol, curCol, self.drawCanvas);
+			draw.fillPtsStroke(leg1, colDefault, colDefault, self.drawCanvas);
+			draw.fillPtsStroke(leg2, colDefault, colDefault, self.drawCanvas);
+			
 		}
 		return drawFunc;
+	},
+	getBodyPts: function(pos, dims, rnd){
+		var pts = new Array(8);
+		pts[0] = pos.copy().movePt({						dy:dims.dy*rnd			});
+		pts[1] = pos.copy().movePt({						dy:dims.dy*(1-rnd)		});
+		pts[2] = pos.copy().movePt({dx:dims.dx*rnd,		dy:dims.dy				});
+		//pts[3] = pos.copy().movePt({dx:dims.dx*.25-pT/2,	dy:dims.dy				});
+		//pts[4] = pos.copy().movePt({dx:dims.dx*.25-pT/2,	dy:dims.dy+150			});
+		//pts[5] = pos.copy().movePt({dx:dims.dx*.25+pT/2,	dy:dims.dy+150			});
+		//pts[6] = pos.copy().movePt({dx:dims.dx*.25+pT/2,	dy:dims.dy				});
+		//pts[7] = pos.copy().movePt({dx:dims.dx*.75-pT/2,	dy:dims.dy				});
+		//pts[8] = pos.copy().movePt({dx:dims.dx*.75-pT/2,	dy:dims.dy+150			});
+		//pts[9] = pos.copy().movePt({dx:dims.dx*.75+pT/2,	dy:dims.dy+150			});
+		//pts[10] = pos.copy().movePt({dx:dims.dx*.75+pT/2,	dy:dims.dy				});
+		pts[3] = pos.copy().movePt({dx:dims.dx*(1-rnd),	dy:dims.dy				});
+		pts[4] = pos.copy().movePt({dx:dims.dx, 			dy:dims.dy*(1-rnd)		});
+		pts[5] = pos.copy().movePt({dx:dims.dx, 			dy:dims.dy*rnd			});
+		pts[6] = pos.copy().movePt({dx:dims.dx*(1-rnd)							});
+		pts[7] = pos.copy().movePt({dx:dims.dx*rnd								});	
+		return pts;
+	},
+	getLegPts: function(pos, dims, width, center){
+		var legs = [new Array(4), new Array(4)];
+		var leg = legs[0]
+		leg[0] = pos.copy().movePt({dx:dims.dx*.25-width/2,	dy:dims.dy	});
+		leg[1] = pos.copy().movePt({dx:-width/2,	dy:dims.dy+150	});
+		leg[2] = pos.copy().movePt({dx:+width/2,	dy:dims.dy+150	});
+		leg[3] = pos.copy().movePt({dx:dims.dx*.25+width/2,	dy:dims.dy	});
+		
+		for (var ptIdx=0; ptIdx<leg.length; ptIdx++){
+			legs[1][ptIdx]=legs[0][ptIdx].copy()
+		}
+		mirrorPts(legs[1], center, V(0, 1));
+		return legs;
 	},
 	getColorSteps: function(min, def, max){
 		var steps = {};
@@ -1056,18 +1084,22 @@ Heater.prototype = {
 	init: function(){
 		addListener(curLevel, 'update', 'drawHeater'+this.handle, this.draw, '');
 		this.setupWalls()
+		this.eAdded=0;
 	},
 	setupWalls: function(){
-		walls.addWall(this.pts, {func:this.hit, obj:this});
+		//legs don't go into collision - too little space between lines
+		walls.addWall(this.bodyPts, {func:this.hit, obj:this});
 	},
-	hit: function(dot, line, wallUV, vPerp){
-		/*var vPar = dot.v.dotProd(wallUV);
+	hit: function(dot, line, wallUV, vPerp, perpUV){
+		var vPar = dot.v.dotProd(wallUV);
 		var tempOld = dot.temp();
 		var tempNew = tempOld + this.temp;
 		var vTotOld = dot.v.mag();
 		var vTotNew = vTotOld*Math.sqrt(tempNew/tempOld);
 		var vPerpNew = Math.sqrt(vTotNew*vTotNew - vPar*vPar);
-		*/
+		dot.v.dx = wallUV.dx*vPar + perpUV.dx*vPerpNew;
+		dot.v.dy = wallUV.dy*vPar + perpUV.dy*vPerpNew;
+		this.eAdded+=this.temp*R/N;
 	},
 
 }

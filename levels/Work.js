@@ -4,7 +4,7 @@ function Work(){
 	this.data.t = [];
 	this.data.pInt = [];
 	this.data.v = [];
-	this.data.e = [];
+	this.data.p = [];
 	this.eUnits = 'kJ';
 	this.bgCol = Col(5, 17, 26);
 	this.wallCol = Col(255,255,255);
@@ -27,6 +27,7 @@ function Work(){
 	this.g = 1.75;
 	this.prompts=[
 		{block:0, title: "testyMcKaw", finished: false, text:""},
+		{block:1, title: "wookuhloo!", finished: false, text:""},
 
 	]
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
@@ -52,6 +53,7 @@ Work.prototype = {
 		$('#canvasDiv').show();
 		$('#clearGraphs').hide();
 		$('#dashRun').show();
+		$('#base').show();
 		addListener(curLevel, 'update', 'moveWalls', this.moveWalls, this);
 		addListener(curLevel, 'update', 'addGravity', this.addGravity, this);
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.onWallImpactSides, obj:this});
@@ -64,7 +66,7 @@ Work.prototype = {
 		this.piston.trackPressure();
 		var ptsToBorder = this.getPtsToBorder();
 		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container', c);
-		this.heater = new Heater('spaceHeater', P(40,425), V(470,10), 0, 20, c);
+		this.heater = new Heater('spaceHeater', P(150,360), V(250,50), 0, 20, c);//P(40,425), V(470,10)
 		this.heater.init();
 		populate('spc1', P(45,35), V(460, 350), 800, 300);
 		populate('spc3', P(45,35), V(450, 350), 600, 300);
@@ -72,9 +74,14 @@ Work.prototype = {
 	},
 
 	block0CleanUp: function(){
-
+		removeListener(curLevel, 'update', 'moveWalls');
+		removeListener(curLevel, 'update', 'addGravity');
+		walls.setWallHandler(0, {func:this.onWallImpactSides, obj:this})
 	},
-
+	block1Start: function(){
+		populate('spc1', P(45,35), V(460, 350), 800, 300);
+		populate('spc3', P(45,35), V(450, 350), 600, 300);		
+	},
 
 	getPtsToBorder: function(){
 		var pts = [];
@@ -189,7 +196,7 @@ Work.prototype = {
 		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}
 	},
 
-	onWallImpactTop: function(dot, line, wallUV, perpV){
+	onWallImpactTop: function(dot, line, wallUV, perpV, perpUV){
 		/*
 		To dampen wall speed , doing:
 		1 = dot
@@ -232,15 +239,16 @@ Work.prototype = {
 			this.wallV = (wallVo*(this.mass()-dot.m)+2*dot.m*dotVo)/(this.mass()+dot.m);
 			dot.y = pt.y+dot.r;			
 		}
+		this.forceInternal += dot.m*(Math.abs(perpV)+Math.abs(dot.v.dy));
 		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}
 	},
-	onWallImpactSides: function(dot, line, wallUV, perpV){
+	onWallImpactSides: function(dot, line, wallUV, perpV, perpUV){
 		var vo = dot.v.copy();
 		walls.impactStd(dot, wallUV, perpV);
 		this.forceInternal += 2*dot.m*Math.abs(perpV);
 		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)};
 	},
-	onWallImpactArrow: function(dot, line, wallUV, perpV){
+	onWallImpactArrow: function(dot, line, wallUV, perpV, perupUV){
 		var hitResult = this.onWallImpact(dot, line, wallUV, perpV);
 		var arrowPts = new Array(3);
 		arrowPts[0] = hitResult.pos.copy().movePt(hitResult.vo.copy().mult(10).neg());
@@ -265,16 +273,20 @@ Work.prototype = {
 				'calibri', 'deltaV = '+round(delV,1)+'m/s', 'center', 3000, c);
 	},
 	dataRun: function(){
-
+		var wall = walls.pts[0];
+		var SA = getLen([wall[0], wall[1], wall[2], wall[3], wall[4]]);//HEY - FOR TESTING PURPOSES ONLY.  DOES NOT WORK WITH MOVING WALL AS WE DO NOT ADD FORCE INTERNAL THERE
+		this.data.p.push(dataHandler.pressureInt(this.forceInternal, this.numUpdates, SA))
 		this.data.t.push(dataHandler.temp());
-		this.data.v.push(dataHandler.volOneWall());
+		this.data.v.push(dataHandler.volPolyWall());
 		
 		for(var graphName in this.graphs){
 			this.graphs[graphName].addLast();
 		}
+		this.numUpdates=0;
+		this.forceInternal=0;
 	},
 	vol: function(){
-		return walls.area(0);// - walls.area(1);
+		return walls.area(0) - walls.area(1);
 	},
 
 	changePressure: function(event, ui){
