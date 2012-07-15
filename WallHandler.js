@@ -4,7 +4,7 @@ function WallHandler(pts, handlers){
 	this.wallUVs = [];
 	this.wallPerpUVs = [];
 	this.wallGrids = [];
-	this.handlers = this.makeBlankHandlers();
+	this.handlers = {};
 	if(handlers){
 		this.doInitHandlers(handlers);
 	}
@@ -23,34 +23,25 @@ WallHandler.prototype = {
 		}
 		
 	},
-	makeBlankHandlers: function(){
-		return {};
-		/*var blankHandlers = new Array(this.pts.length);
-		for(var ptIdx=0; ptIdx<this.pts.length; ptIdx++){
-			var subWall = this.pts[ptIdx];
-			blankHandlers[ptIdx] = new Array(subWall.length);
-		}
-		return blankHandlers;*/
-		
-	},
 	doInitHandlers: function(handlers){
-		if(typeof handlers == 'object'){
-			this.setAllHandler(handlers);
-		}else if (handlers instanceof Array){//NOTE - HANDLERS HAD BETTER BE THE SAME LENGTH AT walls.pts.  I AM ASSUMING IT IS.
+		
+		if (handlers instanceof Array){//NOTE - HANDLERS HAD BETTER BE THE SAME LENGTH AT walls.pts.  I AM ASSUMING IT IS.
 			for (var handlerIdx=0; handlerIdx<handlers.length; handlerIdx++){
-				if(typeof handlers[handlerIdx] == 'object'){
-					var handler = handlers[handlerIdx];
-					this.setWallHandler(handlerIdx, handler)
-				}else if(handlers[handlerIdx] instanceof Array){
+				if(handlers[handlerIdx] instanceof Array){
 					var handlerArray = handlers[handlerIdx];
 					for (var subHandlerIdx=0; subHandlerIdx<handlerArray.length; subHandlerIdx++){
 						var subHandler = handlerArray[subHandlerIdx]
 						this.setSubWallHandler(handlerIdx, subHandlerIdx, subHandler);
 					}
+				}else if(typeof handlers[handlerIdx] == 'object'){
+					var handler = handlers[handlerIdx];
+					this.setWallHandler(handlerIdx, handler)
 				}
 			}
+		} else if(typeof handlers == 'object'){
+			this.setAllHandler(handlers);
 		}else{
-			console.log('YOU SEND POOR WALL HANDLERS.  THEY ARE NEITHER FUNCTION NOR ARRAY');
+			console.log('YOU SEND POOR WALL HANDLERS.  THEY ARE NEITHER OBJECT NOR ARRAY');
 		}
 	},
 	setAllHandler: function(handler){
@@ -120,7 +111,7 @@ WallHandler.prototype = {
 		var perpUVs = new Array(wallUVSet.length);
 		for (var wallUVIdx=0; wallUVIdx<wallUVSet.length; wallUVIdx++){
 			var wallUV = wallUVSet[wallUVIdx];
-			perpUVs[wallUVIdx] = V(wallUV.dy, -wallUV.dx);
+			perpUVs[wallUVIdx] = V(-wallUV.dy, wallUV.dx);
 		}
 		return perpUVs;
 	},
@@ -258,10 +249,10 @@ WallHandler.prototype = {
 		var wallPt = walls.pts[line[0]][line[1]];
 		var wallUV = this.wallUVs[line[0]][line[1]];
 		var perpUV = this.wallPerpUVs[line[0]][line[1]]
-		var dotVec = V(dot.x + dot.v.dx + perpUV.dx*dot.r - wallPt.x, dot.y + dot.v.dy + perpUV.dy*dot.r - wallPt.y);
+		var dotVec = V(dot.x + dot.v.dx - perpUV.dx*dot.r - wallPt.x, dot.y + dot.v.dy - perpUV.dy*dot.r - wallPt.y);
 		var distFromWall = perpUV.dotProd(dotVec);
 		var perpV = perpUV.dotProd(dot.v);
-		if (distFromWall>0 && distFromWall<30 && this.isBetween(dot, line, wallUV)){
+		if (distFromWall<0 && distFromWall>-30 && this.isBetween(dot, line, wallUV)){
 			var handler = this.handlers[line[0] + '-' + line[1]];
 			handler.func.apply(handler.obj,[dot, line, wallUV, perpV]);
 		}
@@ -278,8 +269,8 @@ WallHandler.prototype = {
 		return (dotVecA.dotProd(wallUV)>=0 && dotVecB.dotProd(reverseWallUV)>=0)
 	},
 	impactStd: function(dot, wallUV, perpV){
-		dot.v.dx -= 2*wallUV.dy*perpV;
-		dot.v.dy += 2*wallUV.dx*perpV;
+		dot.v.dx += 2*wallUV.dy*perpV;
+		dot.v.dy -= 2*wallUV.dx*perpV;
 		dot.x -= wallUV.dy
 		dot.y += wallUV.dx
 	},

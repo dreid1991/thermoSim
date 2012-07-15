@@ -251,8 +251,7 @@ function changeAllTemp(temp){
 	for(var spc in spcs){
 		var dots = spcs[spc].dots;
 		for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
-			var dot = dots[dotIdx];
-			changeDotTemp(dot, temp);
+			dots[dotIdx].setTemp(temp);
 		}
 	}
 }
@@ -265,13 +264,7 @@ function changeRMS(spcName, newRMS){
 		dot.v.mult(ratio);
 	}
 }
-function changeDotTemp(dot, temp){
-	var curTemp = dot.temp();
-	var velRatio = Math.sqrt(temp/curTemp);
-	dot.v.dx*=velRatio;
-	dot.v.dy*=velRatio;
-	return dot;
-}
+
 function tempToV(mass, temp){
 	//T/tConst = 0.5*m*v^2
 	temp = 2*Math.max(0, temp/tConst*gauss(1,.1));
@@ -294,13 +287,6 @@ function returnEscapist(dot){
 function round(val, dec){
 	var pow = Math.pow(10,dec);
 	return Math.round(val*pow)/pow;
-}
-function hitHeater(dot, perpV, temp){
-	var vRatio = Math.sqrt(temp/dot.temp())
-	var vNew = dot.v.mag()*vRatio;
-	var UV = dot.v.UV();
-	dot.v.dx = UV.dx*vNew;
-	dot.v.dy = UV.dy*vNew;
 }
 function makeButton(text, id){
 	var newDiv = $('<div>');

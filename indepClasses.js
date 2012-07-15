@@ -200,6 +200,12 @@ Dot.prototype = {
 	temp: function(){
 		return this.KE()*tConst;
 	},
+	setTemp: function(newTemp){
+		var curTemp = this.temp();
+		var scalar = Math.sqrt(newTemp/curTemp);
+		this.v.mult(scalar);
+		return this;
+	},
 	speed: function(){
 		return this.v.mag()*pxToMS;
 		//return pxToMS*Math.sqrt(this.temp()/(this.m*10));

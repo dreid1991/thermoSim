@@ -1058,10 +1058,16 @@ Heater.prototype = {
 		this.setupWalls()
 	},
 	setupWalls: function(){
-		walls.addWall(this.pts, {func:this.OMG, obj:this});
+		walls.addWall(this.pts, {func:this.hit, obj:this});
 	},
-	hit: function(dot, line, wallUV, perpV){
-		
+	hit: function(dot, line, wallUV, vPerp){
+		/*var vPar = dot.v.dotProd(wallUV);
+		var tempOld = dot.temp();
+		var tempNew = tempOld + this.temp;
+		var vTotOld = dot.v.mag();
+		var vTotNew = vTotOld*Math.sqrt(tempNew/tempOld);
+		var vPerpNew = Math.sqrt(vTotNew*vTotNew - vPar*vPar);
+		*/
 	},
 
 }
