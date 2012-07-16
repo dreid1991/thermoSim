@@ -418,6 +418,12 @@ function showPrompt(prev, prompt){
 	}
 
 }
+function toPrompt(promptIdx){
+	var prev = curLevel.prompts[curLevel.promptIdx];
+	prev.finished = true;
+	var prompt = curLevel.prompts[promptIdx];
+	showPrompt(prev, prompt);
+}
 function nextPrompt(){
 	var prev = curLevel.prompts[curLevel.promptIdx];
 	var promptIdx = Math.min(curLevel.promptIdx+1, curLevel.prompts.length-1);

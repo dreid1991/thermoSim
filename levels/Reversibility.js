@@ -10,7 +10,7 @@ function Reversibility(){
 	this.bgCol = Col(5, 17, 26);
 	this.wallCol = Col(255,255,255);
 	this.numUpdates = 0;
-	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], {func:this.onWallImpactSides, obj:this})
+	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], {func:this.onWallImpactSides, obj:this}, ['container']);
 	
 	this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
 	this.SAPExt = getLen(this.extPressurePts);

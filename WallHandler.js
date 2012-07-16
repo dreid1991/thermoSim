@@ -1,6 +1,11 @@
-function WallHandler(pts, handlers){
+function WallHandler(pts, handlers, handles){
 	this.pts = pts;
+	this.handles = handles;
 	this.gridDim=20;
+	if(this.handles.length!=this.pts.length){
+		console.log('NAME YOUR WALLS');
+	}
+	
 	this.wallUVs = [];
 	this.wallPerpUVs = [];
 	this.wallGrids = [];
@@ -63,8 +68,9 @@ WallHandler.prototype = {
 		this.wallPerpUVs[wallIdx] = this.getPerpUVs(wallIdx);
 		this.wallGrids[wallIdx] = this.getSubwallGrid(wallIdx);
 	},
-	addWall: function(pts, handler){
+	addWall: function(pts, handler, handle){
 		//this.handlers.push(new Array(pts.length));
+		this.handles.push(handle)
 		this.closeWall(pts);
 		this.pts.push(pts);
 		this.ptsInit[this.pts.length-1] = this.copyWall(this.pts[this.pts.length-1]);
@@ -89,7 +95,18 @@ WallHandler.prototype = {
 		}
 		return copy;
 	},
+	idxByHandle: function(handle){
+		var handles = this.handles;
+		for (var idx=0; idx<handles.length; idx++){
+			if(handle==handles[idx]){
+				return idx;
+			}
+		}
+		console.log('Failed to get wall idx by handle');
+		
+	},
 	removeWall: function(wallIdx){
+		this.handles.splice(wallIdx, 1);
 		this.pts.splice(wallIdx, 1);
 		this.ptsInit.splice(wallIdx, 1);
 		this.wallUVs.splice(wallIdx, 1);
@@ -251,7 +268,7 @@ WallHandler.prototype = {
 		var perpUV = this.wallPerpUVs[line[0]][line[1]]
 		var dotVec = V(dot.x + dot.v.dx - perpUV.dx*dot.r - wallPt.x, dot.y + dot.v.dy - perpUV.dy*dot.r - wallPt.y);
 		var distFromWall = perpUV.dotProd(dotVec);
-		var perpV = perpUV.dotProd(dot.v);
+		var perpV = -perpUV.dotProd(dot.v);
 		if (distFromWall<0 && distFromWall>-30 && this.isBetween(dot, line, wallUV)){
 			var handler = this.handlers[line[0] + '-' + line[1]];
 			handler.func.apply(handler.obj,[dot, line, wallUV, perpV, perpUV]);
@@ -269,8 +286,8 @@ WallHandler.prototype = {
 		return (dotVecA.dotProd(wallUV)>=0 && dotVecB.dotProd(reverseWallUV)>=0)
 	},
 	impactStd: function(dot, wallUV, perpV){
-		dot.v.dx += 2*wallUV.dy*perpV;
-		dot.v.dy -= 2*wallUV.dx*perpV;
+		dot.v.dx -= 2*wallUV.dy*perpV;
+		dot.v.dy += 2*wallUV.dx*perpV;
 		dot.x -= wallUV.dy
 		dot.y += wallUV.dx
 	},
