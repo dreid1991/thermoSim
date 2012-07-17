@@ -513,7 +513,7 @@ _.extend(IdealGasLaw.prototype, WallCollideMethods.prototype,
 		var canvasElement = canvas;
 		var listeners = {};
 		listeners.onDown = function(){};
-		listeners.onMove = function(){curLevel.changeWallSetPt(this.pos.y)};
+		listeners.onMove = function(){curLevel.changeWallSetPt(this.pos.y, 'isothermal')};
 		listeners.onUp = function(){};
 		
 		if(!bounds){
@@ -530,37 +530,7 @@ _.extend(IdealGasLaw.prototype, WallCollideMethods.prototype,
 		pts.push(wallPts[4].copy().position({y:this.minY}));
 		return pts;
 	},
-	changeWallSetPt: function(dest){
-		var wall = walls.pts[0]
-		removeListener(curLevel, 'update', 'moveWall');
-		var setY = function(curY){
-			wall[0].y = curY;
-			wall[1].y = curY;
-			wall[wall.length-1].y = curY;
-		}
-		var getY = function(){
-			return walls.pts[0][0].y;
-		}
-		
-		var dist = dest-getY();
-		if(dist!=0){
-			var sign = 1;
-			sign = Math.abs(dist)/dist;		
-			this.wallV = this.wallSpeed*sign;
-			walls.setSubWallHandler(0, 0, {func:this.cVisothermal, obj:this});
-			addListener(curLevel, 'update', 'moveWall',
-				function(){
-					setY(boundedStep(getY(), dest, this.wallV))
-					walls.setupWall(0);
-					if(round(getY(),2)==round(dest,2)){
-						removeListener(curLevel, 'update', 'moveWall');
-						walls.setSubWallHandler(0, 0, {func:this.staticAdiabatic, obj:this});
-						this.wallV = 0;
-					}
-				},
-			this);
-		}
-	},
+
 	update: function(){
 		this.numUpdates++;
 		for (var updateListener in this.updateListeners.listeners){
