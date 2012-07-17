@@ -10,7 +10,8 @@ function Reversibility(){
 	this.bgCol = Col(5, 17, 26);
 	this.wallCol = Col(255,255,255);
 	this.numUpdates = 0;
-	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], {func:this.onWallImpactSides, obj:this}, ['container']);
+	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], undefined, ['container']);
+	
 	
 	this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
 	this.SAPExt = getLen(this.extPressurePts);
@@ -48,7 +49,7 @@ function Reversibility(){
 	
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
 	walls.setup();
-	walls.setSubWallHandler(0, 0, {func:this.onWallImpactTop, obj:this});
+	//walls.setSubWallHandler(0, 0, {func:this.onWallImpactTop, obj:this});
 	this.workTracker = new WorkTracker('tracky',
 										function(){return walls.pts[0][0].y},
 										walls.pts[0][1].x-walls.pts[0][0].x,
@@ -62,7 +63,15 @@ function Reversibility(){
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
 	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
-
+	
+	this.wallCollideMethods = new WallCollideMethods(this);
+	var wallMethods = this.wallCollideMethods;
+	wallMethods.setWallVFunc({obj:this, handle:'wallV'});
+	wallMethods.setMassFunc({obj:this, func:this.mass});
+	wallMethods.setForceInternal({obj:this, handle:'forceInternal'});
+	
+	walls.setAllHandler({func:wallMethods.staticAdiabatic, obj:wallMethods})
+	walls.setSubWallHandler(0, 0, {func:wallMethods.cPAdiabaticDamped, obj:wallMethods});
 }
 
 Reversibility.prototype = {
@@ -287,59 +296,12 @@ Reversibility.prototype = {
 	checkWallHits: function(){
 		walls.check();
 	},
-	onWallImpactTop: function(dot, line, wallUV, perpV, perpUV){
-		/*
-		To dampen wall speed , doing:
-		1 = dot
-		2 = wall
-		m1vo1^2 + m2vo2^2 = m1v1^2 + m2v2^2
-		m1vo1 + m2vo2 = m1v1 + A*m2v2
-		where A = (abs(wallV)+1)^(const, maybe .1 to .3)
-		leads to
-		a = m1 + m1^2/(A^2m2)
-		b = -2*vo1*m1^2/(A^2m2) - 2*vo2*m1/A^2
-		c = m1^2*vo1^2/(A^2*m2) + 2*m1*vo2*vo1/A^2 + m2*(vo2/A)^2 - m1*vo1^2 - m2*vo2^2
-		I recommend grouping squared terms in each block for faster computation
-		v1 = (-b + (b^2 - 4*a*c)^.5)/2a
-		v2 = (m1*vo1 + m2*vo2 - m1*v1)/(m2*A)
-		*/
-		if(Math.abs(this.wallV)>1.0){
-			var vo1 = dot.v.dy;
-			var vo2 = this.wallV;
-			var m1 = dot.m;
-			var m2 = this.dragWeights.mass();
-			var vo1Sqr = vo1*vo1;
-			var vo2Sqr = vo2*vo2;
-			
-			var scalar = Math.pow(Math.abs(vo2)+.1, .2);
-			var scalarSqr = scalar*scalar
-			
-			var a = m1*(1 + m1/(scalarSqr*m2));
-			var b = -2*m1*(vo1*m1/(m2) + vo2)/scalarSqr;
-			var c = (m1*(m1*vo1Sqr/m2 + 2*vo2*vo1) + m2*vo2Sqr)/scalarSqr - m1*vo1Sqr - m2*vo2Sqr;
-			
-			dot.v.dy = (-b + Math.pow(b*b - 4*a*c,.5))/(2*a);
-			dot.y = dot.y+dot.r;
-			this.wallV = (m1*vo1 + m2*vo2 - m1*dot.v.dy)/(m2*scalar);
-		}else{
-			var pt = walls.pts[line[0]][line[1]];
-			var dotVo = dot.v.dy;
-			var wallVo = this.wallV;
-			dot.v.dy = (dotVo*(dot.m-this.dragWeights.mass())+2*this.dragWeights.mass()*wallVo)/(dot.m+this.dragWeights.mass());
-			this.wallV = (wallVo*(this.dragWeights.mass()-dot.m)+2*dot.m*dotVo)/(this.dragWeights.mass()+dot.m);
-			dot.y = pt.y+dot.r;			
-		}
-	},
-	onWallImpactSides: function(dot, line, wallUV, perpV, perpUV){
-		walls.impactStd(dot, wallUV, perpV);
-		this.forceInternal += 2*dot.m*Math.abs(perpV);
-	},
 	addDots: function(){
 		populate("spc1", P(35, 80), V(460, 350), 800, 230);
 		populate("spc3", P(35, 80), V(460, 350), 600, 230);		
 	},
 	dataRun: function(){
-		var SAPInt = getLen([walls.pts[0][1], walls.pts[0][2], walls.pts[0][3], walls.pts[0][4]])
+		var SAPInt = walls.surfArea()
 		this.data.pInt.push(dataHandler.pressureInt(this.forceInternal, this.numUpdates, SAPInt));
 		this.data.pExt.push(dataHandler.pressureExt(this.dragWeights.mass(), this.g, this.SAPExt));
 		this.data.t.push(dataHandler.temp());

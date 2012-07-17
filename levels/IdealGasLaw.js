@@ -50,7 +50,13 @@ function IdealGasLaw(){
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
 	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
-
+	
+	this.wallMethods = new WallCollideMethods(this);
+	var wallMethods = this.wallMethods;
+	wallMethods.setWallVFunc({obj:this, handle:'wallV'});
+	wallMethods.setMassFunc({obj:this, func:this.mass});
+	wallMethods.setForceInternal({obj:this, handle:'forceInternal'})
+	
 }
 
 IdealGasLaw.prototype = {
@@ -95,7 +101,8 @@ IdealGasLaw.prototype = {
 		this.playedWithSlider = false;
 		$('#clearGraphs').hide();
 		$('#sliderTemp').show();
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.onWallImpact, obj:this}, ['container']);
+		
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.wallMethods.staticAdiabatic, obj:this.wallMethods}, ['container']);
 		walls.setup();
 		populate('spc4', P(45,35), V(450, 350), 1, 300);
 		var dot = spcs.spc4.dots[0]
@@ -121,13 +128,13 @@ IdealGasLaw.prototype = {
 		$('#sliderTemp').hide();
 	},
 	block2Start: function(){
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.onWallImpact, obj:this}, ['container']);
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.wallMethods.staticAdiabatic, obj:this.wallMethods}, ['container']);
 		walls.setup();	
 		populate('spc4', P(45,35), V(450, 350), 400, 200);
 	},
 	block3Start: function(){
 		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
-			[P(300,30), P(510,30), P(510,440), P(300,440)]], {func:this.onWallImpact, obj:this}, ['c1', 'c2']);
+			[P(300,30), P(510,30), P(510,440), P(300,440)]], {func:this.wallMethods.staticAdiabatic, obj:this.wallMethods}, ['c1', 'c2']);
 		walls.setup();
 		populate('spc4', P(45, 80), V(200, 300), 200, 600);
 		populate('spc4', P(305,75), V(200, 300), 200, 100);
@@ -135,7 +142,7 @@ IdealGasLaw.prototype = {
 	},
 	block4Start: function(){
 		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
-			[P(300,30), P(510,30), P(510,440), P(300,440)]], {func:this.onWallImpact, obj:this}, ['c1', 'c2']);
+			[P(300,30), P(510,30), P(510,440), P(300,440)]], {func:this.wallMethods.staticAdiabatic, obj:this.wallMethods}, ['c1', 'c2']);
 		walls.setup();
 		populate('spc1', P(45, 80), V(200, 300), 200, 300);
 		populate('spc5', P(305,75), V(200, 300), 100, 800);
@@ -173,7 +180,7 @@ IdealGasLaw.prototype = {
 	},
 	block6Start: function(){
 		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
-			[P(300,30), P(510,30), P(510,440), P(300,440)]], {func:this.onWallImpact, obj:this}, ['c1', 'c2']);
+			[P(300,30), P(510,30), P(510,440), P(300,440)]], {func:this.wallMethods.staticAdiabatic, obj:this.wallMethods}, ['c1', 'c2']);
 		walls.setup();
 		var sliderMin = $('#sliderSpeedLeft').slider('option', 'min');
 		var sliderMax = $('#sliderSpeedLeft').slider('option', 'max');
@@ -244,7 +251,7 @@ IdealGasLaw.prototype = {
 		$('#intText').html("");	
 	},
 	block8Start: function(){
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.onWallImpact, obj:this}, ['container']);
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.wallMethods.staticAdiabatic, obj:this.wallMethods}, ['container']);
 		walls.setup();
 		populate('spc1', P(45,35), V(450, 350), 600, 300);
 		populate('spc3', P(45,35), V(450, 350), 800, 300);
@@ -271,7 +278,8 @@ IdealGasLaw.prototype = {
 		$('#longSliderHolder').show();
 		this.playedWithSlider = new Boolean();
 		this.playedWithSlider = false;
-		walls = new WallHandler([[P(50,75), P(75,50), P(475,50), P(500,75), P(500,300), P(475,325), P(75,325), P(50,300)]], {func:this.onWallImpactArrow, obj:this}, ['container']);
+		walls = new WallHandler([[P(50,75), P(75,50), P(475,50), P(500,75), P(500,300), P(475,325), P(75,325), P(50,300)]], {func:this.wallMethods.staticAdiabatic, obj:this.wallMethods}, ['container']);
+		walls.setExtras(this.wallMethods.drawArrow);
 		walls.setup();
 		populate('spc4', P(100,100), V(300,200), 1, 700);
 		//addListener(curLevel, 'wallImpact', 'arrow', this.onWallImpactArrow, this);
@@ -282,6 +290,7 @@ IdealGasLaw.prototype = {
 		return this.block1Conditions();
 	},
 	block9CleanUp: function(){
+		walls.setExtras();
 		this.playedWithSlider = undefined;
 		$('#longSliderHolder').hide();
 		$('#sliderPressure').hide();
@@ -338,7 +347,7 @@ IdealGasLaw.prototype = {
 		$('#intText').hide();
 	},
 	block11Start: function(){
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.onWallImpact, obj:this}, ['container']);
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.wallMethods.staticAdiabatic, obj:this.wallMethods}, ['container']);
 		walls.setup();
 		var ptsToBorder = this.getPtsToBorder();
 		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container', c);
@@ -541,14 +550,14 @@ IdealGasLaw.prototype = {
 			var sign = 1;
 			sign = Math.abs(dist)/dist;		
 			this.wallV = this.wallSpeed*sign;
-			walls.setSubWallHandler(0, 0, {func:this.onWallImpactIsothermal, obj:this});
+			walls.setSubWallHandler(0, 0, {func:this.wallMethods.cVisothermal, obj:this.wallMethods});
 			addListener(curLevel, 'update', 'moveWall',
 				function(){
 					setY(boundedStep(getY(), dest, this.wallV))
 					walls.setupWall(0);
 					if(round(getY(),2)==round(dest,2)){
 						removeListener(curLevel, 'update', 'moveWall');
-						walls.setSubWallHandler(0, 0, {func:this.onWallImpact, obj:this});
+						walls.setSubWallHandler(0, 0, {func:this.wallMethods.staticAdiabatic, obj:this.wallMethods});
 						this.wallV = 0;
 					}
 				},
@@ -586,55 +595,6 @@ IdealGasLaw.prototype = {
 	},
 	checkWallHits: function(){
 		walls.check();
-	},
-	onWallImpact: function(dot, line, wallUV, perpV, perpUV){
-		var vo = dot.v.copy();
-		walls.impactStd(dot, wallUV, perpV);
-		this.forceInternal += 2*dot.m*Math.abs(perpV);
-		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}
-	},
-	onWallImpactIsothermal: function(dot, line, wallUV, perpV, perpUV){
-		var vo = dot.v.copy();
-		var perpUV = walls.wallPerpUVs[line[0]][line[1]]
-		dot.y+=perpUV.dy;
-		walls.impactStd(dot, wallUV, perpV);
-		this.forceInternal += 2*dot.m*Math.abs(perpV);
-		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}	
-	},
-	onWallImpactAdiabatic: function(dot, line, wallUV, perpV, perpUV){
-		var vo = dot.v.copy();
-		if(line[0]==0 && line[1]==0){
-			dot.v.dy = -vo + 2*this.wallV;
-			this.forceInternal += dot.m*(perpV + dot.v.dy);
-		}else{
-			walls.impactStd(dot, wallUV, perpV);
-			this.forceInternal += 2*dot.m*Math.abs(perpV);
-		}
-		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}	
-	},
-	onWallImpactArrow: function(dot, line, wallUV, perpV, perpUV){
-		var hitResult = this.onWallImpact(dot, line, wallUV, perpV, perpUV);
-		var arrowPts = new Array(3);
-		arrowPts[0] = hitResult.pos.copy().movePt(hitResult.vo.copy().mult(10).neg());
-		arrowPts[1] = hitResult.pos;
-		arrowPts[2] = hitResult.pos.copy().movePt(hitResult.vf.copy().mult(10));
-		var lifeSpan = 50;
-		var arrowTurn = 0;
-		var arrow = new Arrow(arrowPts, Col(255,0,0),c);
-		addListener(curLevel, 'update', 'drawArrow'+hitResult.pos.x+hitResult.pos.y,
-			function(){
-				arrow.draw();
-				arrowTurn++;
-				if(arrowTurn==lifeSpan){
-					removeListener(curLevel, 'update', 'drawArrow'+hitResult.pos.x+hitResult.pos.y);
-				}
-			},
-		this);
-		var textPos = hitResult.pos.copy().movePt(hitResult.vf.mult(15));
-		var delV = 2*perpV*pxToMS;
-		animText({pos:textPos, col:Col(255,255,255), rotation:0, size:13}, 
-				{pos:textPos.copy().movePt({dy:-20}), col:this.bgCol},
-				'calibri', 'deltaV = '+round(delV,1)+'m/s', 'center', 3000, c);
 	},
 	dataRun: function(){
 

@@ -54,13 +54,15 @@ WallHandler.prototype = {
 			this.setWallHandler(wallIdx, handler);
 		}
 	},
-	setWallHandler: function(wallIdx, handler){
+	setWallHandler: function(wallInfo, handler){
+		var wallIdx = this.wallInfoToIdx(wallInfo);//info can be handle or idx
 		for (var subWallIdx=0; subWallIdx<this.pts[wallIdx].length; subWallIdx++){
 			this.setSubWallHandler(wallIdx, subWallIdx, handler);
 		}
 	},
 	
-	setSubWallHandler: function(wallIdx, subWallIdx, handler){
+	setSubWallHandler: function(wallInfo, subWallIdx, handler){
+		var wallIdx = this.wallInfoToIdx(wallInfo)
 		this.handlers[wallIdx+ '-' + subWallIdx] = handler;
 	},
 	setupWall: function(wallIdx){
@@ -80,6 +82,13 @@ WallHandler.prototype = {
 	setPtsInit: function(){
 		for (var wallIdx=0; wallIdx<this.pts.length; wallIdx++){
 			this.ptsInit[wallIdx] = this.copyWall(this.pts[wallIdx]);
+		}
+	},
+	setExtras: function(func){
+		if(func){
+			this.extras = func;
+		}else{
+			this.extras = undefined;
 		}
 	},
 	restoreWall: function(wallIdx){
@@ -104,6 +113,15 @@ WallHandler.prototype = {
 		}
 		console.log('Failed to get wall idx by handle');
 		
+	},
+	wallInfoToIdx: function(info){
+		var wallIdx;
+		if(parseFloat(info)!=info){
+			var wallIdx = this.idxByHandle(info)
+		}else{
+			wallIdx = info;
+		}
+		return wallIdx;
 	},
 	removeWall: function(wallIdx){
 		this.handles.splice(wallIdx, 1);
@@ -271,7 +289,7 @@ WallHandler.prototype = {
 		var perpV = -perpUV.dotProd(dot.v);
 		if (distFromWall<0 && distFromWall>-30 && this.isBetween(dot, line, wallUV)){
 			var handler = this.handlers[line[0] + '-' + line[1]];
-			handler.func.apply(handler.obj,[dot, line, wallUV, perpV, perpUV]);
+			handler.func.apply(handler.obj,[dot, line, wallUV, perpV, perpUV, this.extras]);
 		}
 	},
 	isBetween: function(dot, line, wallUV){

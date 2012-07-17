@@ -37,6 +37,12 @@ function Work(){
 	addListener(this, 'data', 'run', this.dataRun, this);
 	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
 
+	this.wallMethods = new WallCollideMethods(this);
+	var wallMethods = this.wallMethods;
+	wallMethods.setWallVFunc({obj:this, handle:'wallV'});
+	wallMethods.setMassFunc({obj:this, func:this.mass});
+	wallMethods.setForceInternal({obj:this, handle:'forceInternal'})
+	
 }
 
 Work.prototype = {
@@ -56,9 +62,9 @@ Work.prototype = {
 		$('#base').show();
 		addListener(curLevel, 'update', 'moveWalls', this.moveWalls, this);
 		addListener(curLevel, 'update', 'addGravity', this.addGravity, this);
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.onWallImpactSides, obj:this});
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.onWallImpactSides, obj:this}, ['container']);
 		walls.setup();
-		walls.setSubWallHandler(0, 0, {func:this.onWallImpactTop, obj:this});
+		walls.setSubWallHandler('container', 0, {func:this.wallMethods.cPAdiabaticDamped, obj:this.wallMethods});
 
 		this.piston = new Piston('tootoo', 500, function(){return walls.pts[0][0].y}, 40, 470, c, 2, function(){return self.g}, this);
 		this.piston.show();

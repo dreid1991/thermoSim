@@ -33,8 +33,10 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.eBarFont = '12pt Calibri';
 	this.eBarFontCol = Col(255,255,255);
 	this.addReadoutEntries();
+	var self = this;
 	if(obj){
 		addListener(obj, 'init', 'dragWeights', this.init, this);
+		obj.mass = function(){return self.pistonMass};
 	}
 }
 
