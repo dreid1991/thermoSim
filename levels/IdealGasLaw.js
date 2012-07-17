@@ -34,7 +34,7 @@ function IdealGasLaw(){
 		{block:6, title: "Current step", finished: false, conditions: this.block6Conditions, text:"Now I have a challenge for you: Make the gases in these two containers be the same temperature.  The molecular masses are 2 g/mol and 8 g/mol respectively.  The two sliders change the RMS of the velocities of their corresponding molecules.  Remember, temperature is proportional to average kinetic energy.<br>Note: A correct answer can be calculated, you don't need to guess and check."},
 		{block:7, title: "Current step", finished: false, text:""},
 		{block:8, title: "Current step", finished: false, text:"Okay, let’s look at pressure.  A pressure is a force per area.  This tells us that gases at non-zero pressure must exert a force on their container.  In the system above, what event causes a force to be exerted on the wall?"},
-		{block:9, title: "Current step", finished: false, conditions: this.block9Conditions, text:"It might be simpler if we look at just one molecule.  Every time the molecule hits the wall, its momentum changes.  If we average that change out over the time between hitting the wall, we get an average force applied which can then be related to a pressure.  How would the momentum change of collision and the frequency of collision change with speed, and how might this relate to pressure?  You can use the slider to change the molecule’s temperature to check your ideas.  When you’re done playing here, we can go through the math on the next page."},
+		{block:9, title: "Current step", finished: false, conditions: this.block9Conditions, text:"It might be simpler if we look at just one molecule.  Every time the molecule hits the wall, its momentum changes.  If we average that change out over the time between each hit, we get an average force applied which can then be related to a pressure.  How would the momentum change of collision and the frequency of collision change with speed, and how might this relate to pressure?  You can use the slider to change the molecule’s temperature to check your ideas."},
 		{block:10, title: "Current step", finished: false, text:"", start:this.block10aStart},
 		{block:10, title: "Current step", finished: false, text:"", start:this.block10bStart},
 		{block:10, title: "", 			 finished: false, text:"", start:this.block10cStart},
@@ -297,38 +297,39 @@ IdealGasLaw.prototype = {
 		$('#intText').show();
 		
 	},
-	block10aStart: function(){
-		$('#intText').html("Hopefully you found that as you increased speed, your molecule hit the wall harder and more often, which would result in a higher pressure.  Let's express those ideas in some math and solve for pressure from molecular collsions.<br>"+
-			"Say we have a molecule of mass m moving as follows:"+
+	block10aStart:function(){
+		$('#intText').html("<p>So we have two ideas at play here:</p><p><ul><li>First, the harder your molecules hit the wall, the more force each collision exerts on it.</p>"+
+		"<p><li>Second, the faster they're moving, the more often they hit the wall.</ul></p>"+
+		"<p>Both of these things are <i>linearly</i> dependant on molecular speed.</p>"+
+		"<p>The total force applied to the walls by the molecules is the product of these two, so multiplying, we get that pressure is proportional to mass times speed squared, or to temperature.</p>"+
+		"<p>Let's see if we can express that with some math.</p>"
+		);
+	},
+	block10bStart: function(){
+		$('#intText').html("Say we have a molecule of mass m moving as follows:"+
 			"<center><img src=img/ideal/pressureSetup.gif></img></center>"+
-			"Then starting from"+
+			"Starting from"+
 			"<center><img src=img/ideal/pggfa.gif></img> and <img src = img/ideal/fma.gif></center>"+
 			"We can integrate F=ma over time to get"+
 			"<center><img src=img/ideal/momentum.gif></img></center>"+
-			"We know that the change in velocity on collision is 2V<sub>x</sub> because it leaves with the inverse of the velocity it arrived with.<br>"+
+			"We know that the change in velocity on collision is 2V<sub>x</sub> because it leaves with the inverse of the velocity it arrived with.  This expresses the first idea.<br>"+
 			"Substituting in F, we get"+
 			"<center><img src=img/ideal/pdelt.gif></center>  <br><p>Continued on next page...</p>"
 			
 			);
 	},
-	block10bStart: function(){
+	block10cStart: function(){
 		$('#intText').html("<center><img src=img/ideal/pressureSetup.gif></img></center>"+
 		"Because we're looking for an average pressure, we average out the momentum change over the whole time between impacts, which is given by"+
 		"<center><img src=img/ideal/delt.gif></img></center>"+
+		"This gives us the second idea.<br>"+
 		"Then we put it all together and get"+
 		"<center><img src=img/ideal/last.gif></img></center>"+
-		"Now hold on!  Remember that T is preportional to mV<sup>2</sup> as well!  This means that we have just derived that <i>P is directly proportional to T</i> from a simple model of balls bouncing around!  Does this sound familiar to the ideal gas law or what?"
+		"Now look at that!  Remember that Y is proportional to mV<sup>2</sup> as well?  This means that we have just derived that <i>P is directly proportional to T</i> from a simple model of balls bouncing around!  Does this sound familiar to the ideal gas law or what?"
 		
 		);
 	},
-	block10cStart:function(){
-		$('#intText').html("<p>So we started with two ideas:</p><p><ul><li>First, the harder your molecules hit the wall, the more force each collision exerts on it.</p>"+
-		"<p><li>Second, the faster they're moving, the more often they hit the wall.</ul></p>"+
-		"<p>Both of these things are <i>linearly</i> dependant on molecular speed.</p>"+
-		"<p>Since total force applied to the walls by the molecules is product of these two, we get that pressure is proportional to mass times speed squared, or to temperature.</p>"+
-		"<p>So there are <i>two factors</i> that influence pressure: force of collisions and number of collisions</p>"
-		);
-	},
+
 	block10CleanUp: function(){
 		loadListener(curLevel, 'update');
 		$('#intText').html('');
