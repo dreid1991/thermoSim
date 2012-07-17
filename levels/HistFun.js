@@ -30,14 +30,11 @@ function HistFun(){
 	addListener(this, 'data', 'run', this.dataRun, this);
 	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
 	
-	this.wallMethods = new WallCollideMethods(this);
-	var wallMethods = this.wallMethods;
-	wallMethods.setWallVFunc({obj:this, handle:'wallV'});
-	wallMethods.setMassFunc({obj:this, func:this.mass});
-	wallMethods.setForceInternal({obj:this, handle:'forceInternal'})
+
 }
 
-HistFun.prototype = {
+_.extends(HistFun.prototype, WallCollideMethods.prototype,
+{
 	init: function(){
 		this.hideDash();
 		this.hideText();
@@ -69,7 +66,7 @@ HistFun.prototype = {
 	},
 	block0Start: function(){
 		$('#sliderTemp').show();
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.wallMethods.staticAdiabatic, obj:this.wallMethods});
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this});
 		walls.setup();
 		populate('spc1', P(45,35), V(450, 350), 1000, 300);
 		this.graphs.vHist = new GraphHist('v', 400, 300, 'v', 'num', {x:{min:0, step:4}, y:{min:0, step:4}}, {data:curLevel.data, x:'v'});
@@ -312,3 +309,4 @@ HistFun.prototype = {
 	},
 
 }
+)

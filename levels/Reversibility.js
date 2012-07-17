@@ -64,17 +64,12 @@ function Reversibility(){
 	addListener(this, 'data', 'run', this.dataRun, this);
 	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
 	
-	this.wallCollideMethods = new WallCollideMethods(this);
-	var wallMethods = this.wallCollideMethods;
-	wallMethods.setWallVFunc({obj:this, handle:'wallV'});
-	wallMethods.setMassFunc({obj:this, func:this.mass});
-	wallMethods.setForceInternal({obj:this, handle:'forceInternal'});
 	
-	walls.setAllHandler({func:wallMethods.staticAdiabatic, obj:wallMethods})
-	walls.setSubWallHandler(0, 0, {func:wallMethods.cPAdiabaticDamped, obj:wallMethods});
+	walls.setAllHandler({func:this.staticAdiabatic, obj:this})
+	walls.setSubWallHandler(0, 0, {func:this.cPAdiabaticDamped, obj:this});
 }
-
-Reversibility.prototype = {
+_.extend(Reversibility.prototype, WallCollideMethods.prototype, 
+{
 	init: function(){
 		this.workTracker.start();
 		this.addDots();
@@ -388,3 +383,4 @@ Reversibility.prototype = {
 	},
 
 }
+)
