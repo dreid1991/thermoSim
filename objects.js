@@ -46,6 +46,10 @@ DragWeights.prototype = {
 		this.dropBins = this.makeDropBins();
 		this.pistonBins = this.makePistonBins();
 		//this.dropAllInBins();
+		addListener(curLevel, 'update', 'moveWalls', curLevel.moveWalls, curLevel);
+		addListener(curLevel, 'update', 'addGravity', curLevel.addGravity, curLevel);
+		addListener(curLevel, 'update', 'moveWeightsOnPiston', this.moveWeightsOnPiston, this);
+		addListener(curLevel, 'update', 'drawDragWeights', this.draw, this);
 		addListener(curLevel, 'mousedown', 'weights', this.mousedown, this);
 		addListener(curLevel, 'reset', 'dragWeights', this.reset, this);
 		delete this.tempWeightDefs;
@@ -840,7 +844,7 @@ function Piston(handle, height, y, xLeftInit, width, drawCanvas, pInit, g, obj){
 	var readoutY = this.pistonBottom.pos.y-2+this.y();
 	var readoutFont = '12pt calibri';
 	var readoutFontCol = Col(255, 255, 255);
-	this.readout = new Readout(readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, undefined, 'center');
+	this.readout = new Readout('pistonReadout', readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, undefined, 'center');
 	obj.mass = function(){return self.mass};
 }
 

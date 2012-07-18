@@ -29,9 +29,13 @@
 		<div id='dashRun' class='dashMed noSelect'>
 			<center>
 				<div>
-					<div id='sliderPressure' style='width:300px'></div>
+					<div id='sliderPressureHolder'>Piston pressure<br>
+						<div id='sliderPressure' style='width:300px'></div>
+					</div>
 					<br>
-					<div id='sliderTemp' style = 'width:300px'></div>
+					<div id='sliderTempHolder'>Temperature control<br>
+						<div id='sliderTemp' style = 'width:300px'></div>
+					</div>
 					<button id='reset' class='noSelect'>Reset experiment</button>
 					<button id='checkAns' class='noSelect'>Check answer</button>
 					<button id='clearGraphs' class='noSelect'>Clear graphs</button>
@@ -87,6 +91,8 @@
 <script src = '../Readout.js'></script>
 <script src = '../WorkTracker.js'></script>
 <script src = '../WallCollideMethods.js'></script>
+<script src = '../LevelTools.js'></script>
+
 <script src = 'Work.js'></script>
 <script src = '../base.js'></script>
 <script type = 'text/javascript'>
@@ -97,8 +103,8 @@ $(function(){
 	myCanvas.height = canvasHeight;
 	curLevel = new Work();
 	
-	$('#sliderSpeedLeftHolder').hide();
-	$('#sliderSpeedRightHolder').hide();
+	$('#sliderTempHolder').hide();
+	$('#sliderPressureHolder').hide();
 	$('#canvasDiv').hide();
 	$('#base').hide();
 	$('#dashIntro').hide();

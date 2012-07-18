@@ -1,4 +1,5 @@
-function Readout(leftBound, rightBound, y, font, fontCol, obj, align){
+function Readout(handle, leftBound, rightBound, y, font, fontCol, obj, align){
+	this.handle = handle;
 	this.align = 'left';
 	if(align){
 		this.align = align;
@@ -140,10 +141,10 @@ Readout.prototype = {
 		}
 	},
 	show: function(){
-		addListener(curLevel, 'update', 'drawReadout', this.draw, this);
+		addListener(curLevel, 'update', 'drawReadout'+this.handle, this.draw, this);
 	},
 	hide: function(){
-		removeListener(curLevel, 'update', 'drawReadout');
+		removeListener(curLevel, 'update', 'drawReadout'+this.handle);
 	}
 
 }

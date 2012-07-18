@@ -47,6 +47,21 @@ WallCollideMethods.prototype = {
 			extras.apply(this, [{pos:P(dot.x, dot.y), vo:vo, vf:dot.v.copy(), dot:dot, perpV:perpV}]);
 		}
 	},	
+	cPAdiabatic: function(dot, line, wallUV, perpV, perpUV, extras){
+		var vo = dot.v.copy();
+		var vo1 = dot.v.dy;
+		var vo2 = this.wallV;
+		var m1 = dot.m;
+		var m2 = this.mass()	
+		var pt = walls.pts[line[0]][line[1]];
+		dot.v.dy = (vo1*(m1-m2)+2*m2*vo2)/(dot.m+m2);
+		this.wallV = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
+		dot.y = pt.y+dot.r;		
+		this.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
+		if(extras){
+			extras.apply(this, [{pos:P(dot.x, dot.y), vo:vo, vf:dot.v.copy(), dot:dot, perpV:perpV}]);
+		}		
+	},
 	staticAdiabatic: function(dot, line, wallUV, perpV, perpUV, extras){
 		var vo = dot.v.copy();
 		walls.impactStd(dot, wallUV, perpV);
@@ -73,42 +88,7 @@ WallCollideMethods.prototype = {
 			extras.apply(this, [{pos:P(dot.x, dot.y), vo:vo, vf:dot.v.copy(), dot:dot, perpV:perpV}]);
 		}
 	},
-	changeWallSetPt: function(dest, compType){
-		var wall = walls.pts[0]
-		var wallMoveMethod;
-		if(compType=='isothermal'){
-			var wallMoveMethod = this.cVIsothermal;
-		} else if (compType=='adiabatic'){
-			var wallMoveMethod = this.cVAdiabatic;
-		}
-		removeListener(curLevel, 'update', 'moveWall');
-		var setY = function(curY){
-			wall[0].y = curY;
-			wall[1].y = curY;
-			wall[wall.length-1].y = curY;
-		}
-		var getY = function(){
-			return walls.pts[0][0].y;
-		}
-		
-		var dist = dest-getY();
-		if(dist!=0){
-			var sign = getSign(dist);
-			this.wallV = this.wallSpeed*sign;
-			walls.setSubWallHandler(0, 0, {func:wallMoveMethod, obj:this});
-			addListener(curLevel, 'update', 'moveWall',
-				function(){
-					setY(boundedStep(getY(), dest, this.wallV))
-					walls.setupWall(0);
-					if(round(getY(),2)==round(dest,2)){
-						removeListener(curLevel, 'update', 'moveWall');
-						walls.setSubWallHandler(0, 0, {func:this.staticAdiabatic, obj:this});
-						this.wallV = 0;
-					}
-				},
-			this);
-		}
-	},
+
 	////////////////////////////////////////////////////////////
 	//EXTRAS
 	////////////////////////////////////////////////////////////

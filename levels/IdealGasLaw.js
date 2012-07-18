@@ -12,14 +12,8 @@ function IdealGasLaw(){
 	this.forceInternal = 0;
 	this.wallV = 0;
 	this.wallSpeed = 1;
-	this.updateListeners = {listeners:{}, save:{}};
-	this.dataListeners = {listeners:{}, save:{}};
-	this.mousedownListeners = {listeners:{}, save:{}};
-	this.mouseupListeners = {listeners:{}, save:{}};
-	this.mousemoveListeners = {listeners:{}, save:{}};
-	this.resetListeners = {listeners:{}, save:{}};
-	this.initListeners = {listeners:{}, save:{}};
-	this.readout = new Readout(30, myCanvas.width-180, 25, '13pt calibri', Col(255,255,255),this);
+	this.makeListeners()
+	this.readout = new Readout('mainReadout', 30, myCanvas.width-180, 25, '13pt calibri', Col(255,255,255),this);
 	this.compMode = 'Isothermal';
 	this.graphs = {}
 	this.promptIdx = -1;
@@ -55,7 +49,7 @@ function IdealGasLaw(){
 	
 }
 
-_.extend(IdealGasLaw.prototype, WallCollideMethods.prototype,
+_.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototype,
 {
 	init: function(){
 		for (var initListenerName in this.initListeners.listeners){
@@ -350,8 +344,8 @@ _.extend(IdealGasLaw.prototype, WallCollideMethods.prototype,
 		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container', c);
 		populate('spc1', P(45,35), V(450, 350), 800, 300);
 		populate('spc3', P(45,35), V(450, 350), 600, 300);	
-		this.dragArrow = this.makeDragArrow();
-		this.dragArrow.show();
+		this.compArrow = this.makeCompArrow({compMode:'isothermal'});
+		this.compArrow.show();
 		var arrowVolInit = new Arrow([P(545, 30), P(510, 30)], Col(255,0,0), c);
 		var arrowVolHalf = new Arrow([P(545, 235), P(510, 235)], Col(0,255,0), c);
 		addListener(curLevel, 'update', 'drawVolArrows', 
@@ -423,7 +417,7 @@ _.extend(IdealGasLaw.prototype, WallCollideMethods.prototype,
 		removeListener(curLevel, 'data', 'recordPressure');
 		this.readout.removeAllEntries();
 		this.readout.hide();
-		this.dragArrow.remove();
+		this.compArrow.remove();
 		this.drawArrow = undefined;
 	},
 	block12Start: function(){
@@ -500,27 +494,7 @@ _.extend(IdealGasLaw.prototype, WallCollideMethods.prototype,
 		pts.push(wallPts[4].copy());
 		return pts;
 	},
-	makeDragArrow: function(bounds){
-		var pos = walls.pts[0][1].copy()
-		var rotation = 0;
-		var cols = {};
-		cols.outer = Col(247, 240,9);
-		cols.onClick = Col(247, 240,9);
-		cols.inner = this.bgCol;
-		var dims = V(25, 15);
-		var name = 'volDragger';
-		var drawCanvas = c;
-		var canvasElement = canvas;
-		var listeners = {};
-		listeners.onDown = function(){};
-		listeners.onMove = function(){curLevel.changeWallSetPt(this.pos.y, 'isothermal')};
-		listeners.onUp = function(){};
-		
-		if(!bounds){
-			bounds = {y:{min:this.minY, max:this.maxY}};
-		}
-		return new DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds);
-	},
+
 	getPtsToBorder: function(){
 		var pts = [];
 		var wallPts = walls.pts[0];
@@ -529,39 +503,6 @@ _.extend(IdealGasLaw.prototype, WallCollideMethods.prototype,
 		pts.push(wallPts[3].copy());
 		pts.push(wallPts[4].copy().position({y:this.minY}));
 		return pts;
-	},
-
-	update: function(){
-		this.numUpdates++;
-		for (var updateListener in this.updateListeners.listeners){
-			var listener = this.updateListeners.listeners[updateListener]
-			listener.func.apply(listener.obj);
-		}
-	},
-	addData: function(){
-		for (var dataListener in this.dataListeners.listeners){
-			var listener = this.dataListeners.listeners[dataListener];
-			listener.func.apply(listener.obj);
-		}
-		this.numUpdates = 0;
-		this.forceInternal = 0;
-	},
-	updateRun: function(){
-		move();
-		this.checkDotHits(); 
-		this.checkWallHits();
-		this.drawRun();
-	},
-	drawRun: function(){
-		draw.clear(this.bgCol);
-		draw.dots();
-		draw.walls(walls, this.wallCol);
-	},
-	checkDotHits: function(){
-		collide.check();
-	},
-	checkWallHits: function(){
-		walls.check();
 	},
 	dataRun: function(){
 

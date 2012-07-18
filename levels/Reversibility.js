@@ -17,14 +17,9 @@ function Reversibility(){
 	this.SAPExt = getLen(this.extPressurePts);
 	this.forceInternal = 0;
 	this.wallV = 0;
-	this.updateListeners = {listeners:{}, save:{}};
-	this.dataListeners = {listeners:{}, save:{}};
-	this.mousedownListeners = {listeners:{}, save:{}};
-	this.mouseupListeners = {listeners:{}, save:{}};
-	this.mousemoveListeners = {listeners:{}, save:{}};
-	this.resetListeners = {listeners:{}, save:{}};
-	this.initListeners = {listeners:{}, save:{}};
-	this.readout = new Readout(15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), this);
+	this.makeListeners()
+
+	this.readout = new Readout('mainReadout', 15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), this);
 	this.graphs = {}
 	this.promptIdx = -1;
 	this.curBlock=-1;
@@ -68,7 +63,9 @@ function Reversibility(){
 	walls.setAllHandler({func:this.staticAdiabatic, obj:this})
 	walls.setSubWallHandler(0, 0, {func:this.cPAdiabaticDamped, obj:this});
 }
-_.extend(Reversibility.prototype, WallCollideMethods.prototype, 
+_.extend(Reversibility.prototype, 
+			LevelTools.prototype, 
+			WallCollideMethods.prototype, 
 {
 	init: function(){
 		this.workTracker.start();
@@ -252,45 +249,6 @@ _.extend(Reversibility.prototype, WallCollideMethods.prototype,
 									);
 		return dragWeights;
 	},
-	update: function(){
-		this.numUpdates++;
-		for (var updateListener in this.updateListeners.listeners){
-			var listener = this.updateListeners.listeners[updateListener]
-			listener.func.apply(listener.obj);
-		}
-	},
-	addData: function(){
-		for (var dataListener in this.dataListeners.listeners){
-			var listener = this.dataListeners.listeners[dataListener];
-			listener.func.apply(listener.obj);
-		}
-		this.numUpdates = 0;
-	},
-	updateRun: function(){
-		move();
-		this.moveWalls();
-		this.addGravity();	
-		this.checkDotHits(); 
-		this.checkWallHits();
-		this.dragWeights.moveWeightsOnPiston();
-		this.drawRun();
-	},
-	addGravity: function(){
-		this.wallV += this.g;
-	},
-	drawRun: function(){
-		draw.clear(this.bgCol);
-		draw.dots();
-		draw.walls(walls, this.wallCol);
-		//draw.fillPts(walls.pts[1], this.heater.col, c);
-		this.dragWeights.draw();
-	},
-	checkDotHits: function(){
-		collide.check();
-	},
-	checkWallHits: function(){
-		walls.check();
-	},
 	addDots: function(){
 		populate("spc1", P(35, 80), V(460, 350), 800, 230);
 		populate("spc3", P(35, 80), V(460, 350), 600, 230);		
@@ -309,36 +267,6 @@ _.extend(Reversibility.prototype, WallCollideMethods.prototype,
 	},
 	vol: function(){
 		return walls.area(0);// - walls.area(1);
-	},
-	moveWalls: function(){
-		var wall = walls.pts[0];
-		var lastY = wall[0].y
-		var unboundedY = lastY + this.wallV + .5*this.g;
-		var dyWeight = null;
-		if(unboundedY>this.maxY || unboundedY<this.minY){
-			var boundedY = Math.max(this.minY, Math.min(this.maxY, unboundedY));
-			var tHit = null;
-			if (boundedY==this.maxY){
-				var tHit = (-this.wallV + Math.sqrt(this.wallV*this.wallV + 2*this.g*(boundedY-lastY)))/this.g;
-			}else if (boundedY==this.minY){
-				var tHit = (-this.wallV - Math.sqrt(this.wallV*this.wallV + 2*this.g*(boundedY-lastY)))/this.g;
-			}
-			var vRebound = -(this.wallV + this.g*tHit);
-			var tLeft = 1 - tHit;
-			var nextY = boundedY + vRebound*tLeft + .5*this.g*tLeft*tLeft;
-			this.wallV += 2*this.g*tHit;
-			this.wallV = -this.wallV;
-			wall[0].y = nextY;
-			wall[1].y = nextY;
-			wall[wall.length-1].y = nextY;
-			dyWeight = nextY - lastY;
-		}else{
-			wall[0].y = unboundedY;
-			wall[1].y = unboundedY;
-			wall[wall.length-1].y = unboundedY;
-			dyWeight = unboundedY - lastY;
-		}
-		walls.setupWall(0);
 	},
 	reset: function(){
 		
@@ -368,19 +296,5 @@ _.extend(Reversibility.prototype, WallCollideMethods.prototype,
 
 		
 	},
-	clearGraphs: function(){
-		for (var graphName in this.graphs){
-			this.graphs[graphName].clear();
-		}
-	},
-	hideDash: function(){
-		$('#dashIntro').hide();
-		$('#dashRun').hide();
-		$('#dashOutro').hide();
-	},
-	hideBase: function(){
-		$('#base').hide();
-	},
-
 }
 )

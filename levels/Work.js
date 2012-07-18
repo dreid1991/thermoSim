@@ -12,24 +12,21 @@ function Work(){
 	this.forceInternal = 0;
 	this.wallV = 0;
 
-	this.updateListeners = {listeners:{}, save:{}};
-	this.dataListeners = {listeners:{}, save:{}};
-	this.mousedownListeners = {listeners:{}, save:{}};
-	this.mouseupListeners = {listeners:{}, save:{}};
-	this.mousemoveListeners = {listeners:{}, save:{}};
-	this.resetListeners = {listeners:{}, save:{}};
-	this.initListeners = {listeners:{}, save:{}};
-	this.readout = new Readout(30, myCanvas.width-180, 25, '13pt calibri', Col(255,255,255),this);
+	this.makeListeners();
+	this.readout = new Readout('mainReadout', 30, myCanvas.width-180, 25, '13pt calibri', Col(255,255,255),this, 'left');
 	this.compMode = 'Isothermal';
 	this.graphs = {}
 	this.promptIdx = -1;
 	this.blockIdx=-1;
 	this.g = 1.75;
 	this.prompts=[
-		{block:0, title: "testyMcKaw", finished: false, text:""},
-		{block:1, title: "wookuhloo!", finished: false, text:""},
+		{block:0, title: "", finished: false, text:""},
+		{block:1, title: "Current step", finished: false, text:"Alright, let’s fit a model to what we just described.  Above we have a piston and cylinder setup.  You can change the piston’s pressure with the pressure slider. Now these molecules undergo perfectly elastic collisions when they hit a wall.  That is to say they behave like a bouncy ball would when you throw it against the wall.  If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving, that is not true.  If you compress the cylinder, the gas will heat up.  Can you relate the change in gas speed and temperature to the bouncy ball model?"},
+		{block:2, title: "Current step", finished: false, text:""},
 
 	]
+	walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
+	walls.setup();
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
 	this.minY = 30;
 	this.maxY = 350;
@@ -37,7 +34,9 @@ function Work(){
 	addListener(this, 'data', 'run', this.dataRun, this);
 	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
 }
-_.extend(Work.prototype, WallCollideMethods.prototype, 
+_.extend(Work.prototype, 
+			LevelTools.prototype, 
+			WallCollideMethods.prototype, 
 {
 	init: function(){
 		for (var initListenerName in this.initListeners.listeners){
@@ -47,39 +46,87 @@ _.extend(Work.prototype, WallCollideMethods.prototype,
 		}		
 		nextPrompt();
 	},
+
 	block0Start: function(){
-		var self = this;
+		saveListener(this, 'update');
+		saveListener(this, 'data');
+		emptyListener(this, "update");
+		emptyListener(this, "data");
+		this.hideDash();
+		this.hideBase();
+		$('#canvasDiv').hide();
+		$('#graphs').hide();
+		$('#display').show();
+		$('#dashIntro').show();
+		$('#intText').show().html("<p>Good afternoon!</p>"+
+		"Today we're going to try to figure out why work does work.  Let's start with the equations that relate work to a temperature change:"+
+		//equations
+		"<p>This equation says that work is equal to how hard you push on a container times how much you compress it.  It also says that as you compress that container, the gas inside heats up.  But why does that happen?  What is it about pushing on a container makes its molecules speed up?</p>"+
+		"<p> One might say that it’s because energy is being added, and that is true, but we’re going to try to pin down the physical event that makes a molecule speed up as a result of the container compressing."
+		);
+		
+	},
+	block0CleanUp: function(){
+		this.hideDash();
+		$('#graphs').show()
 		$('#canvasDiv').show();
-		$('#clearGraphs').hide();
+		$('#display').hide();
+		$('#intText').hide();
 		$('#dashRun').show();
 		$('#base').show();
-		addListener(curLevel, 'update', 'moveWalls', this.moveWalls, this);
-		addListener(curLevel, 'update', 'addGravity', this.addGravity, this);
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.onWallImpactSides, obj:this}, ['container']);
+		loadListener(this, 'update');
+		loadListener(this, 'data');		
+	},
+	
+	block1Start: function(){
+		console.log('here');
+		var self = this;
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
 		walls.setup();
-		walls.setSubWallHandler('container', 0, {func:this.cPAdiabaticDamped, obj:this});
-
-		this.piston = new Piston('tootoo', 500, function(){return walls.pts[0][0].y}, 40, 470, c, 2, function(){return self.g}, this);
-		this.piston.show();
-		this.piston.trackWork();
-		this.piston.trackPressure();
-		var ptsToBorder = this.getPtsToBorder();
-		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container', c);
-		this.heater = new Heater('spaceHeater', P(150,360), V(250,50), 0, 20, c);//P(40,425), V(470,10)
-		this.heater.init();
+		walls.setSubWallHandler('container', 0, {func:this.cPAdiabaticDamped, obj:this});		
 		populate('spc1', P(45,35), V(460, 350), 800, 300);
 		populate('spc3', P(45,35), V(450, 350), 600, 300);
 		//populate('spc3', P(45,35), V(450, 350), 1, 300);
+		
+		//this.readout.addEntry('temp', 'Temperature:', 'K', dataHandler.temp(), 0, 0);
+		//this.readout.show();
+		$('#canvasDiv').show();
+		$('#clearGraphs').hide();
+		$('#dashRun').show();
+		$('#sliderPressureHolder').show();
+		$('#base').show();
+		/*
+		addListener(curLevel, 'data', 'measureTemp', function(){
+			var temps = this.data.t;
+			var tempLast = temps[temps.length-1];
+			this.readout.tick(tempLast, 'temp');
+		},
+		this);
+		*/
+		addListener(curLevel, 'update', 'moveWalls', this.moveWalls, this);
+		addListener(curLevel, 'update', 'addGravity', this.addGravity, this);
+		
+
+		this.piston = new Piston('tootoo', 500, function(){return walls.pts[0][0].y}, 40, 470, c, 2, function(){return self.g}, this);
+		this.piston.show();
+		//this.piston.trackWork();
+		//this.piston.trackPressure();
+		var ptsToBorder = this.getPtsToBorder();
+		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container', c);
+		//this.heater = new Heater('spaceHeater', P(150,360), V(250,50), 0, 20, c);//P(40,425), V(470,10)
+		//this.heater.init();
+
 	},
 
-	block0CleanUp: function(){
+	block1CleanUp: function(){
+		this.readout.removeAllEntries();
+		this.readout.hide();
 		removeListener(curLevel, 'update', 'moveWalls');
 		removeListener(curLevel, 'update', 'addGravity');
 		walls.setWallHandler(0, {func:this.onWallImpactSides, obj:this})
 	},
-	block1Start: function(){
-		populate('spc1', P(45,35), V(460, 350), 800, 300);
-		populate('spc3', P(45,35), V(450, 350), 600, 300);		
+	block2Start: function(){
+		populate('spc1', P(45,35), V(460, 350), 1, 300);
 	},
 
 	getPtsToBorder: function(){
@@ -91,27 +138,7 @@ _.extend(Work.prototype, WallCollideMethods.prototype,
 		pts.push(wallPts[4].copy());
 		return pts;
 	},
-	makeDragArrow: function(bounds){
-		var pos = walls.pts[0][1].copy()
-		var rotation = 0;
-		var cols = {};
-		cols.outer = Col(247, 240,9);
-		cols.onClick = Col(247, 240,9);
-		cols.inner = this.bgCol;
-		var dims = V(25, 15);
-		var name = 'volDragger';
-		var drawCanvas = c;
-		var canvasElement = canvas;
-		var listeners = {};
-		listeners.onDown = function(){};
-		listeners.onMove = function(){curLevel.changeWallSetPt(this.pos.y)};
-		listeners.onUp = function(){};
-		
-		if(!bounds){
-			bounds = {y:{min:this.minY, max:this.maxY}};
-		}
-		return new DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds);
-	},
+//HOLD ON - YOU HAVE TWO.  FIGGER IT OUT.
 	getPtsToBorder: function(){
 		var pts = [];
 		var wallPts = walls.pts[0];
@@ -121,162 +148,13 @@ _.extend(Work.prototype, WallCollideMethods.prototype,
 		pts.push(wallPts[4].copy().position({y:this.minY}));
 		return pts;
 	},
-	moveWalls: function(){
 
-		var wall = walls.pts[0];
-		var lastY = wall[0].y
-		var unboundedY = lastY + this.wallV + .5*this.g;
-		var dyWeight = null;
-		if(unboundedY>this.maxY || unboundedY<this.minY){
-			var boundedY = Math.max(this.minY, Math.min(this.maxY, unboundedY));
-			var tHit = null;
-			if (boundedY==this.maxY){
-				var tHit = (-this.wallV + Math.sqrt(this.wallV*this.wallV + 2*this.g*(boundedY-lastY)))/this.g;
-			}else if (boundedY==this.minY){
-				var tHit = (-this.wallV - Math.sqrt(this.wallV*this.wallV + 2*this.g*(boundedY-lastY)))/this.g;
-			}
-			var vRebound = -(this.wallV + this.g*tHit);
-			var tLeft = 1 - tHit;
-			var nextY = boundedY + vRebound*tLeft + .5*this.g*tLeft*tLeft;
-			this.wallV += 2*this.g*tHit;
-			this.wallV = -this.wallV;
-			wall[0].y = nextY;
-			wall[1].y = nextY;
-			wall[wall.length-1].y = nextY;
-			dyWeight = nextY - lastY;
-		}else{
-			wall[0].y = unboundedY;
-			wall[1].y = unboundedY;
-			wall[wall.length-1].y = unboundedY;
-			dyWeight = unboundedY - lastY;
-		}
-		walls.setupWall(0);
-	
-	},
-	update: function(){
-		this.numUpdates++;
-		for (var updateListener in this.updateListeners.listeners){
-			var listener = this.updateListeners.listeners[updateListener]
-			listener.func.apply(listener.obj);
-		}
-	},
-	addData: function(){
-		for (var dataListener in this.dataListeners.listeners){
-			var listener = this.dataListeners.listeners[dataListener];
-			listener.func.apply(listener.obj);
-		}
-		this.numUpdates = 0;
-		this.forceInternal = 0;
-	},
-	updateRun: function(){
-		move();
-		this.checkDotHits(); 
-		this.checkWallHits();
-		this.drawRun();
-	},
-	addGravity: function(){
-		this.wallV += this.g;
-	},
-	drawRun: function(){
-		draw.clear(this.bgCol);
-		draw.dots();
-		draw.walls(walls, this.wallCol);
-	},
-	checkDotHits: function(){
-		collide.check();
-	},
-	checkWallHits: function(){
-		walls.check();
-	},
-	onWallImpact: function(dot, line, wallUV, perpV){
-		var vo = dot.v.copy();
-		walls.impactStd(dot, wallUV, perpV);
-		this.forceInternal += 2*dot.m*Math.abs(perpV);
-		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}
-	},
-
-	onWallImpactTop: function(dot, line, wallUV, perpV, perpUV){
-		/*
-		To dampen wall speed , doing:
-		1 = dot
-		2 = wall
-		m1vo1^2 + m2vo2^2 = m1v1^2 + m2v2^2
-		m1vo1 + m2vo2 = m1v1 + A*m2v2
-		where A = (abs(wallV)+1)^(const, maybe .1 to .3)
-		leads to
-		a = m1 + m1^2/(A^2m2)
-		b = -2*vo1*m1^2/(A^2m2) - 2*vo2*m1/A^2
-		c = m1^2*vo1^2/(A^2*m2) + 2*m1*vo2*vo1/A^2 + m2*(vo2/A)^2 - m1*vo1^2 - m2*vo2^2
-		I recommend grouping squared terms in each block for faster computation
-		v1 = (-b + (b^2 - 4*a*c)^.5)/2a
-		v2 = (m1*vo1 + m2*vo2 - m1*v1)/(m2*A)
-		*/
-		var vo = dot.v.copy();
-		if(Math.abs(this.wallV)>1.0){
-			var vo1 = dot.v.dy;
-			var vo2 = this.wallV;
-			var m1 = dot.m;
-			var m2 = this.mass();
-			var vo1Sqr = vo1*vo1;
-			var vo2Sqr = vo2*vo2;
-			
-			var scalar = Math.pow(Math.abs(vo2)+.1, .2);
-			var scalarSqr = scalar*scalar
-			
-			var a = m1*(1 + m1/(scalarSqr*m2));
-			var b = -2*m1*(vo1*m1/(m2) + vo2)/scalarSqr;
-			var c = (m1*(m1*vo1Sqr/m2 + 2*vo2*vo1) + m2*vo2Sqr)/scalarSqr - m1*vo1Sqr - m2*vo2Sqr;
-			
-			dot.v.dy = (-b + Math.pow(b*b - 4*a*c,.5))/(2*a);
-			dot.y = dot.y+dot.r;
-			this.wallV = (m1*vo1 + m2*vo2 - m1*dot.v.dy)/(m2*scalar);
-		}else{
-			var pt = walls.pts[line[0]][line[1]];
-			var dotVo = dot.v.dy;
-			var wallVo = this.wallV;
-			dot.v.dy = (dotVo*(dot.m-this.mass())+2*this.mass()*wallVo)/(dot.m+this.mass());
-			this.wallV = (wallVo*(this.mass()-dot.m)+2*dot.m*dotVo)/(this.mass()+dot.m);
-			dot.y = pt.y+dot.r;			
-		}
-		this.forceInternal += dot.m*(Math.abs(perpV)+Math.abs(dot.v.dy));
-		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}
-	},
-	onWallImpactSides: function(dot, line, wallUV, perpV, perpUV){
-		var vo = dot.v.copy();
-		walls.impactStd(dot, wallUV, perpV);
-		this.forceInternal += 2*dot.m*Math.abs(perpV);
-		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)};
-	},
-	onWallImpactArrow: function(dot, line, wallUV, perpV, perupUV){
-		var hitResult = this.onWallImpact(dot, line, wallUV, perpV);
-		var arrowPts = new Array(3);
-		arrowPts[0] = hitResult.pos.copy().movePt(hitResult.vo.copy().mult(10).neg());
-		arrowPts[1] = hitResult.pos;
-		arrowPts[2] = hitResult.pos.copy().movePt(hitResult.vf.copy().mult(10));
-		var lifeSpan = 50;
-		var arrowTurn = 0;
-		var arrow = new Arrow(arrowPts, Col(255,0,0),c);
-		addListener(curLevel, 'update', 'drawArrow'+hitResult.pos.x+hitResult.pos.y,
-			function(){
-				arrow.draw();
-				arrowTurn++;
-				if(arrowTurn==lifeSpan){
-					removeListener(curLevel, 'update', 'drawArrow'+hitResult.pos.x+hitResult.pos.y);
-				}
-			},
-		this);
-		var textPos = hitResult.pos.copy().movePt(hitResult.vf.mult(15));
-		var delV = 2*perpV*pxToMS;
-		animText({pos:textPos, col:Col(255,255,255), rotation:0, size:13}, 
-				{pos:textPos.copy().movePt({dy:-20}), col:this.bgCol},
-				'calibri', 'deltaV = '+round(delV,1)+'m/s', 'center', 3000, c);
-	},
 	dataRun: function(){
 		var wall = walls.pts[0];
 		var SA = getLen([wall[0], wall[1], wall[2], wall[3], wall[4]]);//HEY - FOR TESTING PURPOSES ONLY.  DOES NOT WORK WITH MOVING WALL AS WE DO NOT ADD FORCE INTERNAL THERE
 		this.data.p.push(dataHandler.pressureInt(this.forceInternal, this.numUpdates, SA))
 		this.data.t.push(dataHandler.temp());
-		this.data.v.push(dataHandler.volPolyWall());
+		this.data.v.push(dataHandler.volOneWall());
 		
 		for(var graphName in this.graphs){
 			this.graphs[graphName].addLast();
@@ -325,14 +203,7 @@ _.extend(Work.prototype, WallCollideMethods.prototype,
 		}	
 		
 	},
-	hideDash: function(){
-		$('#dashIntro').hide();
-		$('#dashRun').hide();
-		$('#dashOutro').hide();
-	},
-	hideBase: function(){
-		$('#base').hide();
-	},
+
 
 }
 )
