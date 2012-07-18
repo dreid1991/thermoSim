@@ -17,13 +17,14 @@ function WallHandler(pts, handlers, handles){
 	this.ySpan = Math.floor(myCanvas.height/this.gridDim);
 	this.numCols = Math.ceil(myCanvas.width/this.gridDim);
 	this.numRows = Math.ceil(myCanvas.height/this.gridDim);
+	this.setup();
 };
 WallHandler.prototype = {
 	setup: function(){
 		this.closeWalls();
 		this.ptsInit = [];
 		this.setPtsInit();
-		for (var wallIdx=0; wallIdx<walls.pts.length; wallIdx++){
+		for (var wallIdx=0; wallIdx<this.pts.length; wallIdx++){
 			this.setupWall(wallIdx);
 		}
 		
@@ -151,7 +152,7 @@ WallHandler.prototype = {
 		return perpUVs;
 	},
 	getWallUV: function(wallIdx){
-		var wall = walls.pts[wallIdx];
+		var wall = this.pts[wallIdx];
 		var numUVs = wall.length-1
 		var wallUVs = new Array(numUVs);
 		for (var ptIdx=0; ptIdx<numUVs; ptIdx++){
@@ -176,7 +177,7 @@ WallHandler.prototype = {
 	},
 	getSubwallsInGrid: function(wallIdx, x, y){
 		var subwallsInGrid = [];
-		var wall = walls.pts[wallIdx];
+		var wall = this.pts[wallIdx];
 		for (var ptIdx=0; ptIdx<wall.length-1; ptIdx++){
 			if (this.isInBox(x, y, [wallIdx, ptIdx])){
 				subwallsInGrid.push(ptIdx);
@@ -195,8 +196,8 @@ WallHandler.prototype = {
 		x2*=this.gridDim;
 		y1*=this.gridDim;
 		y2*=this.gridDim;
-		pt1 = walls.pts[pt[0]][pt[1]];
-		pt2 = walls.pts[pt[0]][pt[1]+1];
+		pt1 = this.pts[pt[0]][pt[1]];
+		pt2 = this.pts[pt[0]][pt[1]+1];
 		var angleLine = this.getAngle(pt1.x, pt1.y, pt2.x, pt2.y);
 		var anglePt1 = this.getAngle(pt1.x, pt1.y, x1, y1);
 		var anglePt2 = this.getAngle(pt1.x, pt1.y, x2, y2);

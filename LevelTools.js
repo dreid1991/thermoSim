@@ -142,6 +142,15 @@ LevelTools.prototype = {
 			this.graphs[graphName].clear();
 		}
 	},
+	removeGraph: function(graphName){
+		this.graphs[graphName].remove();
+		this.graphs[graphName] = undefined;
+	},
+	removeAllGraphs: function(){
+		for (var graphName in this.graphs){
+			this.removeGraph(graphName);
+		}	
+	},
 	makeListeners: function(){
 		this.updateListeners = {listeners:{}, save:{}};
 		this.dataListeners = {listeners:{}, save:{}};

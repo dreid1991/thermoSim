@@ -846,6 +846,9 @@ function Piston(handle, height, y, xLeftInit, width, drawCanvas, pInit, g, obj){
 	var readoutFontCol = Col(255, 255, 255);
 	this.readout = new Readout('pistonReadout', readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, undefined, 'center');
 	obj.mass = function(){return self.mass};
+	addListener(curLevel, 'update', 'moveWalls', obj.moveWalls, obj);
+	addListener(curLevel, 'update', 'addGravity', obj.addGravity, obj);
+	this.obj = obj;
 }
 
 Piston.prototype = {
@@ -917,6 +920,10 @@ Piston.prototype = {
 		addListener(curLevel, 'update', 'drawPiston'+this.handle, this.draw, '');
 		this.readout.show();
 	},
+	hide: function(){
+		removeListener(curLevel, 'update', 'drawPiston'+this.handle);
+		this.readout.hide();
+	},
 	setP: function(p){
 		var pSetPt = p;
 		var dp = pSetPt - this.p;
@@ -984,6 +991,12 @@ Piston.prototype = {
 	setDataVal: function(value, handle){
 		this.readout.hardUpdate(value, handle);
 	},
+	remove: function(){
+		this.obj.mass = undefined;
+		this.hide();
+		removeListener(curLevel, 'update', 'moveWalls');
+		removeListener(curLevel, 'update', 'addGravity');
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

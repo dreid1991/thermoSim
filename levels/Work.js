@@ -20,13 +20,12 @@ function Work(){
 	this.blockIdx=-1;
 	this.g = 1.75;
 	this.prompts=[
-		{block:0, title: "", finished: false, text:""},
-		{block:1, title: "Current step", finished: false, text:"Alright, let’s fit a model to what we just described.  Above we have a piston and cylinder setup.  You can change the piston’s pressure with the pressure slider. Now these molecules undergo perfectly elastic collisions when they hit a wall.  That is to say they behave like a bouncy ball would when you throw it against the wall.  If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving, that is not true.  If you compress the cylinder, the gas will heat up.  Can you relate the change in gas speed and temperature to the bouncy ball model?"},
-		{block:2, title: "Current step", finished: false, text:""},
-
+		{block:0, title: '', finished: false, text:""},
+		{block:1, title: 'Current step', finished: false, text:"Alright, let’s fit a model to what we just described.  Above we have a piston and cylinder setup.  You can change the piston’s pressure with the pressure slider.  If you compress the system, how does the temperature behave?  Does this make sense in the context of doing work on the system? "},
+		{block:1, title: 'Current step', finished: false, text:"Now these molecules undergo perfectly elastic collisions when they hit a wall.  That is to say they behave like a bouncy ball would when you throw it against a wall.  If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving, that is not true.  "},
+		{block:2, title: 'Current step', finished: false, text:""},
 	]
 	walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
-	walls.setup();
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
 	this.minY = 30;
 	this.maxY = 350;
@@ -82,35 +81,33 @@ _.extend(Work.prototype,
 		console.log('here');
 		var self = this;
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
-		walls.setup();
 		walls.setSubWallHandler('container', 0, {func:this.cPAdiabaticDamped, obj:this});		
 		populate('spc1', P(45,35), V(460, 350), 800, 300);
 		populate('spc3', P(45,35), V(450, 350), 600, 300);
-		//populate('spc3', P(45,35), V(450, 350), 1, 300);
 		
-		//this.readout.addEntry('temp', 'Temperature:', 'K', dataHandler.temp(), 0, 0);
-		//this.readout.show();
 		$('#canvasDiv').show();
 		$('#clearGraphs').hide();
 		$('#dashRun').show();
 		$('#sliderPressureHolder').show();
 		$('#base').show();
-		/*
-		addListener(curLevel, 'data', 'measureTemp', function(){
-			var temps = this.data.t;
-			var tempLast = temps[temps.length-1];
-			this.readout.tick(tempLast, 'temp');
-		},
-		this);
-		*/
-		addListener(curLevel, 'update', 'moveWalls', this.moveWalls, this);
-		addListener(curLevel, 'update', 'addGravity', this.addGravity, this);
-		
 
+		
+		
+		this.graphs.pVSv = new GraphScatter('pVSv', 400,275, "Volume (L)", "Pressure (atm)",
+							{x:{min:0, step:4}, y:{min:0, step:3}});
+		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
+							{x:{min:0, step:4}, y:{min:250, step:50}});
+		this.graphs.pVSv.addSet('p', 'P Int.', Col(50,50,255), Col(200,200,255),
+								{data:this.data, x:'v', y:'p'});
+
+		this.graphs.tVSv.addSet('t', 'Sys\nTemp', Col(255,0,0), Col(255,200,200),
+								{data:this.data, x:'v', y:'t'});		
+		
+		
 		this.piston = new Piston('tootoo', 500, function(){return walls.pts[0][0].y}, 40, 470, c, 2, function(){return self.g}, this);
 		this.piston.show();
-		//this.piston.trackWork();
-		//this.piston.trackPressure();
+		this.piston.trackWork();
+		this.piston.trackPressure();
 		var ptsToBorder = this.getPtsToBorder();
 		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container', c);
 		//this.heater = new Heater('spaceHeater', P(150,360), V(250,50), 0, 20, c);//P(40,425), V(470,10)
@@ -119,26 +116,19 @@ _.extend(Work.prototype,
 	},
 
 	block1CleanUp: function(){
+		this.removeAllGraphs();
 		this.readout.removeAllEntries();
 		this.readout.hide();
+		this.piston.remove();
+		this.piston = undefined;
 		removeListener(curLevel, 'update', 'moveWalls');
 		removeListener(curLevel, 'update', 'addGravity');
-		walls.setWallHandler(0, {func:this.onWallImpactSides, obj:this})
+		walls.setWallHandler(0, {func:this.staticAdiabatic, obj:this})
 	},
 	block2Start: function(){
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
 		populate('spc1', P(45,35), V(460, 350), 1, 300);
 	},
-
-	getPtsToBorder: function(){
-		var pts = [];
-		var wallPts = walls.pts[0];
-		pts.push(wallPts[1].copy())
-		pts.push(wallPts[2].copy());
-		pts.push(wallPts[3].copy());
-		pts.push(wallPts[4].copy());
-		return pts;
-	},
-//HOLD ON - YOU HAVE TWO.  FIGGER IT OUT.
 	getPtsToBorder: function(){
 		var pts = [];
 		var wallPts = walls.pts[0];

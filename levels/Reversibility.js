@@ -43,7 +43,7 @@ function Reversibility(){
 	this.dragWeights = this.makeDragWeights();
 	
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
-	walls.setup();
+	;
 	//walls.setSubWallHandler(0, 0, {func:this.onWallImpactTop, obj:this});
 	this.workTracker = new WorkTracker('tracky',
 										function(){return walls.pts[0][0].y},
