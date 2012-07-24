@@ -52,7 +52,8 @@ _.extend(Work.prototype,
 		"Today we're going to try to figure out why work does work.  Let's start with the equations that relate work to a temperature change:"+
 		//equations
 		"<p>This equation says that work is equal to how hard you push on a container times how much you compress it.  It also says that as you compress that container, the gas inside heats up.  But why does that happen?  What is it about pushing on a container makes its molecules speed up?</p>"+
-		"<p> One might say that it’s because energy is being added, and that is true, but we’re going to try to pin down the physical event that makes a molecule speed up as a result of the container compressing."
+		"<p> One might say that it’s because energy is being added, and that is true, but we’re going to try to pin down the physical event that makes a molecule speed up as a result of the container compressing.",
+		'intro'
 		);
 		
 	},

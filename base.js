@@ -5,6 +5,7 @@ $(function(){
 	$('#dashIntro').hide();
 	$('#dashRun').hide();
 	$('#dashOutro').hide();
+	$('#dashCutScene').hide();
 	$('#display').hide();
 	$('#intText').hide();
 	canvas = document.getElementById("myCanvas");
