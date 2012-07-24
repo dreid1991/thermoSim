@@ -1,4 +1,5 @@
 function WallHandler(pts, handlers, handles){
+	this.hitMode = 'Std';
 	this.pts = pts;
 	this.handles = handles;
 	this.gridDim=20;
@@ -28,6 +29,9 @@ WallHandler.prototype = {
 			this.setupWall(wallIdx);
 		}
 		
+	},
+	setHitMode: function(inputMode){
+		this.hitMode = inputMode;
 	},
 	doInitHandlers: function(handlers){
 		
@@ -83,13 +87,6 @@ WallHandler.prototype = {
 	setPtsInit: function(){
 		for (var wallIdx=0; wallIdx<this.pts.length; wallIdx++){
 			this.ptsInit[wallIdx] = this.copyWall(this.pts[wallIdx]);
-		}
-	},
-	setExtras: function(func){
-		if(func){
-			this.extras = func;
-		}else{
-			this.extras = undefined;
 		}
 	},
 	restoreWall: function(wallIdx){
@@ -282,33 +279,40 @@ WallHandler.prototype = {
 		}
 	},
 	checkWallHit: function(dot, line){
-		var wallPt = walls.pts[line[0]][line[1]];
-		var wallUV = this.wallUVs[line[0]][line[1]];
-		var perpUV = this.wallPerpUVs[line[0]][line[1]]
+		var wallIdx = line[0];
+		var subWallIdx = line[1];
+		var wallPt = this.pts[wallIdx][subWallIdx];
+		var wallUV = this.wallUVs[wallIdx][subWallIdx];
+		var perpUV = this.wallPerpUVs[wallIdx][subWallIdx]
 		var dotVec = V(dot.x + dot.v.dx - perpUV.dx*dot.r - wallPt.x, dot.y + dot.v.dy - perpUV.dy*dot.r - wallPt.y);
 		var distFromWall = perpUV.dotProd(dotVec);
 		var perpV = -perpUV.dotProd(dot.v);
-		if (distFromWall<0 && distFromWall>-30 && this.isBetween(dot, line, wallUV)){
-			var handler = this.handlers[line[0] + '-' + line[1]];
-			handler.func.apply(handler.obj,[dot, line, wallUV, perpV, perpUV, this.extras]);
+		if (distFromWall<0 && distFromWall>-30 && this.isBetween(dot, wallIdx, subWallIdx, wallUV)){
+			this['didHit'+this.hitMode](dot, wallIdx, subWallIdx, wallUV, perpV, perpUV);
 		}
 	},
-	isBetween: function(dot, line, wallUV){
+	isBetween: function(dot, wallIdx, subWallIdx, wallUV){
 		var wallAdjust = dot.v.dotProd(wallUV);
 		var xAdj = wallAdjust*wallUV.dx;
 		var yAdj = wallAdjust*wallUV.dy;
-		var wallPtA = P(walls.pts[line[0]][line[1]].x+xAdj, walls.pts[line[0]][line[1]].y+yAdj);
-		var wallPtB = P(walls.pts[line[0]][line[1]+1].x+xAdj, walls.pts[line[0]][line[1]+1].y+yAdj);
+		var wallPtA = P(walls.pts[wallIdx][subWallIdx].x+xAdj, walls.pts[wallIdx][subWallIdx].y+yAdj);
+		var wallPtB = P(walls.pts[wallIdx][subWallIdx+1].x+xAdj, walls.pts[wallIdx][subWallIdx+1].y+yAdj);
 		var reverseWallUV = V(-wallUV.dx, -wallUV.dy);
 		var dotVecA = V(dot.x-wallPtA.x, dot.y-wallPtA.y);
 		var dotVecB = V(dot.x-wallPtB.x, dot.y-wallPtB.y);
 		return (dotVecA.dotProd(wallUV)>=0 && dotVecB.dotProd(reverseWallUV)>=0)
 	},
-	impactStd: function(dot, wallUV, perpV){
-		dot.v.dx -= 2*wallUV.dy*perpV;
-		dot.v.dy += 2*wallUV.dx*perpV;
-		dot.x -= wallUV.dy
-		dot.y += wallUV.dx
+	didHitStd: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
+		var handler = this.handlers[wallIdx + '-' + subWallIdx];
+		handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);		
+	},
+	didHitArrow: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
+		var vo = dot.v.copy();
+		var handler = this.handlers[wallIdx + '-' + subWallIdx];
+		handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
+		var pos = P(dot.x, dot.y);
+		var vf = dot.v.copy();
+		this.drawArrow(pos, vo, vf, perpV);  // HEY - modify this so you can get deltaV for difference escape velocity (moving wall)
 	},
 	haveChecked: function(wall, list){
 		for (var listIdx=0; listIdx<list.length; listIdx++){
@@ -341,4 +345,32 @@ WallHandler.prototype = {
 		}
 		return SA;
 	},
+	
+	////////////////////////////////////////////////////////////
+	//EXTRAS
+	////////////////////////////////////////////////////////////
+	drawArrow: function(pos, vo, vf, perpV){
+		var arrowPts = new Array(3);
+		arrowPts[0] = pos.copy().movePt(vo.copy().mult(10).neg());
+		arrowPts[1] = pos.copy();
+		arrowPts[2] = pos.copy().movePt(vf.copy().mult(10));
+		var lifeSpan = 50;
+		var arrowTurn = 0;
+		var arrow = new Arrow(arrowPts, Col(255,0,0),c);
+		addListener(curLevel, 'update', 'drawArrow'+pos.x+pos.y,
+			function(){
+				arrow.draw();
+				arrowTurn++;
+				if(arrowTurn==lifeSpan){
+					removeListener(curLevel, 'update', 'drawArrow'+pos.x+pos.y);
+				}
+			},
+		this);//could be ''.  Do after other stuff is working.
+		var textPos = pos.copy().movePt(vf.mult(15));
+		var delV = 2*perpV*pxToMS;
+		animText({pos:textPos, col:Col(255,255,255), rotation:0, size:13}, 
+				{pos:textPos.copy().movePt({dy:-20}), col:curLevel.bgCol},
+				'calibri', 'deltaV = '+round(delV,1)+'m/s', 'center', 3000, c
+		);
+	},	
 }

@@ -1,7 +1,7 @@
 function WallCollideMethods(level){}
 
 WallCollideMethods.prototype = {
-	cPAdiabaticDamped: function(dot, line, wallUV, perpV, perpUV, extras){
+	cPAdiabaticDamped: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 		/*
 		To dampen wall speed , doing:
 		1 = dot
@@ -37,84 +37,44 @@ WallCollideMethods.prototype = {
 			dot.y = dot.y+dot.r;
 			this.wallV = (m1*vo1 + m2*vo2 - m1*dot.v.dy)/(m2*scalar);
 		}else{
-			var pt = walls.pts[line[0]][line[1]];
+			var pt = walls.pts[wallIdx][subWallIdx];
 			dot.v.dy = (vo1*(m1-m2)+2*m2*vo2)/(dot.m+m2);
 			this.wallV = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
 			dot.y = pt.y+dot.r;			
 		}
 		this.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
-		if(extras){
-			extras.apply(this, [{pos:P(dot.x, dot.y), vo:vo, vf:dot.v.copy(), dot:dot, perpV:perpV}]);
-		}
 	},	
-	cPAdiabatic: function(dot, line, wallUV, perpV, perpUV, extras){
+	cPAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 		var vo = dot.v.copy();
 		var vo1 = dot.v.dy;
 		var vo2 = this.wallV;
 		var m1 = dot.m;
 		var m2 = this.mass()	
-		var pt = walls.pts[line[0]][line[1]];
+		var pt = walls.pts[wallIdx][subWallIdx];
 		dot.v.dy = (vo1*(m1-m2)+2*m2*vo2)/(dot.m+m2);
 		this.wallV = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
 		dot.y = pt.y+dot.r;		
 		this.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
-		if(extras){
-			extras.apply(this, [{pos:P(dot.x, dot.y), vo:vo, vf:dot.v.copy(), dot:dot, perpV:perpV}]);
-		}		
 	},
-	staticAdiabatic: function(dot, line, wallUV, perpV, perpUV, extras){
-		var vo = dot.v.copy();
-		walls.impactStd(dot, wallUV, perpV);
+	staticAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
+		this.reflect(dot, wallUV, perpV);
 		this.forceInternal += 2*dot.m*Math.abs(perpV);
-		if(extras){
-			extras.apply(this, [{pos:P(dot.x, dot.y), vo:vo, vf:dot.v.copy(), dot:dot, perpV:perpV}]);
-		}
 	},
-	cVIsothermal: function(dot, line, wallUV, perpV, perpUV, extras){
-		var vo = dot.v.copy();
-		var perpUV = walls.wallPerpUVs[line[0]][line[1]]
+	cVIsothermal: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 		dot.y+=perpUV.dy;
-		walls.impactStd(dot, wallUV, perpV);
+		this.reflect(dot, wallUV, perpV);
 		this.forceInternal += 2*dot.m*Math.abs(perpV);
-		if(extras){
-			extras.apply(this, [{pos:P(dot.x, dot.y), vo:vo, vf:dot.v.copy(), dot:dot, perpV:perpV}]);
-		}
+		//this is really not correct, but it's not in use yet, so...
 	},
-	cVAdiabatic: function(dot, line, wallUV, perpV, perpUV, extras){
-		var vo = dot.v.copy();
+	cVAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 		dot.v.dy = -vo.dy + 2*this.wallV;
 		this.forceInternal += dot.m*(perpV + dot.v.dy);
-		if(extras){
-			extras.apply(this, [{pos:P(dot.x, dot.y), vo:vo, vf:dot.v.copy(), dot:dot, perpV:perpV}]);
-		}
+	},
+	reflect: function(dot, wallUV, perpV){
+		dot.v.dx -= 2*wallUV.dy*perpV;
+		dot.v.dy += 2*wallUV.dx*perpV;
+		dot.x -= wallUV.dy
+		dot.y += wallUV.dx
 	},
 
-	////////////////////////////////////////////////////////////
-	//EXTRAS
-	////////////////////////////////////////////////////////////
-	drawArrow: function(hitResult){
-		var perpV = hitResult.perpV;
-		var arrowPts = new Array(3);
-		arrowPts[0] = hitResult.pos.copy().movePt(hitResult.vo.copy().mult(10).neg());
-		arrowPts[1] = hitResult.pos;
-		arrowPts[2] = hitResult.pos.copy().movePt(hitResult.vf.copy().mult(10));
-		var lifeSpan = 50;
-		var arrowTurn = 0;
-		var arrow = new Arrow(arrowPts, Col(255,0,0),c);
-		addListener(curLevel, 'update', 'drawArrow'+hitResult.pos.x+hitResult.pos.y,
-			function(){
-				arrow.draw();
-				arrowTurn++;
-				if(arrowTurn==lifeSpan){
-					removeListener(curLevel, 'update', 'drawArrow'+hitResult.pos.x+hitResult.pos.y);
-				}
-			},
-		this);//could be ''.  Do after other stuff is working.
-		var textPos = hitResult.pos.copy().movePt(hitResult.vf.mult(15));
-		var delV = 2*perpV*pxToMS;
-		animText({pos:textPos, col:Col(255,255,255), rotation:0, size:13}, 
-				{pos:textPos.copy().movePt({dy:-20}), col:this.bgCol},
-				'calibri', 'deltaV = '+round(delV,1)+'m/s', 'center', 3000, c
-		);
-	}	
 }

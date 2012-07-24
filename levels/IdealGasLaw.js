@@ -270,7 +270,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		this.playedWithSlider = new Boolean();
 		this.playedWithSlider = false;
 		walls = new WallHandler([[P(50,75), P(75,50), P(475,50), P(500,75), P(500,300), P(475,325), P(75,325), P(50,300)]], {func:this.staticAdiabatic, obj:this}, ['container']);
-		walls.setExtras(this.drawArrow);
+		walls.setHitMode('Arrow');
 		;
 		populate('spc4', P(100,100), V(300,200), 1, 700);
 		//addListener(curLevel, 'wallImpact', 'arrow', this.onWallImpactArrow, this);
@@ -281,7 +281,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		return this.block1Conditions();
 	},
 	block9CleanUp: function(){
-		walls.setExtras();
+		walls.setHitMode('Std');
 		this.playedWithSlider = undefined;
 		$('#longSliderHolder').hide();
 		$('#sliderPressure').hide();
