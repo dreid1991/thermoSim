@@ -93,28 +93,17 @@ _.extend(Reversibility.prototype,
 		nextPrompt();
 	},
 	block0Start: function(){
-		this.pause();
-		this.hideDash();
-		this.hideBase();
-		$('#canvasDiv').hide()
-		$('#graphs').hide()
-		$('#dashIntro').show();
-		$('#intText').show().html("Let’s look at reversibility.  When someone says a process is reversible, they mean that all of the work done to compress (or expand) the system can be recovered by bringing the container back to its original volume.  This means that the system experiences no net energy or temperature change after going through the compression/expansion cycle.</p>"+
+		this.cutSceneStart("Let’s look at reversibility.  When someone says a process is reversible, they mean that all of the work done to compress (or expand) the system can be recovered by bringing the container back to its original volume.  This means that the system experiences no net energy or temperature change after going through the compression/expansion cycle.</p>"+
 			"<p>The definition of a reversible process says that P<sub>internal</sub>, the pressure exerted by the gas on the walls of the container, always equals P<sub>external</sub>, the pressure from an outside force.  Starting from the definition of work, we get</p>"+
 			"<center><img src = img/reversibility1.gif></img></center><br>"+
-			"In this simulation, we're going to try to figure out a physical model of how reversibility works."
-		);
+			"In this simulation, we're going to try to figure out a physical model of how reversibility works.", 
+			'intro');
+		$('#graphs').hide()
 		
 	},
 	block0CleanUp: function(){
-		this.hideDash();
 		$('#graphs').show()
-		$('#canvasDiv').show();
-		$('#display').hide();
-		$('#intText').hide();
-		$('#dashRun').show();
-		$('#base').show();
-		this.resume();	
+		this.cutSceneEnd();
 	},
 	block1Start: function(){
 		this.addDots();
@@ -185,34 +174,22 @@ _.extend(Reversibility.prototype,
 		}
 	},
 	block4aConditions: function(){
-		return this.block2aConditions();
+		return this.block3aConditions();
 	},
 	block4bConditions: function(){
-		return this.block2cConditions();
+		return this.block3cConditions();
 	},
 	block5Start: function(){
-		this.pause()
-		this.hideDash();
-		this.hideBase();
-		$('#canvasDiv').hide()
-		$('#display').show();
-		$('#intText').show().html("Now we must journey into the land of abstraction.  You may have picked up on a trend that the smaller your block size, the more reversibile your cycle becomes.  If a smaller block size makes a cycle more reversible, what block size would make a process completely reversible, such that we can get all of the energy back out?</p>"+
-			"<p>Infinitely small blocks, you say?  Yes, that’s correct!  Let’s go through why.  When you lifted the big block on to the uncompressed piston, you did more work than you had to.  In fact, all you had to do to compress the piston was to lift a tiny weight, like a grain of sand, or more precisely, a <a href = http://en.wikipedia.org/wiki/Differential_(infinitesimal)>differential element target='_blank'</a>.</p>"+
+		this.cutSceneStart("Now we must journey into the land of abstraction.  You may have picked up on a trend that the smaller your block size, the more reversibile your cycle becomes.  If a smaller block size makes a cycle more reversible, what block size would make a process completely reversible, such that we can get all of the energy back out?</p>"+
+			"<p>Infinitely small blocks, you say?  Yes, that’s correct!  Let’s go through why.  When you lifted the big block on to the uncompressed piston, you did more work than you had to.  In fact, all you had to do to compress the piston was to lift a tiny weight, like a grain of sand, or more precisely, a <a href = http://en.wikipedia.org/wiki/Differential_(infinitesimal) target='_blank'>differential element </a>.</p>"+
 			"<p>With each new element we put on top, the system compresses by a differential amount, which corresponds to a height, and thus potential energy change of zero.  That means that we can take that element back off the piston and get all the energy we put in back out.  If we’re using weights of any non-zero size, this isn’t true, since the piston will have compressed some non-zero amount, making the height at which we can take it off lower than the height at which we put it on.  That energy we can’t get back out stays in the system resulting in a temperature increase.</p>"+
 			"<p>By added differential weight elements to the piston, we are making infinitesimally small changes to P<sub>ext</sub>, so might we say that in this compression,  P<sub>ext</sub> = P<sub>int</sub>?  Why we’ve stumbled upon the condition for reversibility!</p>"+
-			"<p>So, can any real process be reversible?  Hint: No, you can only approach reversibility.  Even if you compress with gas very slowly, you’re still adding one gas molecule at a time, and that creates a very small, but still non-zero pressure change.</p>"
+			"<p>So, can any real process be reversible?  Hint: No, you can only approach reversibility.  Even if you compress with gas very slowly, you’re still adding one gas molecule at a time, and that creates a very small, but still non-zero pressure change.</p>",
+			'outro'
 		);
-		$('#dashOutro').show();	
 	},
 	block5CleanUp: function(){
-		this.hideDash();
-		$('#graphs').show();
-		$('#canvasDiv').show();
-		$('#display').hide();
-		$('#intText').hide();
-		$('#dashRun').show();
-		$('#base').show();	
-		this.resume();
+		this.cutSceneEnd();
 	},
 	getPtsToBorder: function(){
 		var pts = [];

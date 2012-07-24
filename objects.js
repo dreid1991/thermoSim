@@ -657,6 +657,7 @@ function DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, l
 	this.pts.outer.push(P(0,0));
 	this.makeDrawFunc();
 	this.clickListeners = this.makeListenerFuncs();
+	return this;
 }
 DragArrow.prototype = {
 
@@ -798,14 +799,17 @@ DragArrow.prototype = {
 	show: function(){
 		addListener(curLevel, 'mousedown', 'dragArrow'+this.name, this.clickListeners, '');
 		addListener(curLevel, 'update', 'drawDragArrow'+this.name, this.draw, '');
+		return this;
 	},
 	hide: function(){
 		removeListener(curLevel, 'mousedown', 'dragArrow'+this.name);
 		removeListener(curLevel, 'update', 'drawDragArrow'+this.name);	
+		return this;
 	},
 	reset: function(){
 		this.pos = this.posInit.copy();
 		removeListener(curLevel, 'update', 'moveWall');
+		return this;
 	},
 	remove: function(){
 		removeListener(curLevel, 'mousedown', 'dragArrow'+this.name);

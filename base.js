@@ -1,3 +1,37 @@
+//shared startup stuff
+$(function(){
+	$('#canvasDiv').hide();
+	$('#base').hide();
+	$('#dashIntro').hide();
+	$('#dashRun').hide();
+	$('#dashOutro').hide();
+	$('#display').hide();
+	$('#intText').hide();
+	canvas = document.getElementById("myCanvas");
+	c = canvas.getContext("2d");	
+	sliderList = [];
+	spcs = {};
+	draw = new drawingTools();
+	collide = new CollideHandler();
+	R = 8.314;
+	vConst = 1/10000;
+	pConst = 16.1423;
+	LtoM3 = .001;
+	ATMtoPA = 101325;
+	JtoKJ = .001;
+	cp = 2*R;//joules/(kelvin*mole)
+	N = 1000;//Avagadro's number
+	//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
+	pxToMS = 157.9;
+	tConst = 20;
+	workConst = .158e-3;//for kJ;
+	updateInterval = 30;
+	dataInterval = 2000;
+	setInterval('curLevel.update()', updateInterval);
+	setInterval('curLevel.addData()', dataInterval);
+})
+
+
 drawingTools.prototype = {
 
 	clear: function(col){
@@ -302,7 +336,10 @@ function removeListener(object, typeName, funcName){
 }
 function removeListenerByName(object, typeName, pieceToRemoveBy){
 	var funcName = getListenerByName(object, typeName, pieceToRemoveBy);
-	delete object[typeName+'Listeners'].listeners[funcName]
+	while (funcName!==undefined){
+		delete object[typeName+'Listeners'].listeners[funcName];
+		funcName = getListenerByName(object, typeName, pieceToRemoveBy);
+	}
 }
 function listenerExists(object, typeName, funcName){
 	return object[typeName + 'Listeners'].listeners[funcName]!==undefined;
@@ -361,12 +398,18 @@ function makeSlider(id, attrs, handlers, initVisibility){
 	if(initVisibility){
 		div[initVisibility]();
 	}
+	sliderList.push(id);
 	return div;
 }
 function sliderBind(div, eventType, func, obj){
 	div.bind(eventType, function(event, ui){func.apply(obj, [event, ui])});
 }
-
+function hideSliders(){
+	for (var idIdx=0; idIdx<sliderList.length; idIdx++){
+		var id = sliderList[idIdx];
+		$('#'+id).hide();
+	}
+}
 function showPrompt(prev, prompt){
 	var finishedPrev = new Boolean();
 	var forward = new Boolean();
@@ -540,16 +583,6 @@ function replaceString(source, oldStr, newStr){
 	}
 	return source;
 } 
-var canvas;
-var c; 
-/*
-HEY - I MADE IT SO THIS RUNS ON LOAD RATHER THAN AFTER EVERYTHING ELSE IS LOADED.
-SEEMS TO WORK AND MAKES IT SO I CAN SEND CANVASES AROUND IN INIT
-*/
-//$(function(){
-	canvas = document.getElementById("myCanvas");
-	c = canvas.getContext("2d");
-//})
 
 function extend(old, add){
 	return function(){
@@ -593,26 +626,9 @@ function UNLOCK(){
 		curLevel.prompts[promptIdx].finished=true;
 	}
 }
-spcs = {};
-draw = new drawingTools();
-collide = new CollideHandler();
-R = 8.314;
-vConst = 1/10000;
-pConst = 16.1423;
-LtoM3 = .001;
-ATMtoPA = 101325;
-JtoKJ = .001;
-cp = 2*R;//joules/(kelvin*mole)
-N = 1000;//Avagadro's number
-//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
-pxToMS = 157.9;
-tConst = 20;
-workConst = .158e-3;//for kJ;
-updateInterval = 30;
-dataInterval = 2000;
 
 
 
 
-setInterval("curLevel.update()", updateInterval);
-setInterval("curLevel.addData()", dataInterval);
+
+

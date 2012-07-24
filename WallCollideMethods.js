@@ -67,8 +67,9 @@ WallCollideMethods.prototype = {
 		//this is really not correct, but it's not in use yet, so...
 	},
 	cVAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
-		dot.v.dy = -vo.dy + 2*this.wallV;
-		this.forceInternal += dot.m*(perpV + dot.v.dy);
+		var v = dot.v;
+		v.dy = -v.dy + 2*this.wallV;
+		this.forceInternal += dot.m*(perpV + v.dy);
 	},
 	reflect: function(dot, wallUV, perpV){
 		dot.v.dx -= 2*wallUV.dy*perpV;

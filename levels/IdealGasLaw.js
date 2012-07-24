@@ -62,25 +62,13 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 	block0Start: function(){
 		//var ptsToBorder = this.getPtsToBorder();
 		//border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container',c);
-		this.pause()
-		this.hideDash();
-		this.hideBase();
-		$('#canvasDiv').hide()
-		$('#graphs').hide()
-		$('#display').show();
-		$('#intText').show().html("<p>Good morning!</p><p>Today, we’re going to consider the ideal gas law.  Specifically, we’re going to figure out why PV does in fact equal nRT, and we’re going to do so from a molecular perspective.  To do this, we’ll need to look at how temperature, pressure, and volume represent themselves on a molecular level. Once that’s understood, we can try to build the relations in the ideal gas law ourselves to get a better understanding of why they're true. </p><p>Let’s begin, shall we?</p>");
-		$('#dashIntro').show();
+		this.cutSceneStart("<p>Good morning!</p><p>Today, we’re going to consider the ideal gas law.  Specifically, we’re going to figure out why PV does in fact equal nRT, and we’re going to do so from a molecular perspective.  To do this, we’ll need to look at how temperature, pressure, and volume represent themselves on a molecular level. Once that’s understood, we can try to build the relations in the ideal gas law ourselves to get a better understanding of why they're true. </p><p>Let’s begin, shall we?</p>",
+		'intro');
+
 		
 	},
 	block0CleanUp: function(){
-		this.hideDash();
-		$('#intText').hide()
-		$('#graphs').show()
-		$('#canvasDiv').show()
-		$('#display').hide();
-		$('#dashRun').show();
-		$('#base').show();
-		this.resume();	
+		this.cutSceneEnd();
 	},
 	block1Start: function(){
 		$('#longSliderHolder').show();
@@ -148,21 +136,13 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 
 		this.spcA = undefined;
 		this.spcB = undefined;
-		this.pause();
-		$('#canvasDiv').hide();
-		$('#display').show();
-		$('#intText').show();
-		$('#intText').html("<p>So, we had two comparisons.</p>  <p>In the first, we had identical gases, but the molecules in one chamber moved more quickly.  The container with the fast moving molecules was hotter because its molecules had a higher average kinetic energy. </p>"+
+		this.cutSceneStart("<p>So, we had two comparisons.</p>  <p>In the first, we had identical gases, but the molecules in one chamber moved more quickly.  The container with the fast moving molecules was hotter because its molecules had a higher average kinetic energy. </p>"+
 		"<p>In the second set, we had a container with a light gas and a container with a heavy gas, but they had the same root mean squared speed.  We can calculate the average kinetic energy of the molecules in each container with</p><center><img src=img/ideal/IdealGasRMS.gif></img></center>"+
 		"<p>This shows us that the average kinetic energy of the heavy gas was greater, but we didn’t <i>need</i> to calculate anything to figure that out.  We know that if two objects have the same speed, the heavier one has more kinetic energy.  This intuition applies to molecules too, and we can say just by looking that the heavier molecules had a higher temperature. </p>"+
 		"<p>So higher temperature doesn’t necessarily mean your gas molecules are moving at a higher speed.  It means your gas molecules are moving with <i>more energy</i>.</p>");
 	},
 	block5CleanUp: function(){
-		this.resume();
-		$('#canvasDiv').show();
-		$('#display').hide();
-		$('#intText').hide();
-		$('#intText').html("");	
+		this.cutSceneEnd();
 	},
 	block6Start: function(){
 		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
@@ -222,18 +202,10 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 	},
 
 	block7Start: function(){
-		this.pause();
-		$('#canvasDiv').hide();
-		$('#display').show();
-		$('#intText').show();
-		$('#intText').html("<p>I see you made it through unscathed.  That’s good!</p><p>Let’s make sure we did that problem the same way.</p><p>First, you can arbitrarily pick an RMS for one of the containers since the temperatures just have to be equal.  Then we can relate RMS to temperature like this:<br><center><img src=img/ideal/block7a.gif></img></center>Since the temperatures of the two containers were equal, you can set the average kinetic energies equal to each other:<br><center><img src=img/ideal/block7b.gif></img></center><p>Finally, you can solve for the unknown RMS like so:</p><center><img src=img/ideal/block7c.gif></img></center>");
+		this.cutSceneStart("<p>I see you made it through unscathed.  That’s good!</p><p>Let’s make sure we did that problem the same way.</p><p>First, you can arbitrarily pick an RMS for one of the containers since the temperatures just have to be equal.  Then we can relate RMS to temperature like this:<br><center><img src=img/ideal/block7a.gif></img></center>Since the temperatures of the two containers were equal, you can set the average kinetic energies equal to each other:<br><center><img src=img/ideal/block7b.gif></img></center><p>Finally, you can solve for the unknown RMS like so:</p><center><img src=img/ideal/block7c.gif></img></center>");
 	},
 	block7CleanUp: function(){
-		this.resume();
-		$('#canvasDiv').show();
-		$('#display').hide();
-		$('#intText').hide();
-		$('#intText').html("");	
+		this.cutSceneEnd();
 	},
 	block8Start: function(){
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
@@ -284,14 +256,10 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		
 	},
 	block10Start: function(){
-		this.pause();
-		$('#canvasDiv').hide();
-		$('#display').show();
-		$('#intText').show();
-		
+		this.cutSceneStart();		
 	},
 	block10aStart:function(){
-		$('#intText').html("<p>So we have two ideas at play here:</p><p><ul><li>First, the harder your molecules hit the wall, the more force each collision exerts on it.</p>"+
+		this.cutSceneText("<p>So we have two ideas at play here:</p><p><ul><li>First, the harder your molecules hit the wall, the more force each collision exerts on it.</p>"+
 		"<p><li>Second, the faster they're moving, the more often they hit the wall.</ul></p>"+
 		"<p>Both of these things are <i>linearly</i> dependant on molecular speed.</p>"+
 		"<p>The total force applied to the walls by the molecules is the product of these two, so multiplying, we get that pressure is proportional to mass times speed squared, or to temperature.</p>"+
@@ -299,7 +267,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		);
 	},
 	block10bStart: function(){
-		$('#intText').html("Say we have a molecule of mass m moving as follows:"+
+		this.cutSceneText("Say we have a molecule of mass m moving as follows:"+
 			"<center><img src=img/ideal/pressureSetup.gif></img></center>"+
 			"Starting from"+
 			"<center><img src=img/ideal/pggfa.gif></img> and <img src = img/ideal/fma.gif></center>"+
@@ -312,7 +280,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 			);
 	},
 	block10cStart: function(){
-		$('#intText').html("<center><img src=img/ideal/pressureSetup.gif></img></center>"+
+		this.cutSceneText("<center><img src=img/ideal/pressureSetup.gif></img></center>"+
 		"Because we're looking for an average pressure, we average out the momentum change over the whole time between impacts, which is given by"+
 		"<center><img src=img/ideal/delt.gif></img></center>"+
 		"This gives us the second idea.<br>"+
@@ -324,11 +292,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 	},
 
 	block10CleanUp: function(){
-		this.resume();
-		$('#intText').html('');
-		$('#canvasDiv').show();
-		$('#display').hide();
-		$('#intText').hide();
+		this.cutSceneEnd();
 	},
 	block11Start: function(){
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
@@ -337,8 +301,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container', c);
 		populate('spc1', P(45,35), V(450, 350), 800, 300);
 		populate('spc3', P(45,35), V(450, 350), 600, 300);	
-		this.compArrow = this.makeCompArrow({compMode:'isothermal'});
-		this.compArrow.show();
+		this.compArrow = this.makeCompArrow({mode:'isothermal'});
 		var arrowVolInit = new Arrow([P(545, 30), P(510, 30)], Col(255,0,0), c);
 		var arrowVolHalf = new Arrow([P(545, 235), P(510, 235)], Col(0,255,0), c);
 		addListener(curLevel, 'update', 'drawVolArrows', 
@@ -411,28 +374,16 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		this.readout.removeAllEntries();
 		this.readout.hide();
 		this.compArrow.remove();
-		this.drawArrow = undefined;
+		this.compArrow = undefined;
 	},
 	block12Start: function(){
-		this.pause();
-		$('#canvasDiv').hide();
-		$('#display').show();
-		$('#intText').show();
-		$('#intText').html("<p>Remember how we looked at the side length of a container, L<sub>x</sub> to find the time between collisions?  If you imagine that L<sub>x</sub> is the vertical dimension of the previous container, every time you halve L<sub>x</sub>, you halve the average time between collisions, doubling the number of wall impacts per time and thus doubling pressure.   From this inverse relationship, might we propose the following:</p><p><center><img src=img/ideal/orientPalphaV.gif></img></center></p><p>Similarly, might we say that if we double the number of molecules, we would double the number of collisions per time and so double pressure?  So we get</p><p><center><img src=img/ideal/orientPalphaN.gif></img></center></p><p>Would the above relationships be true if temperature were not held constant?  Try to relate your answer to frequency and momentum of collisions with the wall.</p>");
+		this.cutSceneStart("<p>Remember how we looked at the side length of a container, L<sub>x</sub> to find the time between collisions?  If you imagine that L<sub>x</sub> is the vertical dimension of the previous container, every time you halve L<sub>x</sub>, you halve the average time between collisions, doubling the number of wall impacts per time and thus doubling pressure.   From this inverse relationship, might we propose the following:</p><p><center><img src=img/ideal/orientPalphaV.gif></img></center></p><p>Similarly, might we say that if we double the number of molecules, we would double the number of collisions per time and so double pressure?  So we get</p><p><center><img src=img/ideal/orientPalphaN.gif></img></center></p><p>Would the above relationships be true if temperature were not held constant?  Try to relate your answer to frequency and momentum of collisions with the wall.</p>");
 	},
 	block12CleanUp: function(){
-		this.resume();
-		$('#intText').html('');
-		$('#canvasDiv').show();
-		$('#display').hide();
-		$('#intText').hide();	
+		this.cutSceneEnd();
 	},
 	block13Start: function(){
-		this.pause();
-		$('#canvasDiv').hide();
-		$('#display').show();
-		$('#intText').show();
-		$('#intText').html("<p>Alright, let's put it all together!</p>"+
+		this.cutSceneStart("<p>Alright, let's put it all together!</p>"+
 		"<p>From combining impact frequency and speed, we got</p><center><img src=img/ideal/orientPalphaT.gif></img></center>"+
 		"<p>By figuring out that if we halve the size, we double the number of collisions, we got</p><center><img src=img/ideal/orientPalphaV.gif></img></center>"+
 		"<p>By saying that if we double the number of molecules, we double the number of collisions, we got</p><center><img src=img/ideal/orientPalphaN.gif></img></center>"+
@@ -440,34 +391,18 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		);
 	},
 	block13CleanUp: function(){
-		this.resume();
-		$('#intText').html('');
-		$('#canvasDiv').show();
-		$('#display').hide();
-		$('#intText').hide();		
+		this.cutSceneEnd();		
 	},
 	block14Start: function(){
-		$('#intText').show().html("<p>If we multiply by the ideal gas constant, R, we can say</p><center><img src=img/ideal/orientPNRTV.gif></img></center>"+
+		this.cutSceneStart("<p>If we multiply by the ideal gas constant, R, we can say</p><center><img src=img/ideal/orientPNRTV.gif></img></center>"+
 			"<p>or</p>"+
 			"<center><img src=img/ideal/orientPVNRT.gif></img></center>"+
-			"<p>So we just developed the ideal gas law from a model of molecules being hard spheres that bounce around!  Yay!</p>")
-		this.pause();
-		$('#canvasDiv').hide()
-		$('#display').show();
-		$('#dashOutro').show();		
-		this.hideDash();
-		this.hideBase();
-		$('#dashOutro').show();
+			"<p>So we just developed the ideal gas law from a model of molecules being hard spheres that bounce around!  Yay!</p>"
+			, 'outro');
+
 	},
 	block14CleanUp: function(){
-		this.hideDash();
-		$('#intText').hide();
-		$('#graphs').show()
-		$('#canvasDiv').show()
-		$('#display').hide();
-		$('#dashRun').show();
-		$('#base').show();	
-		this.resume();
+		this.cutSceneEnd();
 
 		showPrompt(undefined, this.prompts[curLevel.promptIdx]);		
 	},

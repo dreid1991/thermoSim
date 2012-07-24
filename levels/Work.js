@@ -11,7 +11,7 @@ function Work(){
 	this.numUpdates = 0;
 	this.forceInternal = 0;
 	this.wallV = 0;
-
+	this.wallSpeed = 1;
 	this.makeListeners();
 	this.readout = new Readout('mainReadout', 30, myCanvas.width-180, 25, '13pt calibri', Col(255,255,255),this, 'left');
 	this.compMode = 'Isothermal';
@@ -24,7 +24,7 @@ function Work(){
 		{block:1, title: 'Current step', finished: false, text:"Alright, let’s fit a model to what we just described.  Above we have a piston and cylinder setup.  You can change the piston’s pressure with the pressure slider.  If you compress the system, how does the temperature behave?  Does this make sense in the context of doing work on the system?"},
 		{block:1, title: 'Current step', finished: false, text:"Now these molecules undergo perfectly elastic collisions when they hit a wall.  That is to say they behave like a bouncy ball would when you throw it against a wall.  If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving, that is not true."},
 		{block:2, title: 'Current step', finished: false, text:"Let’s see if we can relate that idea to work by looking at just one molecule. If you compress the cylinder, why does the molecule’s speed change?  How does this relate to temperature?"},
-		{block:3, title: '' finished:false, text:''}
+		{block:3, title: '', finished: false, text:''},
 	]
 	walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
@@ -48,14 +48,7 @@ _.extend(Work.prototype,
 	},
 
 	block0Start: function(){
-		this.pause()
-		this.hideDash();
-		this.hideBase();
-		$('#canvasDiv').hide();
-		$('#graphs').hide();
-		$('#display').show();
-		$('#dashIntro').show();
-		$('#intText').show().html("<p>Good afternoon!</p>"+
+		this.cutSceneStart("<p>Good afternoon!</p>"+
 		"Today we're going to try to figure out why work does work.  Let's start with the equations that relate work to a temperature change:"+
 		//equations
 		"<p>This equation says that work is equal to how hard you push on a container times how much you compress it.  It also says that as you compress that container, the gas inside heats up.  But why does that happen?  What is it about pushing on a container makes its molecules speed up?</p>"+
@@ -64,18 +57,10 @@ _.extend(Work.prototype,
 		
 	},
 	block0CleanUp: function(){
-		this.hideDash();
-		$('#graphs').show()
-		$('#canvasDiv').show();
-		$('#display').hide();
-		$('#intText').hide();
-		$('#dashRun').show();
-		$('#base').show();
-		this.resume()	
+		this.cutSceneEnd()
 	},
 	
 	block1Start: function(){
-		console.log('here');
 		var self = this;
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
 		walls.setSubWallHandler('container', 0, {func:this.cPAdiabaticDamped, obj:this});		
@@ -113,6 +98,7 @@ _.extend(Work.prototype,
 	},
 
 	block1CleanUp: function(){
+		$('#sliderPressureHolder').hide();
 		this.removeAllGraphs();
 		this.readout.removeAllEntries();
 		this.readout.hide();
@@ -124,7 +110,17 @@ _.extend(Work.prototype,
 	},
 	block2Start: function(){
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
+		walls.setHitMode('Arrow');
+		this.compArrow = this.makeCompArrow({mode:'adiabatic'});
 		populate('spc1', P(45,35), V(460, 350), 1, 300);
+	},
+	block2CleanUp: function(){
+		this.compArrow.remove();
+		this.compArrow = undefined;
+		walls.setHitMode('Std');
+	},
+	block3Start: function(){
+		
 	},
 	getPtsToBorder: function(){
 		var pts = [];

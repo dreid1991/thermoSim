@@ -1,10 +1,10 @@
 function LevelTools(){}
 LevelTools.prototype = {
-	makeCompArrow: function(data){
-		var compMode = data.compMode;
+	makeCompArrow: function(compAttrs){
+		var compMode = compAttrs.mode;
 		var bounds;
-		if(data.bounds){
-			bounds = data.bounds;	
+		if(compAttrs.bounds){
+			bounds = compAttrs.bounds;	
 		}else{
 			bounds = {y:{min:this.minY, max:this.maxY}};
 		}
@@ -24,7 +24,7 @@ LevelTools.prototype = {
 		listeners.onUp = function(){};
 		
 
-		return new DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds);
+		return new DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds).show();
 	},
 	changeWallSetPt: function(dest, compType){
 		var wall = walls.pts[0]
@@ -68,6 +68,41 @@ LevelTools.prototype = {
 	checkWallHits: function(){
 		walls.check();
 	},
+	cutSceneStart: function(text, mode){
+		this.pause();
+		$('#dashRun').hide();
+		if(!mode){
+			$('#dashCutScene').show();
+		}else if(mode=='intro'){
+			$('#dashIntro').show();
+			$('#base').hide();
+		}else if(mode=='outro'){
+			$('#dashOutro').show();
+			$('#base').hide();
+		}
+		$('#canvasDiv').hide();
+		$('#display').show();
+		if(text){
+			$('#intText').html(text);
+		}
+		$('#intText').show();
+		
+	},
+	cutSceneText: function(text){
+		$('#intText').html(text);
+	},
+	cutSceneEnd: function(){
+		this.resume();
+		$('#intText').html('');
+		$('#dashRun').show();
+		$('#dashOutro').hide();
+		$('#dashIntro').hide();
+		$('#dashCutScene').hide();
+		$('#base').show();
+		$('#canvasDiv').show();
+		$('#display').hide();
+		$('#intText').hide();	
+	},
 	pause: function(){
 		saveListener(this, 'update');
 		saveListener(this, 'data');
@@ -82,9 +117,7 @@ LevelTools.prototype = {
 		$('#dashIntro').hide();
 		$('#dashRun').hide();
 		$('#dashOutro').hide();
-	},
-	hideBase: function(){
-		$('#base').hide();
+		$('#dashCutScene').hide();
 	},
 	moveWalls: function(){
 
@@ -159,6 +192,7 @@ LevelTools.prototype = {
 	removeAllGraphs: function(){
 		for (var graphName in this.graphs){
 			this.removeGraph(graphName);
+			delete this.graphs[graphName];
 		}	
 	},
 	makeListeners: function(){
