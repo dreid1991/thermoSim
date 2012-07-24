@@ -312,7 +312,8 @@ WallHandler.prototype = {
 		handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
 		var pos = P(dot.x, dot.y);
 		var vf = dot.v.copy();
-		this.drawArrow(pos, vo, vf, perpV);  // HEY - modify this so you can get deltaV for difference escape velocity (moving wall)
+		var perpVf = -perpUV.dotProd(dot.v);
+		this.drawArrow(pos, vo, vf, perpV, perpVf);  // HEY - modify this so you can get deltaV for difference escape velocity (moving wall)
 	},
 	haveChecked: function(wall, list){
 		for (var listIdx=0; listIdx<list.length; listIdx++){
@@ -349,7 +350,7 @@ WallHandler.prototype = {
 	////////////////////////////////////////////////////////////
 	//EXTRAS
 	////////////////////////////////////////////////////////////
-	drawArrow: function(pos, vo, vf, perpV){
+	drawArrow: function(pos, vo, vf, perpVo, perpVf){
 		var arrowPts = new Array(3);
 		arrowPts[0] = pos.copy().movePt(vo.copy().mult(10).neg());
 		arrowPts[1] = pos.copy();
@@ -367,7 +368,7 @@ WallHandler.prototype = {
 			},
 		this);//could be ''.  Do after other stuff is working.
 		var textPos = pos.copy().movePt(vf.mult(15));
-		var delV = 2*perpV*pxToMS;
+		var delV = (Math.abs(perpVo)+Math.abs(perpVf))*pxToMS;
 		animText({pos:textPos, col:Col(255,255,255), rotation:0, size:13}, 
 				{pos:textPos.copy().movePt({dy:-20}), col:curLevel.bgCol},
 				'calibri', 'deltaV = '+round(delV,1)+'m/s', 'center', 3000, c
