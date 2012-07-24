@@ -62,10 +62,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 	block0Start: function(){
 		//var ptsToBorder = this.getPtsToBorder();
 		//border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container',c);
-		saveListener(this, 'update');
-		saveListener(this, 'data');
-		emptyListener(this, "update");
-		emptyListener(this, "data");
+		this.pause()
 		this.hideDash();
 		this.hideBase();
 		$('#canvasDiv').hide()
@@ -83,8 +80,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		$('#display').hide();
 		$('#dashRun').show();
 		$('#base').show();
-		loadListener(this, 'update');
-		loadListener(this, 'data');		
+		this.resume();	
 	},
 	block1Start: function(){
 		$('#longSliderHolder').show();
@@ -152,8 +148,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 
 		this.spcA = undefined;
 		this.spcB = undefined;
-		saveListener(curLevel, 'update');
-		emptyListener(curLevel, 'update');
+		this.pause();
 		$('#canvasDiv').hide();
 		$('#display').show();
 		$('#intText').show();
@@ -163,7 +158,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		"<p>So higher temperature doesn’t necessarily mean your gas molecules are moving at a higher speed.  It means your gas molecules are moving with <i>more energy</i>.</p>");
 	},
 	block5CleanUp: function(){
-		loadListener(curLevel, 'update');
+		this.resume();
 		$('#canvasDiv').show();
 		$('#display').hide();
 		$('#intText').hide();
@@ -227,15 +222,14 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 	},
 
 	block7Start: function(){
-		saveListener(curLevel, 'update');
-		emptyListener(curLevel, 'update');
+		this.pause();
 		$('#canvasDiv').hide();
 		$('#display').show();
 		$('#intText').show();
 		$('#intText').html("<p>I see you made it through unscathed.  That’s good!</p><p>Let’s make sure we did that problem the same way.</p><p>First, you can arbitrarily pick an RMS for one of the containers since the temperatures just have to be equal.  Then we can relate RMS to temperature like this:<br><center><img src=img/ideal/block7a.gif></img></center>Since the temperatures of the two containers were equal, you can set the average kinetic energies equal to each other:<br><center><img src=img/ideal/block7b.gif></img></center><p>Finally, you can solve for the unknown RMS like so:</p><center><img src=img/ideal/block7c.gif></img></center>");
 	},
 	block7CleanUp: function(){
-		loadListener(curLevel, 'update');
+		this.resume();
 		$('#canvasDiv').show();
 		$('#display').hide();
 		$('#intText').hide();
@@ -290,8 +284,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		
 	},
 	block10Start: function(){
-		saveListener(curLevel, 'update');
-		emptyListener(curLevel, 'update');
+		this.pause();
 		$('#canvasDiv').hide();
 		$('#display').show();
 		$('#intText').show();
@@ -331,7 +324,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 	},
 
 	block10CleanUp: function(){
-		loadListener(curLevel, 'update');
+		this.resume();
 		$('#intText').html('');
 		$('#canvasDiv').show();
 		$('#display').hide();
@@ -421,23 +414,21 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		this.drawArrow = undefined;
 	},
 	block12Start: function(){
-		saveListener(curLevel, 'update');
-		emptyListener(curLevel, 'update');
+		this.pause();
 		$('#canvasDiv').hide();
 		$('#display').show();
 		$('#intText').show();
 		$('#intText').html("<p>Remember how we looked at the side length of a container, L<sub>x</sub> to find the time between collisions?  If you imagine that L<sub>x</sub> is the vertical dimension of the previous container, every time you halve L<sub>x</sub>, you halve the average time between collisions, doubling the number of wall impacts per time and thus doubling pressure.   From this inverse relationship, might we propose the following:</p><p><center><img src=img/ideal/orientPalphaV.gif></img></center></p><p>Similarly, might we say that if we double the number of molecules, we would double the number of collisions per time and so double pressure?  So we get</p><p><center><img src=img/ideal/orientPalphaN.gif></img></center></p><p>Would the above relationships be true if temperature were not held constant?  Try to relate your answer to frequency and momentum of collisions with the wall.</p>");
 	},
 	block12CleanUp: function(){
-		loadListener(curLevel, 'update');
+		this.resume();
 		$('#intText').html('');
 		$('#canvasDiv').show();
 		$('#display').hide();
 		$('#intText').hide();	
 	},
 	block13Start: function(){
-		saveListener(curLevel, 'update');
-		emptyListener(curLevel, 'update');
+		this.pause();
 		$('#canvasDiv').hide();
 		$('#display').show();
 		$('#intText').show();
@@ -449,7 +440,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		);
 	},
 	block13CleanUp: function(){
-		loadListener(curLevel, 'update');
+		this.resume();
 		$('#intText').html('');
 		$('#canvasDiv').show();
 		$('#display').hide();
@@ -460,10 +451,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 			"<p>or</p>"+
 			"<center><img src=img/ideal/orientPVNRT.gif></img></center>"+
 			"<p>So we just developed the ideal gas law from a model of molecules being hard spheres that bounce around!  Yay!</p>")
-		saveListener(this, 'update');
-		saveListener(this, 'data');
-		emptyListener(this, 'update');
-		emptyListener(this, 'data');
+		this.pause();
 		$('#canvasDiv').hide()
 		$('#display').show();
 		$('#dashOutro').show();		
@@ -479,8 +467,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		$('#display').hide();
 		$('#dashRun').show();
 		$('#base').show();	
-		loadListener(this, 'update');
-		loadListener(this, 'data');
+		this.resume();
 
 		showPrompt(undefined, this.prompts[curLevel.promptIdx]);		
 	},

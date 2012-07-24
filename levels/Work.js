@@ -20,10 +20,11 @@ function Work(){
 	this.blockIdx=-1;
 	this.g = 1.75;
 	this.prompts=[
-		{block:0, title: '', finished: false, text:""},
-		{block:1, title: 'Current step', finished: false, text:"Alright, let’s fit a model to what we just described.  Above we have a piston and cylinder setup.  You can change the piston’s pressure with the pressure slider.  If you compress the system, how does the temperature behave?  Does this make sense in the context of doing work on the system? "},
-		{block:1, title: 'Current step', finished: false, text:"Now these molecules undergo perfectly elastic collisions when they hit a wall.  That is to say they behave like a bouncy ball would when you throw it against a wall.  If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving, that is not true.  "},
-		{block:2, title: 'Current step', finished: false, text:""},
+		{block:0, title: '', finished: false, text:''},
+		{block:1, title: 'Current step', finished: false, text:"Alright, let’s fit a model to what we just described.  Above we have a piston and cylinder setup.  You can change the piston’s pressure with the pressure slider.  If you compress the system, how does the temperature behave?  Does this make sense in the context of doing work on the system?"},
+		{block:1, title: 'Current step', finished: false, text:"Now these molecules undergo perfectly elastic collisions when they hit a wall.  That is to say they behave like a bouncy ball would when you throw it against a wall.  If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving, that is not true."},
+		{block:2, title: 'Current step', finished: false, text:"Let’s see if we can relate that idea to work by looking at just one molecule. If you compress the cylinder, why does the molecule’s speed change?  How does this relate to temperature?"},
+		{block:3, title: '' finished:false, text:''}
 	]
 	walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
@@ -47,10 +48,7 @@ _.extend(Work.prototype,
 	},
 
 	block0Start: function(){
-		saveListener(this, 'update');
-		saveListener(this, 'data');
-		emptyListener(this, "update");
-		emptyListener(this, "data");
+		this.pause()
 		this.hideDash();
 		this.hideBase();
 		$('#canvasDiv').hide();
@@ -73,8 +71,7 @@ _.extend(Work.prototype,
 		$('#intText').hide();
 		$('#dashRun').show();
 		$('#base').show();
-		loadListener(this, 'update');
-		loadListener(this, 'data');		
+		this.resume()	
 	},
 	
 	block1Start: function(){

@@ -93,10 +93,7 @@ _.extend(Reversibility.prototype,
 		nextPrompt();
 	},
 	block0Start: function(){
-		saveListener(this, 'update');
-		saveListener(this, 'data');
-		emptyListener(this, "update");
-		emptyListener(this, "data");
+		this.pause();
 		this.hideDash();
 		this.hideBase();
 		$('#canvasDiv').hide()
@@ -117,8 +114,7 @@ _.extend(Reversibility.prototype,
 		$('#intText').hide();
 		$('#dashRun').show();
 		$('#base').show();
-		loadListener(this, 'update');
-		loadListener(this, 'data');		
+		this.resume();	
 	},
 	block1Start: function(){
 		this.addDots();
@@ -195,10 +191,7 @@ _.extend(Reversibility.prototype,
 		return this.block2cConditions();
 	},
 	block5Start: function(){
-		saveListener(this, 'update');
-		saveListener(this, 'data');
-		emptyListener(this, 'update');
-		emptyListener(this, 'data');
+		this.pause()
 		this.hideDash();
 		this.hideBase();
 		$('#canvasDiv').hide()
@@ -219,8 +212,7 @@ _.extend(Reversibility.prototype,
 		$('#intText').hide();
 		$('#dashRun').show();
 		$('#base').show();	
-		loadListener(this, 'update');
-		loadListener(this, 'data');
+		this.resume();
 	},
 	getPtsToBorder: function(){
 		var pts = [];

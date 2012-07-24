@@ -68,6 +68,16 @@ LevelTools.prototype = {
 	checkWallHits: function(){
 		walls.check();
 	},
+	pause: function(){
+		saveListener(this, 'update');
+		saveListener(this, 'data');
+		emptyListener(this, "update");
+		emptyListener(this, "data");
+	},//COULD ALSO DO LIKE 'SAVE/LOAD BY TYPE' FOR ANIM TEXT, ARROW
+	resume: function(){
+		loadListener(this, 'update');
+		loadListener(this, 'data');
+	},
 	hideDash: function(){
 		$('#dashIntro').hide();
 		$('#dashRun').hide();
