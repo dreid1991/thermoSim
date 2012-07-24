@@ -411,8 +411,8 @@ DragWeights.prototype = {
 	drawEBar: function(m, dh){
 		var yBottom = this.zeroY;
 		var yTop = this.zeroY - dh;
-		var corner = P(this.eBar.x - m*this.eBar.scalar/2, this.yTop);
-		var dims = V(mass*this.eBar.scalar, yBottom-yTop);
+		var corner = P(this.eBar.x - m*this.eBar.scalar/2, yTop);
+		var dims = V(m*this.eBar.scalar, yBottom-yTop);
 		draw.fillRect(corner, dims, this.eBarCol, c);
 	},
 	drawEBarText: function(m, energy){
@@ -420,7 +420,7 @@ DragWeights.prototype = {
 		var text = this.eText(rounded)
 		var x = this.eBar.x;
 		var y = this.zeroY - energy/(workConst*this.g()*m);
-		var pos = P(x, y);
+		var pos = P(x, y-15);
 		draw.text(text, pos, this.eBarFont, this.eBarFontCol, 'center', 0, c);
 	},
 	eText: function(energy){
@@ -490,7 +490,7 @@ DragWeights.prototype = {
 		var clicked = this.getClicked();
 		if(clicked){
 			this.pickup(clicked);
-			if(this.eBarShow && this.eBar.weight===undefined){
+			if(this.showEBar && this.eBar.weight===undefined){
 				if(this.selected.cameFrom=='inBin'){
 					this.eBarFromBin();
 				}
@@ -510,8 +510,8 @@ DragWeights.prototype = {
 		var mouseOrig = orig.mouse;
 		var dx = mousePos.x - mouseOrig.x;
 		var dy = mousePos.y - mouseOrig.y;
-		var newX = mouseOrig.x + dx;
-		var newY = mouseOrig.y + dy;
+		var newX = weightOrig.x + dx;
+		var newY = weightOrig.y + dy;
 		this.selected.pos.x = newX;
 		this.selected.pos.y = newY;
 	},
@@ -544,17 +544,12 @@ DragWeights.prototype = {
 	},
 	eBarFromBin: function(){
 		var eBarType = 'FromBinHolding';
-		//this.eBar.weight = this.selected;//maybe
 		addListener(curLevel, 'update', 'eBar' + eBarType,
 			function(){
 				var selected = this.selected;
-				var grpName = selected.name;
-				var grpAttrs = this.weightGroups[grpName];
-				var dims = grpAttrs.dims;
-				var m = grpAttrs.mass;
-				var pos = this.selected.pos.copy();
-				var dh = this.zeroY - selected.pos.y;
-				var eChange = workConst*m*this.g()*dh;
+				var m = this.weightGroups[selected.name].mass;
+				var eChange = this.getSelectedEnergy();
+				var dh = Math.min(this.zeroY - this.pistonY(), Math.max(0, this.zeroY - selected.pos.y));
 				this.drawEBar(m, dh);
 				this.drawEBarText(m, eChange);
 				
@@ -562,20 +557,19 @@ DragWeights.prototype = {
 		this);
 		addListener(curLevel, 'mouseup', 'switchToRemove', 
 			function(){	
-				removeListener(curLevel, 'update', 'eBar' + eBarTyle);
+				removeListener(curLevel, 'update', 'eBar' + eBarType);
 				removeListener(curLevel, 'mouseup', 'switchToRemove');
 				addListener(curLevel, 'update', 'removeEBar', this.removeEBar, this);
 			}, 
 		this);	
 	},
 	eBarFromPiston: function(){
-		//this.eBar.weight = this.selected;//maybe?
+		var eBarType = 'FromPistonHolding';
 		var m = this.weightGroups[this.eBar.weight.name].mass;
 		var g = this.g();
-		var dh = this.pistonY() - this.zeroY;
+		var dh =this.pistonY() - this.zeroY;
 		var eChange = workConst*m*g*dh;
 		this.eBar.eChange = workConst*m*g*dh;
-		var eBarType = 'FromPistonHolding';
 		addListener(curLevel, 'update', 'eBar' + eBarType, 
 			function(){
 				this.drawEBar(m, dh);
@@ -615,12 +609,20 @@ DragWeights.prototype = {
 		
 		
 	},
+	getSelectedEnergy: function(){
+		var selected = this.selected;
+		var grpName = selected.name;
+		var m = this.weightGroups[grpName].mass;
+		var pos = selected.pos.copy();
+		var dh = Math.min(this.zeroY - this.pistonY(), Math.max(0, this.zeroY - selected.pos.y));
+		return workConst*m*this.g()*dh;		
+	},
 	getClicked: function(){
 		for(var group in this.weightGroups){
 			var group = this.weightGroups[group];
 			for(var weightIdx=0; weightIdx<group.weights.length; weightIdx++){
 				var weight = group.weights[weightIdx];
-				var clickedOn = inRect(weight.pos, group.dims, myCanvas);
+				var clickedOn = inRect(weight.pos.copy().movePt({dy:-group.dims.dy}), group.dims, myCanvas);
 				if(clickedOn){
 					if(weight.status=='inTransit'){
 						return weight;
