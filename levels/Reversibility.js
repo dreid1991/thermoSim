@@ -201,9 +201,10 @@ _.extend(Reversibility.prototype,
 		return pts;
 	},
 	makeDragWeights: function(){
-		var dragWeights = new DragWeights([{name:'sml', count:12, mass:5}, 
-									{name:'med', count:6, mass:10}, 
-									{name:'lrg', count:2, mass:30}
+		var dragWeights = new DragWeights([//{name:'sml', count:12, mass:5}, 
+									//{name:'med', count:6, mass:10}, 
+									//{name:'lrg', count:2, mass:30}
+									{name:'lrg', count:1, mass:30},
 									],
 									walls.pts[0][2].y,
 									function(){return walls.pts[0][0].y},
