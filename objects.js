@@ -563,9 +563,9 @@ DragWeights.prototype = {
 		var destEntry = byAttr(this.readout.entries, 'eAdd', 'name');
 		destPos = destEntry.pos.copy();
 		destPos.x+=40;
-		animText({pos:P(this.eBar.x,this.pistonY()-15), size: 13, rotation:0, col:Col(255,255,255)},
-			{pos:destPos, col:curLevel.bgCol, size:10},
-			'calibri', this.eText(round(this.eBar.eChange,1)), 'center', 300, c)
+		animText.newAnim({pos:P(this.eBar.x,this.pistonY()-15)},
+			{pos:destPos, col:curLevel.bgCol},
+			{text:this.eText(round(this.eBar.eChange,1))})
 	},
 	pickup: function(weight){
 		weight.cameFrom = weight.status;

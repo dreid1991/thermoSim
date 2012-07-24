@@ -103,6 +103,7 @@ var curLevel;
 canvasHeight = 450;
 $(function(){
 	myCanvas.height = canvasHeight;
+	animText = new AnimText(c);
 	curLevel = new IdealGasLaw();
 	curLevel.init();
 	$('#clearGraphs').hide();

@@ -369,9 +369,9 @@ WallHandler.prototype = {
 		this);//could be ''.  Do after other stuff is working.
 		var textPos = pos.copy().movePt(vf.mult(15));
 		var delV = (Math.abs(perpVo)+Math.abs(perpVf))*pxToMS;
-		animText({pos:textPos, col:Col(255,255,255), rotation:0, size:13}, 
+		animText.newAnim({pos:textPos}, 
 				{pos:textPos.copy().movePt({dy:-20}), col:curLevel.bgCol},
-				'calibri', 'deltaV = '+round(delV,1)+'m/s', 'center', 3000, c
+				{text:'deltaV = '+round(delV,1)+'m/s', time:3000}
 		);
 	},	
 }
