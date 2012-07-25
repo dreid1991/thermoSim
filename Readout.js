@@ -40,7 +40,6 @@ Readout.prototype = {
 		var entry = byAttr(this.entries, name, 'name');
 		var init = entry.val
 		var step = (setPt - init)/10;
-		console.log(name+setPt);
 		removeListener(curLevel, 'update', this.handle + entry.name +'tick');
 		if(step!=0){
 			var tickFunc = this.makeTickFunc(entry, step, setPt);
@@ -76,6 +75,14 @@ Readout.prototype = {
 			}
 		}
 		console.log('Entry does not exist');
+	},
+	entryExists: function(entryName){
+		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++){
+			if(this.entries[entryIdx].name==entryName){
+				return true;
+			}
+		}
+		return false;		
 	},
 	removeAllEntries: function(){
 		this.entries = [];

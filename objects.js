@@ -2,13 +2,14 @@
 //DRAG WEIGHTS
 //////////////////////////////////////////////////////////////////////////
 
-function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g, massInit, readout, obj){
+function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g, massInit, readout, wallPts, obj){
 	this.zeroY = zeroY;
 	this.pistonY = pistonY;
 	this.binY = binY;
 	this.weightCol = weightCol;
 	this.eBarCol = this.weightCol;
 	this.g = g;
+	this.wallPts = wallPts;
 	this.eBar = {x:eBarX, scalar: .7};
 	this.binCol = binCol;
 	this.binHeight = 65;
@@ -24,6 +25,7 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.pistonMass = massInit;
 	this.massInit = massInit
 	this.eAdded = 0;
+	this.pressure = this.getPressure();
 	this.readout = readout;
 	this.moveToDropOrders = [];
 	this.moveToPistonOrders = [];
@@ -32,14 +34,15 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.flySpeed = 20;
 	this.eBarFont = '12pt Calibri';
 	this.eBarFontCol = Col(255,255,255);
-	this.addReadoutEntries();
+	this.addStdReadoutEntries();
 	var self = this;
 	if(obj){
 		addListener(obj, 'init', 'dragWeights', this.init, this);
 		obj.mass = function(){return self.pistonMass};
 	}
-	this.showEBar = new Boolean();
-	this.showEBar = true;
+	this.trackEnergy = true;
+	this.trackMass = true;
+	this.trackPressure = false;
 	return this;
 }
 
@@ -59,15 +62,48 @@ DragWeights.prototype = {
 		delete this.tempWeightDefs;
 		
 	},
-	showEBar: function(){
-		this.showEBar = true;
+	trackEnergyStart: function(){
+		this.trackEnergy = true;
+		if(!this.readout.entryExists('eAdd')){
+			this.addEnergyEntry();
+		}
 	},
-	hideEBar: function(){
-		this.showEBar = false;
+	trackEnergyStop: function(){
+		this.trackEnergy = false;
+		this.readout.removeEntry('eAdd');
 	},
-	addReadoutEntries: function(){
-		this.readout.addEntry('eAdd', 'E Added:', 'kJ', 0, undefined, 1);
+	trackMassStart: function(){
+		this.trackMass = true;
+		if(!this.readout.entryExists('mass')){
+			this.addMassEntry();
+		}
+	},
+	trackMassStop: function(){
+		this.trackMass = false;
+		this.readout.removeEntry('mass');
+	},
+	trackPressureStart: function(){
+		this.trackPressure = true;
+		if(!this.readout.entryExists('pressure')){
+			this.addPressureEntry();	
+		}
+	},
+	trackPressureStop: function(){
+		this.trackPressure = false;
+		this.readout.removeEntry('pressure');	
+	},
+	addStdReadoutEntries: function(){
+		this.addEnergyEntry();
+		this.addMassEntry();
+	},
+	addEnergyEntry: function(){
+		this.readout.addEntry('eAdd', 'E Added:', 'kJ', this.eAdded, undefined, 1);
+	},
+	addMassEntry: function(){
 		this.readout.addEntry('mass', 'Mass:', 'kg', this.pistonMass, undefined, 0);
+	},
+	addPressureEntry: function(){
+		this.readout.addEntry('pressure', 'Pressure:', 'atm', this.pressure, undefined, 1); 
 	},
 	getWeightDims: function(weightDefs){
 		var dims = {};
@@ -104,7 +140,7 @@ DragWeights.prototype = {
 	makeStoreBins: function(){
 		var bins = {};
 		var numGroups = this.getNumGroups();
-		var posX = myCanvas.width/2 - this.storeBinWidth*(numGroups-1)/2 - this.storeBinSpacing*(numGroups-1)/2;
+		var posX =(this.wallPts[0].x + this.wallPts[1].x)/2 - this.storeBinWidth*(numGroups-1)/2 - this.storeBinSpacing*(numGroups-1)/2;
 		for (var groupName in this.weightGroups){
 			var weightGroup = this.weightGroups[groupName];
 			bins[groupName] = this.makeStoreBin(posX, weightGroup);
@@ -124,7 +160,7 @@ DragWeights.prototype = {
 	makePistonBins: function(){
 		var bins = {};
 		var numGroups = this.getNumGroups();
-		var posX = myCanvas.width/2 - this.pistonBinWidth*(numGroups-1)/2 - this.pistonBinSpacing*(numGroups-1)/2;
+		var posX = (this.wallPts[0].x + this.wallPts[1].x)/2 - this.pistonBinWidth*(numGroups-1)/2 - this.pistonBinSpacing*(numGroups-1)/2;
 		for (var groupName in this.weightGroups){
 			var weightGroup = this.weightGroups[groupName];
 			bins[groupName] = this.makePistonBin(posX, weightGroup);
@@ -243,7 +279,6 @@ DragWeights.prototype = {
 		}
 		return true;			
 	},
-
 	allEmpty: function(type){
 		var allEmpty = new Boolean();
 		allEmpty = true;
@@ -277,6 +312,9 @@ DragWeights.prototype = {
 			}
 		}
 		return totalMass+this.massInit;
+	},
+	getPressure: function(){
+		return this.pistonMass*this.g()*pConst/(this.wallPts[1].x-this.wallPts[0].x);
 	},
 	pistonMinusVal: function(val){
 		return function(){return walls.pts[0][0].y-val}
@@ -429,8 +467,14 @@ DragWeights.prototype = {
 	putOnPiston: function(weight){
 		this.weightsOnPiston.push(weight);
 		weight.status = 'piston';
-		this.pistonMass = this.getPistonMass()
-		this.readout.tick(this.pistonMass, 'mass');
+		this.pistonMass = this.getPistonMass();
+		this.pressure = this.getPressure();
+		if(this.trackMass){
+			this.readout.tick(this.pistonMass, 'mass');
+		}
+		if(this.trackPressure){
+			this.readout.tick(this.pressure, 'pressure');
+		}
 	},	
 	takeOffPiston: function(weight){
 		for (var idx=0; idx<this.weightsOnPiston.length; idx++){
@@ -439,13 +483,19 @@ DragWeights.prototype = {
 			}
 		}
 		this.pistonMass = this.getPistonMass()
-		this.readout.tick(this.pistonMass, 'mass');
+		this.pressure = this.getPressure();
+		if(this.trackMass){
+			this.readout.tick(this.pistonMass, 'mass');
+		}
+		if(this.trackPressure){
+			this.readout.tick(this.pressure, 'pressure');
+		}
 	},
 	mousedown: function(){
 		var clicked = this.getClicked();
 		if(clicked){
 			this.pickup(clicked);
-			if(this.showEBar){
+			if(this.trackEnergy){
 				if(this.selected.cameFrom=='store'){
 					this.eBarFromBin();
 				}
@@ -477,14 +527,16 @@ DragWeights.prototype = {
 		removeListener(curLevel, 'mousemove', 'weights');
 		removeListener(curLevel, 'mouseup', 'weights');
 		var dest = this.getDest();
-		var trackEnergy = new Boolean();
+		var energyChanged = new Boolean();
 		var selected = this.selected;
-		trackEnergy = (selected.cameFrom=='piston' && dest=='store') || (selected.cameFrom=='store' && dest=='piston')
-		if(trackEnergy){
+		energyChanged = (selected.cameFrom=='piston' && dest=='store') || (selected.cameFrom=='store' && dest=='piston')
+		if(energyChanged){
 			this.eAdded+=this.eBar.eChange;
-			this.readout.tick(this.eAdded, 'eAdd');
-			this.animText();
-			this.shrinkEBar();
+			if(this.trackEnergy){
+				this.readout.tick(this.eAdded, 'eAdd');
+				this.animText();
+				this.shrinkEBar();
+			}
 		}	
 		this.dropIntoBin(this.selected, dest)
 		delete this.origPos;
