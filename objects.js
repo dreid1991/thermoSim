@@ -2,14 +2,14 @@
 //DRAG WEIGHTS
 //////////////////////////////////////////////////////////////////////////
 
-function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g, massInit, readout, wallPts, obj){
+function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g, massInit, readout, wallHandle, obj){
 	this.zeroY = zeroY;
 	this.pistonY = pistonY;
 	this.binY = binY;
 	this.weightCol = weightCol;
 	this.eBarCol = this.weightCol;
 	this.g = g;
-	this.wallPts = wallPts;
+	this.wallHandle = wallHandle;
 	this.eBar = {x:eBarX, scalar: .7};
 	this.binCol = binCol;
 	this.binHeight = 65;
@@ -59,6 +59,7 @@ DragWeights.prototype = {
 		addListener(curLevel, 'update', 'drawDragWeights', this.draw, this);
 		addListener(curLevel, 'mousedown', 'weights', this.mousedown, this);
 		addListener(curLevel, 'reset', 'dragWeights', this.reset, this);
+		this.dropAllIntoStores();
 		delete this.tempWeightDefs;
 		
 	},
@@ -138,9 +139,12 @@ DragWeights.prototype = {
 		return weightGroups;
 	},
 	makeStoreBins: function(){
+		var localWalls = walls;
+		var wallPts = localWalls.pts[localWalls.idxByHandle(this.wallHandle)];
+		var center = (wallPts[0].x + wallPts[1].x)/2;
 		var bins = {};
 		var numGroups = this.getNumGroups();
-		var posX =(this.wallPts[0].x + this.wallPts[1].x)/2 - this.storeBinWidth*(numGroups-1)/2 - this.storeBinSpacing*(numGroups-1)/2;
+		var posX = center - this.storeBinWidth*(numGroups-1)/2 - this.storeBinSpacing*(numGroups-1)/2;
 		for (var groupName in this.weightGroups){
 			var weightGroup = this.weightGroups[groupName];
 			bins[groupName] = this.makeStoreBin(posX, weightGroup);
@@ -158,9 +162,12 @@ DragWeights.prototype = {
 		return bin;
 	},
 	makePistonBins: function(){
+		var localWalls = walls;
+		var wallPts = localWalls.pts[localWalls.idxByHandle(this.wallHandle)];
+		var center = (wallPts[0].x + wallPts[1].x)/2;
 		var bins = {};
 		var numGroups = this.getNumGroups();
-		var posX = (this.wallPts[0].x + this.wallPts[1].x)/2 - this.pistonBinWidth*(numGroups-1)/2 - this.pistonBinSpacing*(numGroups-1)/2;
+		var posX = center - this.pistonBinWidth*(numGroups-1)/2 - this.pistonBinSpacing*(numGroups-1)/2;
 		for (var groupName in this.weightGroups){
 			var weightGroup = this.weightGroups[groupName];
 			bins[groupName] = this.makePistonBin(posX, weightGroup);
@@ -314,7 +321,9 @@ DragWeights.prototype = {
 		return totalMass+this.massInit;
 	},
 	getPressure: function(){
-		return this.pistonMass*this.g()*pConst/(this.wallPts[1].x-this.wallPts[0].x);
+		var localWalls = walls;
+		var wallPts = localWalls.pts[localWalls.idxByHandle(this.wallHandle)];
+		return this.pistonMass*this.g()*pConst/(wallPts[1].x-wallPts[0].x);
 	},
 	pistonMinusVal: function(val){
 		return function(){return walls.pts[0][0].y-val}
@@ -325,18 +334,20 @@ DragWeights.prototype = {
 			for (var weightIdx=0; weightIdx<weightGroup.weights.length; weightIdx++){
 				var weight = weightGroup.weights[weightIdx];
 				if(weight.status=='piston'){
-					weight.status='inTransit';
+					weight.status = 'inTransit';
 					weight.slot.isFull = false;
 					this.takeOffPiston(weight);
 					this.dropIntoBin(weight, 'store');
-				}else if(weight.status=='' ){
+				}else if(weight.status!='store' && weight.status!='inTransit'){
+					weight.status = 'inTransit';
 					this.dropIntoBin(weight, 'store');
-				}
+				}//NOTE - BLOCKS AREADY MOVING WILL NOT GET DROPPED. SHOULD ADD DESTINATION AND IF DEST==PISTON, DROP TO BIN
 				
 			}
 		}
 	},
 	dropIntoBin: function(weight, binType){
+		weight.status = 'inTransit';
 		var dropSlotInfo = this.getDropSlot(weight.name, binType);
 		var slot = dropSlotInfo.slot;
 		slot.isFull = true;

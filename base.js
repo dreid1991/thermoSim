@@ -539,40 +539,7 @@ function inRect(pos, dims, curCanvas){
 function ptInRect(pos, dims, pt){
 	return pt.x>=pos.x && pt.x<=(pos.x+dims.dx) && pt.y>=pos.y && pt.y<=(pos.y+dims.dy);
 }
-function border(pts, thickness, col, name, drawCanvas){
-	var perpUVs = [];
-	var borderPts = [];
-	for (var ptIdx=0; ptIdx<pts.length-1; ptIdx++){
-		var curPt = pts[ptIdx];
-		var nextPt = pts[ptIdx+1];
-		var UV = curPt.VTo(nextPt).UV();
-		perpUVs.push(V(UV.dy, -UV.dx));
-	}
-	for (var ptIdx=0; ptIdx<pts.length; ptIdx++){
-		borderPts.push(pts[ptIdx]);
-	}
-	var lastAdj = perpUVs[perpUVs.length-1].copy().mult(thickness)
-	borderPts.push(pts[pts.length-1].copy().movePt(lastAdj));
-	for (var ptIdx=pts.length-2; ptIdx>0; ptIdx-=1){
-		var UVs = [perpUVs[ptIdx], perpUVs[ptIdx-1]];
-		var pt = pts[ptIdx];
-		borderPts.push(spacedPt(pt, UVs, thickness));
-	}
-	var firstAdj = perpUVs[0].mult(thickness)
-	borderPts.push(pts[0].copy().movePt(firstAdj));
-	borderPts.push(pts[0]);
-	addListener(curLevel, 'update', 'drawBorder' + name, 
-		function(){
-			draw.fillPts(borderPts, col, drawCanvas);
-		}
-	,'');
-}
-function spacedPt(pt, UVs, thickness){
-	var UV1 = UVs[0];
-	var UV2 = UVs[1];
-	var adjust = UV1.add(UV2)
-	return pt.copy().movePt(adjust.mult(thickness));
-}
+
 function replaceString(source, oldStr, newStr){
 	var start = source.indexOf(oldStr);
 	if(start!=-1){

@@ -160,9 +160,9 @@ Point.prototype = {
 		if(v.dy!==undefined){
 			this.y+=v.dy;
 		}
-		if(v.x!==undefined || v.y!==undefined){
-			console.log('movePt TAKES A VECTOR, NOT A POINT!');
-		}
+		//if(v.x!==undefined || v.y!==undefined){
+		//	console.log('movePt TAKES A VECTOR, NOT A POINT!');
+		//}
 		return this;
 	},
 	position: function(p){

@@ -346,7 +346,53 @@ WallHandler.prototype = {
 		}
 		return SA;
 	},
-	
+	border: function(wallInfo, wallPts, thickness, col, ptAdjusts){
+		var drawCanvas = c;
+		var wallIdx = this.wallInfoToIdx(wallInfo);
+		var pts = new Array(wallPts.length);
+		var perpUVs = new Array(wallPts.length-1)
+		var borderPts = [];
+		var targetWallPts = this.pts[wallIdx];
+		var targetWallPerps = this.wallPerpUVs[wallIdx];
+		for (var wallPtIdx=0; wallPtIdx<wallPts.length; wallPtIdx++){
+			pts[wallPtIdx] = targetWallPts[wallPts[wallPtIdx]].copy();
+		}
+		for (var wallPtIdx=0; wallPtIdx<wallPts.length-1; wallPtIdx++){
+			perpUVs[wallPtIdx] = targetWallPerps[wallPts[wallPtIdx]].copy().neg();
+		}
+		for (var ptIdx=0; ptIdx<pts.length; ptIdx++){
+			var pt = pts[ptIdx];
+			//can give either vector or absolute position
+			pt.movePt(ptAdjusts[ptIdx]);
+			pt.position(ptAdjusts[ptIdx]);
+			borderPts.push(pt);
+		}
+		var lastAdj = perpUVs[perpUVs.length-1].copy().mult(thickness)
+		borderPts.push(pts[pts.length-1].copy().movePt(lastAdj));
+		for (var ptIdx=pts.length-2; ptIdx>0; ptIdx-=1){
+			var UVs = [perpUVs[ptIdx], perpUVs[ptIdx-1]];
+			var pt = pts[ptIdx];
+			borderPts.push(this.spacedPt(pt, UVs, thickness));
+		}
+		var firstAdj = perpUVs[0].mult(thickness)
+		borderPts.push(pts[0].copy().movePt(firstAdj));
+		borderPts.push(pts[0]);
+		addListener(curLevel, 'update', 'drawBorder' + wallIdx, 
+			function(){
+				draw.fillPts(borderPts, col, drawCanvas);
+			}
+		,'');
+	},
+	spacedPt: function(pt, UVs, thickness){
+		var UV1 = UVs[0];
+		var UV2 = UVs[1];
+		var adjust = UV1.add(UV2)
+		return pt.copy().movePt(adjust.mult(thickness));
+	},
+	removeBorder: function(wallInfo){
+		var wallIdx = this.wallInfoToIdx(wallInfo);
+		removeListener(curLevel, 'update', 'drawBorder' + wallIdx);
+	},
 	////////////////////////////////////////////////////////////
 	//EXTRAS
 	////////////////////////////////////////////////////////////
