@@ -6,7 +6,7 @@ LevelTools.prototype = {
 		if(compAttrs.bounds){
 			bounds = compAttrs.bounds;	
 		}else{
-			bounds = {y:{min:this.minY, max:this.maxY}};
+			bounds = {y:{min:this.yMin, max:this.yMax}};
 		}
 		var pos = walls.pts[0][1].copy()
 		var rotation = 0;
@@ -125,12 +125,12 @@ LevelTools.prototype = {
 		var lastY = wall[0].y
 		var unboundedY = lastY + this.wallV + .5*this.g;
 		var dyWeight = null;
-		if(unboundedY>this.maxY || unboundedY<this.minY){
-			var boundedY = Math.max(this.minY, Math.min(this.maxY, unboundedY));
+		if(unboundedY>this.yMax || unboundedY<this.yMin){
+			var boundedY = Math.max(this.yMin, Math.min(this.yMax, unboundedY));
 			var tHit = null;
-			if (boundedY==this.maxY){
+			if (boundedY==this.yMax){
 				var tHit = (-this.wallV + Math.sqrt(this.wallV*this.wallV + 2*this.g*(boundedY-lastY)))/this.g;
-			}else if (boundedY==this.minY){
+			}else if (boundedY==this.yMin){
 				var tHit = (-this.wallV - Math.sqrt(this.wallV*this.wallV + 2*this.g*(boundedY-lastY)))/this.g;
 			}
 			var vRebound = -(this.wallV + this.g*tHit);

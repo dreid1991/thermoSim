@@ -91,8 +91,7 @@ _.extend(Work.prototype,
 		this.piston.show();
 		this.piston.trackWork();
 		this.piston.trackPressure();
-		var ptsToBorder = this.getPtsToBorder();
-		walls.border('container', [1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:this.yMin}, {}, {}, {y:this.yMin}]);
+		this.borderStd();
 		//this.heater = new Heater('spaceHeater', P(150,360), V(250,50), 0, 20, c);//P(40,425), V(470,10)
 		//this.heater.init();
 
@@ -108,14 +107,17 @@ _.extend(Work.prototype,
 		removeListener(curLevel, 'update', 'moveWalls');
 		removeListener(curLevel, 'update', 'addGravity');
 		walls.setWallHandler(0, {func:this.staticAdiabatic, obj:this})
+		walls.removeBorder('container');
 	},
 	block2Start: function(){
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
 		walls.setHitMode('Arrow');
+		this.borderStd();
 		this.compArrow = this.makeCompArrow({mode:'adiabatic'});
 		populate('spc4', P(45,35), V(460, 350), 1, 600);
 	},
 	block2CleanUp: function(){
+		walls.removeBorder('container');
 		this.compArrow.remove();
 		this.compArrow = undefined;
 		walls.setHitMode('Std');
@@ -127,15 +129,20 @@ _.extend(Work.prototype,
 		this.cutSceneEnd();
 	},
 	block4Start: function(){
+		this.readout.show();
 		wallHandle = 'container';
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,360), P(40,360)]], {func:this.staticAdiabatic, obj:this}, [wallHandle]);
 		walls.setSubWallHandler(0, 0, {func:this.cPAdiabaticDamped, obj:this});
-		populate('spc1', P(45,35), V(460, 350), 800, 300);
-		populate('spc3', P(45,35), V(450, 350), 600, 300);
+		this.borderStd();
+		populate('spc1', P(45,35), V(445, 325), 800, 300);
+		populate('spc3', P(45,35), V(445, 325), 600, 300);
 		this.dragWeights = this.makeDragWeights(wallHandle)
 	},
 	block4CleanUp: function(){
-		
+		walls.removeBorder(0);
+	},
+	borderStd: function(){
+		walls.border('container', [1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:this.yMin}, {}, {}, {y:this.yMin}]);
 	},
 	makeDragWeights: function(wallHandle){
 		var self = this;

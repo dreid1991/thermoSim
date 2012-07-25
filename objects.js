@@ -428,13 +428,15 @@ DragWeights.prototype = {
 		}
 	},
 	drawBinLabels: function(){
-		for(var binName in this.dropBins){
-			var bin = this.dropBins[binName];
-			var x = bin.x + this.storeBinWidth/2
-			var y = bin.y - this.binHeight+20;
-			var mass = this.weightGroups[binName].mass;
-			var text = mass + ' kg each';
-			draw.text(text, P(x, y), this.eBarFont, this.eBarFontCol, 'center', 0, c);
+		for(var binName in this.bins.store){
+			var bin = this.bins.store[binName];
+			if(bin.visible){
+				var x = bin.x + this.storeBinWidth/2
+				var y = bin.y - this.binHeight+20;
+				var mass = this.weightGroups[binName].mass;
+				var text = mass + ' kg each';
+				draw.text(text, P(x, y), this.eBarFont, this.eBarFontCol, 'center', 0, c);
+			}
 		}
 	},
 	drawEBar: function(m, dh){
