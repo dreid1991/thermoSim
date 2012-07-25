@@ -67,7 +67,7 @@ DragWeights.prototype = {
 	},
 	addReadoutEntries: function(){
 		this.readout.addEntry('eAdd', 'E Added:', 'kJ', 0, undefined, 1);
-		this.readout.addEntry('weight', 'Weight:', 'kg', this.pistonMass, undefined, 0);
+		this.readout.addEntry('mass', 'Mass:', 'kg', this.pistonMass, undefined, 0);
 	},
 	getWeightDims: function(weightDefs){
 		var dims = {};
@@ -243,6 +243,7 @@ DragWeights.prototype = {
 		}
 		return true;			
 	},
+
 	allEmpty: function(type){
 		var allEmpty = new Boolean();
 		allEmpty = true;
@@ -265,6 +266,18 @@ DragWeights.prototype = {
 		}
 		return count;
 	},
+	getPistonMass: function(){
+		var totalMass=0;
+		for (var weightName in this.weightGroups){
+			var weightGroup = this.weightGroups[weightName];
+			var weights = weightGroup.weights;
+			var mass = weightGroup.mass;
+			for(var weightIdx=0; weightIdx<weights.length; weightIdx++){
+				if(weights[weightIdx].status=='piston'){totalMass+=mass};
+			}
+		}
+		return totalMass+this.massInit;
+	},
 	pistonMinusVal: function(val){
 		return function(){return walls.pts[0][0].y-val}
 	},
@@ -274,6 +287,7 @@ DragWeights.prototype = {
 			for (var weightIdx=0; weightIdx<weightGroup.weights.length; weightIdx++){
 				var weight = weightGroup.weights[weightIdx];
 				if(weight.status=='piston'){
+					weight.status='inTransit';
 					weight.slot.isFull = false;
 					this.takeOffPiston(weight);
 					this.dropIntoBin(weight, 'store');
@@ -410,17 +424,13 @@ DragWeights.prototype = {
 			},
 		this);
 	},
-	doEBarReadout: function(readoutName, setPt){
-		//var readout = byAttr(this.readout.entries, readoutName, 'name')
-		
-		this.readout.tick(setPt, readoutName);
-		
-	},
+
 
 	putOnPiston: function(weight){
 		this.weightsOnPiston.push(weight);
-		this.pistonMass+=this.weightGroups[weight.name].mass;
 		weight.status = 'piston';
+		this.pistonMass = this.getPistonMass()
+		this.readout.tick(this.pistonMass, 'mass');
 	},	
 	takeOffPiston: function(weight){
 		for (var idx=0; idx<this.weightsOnPiston.length; idx++){
@@ -428,8 +438,8 @@ DragWeights.prototype = {
 				this.weightsOnPiston.splice([idx],1);
 			}
 		}
-		var prevWeight = this.pistonMass;
-		this.pistonMass-=this.weightGroups[weight.name].mass;
+		this.pistonMass = this.getPistonMass()
+		this.readout.tick(this.pistonMass, 'mass');
 	},
 	mousedown: function(){
 		var clicked = this.getClicked();
@@ -472,8 +482,7 @@ DragWeights.prototype = {
 		trackEnergy = (selected.cameFrom=='piston' && dest=='store') || (selected.cameFrom=='store' && dest=='piston')
 		if(trackEnergy){
 			this.eAdded+=this.eBar.eChange;
-			this.doEBarReadout('eAdd', this.eAdded);
-			this.doEBarReadout('weight', this.pistonMass);
+			this.readout.tick(this.eAdded, 'eAdd');
 			this.animText();
 			this.shrinkEBar();
 		}	
@@ -974,7 +983,7 @@ Piston.prototype = {
 		this.trackingP = false;
 	},
 	reset: function(){
-		this.dataHandler.slots.work.value = 0;
+		//this.dataHandler.slots.work.value = 0;
 	},
 	addData: function(handle, label, value, units){
 		this.readout.addEntry(handle, label, units, value, undefined, 1);

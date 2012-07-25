@@ -40,10 +40,11 @@ Readout.prototype = {
 		var entry = byAttr(this.entries, name, 'name');
 		var init = entry.val
 		var step = (setPt - init)/10;
+		console.log(name+setPt);
+		removeListener(curLevel, 'update', this.handle + entry.name +'tick');
 		if(step!=0){
 			var tickFunc = this.makeTickFunc(entry, step, setPt);
-			removeListener(curLevel, 'update', entry.name);
-			addListener(curLevel, 'update', entry.name, tickFunc, '');
+			addListener(curLevel, 'update', this.handle + entry.name +'tick', tickFunc, this);
 			
 		}
 	},
@@ -52,7 +53,7 @@ Readout.prototype = {
 			entry.val = boundedStep(entry.val, setPt, step);
 			var decPlaces = entry.decPlaces
 			if(round(entry.val,decPlaces+1)==round(setPt,decPlaces+1)){
-				removeListener(curLevel, 'update', entry.name);
+				removeListener(curLevel, 'update', this.handle + entry.name + 'tick');
 			}
 		}
 	},
