@@ -327,43 +327,44 @@ WallHandler.prototype = {
 	area: function(pts){
 		var area=0;
 		var convexResults = this.isConvex(pts);
-		var toNeg = convexResults.toNeg;
+		var multiplier = convexResults.multiplier;
 		var isConvex = convexResults.isConvex;
 		if(isConvex){
 			return this.areaConvex(pts);
 		}else{
-			var ptSets = this.splitConcave(pts, toNeg);
+			var ptSets = this.splitConcave(pts, multiplier);
 			area+=this.area(set[0]);
 			area+=this.area(set[1]);
 		}
 		return area;
 	},
 	isConvex: function(pts){
-		var toNeg = this.getToNeg(pts);
+		var multiplier = this.getMult(pts);
 		for (var ptIdx=1; ptIdx<pts.length-1; ptIdx++){
 			var abcs = this.abcs(pts, ptIdx);
-			var angle = this.angleBetweenPts(abcs.a, abcs.b, abcs.c, toNeg);
+			var angle = this.angleBetweenPts(abcs.a, abcs.b, abcs.c, multiplier);
 			if (angle>Math.PI){
-				return {isConvex:false, toNeg: toNeg};
+				return {isConvex:false, multiplier: multiplier};
 			}
 		}
-		var angle = this.angleBetweenPts(pts[pts.length-1], pts[0], pts[1], toNeg);
+		var angle = this.angleBetweenPts(pts[pts.length-2], pts[pts.length-1], pts[0], multiplier);
+		var angle = this.angleBetweenPts(pts[pts.length-1], pts[0], pts[1], multiplier);
 		if (angle>Math.PI){
-			return {isConvex:false, toNeg: toNeg};
+			return {isConvex:false, multiplier: multiplier};
 		}
-		return {isConvex:true, toNeg: toNeg};
+		return {isConvex:true, multiplier: multiplier};
 		
 	},
-	getToNeg: function(pts){
-		//toNeg refers to which of the first and second unit vectors in the three-point line segment should be inverted so that the UV sum points into the polygon 
+	getMult: function(pts){
+		
 		var reqAngle = Math.PI*(pts.length-2);//interior angle of polygon
 		var UVs = this.getAreaUVs(pts);
-		var angleFirstUVNeg = this.getIntAngles(pts, UVs, 'first');
-		var angleSecondUVNeg = this.getIntAngles(pts, UVs, 'second');
-		if(round(angleFirstUVNeg,2)==round(reqAngle,2)){
-			return 'first';
-		} else if (round(angleSecondUVNeg,2)==round(reqAngle,2)){
-			return 'second';
+		var anglePositive = this.getIntAngles(pts, UVs, 1);
+		var angleNegative = this.getIntAngles(pts, UVs, -1);
+		if(round(anglePositive,2)==round(reqAngle,2)){
+			return 1;
+		} else if (round(angleNegative,2)==round(reqAngle,2)){
+			return -1;
 		}
 	},
 	getAreaUVs: function(pts){
@@ -378,31 +379,32 @@ WallHandler.prototype = {
 		UVs[UVs.length] = a.VTo(b).UV();
 		return UVs;
 	},
-	getIntAngles: function(pts, UVs, toNeg){
+	getIntAngles: function(pts, UVs, multiplier){
 		var intAngle = 0;
 		for (var ptIdx=1; ptIdx<pts.length-1; ptIdx++){
-			intAngle += this.angleBetweenPts(pts[ptIdx-1], pts[ptIdx], pts[ptIdx+1], toNeg);
+			intAngle += this.angleBetweenPts(pts[ptIdx-1], pts[ptIdx], pts[ptIdx+1], multiplier);
 		}
-		intAngle += this.angleBetweenPts(pts[pts.length-1], pts[0], pts[1], toNeg);
+		intAngle += this.angleBetweenPts(pts[pts.length-2], pts[pts.length-1], pts[0], multiplier);
+		intAngle += this.angleBetweenPts(pts[pts.length-1], pts[0], pts[1], multiplier);
 		return intAngle;
 	},
-	splitConcave: function(ptsOrig, toNeg){
+	splitConcave: function(ptsOrig, multiplier){
 		var pts = new Array(ptsOrig.length+2);
 		for (var ptIdx=0; ptIdx<ptsOrig.length; ptIdx++){pts[ptIdx]=ptsOrig[ptIdx]};
 		pts[pts.length-2] = ptsOrig[0];
 		pts[pts.length-1] = ptsOrig[1];
 		for (var ptIdx=1; ptIdx<pts.length-1; ptIdx++){
 			var abcs = this.abcs(pts, ptIdx);
-			var angle = this.angleBetweenPts(abcs.a, abcs.b, abcs.c, toNeg);
+			var angle = this.angleBetweenPts(abcs.a, abcs.b, abcs.c, multiplier);
 			if(angle>Math.PI){
 				if(ptIdx==ptsOrig.length){
 					ptIdx=0;
 				}
-				return this.splitAt(pts, ptIdx, toNeg);
+				return this.splitAt(pts, ptIdx, multiplier);
 			}
 		}
 	},
-	splitAt: function(pts, ptIdx, toNeg){
+	splitAt: function(pts, ptIdx, multiplier){
 		//setting >180 angle to idx 0
 		var pts = pts.slice(ptIdx, pts.length).concat(pts.slice(0, ptIdx));
 		var b = pts[0];
@@ -430,7 +432,7 @@ WallHandler.prototype = {
 				p1 = pts[ptIdx];
 				p2 = pts[ptIdx+1];
 			}
-			if(this.linesCross({p1:a, p2:b}, {p1:p1, p2:p2}){
+			if(this.linesCross({p1:a, p2:b}, {p1:p1, p2:p2})){
 				return true;
 			}
 			
@@ -439,19 +441,19 @@ WallHandler.prototype = {
 	},
 	linesCross: function(a, b){
 		var vA = a.p1.VTo(a.p2);
-		var vB = b.p2.VTo(b.p2);
+		var vB = b.p1.VTo(b.p2);
 		var magA = vA.mag();
 		var magB = vB.mag();
 		var UVA = vA.UV();
 		var UVB = vB.UV();
 		var dir1 = this.getDist(a, b, UVA, UVB, 'p1');
-		var dir2 = this.getDist(a, b, UVA, UVB, 'p2');
+		var dir2 = this.getDist(a, b, UVA.neg(), UVB.neg(), 'p2');
 		if(dir1.da>magA || dir1.db>magB || dir2.da>magA || dir2.db>magB){
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	},
-	getDist(line1, line2, UVA, UVB, from){
+	getDist: function(line1, line2, UVA, UVB, from){
 		var a;
 		var b;
 		if(from=='p1'){
@@ -465,26 +467,26 @@ WallHandler.prototype = {
 			return {da:Infinity, db:Infinity};
 		} else if (UVA.dx==0){
 			var dx = a.x-b.x;
-			var dy = dx/UVB.dx;
-			var hitPt = b.copy().movePt(V(dx, dy));
+			var magMovement = Math.abs(dx/UVB.dx)
+			var hitPt = b.copy().movePt(UVB.copy().mult(magMovement));
 			return {da: a.distTo(hitPt), db:b.distTo(hitPt)};
 		} else if (UVB.dx==0){
 			var dx = b.x-a.x;
-			var dy = dx/UVA.dx;
-			var hitPt = a.copy().movePt(V(dx, dy));
+			var magMovement = Math.abs(dx/UVA.dx);
+			var hitPt = a.copy().movePt(UVA.copy().mult(magMovement));
 			return {da: a.distTo(hitPt), db:b.distTo(hitPt)};		
 		}
 		if(UVA.dy==0 && UVB.dy==0){
 			return {da:Infinity, db:Infinity};
 		}else if(UVA.dy==0){
-			dy = a.y-b.y;
-			dx = dy/UVB.dy;
-			var hitPt = b.copy().movePt(V(dx, dy));
+			var dy = a.y-b.y;
+			var magMovement = Math.abs(dy/UVB.dy)
+			var hitPt = b.copy().movePt(UVB.copy().mult(magMovement));
 			return {da: a.distTo(hitPt), db:b.distTo(hitPt)};
 		}else if(UVB.dy==0){
-			var dx = b.x-a.x;
-			var dy = dx/UVA.dy;
-			var hitPt = a.copy().movePt(V(dx, dy));
+			var dy = b.y-a.y;
+			var magMovement = Math.abs(dy/UVA.dy)
+			var hitPt = a.copy().movePt(UVA.copy().mult(magMovement));
 			return {da: a.distTo(hitPt), db:b.distTo(hitPt)};	
 		}
 		var denom = UVB.dx*UVA.dy/UVA.dx - UVB.dy;
@@ -496,21 +498,16 @@ WallHandler.prototype = {
 		var da = (b.x + UVB.dx*db - a.x)/UVA.dx;
 		return {da:da, db:db};
 	},
-	angleBetweenPts(a, b, c, toNeg){
-		var abMult = 1;
-		var bcMult = 1;
-		if(toNeg=='first'){
-			abMult = -1;
-		else if(toNeg=='second'){
-			bcMult = -1;
-		}
-		var ab = a.VTo(b).UV().mult(abMult);
-		var bc = b.VTo(c).UV().mult(bcMult);
-		var center = ab.copy().add(bc);
-		var angleAB = Math.atan2(ab.dy, ab.dx);
+	angleBetweenPts: function(a, b, c, multiplier){
+		var ba = b.VTo(a).UV()//.mult(multiplier);
+		var bc = b.VTo(c).UV()//.mult(multiplier);
+		var center = ba.copy().add(bc)
+		ba.mult(multiplier);
+		bc.mult(multiplier);
+		var angleBA = Math.atan2(ba.dy, ba.dx);
 		var angleBC = Math.atan2(bc.dy, bc.dx);
 		var angleCenter = Math.atan2(center.dy, center.dx);
-		return this.distBetweenAngles(angleAB, angleCenter) + this.distBetweenAngles(angleCenter, angleBC);
+		return this.distBetweenAngles(angleBA, angleCenter) + this.distBetweenAngles(angleCenter, angleBC);
 	},
 	distBetweenAngles: function(a, b){
 		if(a<0){a+=Math.PI*2;}
