@@ -132,15 +132,13 @@ _.extend(Work.prototype,
 	},
 	block4Start: function(){
 		$('#reset').show()
-		
 		this.readout.show();
 		wallHandle = 'container';
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,350), P(40,350)]], {func:this.staticAdiabatic, obj:this}, [wallHandle]);
-		walls.setSubWallHandler(0, 0, {func:this.cPAdiabaticDamped, obj:this});
+		//walls.setSubWallHandler(0, 0, {func:this.cPAdiabaticDamped, obj:this});
 		this.stops = new Stops(10, 'container').init();
 		this.borderStd();
 		populate('spc1', P(45,35), V(445, 325), 650, 250);
-		
 		populate('spc3', P(45,35), V(445, 325), 450, 250);
 		this.dragWeights = this.makeDragWeights(wallHandle)
 		this.trackVolumeStart(0);
@@ -149,8 +147,15 @@ _.extend(Work.prototype,
 		$('#reset').hide();
 		this.trackVolumeStop();
 		walls.removeBorder(0);
-		this.yMax = this.yMaxSave;
-		this.yMaxSave = undefined;
+		this.stops.remove();
+		this.stop = undefined;
+		this.dragWeights.remove();
+		this.dragWeights = undefined;
+	},
+	block5Start: function(){
+		wallHandle = 'container';
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,350), P(40,350)]], {func:this.staticAdiabatic, obj:this}, [wallHandle]);
+		
 	},
 	borderStd: function(){
 		walls.border('container', [1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:this.yMin}, {}, {}, {y:this.yMin}]);
@@ -170,6 +175,7 @@ _.extend(Work.prototype,
 									massInit,
 									this.readout,
 									wallHandle,
+									{func:this.cPAdiabaticDamped, obj:this},
 									this
 									);
 		dragWeights.trackEnergyStop();
@@ -191,10 +197,6 @@ _.extend(Work.prototype,
 		this.numUpdates=0;
 		this.forceInternal=0;
 	},
-	vol: function(){
-		return walls.area(0) - walls.area(1);
-	},
-
 	changePressure: function(event, ui){
 		this.piston.setP(ui.value);
 	},

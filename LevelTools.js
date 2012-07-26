@@ -201,10 +201,10 @@ LevelTools.prototype = {
 		if(decPlaces===undefined){
 			decPlaces = 1;
 		}
-		this.readout.addEntry('vol', 'Volume:', 'L', dataHandler.volOneWall(), undefined, decPlaces);
+		this.readout.addEntry('vol', 'Volume:', 'L', dataHandler.volume(), undefined, decPlaces);
 		addListener(curLevel, 'update', 'trackVolume',
 			function(){
-				this.readout.hardUpdate(dataHandler.volOneWall(), 'vol');
+				this.readout.hardUpdate(dataHandler.volume(), 'vol');
 			},
 		this);
 	},

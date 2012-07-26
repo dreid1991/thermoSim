@@ -11,7 +11,7 @@ function Reversibility(){
 	this.wallCol = Col(255,255,255);
 	this.numUpdates = 0;
 	var wallHandle = 'container';
-	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], undefined, [wallHandle]);
+	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, [wallHandle]);
 	
 	
 	this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
@@ -60,9 +60,6 @@ function Reversibility(){
 	addListener(this, 'data', 'run', this.dataRun, this);
 	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
 	
-	
-	walls.setAllHandler({func:this.staticAdiabatic, obj:this})
-	walls.setSubWallHandler(0, 0, {func:this.cPAdiabaticDamped, obj:this});
 }
 _.extend(Reversibility.prototype, 
 			LevelTools.prototype, 
@@ -208,6 +205,7 @@ _.extend(Reversibility.prototype,
 									this.massInit,
 									this.readout,
 									wallName,
+									{func:this.cPAdiabaticDamped, obj:this},
 									this
 									);
 		return dragWeights;
@@ -227,9 +225,6 @@ _.extend(Reversibility.prototype,
 			this.graphs[graphName].addLast();
 		}
 		
-	},
-	vol: function(){
-		return walls.area(0);// - walls.area(1);
 	},
 	reset: function(){
 		
