@@ -121,6 +121,8 @@ _.extend(Work.prototype,
 		this.compArrow.remove();
 		this.compArrow = undefined;
 		walls.setHitMode('Std');
+		removeListenerByName(curLevel, 'update', 'drawArrow');
+		removeListenerByName(curLevel, 'update', 'animText');
 	},
 	block3Start: function(){
 		this.cutSceneStart("<p>So it would seem the molecule speeds up as a result of its collisions with a moving wall!  Could simple elastic collisions with moving walls really explain why compressing or expanding (against non-zero pressure) changes system temperature? I think that’s it, but to make sure, we need to do an experiment. </p><p> First we should note that the only way energy is added to the system in these simulations is through <a href=’ http://en.wikipedia.org/wiki/Elastic_collision ‘ target=’_blank’>elastic collisions</a> with the wall.  There’s no magically speeding up the molecules so the their changes in temperatures match the amount of work put in.  Our experiment will simply use the behavior of the molecule in the previous step, but with many molecules.  If work is expressed in some way other than through elastic collisions with the wall, this simulation will produce an incorrect result. </p><p>That being said, I propose the following experiment:<br>From the equation <p><center><img src='img/work/eq2.gif' alt='Don’t click me, it hurts!'></img></center></p><p>If we compress with a fixed pressure over some volume, we can calculate the expected temperature change and compare it to experiment.  If they match, we’ve verified that when you do work on a system, the system’s temperature increases because of elastic collisions with a moving wall (remember the bouncy ball model).</p>");
@@ -129,17 +131,26 @@ _.extend(Work.prototype,
 		this.cutSceneEnd();
 	},
 	block4Start: function(){
+		$('#reset').show()
+		this.yMaxSave = this.yMax;
+		this.yMax = 136.6;
 		this.readout.show();
 		wallHandle = 'container';
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,360), P(40,360)]], {func:this.staticAdiabatic, obj:this}, [wallHandle]);
+		walls = new WallHandler([[P(40,30), P(510,30), P(510,350), P(40,350)]], {func:this.staticAdiabatic, obj:this}, [wallHandle]);
 		walls.setSubWallHandler(0, 0, {func:this.cPAdiabaticDamped, obj:this});
 		this.borderStd();
-		populate('spc1', P(45,35), V(445, 325), 800, 300);
-		populate('spc3', P(45,35), V(445, 325), 600, 300);
+		populate('spc1', P(45,35), V(445, 325), 650, 250);
+		
+		populate('spc3', P(45,35), V(445, 325), 450, 250);
 		this.dragWeights = this.makeDragWeights(wallHandle)
+		this.trackVolumeStart(0);
 	},
 	block4CleanUp: function(){
+		$('#reset').hide();
+		this.trackVolumeStop();
 		walls.removeBorder(0);
+		this.yMax = this.yMaxSave;
+		this.yMaxSave = undefined;
 	},
 	borderStd: function(){
 		walls.border('container', [1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:this.yMin}, {}, {}, {y:this.yMin}]);
@@ -147,7 +158,7 @@ _.extend(Work.prototype,
 	makeDragWeights: function(wallHandle){
 		var self = this;
 		var massInit = 25;
-		var dragWeights = new DragWeights([{name:'lrg', count:1, mass:50}
+		var dragWeights = new DragWeights([{name:'lrg', count:1, mass:75}
 									],
 									walls.pts[0][2].y,
 									function(){return walls.pts[0][0].y},

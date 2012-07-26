@@ -178,7 +178,8 @@ CheckMark.prototype = {
 		draw.fillPtsStroke(this.pts, this.col, this.stroke, this.drawCanvas);
 	},
 }
-function Arrow(pts, col, drawCanvas){
+function Arrow(handle, pts, col, drawCanvas){
+	this.handle = handle;
 	var rotate = .5;
 	this.pts = {line:pts, arrow: new Array(3)}
 	this.col = col;
@@ -189,9 +190,10 @@ function Arrow(pts, col, drawCanvas){
 	var dirSide1 = dirBack.copy().rotate(rotate);
 	var dirSide2 = dirBack.copy().rotate(-rotate);
 
-	this.pts.arrow[0] = ptLast.copy().movePt(dirSide1.mult(5));
+	this.pts.arrow[0] = ptLast.copy().movePt(dirSide1.mult(10));
 	this.pts.arrow[1] = ptLast;
-	this.pts.arrow[2] = ptLast.copy().movePt(dirSide2.mult(5));
+	this.pts.arrow[2] = ptLast.copy().movePt(dirSide2.mult(10));
+	return this;
 }	
 Arrow.prototype = {
 	draw: function(){
@@ -204,6 +206,31 @@ Arrow.prototype = {
 			}	
 		}
 	},
+	show: function(lifespan){//in ms
+		var turn = 0;
+		addListener(curLevel, 'update', 'drawArrow' + this.handle, this.makeDrawFunc(lifespan), this)
+		return this;
+	},
+	makeDrawFunc: function(lifespan){
+		var turn = 0;
+		var self = this;
+		var drawListener = function(){
+			self.draw();
+		}
+		if(lifespan){
+			drawListener = extend(drawListener, function(){
+				turn++;
+					if(turn==lifespan){
+						removeListener(curLevel, 'update', 'drawArrow' + self.handle);
+					}
+				}
+			)
+		}
+		return drawListener;
+	},
+	hide: function(){
+		removeListener(curLevel, 'update', 'drawArrow' + this.handle);
+	}
 }
 function move(){
 	for (var spc in spcs){

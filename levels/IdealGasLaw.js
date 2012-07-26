@@ -237,9 +237,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		this.playedWithSlider = false;
 		walls = new WallHandler([[P(50,75), P(75,50), P(475,50), P(500,75), P(500,300), P(475,325), P(75,325), P(50,300)]], {func:this.staticAdiabatic, obj:this}, ['container']);
 		walls.setHitMode('Arrow');
-		;
 		populate('spc4', P(100,100), V(300,200), 1, 700);
-		//addListener(curLevel, 'wallImpact', 'arrow', this.onWallImpactArrow, this);
 		$('#sliderPressure').show();
 		
 	},
@@ -296,20 +294,11 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 	},
 	block11Start: function(){
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
-		;
-		var ptsToBorder = this.getPtsToBorder();
-		border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container', c);
+		
+		walls.border('container', [1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:this.yMin}, {}, {}, {y:this.yMin}]);
 		populate('spc1', P(45,35), V(450, 350), 800, 300);
 		populate('spc3', P(45,35), V(450, 350), 600, 300);	
 		this.compArrow = this.makeCompArrow({mode:'isothermal'});
-		var arrowVolInit = new Arrow([P(545, 30), P(510, 30)], Col(255,0,0), c);
-		var arrowVolHalf = new Arrow([P(545, 235), P(510, 235)], Col(0,255,0), c);
-		addListener(curLevel, 'update', 'drawVolArrows', 
-			function(){
-				arrowVolInit.draw();
-				arrowVolHalf.draw();
-			},
-		'');
 		this.forceInternal=0;
 		this.numUpdates=0;
 		this.readout.addEntry('pressure', 'Pressure:', 'atm', 0, 0, 1);
@@ -325,14 +314,8 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 	},
 	block11aStart: function(){
 		this.halfY = 235
-		var arrowVolInit = new Arrow([P(545, 30), P(510, 30)], Col(255,255,0), c);
-		var arrowVolHalf = new Arrow([P(545, this.halfY), P(510, this.halfY)], Col(0,255,0), c);
-		addListener(curLevel, 'update', 'drawVolArrows', 
-			function(){
-				arrowVolInit.draw();
-				arrowVolHalf.draw();
-			},
-		'');	
+		this.arrowVolInit = new Arrow('init', [P(545, 30), P(510, 30)], Col(255,255,0), c).show();
+		this.arrowVolHalf = new Arrow('half', [P(545, this.halfY), P(510, this.halfY)], Col(0,255,0), c).show();
 	},
 	block11aConditions: function(){
 		if(fracDiff(walls.pts[0][0].y, this.halfY)<.07){
@@ -342,19 +325,17 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		}
 	},
 	block11aCleanUp: function(){
-		removeListenerByName(curLevel, 'update', 'drawVolArrows');
+		this.arrowVolInit.hide();
+		this.arrowVolHalf.hide();		
+		this.arrowVolInit = undefined;
+		this.arrowVolHalf = undefined;
+		
+		//removeListenerByName(curLevel, 'update', 'drawVolArrows');
 	},
 	block11bStart: function(){
 		this.halfY = 337;
-		var arrowVolInit = new Arrow([P(545, 235), P(510, 235)], Col(255,255,0), c);
-		var arrowVolHalf = new Arrow([P(545, this.halfY), P(510, this.halfY)], Col(0,255,0), c);
-		addListener(curLevel, 'update', 'drawVolArrows', 
-			function(){
-				arrowVolInit.draw();
-				arrowVolHalf.draw();
-			},
-		'');	
-	
+		this.arrowVolInit = new Arrow('init', [P(545, 235), P(510, 235)], Col(255,255,0), c).show();
+		this.arrowVolHalf = new Arrow('half', [P(545, this.halfY), P(510, this.halfY)], Col(0,255,0), c).show();
 	},
 	block11bConditions: function(){
 		if(fracDiff(walls.pts[0][0].y, this.halfY)<.07){
@@ -364,12 +345,14 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		}	
 	},
 	block11bCleanUp: function(){
-		removeListenerByName(curLevel, 'update', 'drawVolArrows');
+		this.arrowVolInit.hide();
+		this.arrowVolHalf.hide();		
+		this.arrowVolInit = undefined;
+		this.arrowVolHalf = undefined;
 	},
 
 	block11CleanUp: function(){
-		removeListener(curLevel, 'update', 'drawVolArrows');
-		removeListenerByName(curLevel, 'update', 'drawBorder');
+		walls.removeBorder('container');
 		removeListener(curLevel, 'data', 'recordPressure');
 		this.readout.removeAllEntries();
 		this.readout.hide();

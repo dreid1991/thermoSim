@@ -8,31 +8,7 @@ DataHandler.prototype = {
 		return pConst*mass*g/SA;
 	},
 	temp: function(spcName){
-		var sumKE = 0
-		var numDots = 0;
-		if(spcName){
-			spc = spcs[spcName];
-			var numInSpc = spc.dots.length;
-			numDots += numInSpc; 
-			for (var dotIdx=0; dotIdx<numInSpc; dotIdx++){
-				var dot = spc.dots[dotIdx];
-				sumKE += dot.KE();
-			}		
-		}else{
-			for (var spcName in spcs){
-				spc = spcs[spcName];
-				var numInSpc = spc.dots.length;
-				numDots += numInSpc; 
-				for (var dotIdx=0; dotIdx<numInSpc; dotIdx++){
-					var dot = spc.dots[dotIdx];
-					sumKE += dot.KE();
-				}
-			}
-		}
-		t = sumKE*tConst;
-		t/=(numDots);
-		return t;
-		
+		return this.KEAvg(spcName)*tConst;
 	},
 	velocities: function(spcName){
 		var spc = spcs[spcName];
@@ -62,7 +38,7 @@ DataHandler.prototype = {
 			}
 			return sumKE/dots.length;
 		}
-		var numDots=0;
+		var numDots = 0;
 		for(spcName in spcs){
 			var dots = spcs[spcName].dots;
 			numDots+=dots.length;

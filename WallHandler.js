@@ -109,7 +109,7 @@ WallHandler.prototype = {
 				return idx;
 			}
 		}
-		console.log('Failed to get wall idx by handle');
+		console.log('Failed to get wall idx by handle\nHandle:'+handle);
 		
 	},
 	wallInfoToIdx: function(info){
@@ -403,16 +403,10 @@ WallHandler.prototype = {
 		arrowPts[2] = pos.copy().movePt(vf.copy().mult(10));
 		var lifeSpan = 50;
 		var arrowTurn = 0;
-		var arrow = new Arrow(arrowPts, Col(255,0,0),c);
-		addListener(curLevel, 'update', 'drawArrow'+pos.x+pos.y,
-			function(){
-				arrow.draw();
-				arrowTurn++;
-				if(arrowTurn==lifeSpan){
-					removeListener(curLevel, 'update', 'drawArrow'+pos.x+pos.y);
-				}
-			},
-		this);//could be ''.  Do after other stuff is working.
+		var handle = 'drawArrow'+round(pos.x,0)+round(pos.y,0);
+		var arrow = new Arrow(handle, arrowPts, Col(255,0,0),c).show(lifeSpan);
+
+
 		var textPos = pos.copy().movePt(vf.mult(15));
 		var delV = (Math.abs(perpVo)+Math.abs(perpVf))*pxToMS;
 		animText.newAnim({pos:textPos}, 

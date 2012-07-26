@@ -129,7 +129,9 @@ LevelTools.prototype = {
 			var boundedY = Math.max(this.yMin, Math.min(this.yMax, unboundedY));
 			var tHit = null;
 			if (boundedY==this.yMax){
-				var tHit = (-this.wallV + Math.sqrt(this.wallV*this.wallV + 2*this.g*(boundedY-lastY)))/this.g;
+				var tHit = (-this.wallV + Math.sqrt(Math.abs(this.wallV*this.wallV + 2*this.g*(boundedY-lastY))))/this.g;
+				//HEY - I abs'd THIS BECAUSE THE STRUFF IN THE sqrt WOULD BE LESS THAN 0 SOMETIMES.  
+				//NOT SURE WHY.  FIGURE IT OUT.
 			}else if (boundedY==this.yMin){
 				var tHit = (-this.wallV - Math.sqrt(this.wallV*this.wallV + 2*this.g*(boundedY-lastY)))/this.g;
 			}
@@ -194,6 +196,21 @@ LevelTools.prototype = {
 			this.removeGraph(graphName);
 			delete this.graphs[graphName];
 		}	
+	},
+	trackVolumeStart: function(decPlaces){
+		if(decPlaces===undefined){
+			decPlaces = 1;
+		}
+		this.readout.addEntry('vol', 'Volume:', 'L', dataHandler.volOneWall(), undefined, decPlaces);
+		addListener(curLevel, 'update', 'trackVolume',
+			function(){
+				this.readout.hardUpdate(dataHandler.volOneWall(), 'vol');
+			},
+		this);
+	},
+	trackVolumeStop: function(){
+		this.readout.removeEntry('vol');
+		removeListener(curLevel, 'update', 'trackVolume');
 	},
 	makeListeners: function(){
 		this.updateListeners = {listeners:{}, save:{}};
