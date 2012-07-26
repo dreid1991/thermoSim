@@ -357,7 +357,7 @@ WallHandler.prototype = {
 	},
 	getMult: function(pts){
 		
-		var reqAngle = Math.PI*(pts.length-2);//interior angle of polygon
+		var reqAngle = Math.PI*(pts.length-2);//interior angles of polygon
 		var UVs = this.getAreaUVs(pts);
 		var anglePositive = this.getIntAngles(pts, UVs, 1);
 		var angleNegative = this.getIntAngles(pts, UVs, -1);
@@ -499,11 +499,10 @@ WallHandler.prototype = {
 		return {da:da, db:db};
 	},
 	angleBetweenPts: function(a, b, c, multiplier){
-		var ba = b.VTo(a).UV()//.mult(multiplier);
-		var bc = b.VTo(c).UV()//.mult(multiplier);
-		var center = ba.copy().add(bc)
-		ba.mult(multiplier);
-		bc.mult(multiplier);
+		var ab = a.VTo(b).UV()
+		var ba = ab.copy().neg()
+		var bc = b.VTo(c).UV()
+		var center = ab.copy().add(bc).rotate(Math.PI/2*multiplier)
 		var angleBA = Math.atan2(ba.dy, ba.dx);
 		var angleBC = Math.atan2(bc.dy, bc.dx);
 		var angleCenter = Math.atan2(center.dy, center.dx);
