@@ -26,7 +26,8 @@ function Work(){
 		{block:1, title: 'Current step', finished: false, text:"Now these molecules undergo perfectly elastic collisions when they hit a wall.  That is to say they behave like a bouncy ball would when you throw it against a wall.  If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving, that is not true."},
 		{block:2, title: 'Current step', finished: false, text:"Let’s see if we can relate that idea to work by looking at just one molecule. If you compress the cylinder, why does the molecule’s speed change?  How does this relate to temperature?"},
 		{block:3, title: '', finished: false, text:''},
-		{block:4, title: 'Current step', finished: false, text:'So here we have a big weight we can use to bring our system to a pressure of n atm.  There are some stops on the piston that give us a max volume change of M L.  We have 1.4 moles of gas with a heat capacity of 8.31 J/mol*K.  What temperature change should we expect?  Try the experiment!  Did the two results match?'},
+		{block:4, title: 'Current step', finished: false, text:'So here we have a big weight we can use to bring our system to a pressure of 6 atm.  There are some stops on the piston that give us a max volume change of 5 liters.  We have 1.1 moles of gas with a heat capacity of 8.31 J/mol*K.  Calculate what temperature change should we expect?  Once you have that, try the experiment!  Did the calculated result match the simulated result?  Do these results back up or refute the idea that works adds energy through collisions with a moving wall?'},
+		{block:5, title: 'Current step', finished: false, text:''},
 	]
 	walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
@@ -140,11 +141,13 @@ _.extend(Work.prototype,
 		this.borderStd();
 		populate('spc1', P(45,35), V(445, 325), 650, 250);
 		populate('spc3', P(45,35), V(445, 325), 450, 250);
-		this.dragWeights = this.makeDragWeights(wallHandle)
+		this.dragWeights = this.makeDragWeights(wallHandle).init().trackEnergyStop().trackMassStop().trackPressureStart();
+		this.trackTempStart();
 		this.trackVolumeStart(0);
 	},
 	block4CleanUp: function(){
 		$('#reset').hide();
+		this.trackTempStop();
 		this.trackVolumeStop();
 		walls.removeBorder(0);
 		this.stops.remove();
@@ -178,9 +181,7 @@ _.extend(Work.prototype,
 									{func:this.cPAdiabaticDamped, obj:this},
 									this
 									);
-		dragWeights.trackEnergyStop();
-		dragWeights.trackPressureStart();
-		dragWeights.init();
+
 		return dragWeights;		
 	},
 

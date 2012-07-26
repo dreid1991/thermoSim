@@ -63,6 +63,7 @@ DragWeights.prototype = {
 		addListener(curLevel, 'reset', 'dragWeights', this.reset, this);
 		this.dropAllIntoStores();
 		delete this.tempWeightDefs;
+		return this;
 		
 	},
 	remove: function(){
@@ -87,30 +88,36 @@ DragWeights.prototype = {
 		if(!this.readout.entryExists('eAdd')){
 			this.addEnergyEntry();
 		}
+		return this;
 	},
 	trackEnergyStop: function(){
 		this.trackEnergy = false;
 		this.readout.removeEntry('eAdd');
+		return this;
 	},
 	trackMassStart: function(){
 		this.trackMass = true;
 		if(!this.readout.entryExists('mass')){
 			this.addMassEntry();
 		}
+		return this;
 	},
 	trackMassStop: function(){
 		this.trackMass = false;
 		this.readout.removeEntry('mass');
+		return this;
 	},
 	trackPressureStart: function(){
 		this.trackPressure = true;
 		if(!this.readout.entryExists('pressure')){
 			this.addPressureEntry();	
 		}
+		return this;
 	},
 	trackPressureStop: function(){
 		this.trackPressure = false;
 		this.readout.removeEntry('pressure');	
+		return this;
 	},
 	addStdReadoutEntries: function(){
 		this.addEnergyEntry();

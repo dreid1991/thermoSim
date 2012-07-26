@@ -212,6 +212,21 @@ LevelTools.prototype = {
 		this.readout.removeEntry('vol');
 		removeListener(curLevel, 'update', 'trackVolume');
 	},
+	trackTempStart: function(decPlaces){
+		if(decPlaces===undefined){
+			decPlaces = 0;
+		}
+		this.readout.addEntry('temp', 'Temp:', 'K', this.data.t[this.data.t.length-1], undefined, decPlaces);
+		addListener(curLevel, 'data', 'trackTemp',
+			function(){
+				this.readout.tick(this.data.t[this.data.t.length-1], 'temp');
+			},
+		this);	
+	},
+	trackTempStop: function(){
+		this.readout.removeEntry('temp');
+		removeListener(curLevel, 'data', 'trackTemp');
+	},
 	makeListeners: function(){
 		this.updateListeners = {listeners:{}, save:{}};
 		this.dataListeners = {listeners:{}, save:{}};
