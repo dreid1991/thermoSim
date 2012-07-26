@@ -438,7 +438,63 @@ WallHandler.prototype = {
 		return false;
 	},
 	linesCross: function(a, b){
-		
+		var vA = a.p1.VTo(a.p2);
+		var vB = b.p2.VTo(b.p2);
+		var magA = vA.mag();
+		var magB = vB.mag();
+		var UVA = vA.UV();
+		var UVB = vB.UV();
+		var dir1 = this.getDist(a, b, UVA, UVB, 'p1');
+		var dir2 = this.getDist(a, b, UVA, UVB, 'p2');
+		if(dir1.da>magA || dir1.db>magB || dir2.da>magA || dir2.db>magB){
+			return true;
+		}
+		return false;
+	},
+	getDist(line1, line2, UVA, UVB, from){
+		var a;
+		var b;
+		if(from=='p1'){
+			a = line1.p1;
+			b = line2.p1;
+		}else{
+			a = line1.p2;
+			b = line2.p2;
+		}
+		if(UVA.dx==0 && UVB.dx==0){
+			return {da:Infinity, db:Infinity};
+		} else if (UVA.dx==0){
+			var dx = a.x-b.x;
+			var dy = dx/UVB.dx;
+			var hitPt = b.copy().movePt(V(dx, dy));
+			return {da: a.distTo(hitPt), db:b.distTo(hitPt)};
+		} else if (UVB.dx==0){
+			var dx = b.x-a.x;
+			var dy = dx/UVA.dx;
+			var hitPt = a.copy().movePt(V(dx, dy));
+			return {da: a.distTo(hitPt), db:b.distTo(hitPt)};		
+		}
+		if(UVA.dy==0 && UVB.dy==0){
+			return {da:Infinity, db:Infinity};
+		}else if(UVA.dy==0){
+			dy = a.y-b.y;
+			dx = dy/UVB.dy;
+			var hitPt = b.copy().movePt(V(dx, dy));
+			return {da: a.distTo(hitPt), db:b.distTo(hitPt)};
+		}else if(UVB.dy==0){
+			var dx = b.x-a.x;
+			var dy = dx/UVA.dy;
+			var hitPt = a.copy().movePt(V(dx, dy));
+			return {da: a.distTo(hitPt), db:b.distTo(hitPt)};	
+		}
+		var denom = UVB.dx*UVA.dy/UVA.dx - UVB.dy;
+		if(denom==0){
+			return {da:Infinity, db:Infinity};
+		}
+		var num = b.y - a.y - UVA.dy*b.y/UVA.dx + a.x*UVA.dy/UVA.dx;
+		var db = num/denom;
+		var da = (b.x + UVB.dx*db - a.x)/UVA.dx;
+		return {da:da, db:db};
 	},
 	angleBetweenPts(a, b, c, toNeg){
 		var abMult = 1;
