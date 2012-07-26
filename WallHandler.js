@@ -323,13 +323,140 @@ WallHandler.prototype = {
 		}
 		return false;
 	},
-	area: function(wallIdx){
-		var wall = walls.pts[wallIdx];
+	//One wall, assuming first/last points do not overlap
+	area: function(pts){
+		var area=0;
+		var convexResults = this.isConvex(pts);
+		var toNeg = convexResults.toNeg;
+		var isConvex = convexResults.isConvex;
+		if(isConvex){
+			return this.areaConvex(pts);
+		}else{
+			var ptSets = this.splitConcave(pts, toNeg);
+			area+=this.area(set[0]);
+			area+=this.area(set[1]);
+		}
+		return area;
+	},
+	isConvex: function(pts){
+		var toNeg = this.getToNeg(pts);
+		for (var ptIdx=1; ptIdx<pts.length-1; ptIdx++){
+			var abcs = this.abcs(pts, ptIdx);
+			var angle = this.angleBetweenPts(abcs.a, abcs.b, abcs.c, toNeg);
+			if (angle>Math.PI){
+				return {isConvex:false, toNeg: toNeg};
+			}
+		}
+		var angle = this.angleBetweenPts(pts[pts.length-1], pts[0], pts[1], toNeg);
+		if (angle>Math.PI){
+			return {isConvex:false, toNeg: toNeg};
+		}
+		return {isConvex:true, toNeg: toNeg};
+		
+	},
+	getToNeg: function(pts){
+		//toNeg refers to which of the first and second unit vectors in the three-point line segment should be inverted so that the UV sum points into the polygon 
+		var reqAngle = Math.PI*(pts.length-2);//interior angle of polygon
+		var UVs = this.getAreaUVs(pts);
+		var angleFirstUVNeg = this.getIntAngles(pts, UVs, 'first');
+		var angleSecondUVNeg = this.getIntAngles(pts, UVs, 'second');
+		if(round(angleFirstUVNeg,2)==round(reqAngle,2)){
+			return 'first';
+		} else if (round(angleSecondUVNeg,2)==round(reqAngle,2)){
+			return 'second';
+		}
+	},
+	getAreaUVs: function(pts){
+		var UVs = new Array(pts.length);
+		for (var ptIdx=0; ptIdx<pts.length-1; ptIdx++){
+			var a = pts[ptIdx];
+			var b = pts[ptIdx+1];
+			UVs[ptIdx] = a.VTo(b).UV();
+		}
+		var a = pts[pts.length-1];
+		var b = pts[0];
+		UVs[UVs.length] = a.VTo(b).UV();
+		return UVs;
+	},
+	getIntAngles: function(pts, UVs, toNeg){
+		var intAngle = 0;
+		for (var ptIdx=1; ptIdx<pts.length-1; ptIdx++){
+			intAngle += this.angleBetweenPts(pts[ptIdx-1], pts[ptIdx], pts[ptIdx+1], toNeg);
+		}
+		intAngle += this.angleBetweenPts(pts[pts.length-1], pts[0], pts[1], toNeg);
+		return intAngle;
+	},
+	splitConcave: function(ptsOrig, toNeg){
+		var pts = new Array(ptsOrig.length+2);
+		for (var ptIdx=0; ptIdx<ptsOrig.length; ptIdx++){pts[ptIdx]=ptsOrig[ptIdx]};
+		pts[pts.length-2] = ptsOrig[0];
+		pts[pts.length-1] = ptsOrig[1];
+		for (var ptIdx=1; ptIdx<pts.length-1; ptIdx++){
+			var abcs = this.abcs(pts, ptIdx);
+			var angle = this.angleBetweenPts(abcs.a, abcs.b, abcs.c, toNeg);
+			if(angle>Math.PI){
+				if(ptIdx==ptsOrig.length){
+					ptIdx=0;
+				}
+				return this.splitAt(pts, ptIdx, toNeg);
+			}
+		}
+	},
+	splitAt: function(pts, ptIdx, toNeg){
+		//setting >180 angle to idx 0
+		var pts = pts.slice(ptIdx, pts.length).concat(pts.slice(0, ptIdx));
+		var a = pts[pts.length-1];
+		var b = pts[0];
+		for (var ptIdx=2; ptIdx<pts.length-1; ptIdx++){
+			var c = pts[ptIdx];
+			if(this.angleBetweenPts(a, b, c, toNeg)<Math.PI && this.doesNotCross(b, c, pts)){
+				
+				
+			}
+		}
+	},
+	abcs: function(pts, centeredAt){
+		return {a:pts[centeredAt-1], b:pts[centeredAt], c:pts[centeredAt+1]}
+	},
+	doesNotCross: function(a, b, pts){
+		var line = a.VTo(b);
+		//finish
+	},
+	angleBetweenPts(a, b, c, toNeg){
+		var abMult = 1;
+		var bcMult = 1;
+		if(toNeg=='first'){
+			abMult = -1;
+		else if(toNeg=='second'){
+			bcMult = -1;
+		}
+		var ab = a.VTo(b).UV().mult(abMult);
+		var bc = b.VTo(c).UV().mult(bcMult);
+		var center = ab.copy().add(bc);
+		var angleAB = Math.atan2(ab.dy, ab.dx);
+		var angleBC = Math.atan2(bc.dy, bc.dx);
+		var angleCenter = Math.atan2(center.dy, center.dx);
+		return this.distBetweenAngles(angleAB, angleCenter) + this.distBetweenAngles(angleCenter, angleBC);
+	},
+	distBetweenAngles: function(a, b){
+		if(a<0){a+=Math.PI*2;}
+		if(b<0){b+=Math.PI*2;}
+		var max = Math.max(a, b);
+		var min = Math.min(a, b);
+		var diff = max-min;
+		if(diff>Math.PI){
+			return 2*Math.PI - diff;
+		}else{
+			return diff;
+		}
+		
+	},
+	areaConvex: function(pts){
 		var area = 0;
-		var originPt = wall[0];
-		for (var ptIdx=2; ptIdx<wall.length-1; ptIdx++){
-			pt1 = wall[ptIdx-1];
-			pt2 = wall[ptIdx];
+		var originPt = pts[0];
+		for (var ptIdx=2; ptIdx<pts.length-1; ptIdx++){
+			pt1 = pts[ptIdx-1];
+			pt2 = pts[ptIdx];
 			area += originPt.area(pt1, pt2);
 		}
 		return area;
