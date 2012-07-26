@@ -493,7 +493,7 @@ WallHandler.prototype = {
 		if(denom==0){
 			return {da:Infinity, db:Infinity};
 		}
-		var num = b.y - a.y - UVA.dy*b.y/UVA.dx + a.x*UVA.dy/UVA.dx;
+		var num = b.y - a.y - UVA.dy*b.x/UVA.dx + a.x*UVA.dy/UVA.dx;
 		var db = num/denom;
 		var da = (b.x + UVB.dx*db - a.x)/UVA.dx;
 		return {da:da, db:db};
