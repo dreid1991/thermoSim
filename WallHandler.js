@@ -333,8 +333,8 @@ WallHandler.prototype = {
 			return this.areaConvex(pts);
 		}else{
 			var ptSets = this.splitConcave(pts, multiplier);
-			area+=this.area(set[0]);
-			area+=this.area(set[1]);
+			area+=this.area(ptSets[0]);
+			area+=this.area(ptSets[1]);
 		}
 		return area;
 	},
@@ -400,7 +400,7 @@ WallHandler.prototype = {
 				if(ptIdx==ptsOrig.length){
 					ptIdx=0;
 				}
-				return this.splitAt(pts, ptIdx, multiplier);
+				return this.splitAt(pts.slice(0, pts.length-2), ptIdx, multiplier);
 			}
 		}
 	},
@@ -412,7 +412,7 @@ WallHandler.prototype = {
 			var c = pts[ptIdx];
 			if(!this.crossesWall(b, c, pts)){
 				var pts1 = pts.slice(0, ptIdx+1);
-				var pts2 = pts.slice(ptIdx, pts.length);
+				var pts2 = pts.slice(0,1).concat(pts.slice(ptIdx, pts.length));
 				return [pts1, pts2];
 			}
 		}
@@ -422,7 +422,7 @@ WallHandler.prototype = {
 	},
 	crossesWall: function(a, b, pts){
 		var line = a.VTo(b);
-		for (var ptIdx=0; ptIdx<pts.length; ptIdx++){
+		for (var ptIdx=1; ptIdx<pts.length; ptIdx++){
 			var p1;
 			var p2;
 			if(ptIdx==pts.length-1){
@@ -448,7 +448,7 @@ WallHandler.prototype = {
 		var UVB = vB.UV();
 		var dir1 = this.getDist(a, b, UVA, UVB, 'p1');
 		var dir2 = this.getDist(a, b, UVA.neg(), UVB.neg(), 'p2');
-		if(dir1.da>magA || dir1.db>magB || dir2.da>magA || dir2.db>magB){
+		if(dir1.da>=magA || dir1.db>=magB || dir2.da>=magA || dir2.db>=magB){
 			return false;
 		}
 		return true;
@@ -524,7 +524,7 @@ WallHandler.prototype = {
 	areaConvex: function(pts){
 		var area = 0;
 		var originPt = pts[0];
-		for (var ptIdx=2; ptIdx<pts.length-1; ptIdx++){
+		for (var ptIdx=2; ptIdx<pts.length; ptIdx++){
 			pt1 = pts[ptIdx-1];
 			pt2 = pts[ptIdx];
 			area += originPt.area(pt1, pt2);
