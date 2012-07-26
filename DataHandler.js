@@ -48,12 +48,7 @@ DataHandler.prototype = {
 		}
 		return sumKE/numDots;
 	},
-	volOneWall: function(){
-		//return walls.area(0)*vConst;
-		return 5;
+	volume: function(){
+		return walls.totalArea()*vConst;
 	},
-	volPolyWall: function(){
-		return 5;
-		//return curLevel.vol()*vConst;
-	}
 }

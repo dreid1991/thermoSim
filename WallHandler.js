@@ -1,6 +1,14 @@
-function WallHandler(pts, handlers, handles){
+function WallHandler(pts, handlers, handles, includes){
 	this.hitMode = 'Std';
 	this.pts = pts;
+	if(includes){
+		this.includes = includes;
+	} else {
+		this.includes = new Array(this.pts.length);
+		for (var ptIdx=0; ptIdx<this.pts.length; ptIdx++){
+			this.includes[ptIdx] = 1;
+		}
+	}
 	this.handles = handles;
 	this.gridDim=20;
 	if(this.handles.length!=this.pts.length){
@@ -75,12 +83,17 @@ WallHandler.prototype = {
 		this.wallPerpUVs[wallIdx] = this.getPerpUVs(wallIdx);
 		this.wallGrids[wallIdx] = this.getSubwallGrid(wallIdx);
 	},
-	addWall: function(pts, handler, handle){
+	addWall: function(pts, handler, handle, includes){
 		//this.handlers.push(new Array(pts.length));
 		this.handles.push(handle)
 		this.closeWall(pts);
 		this.pts.push(pts);
 		this.ptsInit[this.pts.length-1] = this.copyWall(this.pts[this.pts.length-1]);
+		if(includes){
+			this.includes.push(includes);
+		}else{
+			this.includes.push(1);
+		}
 		this.setupWall(this.pts.length-1);
 		this.setWallHandler(this.pts.length-1, handler);
 	},
@@ -128,6 +141,7 @@ WallHandler.prototype = {
 		this.wallUVs.splice(wallIdx, 1);
 		this.wallPerpUVs.splice(wallIdx, 1);
 		this.wallGrids.splice(wallIdx, 1);
+		this.includes.splice(wallIdx, 1);
 		this.handlers.splice(wallIdx, 1);
 	},
 	closeWalls: function(){
@@ -270,8 +284,6 @@ WallHandler.prototype = {
 									}
 								}
 							}
-		
-								
 						}
 					}
 				}
@@ -324,6 +336,15 @@ WallHandler.prototype = {
 		return false;
 	},
 	//One wall, assuming first/last points do not overlap
+	totalArea: function(){
+		var area=0;
+		for (var wallIdx=0; wallIdx<this.pts.length; wallIdx++){
+			var uncutPts = this.pts[wallIdx];
+			var pts = uncutPts.slice(0,uncutPts.length-1);
+			area+=this.includes[wallIdx]*this.area(pts);
+		}
+		return area;
+	},
 	area: function(pts){
 		var area=0;
 		var convexResults = this.isConvex(pts);

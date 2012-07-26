@@ -221,7 +221,7 @@ _.extend(Reversibility.prototype,
 		this.data.pInt.push(dataHandler.pressureInt(this.forceInternal, this.numUpdates, SAPInt));
 		this.data.pExt.push(dataHandler.pressureExt(this.dragWeights.mass(), this.g, this.SAPExt));
 		this.data.t.push(dataHandler.temp());
-		this.data.v.push(dataHandler.volOneWall());
+		this.data.v.push(dataHandler.volume());
 		this.forceInternal = 0;
 		for(var graphName in this.graphs){
 			this.graphs[graphName].addLast();

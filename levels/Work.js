@@ -183,7 +183,7 @@ _.extend(Work.prototype,
 		var SA = getLen([wall[0], wall[1], wall[2], wall[3], wall[4]]);//HEY - FOR TESTING PURPOSES ONLY.  DOES NOT WORK WITH MOVING WALL AS WE DO NOT ADD FORCE INTERNAL THERE  //What?
 		this.data.p.push(dataHandler.pressureInt(this.forceInternal, this.numUpdates, SA))
 		this.data.t.push(dataHandler.temp());
-		this.data.v.push(dataHandler.volOneWall());
+		this.data.v.push(dataHandler.volume());
 		
 		for(var graphName in this.graphs){
 			this.graphs[graphName].addLast();

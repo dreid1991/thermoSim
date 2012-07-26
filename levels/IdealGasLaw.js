@@ -401,7 +401,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 	dataRun: function(){
 
 		this.data.t.push(dataHandler.temp());
-		this.data.v.push(dataHandler.volOneWall());
+		this.data.v.push(dataHandler.volume());
 		
 		for(var graphName in this.graphs){
 			this.graphs[graphName].addLast();
