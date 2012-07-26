@@ -405,22 +405,40 @@ WallHandler.prototype = {
 	splitAt: function(pts, ptIdx, toNeg){
 		//setting >180 angle to idx 0
 		var pts = pts.slice(ptIdx, pts.length).concat(pts.slice(0, ptIdx));
-		var a = pts[pts.length-1];
 		var b = pts[0];
 		for (var ptIdx=2; ptIdx<pts.length-1; ptIdx++){
 			var c = pts[ptIdx];
-			if(this.angleBetweenPts(a, b, c, toNeg)<Math.PI && this.doesNotCross(b, c, pts)){
-				
-				
+			if(!this.crossesWall(b, c, pts)){
+				var pts1 = pts.slice(0, ptIdx+1);
+				var pts2 = pts.slice(ptIdx, pts.length);
+				return [pts1, pts2];
 			}
 		}
 	},
 	abcs: function(pts, centeredAt){
 		return {a:pts[centeredAt-1], b:pts[centeredAt], c:pts[centeredAt+1]}
 	},
-	doesNotCross: function(a, b, pts){
+	crossesWall: function(a, b, pts){
 		var line = a.VTo(b);
-		//finish
+		for (var ptIdx=0; ptIdx<pts.length; ptIdx++){
+			var p1;
+			var p2;
+			if(ptIdx==pts.length-1){
+				p1 = pts[ptIdx];
+				p2 = pts[0];
+			}else{
+				p1 = pts[ptIdx];
+				p2 = pts[ptIdx+1];
+			}
+			if(this.linesCross({p1:a, p2:b}, {p1:p1, p2:p2}){
+				return true;
+			}
+			
+		}
+		return false;
+	},
+	linesCross: function(a, b){
+		
 	},
 	angleBetweenPts(a, b, c, toNeg){
 		var abMult = 1;
