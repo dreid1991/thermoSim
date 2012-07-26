@@ -377,7 +377,6 @@ WallHandler.prototype = {
 		
 	},
 	getMult: function(pts){
-		
 		var reqAngle = Math.PI*(pts.length-2);//interior angles of polygon
 		var UVs = this.getAreaUVs(pts);
 		var anglePositive = this.getIntAngles(pts, UVs, 1);
