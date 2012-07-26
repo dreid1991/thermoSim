@@ -60,14 +60,14 @@ WallHandler.prototype = {
 		}
 	},
 	setWallHandler: function(wallInfo, handler){
-		var wallIdx = this.wallInfoToIdx(wallInfo);//info can be handle or idx
+		var wallIdx = this.idxByInfo(wallInfo);//info can be handle or idx
 		for (var subWallIdx=0; subWallIdx<this.pts[wallIdx].length; subWallIdx++){
 			this.setSubWallHandler(wallIdx, subWallIdx, handler);
 		}
 	},
 	
 	setSubWallHandler: function(wallInfo, subWallIdx, handler){
-		var wallIdx = this.wallInfoToIdx(wallInfo)
+		var wallIdx = this.idxByInfo(wallInfo)
 		this.handlers[wallIdx+ '-' + subWallIdx] = handler;
 	},
 	setupWall: function(wallIdx){
@@ -112,7 +112,7 @@ WallHandler.prototype = {
 		console.log('Failed to get wall idx by handle\nHandle:'+handle);
 		
 	},
-	wallInfoToIdx: function(info){
+	idxByInfo: function(info){
 		var wallIdx;
 		if(parseFloat(info)!=info){
 			var wallIdx = this.idxByHandle(info)
@@ -348,7 +348,7 @@ WallHandler.prototype = {
 	},
 	border: function(wallInfo, wallPts, thickness, col, ptAdjusts){
 		var drawCanvas = c;
-		var wallIdx = this.wallInfoToIdx(wallInfo);
+		var wallIdx = this.idxByInfo(wallInfo);
 		var pts = new Array(wallPts.length);
 		var perpUVs = new Array(wallPts.length-1)
 		var borderPts = [];
@@ -390,7 +390,7 @@ WallHandler.prototype = {
 		return pt.copy().movePt(adjust.mult(thickness));
 	},
 	removeBorder: function(wallInfo){
-		var wallIdx = this.wallInfoToIdx(wallInfo);
+		var wallIdx = this.idxByInfo(wallInfo);
 		removeListener(curLevel, 'update', 'drawBorder' + wallIdx);
 	},
 	////////////////////////////////////////////////////////////

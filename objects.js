@@ -1185,15 +1185,43 @@ Heater.prototype = {
 //////////////////////////////////////////////////////////////////////////
 //STOPS
 //////////////////////////////////////////////////////////////////////////
-function Stops(volume){
+function Stops(volume, wallInfo){
+	//assumes canvas of c.  I mean, where else would they be?
+	this.stopWidth = 20;
+	this.stopHeight = 5;
+	var wallsLocal = walls;
+	this.wallIdx = wallsLocal.idxByInfo(wallInfo);
+	this.pts = wallsLocal.pts[this.wallIdx];
+	var width = this.pts[0].distTo(this.pts[1]);
+	var length = volume/(vConst*width);
+	this.height = this.pts[2].y-length;
 
+	this.draw = this.makeDrawFunc(this.height);
+	return this;
 }
 Stops.prototype = {
-	draw: function(){
-		
+	makeDrawFunc: function(height){
+		var pLeft = this.pts[3].copy().position({y:height});
+		var pRight = this.pts[2].copy().position({y:height}).movePt({dx:-this.stopWidth});
+		var stopWidth = this.stopWidth;
+		var stopHeight = this.stopHeight;
+		var dims = V(stopWidth, stopHeight);
+		var borderColLocal = borderCol;
+		return function(){
+			draw.fillRect(pLeft, dims, borderColLocal, c);
+			draw.fillRect(pRight, dims, borderColLocal, c);
+		}
+	},
+	init: function(){
+		this.yMaxSave = curLevel.yMax;
+		curLevel.yMax = this.height;
+		addListener(curLevel, 'update', 'drawStops' + this.wallIdx, this.draw, '');
+		return this;
 	},
 	remove: function(){
-	
+		curLevel.yMax = this.MaxSave;
+		removeListener(curLevel, 'update', 'drawStops' + this.wallIdx);
+		return this;
 	},
 	
 }

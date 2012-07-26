@@ -42,7 +42,7 @@ DataHandler.prototype = {
 		for(spcName in spcs){
 			var dots = spcs[spcName].dots;
 			numDots+=dots.length;
-			for(var dotIdx=0; dotIdx<dots.lenght; dotIdx++){
+			for(var dotIdx=0; dotIdx<dots.length; dotIdx++){
 				sumKE+=dots[dotIdx].KE();
 			}
 		}

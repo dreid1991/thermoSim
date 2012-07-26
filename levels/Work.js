@@ -132,12 +132,12 @@ _.extend(Work.prototype,
 	},
 	block4Start: function(){
 		$('#reset').show()
-		this.yMaxSave = this.yMax;
-		this.yMax = 136.6;
+		
 		this.readout.show();
 		wallHandle = 'container';
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,350), P(40,350)]], {func:this.staticAdiabatic, obj:this}, [wallHandle]);
 		walls.setSubWallHandler(0, 0, {func:this.cPAdiabaticDamped, obj:this});
+		this.stops = new Stops(10, 'container').init();
 		this.borderStd();
 		populate('spc1', P(45,35), V(445, 325), 650, 250);
 		
