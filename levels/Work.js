@@ -140,8 +140,8 @@ _.extend(Work.prototype,
 		//walls.setSubWallHandler(0, 0, {func:this.cPAdiabaticDamped, obj:this});
 		this.stops = new Stops(10, 'container').init();
 		this.borderStd();
-		//populate('spc1', P(45,35), V(445, 325), 650, 250);
-		//populate('spc3', P(45,35), V(445, 325), 450, 250);
+		populate('spc1', P(45,35), V(445, 325), 650, 250);
+		populate('spc3', P(45,35), V(445, 325), 450, 250);
 		this.dragWeights = this.makeDragWeights(wallHandle).init().trackEnergyStop().trackMassStop().trackPressureStart();
 		this.trackTempStart();
 		this.trackVolumeStart(0);
