@@ -60,8 +60,6 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		nextPrompt();
 	},
 	block0Start: function(){
-		//var ptsToBorder = this.getPtsToBorder();
-		//border(ptsToBorder, 5, this.wallCol.copy().adjust(-100,-100,-100), 'container',c);
 		this.cutSceneStart("<p>Good morning!</p><p>Today, we’re going to consider the ideal gas law.  Specifically, we’re going to figure out why PV does in fact equal nRT, and we’re going to do so from a molecular perspective.  To do this, we’ll need to look at how temperature, pressure, and volume represent themselves on a molecular level. Once that’s understood, we can try to build the relations in the ideal gas law ourselves to get a better understanding of why they're true. </p><p>Let’s begin, shall we?</p>",
 		'intro');
 
@@ -294,8 +292,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 	},
 	block11Start: function(){
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
-		
-		walls.border('container', [1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:this.yMin}, {}, {}, {y:this.yMin}]);
+		this.borderStd();
 		populate('spc1', P(45,35), V(450, 350), 800, 300);
 		populate('spc3', P(45,35), V(450, 350), 600, 300);	
 		this.compArrow = this.makeCompArrow({mode:'isothermal'});
@@ -388,15 +385,6 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		this.cutSceneEnd();
 
 		showPrompt(undefined, this.prompts[curLevel.promptIdx]);		
-	},
-	getPtsToBorder: function(){
-		var pts = [];
-		var wallPts = walls.pts[0];
-		pts.push(wallPts[1].copy().position({y:this.minY}))
-		pts.push(wallPts[2].copy());
-		pts.push(wallPts[3].copy());
-		pts.push(wallPts[4].copy().position({y:this.minY}));
-		return pts;
 	},
 	dataRun: function(){
 		this.data.t.push(dataHandler.temp());

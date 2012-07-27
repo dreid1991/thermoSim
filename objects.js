@@ -1245,5 +1245,46 @@ Stops.prototype = {
 		removeListener(curLevel, 'update', 'drawStops' + this.wallIdx);
 		return this;
 	},
-	
+}
+//////////////////////////////////////////////////////////////////////////
+//STATE LISTENER
+//////////////////////////////////////////////////////////////////////////
+function StateListener(condition, checkList, tolerance, recordAtSatisfy){
+	this.condition = condition;
+	this.checkList = checkList;
+	this.recordAtSatisfy = recordAtSatisfy;
+	this.tolerance = .07;
+	if(tolerance){
+		this.tolerance = tolerance;
+	}
+	this.amSatisfied = false;
+	this.init();
+	return this;
+}
+StateListener.prototype = {
+	init: function(){
+		addListener(curLevel, 'data', 'StateListener' + this.condition,
+			function(){
+				var last = this.checkList[this.checkList.length-1];
+				if(fracDiff(this.condition, last)<this.tolerance){
+					this.amSatisfied = true;
+					this.recordVals();
+					removeListener(curLevel, 'data', 'StateListener' + this.condition);
+				}
+			},
+		this);
+	},
+	recordVals: function(){
+		this.record = {}
+		for (var recordName in this.recordAtSatisfy){
+			var sourceList = this.recordAtSatisfy[recordName];
+			this.record[recordName] = sourceList[sourceList.length-1];
+		}
+	},
+	isSatisfied: function(){
+		return this.amSatisfied;
+	},
+	valsAtSatisfy: function(){
+		return this.record;
+	},
 }

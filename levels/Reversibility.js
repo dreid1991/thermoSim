@@ -86,7 +86,7 @@ _.extend(Reversibility.prototype,
 								{data:this.data, x:'v', y:'t'});		
 		
 		
-		walls.border('container', [1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:this.yMin}, {}, {}, {y:this.yMin}]);
+		this.borderStd();
 		nextPrompt();
 	},
 	block0Start: function(){

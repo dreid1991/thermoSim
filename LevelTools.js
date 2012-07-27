@@ -168,6 +168,9 @@ LevelTools.prototype = {
 		
 		return nextY;
 	},
+	borderStd: function(){
+		walls.border('container', [1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:this.yMin}, {}, {}, {y:this.yMin}]);
+	},
 	update: function(){
 		this.numUpdates++;
 		for (var updateListener in this.updateListeners.listeners){

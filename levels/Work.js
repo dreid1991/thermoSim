@@ -22,11 +22,11 @@ function Work(){
 
 	this.prompts=[
 		{block:0, title: '', finished: false, text:''},
-		{block:1, title: 'Current step', finished: false, text:"Alright, let’s fit a model to what we just described.  Above we have a piston and cylinder setup.  You can change the piston’s pressure with the pressure slider.  If you compress the system, how does the temperature behave?  Does this make sense in the context of doing work on the system?"},
+		{block:1, title: 'Current step', finished: false, text:"Alright, let’s do some work.  Above we have a piston and cylinder setup.  You can change the piston’s pressure with the slider.  If you compress the system, how does the temperature behave?  From the previous equation, how should the slopes of temperature and pressure with respect to volume change?  Do they behave as they should?"},
 		{block:1, title: 'Current step', finished: false, text:"Now these molecules undergo perfectly elastic collisions when they hit a wall.  That is to say they behave like a bouncy ball would when you throw it against a wall.  If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving, that is not true."},
 		{block:2, title: 'Current step', finished: false, text:"Let’s see if we can relate that idea to work by looking at just one molecule. If you compress the cylinder, why does the molecule’s speed change?  How does this relate to temperature?"},
 		{block:3, title: '', finished: false, text:''},
-		{block:4, title: 'Current step', finished: false, text:'So here we have a big weight we can use to bring our system to a pressure of 6 atm.  There are some stops on the piston that give us a max volume change of 5 liters.  We have 1.1 moles of gas with a heat capacity of 8.31 J/mol*K.  Calculate what temperature change should we expect?  Once you have that, try the experiment!  Did the calculated result match the simulated result?  Do these results back up or refute the idea that works adds energy through collisions with a moving wall?'},
+		{block:4, title: 'Current step', finished: false, conditions: this.block4Conditions, text:'So here we have a big weight we can use to bring our system to a pressure of 6 atm.  There are some stops on the piston that let us compress to 10 liters.  We have 1.1 moles of gas with a heat capacity of R J/mol*K (<a href = extras/heatCapacity.html>explanation</a>).  What final temperature should we expect if we compress our piston all the way?  Once you have a value, try the experiment!  Do the calculated and simulated result match?  Do these results back up or refute the idea that works adds energy through collisions with a moving wall?'},
 		{block:5, title: 'Current step', finished: false, text:''},
 	]
 	walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
@@ -52,9 +52,9 @@ _.extend(Work.prototype,
 
 	block0Start: function(){
 		this.cutSceneStart("<p>Good afternoon!</p>"+
-		"Today we're going to try to figure out why work does work.  Let's start with the equations that relate work to a temperature change:"+
+		"HEY - CAPITAL Pressure Today we’re going to try to figure out why work changes a system's temperature.  Let’s start with the equations for relating work to a temperature change:"+
 		"<p><center><img src='img/work/eq1.gif' alt='hoverhoverhover'></img></center></p>"+
-		"<p>This equation says that work is equal to how hard you push on a container times how much you compress it.  It also says that as you compress that container, the gas inside heats up.  But why does that happen?  What is it about pushing on a container makes its molecules speed up?</p>"+
+		"<p>This equation says that work is equal to how hard you compress a container times how much you compress it.  It also says that as you compress that container, the gas inside heats up.  But why does that happen?  What is it about pushing on a container makes its molecules speed up? </p>"+
 		"<p> One might say that it’s because energy is being added, and that is true, but we’re going to try to pin down the physical event that makes a molecule speed up as a result of the container compressing.",
 		'intro'
 		);
@@ -127,7 +127,7 @@ _.extend(Work.prototype,
 		removeListenerByName(curLevel, 'update', 'animText');
 	},
 	block3Start: function(){
-		this.cutSceneStart("<p>So it would seem the molecule speeds up as a result of its collisions with a moving wall!  Could simple elastic collisions with moving walls really explain why compressing or expanding (against non-zero pressure) changes system temperature? I think that’s it, but to make sure, we need to do an experiment. </p><p> First we should note that the only way energy is added to the system in these simulations is through <a href=’ http://en.wikipedia.org/wiki/Elastic_collision ‘ target=’_blank’>elastic collisions</a> with the wall.  There’s no magically speeding up the molecules so the their changes in temperatures match the amount of work put in.  Our experiment will simply use the behavior of the molecule in the previous step, but with many molecules.  If work is expressed in some way other than through elastic collisions with the wall, this simulation will produce an incorrect result. </p><p>That being said, I propose the following experiment:<br>From the equation <p><center><img src='img/work/eq2.gif' alt='Don’t click me, it hurts!'></img></center></p><p>If we compress with a fixed pressure over some volume, we can calculate the expected temperature change and compare it to experiment.  If they match, we’ve verified that when you do work on a system, the system’s temperature increases because of elastic collisions with a moving wall (remember the bouncy ball model).</p>");
+		this.cutSceneStart("<p>So it would seem the molecule speeds up as a result of its collisions with a moving wall!  Could simple elastic collisions with moving walls really explain why compressing or expanding (against non-zero pressure) changes system temperature? I think that’s it, but to make sure, we need to do an experiment. </p><p> First we should note that the only way energy is added to the system in these simulations is through <a href=’ http://en.wikipedia.org/wiki/Elastic_collision ‘ target=’_blank’>elastic collisions</a> with the wall.  There’s no magically speeding up the molecules to match how much work was put in.  If work is expressed in some way other than through elastic collisions with the wall, our experiment will produce the wrong temperature change. </p><p>That being said, I propose the following experiment:<br>From the equation <p><center><img src='img/work/eq2.gif' alt='Don’t click me, it hurts!'></img></center></p><p>If we compress with a fixed pressure over some volume, we can calculate the expected temperature change and compare it to experiment.  If they match, we’ve verified that when you do work on a system, the system’s temperature increases because of elastic collisions with a moving wall (remember the bouncy ball model).</p>");
 	},
 	block3CleanUp: function(){
 		this.cutSceneEnd();
@@ -145,6 +145,8 @@ _.extend(Work.prototype,
 		this.dragWeights = this.makeDragWeights(wallHandle).init().trackEnergyStop().trackMassStop().trackPressureStart();
 		this.trackTempStart();
 		this.trackVolumeStart(0);
+		this.volListener15 = new StateListener(15, this.data.v, .05, {p:this.data.p, t:this.data.t});
+		this.volListener10 = new StateListener(10, this.data.v, .03, {p:this.data.p, t:this.data.t});
 	},
 	block4CleanUp: function(){
 		this.wallV=0;
@@ -157,14 +159,20 @@ _.extend(Work.prototype,
 		this.dragWeights.remove();
 		this.dragWeights = undefined;
 	},
+	block4Conditions: function(){
+		if(this.volListener10.isSatisfied() && this.volListener15.isSatisfied()){
+			return {result:true};
+		}
+		if(!this.volListener10.isSatisfied()){
+			return {result:false, alert:'Compress the container!'};
+		}
+	},
 	block5Start: function(){
 		wallHandle = 'container';
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,350), P(40,350)]], {func:this.staticAdiabatic, obj:this}, [wallHandle]);
 		
 	},
-	borderStd: function(){
-		walls.border('container', [1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:this.yMin}, {}, {}, {y:this.yMin}]);
-	},
+
 	makeDragWeights: function(wallHandle){
 		var self = this;
 		var massInit = 25;

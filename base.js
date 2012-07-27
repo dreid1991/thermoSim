@@ -27,7 +27,7 @@ $(function(){
 	tConst = 20;
 	workConst = .158e-3;//for kJ;
 	updateInterval = 30;
-	dataInterval = 2000;
+	dataInterval = 1250;
 	borderCol = Col(155,155,155);
 	setInterval('curLevel.update()', updateInterval);
 	setInterval('curLevel.addData()', dataInterval);
