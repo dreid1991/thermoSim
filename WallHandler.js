@@ -468,6 +468,12 @@ WallHandler.prototype = {
 		var UVB = vB.UV();
 		var dir1 = this.getDist(a, b, UVA, UVB, 'p1');
 		var dir2 = this.getDist(a, b, UVA.neg(), UVB.neg(), 'p2');
+		dir1.da = round(dir1.da,5);
+		dir1.db = round(dir1.db,5);
+		dir2.da = round(dir2.da,5);
+		dir2.db = round(dir2.db,5);
+		magA = round(magA,5);
+		magB = round(magB,5);
 		if(dir1.da>=magA || dir1.db>=magB || dir2.da>=magA || dir2.db>=magB){
 			return false;
 		}

@@ -120,38 +120,53 @@ LevelTools.prototype = {
 		$('#dashCutScene').hide();
 	},
 	moveWalls: function(){
-
 		var wall = walls.pts[0];
 		var lastY = wall[0].y
+		var nextY;
 		var unboundedY = lastY + this.wallV + .5*this.g;
 		var dyWeight = null;
 		if(unboundedY>this.yMax || unboundedY<this.yMin){
-			var boundedY = Math.max(this.yMin, Math.min(this.yMax, unboundedY));
-			var tHit = null;
-			if (boundedY==this.yMax){
-				var tHit = (-this.wallV + Math.sqrt(Math.abs(this.wallV*this.wallV + 2*this.g*(boundedY-lastY))))/this.g;
-				//HEY - I abs'd THIS BECAUSE THE STRUFF IN THE sqrt WOULD BE LESS THAN 0 SOMETIMES.  
-				//NOT SURE WHY.  FIGURE IT OUT.
-			}else if (boundedY==this.yMin){
-				var tHit = (-this.wallV - Math.sqrt(this.wallV*this.wallV + 2*this.g*(boundedY-lastY)))/this.g;
-			}
-			var vRebound = -(this.wallV + this.g*tHit);
-			var tLeft = 1 - tHit;
-			var nextY = boundedY + vRebound*tLeft + .5*this.g*tLeft*tLeft;
-			this.wallV += 2*this.g*tHit;
-			this.wallV = -this.wallV;
-			wall[0].y = nextY;
-			wall[1].y = nextY;
-			wall[wall.length-1].y = nextY;
-			dyWeight = nextY - lastY;
+			nextY = this.hitBounds(lastY);
 		}else{
-			wall[0].y = unboundedY;
-			wall[1].y = unboundedY;
-			wall[wall.length-1].y = unboundedY;
-			dyWeight = unboundedY - lastY;
+			nextY = unboundedY;
+			this.wallV += this.g;
+
 		}
+		wall[0].y = nextY;
+		wall[1].y = nextY;
+		wall[wall.length-1].y = nextY;
 		walls.setupWall(0);
-	
+		
+	},
+	hitBounds: function(lastY){
+		//possible this should just be for lower bounds
+		var tLeft = 1;
+		var unboundedY = lastY + this.wallV*tLeft + .5*this.g*tLeft*tLeft;
+		var boundedY = Math.max(this.yMin, Math.min(this.yMax, unboundedY));
+		var discr = this.wallV*this.wallV + 2*this.g*(boundedY-lastY);
+		if (boundedY==this.yMax){
+			
+			var tHit = (-this.wallV + Math.sqrt(discr))/this.g;
+
+		}else if (boundedY==this.yMin){
+			
+			var tHit = (-this.wallV - Math.sqrt(discr))/this.g;
+		}
+		this.wallV+=this.g*tHit;
+		this.wallV*=-1;
+		tLeft-=tHit;
+		
+		if(-2*this.wallV< tLeft*this.g && this.wallV<0){
+			var tBounce = Math.abs(2*this.wallV/this.g);
+			var numBounces = Math.floor(tLeft/tBounce);
+			tLeft-=numBounces*tBounce;
+		}
+		var nextY = boundedY + this.wallV*tLeft + .5*this.g*tLeft*tLeft;
+ 
+		
+		this.wallV += this.g*tLeft;//had 2* here.  Didn't make sense
+		
+		return nextY;
 	},
 	update: function(){
 		this.numUpdates++;
@@ -178,9 +193,6 @@ LevelTools.prototype = {
 		draw.clear(this.bgCol);
 		draw.dots();
 		draw.walls(walls, this.wallCol);
-	},
-	addGravity: function(){
-		this.wallV += this.g;
 	},
 	clearGraphs: function(){
 		for (var graphName in this.graphs){

@@ -55,7 +55,6 @@ DragWeights.prototype = {
 		this.bins['piston'] = this.makePistonBins();
 		//this.dropAllstores();
 		addListener(curLevel, 'update', 'moveWalls', curLevel.moveWalls, curLevel);
-		addListener(curLevel, 'update', 'addGravity', curLevel.addGravity, curLevel);
 		addListener(curLevel, 'update', 'moveWeightsOnPiston', this.moveWeightsOnPiston, this);
 		walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);
 		addListener(curLevel, 'update', 'drawDragWeights', this.draw, this);
@@ -68,7 +67,6 @@ DragWeights.prototype = {
 	},
 	remove: function(){
 		removeListener(curLevel, 'update', 'moveWalls');
-		removeListener(curLevel, 'update', 'addGravity');
 		removeListener(curLevel, 'update', 'moveWeightsOnPiston');
 		removeListener(curLevel, 'update', 'drawDragWeights');
 		removeListener(curLevel, 'mousedown', 'weights');
@@ -941,7 +939,6 @@ function Piston(handle, height, y, xLeftInit, width, drawCanvas, pInit, g, obj){
 	this.readout = new Readout('pistonReadout', readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, undefined, 'center');
 	obj.mass = function(){return self.mass};
 	addListener(curLevel, 'update', 'moveWalls', obj.moveWalls, obj);
-	addListener(curLevel, 'update', 'addGravity', obj.addGravity, obj);
 	this.obj = obj;
 }
 
@@ -1089,7 +1086,6 @@ Piston.prototype = {
 		this.obj.mass = undefined;
 		this.hide();
 		removeListener(curLevel, 'update', 'moveWalls');
-		removeListener(curLevel, 'update', 'addGravity');
 	}
 }
 

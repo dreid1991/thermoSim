@@ -99,6 +99,7 @@ _.extend(Work.prototype,
 	},
 
 	block1CleanUp: function(){
+		this.wallV=0;
 		$('#sliderPressureHolder').hide();
 		this.removeAllGraphs();
 		this.readout.removeAllEntries();
@@ -106,7 +107,6 @@ _.extend(Work.prototype,
 		this.piston.remove();
 		this.piston = undefined;
 		removeListener(curLevel, 'update', 'moveWalls');
-		removeListener(curLevel, 'update', 'addGravity');
 		walls.setWallHandler(0, {func:this.staticAdiabatic, obj:this})
 		walls.removeBorder('container');
 	},
@@ -118,6 +118,7 @@ _.extend(Work.prototype,
 		populate('spc4', P(45,35), V(460, 350), 1, 600);
 	},
 	block2CleanUp: function(){
+		this.wallV=0;
 		walls.removeBorder('container');
 		this.compArrow.remove();
 		this.compArrow = undefined;
@@ -139,13 +140,14 @@ _.extend(Work.prototype,
 		//walls.setSubWallHandler(0, 0, {func:this.cPAdiabaticDamped, obj:this});
 		this.stops = new Stops(10, 'container').init();
 		this.borderStd();
-		populate('spc1', P(45,35), V(445, 325), 650, 250);
-		populate('spc3', P(45,35), V(445, 325), 450, 250);
+		//populate('spc1', P(45,35), V(445, 325), 650, 250);
+		//populate('spc3', P(45,35), V(445, 325), 450, 250);
 		this.dragWeights = this.makeDragWeights(wallHandle).init().trackEnergyStop().trackMassStop().trackPressureStart();
 		this.trackTempStart();
 		this.trackVolumeStart(0);
 	},
 	block4CleanUp: function(){
+		this.wallV=0;
 		$('#reset').hide();
 		this.trackTempStop();
 		this.trackVolumeStop();
