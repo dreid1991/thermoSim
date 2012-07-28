@@ -119,55 +119,6 @@ LevelTools.prototype = {
 		$('#dashOutro').hide();
 		$('#dashCutScene').hide();
 	},
-	moveWalls: function(){
-		var wall = walls.pts[0];
-		var lastY = wall[0].y
-		var nextY;
-		var unboundedY = lastY + this.wallV + .5*this.g;
-		var dyWeight = null;
-		if(unboundedY>this.yMax || unboundedY<this.yMin){
-			nextY = this.hitBounds(lastY);
-		}else{
-			nextY = unboundedY;
-			this.wallV += this.g;
-
-		}
-		wall[0].y = nextY;
-		wall[1].y = nextY;
-		wall[wall.length-1].y = nextY;
-		walls.setupWall(0);
-		
-	},
-	hitBounds: function(lastY){
-		//possible this should just be for lower bounds
-		var tLeft = 1;
-		var unboundedY = lastY + this.wallV*tLeft + .5*this.g*tLeft*tLeft;
-		var boundedY = Math.max(this.yMin, Math.min(this.yMax, unboundedY));
-		var discr = this.wallV*this.wallV + 2*this.g*(boundedY-lastY);
-		if (boundedY==this.yMax){
-			
-			var tHit = (-this.wallV + Math.sqrt(discr))/this.g;
-
-		}else if (boundedY==this.yMin){
-			
-			var tHit = (-this.wallV - Math.sqrt(discr))/this.g;
-		}
-		this.wallV+=this.g*tHit;
-		this.wallV*=-1;
-		tLeft-=tHit;
-		
-		if(-2*this.wallV< tLeft*this.g && this.wallV<0){
-			var tBounce = Math.abs(2*this.wallV/this.g);
-			var numBounces = Math.floor(tLeft/tBounce);
-			tLeft-=numBounces*tBounce;
-		}
-		var nextY = boundedY + this.wallV*tLeft + .5*this.g*tLeft*tLeft;
- 
-		
-		this.wallV += this.g*tLeft;//had 2* here.  Didn't make sense
-		
-		return nextY;
-	},
 	borderStd: function(){
 		walls.border('container', [1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:this.yMin}, {}, {}, {y:this.yMin}]);
 	},

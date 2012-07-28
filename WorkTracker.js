@@ -1,9 +1,8 @@
-function WorkTracker(handle, height, width, mass, g, readoutData, obj){
+function WorkTracker(handle, height, width, mass, readoutData, obj){
 	this.handle = handle;
 	this.height = height;
 	this.width = width;
 	this.mass = mass;
-	this.g = g;
 	this.work = 0;
 	this.readout = readoutData.readout;
 	this.readout.addEntry('work', 'Work:', 'kJ', 0, readoutData.idx, 1);
@@ -21,7 +20,7 @@ WorkTracker.prototype = {
 	*/
 	updateVal: function(){
 		var heightCur = this.height();
-		var p = ATMtoPA*pConst*this.mass()*this.g()/this.width;
+		var p = ATMtoPA*pConst*this.mass()*g/this.width;
 		var dV = LtoM3*vConst*(this.heightLast-heightCur)*this.width;
 		this.work -= JtoKJ*p*dV;
 		this.heightLast = heightCur;

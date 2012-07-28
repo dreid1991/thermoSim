@@ -1,41 +1,54 @@
-function WallHandler(pts, handlers, handles, includes){
+function WallHandler(pts, handlers, handles, bounds, includes){
 	var newWall = new Array(pts.length)
 	_.extend(newWall, WallHandler.prototype);
 
-	newWall.assemble(pts, handles, includes)
+	newWall.assemble(pts, handles, bounds, includes)
 	
 	if(handles.length!=pts.length){
 		console.log('NAME YOUR WALLS');
 	}
-	
-	this.wallUVs = [];
-	this.wallPerpUVs = [];
-	this.wallGrids = [];
-	this.handlers = {};
+
 	if(handlers){
 		newWall.doInitHandlers(handlers);
 	}
-	newWall.xSpan = Math.floor(myCanvas.width/this.gridDim);
-	newWall.ySpan = Math.floor(myCanvas.height/this.gridDim);
-	newWall.numCols = Math.ceil(myCanvas.width/this.gridDim);
-	newWall.numRows = Math.ceil(myCanvas.height/this.gridDim);
+
 	newWall.setup();
 	return newWall;
 };
 WallHandler.prototype = {
-	assemble: function(pts, handles, includes){
+	assemble: function(pts, handles, bounds, includes){
 		if(!includes){
 			var includes = new Array(pts.length);
 			for(var includeIdx=0; includeIdx<pts.length; includeIdx++){
 				includes[includeIdx]=1;
 			}
 		}
-		for (var wallIdx=0; wallIdx<pts.length; wallIdx++){
-			this[wallIdx] = {pts:pts[wallIdx], handle:handles[wallIdx], include:includes[wallIdx], hitMode:'Std'};
+		if(!bounds){
+			var bounds = new Array(pts.length)
+			for (var boundIdx=0; boundIdx<pts.length; boundIdx++){
+				bounds[boundsIdx] = {yMin:30, yMax: 435};
+			}
 		}
+		for (var wallIdx=0; wallIdx<pts.length; wallIdx++){
+			this[wallIdx] = pts[wallIdx];
+			this[wallIdx].handle = handles[wallIfx;
+			this[wallIdx].include = includes[wallIfx];
+			this[wallIdx].hitMode = 'Std';
+			this[wallIdx].v = 0;
+			this[wallIdx].bounds = bounds[boundsIdx];
+		}
+
+	},
+	setBounds: function(wallInfo, bounds){
+		this[this.idxByInfo(wallInfo)].bounds = bounds;
+		return this;
 	},
 	setup: function(){
 		this.gridDim=20;
+		this.xSpan = Math.floor(myCanvas.width/this.gridDim);
+		this.ySpan = Math.floor(myCanvas.height/this.gridDim);
+		this.numCols = Math.ceil(myCanvas.width/this.gridDim);
+		this.numRows = Math.ceil(myCanvas.height/this.gridDim);
 		this.closeWalls();
 		this.ptsInit = [];
 		this.setPtsInit();
@@ -69,48 +82,52 @@ WallHandler.prototype = {
 		}
 	},
 	setAllHandler: function(handler){
-		for(var wallIdx=0; wallIdx<this.pts.length; wallIdx++){
+		for(var wallIdx=0; wallIdx<this.length; wallIdx++){
 			this.setWallHandler(wallIdx, handler);
 		}
 	},
 	setWallHandler: function(wallInfo, handler){
 		var wallIdx = this.idxByInfo(wallInfo);//info can be handle or idx
-		for (var subWallIdx=0; subWallIdx<this.pts[wallIdx].length; subWallIdx++){
+		for (var subWallIdx=0; subWallIdx<this[wallIdx].length; subWallIdx++){
 			this.setSubWallHandler(wallIdx, subWallIdx, handler);
 		}
 	},
 	
 	setSubWallHandler: function(wallInfo, subWallIdx, handler){
 		var wallIdx = this.idxByInfo(wallInfo)
-		this.handlers[wallIdx+ '-' + subWallIdx] = handler;
+		this[wallIdx+ '-' + subWallIdx] = handler;
 	},
 	setupWall: function(wallIdx){
-		this[wallIdx].wallUVs[wallIdx] = this.getWallUV(wallIdx);
+		this[wallIdx].wallUVs = this.getWallUV(wallIdx);
 		this[wallIdx].wallPerpUVs= this.getPerpUVs(wallIdx);
 		this[wallIdx].wallGrids = this.getSubwallGrid(wallIdx);
 	},
-	addWall: function(pts, handler, handle, includes){
+	addWall: function(pts, handler, handle, include){
 		//this.handlers.push(new Array(pts.length));
 		var newIdx = this.length;
 		if(!this.includes){
 			var includes = 1;
 		}
 		
-		this.push({pts:pts, handle:handle, includes:includes});
-		this.closeWall(this[this.length].pts);
-		this[newIdx].ptsInit = this.copyWall(this[newIdx].pts);
+		this.push(pts);
+		this[newIdx].hitMode = 'Std';
+		this[newIdx].v = 0;
+		this[newIdx].handle = handle;
+		this[newIdx].include = include
+		this.closeWall(this[newIdx]);
+		this[newIdx].ptsInit = this.copyWall(this[newIdx]);
 
 		this.setupWall(newIdx);
 		this.setWallHandler(newIdx, handler);
 	},
 	setPtsInit: function(){
 		for (var wallIdx=0; wallIdx<this.length; wallIdx++){
-			this[wallIdx][ptsInit] = this.copyWall(this[wallIdx].pts);
+			this[wallIdx][ptsInit] = this.copyWall(this[wallIdx]);
 		}
 	},
 	restoreWall: function(wallIdx){
 		var init = this.ptsInit[wallIdx];
-		this.pts[wallIdx] = this.copyWall(init);
+		this[wallIdx] = this.copyWall(init);
 		this.setupWall(wallIdx);
 	},
 	copyWall: function(wall){
@@ -134,25 +151,26 @@ WallHandler.prototype = {
 	idxByInfo: function(info){
 		var wallIdx;
 		if(parseFloat(info)!=info){
-			var wallIdx = this.idxByHandle(info)
+			return this.idxByHandle(info)
 		}else{
-			wallIdx = info;
+			return info;
 		}
-		return wallIdx;
 	},
-	removeWall: function(wallIdx){
-		this.handles.splice(wallIdx, 1);
-		this.pts.splice(wallIdx, 1);
-		this.ptsInit.splice(wallIdx, 1);
-		this.wallUVs.splice(wallIdx, 1);
-		this.wallPerpUVs.splice(wallIdx, 1);
-		this.wallGrids.splice(wallIdx, 1);
-		this.includes.splice(wallIdx, 1);
-		this.handlers.splice(wallIdx, 1);
+	removeWall: function(wallInfo){
+		var wallIdx = this.idxByInfo(wallInfo);
+		this.splice(wallIdx, 1);
+		this.removeHandlers(wallIdx);
+	},
+	removeHandlers: function(wallIdx){
+		for (var itemName in this){
+			if(indexOf(wallIdx + '-') != -1){
+				this[itemName] = undefined;
+			}
+		}
 	},
 	closeWalls: function(){
 		for (var wallIdx=0; wallIdx<this.length; wallIdx++){
-			var wall = this[wallIdx].pts;
+			var wall = this[wallIdx];
 			this.closeWall(wall);
 		}
 	},
@@ -169,7 +187,7 @@ WallHandler.prototype = {
 		return perpUVs;
 	},
 	getWallUV: function(wallIdx){
-		var wall = this[wallIdx].pts;
+		var wall = this[wallIdx];
 		var numUVs = wall.length-1
 		var wallUVs = new Array(numUVs);
 		for (var ptIdx=0; ptIdx<numUVs; ptIdx++){
@@ -194,7 +212,7 @@ WallHandler.prototype = {
 	},
 	getSubwallsInGrid: function(wallIdx, x, y){
 		var subwallsInGrid = [];
-		var wall = this[wallIdx].pts;
+		var wall = this[wallIdx];
 		for (var ptIdx=0; ptIdx<wall.length-1; ptIdx++){
 			if (this.isInBox(x, y, [wallIdx, ptIdx])){
 				subwallsInGrid.push(ptIdx);
@@ -213,8 +231,8 @@ WallHandler.prototype = {
 		x2*=this.gridDim;
 		y1*=this.gridDim;
 		y2*=this.gridDim;
-		pt1 = this[pt[0]].pts[pt[1]];
-		pt2 = this[pt[0]].pts[pt[1]+1];
+		pt1 = this[pt[0]][pt[1]];
+		pt2 = this[pt[0]][pt[1]+1];
 		var angleLine = this.getAngle(pt1.x, pt1.y, pt2.x, pt2.y);
 		var anglePt1 = this.getAngle(pt1.x, pt1.y, x1, y1);
 		var anglePt2 = this.getAngle(pt1.x, pt1.y, x2, y2);
@@ -299,9 +317,9 @@ WallHandler.prototype = {
 	checkWallHit: function(dot, line){
 		var wallIdx = line[0];
 		var subWallIdx = line[1];
-		var wallPt = this.pts[wallIdx][subWallIdx];
-		var wallUV = this.wallUVs[wallIdx][subWallIdx];
-		var perpUV = this.wallPerpUVs[wallIdx][subWallIdx]
+		var wallPt = this[wallIdx][subWallIdx];
+		var wallUV = this[wallIdx].wallUVs[subWallIdx];
+		var perpUV = this[wallIdx].wallPerpUVs[subWallIdx]
 		var dotVec = V(dot.x + dot.v.dx - perpUV.dx*dot.r - wallPt.x, dot.y + dot.v.dy - perpUV.dy*dot.r - wallPt.y);
 		var distFromWall = perpUV.dotProd(dotVec);
 		var perpV = -perpUV.dotProd(dot.v);
@@ -313,25 +331,25 @@ WallHandler.prototype = {
 		var wallAdjust = dot.v.dotProd(wallUV);
 		var xAdj = wallAdjust*wallUV.dx;
 		var yAdj = wallAdjust*wallUV.dy;
-		var wallPtA = P(walls.pts[wallIdx][subWallIdx].x+xAdj, walls.pts[wallIdx][subWallIdx].y+yAdj);
-		var wallPtB = P(walls.pts[wallIdx][subWallIdx+1].x+xAdj, walls.pts[wallIdx][subWallIdx+1].y+yAdj);
+		var wallPtA = P(walls[wallIdx][subWallIdx].x+xAdj, walls[wallIdx][subWallIdx].y+yAdj);
+		var wallPtB = P(walls[wallIdx][subWallIdx+1].x+xAdj, walls[wallIdx][subWallIdx+1].y+yAdj);
 		var reverseWallUV = V(-wallUV.dx, -wallUV.dy);
 		var dotVecA = V(dot.x-wallPtA.x, dot.y-wallPtA.y);
 		var dotVecB = V(dot.x-wallPtB.x, dot.y-wallPtB.y);
 		return (dotVecA.dotProd(wallUV)>=0 && dotVecB.dotProd(reverseWallUV)>=0)
 	},
 	didHitStd: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
-		var handler = this.handlers[wallIdx + '-' + subWallIdx];
+		var handler = this[wallIdx + '-' + subWallIdx];
 		handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);		
 	},
 	didHitArrow: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
 		var vo = dot.v.copy();
-		var handler = this.handlers[wallIdx + '-' + subWallIdx];
+		var handler = this[wallIdx + '-' + subWallIdx];
 		handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
 		var pos = P(dot.x, dot.y);
 		var vf = dot.v.copy();
 		var perpVf = -perpUV.dotProd(dot.v);
-		this.drawArrow(pos, vo, vf, perpV, perpVf);  // HEY - modify this so you can get deltaV for difference escape velocity (moving wall)
+		this.drawArrow(pos, vo, vf, perpV, perpVf);  
 	},
 	haveChecked: function(wall, list){
 		for (var listIdx=0; listIdx<list.length; listIdx++){
@@ -341,11 +359,71 @@ WallHandler.prototype = {
 		}
 		return false;
 	},
+	moveInit: function(wallInfo){
+		var wallIdx = this.idxByInfo(wallInfo);
+		var wall = this[wallIdx];
+		var gLocal = g;
+		var yMax = this[wallIdx].bounds.yMax;
+		var yMin = this[wallIdx].bounds.yMin;
+		addListener(curLevel, 'update', 'moveWall'+wallIdx,
+			function(){
+				var lastY = wall[0].y
+				var nextY;
+				var unboundedY = lastY + wall.v + .5*gLocal;
+				var dyWeight = null;
+				if(unboundedY>yMax || unboundedY<yMin){
+					nextY = this.hitBounds(wall, lastY, gLocal, yMin, yMax);
+				}else{
+					nextY = unboundedY;
+					wall.v += gLocal;
+
+				}
+				wall[0].y = nextY;
+				wall[1].y = nextY;
+				wall[wall.length-1].y = nextY;
+				walls.setupWall(wallIdx);		
+			}
+		this);
+	},
+	moveStop: function(wallInfo){
+		removeListener(curLevel, 'update', 'moveWall' + this.idxByInfo(wallInfo));
+	},
+	hitBounds: function(wall, lastY, gLocal, yMin, yMax){
+		
+		//possible this should just be for lower bounds
+		var tLeft = 1;
+		var unboundedY = lastY + wall.v*tLeft + .5*gLocal*tLeft*tLeft;
+		var boundedY = Math.max(yMin, Math.min(yMax, unboundedY));
+		var discr = wall.v*wall.v + 2*gLocal*(boundedY-lastY);
+		if (boundedY==yMax){
+			
+			var tHit = (-wall.v + Math.sqrt(discr))/gLocal;
+
+		}else if (boundedY==yMin){
+			
+			var tHit = (-wall.v - Math.sqrt(discr))/gLocal;
+		}
+		wall.v+=gLocal*tHit;
+		wall.v*=-1;
+		tLeft-=tHit;
+		
+		if(-2*wall.v< tLeft*gLocal && wall.v<0){
+			var tBounce = Math.abs(2*wall.v/gLocal);
+			var numBounces = Math.floor(tLeft/tBounce);
+			tLeft-=numBounces*tBounce;
+		}
+		var nextY = boundedY + wall.v*tLeft + .5*gLocal*tLeft*tLeft;
+ 
+		
+		wall.v += gLocal*tLeft;//had 2* here.  Didn't make sense
+		
+		return nextY;
+	},
 	//One wall, assuming first/last points do not overlap
 	totalArea: function(){
 		var area=0;
-		for (var wallIdx=0; wallIdx<this.pts.length; wallIdx++){
-			var uncutPts = this.pts[wallIdx];
+		for (var wallIdx=0; wallIdx<this.length; wallIdx++){
+			var uncutPts = this[wallIdx];
 			var pts = uncutPts.slice(0,uncutPts.length-1);
 			area+=this.includes[wallIdx]*this.area(pts);
 		}
@@ -565,8 +643,8 @@ WallHandler.prototype = {
 	},
 	surfArea: function(){
 		var SA=0;
-		for (var wallIdx=0; wallIdx<walls.pts.length; wallIdx++){
-			var wall = walls.pts[wallIdx];
+		for (var wallIdx=0; wallIdx<this.length; wallIdx++){
+			var wall = this[wallIdx];
 			for (ptIdx=0; ptIdx<wall.length-1; ptIdx++){
 				var pt = wall[ptIdx];
 				var ptNext = wall[ptIdx+1];
@@ -581,8 +659,8 @@ WallHandler.prototype = {
 		var pts = new Array(wallPts.length);
 		var perpUVs = new Array(wallPts.length-1)
 		var borderPts = [];
-		var targetWallPts = this.pts[wallIdx];
-		var targetWallPerps = this.wallPerpUVs[wallIdx];
+		var targetWallPts = this[wallIdx];
+		var targetWallPerps = this[wallIdx].wallPerpUVs;
 		for (var wallPtIdx=0; wallPtIdx<wallPts.length; wallPtIdx++){
 			pts[wallPtIdx] = targetWallPts[wallPts[wallPtIdx]].copy();
 		}

@@ -25,6 +25,7 @@ $(function(){
 	//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
 	pxToMS = 157.9;
 	tConst = 20;
+	g = 1.75
 	workConst = .158e-3;//for kJ;
 	updateInterval = 30;
 	dataInterval = 1250;
@@ -60,8 +61,8 @@ drawingTools.prototype = {
 	walls: function(walls, col){
 		c.beginPath();
 		c.strokeStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";		
-		for (var wallIdx=0; wallIdx<walls.pts.length; wallIdx++){
-			var wall = walls.pts[wallIdx];
+		for (var wallIdx=0; wallIdx<walls.length; wallIdx++){
+			var wall = walls[wallIdx];
 			c.moveTo(wall[0].x, wall[0].y);
 			for (var ptIdx=1; ptIdx<wall.length; ptIdx++){
 				var pt = wall[ptIdx];
@@ -337,9 +338,9 @@ function VToTemp(mass, v){
 	return .5*mass*v*v*tConst;
 }
 function returnEscapist(dot){
-	var pt1 = walls.pts[0][0];
-	var pt2 = walls.pts[0][1];
-	UV = walls.wallUVs[0][0];
+	var pt1 = walls[0][0];
+	var pt2 = walls[0][1];
+	UV = walls[0].wallUVs[0];
 	var x = (pt1.x+pt2.x)/2 - 5*UV.dy;
 	var y = (pt1.y+pt2.y)/2 + 5*UV.dx;
 	dot.v.dy = Math.abs(dot.v.dy);

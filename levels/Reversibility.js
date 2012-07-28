@@ -14,7 +14,7 @@ function Reversibility(){
 	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, [wallHandle]);
 	
 	
-	this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
+	this.extPressurePts = [walls[0][0], walls[0][1]];
 	this.SAPExt = getLen(this.extPressurePts);
 	this.forceInternal = 0;
 	this.wallV = 0;
@@ -39,7 +39,6 @@ function Reversibility(){
 		{block:5, title: "", finished: false, text:""},
 	]
 	
-	this.g = 1.75;
 	this.massInit = 25;
 	this.dragWeights = this.makeDragWeights(wallHandle);
 	
@@ -47,14 +46,13 @@ function Reversibility(){
 	;
 	//walls.setSubWallHandler(0, 0, {func:this.onWallImpactTop, obj:this});
 	this.workTracker = new WorkTracker('tracky',
-										function(){return walls.pts[0][0].y},
-										walls.pts[0][1].x-walls.pts[0][0].x,
+										function(){return walls[0][0].y},
+										walls[0][1].x-walls[0][0].x,
 										function(){return self.dragWeights.mass()},
-										function(){return self.g},
 										{readout:this.readout, idx:1},
 										this);
 	this.yMin = 60;
-	this.yMax = walls.pts[0][2].y-75;
+	this.yMax = walls[0][2].y-75;
 	addSpecies(['spc1', 'spc3']);
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
@@ -107,7 +105,7 @@ _.extend(Reversibility.prototype,
 
 		this.numUpdates = 0;
 		walls.restoreWall(0);
-		this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
+		this.extPressurePts = [walls[0][0], walls[0][1]];
 		this.forceInternal = 0;
 		for (resetListenerName in this.resetListeners.listeners){
 			var func = this.resetListeners.listeners[resetListenerName].func;
@@ -195,13 +193,12 @@ _.extend(Reversibility.prototype,
 									{name:'lrg', count:2, mass:30}
 									//{name:'lrg', count:2, mass:30},
 									],
-									walls.pts[0][2].y,
-									function(){return walls.pts[0][0].y},
+									walls[0][2].y,
+									function(){return walls[0][0].y},
 									myCanvas.height-15,
 									20,
 									Col(218, 187, 41),
 									Col(150, 150, 150),
-									function(){return self.g},
 									this.massInit,
 									this.readout,
 									wallName,
@@ -217,7 +214,7 @@ _.extend(Reversibility.prototype,
 	dataRun: function(){
 		var SAPInt = walls.surfArea()
 		this.data.pInt.push(dataHandler.pressureInt(this.forceInternal, this.numUpdates, SAPInt));
-		this.data.pExt.push(dataHandler.pressureExt(this.dragWeights.mass(), this.g, this.SAPExt));
+		this.data.pExt.push(dataHandler.pressureExt(this.dragWeights.mass(), this.SAPExt));
 		this.data.t.push(dataHandler.temp());
 		this.data.v.push(dataHandler.volume());
 		this.forceInternal = 0;
@@ -239,7 +236,7 @@ _.extend(Reversibility.prototype,
 			depopulate(spcName);
 		}		
 		this.numUpdates = 0;
-		this.extPressurePts = [walls.pts[0][0], walls.pts[0][1]];
+		this.extPressurePts = [walls[0][0], walls[0][1]];
 		this.forceInternal = 0;
 		
 		for (resetListenerName in this.resetListeners.listeners){

@@ -2,14 +2,13 @@
 //DRAG WEIGHTS
 //////////////////////////////////////////////////////////////////////////
 
-function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, g, massInit, readout, wallInfo, wallHandler, obj){
+function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, massInit, readout, wallInfo, wallHandler, obj){
 	this.zeroY = zeroY;
 	this.pistonY = pistonY;
 	this.binY = binY;
 	this.weightCol = weightCol;
-	this.eBarCol = this.weightCol;
-	this.g = g;
 	this.wallHandler = wallHandler;
+	this.eBarCol = this.weightCol;
 	this.wallInfo = wallInfo;
 	this.eBar = {x:eBarX, scalar: .7};
 	this.binCol = binCol;
@@ -26,7 +25,7 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.pistonMass = massInit;
 	this.massInit = massInit
 	this.eAdded = 0;
-	this.pressure = this.getPressure();
+	this.pressure = getPressure();
 	this.readout = readout;
 	this.moveToDropOrders = [];
 	this.moveToPistonOrders = [];
@@ -143,7 +142,7 @@ DragWeights.prototype = {
 	},
 	makeWeights: function(weightDefs){
 		var weightGroups = {};
-		var weightDims = this.getWeightDims(weightDefs)
+		var weightDims = getWeightDims(weightDefs)
 		for (var groupIdx=0; groupIdx<weightDefs.length; groupIdx++){
 			var weightDef = weightDefs[groupIdx];
 			var weightGroup = {}; 
@@ -164,10 +163,10 @@ DragWeights.prototype = {
 	},
 	makeStoreBins: function(){
 		var localWalls = walls;
-		var wallPts = localWalls.pts[localWalls.idxByHandle(this.wallInfo)];
+		var wallPts = localWalls[localWalls.idxByHandle(this.wallInfo)];
 		var center = (wallPts[0].x + wallPts[1].x)/2;
 		var bins = {};
-		var numGroups = this.getNumGroups();
+		var numGroups = getNumGroups();
 		var posX = center - this.storeBinWidth*(numGroups-1)/2 - this.storeBinSpacing*(numGroups-1)/2;
 		for (var groupName in this.weightGroups){
 			var weightGroup = this.weightGroups[groupName];
@@ -178,19 +177,19 @@ DragWeights.prototype = {
 	},
 	makeStoreBin: function(posX, weightGroup){
 		var bin = {}
-		bin.pts = this.getBinPts(posX);
+		bin.pts = getBinPts(posX);
 		bin.x = posX - this.storeBinWidth/2;
 		bin.y = this.binY;
-		bin.slots = this.getBinSlots(P(bin.x, bin.y), weightGroup);
+		bin.slots = getBinSlots(P(bin.x, bin.y), weightGroup);
 		bin.visible = true;
 		return bin;
 	},
 	makePistonBins: function(){
 		var localWalls = walls;
-		var wallPts = localWalls.pts[localWalls.idxByHandle(this.wallInfo)];
+		var wallPts = localWalls[localWalls.idxByHandle(this.wallInfo)];
 		var center = (wallPts[0].x + wallPts[1].x)/2;
 		var bins = {};
-		var numGroups = this.getNumGroups();
+		var numGroups = getNumGroups();
 		var posX = center - this.pistonBinWidth*(numGroups-1)/2 - this.pistonBinSpacing*(numGroups-1)/2;
 		for (var groupName in this.weightGroups){
 			var weightGroup = this.weightGroups[groupName];
@@ -203,7 +202,7 @@ DragWeights.prototype = {
 		var bin = {};
 		bin.x = posX - this.pistonBinWidth/2;
 		bin.y = this.pistonY();
-		bin.slots = this.getPistonBinSlots(bin.x, weightGroup);
+		bin.slots = getPistonBinSlots(bin.x, weightGroup);
 		bin.visible = false;
 		return bin
 	},
@@ -346,11 +345,11 @@ DragWeights.prototype = {
 	},
 	getPressure: function(){
 		var localWalls = walls;
-		var wallPts = localWalls.pts[localWalls.idxByHandle(this.wallInfo)];
-		return this.pistonMass*this.g()*pConst/(wallPts[1].x-wallPts[0].x);
+		var wallPts = localWalls[localWalls.idxByHandle(this.wallInfo)];
+		return this.pistonMass*g*pConst/(wallPts[1].x-wallPts[0].x);
 	},
 	pistonMinusVal: function(val){
-		return function(){return walls.pts[0][0].y-val}
+		return function(){return walls[0][0].y-val}
 	},
 	dropAllIntoStores: function(){
 		for (var group in this.weightGroups){
@@ -372,7 +371,7 @@ DragWeights.prototype = {
 	},
 	dropIntoBin: function(weight, binType){
 		weight.status = 'inTransit';
-		var dropSlotInfo = this.getDropSlot(weight.name, binType);
+		var dropSlotInfo = getDropSlot(weight.name, binType);
 		var slot = dropSlotInfo.slot;
 		slot.isFull = true;
 		var slotIdNum = dropSlotInfo.id;
@@ -474,7 +473,7 @@ DragWeights.prototype = {
 		var rounded = round(energy,1)
 		var text = this.eText(rounded)
 		var x = this.eBar.x;
-		var y = this.zeroY - energy/(workConst*this.g()*m);
+		var y = this.zeroY - energy/(workConst*g*m);
 		var pos = P(x, y-15);
 		draw.text(text, pos, this.eBarFont, this.eBarFontCol, 'center', 0, c);
 	},
@@ -504,8 +503,8 @@ DragWeights.prototype = {
 	putOnPiston: function(weight){
 		this.weightsOnPiston.push(weight);
 		weight.status = 'piston';
-		this.pistonMass = this.getPistonMass();
-		this.pressure = this.getPressure();
+		this.pistonMass = getPistonMass();
+		this.pressure = getPressure();
 		if(this.trackMass){
 			this.readout.tick(this.pistonMass, 'mass');
 		}
@@ -519,8 +518,8 @@ DragWeights.prototype = {
 				this.weightsOnPiston.splice([idx],1);
 			}
 		}
-		this.pistonMass = this.getPistonMass()
-		this.pressure = this.getPressure();
+		this.pistonMass = getPistonMass()
+		this.pressure = getPressure();
 		if(this.trackMass){
 			this.readout.tick(this.pistonMass, 'mass');
 		}
@@ -529,7 +528,7 @@ DragWeights.prototype = {
 		}
 	},
 	mousedown: function(){
-		var clicked = this.getClicked();
+		var clicked = getClicked();
 		if(clicked){
 			this.pickup(clicked);
 			if(this.trackEnergy){
@@ -563,7 +562,7 @@ DragWeights.prototype = {
 	mouseup: function(){
 		removeListener(curLevel, 'mousemove', 'weights');
 		removeListener(curLevel, 'mouseup', 'weights');
-		var dest = this.getDest();
+		var dest = getDest();
 		var energyChanged = new Boolean();
 		var selected = this.selected;
 		energyChanged = (selected.cameFrom=='piston' && dest=='store') || (selected.cameFrom=='store' && dest=='piston')
@@ -595,7 +594,7 @@ DragWeights.prototype = {
 			function(){
 				var selected = this.selected;
 				var m = this.weightGroups[selected.name].mass;
-				this.eBar.eChange = this.getSelectedEnergy();
+				this.eBar.eChange = getSelectedEnergy();
 				var dh = Math.min(this.zeroY - this.pistonY(), Math.max(0, this.zeroY - selected.pos.y));
 				this.drawEBar(m, dh);
 				this.drawEBarText(m, this.eBar.eChange);
@@ -677,10 +676,10 @@ DragWeights.prototype = {
 		return false
 	},
 	eToHeight: function(e, m){
-		return e/(workConst*m*this.g());
+		return e/(workConst*m*g);
 	},
 	heightToE: function(dh, m){
-		return workConst*m*this.g()*dh;
+		return workConst*m*g*dh;
 	},
 	mouseOnWeight: function(dims, weightPos){
 		var mousePos = mouseOffset(myCanvas);
@@ -916,13 +915,12 @@ DragArrow.prototype = {
 //PISTON
 //////////////////////////////////////////////////////////////////////////
 
-function Piston(handle, wallInfo, pInit, g, obj){
+function Piston(handle, wallInfo, pInit, obj){
 	var self = this;
 	this.p = pInit;
-	this.g = g;
 	this.slant = .07;
 	this.drawCanvas = c;
-	var wallPts = walls.pts[walls.idxByInfo(wallInfo)];
+	var wallPts = walls[walls.idxByInfo(wallInfo)];
 	this.left = wallPts[0].x;
 	this.width = wallPts[1].x-this.left;
 	this.y = function(){return wallPts[0].y};
@@ -1034,7 +1032,7 @@ Piston.prototype = {
 			this);
 	},
 	setMass: function(){
-		this.mass = this.p*this.width/(pConst*this.g());
+		this.mass = this.p*this.width/(pConst*g);
 	},
 	setReadoutY: function(){
 		this.readout.position({y:this.pistonBottom.pos.y-2+this.y()});
@@ -1046,7 +1044,6 @@ Piston.prototype = {
 						function(){return self.y()},
 						this.width,
 						function(){return self.mass},
-						function(){return self.g()},
 						{readout:this.readout, idx:undefined}
 						);
 		this.workTracker.start();
@@ -1127,12 +1124,12 @@ Heater.prototype = {
 		var legThickness = 10;
 
 		var center = this.pos.copy().movePt(dims.copy().mult(.5));
-		this.bodyPts = this.getBodyPts(pos, dims, rnd);
-		this.legPts = this.getLegPts(pos, dims, legThickness, center);
+		this.bodyPts = getBodyPts(pos, dims, rnd);
+		this.legPts = getLegPts(pos, dims, legThickness, center);
 		rotatePts(this.bodyPts, center, this.rot);
 		rotatePts(this.legPts[0], center, this.rot);
 		rotatePts(this.legPts[1], center, this.rot);
-		var colorSteps = this.getColorSteps(colMin, colDefault, colMax)
+		var colorSteps = getColorSteps(colMin, colDefault, colMax)
 		var strokeCol = Col(0,0,0)
 		var self = this;
 		var bodyPts = this.bodyPts;
@@ -1215,7 +1212,7 @@ function Stops(volume, wallInfo){
 	this.stopHeight = 5;
 	var wallsLocal = walls;
 	this.wallIdx = wallsLocal.idxByInfo(wallInfo);
-	this.pts = wallsLocal.pts[this.wallIdx];
+	this.pts = wallsLocal[this.wallIdx];
 	var width = this.pts[0].distTo(this.pts[1]);
 	var length = volume/(vConst*width);
 	this.height = this.pts[2].y-length;
