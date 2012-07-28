@@ -11,7 +11,7 @@ function Reversibility(){
 	this.wallCol = Col(255,255,255);
 	this.numUpdates = 0;
 	var wallHandle = 'container';
-	walls = new WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, [wallHandle]);
+	walls = WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, [wallHandle], [{yMin:60, yMax:435}]);
 	
 	
 	this.extPressurePts = [walls[0][0], walls[0][1]];
@@ -51,8 +51,7 @@ function Reversibility(){
 										function(){return self.dragWeights.mass()},
 										{readout:this.readout, idx:1},
 										this);
-	this.yMin = 60;
-	this.yMax = walls[0][2].y-75;
+
 	addSpecies(['spc1', 'spc3']);
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
@@ -84,7 +83,7 @@ _.extend(Reversibility.prototype,
 								{data:this.data, x:'v', y:'t'});		
 		
 		
-		this.borderStd();
+		this.borderStd(60);
 		nextPrompt();
 	},
 	block0Start: function(){

@@ -1,6 +1,7 @@
 function LevelTools(){}
 LevelTools.prototype = {
-	makeCompArrow: function(compAttrs){
+	makeCompArrow: function(wallInfo, compAttrs){
+		var wallIdx = walls.idxByInfo(wallInfo);
 		var compMode = compAttrs.mode;
 		var bounds;
 		if(compAttrs.bounds){
@@ -8,7 +9,7 @@ LevelTools.prototype = {
 		}else{
 			bounds = {y:{min:this.yMin, max:this.yMax}};
 		}
-		var pos = walls.pts[0][1].copy()
+		var pos = walls[wallIdx][1].copy()
 		var rotation = 0;
 		var cols = {};
 		cols.outer = Col(247, 240,9);
@@ -20,14 +21,15 @@ LevelTools.prototype = {
 		var canvasElement = canvas;
 		var listeners = {};
 		listeners.onDown = function(){};
-		listeners.onMove = function(){curLevel.changeWallSetPt(this.pos.y, compMode)};
+		listeners.onMove = function(){curLevel.changeWallSetPt(0, this.pos.y, compMode)};
 		listeners.onUp = function(){};
 		
 
 		return new DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds).show();
 	},
-	changeWallSetPt: function(dest, compType){
-		var wall = walls.pts[0]
+	changeWallSetPt: function(wallInfo, dest, compType){
+		var wallIdx = walls.idxByInfo(wallInfo);
+		var wall = walls[wallIdx]
 		var wallMoveMethod;
 		if(compType=='isothermal'){
 			var wallMoveMethod = this.cVIsothermal;
@@ -41,22 +43,22 @@ LevelTools.prototype = {
 			wall[wall.length-1].y = curY;
 		}
 		var getY = function(){
-			return walls.pts[0][0].y;
+			return walls[wallIdx][0].y;
 		}
 		
 		var dist = dest-getY();
 		if(dist!=0){
 			var sign = getSign(dist);
-			this.wallV = this.wallSpeed*sign;
+			wall.v = this.wallSpeed*sign;
 			walls.setSubWallHandler(0, 0, {func:wallMoveMethod, obj:this});
 			addListener(curLevel, 'update', 'moveWall',
 				function(){
-					setY(boundedStep(getY(), dest, this.wallV))
+					setY(boundedStep(getY(), dest, wall.v))
 					walls.setupWall(0);
 					if(round(getY(),2)==round(dest,2)){
 						removeListener(curLevel, 'update', 'moveWall');
 						walls.setSubWallHandler(0, 0, {func:this.staticAdiabatic, obj:this});
-						this.wallV = 0;
+						wall.v = 0;
 					}
 				},
 			this);
@@ -119,8 +121,8 @@ LevelTools.prototype = {
 		$('#dashOutro').hide();
 		$('#dashCutScene').hide();
 	},
-	borderStd: function(){
-		walls.border('container', [1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:this.yMin}, {}, {}, {y:this.yMin}]);
+	borderStd: function(min){
+		walls.border('container', [1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:min}, {}, {}, {y:min}]);
 	},
 	update: function(){
 		this.numUpdates++;

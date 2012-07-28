@@ -17,9 +17,10 @@ WallCollideMethods.prototype = {
 		v1 = (-b + (b^2 - 4*a*c)^.5)/2a
 		v2 = (m1*vo1 + m2*vo2 - m1*v1)/(m2*A)
 		*/
+		var wall = walls[wallIdx];
 		var vo = dot.v.copy();
 		var vo1 = dot.v.dy;
-		var vo2 = this.wallV;
+		var vo2 = wall.v;
 		var m1 = dot.m;
 		var m2 = this.mass()
 		if(Math.abs(vo2)>1.0){
@@ -35,24 +36,26 @@ WallCollideMethods.prototype = {
 			
 			dot.v.dy = (-b + Math.pow(b*b - 4*a*c,.5))/(2*a);
 			dot.y = dot.y+dot.r;
-			this.wallV = (m1*vo1 + m2*vo2 - m1*dot.v.dy)/(m2*scalar);
+			wall.v = (m1*vo1 + m2*vo2 - m1*dot.v.dy)/(m2*scalar);
 		}else{
-			var pt = walls.pts[wallIdx][subWallIdx];
+			var pt = walls[wallIdx][subWallIdx];
 			dot.v.dy = (vo1*(m1-m2)+2*m2*vo2)/(dot.m+m2);
-			this.wallV = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
+			wall.v = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
 			dot.y = pt.y+dot.r;			
 		}
 		this.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
 	},	
 	cPAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
+		
+		var wall = walls[wallIdx];
 		var vo = dot.v.copy();
 		var vo1 = dot.v.dy;
-		var vo2 = this.wallV;
+		var vo2 = wall.v;
 		var m1 = dot.m;
 		var m2 = this.mass()	
-		var pt = walls.pts[wallIdx][subWallIdx];
+		var pt = wall[subWallIdx];
 		dot.v.dy = (vo1*(m1-m2)+2*m2*vo2)/(dot.m+m2);
-		this.wallV = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
+		wall.v = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
 		dot.y = pt.y+dot.r;		
 		this.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
 	},
@@ -68,7 +71,7 @@ WallCollideMethods.prototype = {
 	},
 	cVAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 		var v = dot.v;
-		v.dy = -v.dy + 2*this.wallV;
+		v.dy = -v.dy + 2*walls[wallIdx].v;
 		this.forceInternal += dot.m*(perpV + v.dy);
 	},
 	reflect: function(dot, wallUV, perpV){

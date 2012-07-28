@@ -39,8 +39,8 @@ function IdealGasLaw(){
 		{block:14, title: "", finished: false, text: ""},
 	]
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5', 'spc6']);
-	this.minY = 30;
-	this.maxY = 350;
+	this.yMin = 30;
+	this.yMax = 350;
 	addListener(this, 'update', 'run', this.updateRun, this);
 	addListener(this, 'data', 'run', this.dataRun, this);
 	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
@@ -233,8 +233,8 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		$('#longSliderHolder').show();
 		this.playedWithSlider = new Boolean();
 		this.playedWithSlider = false;
-		walls = new WallHandler([[P(50,75), P(75,50), P(475,50), P(500,75), P(500,300), P(475,325), P(75,325), P(50,300)]], {func:this.staticAdiabatic, obj:this}, ['container']);
-		walls.setHitMode('Arrow');
+		walls = WallHandler([[P(50,75), P(75,50), P(475,50), P(500,75), P(500,300), P(475,325), P(75,325), P(50,300)]], {func:this.staticAdiabatic, obj:this}, ['container']);
+		walls.setHitMode('container', 'Arrow');
 		populate('spc4', P(100,100), V(300,200), 1, 700);
 		$('#sliderPressure').show();
 		
@@ -243,7 +243,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		return this.block1Conditions();
 	},
 	block9CleanUp: function(){
-		walls.setHitMode('Std');
+		walls.setHitMode('container', 'Std');
 		this.playedWithSlider = undefined;
 		$('#longSliderHolder').hide();
 		$('#sliderPressure').hide();
@@ -291,11 +291,11 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		this.cutSceneEnd();
 	},
 	block11Start: function(){
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
-		this.borderStd();
+		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container'], [{yMin:this.yMin, yMax: this.yMin}], [{yMin:this.yMin, yMax: this.yMin}]);
+		this.borderStd(this.yMin);
 		populate('spc1', P(45,35), V(450, 350), 800, 300);
 		populate('spc3', P(45,35), V(450, 350), 600, 300);	
-		this.compArrow = this.makeCompArrow({mode:'isothermal'});
+		this.compArrow = this.makeCompArrow('container', {mode:'isothermal'});
 		this.forceInternal=0;
 		this.numUpdates=0;
 		this.readout.addEntry('pressure', 'Pressure:', 'atm', 0, 0, 1);
@@ -315,7 +315,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		this.arrowVolHalf = new Arrow('half', [P(545, this.halfY), P(510, this.halfY)], Col(0,255,0), c).show();
 	},
 	block11aConditions: function(){
-		if(fracDiff(walls.pts[0][0].y, this.halfY)<.07){
+		if(fracDiff(walls[0][0].y, this.halfY)<.07){
 			return {result:true}
 		}else{
 			return {result:false, alert:'Halve the volume!'}

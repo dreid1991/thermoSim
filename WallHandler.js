@@ -26,21 +26,24 @@ WallHandler.prototype = {
 		if(!bounds){
 			var bounds = new Array(pts.length)
 			for (var boundIdx=0; boundIdx<pts.length; boundIdx++){
-				bounds[boundsIdx] = {yMin:30, yMax: 435};
+				bounds[boundIdx] = {yMin:30, yMax: 435};
 			}
 		}
 		for (var wallIdx=0; wallIdx<pts.length; wallIdx++){
 			this[wallIdx] = pts[wallIdx];
-			this[wallIdx].handle = handles[wallIfx;
-			this[wallIdx].include = includes[wallIfx];
+			this[wallIdx].handle = handles[wallIdx];
+			this[wallIdx].include = includes[wallIdx];
 			this[wallIdx].hitMode = 'Std';
 			this[wallIdx].v = 0;
-			this[wallIdx].bounds = bounds[boundsIdx];
+			this[wallIdx].bounds = bounds[wallIdx];
 		}
 
 	},
 	setBounds: function(wallInfo, bounds){
-		this[this.idxByInfo(wallInfo)].bounds = bounds;
+		var wallBounds = this[this.idxByInfo(wallInfo)].bounds;
+		for (var boundName in bounds){
+			wallBounds[boundName] = bounds[boundName]
+		}
 		return this;
 	},
 	setup: function(){
@@ -57,10 +60,11 @@ WallHandler.prototype = {
 		}
 		
 	},
-	setHitMode: function(inputMode){
-		this.hitMode = inputMode;
+	setHitMode: function(wallInfo, inputMode){
+		var wallIdx = this.idxByInfo(wallInfo);
+		this[wallIdx].hitMode = inputMode;
 	},
-	doInitHandlers: function(walls, handlers){
+	doInitHandlers: function(handlers){
 		
 		if (handlers instanceof Array){//NOTE - HANDLERS HAD BETTER BE THE SAME LENGTH AT walls.pts.  I AM ASSUMING IT IS.
 			for (var handlerIdx=0; handlerIdx<handlers.length; handlerIdx++){
@@ -115,22 +119,24 @@ WallHandler.prototype = {
 		this[newIdx].handle = handle;
 		this[newIdx].include = include
 		this.closeWall(this[newIdx]);
-		this[newIdx].ptsInit = this.copyWall(this[newIdx]);
+		this[newIdx].ptsInit = this.copyWallPts(this[newIdx]);
 
 		this.setupWall(newIdx);
 		this.setWallHandler(newIdx, handler);
 	},
 	setPtsInit: function(){
 		for (var wallIdx=0; wallIdx<this.length; wallIdx++){
-			this[wallIdx][ptsInit] = this.copyWall(this[wallIdx]);
+			this[wallIdx].ptsInit = this.copyWallPts(this[wallIdx]);
 		}
 	},
 	restoreWall: function(wallIdx){
-		var init = this.ptsInit[wallIdx];
-		this[wallIdx] = this.copyWall(init);
+		var init = this[wallIdx].ptsInit;
+		for (var ptIdx=0; ptIdx<init.length; ptIdx++){
+			this[wallIdx][ptIdx] = init[ptIdx].copy();
+		}
 		this.setupWall(wallIdx);
 	},
-	copyWall: function(wall){
+	copyWallPts: function(wall){
 		var len = wall.length;
 		var copy = new Array(len);
 		for (var ptIdx=0; ptIdx<len; ptIdx++){
@@ -139,9 +145,9 @@ WallHandler.prototype = {
 		return copy;
 	},
 	idxByHandle: function(handle){
-		var handles = this.handles;
-		for (var idx=0; idx<handles.length; idx++){
-			if(handle==handles[idx]){
+		
+		for (var idx=0; idx<this.length; idx++){
+			if(handle==this[idx].handle){
 				return idx;
 			}
 		}
@@ -283,7 +289,6 @@ WallHandler.prototype = {
 		var gridDim = this.gridDim;
 		var xSpan = this.xSpan;
 		var ySpan = this.ySpan;
-		var wallGrids = this.wallGrids;
 		for (var spcName in spcs){
 			var spc = spcs[spcName];
 			for (var dotIdx=0; dotIdx<spc.dots.length; dotIdx++){
@@ -299,12 +304,13 @@ WallHandler.prototype = {
 					for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){
 						for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, ySpan); y++){
 							
-							for (var subwallIdx=0; subwallIdx<walls.wallGrids.length; subwallIdx++){
-								for (var lineIdx=0; lineIdx<wallGrids[subwallIdx][x][y].length; lineIdx++){
-									var line = wallGrids[subwallIdx][x][y][lineIdx];
-									if (!this.haveChecked([subwallIdx, line], checkedWalls)){
-										this.checkWallHit(dot, [subwallIdx, line]);
-										checkedWalls.push([subwallIdx, line]);
+							for (var wallIdx=0; wallIdx<this.length; wallIdx++){
+								var gridSquare = this[wallIdx].wallGrids[x][y];
+								for (var lineIdx=0; lineIdx<gridSquare.length; lineIdx++){
+									var line = gridSquare[lineIdx];
+									if (!this.haveChecked([wallIdx, line], checkedWalls)){
+										this.checkWallHit(dot, [wallIdx, line]);
+										checkedWalls.push([wallIdx, line]);
 									}
 								}
 							}
@@ -323,8 +329,9 @@ WallHandler.prototype = {
 		var dotVec = V(dot.x + dot.v.dx - perpUV.dx*dot.r - wallPt.x, dot.y + dot.v.dy - perpUV.dy*dot.r - wallPt.y);
 		var distFromWall = perpUV.dotProd(dotVec);
 		var perpV = -perpUV.dotProd(dot.v);
+		var hitMode = this[line[0]].hitMode;
 		if (distFromWall<0 && distFromWall>-30 && this.isBetween(dot, wallIdx, subWallIdx, wallUV)){
-			this['didHit'+this.hitMode](dot, wallIdx, subWallIdx, wallUV, perpV, perpUV);
+			this['didHit'+hitMode](dot, wallIdx, subWallIdx, wallUV, perpV, perpUV);
 		}
 	},
 	isBetween: function(dot, wallIdx, subWallIdx, wallUV){
@@ -382,7 +389,7 @@ WallHandler.prototype = {
 				wall[1].y = nextY;
 				wall[wall.length-1].y = nextY;
 				walls.setupWall(wallIdx);		
-			}
+			},
 		this);
 	},
 	moveStop: function(wallInfo){
@@ -425,7 +432,7 @@ WallHandler.prototype = {
 		for (var wallIdx=0; wallIdx<this.length; wallIdx++){
 			var uncutPts = this[wallIdx];
 			var pts = uncutPts.slice(0,uncutPts.length-1);
-			area+=this.includes[wallIdx]*this.area(pts);
+			area+=this[wallIdx].include*this.area(pts);
 		}
 		return area;
 	},

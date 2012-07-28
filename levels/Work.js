@@ -110,9 +110,9 @@ _.extend(Work.prototype,
 	},
 	block2Start: function(){
 		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
-		walls.setHitMode('Arrow');
+		walls.setHitMode('container', 'Arrow');
 		this.borderStd();
-		this.compArrow = this.makeCompArrow({mode:'adiabatic'});
+		this.compArrow = this.makeCompArrow('container', {mode:'adiabatic'});
 		populate('spc4', P(45,35), V(460, 350), 1, 600);
 	},
 	block2CleanUp: function(){
@@ -120,7 +120,7 @@ _.extend(Work.prototype,
 		walls.removeBorder('container');
 		this.compArrow.remove();
 		this.compArrow = undefined;
-		walls.setHitMode('Std');
+		walls.setHitMode('container', 'Std');
 		removeListenerByName(curLevel, 'update', 'drawArrow');
 		removeListenerByName(curLevel, 'update', 'animText');
 	},
