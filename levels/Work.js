@@ -28,6 +28,7 @@ function Work(){
 		{block:3, title: '', finished: false, text:''},
 		{block:4, title: 'Current step', finished: false, conditions: this.block4Conditions, text:'So here we have a big weight we can use to bring our system to a pressure of 6 atm.  There are some stops on the piston that let us compress to 10 liters.  We have 1.1 moles of gas with a heat capacity of R J/mol*K (<a href = extras/heatCapacity.html>explanation</a>).  What final temperature should we expect if we compress our piston all the way?  Once you have a value, try the experiment!  Do the calculated and simulated result match?  Do these results back up or refute the idea that works adds energy through collisions with a moving wall?'},
 		{block:5, title: 'Current step', finished: false, text:''},
+		{block:6, title: 'Current step', finished: false, text:''},
 	]
 	walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
@@ -67,7 +68,7 @@ _.extend(Work.prototype,
 	block1Start: function(){
 		var self = this;
 		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
-		walls.setSubWallHandler('container', 0, {func:this.cPAdiabaticDamped, obj:this});		
+		
 		populate('spc1', P(45,35), V(460, 350), 800, 300);
 		populate('spc3', P(45,35), V(450, 350), 600, 300);
 		
@@ -88,7 +89,7 @@ _.extend(Work.prototype,
 								{data:this.data, x:'v', y:'t'});		
 		
 		
-		this.piston = new Piston('tootoo', 500, function(){return walls.pts[0][0].y}, 40, 470, c, 2, function(){return self.g}, this);
+		this.piston = new Piston('tootoo', 'container', 2, function(){return self.g}, this);
 		this.piston.show();
 		this.piston.trackWork();
 		this.piston.trackPressure();
@@ -106,7 +107,6 @@ _.extend(Work.prototype,
 		this.readout.hide();
 		this.piston.remove();
 		this.piston = undefined;
-		removeListener(curLevel, 'update', 'moveWalls');
 		walls.setWallHandler(0, {func:this.staticAdiabatic, obj:this})
 		walls.removeBorder('container');
 	},
@@ -168,11 +168,20 @@ _.extend(Work.prototype,
 		}
 	},
 	block5Start: function(){
-		wallHandle = 'container';
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,350), P(40,350)]], {func:this.staticAdiabatic, obj:this}, [wallHandle]);
-		
+		var str = '<p>Okay, so your calculations should have looked something like this:<p><center><img src = img/work/eq3.gif></img></p><p><img src=img/work/eq4.gif></img></p></center>You had an initial temperature of INITIAL K and a final temperature of FINAL K.  How’d it do?</p><p>Now let’s apply some of that thinking to figure out why constant pressure and constant volume heat capacities are different.  For this gas, C<sub>v</sub> is R and C<sub>p</sub> is 2R.  This means that is takes more energy to heat up a gas at constant pressure than one at constant volume.  Huh?  The gas is the same.  Why do they take different amounts of energy?  Any thoughts?</p>';
+		str = replaceString(replaceString(str, 'INITIAL', round(this.volListener15.getResults().t,0)), 'FINAL', round(this.volListener10.getResults().t,0));
+		this.cutSceneStart(str);
 	},
-
+	block5CleanUp: function(){
+		this.cutSceneEnd();
+	},
+	block6Start: function(){
+		$('#sliderHeaterHolder').show();
+		walls = new WallHandler([[P(40,30), P(255,30), P(255,350), P(40,350)], [P(295,30), P(510,30), P(510,350), P(295,350)]], {func:this.staticAdiabatic, obj:this}, ['left', 'right']);
+		//this.piston = new Piston('pistony', 'right', 5, function(){return this.g}, this);
+		populate('spc1', P(40,30), V(200,300), 600, 300);
+		populate('spc1', P(285,30), V(200,300), 600, 300);
+	},
 	makeDragWeights: function(wallHandle){
 		var self = this;
 		var massInit = 25;
@@ -211,8 +220,11 @@ _.extend(Work.prototype,
 	changePressure: function(event, ui){
 		this.piston.setP(ui.value);
 	},
-	changeTemp: function(event, ui){
-		this.heater.setTemp(ui.value);
+	heatLeft: function(event, ui){
+		this.heaterLeft.setTemp(ui.value);
+	},
+	heatRight: function(event, ui){
+		this.heaterRight.setTemp(ui.value)
 	},
 	reset: function(){
 		var curPrompt = this.prompts[this.promptIdx];

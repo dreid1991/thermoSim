@@ -916,18 +916,19 @@ DragArrow.prototype = {
 //PISTON
 //////////////////////////////////////////////////////////////////////////
 
-function Piston(handle, height, y, xLeftInit, width, drawCanvas, pInit, g, obj){
+function Piston(handle, wallInfo, pInit, g, obj){
 	var self = this;
-	this.y = y;
 	this.p = pInit;
 	this.g = g;
 	this.slant = .07;
-	
-	this.left = xLeftInit;
-	this.width = width;
+	this.drawCanvas = c;
+	var wallPts = walls.pts[walls.idxByInfo(wallInfo)];
+	this.left = wallPts[0].x;
+	this.width = wallPts[1].x-this.left;
+	this.y = function(){return wallPts[0].y};
+	this.height = 500;
 	this.setMass();
-	this.drawCanvas = drawCanvas;
-	this.draw = this.makeDrawFunc(height, this.left, this.width);
+	this.draw = this.makeDrawFunc(this.height, this.left, this.width);
 	this.dataSlotFont = '12pt Calibri';
 	this.dataSlotFontCol = Col(255,255,255);
 	this.pStep = .05;
@@ -939,6 +940,7 @@ function Piston(handle, height, y, xLeftInit, width, drawCanvas, pInit, g, obj){
 	this.readout = new Readout('pistonReadout', readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, undefined, 'center');
 	obj.mass = function(){return self.mass};
 	addListener(curLevel, 'update', 'moveWalls', obj.moveWalls, obj);
+	walls.setSubWallHandler(wallInfo, 0, {func:obj.cPAdiabaticDamped, obj:obj});		
 	this.obj = obj;
 }
 
@@ -1275,16 +1277,16 @@ StateListener.prototype = {
 		this);
 	},
 	recordVals: function(){
-		this.record = {}
+		this.results = {}
 		for (var recordName in this.recordAtSatisfy){
 			var sourceList = this.recordAtSatisfy[recordName];
-			this.record[recordName] = sourceList[sourceList.length-1];
+			this.results[recordName] = sourceList[sourceList.length-1];
 		}
 	},
 	isSatisfied: function(){
 		return this.amSatisfied;
 	},
-	valsAtSatisfy: function(){
-		return this.record;
+	getResults: function(){
+		return this.results;
 	},
 }

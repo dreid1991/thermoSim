@@ -33,8 +33,17 @@
 						<div id='sliderPressure' style='width:300px'></div>
 					</div>
 					<br>
-					<div id='sliderTempHolder'>Temperature control<br>
-						<div id='sliderTemp' style = 'width:300px'></div>
+					<div id='sliderHeaterHolder'>
+						<div id='sliderHeaterLeftHolder' style = 'float:left'>
+							<center>Left heater
+								<div id='sliderHeaterLeft' style = 'width:200px'></div>
+							</center>
+						</div>
+						<div id='sliderHeaterRightHolder' style = 'float:right'>
+							<center>Right heater
+								<div id='sliderHeaterRight' style = 'width:200px'></div>
+							</center>
+						</div>
 					</div>
 					<button id='reset' class='noSelect'>Reset experiment</button>
 					<button id='checkAns' class='noSelect'>Check answer</button>
@@ -104,7 +113,7 @@ $(function(){
 	myCanvas.height = canvasHeight;
 	curLevel = new Work();
 	animText = new AnimText(c);
-	$('#sliderTempHolder').hide();
+	$('#sliderHeaterHolder').hide();
 	$('#sliderPressureHolder').hide();
 
 	$('#checkAns').hide();
@@ -133,7 +142,7 @@ $(function(){
 		'show'
 	);
 	makeSlider(
-		"sliderTemp", 
+		"sliderHeaterLeft", 
 		{
 			min:-20, 
 			max:20, 
@@ -141,9 +150,9 @@ $(function(){
 		},
 		[
 			{eventType:'slidestop', obj:curLevel, func:function(event, ui){
-															$('#sliderTemp').slider('option', {value:0});
+															$('#sliderHeaterLeft').slider('option', {value:0});
 															ui.value=0;
-															this.changeTemp(event, ui)
+															this.heaterLeft(event, ui)
 														}
 			},
 			{eventType:'slide', obj:curLevel, func:curLevel.changeTemp}, 
@@ -151,6 +160,26 @@ $(function(){
 		],
 		'show'
 	);
+	makeSlider(
+		"sliderHeaterRight", 
+		{
+			min:-20, 
+			max:20, 
+			value:0, 
+		},
+		[
+			{eventType:'slidestop', obj:curLevel, func:function(event, ui){
+															$('#sliderHeaterRight').slider('option', {value:0});
+															ui.value=0;
+															this.heatRight(event, ui)
+														}
+			},
+			{eventType:'slide', obj:curLevel, func:curLevel.changeTemp}, 
+			
+		],
+		'show'
+	);
+
 
 });
 
