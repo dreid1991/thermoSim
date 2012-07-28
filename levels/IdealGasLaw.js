@@ -75,7 +75,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		$('#clearGraphs').hide();
 		$('#sliderTemp').show();
 		
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
+		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
 		;
 		populate('spc4', P(45,35), V(450, 350), 1, 300);
 		var dot = spcs.spc4.dots[0]
@@ -101,12 +101,12 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		$('#sliderTemp').hide();
 	},
 	block2Start: function(){
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
+		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
 		;	
 		populate('spc4', P(45,35), V(450, 350), 400, 200);
 	},
 	block3Start: function(){
-		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
+		walls = WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
 			[P(300,30), P(510,30), P(510,440), P(300,440)]], {func:this.staticAdiabatic, obj:this}, ['c1', 'c2']);
 		;
 		populate('spc4', P(45, 80), V(200, 300), 200, 600);
@@ -114,7 +114,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		
 	},
 	block4Start: function(){
-		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
+		walls = WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
 			[P(300,30), P(510,30), P(510,440), P(300,440)]], {func:this.staticAdiabatic, obj:this}, ['c1', 'c2']);
 		;
 		populate('spc1', P(45, 80), V(200, 300), 200, 300);
@@ -143,7 +143,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		this.cutSceneEnd();
 	},
 	block6Start: function(){
-		walls = new WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
+		walls = WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
 			[P(300,30), P(510,30), P(510,440), P(300,440)]], {func:this.staticAdiabatic, obj:this}, ['c1', 'c2']);
 		;
 		var sliderMin = $('#sliderSpeedLeft').slider('option', 'min');
@@ -206,7 +206,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 		this.cutSceneEnd();
 	},
 	block8Start: function(){
-		walls = new WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
+		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
 		;
 		populate('spc1', P(45,35), V(450, 350), 600, 300);
 		populate('spc3', P(45,35), V(450, 350), 800, 300);
