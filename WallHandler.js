@@ -1,17 +1,10 @@
 function WallHandler(pts, handlers, handles, includes){
-	this.hitMode = 'Std';
-	this.pts = pts;
-	if(includes){
-		this.includes = includes;
-	} else {
-		this.includes = new Array(this.pts.length);
-		for (var ptIdx=0; ptIdx<this.pts.length; ptIdx++){
-			this.includes[ptIdx] = 1;
-		}
-	}
-	this.handles = handles;
-	this.gridDim=20;
-	if(this.handles.length!=this.pts.length){
+	var newWall = new Array(pts.length)
+	_.extend(newWall, WallHandler.prototype);
+
+	newWall.assemble(pts, handles, includes)
+	
+	if(handles.length!=pts.length){
 		console.log('NAME YOUR WALLS');
 	}
 	
@@ -20,20 +13,33 @@ function WallHandler(pts, handlers, handles, includes){
 	this.wallGrids = [];
 	this.handlers = {};
 	if(handlers){
-		this.doInitHandlers(handlers);
+		newWall.doInitHandlers(handlers);
 	}
-	this.xSpan = Math.floor(myCanvas.width/this.gridDim);
-	this.ySpan = Math.floor(myCanvas.height/this.gridDim);
-	this.numCols = Math.ceil(myCanvas.width/this.gridDim);
-	this.numRows = Math.ceil(myCanvas.height/this.gridDim);
-	this.setup();
+	newWall.xSpan = Math.floor(myCanvas.width/this.gridDim);
+	newWall.ySpan = Math.floor(myCanvas.height/this.gridDim);
+	newWall.numCols = Math.ceil(myCanvas.width/this.gridDim);
+	newWall.numRows = Math.ceil(myCanvas.height/this.gridDim);
+	newWall.setup();
+	return newWall;
 };
 WallHandler.prototype = {
+	assemble: function(pts, handles, includes){
+		if(!includes){
+			var includes = new Array(pts.length);
+			for(var includeIdx=0; includeIdx<pts.length; includeIdx++){
+				includes[includeIdx]=1;
+			}
+		}
+		for (var wallIdx=0; wallIdx<pts.length; wallIdx++){
+			this[wallIdx] = {pts:pts[wallIdx], handle:handles[wallIdx], include:includes[wallIdx], hitMode:'Std'};
+		}
+	},
 	setup: function(){
+		this.gridDim=20;
 		this.closeWalls();
 		this.ptsInit = [];
 		this.setPtsInit();
-		for (var wallIdx=0; wallIdx<this.pts.length; wallIdx++){
+		for (var wallIdx=0; wallIdx<this.length; wallIdx++){
 			this.setupWall(wallIdx);
 		}
 		
@@ -41,7 +47,7 @@ WallHandler.prototype = {
 	setHitMode: function(inputMode){
 		this.hitMode = inputMode;
 	},
-	doInitHandlers: function(handlers){
+	doInitHandlers: function(walls, handlers){
 		
 		if (handlers instanceof Array){//NOTE - HANDLERS HAD BETTER BE THE SAME LENGTH AT walls.pts.  I AM ASSUMING IT IS.
 			for (var handlerIdx=0; handlerIdx<handlers.length; handlerIdx++){
@@ -79,27 +85,27 @@ WallHandler.prototype = {
 		this.handlers[wallIdx+ '-' + subWallIdx] = handler;
 	},
 	setupWall: function(wallIdx){
-		this.wallUVs[wallIdx] = this.getWallUV(wallIdx);
-		this.wallPerpUVs[wallIdx] = this.getPerpUVs(wallIdx);
-		this.wallGrids[wallIdx] = this.getSubwallGrid(wallIdx);
+		this[wallIdx].wallUVs[wallIdx] = this.getWallUV(wallIdx);
+		this[wallIdx].wallPerpUVs= this.getPerpUVs(wallIdx);
+		this[wallIdx].wallGrids = this.getSubwallGrid(wallIdx);
 	},
 	addWall: function(pts, handler, handle, includes){
 		//this.handlers.push(new Array(pts.length));
-		this.handles.push(handle)
-		this.closeWall(pts);
-		this.pts.push(pts);
-		this.ptsInit[this.pts.length-1] = this.copyWall(this.pts[this.pts.length-1]);
-		if(includes){
-			this.includes.push(includes);
-		}else{
-			this.includes.push(1);
+		var newIdx = this.length;
+		if(!this.includes){
+			var includes = 1;
 		}
-		this.setupWall(this.pts.length-1);
-		this.setWallHandler(this.pts.length-1, handler);
+		
+		this.push({pts:pts, handle:handle, includes:includes});
+		this.closeWall(this[this.length].pts);
+		this[newIdx].ptsInit = this.copyWall(this[newIdx].pts);
+
+		this.setupWall(newIdx);
+		this.setWallHandler(newIdx, handler);
 	},
 	setPtsInit: function(){
-		for (var wallIdx=0; wallIdx<this.pts.length; wallIdx++){
-			this.ptsInit[wallIdx] = this.copyWall(this.pts[wallIdx]);
+		for (var wallIdx=0; wallIdx<this.length; wallIdx++){
+			this[wallIdx][ptsInit] = this.copyWall(this[wallIdx].pts);
 		}
 	},
 	restoreWall: function(wallIdx){
@@ -145,8 +151,8 @@ WallHandler.prototype = {
 		this.handlers.splice(wallIdx, 1);
 	},
 	closeWalls: function(){
-		for (var wallIdx=0; wallIdx<this.pts.length; wallIdx++){
-			var wall = this.pts[wallIdx];
+		for (var wallIdx=0; wallIdx<this.length; wallIdx++){
+			var wall = this[wallIdx].pts;
 			this.closeWall(wall);
 		}
 	},
@@ -154,7 +160,7 @@ WallHandler.prototype = {
 		wall.push(P(wall[0].x, wall[0].y))
 	},
 	getPerpUVs: function(wallIdx){
-		var wallUVSet = this.wallUVs[wallIdx];
+		var wallUVSet = this[wallIdx].wallUVs;
 		var perpUVs = new Array(wallUVSet.length);
 		for (var wallUVIdx=0; wallUVIdx<wallUVSet.length; wallUVIdx++){
 			var wallUV = wallUVSet[wallUVIdx];
@@ -163,7 +169,7 @@ WallHandler.prototype = {
 		return perpUVs;
 	},
 	getWallUV: function(wallIdx){
-		var wall = this.pts[wallIdx];
+		var wall = this[wallIdx].pts;
 		var numUVs = wall.length-1
 		var wallUVs = new Array(numUVs);
 		for (var ptIdx=0; ptIdx<numUVs; ptIdx++){
@@ -175,8 +181,8 @@ WallHandler.prototype = {
 	},
 	getSubwallGrid: function(wallIdx){
 		var subwallGrid = new Array(this.numCols);
-		for (var x=0; x<this.numCols; x++){ //HEY - you changed this from .floor +1
-			var column = new Array(this.numRows);
+		for (var x=0; x<this.numCols; x++){ 
+		var column = new Array(this.numRows);
 			for (var y=0; y<this.numRows; y++){
 				column[y] = (this.getSubwallsInGrid(wallIdx, x, y));
 			}
@@ -188,7 +194,7 @@ WallHandler.prototype = {
 	},
 	getSubwallsInGrid: function(wallIdx, x, y){
 		var subwallsInGrid = [];
-		var wall = this.pts[wallIdx];
+		var wall = this[wallIdx].pts;
 		for (var ptIdx=0; ptIdx<wall.length-1; ptIdx++){
 			if (this.isInBox(x, y, [wallIdx, ptIdx])){
 				subwallsInGrid.push(ptIdx);
@@ -207,8 +213,8 @@ WallHandler.prototype = {
 		x2*=this.gridDim;
 		y1*=this.gridDim;
 		y2*=this.gridDim;
-		pt1 = this.pts[pt[0]][pt[1]];
-		pt2 = this.pts[pt[0]][pt[1]+1];
+		pt1 = this[pt[0]].pts[pt[1]];
+		pt2 = this[pt[0]].pts[pt[1]+1];
 		var angleLine = this.getAngle(pt1.x, pt1.y, pt2.x, pt2.y);
 		var anglePt1 = this.getAngle(pt1.x, pt1.y, x1, y1);
 		var anglePt2 = this.getAngle(pt1.x, pt1.y, x2, y2);
