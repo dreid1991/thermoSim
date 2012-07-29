@@ -349,7 +349,7 @@ _.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototy
 	},
 
 	block11CleanUp: function(){
-		walls.removeBorder('container');
+		walls['container'].removeBorder();
 		removeListener(curLevel, 'data', 'recordPressure');
 		this.readout.removeAllEntries();
 		this.readout.hide();

@@ -122,7 +122,7 @@ LevelTools.prototype = {
 		$('#dashCutScene').hide();
 	},
 	borderStd: function(min){
-		walls.border('container', [1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:min}, {}, {}, {y:min}]);
+		walls['container'].border([1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:min}, {}, {}, {y:min}]);
 	},
 	update: function(){
 		this.numUpdates++;

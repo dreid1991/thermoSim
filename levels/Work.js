@@ -106,7 +106,7 @@ _.extend(Work.prototype,
 		this.piston.remove();
 		this.piston = undefined;
 		walls.setWallHandler(0, {func:this.staticAdiabatic, obj:this})
-		walls.removeBorder('container');
+		walls['container'].removeBorder();
 	},
 	block2Start: function(){
 		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
@@ -117,7 +117,7 @@ _.extend(Work.prototype,
 	},
 	block2CleanUp: function(){
 		this.wallV=0;
-		walls.removeBorder('container');
+		walls['container'].removeBorder();
 		this.compArrow.remove();
 		this.compArrow = undefined;
 		walls.setHitMode('container', 'Std');
@@ -151,7 +151,7 @@ _.extend(Work.prototype,
 		$('#reset').hide();
 		this.trackTempStop();
 		this.trackVolumeStop();
-		walls.removeBorder(0);
+		walls['container'].removeBorder();
 		this.stops.remove();
 		this.stop = undefined;
 		this.dragWeights.remove();
