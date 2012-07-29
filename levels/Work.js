@@ -37,8 +37,8 @@ function Work(){
 	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
 }
 _.extend(Work.prototype, 
-			LevelTools.prototype, 
-			WallCollideMethods.prototype, 
+			LevelTools, 
+			WallMethods.collideMethods, 
 {
 	init: function(){
 		for (var initListenerName in this.initListeners.listeners){

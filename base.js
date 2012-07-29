@@ -264,12 +264,12 @@ function boundedStep(cur, setPt, step){
 function addSpecies(toAdd){
 	if (String(toAdd)===toAdd){
 		var def = speciesDefs[toAdd];
-		spcs[toAdd] = new Species(def.m, def.r, def.cols);
+		spcs[toAdd] = Species(def.m, def.r, def.cols, def);
 	} else if (toAdd instanceof Array){
 		for (var toAddIdx=0; toAddIdx<toAdd.length; toAddIdx++){
 			var name = toAdd[toAddIdx];
 			var def = speciesDefs[name];
-			spcs[name] = new Species(def.m, def.r, def.cols);
+			spcs[name] = Species(def.m, def.r, def.cols, def);
 		}
 	}
 	collide.setup();
@@ -285,32 +285,8 @@ function removeSpecies(toRem){
 	}
 	collide.setup();
 }
-function populate(name, pos, dims, num, temp){
-	var vStdev = .1;
-	var x = pos.x;
-	var y = pos.y;
-	var width = dims.dx;
-	var height = dims.dy;
-	var spc = spcs[name];
-	var def = speciesDefs[name];
-	if(spc===undefined){
-		alert('Tried to populate undefined species');
-	}else{
-		for (var i=0; i<num; i++){
-			var placeX = x + Math.random()*width;
-			var placeY = y + Math.random()*height;
-			var v = tempToV(spc.m, temp)
-			var angle = Math.random()*2*Math.PI;
-			var vx = v * Math.cos(angle);
-			var vy = v * Math.sin(angle);
-			spc.dots.push(D(placeX, placeY, V(vx, vy), spc.m, spc.r, def.name, def.idNum));
-		}
-	}
-}
-function depopulate(name){
-	var spc = spcs[name];
-	spc.dots = [];
-}
+
+
 function changeAllTemp(temp){
 	for(var spc in spcs){
 		var dots = spcs[spc].dots;

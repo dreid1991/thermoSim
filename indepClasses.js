@@ -9,12 +9,36 @@ function Dot(x, y, v, mass, radius, name, idNum){
 	this.name = name;
 	this.idNum = idNum;
 }
-function Species( mass, radius, colors){
-	this.m = mass;
-	this.r = radius;
-	this.cols = colors;
-	this.dots = [];
-	return this;
+function Species(mass, radius, colors, def){
+	var spc = [];
+	spc.m = mass;
+	spc.r = radius;
+	spc.cols = colors;
+	spc.def = def;
+	_.extend(spc, Species.prototype);
+	return spc;
+}
+Species.prototype = {
+	populate: function(pos, dims, count, temp){
+		var vStdev = .1;
+		var x = pos.x;
+		var y = pos.y;
+		var width = dims.dx;
+		var height = dims.dy;
+		for (var i=0; i<num; i++){
+			var placeX = x + Math.random()*width;
+			var placeY = y + Math.random()*height;
+			var v = tempToV(this.m, temp)
+			var angle = Math.random()*2*Math.PI;
+			var vx = v * Math.cos(angle);
+			var vy = v * Math.sin(angle);
+			this.push(D(placeX, placeY, V(vx, vy), this.m, this.r, this.def.name, this.def.idNum));
+			
+		}		
+	},
+	depopulate: function(){
+		this.splice(0, this.length);
+	},
 }
 function Point(x, y){
 	this.x = x;

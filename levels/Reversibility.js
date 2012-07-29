@@ -59,8 +59,8 @@ function Reversibility(){
 	
 }
 _.extend(Reversibility.prototype, 
-			LevelTools.prototype, 
-			WallCollideMethods.prototype, 
+			LevelTools, 
+			WallMethods.collideMethods, 
 {
 	init: function(){
 		this.workTracker.start();

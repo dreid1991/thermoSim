@@ -1,5 +1,5 @@
-function LevelTools(){}
-LevelTools.prototype = {
+
+LevelTools = {
 	makeCompArrow: function(wallInfo, compAttrs){
 		var wallIdx = walls.idxByInfo(wallInfo);
 		var compMode = compAttrs.mode;

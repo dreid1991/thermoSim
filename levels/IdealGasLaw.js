@@ -49,7 +49,9 @@ function IdealGasLaw(){
 	
 }
 
-_.extend(IdealGasLaw.prototype, LevelTools.prototype, WallCollideMethods.prototype,
+_.extend(IdealGasLaw.prototype, 
+		LevelTools, 
+		WallMethods.collideMethods,
 {
 	init: function(){
 		for (var initListenerName in this.initListeners.listeners){
