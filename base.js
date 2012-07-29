@@ -347,7 +347,12 @@ function returnEscapist(dot){
 	dot.x = x;
 	dot.y = y;
 }
-
+function defaultTo(defaultVal, inputVal){
+	if(inputVal){
+		return inputVal;
+	}
+	return defaultVal;
+} 
 function round(val, dec){
 	var pow = Math.pow(10,dec);
 	return Math.round(val*pow)/pow;

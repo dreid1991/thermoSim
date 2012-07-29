@@ -25,16 +25,19 @@ AnimText.prototype = {
 		defaults.align = 'center';
 		defaults.font = 'calibri';
 		
-		var font = this.assignStaticAttr(attrs, defaults, 'font');
-		var align = this.assignStaticAttr(attrs, defaults, 'align');
-		var time = this.assignStaticAttr(attrs, defaults, 'time');
+		var font = defaultTo(defaults.font, attrs.font);
+		var align = defaultTo(defaults.align, attrs.align);
+		var time = defaultTo(defaults.time, attrs.time);
 		
 		var cur = {};
 		
-		this.assignDynamicAttr(init, defaults, cur, 'size');
-		this.assignDynamicAttr(init, defaults, cur, 'rot');
-		this.assignDynamicAttr(init, defaults, cur, 'col');
+		init.size = defaultTo(defaults.size, init.size);
+		init.rot = defaultTo(defaults.rot, init.rot);
+		init.col = defaultTo(defaults.col, init.col);
 		
+		cur.size = init.size;
+		cur.rot = init.rot;
+		cur.col = init.col;
 		//only necessary init attr
 		cur.pos = init.pos.copy();
 		
@@ -102,21 +105,5 @@ AnimText.prototype = {
 			},
 		'');	
 		
-	},
-
-	assignStaticAttr: function(attrs, defaults, attrName){
-		if(attrs[attrName]){
-			return attrs[attrName];
-		}else{
-			return defaults[attrName];
-		}
-	},
-	assignDynamicAttr: function(init, defaults, cur, attrName){
-		if(init[attrName]){
-			cur[attrName] = init[attrName];
-		}else{
-			cur[attrName] = defaults[attrName];
-			init[attrName] = defaults[attrName];
-		}
 	},
 }

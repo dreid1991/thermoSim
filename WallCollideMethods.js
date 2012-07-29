@@ -22,7 +22,8 @@ WallCollideMethods.prototype = {
 		var vo1 = dot.v.dy;
 		var vo2 = wall.v;
 		var m1 = dot.m;
-		var m2 = this.mass()
+		var m2 = wall.mass();
+		
 		if(Math.abs(vo2)>1.0){
 			var vo1Sqr = vo1*vo1;
 			var vo2Sqr = vo2*vo2;

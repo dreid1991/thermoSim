@@ -10,6 +10,7 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.wallHandler = wallHandler;
 	this.eBarCol = this.weightCol;
 	this.wallIdx = walls.idxByInfo(wallInfo);
+	this.wall = walls[this.wallIdx];
 	this.eBar = {x:eBarX, scalar: .7};
 	this.binCol = binCol;
 	this.binHeight = 65;
@@ -23,6 +24,7 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.weightScalar = 40;
 	this.moveSpeed = 20;
 	this.pistonMass = massInit;
+	this.massChunkName = 'dragWeights';
 	this.massInit = massInit
 	this.eAdded = 0;
 	this.pressure = this.getPressure();
@@ -38,8 +40,9 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	var self = this;
 	if(obj){
 		addListener(obj, 'init', 'dragWeights', this.init, this);
-		obj.mass = function(){return self.pistonMass};
 	}
+
+	this.wall.setMass(this.massChunkName, this.massInit);
 	this.trackEnergy = true;
 	this.trackMass = true;
 	this.trackPressure = false;
@@ -65,6 +68,7 @@ DragWeights.prototype = {
 		
 	},
 	remove: function(){
+		walls[this.wallIdx] = 
 		removeListener(curLevel, 'update', 'moveWalls');
 		removeListener(curLevel, 'update', 'moveWeightsOnPiston');
 		removeListener(curLevel, 'update', 'drawDragWeights');
@@ -162,9 +166,8 @@ DragWeights.prototype = {
 		return weightGroups;
 	},
 	makeStoreBins: function(){
-		var localWalls = walls;
-		var wallPts = localWalls[this.wallIdx];
-		var center = (wallPts[0].x + wallPts[1].x)/2;
+
+		var center = (this.wall[0].x + this.wall[1].x)/2;
 		var bins = {};
 		var numGroups = this.getNumGroups();
 		var posX = center - this.storeBinWidth*(numGroups-1)/2 - this.storeBinSpacing*(numGroups-1)/2;
@@ -185,9 +188,8 @@ DragWeights.prototype = {
 		return bin;
 	},
 	makePistonBins: function(){
-		var localWalls = walls;
-		var wallPts = localWalls[this.wallIdx];
-		var center = (wallPts[0].x + wallPts[1].x)/2;
+
+		var center = (this.wall[0].x + this.wall[1].x)/2;
 		var bins = {};
 		var numGroups = this.getNumGroups();
 		var posX = center - this.pistonBinWidth*(numGroups-1)/2 - this.pistonBinSpacing*(numGroups-1)/2;
@@ -344,9 +346,8 @@ DragWeights.prototype = {
 		return totalMass+this.massInit;
 	},
 	getPressure: function(){
-		var localWalls = walls;
-		var wallPts = localWalls[this.wallIdx];
-		return this.pistonMass*g*pConst/(wallPts[1].x-wallPts[0].x);
+		
+		return this.pistonMass*g*pConst/(this.wall[1].x-this.wall[0].x);
 	},
 	pistonMinusVal: function(val){
 		return function(){return walls[0][0].y-val}
@@ -504,6 +505,7 @@ DragWeights.prototype = {
 		this.weightsOnPiston.push(weight);
 		weight.status = 'piston';
 		this.pistonMass = this.getPistonMass();
+		this.wall.setMass(this.massChunkName, this.pistonMass);
 		this.pressure = this.getPressure();
 		if(this.trackMass){
 			this.readout.tick(this.pistonMass, 'mass');
@@ -518,7 +520,8 @@ DragWeights.prototype = {
 				this.weightsOnPiston.splice([idx],1);
 			}
 		}
-		this.pistonMass = this.getPistonMass()
+		this.pistonMass = this.getPistonMass();
+		this.wall.setMass(this.massChunkName, this.pistonMass);
 		this.pressure = this.getPressure();
 		if(this.trackMass){
 			this.readout.tick(this.pistonMass, 'mass');
@@ -921,10 +924,11 @@ function Piston(handle, wallInfo, pInit, obj){
 	this.slant = .07;
 	this.drawCanvas = c;
 	this.wallIdx = walls.idxByInfo(wallInfo);
-	var wallPts = walls[this.wallIdx];
-	this.left = wallPts[0].x;
-	this.width = wallPts[1].x-this.left;
-	this.y = function(){return wallPts[0].y};
+	this.wall = walls[this.wallIdx];
+	this.left = this.wall[0].x;
+	this.width = this.wall[1].x-this.left;
+	var myWall = this.wall
+	this.y = function(){return myWall[0].y};
 	this.height = 500;
 	this.setMass();
 	this.draw = this.makeDrawFunc(this.height, this.left, this.width);
@@ -1249,7 +1253,7 @@ Stops.prototype = {
 //////////////////////////////////////////////////////////////////////////
 //STATE LISTENER
 //////////////////////////////////////////////////////////////////////////
-function StateListener(condition, checkList, tolerance, recordAtSatisfy){
+function StateListener(condition, checkList, tolerance, recordAtSatisfy, atSatisfyFunc){
 	this.condition = condition;
 	this.checkList = checkList;
 	this.recordAtSatisfy = recordAtSatisfy;
@@ -1258,6 +1262,7 @@ function StateListener(condition, checkList, tolerance, recordAtSatisfy){
 		this.tolerance = tolerance;
 	}
 	this.amSatisfied = false;
+	this.atSatisfyFunc = atSatisfyFunc;
 	this.init();
 	return this;
 }
@@ -1269,6 +1274,9 @@ StateListener.prototype = {
 				if(fracDiff(this.condition, last)<this.tolerance){
 					this.amSatisfied = true;
 					this.recordVals();
+					if(this.atSatisfyFunc){
+						this.atSatisfyFunc.func.apply(this.atSatisfyFunc.obj);
+					}
 					removeListener(curLevel, 'data', 'StateListener' + this.condition);
 				}
 			},
