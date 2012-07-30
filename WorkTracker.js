@@ -11,6 +11,7 @@ function WorkTracker(handle, height, width, mass, readoutData, obj){
 		addListener(obj, 'reset', 'workTracker'+this.handle, this.reset, this);
 	}
 }
+//HEY - THIS CAN PROBABLY BE ABSORBED INTO WALL FUNCTIONS
 WorkTracker.prototype = {
 
 	/*

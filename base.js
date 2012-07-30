@@ -296,9 +296,13 @@ function changeAllTemp(temp){
 		}
 	}
 }
-function changeRMS(spcName, newRMS){
+function changeRMS(info, newRMS){
+	info = defaultTo({}, info);
+	var spcName = info.spcName;
+	var tag = info.tag;
+	
 	var dots = spcs[spcName];
-	var curRMS = rms(dataHandler.velocities(spcName));
+	var curRMS = rms(dataHandler.velocities(info));
 	var ratio = newRMS/curRMS;
 	for (var dotIdx=0; dotIdx<dots.length; dotIdx++){
 		var dot = dots[dotIdx];

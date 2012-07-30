@@ -1,6 +1,6 @@
 
 
-function Dot(x, y, v, mass, radius, name, idNum){
+function Dot(x, y, v, mass, radius, name, idNum, tag){
 	this.x = x;
 	this.y = y;
 	this.v = v;
@@ -8,6 +8,7 @@ function Dot(x, y, v, mass, radius, name, idNum){
 	this.r = radius;
 	this.name = name;
 	this.idNum = idNum;
+	this.tag = tag;
 }
 function Species(mass, radius, colors, def){
 	var spc = [];
@@ -19,7 +20,7 @@ function Species(mass, radius, colors, def){
 	return spc;
 }
 Species.prototype = {
-	populate: function(pos, dims, count, temp){
+	populate: function(pos, dims, count, temp, tag){
 		var vStdev = .1;
 		var x = pos.x;
 		var y = pos.y;
@@ -32,12 +33,20 @@ Species.prototype = {
 			var angle = Math.random()*2*Math.PI;
 			var vx = v * Math.cos(angle);
 			var vy = v * Math.sin(angle);
-			this.push(D(placeX, placeY, V(vx, vy), this.m, this.r, this.def.name, this.def.idNum));
+			this.push(D(placeX, placeY, V(vx, vy), this.m, this.r, this.def.name, this.def.idNum, tag));
 			
 		}		
 	},
-	depopulate: function(){
-		this.splice(0, this.length);
+	depopulate: function(tag){
+		if(tag){
+			for(var dotIdx=this.length-1; dotIdx>=0; dotIdx-=1){
+				if(this[dotIdx].tag == tag){
+					this.splice(dotIdx, 1);
+				}
+			}
+		}else{
+			this.splice(0, this.length);
+		}
 	},
 }
 function Point(x, y){

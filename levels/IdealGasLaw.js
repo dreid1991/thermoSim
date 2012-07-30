@@ -120,9 +120,9 @@ _.extend(IdealGasLaw.prototype,
 		spcs['spc1'].populate(P(45, 80), V(200, 300), 200, 300);
 		spcs['spc5'].populate(P(305,75), V(200, 300), 100, 800);
 
-		this.readout.addEntry('rmsLeft', 'RMS(v) Left:', 'm/s', rms(dataHandler.velocities('spc1')), undefined, 0);
+		this.readout.addEntry('rmsLeft', 'RMS(v) Left:', 'm/s', rms(dataHandler.velocities({spcName:'spc1'})), undefined, 0);
 		
-		this.readout.addEntry('rmsRight', 'RMS(v) Right:', 'm/s', rms(dataHandler.velocities('spc5')), undefined, 0);
+		this.readout.addEntry('rmsRight', 'RMS(v) Right:', 'm/s', rms(dataHandler.velocities({spcName:'spc5'})), undefined, 0);
 
 		this.readout.show();
 	},
@@ -173,8 +173,8 @@ _.extend(IdealGasLaw.prototype,
 		this.readout.show();
 	},
 	block6Conditions: function(){
-		var tempA = dataHandler.temp(this.spcA);
-		var tempB = dataHandler.temp(this.spcB);
+		var tempA = dataHandler.temp({spcName:this.spcA});
+		var tempB = dataHandler.temp({spcName:this.spcB});
 		if(fracDiff(tempA, tempB)<.05){
 			return {result:true}
 		} else{
@@ -182,8 +182,8 @@ _.extend(IdealGasLaw.prototype,
 		}
 	},
 	checkAnsTemp: function(){
-		var tempA = dataHandler.temp(this.spcA);
-		var tempB = dataHandler.temp(this.spcB);
+		var tempA = dataHandler.temp({spcName:this.spcA});
+		var tempB = dataHandler.temp({spcName:this.spcB});
 		if(fracDiff(tempA, tempB)<.05){
 			alert('Your temperatures are ' + round(tempA,0) + ' K and ' + round(tempB,0) + ' K. Close enough, well done.');
 			this.prompts[this.promptIdx].finished = true;
@@ -419,12 +419,12 @@ _.extend(IdealGasLaw.prototype,
 	},
 	changeTempSpcA: function(event, ui){
 		var rms = ui.value;
-		changeRMS(this.spcA, rms);
+		changeRMS({spcName:this.spcA}, rms);
 		this.readout.hardUpdate(rms, 'rmsLeft');
 	},
 	changeTempSpcB: function(event, ui){
 		var rms = ui.value;
-		changeRMS(this.spcB, rms);	
+		changeRMS({spcName:this.spcB}, rms);	
 		this.readout.hardUpdate(rms, 'rmsRight');		
 	},
 

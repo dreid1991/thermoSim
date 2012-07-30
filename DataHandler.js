@@ -7,46 +7,69 @@ DataHandler.prototype = {
 	pressureExt: function(mass, SA){
 		return pConst*mass*g/SA;
 	},
-	temp: function(spcName){
-		return this.KEAvg(spcName)*tConst;
+	temp: function(info){
+		info = defaultTo({}, info);
+		//info can have attrs spcName and/or tag
+		return this.KEAvg(info)*tConst;
 	},
-	velocities: function(spcName){
-		var spc = spcs[spcName];
+	velocities: function(info){
+		info = defaultTo({}, info);
+		var tag = info.tag;
+		var spcToMeasure = info.spcName;
+		var spc = spcs[spcToMeasure];
 		var numDots = spc.length
 		var velocities = new Array(numDots);
 		
 		for (var dotIdx=0; dotIdx<numDots; dotIdx++){
 			var dot = spc[dotIdx];
-			velocities[dotIdx] = dot.speed();
+			if(!tag || tag==dot.tag){
+				velocities[dotIdx] = dot.speed();
+			}
 		}
 		return velocities;
 	},
-	velocityAvg: function(spcName){
-		vList = this.velocities(spcName);
+	velocityAvg: function(info){
+		info = defaultTo({}, info);
+		vList = this.velocities(info);
 		var sum=0;
 		for(var dotIdx=0; dotIdx<vList.length; dotIdx++){
 			sum+=vList[dotIdx];
 		}
 		return sum/vList.length;
 	},
-	KEAvg: function(spcName){
+	KEAvg: function(info){
+		info = defaultTo({}, info);
+		var tag = info.tag;
+		var spcToMeasure = info.spcName;
 		var sumKE=0;
-		if(spcName){
+		if(spcToMeasure){
 			var dots = spcs[spcName];
-			for(var dotIdx=0; dotIdx<dots.length; dotIdx++){
-				sumKE+=dots[dotIdx].KE();
-			}
-			return sumKE/dots.length;
+			var KEResult = this.KESpc(dots, tag);
+			sumKE += KEResult.sumKE;
+			return sumKE/KEResult.num;
 		}
 		var numDots = 0;
 		for(spcName in spcs){
-			var dots = spcs[spcName];
-			numDots+=dots.length;
-			for(var dotIdx=0; dotIdx<dots.length; dotIdx++){
-				sumKE+=dots[dotIdx].KE();
+			if(!spcToMeasure || spcToMeasure==spcName){
+				var dots = spcs[spcName];
+				var KEResult = this.KESpc(dots, tag);
+				sumKE += KEResult.sumKE;
+				numDots += KEResult.num;
 			}
 		}
 		return sumKE/numDots;
+	},
+	KESpc: function(dots, tag){
+		var sumKE = 0;
+		var numCounted = 0;
+		for(var dotIdx=0; dotIdx<dots.length; dotIdx++){
+			var dot = dots[dotIdx];
+			if(!tag || tag==dot.tag){
+				numCounted++;
+				sumKE+=dots[dotIdx].KE();
+			}
+		}	
+		return {sumKE:sumKE, num:numCounted};
 	},
 	volume: function(){
 		return walls.totalArea()*vConst;

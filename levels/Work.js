@@ -26,7 +26,7 @@ function Work(){
 		{block:3, title: '', finished: false, text:''},
 		{block:4, title: 'Current step', finished: false, conditions: this.block4Conditions, text:'So here we have a big weight we can use to bring our system to a pressure of 6 atm.  There are some stops on the piston that let us compress to 10 liters.  We have 1.1 moles of gas with a heat capacity of R J/mol*K (<a href = extras/heatCapacity.html>explanation</a>).  What final temperature should we expect if we compress our piston all the way?  Once you have a value, try the experiment!  Do the calculated and simulated result match?  Do these results back up or refute the idea that works adds energy through collisions with a moving wall?'},
 		{block:5, title: 'Current step', finished: false, text:''},
-		{block:6, title: 'Current step', finished: false, text:''},
+		{block:6, title: 'Current step', finished: false, text:'Alright, here’s our adiabatic system.  If you compress the system, does the slope of temperature with respect to volume match what the previous equation says it should be(Note C<sub>v</sub> is R and C<sub>p</sub> is 2R)?  How can you relate this slope to the number of collisions that happen with the wall as the volume decreases?'},
 	]
 	walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
@@ -50,7 +50,7 @@ _.extend(Work.prototype,
 
 	block0Start: function(){
 		this.cutSceneStart("<p>Good afternoon!</p>"+
-		"HEY - CAPITAL Pressure Today we’re going to try to figure out why work changes a system's temperature.  Let’s start with the equations for relating work to a temperature change:"+
+		"Today we’re going to try to figure out why work changes a system's temperature.  Let’s start with the equations for relating work to a temperature change:"+
 		"<p><center><img src='img/work/eq1.gif' alt='hoverhoverhover'></img></center></p>"+
 		"<p>This equation says that work is equal to how hard you compress a container times how much you compress it.  It also says that as you compress that container, the gas inside heats up.  But why does that happen?  What is it about pushing on a container makes its molecules speed up? </p>"+
 		"<p> One might say that it’s because energy is being added, and that is true, but we’re going to try to pin down the physical event that makes a molecule speed up as a result of the container compressing.",
@@ -164,7 +164,7 @@ _.extend(Work.prototype,
 		}
 	},
 	block5Start: function(){
-		var str = '<p>Okay, so your calculations should have looked something like this:<p><center><img src = img/work/eq3.gif></img></p><p><img src=img/work/eq4.gif></img></p></center>You had an initial temperature of INITIAL K and a final temperature of FINAL K.  How’d it do?</p><p>Now let’s apply some of that thinking to figure out why constant pressure and constant volume heat capacities are different.  For this gas, C<sub>v</sub> is R and C<sub>p</sub> is 2R.  This means that is takes more energy to heat up a gas at constant pressure than one at constant volume.  Huh?  The gas is the same.  Why do they take different amounts of energy?  Any thoughts?</p>';
+		var str = '<p>Okay, so your calculations should have looked something like this:<p><center><img src = img/work/eq3.gif></img></p><p><img src=img/work/eq4.gif></img></p></center>You had an initial temperature of INITIAL K and a final temperature of FINAL K.  Do the calculated and simulated result match?  Does this back up or refute the idea that works adds energy through collisions with a moving wall?</p><p>Now let’s go on a brief tangent.  When you compress, temperature increases, right?  If you start from the equation</p><p><center><img src=img/work/eq5.gif></img></center></p>, which describes adiabatic compressions, and solve for temperature , how should temperature increase as volume decreases?  If you get stuck solving, remember that you can use the ideal gas law to replace variables.  Once you’ve solved for temperature, consider:  Can you justify what slope given that energy is added when molecules collide with the moving wall?  Let’s try to do that on the next page.';
 		str = replaceString(replaceString(str, 'INITIAL', round(this.volListener15.getResults().t,0)), 'FINAL', round(this.volListener10.getResults().t,0));
 		this.cutSceneStart(str);
 	},
@@ -175,8 +175,8 @@ _.extend(Work.prototype,
 		$('#sliderHeaterHolder').show();
 		walls = WallHandler([[P(40,30), P(255,30), P(255,350), P(40,350)], [P(295,30), P(510,30), P(510,350), P(295,350)]], 'staticAdiabatic', ['left', 'right']);
 		//this.piston = new Piston('pistony', 'right', 5, function(){return this.g}, this);
-		spcs['spc1'].populate(P(40,30), V(200,300), 600, 300);
-		spcs['spc1'].populate(P(285,30), V(200,300), 600, 300);
+		spcs['spc1'].populate(P(40,30), V(200,300), 600, 300, 'left');
+		spcs['spc1'].populate(P(285,30), V(200,300), 600, 300, 'right');
 	},
 	makeDragWeights: function(wallHandle){
 		var self = this;
