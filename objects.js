@@ -1117,6 +1117,7 @@ function Heater(handle, pos, dims, rotation, tempMax, drawCanvas){
 	var colDefault = Col(100, 100, 100);
 	this.draw = this.makeDrawFunc(colMin, colDefault, colMax);
 	this.eAdded=0;
+	return this;
 }
 
 Heater.prototype = {
@@ -1131,12 +1132,12 @@ Heater.prototype = {
 		var legThickness = 10;
 
 		var center = this.pos.copy().movePt(dims.copy().mult(.5));
-		this.bodyPts = getBodyPts(pos, dims, rnd);
-		this.legPts = getLegPts(pos, dims, legThickness, center);
+		this.bodyPts = this.getBodyPts(pos, dims, rnd);
+		this.legPts = this.getLegPts(pos, dims, legThickness, center);
 		rotatePts(this.bodyPts, center, this.rot);
 		rotatePts(this.legPts[0], center, this.rot);
 		rotatePts(this.legPts[1], center, this.rot);
-		var colorSteps = getColorSteps(colMin, colDefault, colMax)
+		var colorSteps = this.getColorSteps(colMin, colDefault, colMax)
 		var strokeCol = Col(0,0,0)
 		var self = this;
 		var bodyPts = this.bodyPts;
@@ -1192,12 +1193,13 @@ Heater.prototype = {
 		addListener(curLevel, 'update', 'drawHeater'+this.handle, this.draw, '');
 		this.setupWalls()
 		this.eAdded=0;
+		return this;
 	},
 	setupWalls: function(){
 		//legs don't go into collision - too little space between lines
-		walls.addWall(this.bodyPts, {func:this.hit, obj:this});
+		walls.addWall(this.bodyPts, {func:this.hit, obj:this}, 'heater' + this.handle, undefined, -1);
 	},
-	hit: function(dot, line, wallUV, vPerp, perpUV){
+	hit: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){
 		var vPar = dot.v.dotProd(wallUV);
 		var tempOld = dot.temp();
 		var tempNew = tempOld + this.temp;
@@ -1208,7 +1210,10 @@ Heater.prototype = {
 		dot.v.dy = wallUV.dy*vPar + perpUV.dy*vPerpNew;
 		this.eAdded+=this.temp*R/N;
 	},
-
+	remove: function(){
+		removeListener(curLevel, 'update', 'drawHeater'+this.handle);
+		walls.removeWall('heater' + this.handle);
+	}
 }
 //////////////////////////////////////////////////////////////////////////
 //STOPS

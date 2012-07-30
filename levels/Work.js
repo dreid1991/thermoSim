@@ -27,6 +27,9 @@ function Work(){
 		{block:4, title: 'Current step', finished: false, conditions: this.block4Conditions, text:'So here we have a big weight we can use to bring our system to a pressure of 6 atm.  There are some stops on the piston that let us compress to 10 liters.  We have 1.1 moles of gas with a heat capacity of R J/mol*K (<a href = extras/heatCapacity.html>explanation</a>).  What final temperature should we expect if we compress our piston all the way?  Once you have a value, try the experiment!  Do the calculated and simulated result match?  Do these results back up or refute the idea that works adds energy through collisions with a moving wall?'},
 		{block:5, title: 'Current step', finished: false, text:''},
 		{block:6, title: 'Current step', finished: false, text:'Alright, here’s our adiabatic system.  If you compress the system, does the slope of temperature with respect to volume match what the previous equation says it should be(Note C<sub>v</sub> is R and C<sub>p</sub> is 2R)?  How can you relate this slope to the number of collisions that happen with the wall as the volume decreases?'},
+		{block:7, title: '', finished: false, text:''},
+		{block:8, title: '', finished: false, text:''},
+		{block:9, title: '', finished: false, text:''},
 	]
 	walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
@@ -164,7 +167,7 @@ _.extend(Work.prototype,
 		}
 	},
 	block5Start: function(){
-		var str = '<p>Okay, so your calculations should have looked something like this:<p><center><img src = img/work/eq3.gif></img></p><p><img src=img/work/eq4.gif></img></p></center>You had an initial temperature of INITIAL K and a final temperature of FINAL K.  Do the calculated and simulated result match?  Does this back up or refute the idea that works adds energy through collisions with a moving wall?</p><p>Now let’s go on a brief tangent.  When you compress, temperature increases, right?  If you start from the equation</p><p><center><img src=img/work/eq5.gif></img></center></p>, which describes adiabatic compressions, and solve for temperature , how should temperature increase as volume decreases?  If you get stuck solving, remember that you can use the ideal gas law to replace variables.  Once you’ve solved for temperature, consider:  Can you justify what slope given that energy is added when molecules collide with the moving wall?  Let’s try to do that on the next page.';
+		var str = 'Okay, so your calculations should have looked something like this:<p><center><img src = img/work/eq3.gif></img></p><p><img src=img/work/eq4.gif></img></p></center>You had an initial temperature of INITIAL K and a final temperature of FINAL K.  Do the calculated and simulated result match?  Does this back up or refute the idea that works adds energy through collisions with a moving wall?</p><p>Now let’s go on a brief tangent.  When you compress, temperature increases, right?  If you start from the equation</p><p><center><img src=img/work/eq5.gif></img></center></p> which describes adiabatic compressions, and solve for temperature , how should temperature increase as volume decreases?  If you get stuck solving, remember that you can use the ideal gas law to replace variables.  Once you’ve solved for temperature, consider:  Can you justify what slope given that energy is added when molecules collide with the moving wall?  Let’s try to do that on the next page.';
 		str = replaceString(replaceString(str, 'INITIAL', round(this.volListener15.getResults().t,0)), 'FINAL', round(this.volListener10.getResults().t,0));
 		this.cutSceneStart(str);
 	},
@@ -172,12 +175,69 @@ _.extend(Work.prototype,
 		this.cutSceneEnd();
 	},
 	block6Start: function(){
-		$('#sliderHeaterHolder').show();
-		walls = WallHandler([[P(40,30), P(255,30), P(255,350), P(40,350)], [P(295,30), P(510,30), P(510,350), P(295,350)]], 'staticAdiabatic', ['left', 'right']);
-		//this.piston = new Piston('pistony', 'right', 5, function(){return this.g}, this);
-		spcs['spc1'].populate(P(40,30), V(200,300), 600, 300, 'left');
-		spcs['spc1'].populate(P(285,30), V(200,300), 600, 300, 'right');
+		wallHandle = 'container';
+		walls = WallHandler([[P(40,30), P(510,30), P(510,400), P(40,400)]], 'staticAdiabatic', [wallHandle]);
+		this.borderStd();
+		spcs['spc1'].populate(P(45,35), V(445, 375), 650, 250);
+		spcs['spc3'].populate(P(45,35), V(445, 375), 450, 250);		
+		this.compArrow = this.makeCompArrow('container', {mode:'adiabatic'});
+		this.graphs.pVSv = new GraphScatter('pVSv', 400,275, "Volume (L)", "Pressure (atm)",
+							{x:{min:0, step:4}, y:{min:0, step:3}});
+		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
+							{x:{min:0, step:4}, y:{min:250, step:50}});
+		this.graphs.pVSv.addSet('p', 'P Int.', Col(50,50,255), Col(200,200,255),
+								{data:this.data, x:'v', y:'p'});
+
+		this.graphs.tVSv.addSet('t', 'Sys\nTemp', Col(255,0,0), Col(255,200,200),
+								{data:this.data, x:'v', y:'t'});		
+		
 	},
+	block6CleanUp: function(){
+		walls['container'].removeBorder();
+		this.compArrow.remove();
+		this.compArrow = undefined;
+		this.removeAllGraphs();
+		
+	},
+	block7Start: function(){
+		this.cutSceneStart('<p>So it would seem that as your volume decreases, the number of collisions that happen over a given compression increases, meaning that the energy added when compressing at a small volume is greater than the energy added when compressing at a large volume.  This translates to a larger temperature increase.  I know this doesn’t perfectly justify why volume should be raised to the C<sub>p</sub>/C<sub>v</sub> power, but hopefully it gives you a mental model that you can work with to understand how systems behave when they’re compressed.</p>');
+	},
+	block7CleanUp: function(){
+		this.cutSceneEnd();
+	},
+	block8Start: function(){
+		this.cutSceneStart('<p>Now let’s apply some of this thinking to figure out why constant pressure and constant volume heat capacities are different.  For the gas in these simulations, C<sub>v</sub> is R and C<sub>p</sub> is 2R.  This means that is takes more energy to heat up a gas at constant pressure than one at constant volume.  Huh?  The gas is the same.  Why do they take different amounts of energy?  Any thoughts?</p>');
+	},
+	block8CleanUp: function(){
+		this.cutSceneEnd();
+	},
+	block9Start: function(){
+		$('#sliderHeaterHolder').show();
+		walls = WallHandler([[P(40,30), P(255,30), P(255,440), P(40,440)], [P(295,30), P(510,30), P(510,440), P(295,440)]], 'staticAdiabatic', ['left', 'right']);
+		//this.piston = new Piston('pistony', 'right', 5, function(){return this.g}, this);
+		spcs['spc1'].populate(P(40,30), V(200,350), 400, 300, 'left');
+		spcs['spc3'].populate(P(40,30), V(200,350), 400, 300, 'left');
+		spcs['spc1'].populate(P(285,30), V(200,350), 400, 300, 'right');
+		spcs['spc3'].populate(P(285,30), V(200,350), 400, 300, 'right');
+		this.heaterLeft = new Heater('left', P(60,370), V(160, 50), 0, 20, c).init();
+		this.heaterRight = new Heater('right', P(315,370), V(160, 50), 0, 20, c).init();	
+	},
+	block9CleanUp: function(){
+		$('#sliderHeaterHolder').hide();
+		this.heaterLeft.remove();
+		this.heaterRight.remove()
+	}
+	/*
+	blockNStart: function(){
+		$('#sliderHeaterHolder').show();
+		walls = WallHandler([[P(40,30), P(255,30), P(255,440), P(40,440)], [P(295,30), P(510,30), P(510,440), P(295,440)]], 'staticAdiabatic', ['left', 'right']);
+		//this.piston = new Piston('pistony', 'right', 5, function(){return this.g}, this);
+		spcs['spc1'].populate(P(40,30), V(200,350), 600, 300, 'left');
+		spcs['spc1'].populate(P(285,30), V(200,350), 600, 300, 'right');
+		this.heaterLeft = new Heater('left', P(60,370), V(160, 50), 0, 20, c).init();
+		this.heaterRight = new Heater('right', P(315,370), V(160, 50), 0, 20, c).init();
+	},
+	*/
 	makeDragWeights: function(wallHandle){
 		var self = this;
 		var massInit = 25;
@@ -201,7 +261,6 @@ _.extend(Work.prototype,
 
 	dataRun: function(){
 		var wall = walls[0];
-		var SA = getLen([wall[0], wall[1], wall[2], wall[3], wall[4]]);//HEY - FOR TESTING PURPOSES ONLY.  DOES NOT WORK WITH MOVING WALL AS WE DO NOT ADD FORCE INTERNAL THERE  //What?
 		this.data.p.push(wall.pInt())
 		this.data.t.push(dataHandler.temp());
 		this.data.v.push(dataHandler.volume());

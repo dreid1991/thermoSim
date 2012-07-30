@@ -62,7 +62,7 @@ WallMethods = {
 						this.setWallHandler(handlerIdx, handler)
 					}
 				}
-			} else if(typeof handlers == 'string'){
+			} else if(typeof handlers == 'string' || typeof handlers=='object'){
 				this.setAllHandler(handlers);
 			}else{
 				console.log('YOU SEND POOR WALL HANDLERS.  THEY ARE NEITHER STRING NOR ARRAY');
@@ -82,7 +82,11 @@ WallMethods = {
 		
 		setSubWallHandler: function(wallInfo, subWallIdx, handler){
 			var wallIdx = this.idxByInfo(wallInfo)
-			this[wallIdx+ '-' + subWallIdx] = handler;
+			if(typeof handler == 'string'){
+				this[wallIdx+ '-' + subWallIdx] = {obj:this, func:this[handler]};
+			}else if(typeof handler=='object'){
+				this[wallIdx+ '-' + subWallIdx] = {obj:handler.obj, func: handler.func};
+			}
 		},
 		setupWall: function(wallIdx){
 			this[wallIdx].wallUVs = this.getWallUV(wallIdx);
@@ -107,8 +111,8 @@ WallMethods = {
 			this[handle] = this[wallIdx];
 			_.extend(this[wallIdx], WallMethods.wall);	
 		},
-		addWall: function(pts, handler, handle, bound, include){
-
+		addWall: function(pts, handler, handle, bounds, include){
+			
 			var newIdx = this.length;
 			this.setWallVals(newIdx, pts, handle, bounds, include);
 			this.setupWall(newIdx);
@@ -334,14 +338,14 @@ WallMethods = {
 		},
 		didHitStd: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
 			var handler = this[wallIdx + '-' + subWallIdx];
-			this[handler](dot, wallIdx, subWallIdx, wallUV, perpV, perpUV);
-			//handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);		
+			//this[handler](dot, wallIdx, subWallIdx, wallUV, perpV, perpUV);
+			handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);		
 		},
 		didHitArrow: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
 			var vo = dot.v.copy();
 			var handler = this[wallIdx + '-' + subWallIdx];
-			this[handler](dot, wallIdx, subWallIdx, wallUV, perpV, perpUV);
-			//handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
+			//this[handler](dot, wallIdx, subWallIdx, wallUV, perpV, perpUV);
+			handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
 			var pos = P(dot.x, dot.y);
 			var vf = dot.v.copy();
 			var perpVf = -perpUV.dotProd(dot.v);

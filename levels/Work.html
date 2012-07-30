@@ -151,10 +151,10 @@ $(function(){
 			{eventType:'slidestop', obj:curLevel, func:function(event, ui){
 															$('#sliderHeaterLeft').slider('option', {value:0});
 															ui.value=0;
-															this.heaterLeft(event, ui)
+															this.heatLeft(event, ui)
 														}
 			},
-			{eventType:'slide', obj:curLevel, func:curLevel.changeTemp}, 
+			{eventType:'slide', obj:curLevel, func:curLevel.heatLeft}, 
 			
 		],
 		'show'
@@ -173,7 +173,7 @@ $(function(){
 															this.heatRight(event, ui)
 														}
 			},
-			{eventType:'slide', obj:curLevel, func:curLevel.changeTemp}, 
+			{eventType:'slide', obj:curLevel, func:curLevel.heatRight}, 
 			
 		],
 		'show'

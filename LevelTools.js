@@ -7,7 +7,7 @@ LevelTools = {
 		if(compAttrs.bounds){
 			bounds = compAttrs.bounds;	
 		}else{
-			bounds = {y:{min:this.yMin, max:this.yMax}};
+			bounds = {y:{min:this.yMin, max:this.yMax-50}};
 		}
 		var pos = walls[wallIdx][1].copy()
 		var rotation = 0;
