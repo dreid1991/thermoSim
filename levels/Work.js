@@ -246,9 +246,13 @@ _.extend(Work.prototype,
 		this.heaterRight = undefined;
 	},
 	block10Start: function(){
-		this.cutSceneStart('<p>So, what happened?  Why did the constant pressure system take more energy to heat up?  Because it was doing work on its surroundings to maintain that constant pressure?  Why yes, that’s it!  Well done.  Shall we formalize?</p><p> To heat up the C<sub>v</sub> container, you just had to put energy into the molecules to make them move more quickly.  But there’s more going on in the C<sub>p</sub> container.  To maintain constant pressure, it had to expand, doing work on its surroundings.  This means that the energy we added to the C<sub>p</sub> went to two places:  to the molecules to make them move more quickly, and to the wall, to push it outwards.  Having the energy go into expanding the container means that you have to put more energy to achieve a given molecular kinetic energy, or temperature, increase.  Let’s express that in math:');
+		this.cutSceneStart('<p>So, what happened?  Why did the constant pressure system take more energy to heat up?  Because it was doing work on its surroundings to maintain that constant pressure?  Why yes, that’s it!  Well done.  Shall we formalize?</p><p> To heat up the C<sub>v</sub> container, you just had to put energy into the molecules to make them move more quickly.  But there’s more going on in the C<sub>p</sub> container.  To maintain constant pressure, it had to expand, doing work on its surroundings.  This means that the energy we added to the C<sub>p</sub> went to two places:  to the molecules to make them move more quickly, and to the wall, to push it outwards.  Having the energy go into expanding the container means that you have to put more energy to achieve a given molecular kinetic energy, or temperature, increase.  Let’s express that in math:',
+		'outro');
 		
 		
+	},
+	block10CleanUp: function(){
+		this.cutSceneEnd();
 	},
 	/*
 	blockNStart: function(){
