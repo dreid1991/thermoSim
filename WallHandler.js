@@ -164,7 +164,7 @@ WallMethods = {
 		},
 		removeHandlers: function(wallIdx){
 			for (var itemName in this){
-				if(indexOf(wallIdx + '-') != -1){
+				if(itemName.indexOf(wallIdx + '-') != -1){
 					this[itemName] = undefined;
 				}
 			}

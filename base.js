@@ -319,9 +319,10 @@ function VToTemp(mass, v){
 	return .5*mass*v*v*tConst;
 }
 function returnEscapist(dot){
-	var pt1 = walls[0][0];
-	var pt2 = walls[0][1];
-	UV = walls[0].wallUVs[0];
+	returnTo = defaultTo('0', dot.returnTo);
+	var pt1 = walls[returnTo][0];
+	var pt2 = walls[returnTo][1];
+	var UV = walls[returnTo].wallUVs[0];	
 	var x = (pt1.x+pt2.x)/2 - 5*UV.dy;
 	var y = (pt1.y+pt2.y)/2 + 5*UV.dx;
 	dot.v.dy = Math.abs(dot.v.dy);

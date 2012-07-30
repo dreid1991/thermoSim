@@ -13,7 +13,7 @@ function Work(){
 	this.wallV = 0;
 	this.wallSpeed = 1;
 	this.makeListeners();
-	this.readout = new Readout('mainReadout', 30, myCanvas.width-180, 25, '13pt calibri', Col(255,255,255),this, 'left');
+	this.readout = new Readout('mainReadout', 30, myCanvas.width-125, 25, '13pt calibri', Col(255,255,255),this, 'left');
 	this.compMode = 'Isothermal';
 	this.graphs = {}
 	this.promptIdx = -1;
@@ -29,7 +29,8 @@ function Work(){
 		{block:6, title: 'Current step', finished: false, text:'Alright, here’s our adiabatic system.  If you compress the system, does the slope of temperature with respect to volume match what the previous equation says it should be(Note C<sub>v</sub> is R and C<sub>p</sub> is 2R)?  How can you relate this slope to the number of collisions that happen with the wall as the volume decreases?'},
 		{block:7, title: '', finished: false, text:''},
 		{block:8, title: '', finished: false, text:''},
-		{block:9, title: '', finished: false, text:''},
+		{block:9, title: '', finished: false, text:'Well, let’s figure it out.  Here we have two containers.  Both contain 1 mole of gas at 300 K.  One is held at constant volume, the other at constant pressure.  You can heat or cool them with their corresponding sliders.  If you heat both containers to some new temperature, how do the energies used compare?  The piston tracks the work it does on the system.  Remember that it takes energy to speed up molecules and to expand against a pressure. '},
+		{block:10, title: '', finished: false, text:''},
 	]
 	walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
@@ -88,10 +89,7 @@ _.extend(Work.prototype,
 								{data:this.data, x:'v', y:'t'});		
 		
 		
-		this.piston = new Piston('tootoo', 'container', 2, this);
-		this.piston.show();
-		this.piston.trackWork();
-		this.piston.trackPressure();
+		this.piston = new Piston('tootoo', 'container', 2, this).show().trackWork().trackPressure();
 		this.borderStd();
 		//this.heater = new Heater('spaceHeater', P(150,360), V(250,50), 0, 20, c);//P(40,425), V(470,10)
 		//this.heater.init();
@@ -213,20 +211,44 @@ _.extend(Work.prototype,
 	},
 	block9Start: function(){
 		$('#sliderHeaterHolder').show();
-		walls = WallHandler([[P(40,30), P(255,30), P(255,440), P(40,440)], [P(295,30), P(510,30), P(510,440), P(295,440)]], 'staticAdiabatic', ['left', 'right']);
+		walls = WallHandler([[P(40,30), P(255,30), P(255,440), P(40,440)], [P(295,250), P(510,250), P(510,440), P(295,440)]], 'staticAdiabatic', ['left', 'right']);
 		//this.piston = new Piston('pistony', 'right', 5, function(){return this.g}, this);
-		spcs['spc1'].populate(P(40,30), V(200,350), 400, 300, 'left');
-		spcs['spc3'].populate(P(40,30), V(200,350), 400, 300, 'left');
-		spcs['spc1'].populate(P(285,30), V(200,350), 400, 300, 'right');
-		spcs['spc3'].populate(P(285,30), V(200,350), 400, 300, 'right');
-		this.heaterLeft = new Heater('left', P(60,370), V(160, 50), 0, 20, c).init();
-		this.heaterRight = new Heater('right', P(315,370), V(160, 50), 0, 20, c).init();	
+		spcs['spc1'].populate(P(40,30), V(200,350), 400, 300, 'left', 'left');
+		spcs['spc3'].populate(P(40,30), V(200,350), 400, 300, 'left', 'left');
+		spcs['spc1'].populate(P(295,250), V(200,140), 400, 300, 'right', 'right');
+		spcs['spc3'].populate(P(295,250), V(200,140), 400, 300, 'right', 'right');
+		this.heaterLeft = new Heater('left', P(67,400), V(160, 25), 0, 20, c).init();
+		this.heaterRight = new Heater('right', P(322,400), V(160, 25), 0, 20, c).init()
+		this.piston = new Piston('tootoo', 'right', 5, this).show().trackWork();
+		this.readout.show();
+		this.readout.addEntry('tLeft', 'Temp:', 'K', dataHandler.temp('left'), undefined, 0);
+		this.readout.addEntry('eLeft', 'E added:', 'kJ', this.heaterLeft.eAdded, undefined, 1);
+		this.readout.addEntry('tRight', 'Temp:', 'K', dataHandler.temp('right'), undefined, 0);
+		this.readout.addEntry('eRight', 'E added:', 'kJ', this.heaterRight.eAdded, undefined, 1);
+		addListener(curLevel, 'data', 'updateT',
+			function(){
+				this.readout.tick(dataHandler.temp({tag:'left'}), 'tLeft');
+				this.readout.tick(dataHandler.temp({tag:'right'}), 'tRight');
+				this.readout.tick(this.heaterLeft.eAdded, 'eLeft');
+				this.readout.tick(this.heaterRight.eAdded, 'eRight');
+			},
+		this);
 	},
 	block9CleanUp: function(){
 		$('#sliderHeaterHolder').hide();
+		this.readout.removeAllEntries();
+		this.readout.hide();
+		this.piston.remove();
 		this.heaterLeft.remove();
-		this.heaterRight.remove()
-	}
+		this.heaterRight.remove();
+		this.piston = undefined;
+		this.heaterLeft = undefined;
+		this.heaterRight = undefined;
+	},
+	block10Start: function(){
+		this.cutSceneStart('<p>So, what happened?  Why did the constant pressure system take more energy to heat up?  Because it was doing work on its surroundings to maintain that constant pressure?  Why yes, that’s it!  Well done.  Shall we formalize?</p><p> To heat up the C<sub>v<sub> container, you just had to put energy into the molecules to make them move more quickly.  But there’s more going on in the C<sub>p</sub> container.  To maintain constant pressure, it had to expand, doing work on its surroundings.  This means that the energy we added to the C<sub>p</sub> went to two places:  to the molecules to make them move more quickly, and to the wall, to push it outwards.  Having the energy go into expanding the container means that you have to put more energy to achieve a given molecular kinetic energy, or temperature, increase.  Let’s express that in math:FINISH');
+		
+	},
 	/*
 	blockNStart: function(){
 		$('#sliderHeaterHolder').show();

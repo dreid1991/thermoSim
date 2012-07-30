@@ -945,6 +945,7 @@ function Piston(handle, wallInfo, pInit, obj){
 	this.wall.moveInit();
 	walls.setSubWallHandler(this.wallIdx, 0, 'cPAdiabaticDamped');		
 	this.obj = obj;
+	return this;
 }
 
 Piston.prototype = {
@@ -1015,6 +1016,7 @@ Piston.prototype = {
 	show: function(){
 		addListener(curLevel, 'update', 'drawPiston'+this.handle, this.draw, '');
 		this.readout.show();
+		return this;
 	},
 	hide: function(){
 		removeListener(curLevel, 'update', 'drawPiston'+this.handle);
@@ -1053,27 +1055,33 @@ Piston.prototype = {
 						{readout:this.readout, idx:undefined}
 						);
 		this.workTracker.start();
+		return this;
 	},
 	trackWorkStart: function(){
 		this.workTracker.start();
+		return this;
 	},
 	trackWorkStop: function(){
 		this.workTracker.stop();
+		return this;
 	},
 	trackPressure: function(){
 		this.addData('pressure', 'P:', this.p, 'atm');
 		this.trackingP = new Boolean();
 		this.trackingP = true;
+		return this;
 	},
 	trackPressureStart: function(){
 		if(!this.trackingP){
 			this.addData('pressure', 'P:', this.p, 'atm');
 			this.trackingP = true;
 		}
+		return this;
 	},
 	trackPressureStop: function(){
 		this.removeData('pressure')
 		this.trackingP = false;
+		return this;
 	},
 	reset: function(){
 		//this.dataHandler.slots.work.value = 0;
@@ -1156,15 +1164,16 @@ Heater.prototype = {
 		return drawFunc;
 	},
 	getBodyPts: function(pos, dims, rnd){
-		var pts = new Array(8);
+		var pts = new Array(9);
 		pts[0] = pos.copy().movePt({						dy:dims.dy*rnd			});
 		pts[1] = pos.copy().movePt({						dy:dims.dy*(1-rnd)		});
-		pts[2] = pos.copy().movePt({dx:dims.dx*rnd,		dy:dims.dy				});
-		pts[3] = pos.copy().movePt({dx:dims.dx*(1-rnd),	dy:dims.dy				});
-		pts[4] = pos.copy().movePt({dx:dims.dx, 			dy:dims.dy*(1-rnd)		});
-		pts[5] = pos.copy().movePt({dx:dims.dx, 			dy:dims.dy*rnd			});
-		pts[6] = pos.copy().movePt({dx:dims.dx*(1-rnd)							});
-		pts[7] = pos.copy().movePt({dx:dims.dx*rnd								});	
+		pts[2] = pos.copy().movePt({dx:dims.dx*rnd,			dy:dims.dy				});
+		pts[3] = pos.copy().movePt({dx:dims.dx/2,			dy:dims.dy + 3			});
+		pts[4] = pos.copy().movePt({dx:dims.dx*(1-rnd),		dy:dims.dy				});
+		pts[5] = pos.copy().movePt({dx:dims.dx, 			dy:dims.dy*(1-rnd)		});
+		pts[6] = pos.copy().movePt({dx:dims.dx, 			dy:dims.dy*rnd			});
+		pts[7] = pos.copy().movePt({dx:dims.dx*(1-rnd)							});
+		pts[8] = pos.copy().movePt({dx:dims.dx*rnd								});	
 		return pts;
 	},
 	getLegPts: function(pos, dims, width, center){
@@ -1200,15 +1209,33 @@ Heater.prototype = {
 		walls.addWall(this.bodyPts, {func:this.hit, obj:this}, 'heater' + this.handle, undefined, -1);
 	},
 	hit: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){
+		/*
 		var vPar = dot.v.dotProd(wallUV);
 		var tempOld = dot.temp();
-		var tempNew = tempOld + this.temp;
+		if(tempOld==0){
+			console.log('ahh!');
+		}
+		var tempNew = Math.max(tempOld + this.temp, 1);
 		var vTotOld = dot.v.mag();
 		var vTotNew = vTotOld*Math.sqrt(tempNew/tempOld);
-		var vPerpNew = Math.sqrt(vTotNew*vTotNew - vPar*vPar);
-		dot.v.dx = wallUV.dx*vPar + perpUV.dx*vPerpNew;
-		dot.v.dy = wallUV.dy*vPar + perpUV.dy*vPerpNew;
-		this.eAdded+=this.temp*R/N;
+		var sqrtBit = vTotNew*vTotNew - vPar*vPar;
+		if(sqrtBit<0){
+			dot.setTemp(tempNew);
+		}else{
+			var vPerpNew = Math.sqrt(sqrtBit);
+			dot.v.dx = wallUV.dx*vPar + perpUV.dx*vPerpNew;
+			dot.v.dy = wallUV.dy*vPar + perpUV.dy*vPerpNew;
+		}
+		if(isNaN(dot.v.dx) || isNaN(dot.v.dy)){
+			console.log('foo');
+		}
+		*/
+		if(this.temp!=0){
+			var tempOld = dot.temp();
+			var tempNew = Math.max(tempOld + this.temp, 50);
+			dot.setTemp(tempNew);
+			this.eAdded+=(tempNew-tempOld)*R/N*JtoKJ;
+		}
 	},
 	remove: function(){
 		removeListener(curLevel, 'update', 'drawHeater'+this.handle);

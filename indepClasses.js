@@ -1,6 +1,6 @@
 
 
-function Dot(x, y, v, mass, radius, name, idNum, tag){
+function Dot(x, y, v, mass, radius, name, idNum, tag, returnTo){
 	this.x = x;
 	this.y = y;
 	this.v = v;
@@ -9,6 +9,7 @@ function Dot(x, y, v, mass, radius, name, idNum, tag){
 	this.name = name;
 	this.idNum = idNum;
 	this.tag = tag;
+	this.returnTo = returnTo;
 }
 function Species(mass, radius, colors, def){
 	var spc = [];
@@ -20,7 +21,7 @@ function Species(mass, radius, colors, def){
 	return spc;
 }
 Species.prototype = {
-	populate: function(pos, dims, count, temp, tag){
+	populate: function(pos, dims, count, temp, tag, returnTo){
 		var vStdev = .1;
 		var x = pos.x;
 		var y = pos.y;
@@ -33,7 +34,7 @@ Species.prototype = {
 			var angle = Math.random()*2*Math.PI;
 			var vx = v * Math.cos(angle);
 			var vy = v * Math.sin(angle);
-			this.push(D(placeX, placeY, V(vx, vy), this.m, this.r, this.def.name, this.def.idNum, tag));
+			this.push(D(placeX, placeY, V(vx, vy), this.m, this.r, this.def.name, this.def.idNum, tag, returnTo));
 			
 		}		
 	},
@@ -67,8 +68,8 @@ function Color(r, g, b){
 }
 function drawingTools(){};
 
-function D(x, y, vx, vy, mass, radius, name){
-	return new Dot(x, y, vx, vy, mass, radius, name);
+function D(x, y, v, mass, radius, name, idNum, tag, returnTo){
+	return new Dot(x, y, v, mass, radius, name, idNum, tag, returnTo);
 }
 function P(x, y){
 	return new Point(x, y);
