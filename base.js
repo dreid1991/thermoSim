@@ -1,5 +1,6 @@
 //shared startup stuff
 $(function(){
+	turn = 0;
 	$('#canvasDiv').hide();
 	$('#base').hide();
 	$('#dashIntro').hide();
@@ -46,9 +47,8 @@ drawingTools.prototype = {
 	},
 	dots: function(){
 		for (var spcName in spcs){
-			var spc = spcs[spcName];
-			c.fillStyle = "rgb(" + spc.cols.r + "," + spc.cols.g + "," + spc.cols.b + ")";
-			var dots = spc.dots;
+			var dots = spcs[spcName];
+			c.fillStyle = "rgb(" + dots.cols.r + "," + dots.cols.g + "," + dots.cols.b + ")";
 			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
 				var dot = dots[dotIdx];
 				c.beginPath();
@@ -235,8 +235,9 @@ Arrow.prototype = {
 	}
 }
 function move(){
-	for (var spc in spcs){
-		var dots = spcs[spc].dots;
+	var spcsLocal = spcs;
+	for (var spcName in spcsLocal){
+		var dots = spcsLocal[spcName];
 		for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
 			var dot = dots[dotIdx];
 			dot.x += dot.v.dx;
@@ -289,14 +290,14 @@ function removeSpecies(toRem){
 
 function changeAllTemp(temp){
 	for(var spc in spcs){
-		var dots = spcs[spc].dots;
+		var dots = spcs[spc];
 		for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
 			dots[dotIdx].setTemp(temp);
 		}
 	}
 }
 function changeRMS(spcName, newRMS){
-	var dots = spcs[spcName].dots;
+	var dots = spcs[spcName];
 	var curRMS = rms(dataHandler.velocities(spcName));
 	var ratio = newRMS/curRMS;
 	for (var dotIdx=0; dotIdx<dots.length; dotIdx++){
@@ -333,12 +334,6 @@ function round(val, dec){
 	var pow = Math.pow(10,dec);
 	return Math.round(val*pow)/pow;
 }
-function makeButton(text, id){
-	var newDiv = $('<div>');
-	newDiv.append( $('<button>').text(text).button() );
-	newDiv.attr({id:id});
-	return newDiv;
-} 
 function addListener(object, typeName, funcName, func, destObj){
 	object[typeName + 'Listeners'].listeners[funcName] = {func:func, obj:destObj};
 }
@@ -456,8 +451,9 @@ function showPrompt(prev, prompt){
 		var func = prompt.start;
 		var title = prompt.title;
 		if(block!=curLevel.blockIdx){
-			for (var spcName in spcs){
-				depopulate(spcName);
+			var spcsLocal = spcs;
+			for (var spcName in spcsLocal){
+				spcsLocal[spcName].depopulate();
 			}
 			if(prev && curLevel['block'+prev.block+'CleanUp']){
 				curLevel['block'+prev.block+'CleanUp'].apply(curLevel);

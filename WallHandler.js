@@ -1,6 +1,6 @@
 function WallHandler(pts, handlers, handles, bounds, includes){
 	var newWall = new Array(pts.length)
-	_.extend(newWall, WallMethods.main);
+	_.extend(newWall, WallMethods.main, WallMethods.collideMethods);
 
 	newWall.assemble(pts, handles, bounds, includes)
 	
@@ -57,15 +57,15 @@ WallMethods = {
 							var subHandler = handlerArray[subHandlerIdx]
 							this.setSubWallHandler(handlerIdx, subHandlerIdx, subHandler);
 						}
-					}else if(typeof handlers[handlerIdx] == 'object'){
+					}else if(typeof handlers[handlerIdx] == 'string'){
 						var handler = handlers[handlerIdx];
 						this.setWallHandler(handlerIdx, handler)
 					}
 				}
-			} else if(typeof handlers == 'object'){
+			} else if(typeof handlers == 'string'){
 				this.setAllHandler(handlers);
 			}else{
-				console.log('YOU SEND POOR WALL HANDLERS.  THEY ARE NEITHER OBJECT NOR ARRAY');
+				console.log('YOU SEND POOR WALL HANDLERS.  THEY ARE NEITHER STRING NOR ARRAY');
 			}
 		},
 		setAllHandler: function(handler){
@@ -101,6 +101,8 @@ WallMethods = {
 			this.closeWall(this[wallIdx]);
 			this[wallIdx].ptsInit = this.copyWallPts(this[wallIdx]);
 			this[wallIdx].massChunks = {};
+			this[wallIdx].forceInternal = 0;
+			this[wallIdx].pLastRecord = turn;
 			this[wallIdx].parent = this;
 			this[handle] = this[wallIdx];
 			_.extend(this[wallIdx], WallMethods.wall);	
@@ -273,10 +275,11 @@ WallMethods = {
 			var gridDim = this.gridDim;
 			var xSpan = this.xSpan;
 			var ySpan = this.ySpan;
-			for (var spcName in spcs){
-				var spc = spcs[spcName];
-				for (var dotIdx=0; dotIdx<spc.dots.length; dotIdx++){
-					var dot = spc.dots[dotIdx];
+			var spcsLocal = spcs;
+			for (var spcName in spcsLocal){
+				var spc = spcsLocal[spcName];
+				for (var dotIdx=0; dotIdx<spc.length; dotIdx++){
+					var dot = spc[dotIdx];
 					var checkedWalls = [];
 					var gridX = Math.floor(dot.x/gridDim);
 					var gridY = Math.floor(dot.y/gridDim);
@@ -331,12 +334,14 @@ WallMethods = {
 		},
 		didHitStd: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
 			var handler = this[wallIdx + '-' + subWallIdx];
-			handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);		
+			this[handler](dot, wallIdx, subWallIdx, wallUV, perpV, perpUV);
+			//handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);		
 		},
 		didHitArrow: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
 			var vo = dot.v.copy();
 			var handler = this[wallIdx + '-' + subWallIdx];
-			handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
+			this[handler](dot, wallIdx, subWallIdx, wallUV, perpV, perpUV);
+			//handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
 			var pos = P(dot.x, dot.y);
 			var vf = dot.v.copy();
 			var perpVf = -perpUV.dotProd(dot.v);
@@ -573,18 +578,7 @@ WallMethods = {
 			}
 			return area;
 		},
-		surfArea: function(){
-			var SA=0;
-			for (var wallIdx=0; wallIdx<this.length; wallIdx++){
-				var wall = this[wallIdx];
-				for (ptIdx=0; ptIdx<wall.length-1; ptIdx++){
-					var pt = wall[ptIdx];
-					var ptNext = wall[ptIdx+1];
-					SA+=pt.distTo(ptNext);
-				}
-			}
-			return SA;
-		},
+
 	
 		////////////////////////////////////////////////////////////
 		//EXTRAS
@@ -617,6 +611,23 @@ WallMethods = {
 		pExt: function(){
 			var SA = this[1].x - this[0].x;
 			return pConst*this.mass()*g/SA;
+		},
+		pInt: function(){
+			var SA = this.surfArea();
+			var pInt = pConst*this.forceInternal/((turn-this.pLastRecord)*SA);
+			this.forceInternal = 0;
+			this.pLastRecord = turn;
+			return pInt;
+		},
+		surfArea: function(){
+			var SA=0;
+			for (ptIdx=0; ptIdx<this.length-1; ptIdx++){
+				var pt = this[ptIdx];
+				var ptNext = this[ptIdx+1];
+				SA+=pt.distTo(ptNext);
+			}
+			
+			return SA;
 		},
 		mass: function(){
 			var totalMass = 0;
@@ -761,7 +772,7 @@ WallMethods = {
 			v1 = (-b + (b^2 - 4*a*c)^.5)/2a
 			v2 = (m1*vo1 + m2*vo2 - m1*v1)/(m2*A)
 			*/
-			var wall = walls[wallIdx];
+			var wall = this[wallIdx];
 			var vo = dot.v.copy();
 			var vo1 = dot.v.dy;
 			var vo2 = wall.v;
@@ -788,11 +799,10 @@ WallMethods = {
 				wall.v = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
 				dot.y = pt.y+dot.r;			
 			}
-			this.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
+			wall.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
 		},	
 		cPAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
-			
-			var wall = walls[wallIdx];
+			var wall = this[wallIdx];
 			var vo = dot.v.copy();
 			var vo1 = dot.v.dy;
 			var vo2 = wall.v;
@@ -802,22 +812,22 @@ WallMethods = {
 			dot.v.dy = (vo1*(m1-m2)+2*m2*vo2)/(dot.m+m2);
 			wall.v = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
 			dot.y = pt.y+dot.r;		
-			this.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
+			wall.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
 		},
 		staticAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 			this.reflect(dot, wallUV, perpV);
-			this.forceInternal += 2*dot.m*Math.abs(perpV);
+			this[wallIdx].forceInternal += 2*dot.m*Math.abs(perpV);
 		},
 		cVIsothermal: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 			dot.y+=perpUV.dy;
 			this.reflect(dot, wallUV, perpV);
-			this.forceInternal += 2*dot.m*Math.abs(perpV);
+			this[wallIdx].forceInternal += 2*dot.m*Math.abs(perpV);
 			//this is really not correct, but it's not in use yet, so...
 		},
 		cVAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 			var v = dot.v;
 			v.dy = -v.dy + 2*walls[wallIdx].v;
-			this.forceInternal += dot.m*(perpV + v.dy);
+			this[wallIdx].forceInternal += dot.m*(perpV + v.dy);
 		},
 		reflect: function(dot, wallUV, perpV){
 			dot.v.dx -= 2*wallUV.dy*perpV;

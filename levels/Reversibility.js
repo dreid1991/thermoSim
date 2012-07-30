@@ -11,7 +11,8 @@ function Reversibility(){
 	this.wallCol = Col(255,255,255);
 	this.numUpdates = 0;
 	var wallHandle = 'container';
-	walls = WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, [wallHandle], [{yMin:60, yMax:435}]);
+	walls = WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], 'staticAdiabatic', [wallHandle], [{yMin:60, yMax:435}]);
+
 	
 	
 	this.extPressurePts = [walls[0][0], walls[0][1]];
@@ -60,7 +61,6 @@ function Reversibility(){
 }
 _.extend(Reversibility.prototype, 
 			LevelTools, 
-			WallMethods.collideMethods, 
 {
 	init: function(){
 		this.workTracker.start();
@@ -201,19 +201,19 @@ _.extend(Reversibility.prototype,
 									this.massInit,
 									this.readout,
 									wallName,
-									{func:this.cPAdiabaticDamped, obj:this},
+									'cPAdiabaticDamped',
 									this
 									);
 		return dragWeights;
 	},
 	addDots: function(){
-		populate("spc1", P(35, 80), V(460, 350), 800, 230);
-		populate("spc3", P(35, 80), V(460, 350), 600, 230);		
+		spcs.spc1.populate(P(35, 80), V(460, 350), 800, 230);
+		spcs.spc3.populate(P(35, 80), V(460, 350), 600, 230);
 	},
 	dataRun: function(){
-		var SAPInt = walls.surfArea()
-		this.data.pInt.push(dataHandler.pressureInt(this.forceInternal, this.numUpdates, SAPInt));
-		this.data.pExt.push(dataHandler.pressureExt(this.dragWeights.mass(), this.SAPExt));
+		var wall = walls[0];
+		this.data.pInt.push(wall.pInt());
+		this.data.pExt.push(wall.pExt());
 		this.data.t.push(dataHandler.temp());
 		this.data.v.push(dataHandler.volume());
 		this.forceInternal = 0;
@@ -232,7 +232,7 @@ _.extend(Reversibility.prototype,
 			curPrompt.cleanUp();
 		}	
 		for (var spcName in spcs){
-			depopulate(spcName);
+			spcs[spcName].depopulate();
 		}		
 		this.numUpdates = 0;
 		this.extPressurePts = [walls[0][0], walls[0][1]];

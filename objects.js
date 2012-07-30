@@ -943,7 +943,7 @@ function Piston(handle, wallInfo, pInit, obj){
 	this.readout = new Readout('pistonReadout', readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, undefined, 'center');
 	obj.mass = function(){return self.mass};
 	this.wall.moveInit();
-	walls.setSubWallHandler(this.wallIdx, 0, {func:obj.cPAdiabaticDamped, obj:obj});		
+	walls.setSubWallHandler(this.wallIdx, 0, 'cPAdiabaticDamped');		
 	this.obj = obj;
 }
 

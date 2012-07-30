@@ -29,8 +29,8 @@ CollideHandler.prototype = {
 		var grid = this.makeGrid();
 		for (var spcName in spcs){
 			var spc = spcs[spcName];
-			for (var dotIdx=0; dotIdx<spc.dots.length; dotIdx++){
-				var dot = spc.dots[dotIdx];
+			for (var dotIdx=0; dotIdx<spc.length; dotIdx++){
+				var dot = spc[dotIdx];
 				var gridX = Math.floor(dot.x/gridSize);
 				var gridY = Math.floor(dot.y/gridSize);
 				for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){

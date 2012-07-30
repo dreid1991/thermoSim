@@ -32,9 +32,9 @@ LevelTools = {
 		var wall = walls[wallIdx]
 		var wallMoveMethod;
 		if(compType=='isothermal'){
-			var wallMoveMethod = this.cVIsothermal;
+			var wallMoveMethod = 'cVIsothermal';
 		} else if (compType=='adiabatic'){
-			var wallMoveMethod = this.cVAdiabatic;
+			var wallMoveMethod = 'cVAdiabatic';
 		}
 		removeListener(curLevel, 'update', 'moveWall');
 		var setY = function(curY){
@@ -50,14 +50,14 @@ LevelTools = {
 		if(dist!=0){
 			var sign = getSign(dist);
 			wall.v = this.wallSpeed*sign;
-			walls.setSubWallHandler(0, 0, {func:wallMoveMethod, obj:this});
+			walls.setSubWallHandler(wallIdx, 0, wallMoveMethod);
 			addListener(curLevel, 'update', 'moveWall',
 				function(){
 					setY(boundedStep(getY(), dest, wall.v))
 					walls.setupWall(0);
 					if(round(getY(),2)==round(dest,2)){
 						removeListener(curLevel, 'update', 'moveWall');
-						walls.setSubWallHandler(0, 0, {func:this.staticAdiabatic, obj:this});
+						walls.setSubWallHandler(wallIdx, 0, 'staticAdiabatic');
 						wall.v = 0;
 					}
 				},
@@ -124,8 +124,10 @@ LevelTools = {
 	borderStd: function(min){
 		walls['container'].border([1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:min}, {}, {}, {y:min}]);
 	},
+
 	update: function(){
 		this.numUpdates++;
+		turn++;
 		for (var updateListener in this.updateListeners.listeners){
 			var listener = this.updateListeners.listeners[updateListener]
 			listener.func.apply(listener.obj);
@@ -137,7 +139,6 @@ LevelTools = {
 			listener.func.apply(listener.obj);
 		}
 		this.numUpdates = 0;
-		this.forceInternal = 0;
 	},
 	updateRun: function(){
 		move();
@@ -179,6 +180,22 @@ LevelTools = {
 	trackVolumeStop: function(){
 		this.readout.removeEntry('vol');
 		removeListener(curLevel, 'update', 'trackVolume');
+	},
+	trackIntPressureStart: function(handle){
+		this.data['pInt'+handle] = [];
+		var dataList = this.data['pInt'+handle]
+		var wall = walls[handle];
+		wall.forceInternal = 0;
+		wall.pLastRecord = turn;
+		addListener(curLevel, 'data', 'trackIntPressure'+handle,
+			function(){
+				dataList.push(wall.pInt());
+			},
+		'');
+		
+	},
+	trackIntPressureStop: function(handle){
+		removeListener(curLevel, 'data', 'trackIntPressure'+handle);
 	},
 	trackTempStart: function(decPlaces){
 		if(decPlaces===undefined){

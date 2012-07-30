@@ -28,7 +28,7 @@ function Work(){
 		{block:5, title: 'Current step', finished: false, text:''},
 		{block:6, title: 'Current step', finished: false, text:''},
 	]
-	walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
+	walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
 	this.yMin = 30;
 	this.yMax = 350;
@@ -38,7 +38,6 @@ function Work(){
 }
 _.extend(Work.prototype, 
 			LevelTools, 
-			WallMethods.collideMethods, 
 {
 	init: function(){
 		for (var initListenerName in this.initListeners.listeners){
@@ -65,10 +64,9 @@ _.extend(Work.prototype,
 	
 	block1Start: function(){
 		var self = this;
-		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
-		
-		populate('spc1', P(45,35), V(460, 350), 800, 300);
-		populate('spc3', P(45,35), V(450, 350), 600, 300);
+		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
+		spcs['spc1'].populate(P(45,35), V(460, 350), 800, 300);
+		spcs['spc3'].populate(P(45,35), V(450, 350), 600, 300);
 		
 		$('#canvasDiv').show();
 		$('#clearGraphs').hide();
@@ -105,15 +103,15 @@ _.extend(Work.prototype,
 		this.readout.hide();
 		this.piston.remove();
 		this.piston = undefined;
-		walls.setWallHandler(0, {func:this.staticAdiabatic, obj:this})
+		walls.setWallHandler(0, 'staticAdiabatic')
 		walls['container'].removeBorder();
 	},
 	block2Start: function(){
-		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
+		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
 		walls.setHitMode('container', 'Arrow');
 		this.borderStd();
 		this.compArrow = this.makeCompArrow('container', {mode:'adiabatic'});
-		populate('spc4', P(45,35), V(460, 350), 1, 600);
+		spcs['spc4'].populate(P(45,35), V(460, 350), 1, 600);
 	},
 	block2CleanUp: function(){
 		this.wallV=0;
@@ -134,12 +132,12 @@ _.extend(Work.prototype,
 		$('#reset').show()
 		this.readout.show();
 		wallHandle = 'container';
-		walls = WallHandler([[P(40,30), P(510,30), P(510,350), P(40,350)]], {func:this.staticAdiabatic, obj:this}, [wallHandle]);
+		walls = WallHandler([[P(40,30), P(510,30), P(510,350), P(40,350)]], 'staticAdiabatic', [wallHandle]);
 		//walls.setSubWallHandler(0, 0, {func:this.cPAdiabaticDamped, obj:this});
 		this.stops = new Stops(10, 'container').init();
 		this.borderStd();
-		populate('spc1', P(45,35), V(445, 325), 650, 250);
-		populate('spc3', P(45,35), V(445, 325), 450, 250);
+		spcs['spc1'].populate(P(45,35), V(445, 325), 650, 250);
+		spcs['spc3'].populate(P(45,35), V(445, 325), 450, 250);
 		this.dragWeights = this.makeDragWeights(wallHandle).init().trackEnergyStop().trackMassStop().trackPressureStart();
 		this.trackTempStart();
 		this.trackVolumeStart(0);
@@ -175,10 +173,10 @@ _.extend(Work.prototype,
 	},
 	block6Start: function(){
 		$('#sliderHeaterHolder').show();
-		walls = WallHandler([[P(40,30), P(255,30), P(255,350), P(40,350)], [P(295,30), P(510,30), P(510,350), P(295,350)]], {func:this.staticAdiabatic, obj:this}, ['left', 'right']);
+		walls = WallHandler([[P(40,30), P(255,30), P(255,350), P(40,350)], [P(295,30), P(510,30), P(510,350), P(295,350)]], 'staticAdiabatic', ['left', 'right']);
 		//this.piston = new Piston('pistony', 'right', 5, function(){return this.g}, this);
-		populate('spc1', P(40,30), V(200,300), 600, 300);
-		populate('spc1', P(285,30), V(200,300), 600, 300);
+		spcs['spc1'].populate(P(40,30), V(200,300), 600, 300);
+		spcs['spc1'].populate(P(285,30), V(200,300), 600, 300);
 	},
 	makeDragWeights: function(wallHandle){
 		var self = this;
@@ -194,7 +192,7 @@ _.extend(Work.prototype,
 									massInit,
 									this.readout,
 									wallHandle,
-									{func:this.cPAdiabaticDamped, obj:this},
+									'cPAdiabaticDamped',
 									this
 									);
 
@@ -204,7 +202,7 @@ _.extend(Work.prototype,
 	dataRun: function(){
 		var wall = walls[0];
 		var SA = getLen([wall[0], wall[1], wall[2], wall[3], wall[4]]);//HEY - FOR TESTING PURPOSES ONLY.  DOES NOT WORK WITH MOVING WALL AS WE DO NOT ADD FORCE INTERNAL THERE  //What?
-		this.data.p.push(dataHandler.pressureInt(this.forceInternal, this.numUpdates, SA))
+		this.data.p.push(wall.pInt())
 		this.data.t.push(dataHandler.temp());
 		this.data.v.push(dataHandler.volume());
 		

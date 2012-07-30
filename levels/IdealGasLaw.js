@@ -51,7 +51,6 @@ function IdealGasLaw(){
 
 _.extend(IdealGasLaw.prototype, 
 		LevelTools, 
-		WallMethods.collideMethods,
 {
 	init: function(){
 		for (var initListenerName in this.initListeners.listeners){
@@ -77,15 +76,15 @@ _.extend(IdealGasLaw.prototype,
 		$('#clearGraphs').hide();
 		$('#sliderTemp').show();
 		
-		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
-		;
-		populate('spc4', P(45,35), V(450, 350), 1, 300);
-		var dot = spcs.spc4.dots[0]
+		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
+		
+		spcs['spc4'].populate(P(45,35), V(450, 350), 1, 300);
+		var dot = spcs.spc4[0]
 		this.readout.addEntry('temp', "Molecule's temperature:", 'K', dataHandler.temp(), 0, 0);
 		this.readout.addEntry('speed', "Speed:", 'm/s', dot.speed(),0,0);
 		this.readout.resetAll();
 		this.readout.show();
-		var temp = spcs.spc4.dots[0].temp();
+		var temp = spcs.spc4[0].temp();
 		$('#sliderTemp').slider('option', {value:temp});
 	},
 	block1Conditions: function(){
@@ -103,24 +102,23 @@ _.extend(IdealGasLaw.prototype,
 		$('#sliderTemp').hide();
 	},
 	block2Start: function(){
-		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
-		;	
-		populate('spc4', P(45,35), V(450, 350), 400, 200);
+		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
+			
+		spcs['spc4'].populate(P(45,35), V(450, 350), 400, 200);
 	},
 	block3Start: function(){
 		walls = WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
-			[P(300,30), P(510,30), P(510,440), P(300,440)]], {func:this.staticAdiabatic, obj:this}, ['c1', 'c2']);
+			[P(300,30), P(510,30), P(510,440), P(300,440)]], 'staticAdiabatic', ['c1', 'c2']);
 		;
-		populate('spc4', P(45, 80), V(200, 300), 200, 600);
-		populate('spc4', P(305,75), V(200, 300), 200, 100);
+		spcs['spc4'].populate(P(45, 80), V(200, 300), 200, 600);
+		spcs['spc4'].populate(P(305,75), V(200, 300), 200, 100);
 		
 	},
 	block4Start: function(){
 		walls = WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
-			[P(300,30), P(510,30), P(510,440), P(300,440)]], {func:this.staticAdiabatic, obj:this}, ['c1', 'c2']);
-		;
-		populate('spc1', P(45, 80), V(200, 300), 200, 300);
-		populate('spc5', P(305,75), V(200, 300), 100, 800);
+			[P(300,30), P(510,30), P(510,440), P(300,440)]], 'staticAdiabatic', ['c1', 'c2']);
+		spcs['spc1'].populate(P(45, 80), V(200, 300), 200, 300);
+		spcs['spc5'].populate(P(305,75), V(200, 300), 100, 800);
 
 		this.readout.addEntry('rmsLeft', 'RMS(v) Left:', 'm/s', rms(dataHandler.velocities('spc1')), undefined, 0);
 		
@@ -146,7 +144,7 @@ _.extend(IdealGasLaw.prototype,
 	},
 	block6Start: function(){
 		walls = WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
-			[P(300,30), P(510,30), P(510,440), P(300,440)]], {func:this.staticAdiabatic, obj:this}, ['c1', 'c2']);
+			[P(300,30), P(510,30), P(510,440), P(300,440)]], 'staticAdiabatic', ['c1', 'c2']);
 		;
 		var sliderMin = $('#sliderSpeedLeft').slider('option', 'min');
 		var sliderMax = $('#sliderSpeedLeft').slider('option', 'max');
@@ -162,8 +160,8 @@ _.extend(IdealGasLaw.prototype,
 			var tempA = VToTemp(mA, rmsInitA/pxToMS);
 			var tempB = VToTemp(mB, rmsInitB/pxToMS);
 		}
-		populate(this.spcA, P(45, 80), V(200, 300), 200, tempA);
-		populate(this.spcB, P(305,75), V(200, 300), 100, tempB);
+		spcs[this.spcA].populate(P(45, 80), V(200, 300), 200, tempA);
+		spcs[this.spcB].populate(P(305,75), V(200, 300), 100, tempB);
 		
 		$('#sliderSpeedLeft').slider('option', {value:rmsInitA});
 		$('#sliderSpeedRight').slider('option', {value:rmsInitB});
@@ -208,25 +206,25 @@ _.extend(IdealGasLaw.prototype,
 		this.cutSceneEnd();
 	},
 	block8Start: function(){
-		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container']);
+		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
 		;
-		populate('spc1', P(45,35), V(450, 350), 600, 300);
-		populate('spc3', P(45,35), V(450, 350), 800, 300);
+		spcs['spc1'].populate(P(45,35), V(450, 350), 600, 300);
+		spcs['spc3'].populate(P(45,35), V(450, 350), 800, 300);
 		this.forceInternal=0;
 		this.numUpdates=0;
 		this.readout.addEntry('pressure', 'Pressure:', 'atm', 0, 0, 1);
 		this.readout.show();
+		var wall = walls[0];
+		this.trackIntPressureStart(wall.handle);
+		var pList = this.data['pInt'+wall.handle];
 		addListener(curLevel, 'data', 'recordPressure', 
 			function(){
-				var SAPInt = walls.surfArea()
-				var newP = dataHandler.pressureInt(this.forceInternal, this.numUpdates, SAPInt);
-				this.data.pInt.push(newP);
-				this.readout.tick(newP, 'pressure')
+				this.readout.tick(pList[pList.length-1], 'pressure')
 			},
 			this);
 	},
 	block8CleanUp: function(){
-
+		this.trackIntPressureStop(walls[0].handle);
 		this.readout.removeAllEntries();
 		this.readout.hide();
 		removeListener(curLevel, 'data', 'recordPressure');
@@ -235,9 +233,9 @@ _.extend(IdealGasLaw.prototype,
 		$('#longSliderHolder').show();
 		this.playedWithSlider = new Boolean();
 		this.playedWithSlider = false;
-		walls = WallHandler([[P(50,75), P(75,50), P(475,50), P(500,75), P(500,300), P(475,325), P(75,325), P(50,300)]], {func:this.staticAdiabatic, obj:this}, ['container']);
+		walls = WallHandler([[P(50,75), P(75,50), P(475,50), P(500,75), P(500,300), P(475,325), P(75,325), P(50,300)]], 'staticAdiabatic', ['container']);
 		walls.setHitMode('container', 'Arrow');
-		populate('spc4', P(100,100), V(300,200), 1, 700);
+		spcs['spc4'].populate(P(100,100), V(300,200), 1, 700);
 		$('#sliderPressure').show();
 		
 	},
@@ -293,15 +291,24 @@ _.extend(IdealGasLaw.prototype,
 		this.cutSceneEnd();
 	},
 	block11Start: function(){
-		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], {func:this.staticAdiabatic, obj:this}, ['container'], [{yMin:this.yMin, yMax: this.yMin}], [{yMin:this.yMin, yMax: this.yMin}]);
+		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container'], [{yMin:this.yMin, yMax: this.yMin}], [{yMin:this.yMin, yMax: this.yMin}]);
 		this.borderStd(this.yMin);
-		populate('spc1', P(45,35), V(450, 350), 800, 300);
-		populate('spc3', P(45,35), V(450, 350), 600, 300);	
+		spcs['spc1'].populate(P(45,35), V(450, 350), 800, 300);
+		spcs['spc3'].populate(P(45,35), V(450, 350), 600, 300);	
 		this.compArrow = this.makeCompArrow('container', {mode:'isothermal'});
 		this.forceInternal=0;
 		this.numUpdates=0;
 		this.readout.addEntry('pressure', 'Pressure:', 'atm', 0, 0, 1);
 		this.readout.show();
+		var wall = walls[0];
+		this.trackIntPressureStart(wall.handle);
+		var pList = this.data['pInt'+wall.handle];
+		addListener(curLevel, 'data', 'recordPressure', 
+			function(){
+				this.readout.tick(pList[pList.length-1], 'pressure')
+			},
+			this);
+			/*
 		addListener(curLevel, 'data', 'recordPressure', 
 			function(){
 				var SAPInt = walls.surfArea()
@@ -310,6 +317,7 @@ _.extend(IdealGasLaw.prototype,
 				this.readout.tick(newP, 'pressure')
 			},
 		this);
+		*/
 	},
 	block11aStart: function(){
 		this.halfY = 235
@@ -337,13 +345,14 @@ _.extend(IdealGasLaw.prototype,
 		this.arrowVolHalf = new Arrow('half', [P(545, this.halfY), P(510, this.halfY)], Col(0,255,0), c).show();
 	},
 	block11bConditions: function(){
-		if(fracDiff(walls.pts[0][0].y, this.halfY)<.07){
+		if(fracDiff(walls[0][0].y, this.halfY)<.07){
 			return {result:true}
 		}else{
 			return {result:false, alert:'Halve the volume!'}
 		}	
 	},
 	block11bCleanUp: function(){
+		this.trackIntPressureStop(walls[0].handle);
 		this.arrowVolInit.hide();
 		this.arrowVolHalf.hide();		
 		this.arrowVolInit = undefined;
@@ -399,7 +408,7 @@ _.extend(IdealGasLaw.prototype,
 		this.playedWithSlider = true;
 		var temp = ui.value;
 		changeAllTemp(temp);
-		var dot = spcs.spc4.dots[0];
+		var dot = spcs.spc4[0];
 		this.readout.hardUpdate(temp, 'temp');
 		this.readout.hardUpdate(dot.speed(), 'speed');
 	},
