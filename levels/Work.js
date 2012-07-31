@@ -27,7 +27,7 @@ function Work(){
 		{block:4, title: 'Current step', finished: false, conditions: this.block4Conditions, text:"So here we have a big weight we can use to bring our system to a pressure of 6 atm.  There are some stops on the piston that let us compress to 10 liters.  We have 1.5 moles of gas with a heat capacity of R J/mol*K (<a href = extras/heatCapacity.html target='_blank'>explanation</a>).  What final temperature should we expect if we compress our piston all the way?  Once you have a value, try the experiment!  "},
 		{block:5, title: 'Current step', finished: false, text:''},
 		{block:6, title: 'Current step', finished: false, text:''},
-		{block:7, title: 'Current step', finished: false, conditions: this.block7Conditions, text:'Alright, here’s our adiabatic system.  If you compress the system, does the slope of temperature with respect to volume look like what the previous equation says it should be (Note C<sub>v</sub> is R and C<sub>p</sub> is 2R)?  How can you relate this slope to the number of collisions that happen with the wall as the volume decreases?'},
+		{block:7, title: 'Current step', finished: false, conditions: this.block7Conditions, text:'Alright, here’s our adiabatic system.  If you compress the system, does the slope of temperature with respect to volume look like what the previous equation says it should be?  How can you relate this slope to the number of collisions that happen with the wall as the volume decreases?'},
 		{block:8, title: '', finished: false, text:''},
 		{block:9, title: '', finished: false, text:''},
 		{block:10, title: '', finished: false, conditions: this.block10Conditions, text:'Well, let’s figure it out.  Here we have two containers.  Both contain 1 mole of gas at 300 K.  One is held at constant volume, the other at constant pressure.  You can heat or cool them with their corresponding sliders.  If you heat both containers to some new temperature, how do the energies used compare?  The piston tracks the work it does on the system.  Remember that it takes energy to speed up molecules <i>and</i> to expand against a pressure.'},
@@ -125,7 +125,7 @@ _.extend(Work.prototype,
 		walls.setHitMode('container', 'Arrow');
 		this.borderStd();
 		this.compArrow = this.makeCompArrow('container', {mode:'adiabatic'});
-		spcs['spc4'].populate(P(45,35), V(460, 350), 1, 600);
+		spcs['spc4'].populate(P(45,35), V(460, 100), 1, 600);
 		this.tempChanged = false;
 		var initTemp = dataHandler.temp();
 		addListener(curLevel, 'data', 'checkTempChanged',
@@ -197,14 +197,18 @@ _.extend(Work.prototype,
 	},
 	block5Start: function(){
 		var str = "<p>Okay, so your calculations should have looked something like this:<p><center><img src = img/work/eq3.gif></img></p><img src=img/work/eq4.gif></img></center></p>You had an initial temperature of INITIAL K and a final temperature of FINAL K.  Are the two results close to each other?  What does this say about our idea that work adds energy through molecules’ collisions with a moving wall?</p>";
-		str = replaceString(replaceString(str, 'INITIAL', round(this.volListener15.getResults().t,0)), 'FINAL', round(this.volListener10.getResults().t,0));
+		var results15 = this.volListener15.getResults();
+		var results10 = this.volListener10.getResults();
+		if(results15 && results10){
+			str = replaceString(replaceString(str, 'INITIAL', round(results15.t,0)), 'FINAL', round(results10.t,0));
+		}
 		this.cutSceneStart(str);
 	},
 	block5CleanUp: function(){
 		this.cutSceneEnd();
 	},
 	block6Start: function(){
-		this.cutSceneStart("<p><p>Now let’s go on a brief tangent.  When you compress, temperature increases, right?  If you start from the equation</p><center><img src=img/work/eq5.gif></img></center></p> <p>which describes adiabatic compressions, and solve for temperature, how should temperature increase as volume decreases?  If you get stuck solving, remember that you can use the ideal gas law to replace variables.</p><p> Once you’ve solved for temperature, try graphing temperature with respect to volume.  Note that the temperature’s slope gets steeper you compress.  Why might this be?  Let’s try to figure by looking at an adiabatic compression.</p>");
+		this.cutSceneStart("<p><p>Now let’s go on a brief tangent.  When you compress, temperature increases, right?  If you start from the equation</p><center><img src=img/work/eq5.gif></img></center></p> <p>which describes adiabatic compressions, and solve for temperature, how should temperature increase as volume decreases?  If you get stuck solving, remember that you can use the ideal gas law to replace variables.</p><p> Once you’ve solved for temperature, try graphing temperature with respect to volume with C<sub>V</sub> of R and C<sub>P</sub> of 2R.  Note that the temperature’s slope gets steeper you compress.  Why might this be?  Let’s try to figure by looking at an adiabatic compression.</p>");
 	},
 	block6CleanUp: function(){
 		this.cutSceneEnd();
@@ -305,7 +309,7 @@ _.extend(Work.prototype,
 		this.heaterRight = undefined;
 	},
 	block11Start: function(){
-		this.cutSceneStart('<p>So, what happened?  Why did the constant pressure system take more energy to heat up?  Because it was doing work on its surroundings to maintain that constant pressure?  Why yes, that’s it!  Well done.  Shall we formalize?</p><p> To heat up the C<sub>v</sub> container, you just had to put energy into the molecules to make them move more quickly.</p>We can say that like...</p><center><p><img src = img/work/eq6.gif></img></center></p>  But there’s more going on in the C<sub>p</sub> container.  To maintain constant pressure, it had to expand, doing work on its surroundings.</p><p>This means that the energy we added to the C<sub>p</sub> went to <i>two</i> places:  to the molecules to make them move more quickly, and to the wall, to push it outwards.  That looks like...</p><center><p><img src=img/work/eq7.gif></img></p></center><p>Having another place for the energy to go means that you have to put more energy in to change the temperature a given amount.</p>');		
+		this.cutSceneStart('<p>So, what happened?  Why did the constant pressure system take more energy to heat up?  Because it was doing work on its surroundings to maintain that constant pressure?  Why yes, that’s it!  Well done.  Shall we formalize?</p><p> To heat up the C<sub>v</sub> container, you just had to put energy into the molecules to make them move more quickly.</p>We can say that like...</p><center><p><img src = img/work/eq6.gif></img></center></p>  But there’s more going on in the C<sub>p</sub> container.  To maintain constant pressure, it had to expand, doing work on its surroundings.</p><p>This means that the energy we added to the C<sub>p</sub> went to <i>two</i> places:  to the molecules to make them move more quickly, and to the wall to push it outwards.  That looks like...</p><center><p><img src=img/work/eq7.gif></img></p></center><p>Having another place for the energy to go means that you have to put more energy in to change the temperature a given amount.</p>');		
 		
 	},
 	block11CleanUp: function(){

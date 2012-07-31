@@ -1327,6 +1327,10 @@ StateListener.prototype = {
 		return this.amSatisfied;
 	},
 	getResults: function(){
-		return this.results;
+		if(this.results){
+			return this.results;
+		}else{
+			return 'no results from ' + this.condition + 'listener yet';
+		}
 	},
 }
