@@ -248,7 +248,7 @@ _.extend(Work.prototype,
 		
 	},
 	block8Start: function(){
-		this.cutSceneStart('<p>So it would seem that as your volume decreases, the number of collisions that happen over a given compression increases.  From this we can say that the energy added per volume when compressing at high pressure is <i>greater</i> than when at low pressure.</p><p>  This means that as our volume decreases (and pressure increases), the rate of temperature change will increase, giving us a greater-than-linear slope.</p><p>I know this doesn’t perfectly justify why volume should be raised to the C<sub>p</sub>/C<sub>v</sub> power, but hopefully it gives you a mental model that you can work with to understand how systems behave when they’re compressed.</p>');
+		this.cutSceneStart('<p>So it would seem that as the container gets smaller, more molecules hit the wall, increasing the pressure.  We know that every time a molecule hits a moving wall, energy is added.  This means that as we compress our container, the amount of energy we add per volume change in volume goes up.  Since temperature is an expression of energy, this makes temperature change more quickly as volume decreases. </p><p>I know this doesn’t perfectly justify why volume should be raised to the C<sub>p</sub>/C<sub>v</sub> power, but hopefully it gives you a mental model that you can work with to understand how systems behave when they’re compressed.</p>');
 	},
 	block8CleanUp: function(){
 		this.cutSceneEnd();
