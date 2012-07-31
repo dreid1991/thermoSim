@@ -199,7 +199,7 @@ _.extend(Work.prototype,
 		var str = "<p>Okay, so your calculations should have looked something like this:<p><center><img src = img/work/eq3.gif></img></p><img src=img/work/eq4.gif></img></center></p>You had an initial temperature of INITIAL K and a final temperature of FINAL K.  Are the two results close to each other?  What does this say about our idea that work adds energy through molecules’ collisions with a moving wall?</p>";
 		var results15 = this.volListener15.getResults();
 		var results10 = this.volListener10.getResults();
-		if(results15 && results10){
+		if(results15 && results10 && !isNaN(results15.t) && !isNaN(results10.t)){
 			str = replaceString(replaceString(str, 'INITIAL', round(results15.t,0)), 'FINAL', round(results10.t,0));
 		}
 		this.cutSceneStart(str);
