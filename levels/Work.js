@@ -59,7 +59,7 @@ _.extend(Work.prototype,
 		this.cutSceneStart("<p>Good afternoon!</p>"+
 		"Today we’re going to try to figure out why work changes a system’s temperature.  Let’s start with the equation for relating work to a temperature change:"+
 		"<p><center><img src='img/work/eq1.gif' alt='hoverhoverhover'></img></center></p>"+
-		"<p>This equations says that work is equal to how hard you compress a container times how much you compress it.  It also says that as you compress that container, the gas inside heats up.  But why does that happen?  What is it about pushing on a container makes its molecules speed up?</p>"+
+		"<p>This equation says that work is equal to how hard you compress a container times how much you compress it.  It also says that as you compress that container, the gas inside heats up.  But why does that happen?  What is it about pushing on a container that7 makes its molecules speed up?</p>"+
 		"<p> One might say that it’s because energy is being added, and that is true, but we’re going to try to pin down the physical event that makes molecules speed up as a result of the container compressing.",
 		'intro'
 		);
@@ -208,7 +208,7 @@ _.extend(Work.prototype,
 		this.cutSceneEnd();
 	},
 	block6Start: function(){
-		this.cutSceneStart("<p><p>Now let’s go on a brief tangent.  When you compress, temperature increases, right?  If you start from the equation</p><center><img src=img/work/eq5.gif></img></center></p> <p>which describes adiabatic compressions, and solve for temperature, how should temperature increase as volume decreases?  If you get stuck solving, remember that you can use the ideal gas law to replace variables.</p><p> Once you’ve solved for temperature, try graphing temperature with respect to volume with C<sub>V</sub> of R and C<sub>P</sub> of 2R.  Note that the temperature’s slope gets steeper you compress.  Why might this be?  Let’s try to figure by looking at an adiabatic compression.</p>");
+		this.cutSceneStart("<p><p>Now let’s go on a brief tangent.  When you compress, temperature increases, right?  If you start from the equation</p><center><img src=img/work/eq5.gif></img></center></p> <p>which describes adiabatic compressions, and solve for temperature, how should temperature increase as volume decreases?  If you get stuck solving, remember that you can use the ideal gas law to replace variables.</p><p> Once you’ve solved for temperature, try graphing temperature with respect to volume with C<sub>V</sub> of R and C<sub>P</sub> of 2R.  Note that the temperature’s slope gets steeper you compress.  Why might this be?  Let’s try to figure it out by looking at an adiabatic compression.</p>");
 	},
 	block6CleanUp: function(){
 		this.cutSceneEnd();
