@@ -24,7 +24,7 @@ function Work(){
 		{block:1, title: 'Current step', finished: false, text:"Now these molecules undergo perfectly elastic collisions when they hit a wall.  That is to say they behave like a bouncy ball would when you throw it against a wall.  If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving, that is not true."},
 		{block:2, title: 'Current step', finished: false, conditions: this.block2Conditions, text:"Let’s see if we can relate that idea to work by looking at just one molecule.  If you compress the cylinder, why does the molecule’s speed change?  How does this relate to temperature change and work?"},
 		{block:3, title: '', finished: false, text:''},
-		{block:4, title: 'Current step', finished: false, conditions: this.block4Conditions, text:"So here we have a big weight we can use to bring our system to a pressure of 6 atm.  There are some stops on the piston that let us compress to 10 liters.  We have 1.1 moles of gas with a heat capacity of R J/mol*K (<a href = extras/heatCapacity.html target='_blank'>explanation</a>).  What final temperature should we expect if we compress our piston all the way?  Once you have a value, try the experiment!  "},
+		{block:4, title: 'Current step', finished: false, conditions: this.block4Conditions, text:"So here we have a big weight we can use to bring our system to a pressure of 6 atm.  There are some stops on the piston that let us compress to 10 liters.  We have 1.5 moles of gas with a heat capacity of R J/mol*K (<a href = extras/heatCapacity.html target='_blank'>explanation</a>).  What final temperature should we expect if we compress our piston all the way?  Once you have a value, try the experiment!  "},
 		{block:5, title: 'Current step', finished: false, text:''},
 		{block:6, title: 'Current step', finished: false, text:''},
 		{block:7, title: 'Current step', finished: false, conditions: this.block7Conditions, text:'Alright, here’s our adiabatic system.  If you compress the system, does the slope of temperature with respect to volume look like what the previous equation says it should be (Note C<sub>v</sub> is R and C<sub>p</sub> is 2R)?  How can you relate this slope to the number of collisions that happen with the wall as the volume decreases?'},
@@ -168,8 +168,8 @@ _.extend(Work.prototype,
 		//walls.setSubWallHandler(0, 0, {func:this.cPAdiabaticDamped, obj:this});
 		this.stops = new Stops(10, 'container').init();
 		this.borderStd();
-		spcs['spc1'].populate(P(45,35), V(445, 325), 650, 270);
-		spcs['spc3'].populate(P(45,35), V(445, 325), 450, 270);
+		spcs['spc1'].populate(P(45,35), V(445, 325), 850, 198);
+		spcs['spc3'].populate(P(45,35), V(445, 325), 650, 198);
 		this.dragWeights = this.makeDragWeights(wallHandle).init().trackEnergyStop().trackMassStop().trackPressureStart();
 		this.trackTempStart();
 		this.trackVolumeStart(0);
@@ -318,7 +318,7 @@ _.extend(Work.prototype,
 		this.cutSceneEnd();
 	},
 	block13Start: function(){
-		this.cutSceneStart('And thus we have demystified work.  By knowing that our molecules behave like bouncy balls, we figured out that that molecules change speed as a result of collisions with a moving wall.  On a macroscopic scale, we say that work is being done on the container.  The higher the system pressure, the more work is done per volume change.  We can justify this by saying there are more collisions with the wall at higher pressure, and that each collision speeds up the colliding molecule.  From there, we looked at heat capacities and decided that C<sub>P</sub> is greater than C<sub>V</sub> because of the work done by the constant pressure container.  Now go forth and conquer.',
+		this.cutSceneStart('<p>And thus we have demystified work</p>  <p>By knowing that our molecules behave like bouncy balls, we figured out that that molecules change speed as a result of collisions with a moving wall.  On a macroscopic scale, we say that work is being done on the container.  The higher the system pressure, the more work is done per volume change.  We can justify this by saying there are more collisions with the wall at higher pressure, and that each collision speeds up the colliding molecule.</p> <p> From there, we looked at heat capacities and decided that C<sub>P</sub> is greater than C<sub>V</sub> because of the work done by the constant pressure container. </p><p> Now go forth and conquer.  </p>',
 		'outro');
 	},
 	block13CleanUp: function(){
