@@ -1060,7 +1060,7 @@ Piston.prototype = {
 		removeListener(curLevel, 'update', 'drawPiston'+this.handle);
 		this.readout.hide();
 	},
-	setP: function(p){
+	setPressure: function(p){
 		var pSetPt = p;
 		var dp = pSetPt - this.p;
 		addListener(curLevel, 'update', 'piston'+this.handle+'adjP', 

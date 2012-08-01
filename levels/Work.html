@@ -30,7 +30,7 @@
 			<center>
 				<div>
 					<div id='sliderPressureHolder'>Piston pressure<br>
-						<div id='sliderPressure' style='width:300px'></div>
+						<div id='sliderPiston' style='width:300px'></div>
 					</div>
 					<br>
 					<div id='sliderHeaterHolder'>
@@ -129,20 +129,23 @@ $(function(){
 	$('#reset').click(function(){curLevel.reset()});
 	$('#reset').hide();
 	curLevel.init();
+	var sliderName = 'sliderPiston';
 	makeSlider(
-		"sliderPressure", 
+		sliderName, 
 		{
 			min:2, 
 			max:15, 
 			value:2, 
 		},
 		[
-			{eventType:'slide', obj:curLevel, func:curLevel.changePressure},
+			{eventType:'slide', obj:curLevel, funcStr:sliderName + 'Set'},
 		],
-		'show'
+		'show',
+		'Pressure'
 	);
+	var sliderName = 'sliderHeaterLeft';
 	makeSlider(
-		"sliderHeaterLeft", 
+		sliderName, 
 		{
 			min:-20, 
 			max:20, 
@@ -152,14 +155,17 @@ $(function(){
 			{eventType:'slidestop', obj:curLevel, func:function(event, ui){
 															$('#sliderHeaterLeft').slider('option', {value:0});
 															ui.value=0;
-															this.heatLeft(event, ui)
+															
+															this.sliderHeaterLeftSet(event, ui);
 														}
 			},
-			{eventType:'slide', obj:curLevel, func:curLevel.heatLeft}, 
+			{eventType:'slide', obj:curLevel, funcStr:sliderName+'Set'}, 
 			
 		],
-		'show'
+		'show',
+		'Temp'
 	);
+	var sliderName = 'sliderHeaterRight';
 	makeSlider(
 		"sliderHeaterRight", 
 		{
@@ -171,13 +177,14 @@ $(function(){
 			{eventType:'slidestop', obj:curLevel, func:function(event, ui){
 															$('#sliderHeaterRight').slider('option', {value:0});
 															ui.value=0;
-															this.heatRight(event, ui)
+															this.sliderHeaterRightSet(event, ui)
 														}
 			},
-			{eventType:'slide', obj:curLevel, func:curLevel.heatRight}, 
+			{eventType:'slide', obj:curLevel, funcStr:sliderName+'Set'}, 
 			
 		],
-		'show'
+		'show',
+		'Temp'
 	);
 
 

@@ -28,7 +28,7 @@ function Work(){
 		{block:5, title: 'Current step', finished: false, text:''},
 		{block:6, title: 'Current step', finished: false, conditions: this.block6Conditions, text:'So why is work dependant on pressure?  Here we have two containers, one at low pressure, the other at high pressure.  If you compress these two containers to their stops, which system did you do more work on, and why?  Consider collision frequency with the moving wall.  This is a nearly reversible compression, so we’re going to say P<sub>ext</sub> = P<sub>int</sub>.'},
 		{block:7, title: '', finished: false, text:''},
-		{block:8, title: '', finished: false, conditions: this.block9Conditions, text:'Well, let’s figure it out.  Here we have two containers.  Both contain 1 mole of gas at 300 K.  One is held at constant volume, the other at constant pressure.  You can heat or cool them with their corresponding sliders.  If you heat both containers to some new temperature, how do the energies used compare?  The piston tracks the work it does on the system.  Remember that it takes energy to speed up molecules <i>and</i> to expand against a pressure.'},
+		{block:8, title: '', finished: false, conditions: this.block8Conditions, text:'Well, let’s figure it out.  Here we have two containers.  Both contain 1 mole of gas at 300 K.  One is held at constant volume, the other at constant pressure.  You can heat or cool them with their corresponding sliders.  If you heat both containers to some new temperature, how do the energies used compare?  The piston tracks the work it does on the system.  Remember that it takes energy to speed up molecules <i>and</i> to expand against a pressure.'},
 		{block:9, title: '', finished: false, text:''},
 		{block:10, title: '', finished: false, text:''},
 		{block:11, title: '', finished: false, text:''},
@@ -342,8 +342,6 @@ _.extend(Work.prototype,
 	block11CleanUp: function(){
 		this.cutSceneEnd();
 	},
-
-
 	dataRun: function(){
 		var wall = walls[0];
 		this.data.p.push(wall.pInt())
@@ -356,6 +354,7 @@ _.extend(Work.prototype,
 		this.numUpdates=0;
 		this.forceInternal=0;
 	},
+	/*
 	changePressure: function(event, ui){
 		this.piston.setP(ui.value);
 		this.playedWithSlider = true;
@@ -366,5 +365,6 @@ _.extend(Work.prototype,
 	heatRight: function(event, ui){
 		this.heaterRight.setTemp(ui.value)
 	},
+	*/
 }
 )

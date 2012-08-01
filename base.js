@@ -385,10 +385,19 @@ function loadListener(object, typeName){
 	
 }
 
-function makeSlider(id, attrs, handlers, initVisibility){
+function makeSlider(handle, attrs, handlers, initVisibility, toChange){
 	//var newDiv = $('<div>');
 	//newDiv.attr({id:id});
-	var div = $('#' + id);
+	
+	var objName = handle.slice('slider'.length, handle.length);
+	objName = objName.slice(0,1).toLowerCase() + objName.slice(1, objName.length);
+	if(toChange){
+		curLevel[handle+'Set'] = function(event, ui){
+			this.playedWithSlider = true;
+			this[objName]['set' + toChange](ui.value);
+		}
+	}
+	var div = $('#' + handle);
 	div.slider({});
 	div.slider("option",attrs);
 	div.attr({width:300});
@@ -396,7 +405,12 @@ function makeSlider(id, attrs, handlers, initVisibility){
 		var handler=handlers[handlerIdx];
 		var eventType = handler.eventType;
 		var obj = handler.obj;
-		var func = handler.func;
+		if(handler.func){
+			var func = handler.func;
+		}else if(handler.funcStr){
+			var func = obj[handler.funcStr];
+		}
+
 		var event;
 		var ui;
 		if(obj===undefined){
@@ -409,16 +423,16 @@ function makeSlider(id, attrs, handlers, initVisibility){
 	if(initVisibility){
 		div[initVisibility]();
 	}
-	sliderList.push(id);
+	sliderList.push(handle);
 	return div;
 }
 function sliderBind(div, eventType, func, obj){
 	div.bind(eventType, function(event, ui){func.apply(obj, [event, ui])});
 }
 function hideSliders(){
-	for (var idIdx=0; idIdx<sliderList.length; idIdx++){
-		var id = sliderList[idIdx];
-		$('#'+id).hide();
+	for (var handleIdx=0; handleIdx<sliderList.length; idIdx++){
+		var handle = sliderList[handleIdx];
+		$('#'+ handle).hide();
 	}
 }
 function showPrompt(prev, prompt){
