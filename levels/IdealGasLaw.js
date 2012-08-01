@@ -428,39 +428,5 @@ _.extend(IdealGasLaw.prototype,
 		this.readout.hardUpdate(rms, 'rmsRight');		
 	},
 
-	reset: function(){
-		var curPrompt = this.prompts[this.promptIdx];
-		if(this['block'+this.blockIdx+'CleanUp']){
-			this['block'+this.blockIdx+'CleanUp']()
-		}
-		if(curPrompt.cleanUp){
-			curPrompt.cleanUp();
-		}	
-		for (var spcName in spcs){
-			depopulate(spcName);
-		}
-		this.numUpdates = 0;
-
-		this.forceInternal = 0;
-		this.wallV = 0;
-		emptyListener(this, 'update');
-		emptyListener(this, 'wallImpact');
-		emptyListener(this, 'data');
-
-		for (resetListenerName in this.resetListeners.listeners){
-			var func = this.resetListeners.listeners[resetListenerName].func;
-			var obj = this.resetListeners.listeners[resetListenerName].obj;
-			func.apply(obj);
-		}
-
-		if(this['block'+this.blockIdx+'Start']){
-			this['block'+this.blockIdx+'Start']()
-		}
-		
-		if(curPrompt.start){
-			curPrompt.start();
-		}	
-		
-	},
 }
 )

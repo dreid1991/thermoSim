@@ -192,6 +192,28 @@ LevelTools = {
 		this.readout.removeEntry(handle);
 		removeListener(curLevel, 'data', 'trackTemp' + handle);
 	},
+	makeDragWeights: function(weights, wallHandle){
+		var self = this;
+		var massInit = 25;
+		wallHandle = defaultTo('0', wallHandle);
+		min = walls[0][2].y;
+		var curYPt = walls[wallHandle][0];
+		var dragWeights = new DragWeights(weights,
+									min,
+									function(){return curYPt.y},
+									myCanvas.height-15,
+									20,
+									Col(218, 187, 41),
+									Col(150, 150, 150),
+									massInit,
+									this.readout,
+									wallHandle,
+									'cPAdiabaticDamped',
+									this
+									);
+
+		return dragWeights;		
+	},
 	makeListeners: function(){
 		this.updateListeners = {listeners:{}, save:{}};
 		this.dataListeners = {listeners:{}, save:{}};
@@ -200,5 +222,30 @@ LevelTools = {
 		this.mousemoveListeners = {listeners:{}, save:{}};
 		this.resetListeners = {listeners:{}, save:{}};
 		this.initListeners = {listeners:{}, save:{}};		
+	},
+	reset: function(){
+		
+		var curPrompt = this.prompts[this.promptIdx];
+		if(this['block'+this.blockIdx+'CleanUp']){
+			this['block'+this.blockIdx+'CleanUp']()
+		}
+		if(curPrompt.cleanUp){
+			curPrompt.cleanUp();
+		}	
+		for (var spcName in spcs){
+			spcs[spcName].depopulate();
+		}		
+		
+		for (resetListenerName in this.resetListeners.listeners){
+			var func = this.resetListeners.listeners[resetListenerName].func;
+			var obj = this.resetListeners.listeners[resetListenerName].obj;
+			func.apply(obj);
+		}
+		
+		if(this['block'+this.blockIdx+'Start']){
+			this['block'+this.blockIdx+'Start']()
+		}		
+
+		
 	},
 }

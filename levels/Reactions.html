@@ -1,0 +1,196 @@
+<html>
+<body>
+<link type='text/css' href = '../css/sunny/jquery-ui-1.8.20.custom.css' rel='stylesheet' />
+<link type='text/css' href = '../styles.css' rel='stylesheet'/>
+<script src = '../underscore-min.js'></script>
+<script src = '../js/jquery-1.7.2.min.js'></script>
+<script src = '../js/jquery-ui-1.8.20.custom.min.js'></script>
+<div class='noSelect wrapper'>
+	<div id='main' class='main noSelect'>
+		<div id='mainHeader' class='header noSelect'>
+			Work
+		</div>
+		<div id='canvasDiv' class='canvasDiv noSelect'>
+			<canvas id='myCanvas'>
+			</canvas>
+		</div>
+		<div id='display' class='display noSelect'>
+				<div id='intText' class='displayText noSelect'>
+			</div>
+		</div>
+
+
+		<div id='dashIntro' class='dashMed noSelect'>
+			<center>
+				<button id='toSim' class='noSelect'>To the simulation!</button>
+			</center>
+			
+		</div>
+		<div id='dashRun' class='dashMed noSelect'>
+			<center>
+				<div>
+					<div id='sliderPressureHolder'>Piston pressure<br>
+						<div id='sliderPressure' style='width:300px'></div>
+					</div>
+					<br>
+					<div id='sliderHeaterHolder'>
+						<div id='sliderHeaterLeftHolder' style = 'float:left'>
+							<center>Left heater
+								<div id='sliderHeaterLeft' style = 'width:200px'></div>
+							</center>
+						</div>
+						<div id='sliderHeaterRightHolder' style = 'float:right'>
+							<center>Right heater
+								<div id='sliderHeaterRight' style = 'width:200px'></div>
+							</center>
+						</div>
+					</div>
+					<button id='reset' class='noSelect'>Reset experiment</button>
+					<button id='checkAns' class='noSelect'>Check answer</button>
+					<button id='clearGraphs' class='noSelect'>Clear graphs</button>
+
+				</div>
+			</center>
+		</div>
+		<div id='dashCutScene' class='dashMed noSelect'>
+		</div>
+		<div id='dashOutro' class='dash noSelect ' >
+			<center>
+				<button id='backToSim'>Back to the simulation</button>
+			</center>
+			
+			
+		</div>
+		
+
+	</div>
+	<div id='graphs' class='graphs noSelect'>
+	</div>
+</div>
+<br>
+<div id='base' class='base noSelect'>
+	<div id='baseHeader' class='header noSelect'></div>
+	<div class='borderedBlock noSelect'>
+		<div id='quesHolder noSelect'>
+		</div>
+		<div style='padding:10px' class='displayText noSelect'>
+			<div id='prompt'>
+			
+			</div>
+		
+			<div id='submitDiv' align='right'>
+				<button id = 'previous'>Previous</button>
+				<button id = 'next'>Next</button>
+			</div>
+
+		</div>
+	</div>
+
+	<div id='baseDash' class='bottomRound noSelect'></div>
+</div>
+<script src = '../indepClasses.js'></script>
+<script src = '../GraphBase.js'></script>
+<script src = '../GraphScatter.js'></script>
+<script src = '../GraphHist.js'></script>
+<script src = '../SpeciesDefs.js'></script>
+<script src = '../CollideHandler.js'></script>
+<script src = '../DataHandler.js'></script>
+<script src = '../WallHandler.js'></script>
+<script src = '../objects.js'></script>
+<script src = '../animText.js'></script>
+<script src = '../Readout.js'></script>
+<script src = '../WorkTracker.js'></script>
+<script src = '../LevelTools.js'></script>
+
+<script src = 'Work.js'></script>
+<script src = '../base.js'></script>
+<script type = 'text/javascript'>
+var curLevel;
+canvasHeight = 450;
+$(function(){
+	//HEY - COULD PUT INIT STUFF HERE. 
+	myCanvas.height = canvasHeight;
+	curLevel = new Work();
+	animText = new AnimText(c);
+	$('#sliderHeaterHolder').hide();
+	$('#sliderPressureHolder').hide();
+
+	$('#checkAns').hide();
+	$('#clearGraphs').hide();
+	$('button').button();
+	$('#longSliderHolder').hide();
+	$('#toSim').click(function(){nextPrompt()});
+	$('#backToSim').click(function(){prevPrompt()});
+	$('#previous').click(function(){prevPrompt()});
+	$('#next').click(function(){nextPrompt()});
+	$('#submit').click(function(){submit()});
+	$('#checkAns').click(function(){curLevel.checkAnsTemp()});
+	$('#clearGraphs').click(function(){curLevel.clearGraphs()});
+	$('#reset').click(function(){curLevel.reset()});
+	$('#reset').hide();
+	curLevel.init();
+	makeSlider(
+		"sliderPressure", 
+		{
+			min:2, 
+			max:15, 
+			value:2, 
+		},
+		[
+			{eventType:'slide', obj:curLevel, func:curLevel.changePressure},
+		],
+		'show'
+	);
+	makeSlider(
+		"sliderHeaterLeft", 
+		{
+			min:-20, 
+			max:20, 
+			value:0, 
+		},
+		[
+			{eventType:'slidestop', obj:curLevel, func:function(event, ui){
+															$('#sliderHeaterLeft').slider('option', {value:0});
+															ui.value=0;
+															this.heatLeft(event, ui)
+														}
+			},
+			{eventType:'slide', obj:curLevel, func:curLevel.heatLeft}, 
+			
+		],
+		'show'
+	);
+	makeSlider(
+		"sliderHeaterRight", 
+		{
+			min:-20, 
+			max:20, 
+			value:0, 
+		},
+		[
+			{eventType:'slidestop', obj:curLevel, func:function(event, ui){
+															$('#sliderHeaterRight').slider('option', {value:0});
+															ui.value=0;
+															this.heatRight(event, ui)
+														}
+			},
+			{eventType:'slide', obj:curLevel, func:curLevel.heatRight}, 
+			
+		],
+		'show'
+	);
+
+
+});
+
+myCanvas.width = $('#main').width();
+
+
+</script>
+
+
+
+
+
+</body>
+</html>

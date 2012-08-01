@@ -41,7 +41,9 @@ function Reversibility(){
 	]
 	
 	this.massInit = 25;
-	this.dragWeights = this.makeDragWeights(wallHandle);
+	this.dragWeights = this.makeDragWeights([{name:'sml', count:12, mass:5}, 
+									{name:'med', count:6, mass:10}, 
+									{name:'lrg', count:2, mass:30}]);
 	
 	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
 	;
@@ -64,7 +66,6 @@ _.extend(Reversibility.prototype,
 {
 	init: function(){
 		this.workTracker.start();
-		this.addDots();
 		for (var initListenerName in this.initListeners.listeners){
 			var func = this.initListeners.listeners[initListenerName].func;
 			var obj = this.initListeners.listeners[initListenerName].obj;
@@ -100,7 +101,8 @@ _.extend(Reversibility.prototype,
 		this.cutSceneEnd();
 	},
 	block1Start: function(){
-		this.addDots();
+		spcs['spc1'].populate(P(35, 80), V(460, 350), 800, 230);
+		spcs['spc3'].populate(P(35, 80), V(460, 350), 600, 230);
 
 		this.numUpdates = 0;
 		walls.restoreWall(0);
@@ -185,31 +187,6 @@ _.extend(Reversibility.prototype,
 	block5CleanUp: function(){
 		this.cutSceneEnd();
 	},
-	makeDragWeights: function(wallName){
-		var self = this;
-		var dragWeights = new DragWeights([{name:'sml', count:12, mass:5}, 
-									{name:'med', count:6, mass:10}, 
-									{name:'lrg', count:2, mass:30}
-									//{name:'lrg', count:2, mass:30},
-									],
-									walls[0][2].y,
-									function(){return walls[0][0].y},
-									myCanvas.height-15,
-									20,
-									Col(218, 187, 41),
-									Col(150, 150, 150),
-									this.massInit,
-									this.readout,
-									wallName,
-									'cPAdiabaticDamped',
-									this
-									);
-		return dragWeights;
-	},
-	addDots: function(){
-		spcs.spc1.populate(P(35, 80), V(460, 350), 800, 230);
-		spcs.spc3.populate(P(35, 80), V(460, 350), 600, 230);
-	},
 	dataRun: function(){
 		var wall = walls[0];
 		this.data.pInt.push(wall.pInt());
@@ -222,33 +199,6 @@ _.extend(Reversibility.prototype,
 		}
 		
 	},
-	reset: function(){
-		
-		var curPrompt = this.prompts[this.promptIdx];
-		if(this['block'+this.blockIdx+'CleanUp']){
-			this['block'+this.blockIdx+'CleanUp']()
-		}
-		if(curPrompt.cleanUp){
-			curPrompt.cleanUp();
-		}	
-		for (var spcName in spcs){
-			spcs[spcName].depopulate();
-		}		
-		this.numUpdates = 0;
-		this.extPressurePts = [walls[0][0], walls[0][1]];
-		this.forceInternal = 0;
-		
-		for (resetListenerName in this.resetListeners.listeners){
-			var func = this.resetListeners.listeners[resetListenerName].func;
-			var obj = this.resetListeners.listeners[resetListenerName].obj;
-			func.apply(obj);
-		}
-		
-		if(this['block'+this.blockIdx+'Start']){
-			this['block'+this.blockIdx+'Start']()
-		}		
 
-		
-	},
 }
 )

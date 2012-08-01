@@ -168,7 +168,7 @@ _.extend(Work.prototype,
 		this.borderStd();
 		spcs['spc1'].populate(P(45,35), V(445, 325), 850, 198);
 		spcs['spc3'].populate(P(45,35), V(445, 325), 650, 198);
-		this.dragWeights = this.makeDragWeights(wallHandle).init().trackEnergyStop().trackMassStop().trackPressureStart();
+		this.dragWeights = this.makeDragWeights([{name:'lrg', count:1, mass:75}], wallHandle).init().trackEnergyStop().trackMassStop().trackPressureStart();
 		this.trackTempStart();
 		this.trackVolumeStart(0);
 		this.volListener15 = new StateListener(15, this.data.v, .05, {p:this.data.p, t:this.data.t});
@@ -336,32 +336,13 @@ _.extend(Work.prototype,
 		this.cutSceneEnd();
 	},
 	block11Start: function(){
-		this.cutSceneStart('<p>And thus we have demystified work</p>  <p>By knowing that our molecules behave like bouncy balls, we figured out that that molecules change speed as a result of collisions with a moving wall.  On a macroscopic scale, we say that work is being done on the container.  The higher the system pressure, the more work is done per volume change.  We can justify this by saying there are more collisions with the wall at higher pressure, and that each collision speeds up the colliding molecule.</p> <p> From there, we looked at heat capacities and decided that C<sub>P</sub> is greater than C<sub>V</sub> because of the work done by the constant pressure container. </p><p> Now go forth and conquer.  </p>',
+		this.cutSceneStart('<p>And thus we have demystified work</p>  <p>By knowing that our molecules behave like bouncy balls, we figured out that that molecules change speed as a result of collisions with a moving wall.  On a macroscopic scale, we say that work is being done on the container.  The higher the system pressure, the more work is done per volume change.  We can justify this by saying there are more collisions with the wall at higher pressure and that each collision speeds up the colliding molecule.</p> <p> From there, we looked at heat capacities and decided that C<sub>P</sub> is greater than C<sub>V</sub> because of the work done by the constant pressure container. </p><p> Now go forth and conquer.  </p>',
 		'outro');
 	},
 	block11CleanUp: function(){
 		this.cutSceneEnd();
 	},
-	makeDragWeights: function(wallHandle){
-		var self = this;
-		var massInit = 25;
-		var dragWeights = new DragWeights([{name:'lrg', count:1, mass:75}
-									],
-									walls[0][2].y,
-									function(){return walls[0][0].y},
-									myCanvas.height-15,
-									20,
-									Col(218, 187, 41),
-									Col(150, 150, 150),
-									massInit,
-									this.readout,
-									wallHandle,
-									'cPAdiabaticDamped',
-									this
-									);
 
-		return dragWeights;		
-	},
 
 	dataRun: function(){
 		var wall = walls[0];
@@ -385,38 +366,5 @@ _.extend(Work.prototype,
 	heatRight: function(event, ui){
 		this.heaterRight.setTemp(ui.value)
 	},
-	reset: function(){
-		var curPrompt = this.prompts[this.promptIdx];
-		if(this['block'+this.blockIdx+'CleanUp']){
-			this['block'+this.blockIdx+'CleanUp']()
-		}
-		if(curPrompt.cleanUp){
-			curPrompt.cleanUp();
-		}	
-		for (var spcName in spcs){
-			depopulate(spcName);
-		}
-		this.numUpdates = 0;
-
-		this.forceInternal = 0;
-		this.wallV = 0;
-
-		for (resetListenerName in this.resetListeners.listeners){
-			var func = this.resetListeners.listeners[resetListenerName].func;
-			var obj = this.resetListeners.listeners[resetListenerName].obj;
-			func.apply(obj);
-		}
-
-		if(this['block'+this.blockIdx+'Start']){
-			this['block'+this.blockIdx+'Start']()
-		}
-		
-		if(curPrompt.start){
-			curPrompt.start();
-		}	
-		
-	},
-
-
 }
 )
