@@ -71,7 +71,12 @@ DataHandler.prototype = {
 		}	
 		return {sumKE:sumKE, num:numCounted};
 	},
-	volume: function(){
-		return walls.totalArea()*vConst;
+	volume: function(wallInfo){
+		if(wallInfo===undefined){
+			var area = walls.totalArea();
+		}else{
+			var area = walls.wallArea(wallInfo);
+		}
+		return area*vConst;
 	},
 }

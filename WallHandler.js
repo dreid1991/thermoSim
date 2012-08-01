@@ -364,11 +364,12 @@ WallMethods = {
 		totalArea: function(){
 			var area=0;
 			for (var wallIdx=0; wallIdx<this.length; wallIdx++){
-				var uncutPts = this[wallIdx];
-				var pts = uncutPts.slice(0,uncutPts.length-1);
-				area+=this[wallIdx].include*this.area(pts);
+				area+=this[wallIdx].include*this.wallArea(wallIdx);
 			}
 			return area;
+		},
+		wallArea: function(wallInfo){
+			return this.area(this[wallInfo].slice(0,this[wallInfo].length-1));
 		},
 		area: function(pts){
 			var area=0;

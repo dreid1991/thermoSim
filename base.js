@@ -330,7 +330,7 @@ function returnEscapist(dot){
 	dot.y = y;
 }
 function defaultTo(defaultVal, inputVal){
-	if(inputVal){
+	if(inputVal !== undefined){
 		return inputVal;
 	}
 	return defaultVal;

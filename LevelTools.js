@@ -1,33 +1,7 @@
 
 LevelTools = {
-	makeCompArrow: function(wallInfo, compAttrs){
-		var wallIdx = walls.idxByInfo(wallInfo);
-		var compMode = compAttrs.mode;
-		var bounds;
-		if(compAttrs.bounds){
-			bounds = compAttrs.bounds;	
-		}else{
-			bounds = {y:{min:this.yMin, max:this.yMax-50}};
-		}
-		var pos = walls[wallIdx][1].copy()
-		var rotation = 0;
-		var cols = {};
-		cols.outer = Col(247, 240,9);
-		cols.onClick = Col(247, 240,9);
-		cols.inner = this.bgCol;
-		var dims = V(25, 15);
-		var name = 'volDragger';
-		var drawCanvas = c;
-		var canvasElement = canvas;
-		var listeners = {};
-		listeners.onDown = function(){};
-		listeners.onMove = function(){curLevel.changeWallSetPt(0, this.pos.y, compMode)};
-		listeners.onUp = function(){};
-		
 
-		return new DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds).show();
-	},
-	changeWallSetPt: function(wallInfo, dest, compType){
+	changeWallSetPt: function(wallInfo, dest, compType, speed){
 		var wallIdx = walls.idxByInfo(wallInfo);
 		var wall = walls[wallIdx]
 		var wallMoveMethod;
@@ -42,21 +16,20 @@ LevelTools = {
 			wall[1].y = curY;
 			wall[wall.length-1].y = curY;
 		}
-		var getY = function(){
-			return walls[wallIdx][0].y;
-		}
-		
-		var dist = dest-getY();
+		var y = wall[0].y
+		var dist = dest-y;
 		if(dist!=0){
 			var sign = getSign(dist);
-			wall.v = this.wallSpeed*sign;
+			var speed = defaultTo(this.wallSpeed, speed);
+			wall.v = speed*sign;
 			walls.setSubWallHandler(wallIdx, 0, wallMoveMethod);
-			addListener(curLevel, 'update', 'moveWall',
+			addListener(curLevel, 'update', 'moveWall'+wallInfo,
 				function(){
-					setY(boundedStep(getY(), dest, wall.v))
-					walls.setupWall(0);
-					if(round(getY(),2)==round(dest,2)){
-						removeListener(curLevel, 'update', 'moveWall');
+					var y = wall[0].y
+					setY(boundedStep(y, dest, wall.v))
+					walls.setupWall(wallIdx);
+					if(round(y,2)==round(dest,2)){
+						removeListener(curLevel, 'update', 'moveWall' + wallInfo);
 						walls.setSubWallHandler(wallIdx, 0, 'staticAdiabatic');
 						wall.v = 0;
 					}
@@ -121,8 +94,11 @@ LevelTools = {
 		$('#dashOutro').hide();
 		$('#dashCutScene').hide();
 	},
-	borderStd: function(min){
-		walls['container'].border([1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:min}, {}, {}, {y:min}]);
+	borderStd: function(info){
+		info = defaultTo({}, info);
+		var wall = defaultTo('container', info.wallInfo);
+		
+		walls[wall].border([1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:info.min}, {}, {}, {y:info.min}]);
 	},
 
 	update: function(){
@@ -197,20 +173,24 @@ LevelTools = {
 	trackIntPressureStop: function(handle){
 		removeListener(curLevel, 'data', 'trackIntPressure'+handle);
 	},
-	trackTempStart: function(decPlaces){
+	trackTempStart: function(decPlaces, handle, label, dataSet){
 		if(decPlaces===undefined){
 			decPlaces = 0;
 		}
-		this.readout.addEntry('temp', 'Temp:', 'K', this.data.t[this.data.t.length-1], undefined, decPlaces);
-		addListener(curLevel, 'data', 'trackTemp',
+		dataSet = defaultTo('t', dataSet);
+		label = defaultTo('Temp:', label);
+		handle = defaultTo('temp', handle);
+		this.readout.addEntry(handle, label, 'K', this.data[dataSet][this.data[dataSet].length-1], undefined, decPlaces);
+		addListener(curLevel, 'data', 'trackTemp' + handle,
 			function(){
-				this.readout.tick(this.data.t[this.data.t.length-1], 'temp');
+				this.readout.tick(this.data[dataSet][this.data[dataSet].length-1], 'temp');
 			},
 		this);	
 	},
-	trackTempStop: function(){
-		this.readout.removeEntry('temp');
-		removeListener(curLevel, 'data', 'trackTemp');
+	trackTempStop: function(handle){
+		handle = defaultTo('temp', handle)
+		this.readout.removeEntry(handle);
+		removeListener(curLevel, 'data', 'trackTemp' + handle);
 	},
 	makeListeners: function(){
 		this.updateListeners = {listeners:{}, save:{}};

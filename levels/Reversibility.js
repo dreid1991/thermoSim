@@ -83,7 +83,7 @@ _.extend(Reversibility.prototype,
 								{data:this.data, x:'v', y:'t'});		
 		
 		
-		this.borderStd(60);
+		this.borderStd({min:60});
 		nextPrompt();
 	},
 	block0Start: function(){

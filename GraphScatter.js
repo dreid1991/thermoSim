@@ -84,9 +84,10 @@ _.extend(GraphScatter.prototype, GraphBase.prototype,
 				var dataSet = this.data[address];
 				toAdd.push(dataSet.getLast(address));
 			}
-			this.addPts(toAdd);
+			if(this.ptsExist(toAdd)){
+				this.addPts(toAdd);
+			}
 		},
-
 
 
 		plotData: function(xVals, yVals, address){

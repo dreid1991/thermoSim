@@ -292,10 +292,10 @@ _.extend(IdealGasLaw.prototype,
 	},
 	block11Start: function(){
 		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container'], [{yMin:this.yMin, yMax: this.yMin}], [{yMin:this.yMin, yMax: this.yMin}]);
-		this.borderStd(this.yMin);
+		this.borderStd({min:this.yMin});
 		spcs['spc1'].populate(P(45,35), V(450, 350), 800, 300);
 		spcs['spc3'].populate(P(45,35), V(450, 350), 600, 300);	
-		this.compArrow = this.makeCompArrow('container', {mode:'isothermal'});
+		this.compArrow = new CompArrow({wallInfo:'container'}, {mode:'isothermal', stops:false});
 		this.forceInternal=0;
 		this.numUpdates=0;
 		this.readout.addEntry('pressure', 'Pressure:', 'atm', 0, 0, 1);

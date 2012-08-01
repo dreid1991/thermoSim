@@ -297,6 +297,15 @@ GraphBase.prototype = {
 			return {x:xLast, y:yLast, address:address};
 		}
 	},
+	ptsExist: function(pts){
+		for (var ptIdx=0; ptIdx<pts.length; ptIdx++){
+			var pt = pts[ptIdx];
+			if(pt.x===undefined || pt.y===undefined){
+				return false;
+			}
+		}
+		return true;
+	},
 	makeHistDataGrabFunc: function(path){
 		return function(address){
 			var data = path.data[path.x];

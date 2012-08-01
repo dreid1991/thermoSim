@@ -26,14 +26,12 @@ function Work(){
 		{block:3, title: '', finished: false, text:''},
 		{block:4, title: 'Current step', finished: false, conditions: this.block4Conditions, text:"So here we have a big weight we can use to bring our system to a pressure of 6 atm.  There are some stops on the piston that let us compress to 10 liters.  We have 1.5 moles of gas with a heat capacity of R J/mol*K (<a href = extras/heatCapacity.html target='_blank'>explanation</a>).  What final temperature should we expect if we compress our piston all the way?  Once you have a value, try the experiment!  "},
 		{block:5, title: 'Current step', finished: false, text:''},
-		{block:6, title: 'Current step', finished: false, text:''},
-		{block:7, title: 'Current step', finished: false, conditions: this.block7Conditions, text:'Alright, here’s our adiabatic system.  If you compress the system, does the slope of temperature with respect to volume look like what the previous equation says it should be?  How can you relate this slope to the number of collisions that happen with the wall as the volume decreases?'},
-		{block:8, title: '', finished: false, text:''},
+		{block:6, title: 'Current step', finished: false, conditions: this.block6Conditions, text:'So why is work dependant on pressure?  Here we have two containers, one at low pressure, the other at high pressure.  If you compress these two containers to their stops, which system did you do more work on, and why?  Consider collision frequency with the moving wall.'},
+		{block:7, title: '', finished: false, text:''},
+		{block:8, title: '', finished: false, conditions: this.block9Conditions, text:'Well, let’s figure it out.  Here we have two containers.  Both contain 1 mole of gas at 300 K.  One is held at constant volume, the other at constant pressure.  You can heat or cool them with their corresponding sliders.  If you heat both containers to some new temperature, how do the energies used compare?  The piston tracks the work it does on the system.  Remember that it takes energy to speed up molecules <i>and</i> to expand against a pressure.'},
 		{block:9, title: '', finished: false, text:''},
-		{block:10, title: '', finished: false, conditions: this.block10Conditions, text:'Well, let’s figure it out.  Here we have two containers.  Both contain 1 mole of gas at 300 K.  One is held at constant volume, the other at constant pressure.  You can heat or cool them with their corresponding sliders.  If you heat both containers to some new temperature, how do the energies used compare?  The piston tracks the work it does on the system.  Remember that it takes energy to speed up molecules <i>and</i> to expand against a pressure.'},
+		{block:10, title: '', finished: false, text:''},
 		{block:11, title: '', finished: false, text:''},
-		{block:12, title: '', finished: false, text:''},
-		{block:13, title: '', finished: false, text:''},
 	]
 	walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
@@ -124,8 +122,8 @@ _.extend(Work.prototype,
 		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
 		walls.setHitMode('container', 'Arrow');
 		this.borderStd();
-		this.compArrow = this.makeCompArrow('container', {mode:'adiabatic'});
-		spcs['spc4'].populate(P(45,35), V(460, 100), 1, 600);
+		this.compArrow = new CompArrow({wallInfo:'container'}, {mode:'adiabatic', speed:1.5});
+		spcs['spc4'].populate(P(45,235), V(460, 100), 1, 600);
 		this.tempChanged = false;
 		var initTemp = dataHandler.temp();
 		addListener(curLevel, 'data', 'checkTempChanged',
@@ -146,7 +144,7 @@ _.extend(Work.prototype,
 	},
 	block2CleanUp: function(){
 		this.tempChanged = undefined;
-		this.wallV=0;
+		walls['container'].v = 0;
 		walls['container'].removeBorder();
 		this.compArrow.remove();
 		this.compArrow = undefined;
@@ -166,7 +164,7 @@ _.extend(Work.prototype,
 		wallHandle = 'container';
 		walls = WallHandler([[P(40,30), P(510,30), P(510,350), P(40,350)]], 'staticAdiabatic', [wallHandle]);
 		//walls.setSubWallHandler(0, 0, {func:this.cPAdiabaticDamped, obj:this});
-		this.stops = new Stops(10, 'container').init();
+		this.stops = new Stops({volume:10}, 'container').init();
 		this.borderStd();
 		spcs['spc1'].populate(P(45,35), V(445, 325), 850, 198);
 		spcs['spc3'].populate(P(45,35), V(445, 325), 650, 198);
@@ -200,66 +198,82 @@ _.extend(Work.prototype,
 		var results15 = this.volListener15.getResults();
 		var results10 = this.volListener10.getResults();
 		if(results15 && results10 && !isNaN(results15.t) && !isNaN(results10.t)){
-			str = replaceString(replaceString(str, 'INITIAL', round(results15.t,0)), 'FINAL', round(results10.t,0));
+			this.results15 = round(results15.t,0);
+			this.results10 = round(results10.t,0);
+			
 		}
+		str = replaceString(replaceString(str, 'INITIAL', this.results15), 'FINAL', this.results10);
 		this.cutSceneStart(str);
 	},
 	block5CleanUp: function(){
 		this.cutSceneEnd();
 	},
 	block6Start: function(){
-		this.cutSceneStart("<p><p>Now let’s go on a brief tangent.  When you compress, temperature increases, right?  If you start from the equation</p><center><img src=img/work/eq5.gif></img></center></p> <p>which describes adiabatic compressions, and solve for temperature, how should temperature increase as volume decreases?  If you get stuck solving, remember that you can use the ideal gas law to replace variables.</p><p> Once you’ve solved for temperature, try graphing temperature with respect to volume with C<sub>V</sub> of R and C<sub>P</sub> of 2R.  Note that the temperature’s slope gets steeper you compress.  Why might this be?  Let’s try to figure it out by looking at an adiabatic compression.</p>");
-	},
-	block6CleanUp: function(){
-		this.cutSceneEnd();
-	},
-	block7Start: function(){
 		wallHandle = 'container';
-		walls = WallHandler([[P(40,30), P(510,30), P(510,400), P(40,400)]], 'staticAdiabatic', [wallHandle]);
-		this.borderStd();
-		spcs['spc1'].populate(P(45,35), V(445, 375), 650, 250);
-		spcs['spc3'].populate(P(45,35), V(445, 375), 450, 250);		
-		this.compArrow = this.makeCompArrow('container', {mode:'adiabatic'});
-		this.graphs.pVSv = new GraphScatter('pVSv', 400,275, "Volume (L)", "Pressure (atm)",
-							{x:{min:0, step:4}, y:{min:0, step:3}});
-		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
-							{x:{min:0, step:4}, y:{min:200, step:50}});
-		this.graphs.pVSv.addSet('p', 'P Int.', Col(50,50,255), Col(200,200,255),
-								{data:this.data, x:'v', y:'p'});
+		walls = WallHandler([[P(40,30), P(255,30), P(255,440), P(40,440)], [P(295,30), P(510,30), P(510,440), P(295,440)]], 'staticAdiabatic', ['left', 'right']);
+		this.borderStd({wallInfo:'left'});
+		this.borderStd({wallInfo:'right'});
+		spcs['spc1'].populate(P(45,35), V(200, 375), 450, 200, 'left', 'left');
+		spcs['spc3'].populate(P(45,35), V(200, 375), 350, 200, 'left', 'left');	
 
-		this.graphs.tVSv.addSet('t', 'Sys\nTemp', Col(255,0,0), Col(255,200,200),
-								{data:this.data, x:'v', y:'t'});	
-		this.volListener = new StateListener(7, this.data.v, .15, {}, {func:function(){}, obj:''});
+		spcs['spc1'].populate(P(300,35), V(200, 375), 450, 400, 'right', 'right');
+		spcs['spc3'].populate(P(300,35), V(200, 375), 350, 400, 'right', 'right');	
+		this.data.tLeft = [];
+		this.data.tRight = [];
+		this.data.vLeft = [];
+		this.data.vRight = [];
+		addListener(curLevel, 'data', 'updateData',
+			function(){
+				this.data.tLeft.push(dataHandler.temp({tag:'left'}));
+				this.data.tRight.push(dataHandler.temp({tag:'right'}));
+				this.data.vLeft.push(dataHandler.volume('left'));
+				this.data.vRight.push(dataHandler.volume('right'));
+			},
+		this);
+		var stopMax = this.yMax-110;
+		this.compArrowLeft = new CompArrow({wallInfo:'left', handle:'left'}, {mode:'adiabatic', bounds:{y:{min:this.yMin, max:stopMax}}});
+		this.compArrowRight = new CompArrow({wallInfo:'right', handle:'right'}, {mode:'adiabatic', bounds:{y:{min:this.yMin, max:stopMax}}});
+		
+		this.graphs.tVSv = new GraphScatter('tVSv', 400, 350,"Volume (L)", "Temperature (K)",
+							{x:{min:0, step:2}, y:{min:150, step:50}});
+
+
+		this.graphs.tVSv.addSet('tLeft', 'Temp\nLeft', Col(255,0,0), Col(255,200,200),
+								{data:this.data, x:'vLeft', y:'tLeft'});			
+		this.graphs.tVSv.addSet('tRight', 'Temp\nRight', Col(0,100,200), Col(255,200,200),
+								{data:this.data, x:'vRight', y:'tRight'});	
+		
+		this.volListenerLeft = new StateListener(stopMax, function(){return walls['left'][0].y}, .15, {}, {func:function(){}, obj:''});
+		this.volListenerRight = new StateListener(stopMax, function(){return walls['right'][0].y}, .15, {}, {func:function(){}, obj:''});
 		
 		
 	},
-	block7Conditions: function(){
-		if(this.volListener.isSatisfied()){
+	block6Conditions: function(){
+		if(this.volListenerLeft.isSatisfied() && this.volListenerRight.isSatisfied()){
 			return {result:true};
 		}
 		return {result:false, alert:'Compress MORE!'};
 
 	},
-	block7CleanUp: function(){
-		walls['container'].removeBorder();
-		this.compArrow.remove();
-		this.compArrow = undefined;
+	block6CleanUp: function(){
+		removeListener(curLevel, 'data', 'updateData');
+		walls['left'].removeBorder();
+		walls['right'].removeBorder();
+		this.compArrowLeft.remove();
+		this.compArrowLeft = undefined;
+		this.compArrowRight.remove();
+		this.compArrowRight = undefined;
 		this.removeAllGraphs();
 		
 	},
+	block7Start: function(){
+		this.cutSceneStart('<p>So at a higher pressure, molecules hit the wall more frequently.  If the container is being compressed, it means that more molecules will hit the moving wall and gain energy.  This results means that the container at higher pressure will gain more energy and thus have a greater temperature change.  Since pressure increases as compress, you get a a greater-than-linear increase in temperature.</p><p>Now let’s apply some of this thinking to figure out why constant pressure and constant volume heat capacities are different.</p><p>  For the gas in these simulations, C<sub>v</sub> is R and C<sub>p</sub> is 2R.  This means that is takes more energy to heat up a gas at constant pressure than one at constant volume.  Huh?  The gas is the same.  Why do they take different amounts of energy?</p><p>Any thoughts?</p>');
+	},
+	block7CleanUp: function(){
+		this.cutSceneEnd();
+	},
+
 	block8Start: function(){
-		this.cutSceneStart('<p>So it would seem that as the container gets smaller, more molecules hit the wall, increasing the pressure.  We know that every time a molecule hits a moving wall, energy is added.  This means that as we compress our container, the amount of energy we add per volume change in volume goes up.  Since temperature is an expression of energy, this makes temperature change more quickly as volume decreases. </p><p>I know this doesn’t perfectly justify why volume should be raised to the C<sub>p</sub>/C<sub>v</sub> power, but hopefully it gives you a mental model that you can work with to understand how systems behave when they’re compressed.</p>');
-	},
-	block8CleanUp: function(){
-		this.cutSceneEnd();
-	},
-	block9Start: function(){
-		this.cutSceneStart('<p>Now let’s apply some of this thinking to figure out why constant pressure and constant volume heat capacities are different.  For the gas in these simulations, C<sub>v</sub> is R and C<sub>p</sub> is 2R.  This means that is takes more energy to heat up a gas at constant pressure than one at constant volume.  Huh?  The gas is the same.  Why do they take different amounts of energy?  Any thoughts?</p>');
-	},
-	block9CleanUp: function(){
-		this.cutSceneEnd();
-	},
-	block10Start: function(){
 		$('#sliderHeaterHolder').show();
 		walls = WallHandler([[P(40,30), P(255,30), P(255,440), P(40,440)], [P(295,250), P(510,250), P(510,440), P(295,440)]], 'staticAdiabatic', ['left', 'right']);
 		//this.piston = new Piston('pistony', 'right', 5, function(){return this.g}, this);
@@ -285,7 +299,7 @@ _.extend(Work.prototype,
 			},
 		this);
 	},
-	block10Conditions: function(){
+	block8Conditions: function(){
 		var tempLeft = dataHandler.temp({tag:'left'});
 		var tempRight = dataHandler.temp({tag:'right'});
 		var heatBy = 1.5;
@@ -297,7 +311,7 @@ _.extend(Work.prototype,
 		return {result:false, alert:'Make your containers have the same temperature!'};
 		
 	},
-	block10CleanUp: function(){
+	block8CleanUp: function(){
 		$('#sliderHeaterHolder').hide();
 		this.readout.removeAllEntries();
 		this.readout.hide();
@@ -308,24 +322,24 @@ _.extend(Work.prototype,
 		this.heaterLeft = undefined;
 		this.heaterRight = undefined;
 	},
-	block11Start: function(){
+	block9Start: function(){
 		this.cutSceneStart('<p>So, what happened?  Why did the constant pressure system take more energy to heat up?  Because it was doing work on its surroundings to maintain that constant pressure?  Why yes, that’s it!  Well done.  Shall we formalize?</p><p> To heat up the C<sub>v</sub> container, you just had to put energy into the molecules to make them move more quickly.</p>We can say that like...</p><center><p><img src = img/work/eq6.gif></img></center></p>  But there’s more going on in the C<sub>p</sub> container.  To maintain constant pressure, it had to expand, doing work on its surroundings.</p><p>This means that the energy we added to the C<sub>p</sub> went to <i>two</i> places:  to the molecules to make them move more quickly, and to the wall to push it outwards.  That looks like...</p><center><p><img src=img/work/eq7.gif></img></p></center><p>Having another place for the energy to go means that you have to put more energy in to change the temperature a given amount.</p>');		
 		
 	},
-	block11CleanUp: function(){
+	block9CleanUp: function(){
 		this.cutSceneEnd();
 	},
-	block12Start: function(){
+	block10Start: function(){
 		this.cutSceneStart('<p>If you substitute in PV = RT from the ideal gas law, you’ll find that C<sub>V</sub> + R = C<sub>P</sub>.  Or, the energy that goes into speeding up the molecules plus work done to maintain constant pressure equals heat capacity at constant pressure.  </p>');
 	},
-	block12CleanUp: function(){
+	block10CleanUp: function(){
 		this.cutSceneEnd();
 	},
-	block13Start: function(){
+	block11Start: function(){
 		this.cutSceneStart('<p>And thus we have demystified work</p>  <p>By knowing that our molecules behave like bouncy balls, we figured out that that molecules change speed as a result of collisions with a moving wall.  On a macroscopic scale, we say that work is being done on the container.  The higher the system pressure, the more work is done per volume change.  We can justify this by saying there are more collisions with the wall at higher pressure, and that each collision speeds up the colliding molecule.</p> <p> From there, we looked at heat capacities and decided that C<sub>P</sub> is greater than C<sub>V</sub> because of the work done by the constant pressure container. </p><p> Now go forth and conquer.  </p>',
 		'outro');
 	},
-	block13CleanUp: function(){
+	block11CleanUp: function(){
 		this.cutSceneEnd();
 	},
 	makeDragWeights: function(wallHandle){

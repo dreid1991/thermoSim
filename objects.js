@@ -913,6 +913,44 @@ DragArrow.prototype = {
 		return ptInRect(ULCorner, this.dims, unRotated);
 	},
 }
+//////////////////////////////////////////////////////////////////////////
+//COMP ARROW
+//////////////////////////////////////////////////////////////////////////
+function CompArrow(nameInfo, compAttrs){
+	var wallIdx = walls.idxByInfo(nameInfo.wallInfo);
+	var compMode = compAttrs.mode;
+	var speed = compAttrs.speed;
+	var makeStops = defaultTo(true, compAttrs.stops);
+	var bounds = defaultTo({y:{min:30, max:350}}, compAttrs.bounds);
+	var pos = walls[wallIdx][1].copy()
+	var rotation = 0;
+	var cols = {};
+	cols.outer = Col(247, 240,9);
+	cols.onClick = Col(247, 240,9);
+	cols.inner = curLevel.bgCol.copy();
+	var dims = V(25, 15);
+	var handle = 'volDragger' + defaultTo('', nameInfo.handle);
+	var drawCanvas = c;
+	var canvasElement = canvas;
+	var listeners = {};
+	if(makeStops){
+		this.stops = new Stops({height:bounds.y.max}, wallIdx).init();
+	}
+ 
+	listeners.onDown = function(){};
+	listeners.onMove = function(){curLevel.changeWallSetPt(wallIdx, this.pos.y, compMode, speed)};
+	listeners.onUp = function(){};
+	this.dragArrow = new DragArrow(pos, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds).show();
+	return this;
+}
+CompArrow.prototype = {
+	remove: function(){
+		this.dragArrow.remove();
+		if(this.stop){
+			this.stops.remove();
+		}
+	},
+}
 
 //////////////////////////////////////////////////////////////////////////
 //PISTON
@@ -1110,7 +1148,6 @@ function Heater(handle, pos, dims, rotation, tempMax, drawCanvas){
 	/*
 	dims.dx corresponds to long side w/ wires
 	dims.dy corresponds to short side
-	need to correlate Cp, Cv to get energy from temperature
 	*/
 	this.handle = handle;
 	this.drawCanvas = drawCanvas;
@@ -1245,16 +1282,20 @@ Heater.prototype = {
 //////////////////////////////////////////////////////////////////////////
 //STOPS
 //////////////////////////////////////////////////////////////////////////
-function Stops(volume, wallInfo){
+function Stops(stopPt, wallInfo){
 	//assumes canvas of c.  I mean, where else would they be?
 	this.stopWidth = 20;
 	this.stopHeight = 5;
 	var wallsLocal = walls;
 	this.wallIdx = wallsLocal.idxByInfo(wallInfo);
 	this.pts = wallsLocal[this.wallIdx];
-	var width = this.pts[0].distTo(this.pts[1]);
-	var length = volume/(vConst*width);
-	this.height = this.pts[2].y-length;
+	if(stopPt.volume){
+		var width = this.pts[0].distTo(this.pts[1]);
+		var length = stopPt.volume/(vConst*width);
+		this.height = this.pts[2].y-length;
+	}else if (stopPt.height){
+		this.height = stopPt.height;
+	}
 
 	this.draw = this.makeDrawFunc(this.height);
 	return this;
@@ -1273,7 +1314,7 @@ Stops.prototype = {
 		}
 	},
 	init: function(){
-		this.yMaxSave = curLevel.yMax;
+		this.yMaxSave = walls[this.wallIdx].bounds.yMax;
 		walls.setBounds(this.wallIdx, {yMax:this.height});
 		addListener(curLevel, 'update', 'drawStops' + this.wallIdx, this.draw, '');
 		return this;
@@ -1287,9 +1328,9 @@ Stops.prototype = {
 //////////////////////////////////////////////////////////////////////////
 //STATE LISTENER
 //////////////////////////////////////////////////////////////////////////
-function StateListener(condition, checkList, tolerance, recordAtSatisfy, atSatisfyFunc){
+function StateListener(condition, checkAgainst, tolerance, recordAtSatisfy, atSatisfyFunc){
 	this.condition = condition;
-	this.checkList = checkList;
+	this.checkAgainst = checkAgainst;
 	this.recordAtSatisfy = recordAtSatisfy;
 	this.tolerance = .07;
 	if(tolerance){
@@ -1302,16 +1343,21 @@ function StateListener(condition, checkList, tolerance, recordAtSatisfy, atSatis
 }
 StateListener.prototype = {
 	init: function(){
-		addListener(curLevel, 'data', 'StateListener' + this.condition,
+		var handle = 'StateListener' + this.condition + Math.round(Math.random()*10000);
+		addListener(curLevel, 'data', handle,
 			function(){
-				var last = this.checkList[this.checkList.length-1];
+				if(this.checkAgainst instanceof Array){
+					var last = this.checkAgainst[this.checkAgainst.length-1];
+				} else {
+					var last = this.checkAgainst();
+				}
 				if(fracDiff(this.condition, last)<this.tolerance){
 					this.amSatisfied = true;
 					this.recordVals();
 					if(this.atSatisfyFunc){
 						this.atSatisfyFunc.func.apply(this.atSatisfyFunc.obj);
 					}
-					removeListener(curLevel, 'data', 'StateListener' + this.condition);
+					removeListener(curLevel, 'data', handle);
 				}
 			},
 		this);
