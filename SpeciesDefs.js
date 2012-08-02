@@ -8,6 +8,7 @@ $(function(){
 	var idNum = 0;
 	for (var spcName in speciesDefs){
 		speciesDefs[spcName].idNum = idNum;
+		speciesDefs[spcName].name = spcName;
 		idNum++;
 	}
 })

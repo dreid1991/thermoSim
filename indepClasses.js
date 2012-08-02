@@ -113,6 +113,9 @@ Vector.prototype = {
 		this.dy*=scalar;
 		return this;
 	},
+	setMag: function(mag){
+		this.mult(mag/this.mag())
+	},
 	adjust: function(ddx, ddy){
 		this.dx+=ddx;
 		this.dy+=ddy;
@@ -251,6 +254,10 @@ Dot.prototype = {
 		var curTemp = this.temp();
 		var scalar = Math.sqrt(newTemp/curTemp);
 		this.v.mult(scalar);
+		return this;
+	},
+	setEnergy: function(energy){
+		this.v.setMag(Math.sqrt((2*energy)/(this.m*tConst*R)));
 		return this;
 	},
 	speed: function(){

@@ -1,6 +1,6 @@
 function CollideHandler(){
+	this.spcs = spcs;
 	console.log("Made supercollider");
-	this.handlers = {};
 }
 CollideHandler.prototype = {
 	setDefaultHandler: function(handler){
@@ -10,7 +10,7 @@ CollideHandler.prototype = {
 		}
 		for (var i=0; i<numSpcs; i++){
 			for (var j=i; j<numSpcs; j++){
-				this.handlers[i + '-' + j] = handler; //has func and obj
+				this[i + '-' + j] = handler; //has func and obj
 			}
 		}
 	
@@ -26,16 +26,18 @@ CollideHandler.prototype = {
 		var gridSize = this.gridSize;
 		var xSpan = this.xSpan;
 		var ySpan = this.ySpan;
-		var grid = this.makeGrid();
-		for (var spcName in spcs){
+		this.grid = this.makeGrid();
+		var grid = this.grid;
+
+		for (var spcName in this.spcs){
 			var spc = spcs[spcName];
-			for (var dotIdx=0; dotIdx<spc.length; dotIdx++){
+			for (var dotIdx=spc.length-1; dotIdx>-1; dotIdx-=1){
 				var dot = spc[dotIdx];
 				var gridX = Math.floor(dot.x/gridSize);
 				var gridY = Math.floor(dot.y/gridSize);
 				for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){
 					for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, ySpan); y++){
-						for (var neighborIdx=0; neighborIdx<grid[x][y].length; neighborIdx++){
+						for (var neighborIdx=grid[x][y].length-1; neighborIdx>-1; neighborIdx-=1){
 							var neighbor = grid[x][y][neighborIdx];
 							var dx = dot.x-neighbor.x;
 							var dy = dot.y-neighbor.y;
@@ -45,23 +47,26 @@ CollideHandler.prototype = {
 								var min = Math.min(dot.idNum, neighbor.idNum);
 								var max = Math.max(dot.idNum, neighbor.idNum);
 								var refStr = min + '-' + max;
-								var handler = this.handlers[refStr];
-								handler.func.apply(handler.obj, [dot, neighbor]);
+								var handler = this[refStr];
+								var UVAB = V(neighbor.x-dot.x, neighbor.y-dot.y).UV();
+								var perpAB = dot.v.dotProd(UVAB);
+								var perpBA = neighbor.v.dotProd(UVAB);
+								if(!handler.func.apply(handler.obj, [dot, neighbor, UVAB, perpAB, perpBA, x, y])){
+									break;
+								}
 							}
 						}
 					}
-				}//OOH - do ORs instead so it doesn't have to check all if out of bounds
-				if(gridX>=0 && gridY>=0 && gridX<grid.length && gridY<grid[0].length){
+				}
+				if(gridX>=0 && gridY>=0 && gridX<this.numCols && gridY<this.numRows){
 					grid[gridX][gridY].push(dot);
 				}
+				
 				
 			}
 		}
 	},
-	impactStd: function(a, b){
-		var UVAB = V(b.x-a.x, b.y-a.y).UV();
-		var perpAB = a.v.dotProd(UVAB);
-		var perpBA = b.v.dotProd(UVAB);
+	impactStd: function(a, b, UVAB, perpAB, perpBA){
 		var perpABRes = (perpAB*(a.m-b.m)+2*b.m*perpBA)/(a.m+b.m);
 		var perpBARes = (perpBA*(b.m-a.m)+2*a.m*perpAB)/(a.m+b.m);
 		a.v.dx += UVAB.dx*(perpABRes-perpAB);
@@ -69,6 +74,7 @@ CollideHandler.prototype = {
 		b.v.dx += UVAB.dx*(perpBARes-perpBA);
 		b.v.dy += UVAB.dy*(perpBARes-perpBA);
 		this.breakUp(a, b, UVAB);
+		return true;
 	},
 	breakUp: function(a, b, UVAB){
 		var sumR = a.r+b.r;
@@ -108,5 +114,57 @@ CollideHandler.prototype = {
 			maxR = Math.max(maxR, spc.r);
 		}
 		return maxR;	
+	},
+	addReaction: function(spcA, spcB, activationE, deltaHRxn, products){
+		var idA = spcA.idNum;
+		var idB = spcB.idNum;
+		var min = Math.min(idA, idB);
+		var max = Math.max(idA, idB);
+		var spcsLocal = this.spcs;
+		this[min + '-' + max] = function(a, b, UVAB, perpAB, perpBA, bX, bY){
+			var collideEnergy = this.collideEnergy(a, b, perpA, perpB);
+			
+			if(collideEnergy>activationE){
+				var spcA = spcsLocal[a.name];
+				var spcB = spcsLocal[b.name];
+				var idxA = spcA.indexOf(a);
+				var idxB = spcB.indexOf(b);
+				spcA.splice(idxA, 1);
+				spcB.splice(idxB, 1);
+				var bGridSquare = this.grid[bX][bY];
+				bGridSquare.splice(bGridSquare.indexOf(b), 1);
+				var added = [];
+				for (var prodIdx=0; prodIdx<products.length; prodIdx++){
+					var avgX = (a.x + b.x)/2;
+					var avgY = (a.y + b.y)/2;
+					var product = products[prodIdx];
+					var count = product.count;
+					var spc = spcsLocal[product.spc];
+					for (var countIdx=0; countIdx<count; countIdx++){
+						var dir = Math.random()*2*Math.PI;
+						var v = V(Math.cos(dir), Math.sin(dir));
+						var newDot = D();//someUV
+						spc.push(newDot);
+						added.push(newDot);
+						
+					}
+				}
+				var e = a.KE() + b.KE() + deltaHRxn;//UNITS
+				var ePerDot = e/added.length;
+				for(var addedIdx=0; addedIdx<added.length; addedIdx++){
+					var dot = added[addedIdx];
+					dot.setEnergy(ePerDot);
+				}
+					
+				
+				return false;
+			}else{
+				this.impactStd(a, b, UVAB, perpAB, perpBA);
+			}
+		}
+	},
+	collideEnergy: function(a, b, perpA, perpB){
+		var sumKE = .5*(perpA*perpA*a.m + perpB*perpB*b.m);
+		return sumKE*tConst*R; //in KJ.  *N*J->kJ = 1;
 	}
 }
