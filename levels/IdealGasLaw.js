@@ -32,11 +32,6 @@ function IdealGasLaw(){
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5', 'spc6']);
 	this.yMin = 30;
 	this.yMax = 350;
-	addListener(this, 'update', 'run', this.updateRun, this);
-	addListener(this, 'data', 'run', this.dataRun, this);
-	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
-	
-
 	
 }
 

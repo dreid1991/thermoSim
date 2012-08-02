@@ -41,10 +41,6 @@ function Reversibility(){
 										this);
 
 	addSpecies(['spc1', 'spc3']);
-	addListener(this, 'update', 'run', this.updateRun, this);
-	addListener(this, 'data', 'run', this.dataRun, this);
-	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
-	
 }
 _.extend(Reversibility.prototype, 
 			LevelTools, 

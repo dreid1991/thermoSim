@@ -114,16 +114,7 @@ CollideHandler.prototype = {
 		var spcsLocal = this.spcs;
 		var spcA = spcsLocal[spcAName];
 		var spcB = spcsLocal[spcBName];
-		if(!spcA){
-			addSpecies(spcAName);
-			spcA = spcLocal[spcAName];
-			this.setup();
-		}
-		if(!spcB){
-			addSpecies(spcBName);
-			spcB = spcLocal[spcBName];
-			this.setup();
-		}
+		this.includeSpcs(spcAName, spcBName, products);
 		var idA = spcA.idNum;
 		var idB = spcB.idNum;
 		var min = Math.min(idA, idB);
@@ -160,7 +151,8 @@ CollideHandler.prototype = {
 						added.push(newDot);
 					}
 				}
-				var eToAdd = deltaHRxn*added.length/NLocal;
+				//YOUR ENERGIES ARE NOT WORKING
+				//var eToAdd = deltaHRxn*added.length/NLocal;
 				var e = (a.KE() + b.KE())*tConstLocal*cVLocal/NLocal + deltaHRxn/NLocal;
 				var ePerDot = e/added.length;
 				for(var addedIdx=0; addedIdx<added.length; addedIdx++){
@@ -175,6 +167,15 @@ CollideHandler.prototype = {
 			}
 		}
 		this[min + '-' + max] = {func:func, obj:this};
+	},
+	includeSpcs: function(a, b, prods){
+		var nameList = new Array(prods.length + 2);
+		nameList[0] = a;
+		nameList[1] = b;
+		for (var prodIdx=0; prodIdx<prods.length; prodIdx++){
+			nameList[prodIdx+2] = prods[prodIdx].spc;
+		}
+		addSpecies(nameList);
 	},
 	removeReaction: function(spcAName, spcBName){
 		var spcA = spcs[spcAName];

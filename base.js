@@ -283,17 +283,27 @@ function boundedStep(cur, setPt, step){
 	return sign*Math.min(cur+step, setPt);
 }
 function addSpecies(toAdd){
+	var didAdd = false;
 	if (String(toAdd)===toAdd){
-		var def = speciesDefs[toAdd];
-		spcs[toAdd] = Species(def.m, def.r, def.cols, def);
+		if(!spcs[toAdd]){
+			var def = speciesDefs[toAdd];
+			spcs[toAdd] = Species(def.m, def.r, def.cols, def);
+			didAdd = true;
+		}
+		
 	} else if (toAdd instanceof Array){
 		for (var toAddIdx=0; toAddIdx<toAdd.length; toAddIdx++){
 			var name = toAdd[toAddIdx];
-			var def = speciesDefs[name];
-			spcs[name] = Species(def.m, def.r, def.cols, def);
+			if(!spcs[name]){
+				var def = speciesDefs[name];
+				spcs[name] = Species(def.m, def.r, def.cols, def);
+				didAdd = true;
+			}
 		}
 	}
-	collide.setup();
+	if(didAdd){
+		collide.setup();
+	}
 }
 function removeSpecies(toRem){
 	if (String(toRemove)===toRemove){
