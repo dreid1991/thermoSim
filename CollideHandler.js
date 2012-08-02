@@ -28,7 +28,7 @@ CollideHandler.prototype = {
 		var ySpan = this.ySpan;
 		this.grid = this.makeGrid();
 		var grid = this.grid;
-
+		//defining grid locally speeds up by ~250ms/500runs (1000->750)
 		for (var spcName in this.spcs){
 			var spc = spcs[spcName];
 			for (var dotIdx=spc.length-1; dotIdx>-1; dotIdx-=1){
@@ -41,17 +41,10 @@ CollideHandler.prototype = {
 							var neighbor = grid[x][y][neighborIdx];
 							var dx = dot.x-neighbor.x;
 							var dy = dot.y-neighbor.y;
-							var distSqr = dx*dx+dy*dy;
-							var rSqr = (dot.r+neighbor.r)*(dot.r+neighbor.r);
-							if(distSqr<=rSqr){
-								var min = Math.min(dot.idNum, neighbor.idNum);
-								var max = Math.max(dot.idNum, neighbor.idNum);
-								var refStr = min + '-' + max;
-								var handler = this[refStr];
+							if(dx*dx+dy*dy<=(dot.r+neighbor.r)*(dot.r+neighbor.r)){
+								var handler = this[Math.min(dot.idNum, neighbor.idNum) + '-' + Math.max(dot.idNum, neighbor.idNum)];
 								var UVAB = V(neighbor.x-dot.x, neighbor.y-dot.y).UV();
-								var perpAB = dot.v.dotProd(UVAB);
-								var perpBA = neighbor.v.dotProd(UVAB);
-								if(!handler.func.apply(handler.obj, [dot, neighbor, UVAB, perpAB, perpBA, x, y])){
+								if(!handler.func.apply(handler.obj, [dot, neighbor, UVAB, dot.v.dotProd(UVAB), neighbor.v.dotProd(UVAB), x, y])){
 									break;
 								}
 							}

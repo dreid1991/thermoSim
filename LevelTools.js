@@ -197,10 +197,10 @@ LevelTools = {
 		var massInit = 25;
 		wallHandle = defaultTo('0', wallHandle);
 		min = walls[0][2].y;
-		var curYPt = walls[wallHandle][0];
+		var wall = walls[wallHandle];
 		var dragWeights = new DragWeights(weights,
 									min,
-									function(){return curYPt.y},
+									function(){return wall[0].y},
 									myCanvas.height-15,
 									20,
 									Col(218, 187, 41),

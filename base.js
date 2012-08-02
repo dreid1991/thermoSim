@@ -1,5 +1,6 @@
 //shared startup stuff
 $(function(){
+
 	turn = 0;
 	$('#canvasDiv').hide();
 	$('#base').hide();
@@ -33,6 +34,24 @@ $(function(){
 	borderCol = Col(155,155,155);
 	setInterval('curLevel.update()', updateInterval);
 	setInterval('curLevel.addData()', dataInterval);
+	/*Timing stuff
+	started = false;
+	counted = 0;
+	total = 0;
+
+	if(started){
+		var then = Date.now();
+	}	
+	//stuff to time goes here
+	if(started&&counted<500){
+		counted++;
+		total+=Date.now()-then;
+	}else if (counted==500){
+		console.log(total);
+		counted=0;
+		total=0;
+	}
+	*/
 })
 
 
@@ -42,17 +61,19 @@ drawingTools.prototype = {
 		var width = myCanvas.width;
 		var height = myCanvas.height;
 		c.clearRect(0, 0, width, height);
-		c.fillStyle = "rgb(" + col.r + "," + col.g + "," + col.b + ")";
+		c.fillStyle = col.hex;
 		c.fillRect(0,0, width, height);	
 	},
 	dots: function(){
 		for (var spcName in spcs){
 			var dots = spcs[spcName];
-			c.fillStyle = "rgb(" + dots.cols.r + "," + dots.cols.g + "," + dots.cols.b + ")";
+			c.fillStyle = dots.cols.hex;
+			if(dots[0]){
+				var r = dots[0].r;//from 5250ms/500 -> 4975 ms/500.  also don't define dot locally
+			}
 			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
-				var dot = dots[dotIdx];
 				c.beginPath();
-				c.arc(dot.x,dot.y,dot.r,0,Math.PI*2,true);
+				c.arc(dots[dotIdx].x,dots[dotIdx].y,r,0,Math.PI*2,true);
 				c.closePath();
 				c.fill();	
 			}
@@ -60,7 +81,7 @@ drawingTools.prototype = {
 	},
 	walls: function(walls, col){
 		c.beginPath();
-		c.strokeStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";		
+		c.strokeStyle = col.hex;		
 		for (var wallIdx=0; wallIdx<walls.length; wallIdx++){
 			var wall = walls[wallIdx];
 			c.moveTo(wall[0].x, wall[0].y);
@@ -73,24 +94,22 @@ drawingTools.prototype = {
 		c.stroke();
 	},
 	fillPts: function(pts, col, drawCanvas){
-		drawCanvas.fillStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
+		drawCanvas.fillStyle = col.hex;
 		drawCanvas.beginPath();
 		drawCanvas.moveTo(pts[0].x, pts[0].y);
 		for (var ptIdx=1; ptIdx<pts.length; ptIdx++){
-			var pt = pts[ptIdx];
-			drawCanvas.lineTo(pt.x, pt.y);
+			drawCanvas.lineTo(pts[ptIdx].x, pts[ptIdx].y);
 		}
 		drawCanvas.closePath();
 		drawCanvas.fill();
 	},
 	fillPtsStroke: function(pts, fillCol, strokeCol, drawCanvas){
-		drawCanvas.fillStyle = "rgb(" + Math.floor(fillCol.r) + "," + Math.floor(fillCol.g) + "," + Math.floor(fillCol.b) + ")";
-		drawCanvas.strokeStyle = "rgb(" + Math.floor(strokeCol.r) + "," + Math.floor(strokeCol.g) + "," + Math.floor(strokeCol.b) + ")";
+		drawCanvas.fillStyle = fillCol.hex
+		drawCanvas.strokeStyle = strokeCol.hex
 		drawCanvas.beginPath();
 		drawCanvas.moveTo(pts[0].x, pts[0].y);
 		for (var ptIdx=1; ptIdx<pts.length; ptIdx++){
-			var pt = pts[ptIdx];
-			drawCanvas.lineTo(pt.x, pt.y);
+			drawCanvas.lineTo(pts[ptIdx].x, pts[ptIdx].y);
 		}
 		drawCanvas.closePath();
 		drawCanvas.stroke();
@@ -101,7 +120,7 @@ drawingTools.prototype = {
 		var y = pos.y;
 		var width = dims.dx;
 		var height = dims.dy;
-		drawCanvas.fillStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
+		drawCanvas.fillStyle = col.hex
 		drawCanvas.beginPath();
 		drawCanvas.moveTo(x+r, y);
 		this.curvedLine(P(x+width-r, y), P(x+width, y), P(x+width, y+r), drawCanvas);
@@ -113,22 +132,22 @@ drawingTools.prototype = {
 		
 	},
 	fillRect: function(corner, dims, fillCol, drawCanvas){
-		drawCanvas.fillStyle = "rgb(" + Math.floor(fillCol.r) + "," + Math.floor(fillCol.g) + "," + Math.floor(fillCol.b) + ")";
+		drawCanvas.fillStyle = fillCol.hex
 		drawCanvas.fillRect(corner.x, corner.y, dims.dx, dims.dy);
 	},
 	fillStrokeRect: function(corner, dims, fillCol, strokeCol, drawCanvas){
-		drawCanvas.strokeStyle = "rgb(" + Math.floor(strokeCol.r) + "," + Math.floor(strokeCol.g) + "," + Math.floor(strokeCol.b) + ")";
-		drawCanvas.fillStyle = "rgb(" + Math.floor(fillCol.r) + "," + Math.floor(fillCol.g) + "," + Math.floor(fillCol.b) + ")";
+		drawCanvas.strokeStyle = strokeCol.hex;
+		drawCanvas.fillStyle = fillCol.hex;
 		drawCanvas.fillRect(corner.x, corner.y, dims.dx, dims.dy);
 		drawCanvas.strokeRect(corner.x, corner.y, dims.dx, dims.dy);
 	},
 	strokeRect: function(corner, dims, col, drawCanvas){
-		drawCanvas.strokeStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
+		drawCanvas.strokeStyle = col.hex;
 		drawCanvas.strokeRect(corner.x, corner.y, dims.dx, dims.dy);
 	},
 
 	line: function(p1, p2, col, drawCanvas){
-		drawCanvas.strokeStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
+		drawCanvas.strokeStyle = col.hex;
 		drawCanvas.beginPath();
 		drawCanvas.moveTo(p1.x, p1.y);
 		drawCanvas.lineTo(p2.x, p2.y);
@@ -140,11 +159,10 @@ drawingTools.prototype = {
 		drawCanvas.quadraticCurveTo(curvePt.x, curvePt.y, quadEnd.x, quadEnd.y);
 	},
 	text: function(text, pos, font, col, align, rotation, drawCanvas){
-		
 		drawCanvas.save();
 		drawCanvas.translate(pos.x, pos.y);
 		drawCanvas.rotate(rotation);
-		drawCanvas.fillStyle = "rgb(" + Math.floor(col.r) + "," + Math.floor(col.g) + "," + Math.floor(col.b) + ")";
+		drawCanvas.fillStyle = col.hex;
 		drawCanvas.font = font;
 		drawCanvas.textAlign = align;
 		var fontSize = parseFloat(font);

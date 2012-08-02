@@ -64,6 +64,7 @@ function Color(r, g, b){
 	this.r = r;
 	this.g = g;
 	this.b = b;
+	this.setHex();
 	return this;
 }
 function drawingTools(){};
@@ -151,13 +152,24 @@ Color.prototype = {
 		this.r = Math.round(Math.min(255, Math.max(0, this.r+dr)));
 		this.g = Math.round(Math.min(255, Math.max(0, this.g+dg)));
 		this.b = Math.round(Math.min(255, Math.max(0, this.b+db)));
+		this.setHex();
 		return this;
 	},
 	set: function(col){
 		if(col.r!==undefined){this.r = col.r;};
 		if(col.g!==undefined){this.g = col.g;};
 		if(col.b!==undefined){this.b = col.b;};
+		this.setHex();
 		return this;
+	},
+	setHex: function(){
+		var r = Number(Math.round(this.r)).toString(16).toUpperCase();
+		var g = Number(Math.round(this.g)).toString(16).toUpperCase();
+		var b = Number(Math.round(this.b)).toString(16).toUpperCase();
+		if(r.length==1){r = '0'+r;}
+		if(g.length==1){g = '0'+g;}
+		if(b.length==1){b = '0'+b;}
+		this.hex = r+g+b;
 	},
 	copy: function(){
 		return Col(this.r, this.g, this.b);
@@ -166,6 +178,7 @@ Color.prototype = {
 		this.r = Math.round(Math.min(255, Math.max(0, this.r*scalar)));
 		this.g = Math.round(Math.min(255, Math.max(0, this.g*scalar)));
 		this.b = Math.round(Math.min(255, Math.max(0, this.b*scalar)));
+		this.setHex();
 		return this;
 	}
 }

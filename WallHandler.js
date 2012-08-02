@@ -89,9 +89,55 @@ WallMethods = {
 			}
 		},
 		setupWall: function(wallIdx){
+	
+			
 			this[wallIdx].wallUVs = this.getWallUV(wallIdx);
 			this[wallIdx].wallPerpUVs= this.getPerpUVs(wallIdx);
-			this[wallIdx].wallGrids = this.getSubwallGrid(wallIdx);
+			
+			
+
+			
+			this[wallIdx].wallGrids = this.scatterPts(wallIdx);
+
+			//this[wallIdx].wallGrids = this.getSubwallGrid(wallIdx);
+
+		},
+		scatterPts: function(wallIdx){
+			var grid = this.makeBlankGrid();
+			var wall = this[wallIdx];
+			wall.scatter = new Array(wall.length-1);
+			var UVs = wall.wallUVs;
+			var gridDim = this.gridDim;
+			for (var wallIdx=0; wallIdx<wall.scatter.length; wallIdx++){
+				var UV = UVs[wallIdx];
+				var dist = wall[wallIdx].distTo(wall[wallIdx+1]);
+				var numScatters = Math.ceil(dist/gridDim)
+				var wallScatters = new Array(numScatters);
+				var ptInit = wall[wallIdx];
+				var gridXLast = -1;
+				var gridYLast = -1;
+				for (var ptIdx=0; ptIdx<numScatters; ptIdx++){
+					var newX = ptInit.x + UV.dx*gridDim*ptIdx;
+					var newY = ptInit.y + UV.dy*gridDim*ptIdx;
+					var gridX = Math.floor(newX/gridDim);
+					var gridY = Math.floor(newY/gridDim);
+					if(gridX!=gridXLast || gridY!=gridYLast){
+						grid[gridX][gridY].push(wallIdx);
+					}
+				}
+			}
+			return grid;
+		},
+		makeBlankGrid: function(){
+			var wallGrid = new Array(this.numCols);
+			for (var x=0; x<this.numCols; x++){ 
+				var column = new Array(this.numRows);
+				for (var y=0; y<this.numRows; y++){
+					column[y] = [];
+				}
+				wallGrid[x] = (column);
+			}
+			return wallGrid;
 		},
 		setWallVals: function(wallIdx, pts, handle, bounds, include){
 			bounds = defaultTo({yMin:30, yMax: 435}, bounds);
@@ -192,89 +238,6 @@ WallMethods = {
 			}
 			return wallUVs;
 		},
-		getSubwallGrid: function(wallIdx){
-			var subwallGrid = new Array(this.numCols);
-			for (var x=0; x<this.numCols; x++){ 
-			var column = new Array(this.numRows);
-				for (var y=0; y<this.numRows; y++){
-					column[y] = (this.getSubwallsInGrid(wallIdx, x, y));
-				}
-				subwallGrid[x] = (column);
-			}
-			return subwallGrid;
-			
-			
-		},
-		getSubwallsInGrid: function(wallIdx, x, y){
-			var subwallsInGrid = [];
-			var wall = this[wallIdx];
-			for (var ptIdx=0; ptIdx<wall.length-1; ptIdx++){
-				if (this.isInBox(x, y, [wallIdx, ptIdx])){
-					subwallsInGrid.push(ptIdx);
-				}
-			}
-			return subwallsInGrid;
-		},
-		isInBox: function(x, y, pt){
-			if (this.crossesLine(x, y, x+1, y, pt, "min") || this.crossesLine(x+1, y, x+1, y+1, pt, "max") || this.crossesLine(x+1, y+1, x, y+1, pt, "max") || this.crossesLine(x, y+1, x, y, pt, "min")){
-				return true;
-			};
-			return false;
-		},
-		crossesLine: function(x1, y1, x2, y2, pt, type){
-			x1*=this.gridDim;
-			x2*=this.gridDim;
-			y1*=this.gridDim;
-			y2*=this.gridDim;
-			pt1 = this[pt[0]][pt[1]];
-			pt2 = this[pt[0]][pt[1]+1];
-			var angleLine = this.getAngle(pt1.x, pt1.y, pt2.x, pt2.y);
-			var anglePt1 = this.getAngle(pt1.x, pt1.y, x1, y1);
-			var anglePt2 = this.getAngle(pt1.x, pt1.y, x2, y2);
-			if (this.getBetweenAngle(angleLine, anglePt1, anglePt2)){
-				if(x1==x2){
-					return this.getBetweenPoint(x1, pt1.x, pt2.x, type);
-				} else if (y1==y2){
-					return this.getBetweenPoint(y1, pt1.y, pt2.y, type);
-				}
-			}
-			return false;
-		},
-		getAngle: function(x1, y1, x2, y2){
-			var angle = Math.atan2((y2-y1),(x2-x1))
-			if(angle<0){
-				angle+=2*Math.PI;
-			}
-			return angle;
-		},
-		getBetweenAngle: function(line, pt1, pt2){
-			var big = Math.max(pt1, pt2);
-			var small = Math.min(pt1, pt2);
-			if (big >= line && line >= small){
-				return true;
-			} else if (big-small > Math.PI){
-				if (line >= big || line <= small){
-					return true;
-				}
-			}
-			return false;
-		},
-		getBetweenPoint: function(gridPt, wallPt1, wallPt2, type){
-			var gridDim = this.gridDim;
-			if (Math.min(wallPt1, wallPt2) <= gridPt && gridPt <= Math.max(wallPt1, wallPt2)){
-				return true;
-			} else if (type=="min"){
-				if (gridPt + gridDim >= wallPt1 && wallPt1 >= gridPt && gridPt + gridDim >= wallPt1 && wallPt1 >= gridPt){
-					return true;
-				}
-			} else if (type=="max"){
-				if(gridPt - gridDim >= wallPt1 && wallPt1 >= gridPt && gridPt - gridDim >= wallPt1 && wallPt1 >= gridPt){
-					return true;
-				}
-			}
-			return false;
-		},
-
 		check: function(){
 			var gridDim = this.gridDim;
 			var xSpan = this.xSpan;
@@ -304,12 +267,14 @@ WallMethods = {
 											checkedWalls.push([wallIdx, line]);
 										}
 									}
+								
 								}
 							}
 						}
 					}
 				}
 			}
+
 		},
 		checkWallHit: function(dot, line){
 			var wallIdx = line[0];
