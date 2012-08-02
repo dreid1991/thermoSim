@@ -1,23 +1,14 @@
 function IdealGasLaw(){
 	dataHandler = new DataHandler();
-	this.data = {};
+	this.setStds();
 	this.data.t = [];
 	this.data.pInt = [];
 	this.data.v = [];
 	this.data.e = [];
-	this.eUnits = 'kJ';
-	this.bgCol = Col(5, 17, 26);
-	this.wallCol = Col(255,255,255);
-	this.numUpdates = 0;
-	this.forceInternal = 0;
-	this.wallV = 0;
 	this.wallSpeed = 1;
 	this.makeListeners()
 	this.readout = new Readout('mainReadout', 30, myCanvas.width-180, 25, '13pt calibri', Col(255,255,255),this);
 	this.compMode = 'Isothermal';
-	this.graphs = {}
-	this.promptIdx = -1;
-	this.blockIdx=-1;
 	this.prompts=[
 		{block:0, title: "", finished: false, text:""},
 		{block:1, title: "Current step", finished: false, conditions: this.block1Conditions, text:"Alright, let’s figure out what temperature looks like.  Above, we have one molecule, and I submit to you that this molecule has a temperature.  The equation for a molecule’s temperature is as follows: 1.5k<sub>b</sub>T = 0.5mv<sup>2</sup>, where k<sub>b</sub> in the boltzmann constant, T is temperature, m is the molecule’s mass, and v is its speed.  This tells us that temperature is an expression of molecular kinetic energy.  The slider above changes the molecule’s temperature.  If you double the molecule’s temperature, by what factor will its speed increase?  What would a graph of this molecule’s speed with respect to temperature look like?"},

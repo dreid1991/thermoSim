@@ -1,6 +1,19 @@
 
 LevelTools = {
-
+	setStds: function(){
+		this.graphs = {};
+		this.eUnits = 'kJ';
+		this.bgCol = Col(5, 17, 26);
+		this.wallCol = Col(255,255,255);
+		this.numUpdates = 0;
+		this.makeListeners();
+		this.promptIdx = -1;
+		this.blockIdx = -1;
+		this.data = {};
+		addListener(this, 'update', 'run', this.updateRun, this);
+		addListener(this, 'data', 'run', this.dataRun, this);
+		collide.setDefaultHandler({func:collide.impactStd, obj:collide})
+	},
 	changeWallSetPt: function(wallInfo, dest, compType, speed){
 		var wallIdx = walls.idxByInfo(wallInfo);
 		var wall = walls[wallIdx]

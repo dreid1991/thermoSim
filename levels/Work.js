@@ -1,23 +1,13 @@
 function Work(){
 	dataHandler = new DataHandler();
-	this.data = {};
+	this.setStds();
 	this.data.t = [];
 	this.data.pInt = [];
 	this.data.v = [];
 	this.data.p = [];
-	this.eUnits = 'kJ';
-	this.bgCol = Col(5, 17, 26);
-	this.wallCol = Col(255,255,255);
-	this.numUpdates = 0;
-	this.forceInternal = 0;
-	this.wallV = 0;
 	this.wallSpeed = 1;
-	this.makeListeners();
 	this.readout = new Readout('mainReadout', 30, myCanvas.width-125, 25, '13pt calibri', Col(255,255,255),this, 'left');
 	this.compMode = 'Isothermal';
-	this.graphs = {}
-	this.promptIdx = -1;
-	this.blockIdx=-1;
 	this.prompts=[
 		{block:0, title: '', finished: false, text:''},
 		{block:1, title: 'Current step', finished: false, conditions: this.block1Conditions, text:"Alright, let’s do some work.  Above we have a piston and cylinder setup.  You can change the piston’s pressure with the slider.  If you compress the system, how does the temperature behave?  Does the change seem consistent with the previous equation?"},
@@ -37,9 +27,6 @@ function Work(){
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
 	this.yMin = 30;
 	this.yMax = 350;
-	addListener(this, 'update', 'run', this.updateRun, this);
-	addListener(this, 'data', 'run', this.dataRun, this);
-	collide.setDefaultHandler({func:collide.impactStd, obj:collide})
 }
 _.extend(Work.prototype, 
 			LevelTools, 
@@ -354,17 +341,6 @@ _.extend(Work.prototype,
 		this.numUpdates=0;
 		this.forceInternal=0;
 	},
-	/*
-	changePressure: function(event, ui){
-		this.piston.setP(ui.value);
-		this.playedWithSlider = true;
-	},
-	heatLeft: function(event, ui){
-		this.heaterLeft.setTemp(ui.value);
-	},
-	heatRight: function(event, ui){
-		this.heaterRight.setTemp(ui.value)
-	},
-	*/
+
 }
 )

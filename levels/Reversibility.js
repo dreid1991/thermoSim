@@ -1,30 +1,16 @@
 function Reversibility(){
 	dataHandler = new DataHandler();
-	this.data = {};
+	this.setStds();
 	this.data.t = [];
 	this.data.pInt = [];
 	this.data.pExt = [];
 	this.data.v = [];
 	this.data.e = [];
-	this.eUnits = 'kJ';
-	this.bgCol = Col(5, 17, 26);
-	this.wallCol = Col(255,255,255);
-	this.numUpdates = 0;
 	var wallHandle = 'container';
 	walls = WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], 'staticAdiabatic', [wallHandle], [{yMin:60, yMax:435}]);
-
-	
-	
 	this.extPressurePts = [walls[0][0], walls[0][1]];
 	this.SAPExt = getLen(this.extPressurePts);
-	this.forceInternal = 0;
-	this.wallV = 0;
-	this.makeListeners()
-
 	this.readout = new Readout('mainReadout', 15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), this);
-	this.graphs = {}
-	this.promptIdx = -1;
-	this.curBlock=-1;
 	var self = this;
 	this.prompts=[
 		{block:0, title: "", finished: false, text:""},
@@ -40,7 +26,6 @@ function Reversibility(){
 		{block:5, title: "", finished: false, text:""},
 	]
 	
-	this.massInit = 25;
 	this.dragWeights = this.makeDragWeights([{name:'sml', count:12, mass:5}, 
 									{name:'med', count:6, mass:10}, 
 									{name:'lrg', count:2, mass:30}]);

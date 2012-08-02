@@ -114,6 +114,16 @@ CollideHandler.prototype = {
 		var spcsLocal = this.spcs;
 		var spcA = spcsLocal[spcAName];
 		var spcB = spcsLocal[spcBName];
+		if(!spcA){
+			addSpecies(spcAName);
+			spcA = spcLocal[spcAName];
+			this.setup();
+		}
+		if(!spcB){
+			addSpecies(spcBName);
+			spcB = spcLocal[spcBName];
+			this.setup();
+		}
 		var idA = spcA.idNum;
 		var idB = spcB.idNum;
 		var min = Math.min(idA, idB);
@@ -122,6 +132,7 @@ CollideHandler.prototype = {
 		var NLocal = N;
 		var cVLocal = cV;
 		var tConstLocal = tConst;
+		this.checkMassConserve(spcA, spcB, products);
 		var func = function(a, b, UVAB, perpAB, perpBA, bX, bY){
 			var collideEnergy = this.collideEnergy(a, b, perpAB, perpBA);
 			if(collideEnergy>activationE){
@@ -135,19 +146,16 @@ CollideHandler.prototype = {
 				var bGridSquare = this.grid[bX][bY];
 				bGridSquare.splice(bGridSquare.indexOf(b), 1);
 				var added = [];
+				var avgX = (a.x + b.x)/2;
+				var avgY = (a.y + b.y)/2;
 				for (var prodIdx=0; prodIdx<products.length; prodIdx++){
-					var avgX = (a.x + b.x)/2;
-					var avgY = (a.y + b.y)/2;
 					var product = products[prodIdx];
-					var count = product.count;
 					var spc = spcsLocal[product.spc];
 					var def = defsLocal[product.spc];
-					for (var countIdx=0; countIdx<count; countIdx++){
+					for (var countIdx=0; countIdx<product.count; countIdx++){
 						var dir = Math.random()*2*Math.PI;
 						var v = V(Math.cos(dir), Math.sin(dir));
-						var dotX = avgX + 2*v.dx;
-						var dotY = avgY + 2*v.dy;
-						var newDot = D(dotX, dotY, v, def.m, def.r, def.name, spc.idNum, product.tag, product.returnTo);//someUV
+						var newDot = D(avgX + 2*v.dx, avgY + 2*v.dy, v, def.m, def.r, def.name, spc.idNum, product.tag, product.returnTo);
 						spc.push(newDot);
 						added.push(newDot);
 					}
@@ -178,8 +186,20 @@ CollideHandler.prototype = {
 		this[min + '-' + max] = {func:this.impactStd, obj:this};
 		return this;
 	},
+	removeAllReactions: function(){
+		this.setDefaultHandler({func:this.impactStd, obj:this});
+	},
 	collideEnergy: function(a, b, perpAB, perpBA){
 		return .5*(perpAB*perpAB*a.m + perpBA*perpBA*b.m)*tConst*cV/N;
-		
-	}
+	},
+	checkMassConserve: function(a, b, products){
+		var massIn = a.m + b.m;
+		var massOut = 0;
+		for (var prodIdx=0; prodIdx<products.length; prodIdx++){
+			massOut += spcs[products[prodIdx].spc].m*products[prodIdx].count;
+		}
+		if(massIn!=massOut){
+			console.log('YOUR ATTENTION PLEASE: MASS IS NOT CONSERVED IN THE REACTION BETWEEN ' + a.name + ' AND ' + b.name);
+		}
+	},
 }

@@ -19,11 +19,11 @@ function Reactions(){
 	this.promptIdx = -1;
 	this.blockIdx=-1;
 	this.prompts=[
-		{block:0, title: '', finished: false, text:'smack smack smack'},
+		{block:0, title: '', finished: false, text:'quack quack quack'},
 
 	]
 	walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
-	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
+	addSpecies(['spc1', 'spc3']);
 	this.yMin = 30;
 	this.yMax = 350;
 	addListener(this, 'update', 'run', this.updateRun, this);
@@ -43,7 +43,7 @@ _.extend(Work.prototype,
 	},
 
 
-	block1Start: function(){
+	block0Start: function(){
 		this.playedWithSlider = false;
 		var self = this;
 		var sliderMin = $('#sliderPressure').slider('option', 'min');
@@ -51,7 +51,7 @@ _.extend(Work.prototype,
 		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
 		spcs['spc1'].populate(P(45,35), V(460, 350), 800, 300);
 		spcs['spc3'].populate(P(45,35), V(450, 350), 600, 300);
-		
+		collide.addReaction('spc3', 'spc1', 4, 100, [{spc:'spc4', count:1}]);
 		$('#canvasDiv').show();
 		$('#clearGraphs').hide();
 		$('#dashRun').show();
@@ -69,51 +69,18 @@ _.extend(Work.prototype,
 								{data:this.data, x:'v', y:'t'});		
 		
 		
-		this.piston = new Piston('tootoo', 'container', 2, this).show().trackWork().trackPressure();
+
 		this.borderStd();
 		//this.heater = new Heater('spaceHeater', P(150,360), V(250,50), 0, 20, c);//P(40,425), V(470,10)
 		//this.heater.init();
 
 	},
-	block1Conditions: function(){
-		if(this.playedWithSlider){
-			return {result:true};
-		}
-		return {result:false, alert:'Play with the slider, I insist.'};
-	},
-	block1CleanUp: function(){
-		this.playedWithSlider = undefined;
-		this.wallV=0;
-		$('#sliderPressureHolder').hide();
-		this.removeAllGraphs();
-		this.readout.removeAllEntries();
-		this.readout.hide();
-		this.piston.remove();
-		this.piston = undefined;
-		walls.setWallHandler(0, 'staticAdiabatic')
+
+	block0CleanUp: function(){
 		walls['container'].removeBorder();
+		collide.
 	},
 
-	makeDragWeights: function(wallHandle){
-		var self = this;
-		var massInit = 25;
-		var dragWeights = new DragWeights([{name:'lrg', count:1, mass:75}
-									],
-									walls[0][2].y,
-									function(){return walls[0][0].y},
-									myCanvas.height-15,
-									20,
-									Col(218, 187, 41),
-									Col(150, 150, 150),
-									massInit,
-									this.readout,
-									wallHandle,
-									'cPAdiabaticDamped',
-									this
-									);
-
-		return dragWeights;		
-	},
 
 	dataRun: function(){
 		var wall = walls[0];
@@ -127,44 +94,8 @@ _.extend(Work.prototype,
 		this.numUpdates=0;
 		this.forceInternal=0;
 	},
-	changePressure: function(event, ui){
-		this.piston.setP(ui.value);
-		this.playedWithSlider = true;
-	},
-	heatLeft: function(event, ui){
-		this.heaterLeft.setTemp(ui.value);
-	},
-	heatRight: function(event, ui){
-		this.heaterRight.setTemp(ui.value)
-	},
-	reset: function(){
-		var curPrompt = this.prompts[this.promptIdx];
-		if(this['block'+this.blockIdx+'CleanUp']){
-			this['block'+this.blockIdx+'CleanUp']()
-		}
-		if(curPrompt.cleanUp){
-			curPrompt.cleanUp();
-		}	
-		for (var spcName in spcs){
-			depopulate(spcName);
-		}
-		this.numUpdates = 0;
 
-		for (resetListenerName in this.resetListeners.listeners){
-			var func = this.resetListeners.listeners[resetListenerName].func;
-			var obj = this.resetListeners.listeners[resetListenerName].obj;
-			func.apply(obj);
-		}
 
-		if(this['block'+this.blockIdx+'Start']){
-			this['block'+this.blockIdx+'Start']()
-		}
-		
-		if(curPrompt.start){
-			curPrompt.start();
-		}	
-		
-	},
 
 
 }
