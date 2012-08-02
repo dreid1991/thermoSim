@@ -17,6 +17,7 @@ function Species(mass, radius, colors, def){
 	spc.r = radius;
 	spc.cols = colors;
 	spc.def = def;
+	spc.idNum = def.idNum
 	_.extend(spc, Species.prototype);
 	return spc;
 }
@@ -191,6 +192,9 @@ Point.prototype = {
 	VTo: function(b){
 		return V(b.x-this.x, b.y-this.y);
 	},
+	avg: function(b){
+		return P((this.x+b.x)/2, (this.y+b.y)/2);
+	},
 	area: function(a, b){
 		var baseV = V(a.x-this.x, a.y-this.y);
 		var baseUV = baseV.UV();
@@ -270,7 +274,8 @@ Dot.prototype = {
 		return this;
 	},
 	setEnergy: function(energy){
-		this.v.setMag(Math.sqrt((2*energy)/(this.m*tConst*R)));
+		this.v.setMag(Math.sqrt((2/this.m)*energy*N/(tConst*cV)))
+		//this.v.setMag(Math.sqrt((2*energy)/(this.m*tConst*R)));
 		return this;
 	},
 	speed: function(){

@@ -17,12 +17,14 @@ $(function(){
 	draw = new drawingTools();
 	collide = new CollideHandler();
 	R = 8.314;
+	cV = R;
+	cP = 2*R
 	vConst = 1/10000;
 	pConst = 16.1423;
 	LtoM3 = .001;
 	ATMtoPA = 101325;
 	JtoKJ = .001;
-	cp = 2*R;//joules/(kelvin*mole)
+	//cp = 2*R;//joules/(kelvin*mole)
 	N = 1000;//Avagadro's number
 	//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
 	pxToMS = 157.9;

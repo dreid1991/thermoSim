@@ -108,21 +108,29 @@ CollideHandler.prototype = {
 		}
 		return maxR;	
 	},
-	addReaction: function(spcA, spcB, activationE, deltaHRxn, products){
+	addReaction: function(spcAName, spcBName, activationE, deltaHRxn, products){
+		deltaHRxn *= .8;
+		//converting from Cp of 5/2R to 4/2R to make the temp change in this be what it should be, I think
+		var spcsLocal = this.spcs;
+		var spcA = spcsLocal[spcAName];
+		var spcB = spcsLocal[spcBName];
 		var idA = spcA.idNum;
 		var idB = spcB.idNum;
 		var min = Math.min(idA, idB);
 		var max = Math.max(idA, idB);
-		var spcsLocal = this.spcs;
-		this[min + '-' + max] = function(a, b, UVAB, perpAB, perpBA, bX, bY){
-			var collideEnergy = this.collideEnergy(a, b, perpA, perpB);
-			
+		var defsLocal = speciesDefs;
+		var NLocal = N;
+		var cVLocal = cV;
+		var tConstLocal = tConst;
+		var func = function(a, b, UVAB, perpAB, perpBA, bX, bY){
+			var collideEnergy = this.collideEnergy(a, b, perpAB, perpBA);
 			if(collideEnergy>activationE){
 				var spcA = spcsLocal[a.name];
 				var spcB = spcsLocal[b.name];
 				var idxA = spcA.indexOf(a);
-				var idxB = spcB.indexOf(b);
 				spcA.splice(idxA, 1);
+				var idxB = spcB.indexOf(b);
+				
 				spcB.splice(idxB, 1);
 				var bGridSquare = this.grid[bX][bY];
 				bGridSquare.splice(bGridSquare.indexOf(b), 1);
@@ -133,16 +141,19 @@ CollideHandler.prototype = {
 					var product = products[prodIdx];
 					var count = product.count;
 					var spc = spcsLocal[product.spc];
+					var def = defsLocal[product.spc];
 					for (var countIdx=0; countIdx<count; countIdx++){
 						var dir = Math.random()*2*Math.PI;
 						var v = V(Math.cos(dir), Math.sin(dir));
-						var newDot = D();//someUV
+						var dotX = avgX + 2*v.dx;
+						var dotY = avgY + 2*v.dy;
+						var newDot = D(dotX, dotY, v, def.m, def.r, def.name, spc.idNum, product.tag, product.returnTo);//someUV
 						spc.push(newDot);
 						added.push(newDot);
-						
 					}
 				}
-				var e = a.KE() + b.KE() + deltaHRxn;//UNITS
+				var eToAdd = deltaHRxn*added.length/NLocal;
+				var e = (a.KE() + b.KE())*tConstLocal*cVLocal/NLocal + deltaHRxn/NLocal;
 				var ePerDot = e/added.length;
 				for(var addedIdx=0; addedIdx<added.length; addedIdx++){
 					var dot = added[addedIdx];
@@ -155,9 +166,20 @@ CollideHandler.prototype = {
 				this.impactStd(a, b, UVAB, perpAB, perpBA);
 			}
 		}
+		this[min + '-' + max] = {func:func, obj:this};
 	},
-	collideEnergy: function(a, b, perpA, perpB){
-		var sumKE = .5*(perpA*perpA*a.m + perpB*perpB*b.m);
-		return sumKE*tConst*R; //in KJ.  *N*J->kJ = 1;
+	removeReaction: function(spcAName, spcBName){
+		var spcA = spcs[spcAName];
+		var spcB = spcs[spcBName];
+		var idA = spcA.idNum;
+		var idB = spcB.idNum;
+		var min = Math.min(idA, idB);
+		var max = Math.max(idA, idB);
+		this[min + '-' + max] = {func:this.impactStd, obj:this};
+		return this;
+	},
+	collideEnergy: function(a, b, perpAB, perpBA){
+		return .5*(perpAB*perpAB*a.m + perpBA*perpBA*b.m)*tConst*cV/N;
+		
 	}
 }
