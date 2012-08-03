@@ -216,6 +216,35 @@ LevelTools = {
 		this.readout.removeEntry(handle);
 		removeListener(curLevel, 'data', 'trackTemp' + handle);
 	},
+	trackExtentRxnStart: function(handle, rxnInfo){
+		var spcsLocal = spcs;
+		var NLOCAL = N;
+		var initVals = new Array(rxnInfo.length);
+		this.data['extent' + handle] = [];
+		for (var compIdx=0; compIdx<rxnInfo.length; compIdx++){
+			var compInfo = rxnInfo[compIdx];
+			var initCount = spcsLocal[compInfo.spc].length;
+			compInfo.init = initCount;
+
+		}
+		addListener(curLevel, 'data', 'trackExtentRxn' + handle,
+			function(){
+				var extent = Number.MAX_VALUE;
+				for (var compIdx=0; compIdx<rxnInfo.length; compIdx++){
+					var compInfo = rxnInfo[compIdx];
+					var init = compInfo.init;
+					var cur = spcsLocal[compInfo.spc].length;
+					var coeff = compInfo.coeff;
+					//HEY - coeff MUST BE NEGATIVE IF THING IS BEING CONSUMED
+					extent = Math.min(extent, (cur-init)/(coeff*NLOCAL));
+				}
+				this.data['extent' + handle].push(extent);
+			},
+		this);
+	},
+	trackExtentRxnStop: function(handle){
+		removeListener(curLevel, 'data', 'trackExtentRxn' + handle);
+	},
 	makeDragWeights: function(weights, wallHandle){
 		var self = this;
 		var massInit = 25;

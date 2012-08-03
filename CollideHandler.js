@@ -113,8 +113,8 @@ CollideHandler.prototype = {
 		return maxR;	
 	},
 	addReaction: function(spcAName, spcBName, activationE, deltaHRxn, products){
-		deltaHRxn *= .8;
-		//converting from Cp of 5/2R to 4/2R to make the temp change in this be what it should be, I think
+		//deltaHRxn *= .8;
+		//NOT converting from Cp of 5/2R to 4/2R to make the temp change in this be what it should be, I think
 		//deltaHRxn converted to joules
 		if(deltaHRxn.toString().toLowerCase().indexOf('kj')!=-1){
 			deltaHRxn = parseFloat(deltaHRxn);
@@ -161,7 +161,7 @@ CollideHandler.prototype = {
 						added.push(newDot);
 					}
 				}
-				var tF = (a.temp() + b.temp() + deltaHRxn/this.cV)/added.length;
+				var tF = (a.temp() + b.temp() - deltaHRxn/this.cV)/added.length;
 				for(var addedIdx=0; addedIdx<added.length; addedIdx++){
 					var dot = added[addedIdx];
 					dot.setTemp(tF);
@@ -198,7 +198,7 @@ CollideHandler.prototype = {
 		this.setDefaultHandler({func:this.impactStd, obj:this});
 	},
 	collideEnergy: function(a, b, perpAB, perpBA){
-		return .5*(perpAB*perpAB*a.m + perpBA*perpBA*b.m)*tConst;
+		return .5*(perpAB*perpAB*a.m + perpBA*perpBA*b.m)*this.tConst;
 		//in temperature (kelvin)
 	},
 	checkMassConserve: function(a, b, products){
