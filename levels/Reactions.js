@@ -42,8 +42,8 @@ _.extend(Reactions.prototype,
 		//walls = WallHandler([[P(40,30), P(70,30), P(70,70), P(40,70)]], 'staticAdiabatic', ['container']);
 		//spcs['spc1'].populate(P(45,35), V(1, 1), 1, 300);
 		//spcs['spc3'].populate(P(45,35), V(1, 1), 1, 300);
-		collide.addReaction('spc3', 'spc1', 900, 0/*-cV*300*/, [{spc:'spc4', count:1}]);
-		this.trackExtentRxnStart('13to4', [{spc:'spc1', coeff:-1}, {spc:'spc3', coeff:-1}, {spc:'spc4', coeff:1}]);
+		collide.addReaction('spc3', 'spc1', 900, 0/*-cV*300*/, [{spc:'spc4', count:1}], true);
+		//this.trackExtentRxnStart('13to4', [{spc:'spc1', coeff:-1}, {spc:'spc3', coeff:-1}, {spc:'spc4', coeff:1}]);
 		$('#canvasDiv').show();
 		$('#clearGraphs').hide();
 		$('#dashRun').show();

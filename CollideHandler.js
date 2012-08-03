@@ -112,7 +112,7 @@ CollideHandler.prototype = {
 		}
 		return maxR;	
 	},
-	addReaction: function(spcAName, spcBName, activationE, deltaHRxn, products){
+	addReaction: function(spcAName, spcBName, activationE, deltaHRxn, products, track){
 		//deltaHRxn *= .8;
 		//NOT converting from Cp of 5/2R to 4/2R to make the temp change in this be what it should be, I think
 		//deltaHRxn converted to joules
@@ -134,6 +134,10 @@ CollideHandler.prototype = {
 		var cVLocal = cV;
 		var tConstLocal = tConst;
 		this.checkMassConserve(spcA, spcB, products);
+		var rxnName = this.nameRxn(spcAName, spcBName, products);
+		if(track){
+			this.addTracking(spcAName, spcBName, products, rxnName);
+		}
 		var func = function(a, b, UVAB, perpAB, perpBA, bX, bY){
 			var collideEnergy = this.collideEnergy(a, b, perpAB, perpBA);
 			if(collideEnergy>activationE){
@@ -173,7 +177,7 @@ CollideHandler.prototype = {
 				this.impactStd(a, b, UVAB, perpAB, perpBA);
 			}
 		}
-		this[min + '-' + max] = {func:func, obj:this};
+		this[min + '-' + max] = {func:func, obj:this, rxnName:rxnName};
 	},
 	includeSpcs: function(a, b, prods){
 		var nameList = new Array(prods.length + 2);
@@ -184,6 +188,25 @@ CollideHandler.prototype = {
 		}
 		addSpecies(nameList);
 	},
+	nameRxn: function(a, b, prods){
+		var rxnName = a+b;
+		for(var prodIdx=0; prodIdx<prods.length; prodIdx++){
+			var prod = prods[prodIdx];
+			rxnName += prod.count + prod.spc;
+		}
+		return rxnName;
+	},
+	addTracking: function(a, b, prods, rxnName){
+		var trackList = new Array(prods.length+2);
+		trackList[0] = {spc:a, coeff:-1};
+		trackList[1] = {spc:b, coeff:-1};
+		
+		for(var prodIdx=0; prodIdx<prods.length; prodIdx++){
+			var prod = prods[prodIdx];
+			trackList[prodIdx+2] = {spc:prod.spc, coeff:prod.count};
+		}
+		curLevel.trackExtentRxnStart(rxnName, trackList);
+	},
 	removeReaction: function(spcAName, spcBName){
 		var spcA = spcs[spcAName];
 		var spcB = spcs[spcBName];
@@ -191,10 +214,13 @@ CollideHandler.prototype = {
 		var idB = spcB.idNum;
 		var min = Math.min(idA, idB);
 		var max = Math.max(idA, idB);
-		this[min + '-' + max] = {func:this.impactStd, obj:this};
+		var handler = this[min + '-' + max];
+		removeListener(curLevel, 'data', 'trackExtentRxn' + handler.rxnName);
+		handler = {func:this.impactStd, obj:this};
 		return this;
 	},
 	removeAllReactions: function(){
+		removeListenerByName(curLevel, 'data', 'trackExtentRxn');
 		this.setDefaultHandler({func:this.impactStd, obj:this});
 	},
 	collideEnergy: function(a, b, perpAB, perpBA){
