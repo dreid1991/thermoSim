@@ -1,5 +1,8 @@
 function CollideHandler(){
 	this.spcs = spcs;
+	this.tConst = tConst;
+	this.cP = cP;
+	this.cV = cV;
 	console.log("Made supercollider");
 }
 CollideHandler.prototype = {
@@ -35,6 +38,7 @@ CollideHandler.prototype = {
 				var dot = spc[dotIdx];
 				var gridX = Math.floor(dot.x/gridSize);
 				var gridY = Math.floor(dot.y/gridSize);
+				var doAdd = true;
 				for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){
 					for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, ySpan); y++){
 						for (var neighborIdx=grid[x][y].length-1; neighborIdx>-1; neighborIdx-=1){
@@ -45,13 +49,13 @@ CollideHandler.prototype = {
 								var handler = this[Math.min(dot.idNum, neighbor.idNum) + '-' + Math.max(dot.idNum, neighbor.idNum)];
 								var UVAB = V(neighbor.x-dot.x, neighbor.y-dot.y).UV();
 								if(!handler.func.apply(handler.obj, [dot, neighbor, UVAB, dot.v.dotProd(UVAB), neighbor.v.dotProd(UVAB), x, y])){
-									break;
+									doAdd = false;;
 								}
 							}
 						}
 					}
 				}
-				if(gridX>=0 && gridY>=0 && gridX<this.numCols && gridY<this.numRows){
+				if(doAdd && gridX>=0 && gridY>=0 && gridX<this.numCols && gridY<this.numRows){
 					grid[gridX][gridY].push(dot);
 				}
 				
@@ -111,6 +115,12 @@ CollideHandler.prototype = {
 	addReaction: function(spcAName, spcBName, activationE, deltaHRxn, products){
 		deltaHRxn *= .8;
 		//converting from Cp of 5/2R to 4/2R to make the temp change in this be what it should be, I think
+		//deltaHRxn converted to joules
+		if(deltaHRxn.toString().toLowerCase().indexOf('kj')!=-1){
+			deltaHRxn = parseFloat(deltaHRxn);
+			deltaHRxn*=1000;
+		}
+		deltaHRxn = parseFloat(deltaHRxn);
 		var spcsLocal = this.spcs;
 		var spcA = spcsLocal[spcAName];
 		var spcB = spcsLocal[spcBName];
@@ -151,13 +161,10 @@ CollideHandler.prototype = {
 						added.push(newDot);
 					}
 				}
-				//YOUR ENERGIES ARE NOT WORKING
-				//var eToAdd = deltaHRxn*added.length/NLocal;
-				var e = (a.KE() + b.KE())*tConstLocal*cVLocal/NLocal + deltaHRxn/NLocal;
-				var ePerDot = e/added.length;
+				var tF = (a.temp() + b.temp() + deltaHRxn/this.cV)/added.length;
 				for(var addedIdx=0; addedIdx<added.length; addedIdx++){
 					var dot = added[addedIdx];
-					dot.setEnergy(ePerDot);
+					dot.setTemp(tF);
 				}
 					
 				
@@ -191,7 +198,8 @@ CollideHandler.prototype = {
 		this.setDefaultHandler({func:this.impactStd, obj:this});
 	},
 	collideEnergy: function(a, b, perpAB, perpBA){
-		return .5*(perpAB*perpAB*a.m + perpBA*perpBA*b.m)*tConst*cV/N;
+		return .5*(perpAB*perpAB*a.m + perpBA*perpBA*b.m)*tConst;
+		//in temperature (kelvin)
 	},
 	checkMassConserve: function(a, b, products){
 		var massIn = a.m + b.m;

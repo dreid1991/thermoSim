@@ -42,7 +42,7 @@ _.extend(Reactions.prototype,
 		walls = WallHandler([[P(40,30), P(70,30), P(70,70), P(40,70)]], 'staticAdiabatic', ['container']);
 		spcs['spc1'].populate(P(45,35), V(1, 1), 1, 300);
 		spcs['spc3'].populate(P(45,35), V(1, 1), 1, 300);
-		collide.addReaction('spc3', 'spc1', 1, 100, [{spc:'spc4', count:1}]);
+		collide.addReaction('spc3', 'spc1', 1, 0, [{spc:'spc4', count:1}]);
 		$('#canvasDiv').show();
 		$('#clearGraphs').hide();
 		$('#dashRun').show();

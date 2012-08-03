@@ -12,15 +12,12 @@ $(function(){
 	$('#intText').hide();
 	canvas = document.getElementById("myCanvas");
 	c = canvas.getContext("2d");	
-	sliderList = [];
-	spcs = {};
-	draw = new drawingTools();
-	collide = new CollideHandler();
 	R = 8.314;
 	cV = R;
 	cP = 2*R
 	vConst = 1/10000;
 	pConst = 16.1423;
+	tConst = 20;
 	LtoM3 = .001;
 	ATMtoPA = 101325;
 	JtoKJ = .001;
@@ -28,12 +25,15 @@ $(function(){
 	N = 1000;//Avagadro's number
 	//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
 	pxToMS = 157.9;
-	tConst = 20;
 	g = 1.75
 	workConst = .158e-3;//for kJ;
 	updateInterval = 30;
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);
+	sliderList = [];
+	spcs = {};
+	draw = new drawingTools();
+	collide = new CollideHandler();
 	setInterval('curLevel.update()', updateInterval);
 	setInterval('curLevel.addData()', dataInterval);
 

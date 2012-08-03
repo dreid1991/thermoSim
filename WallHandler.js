@@ -150,6 +150,8 @@ WallMethods = {
 			this[wallIdx].bounds = bounds;
 			this.closeWall(this[wallIdx]);
 			this[wallIdx].ptsInit = this.copyWallPts(this[wallIdx]);
+			this[wallIdx].g = g;
+			this[wallIdx].pConst = pConst;
 			this[wallIdx].massChunks = {};
 			this[wallIdx].forceInternal = 0;
 			this[wallIdx].pLastRecord = turn;
@@ -580,11 +582,11 @@ WallMethods = {
 	wall: {
 		pExt: function(){
 			var SA = this[1].x - this[0].x;
-			return pConst*this.mass()*g/SA;
+			return this.pConst*this.mass()*this.g/SA;
 		},
 		pInt: function(){
 			var SA = this.surfArea();
-			var pInt = pConst*this.forceInternal/((turn-this.pLastRecord)*SA);
+			var pInt = this.pConst*this.forceInternal/((turn-this.pLastRecord)*SA);
 			this.forceInternal = 0;
 			this.pLastRecord = turn;
 			return pInt;

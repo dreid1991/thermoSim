@@ -1,16 +1,11 @@
 function DataHandler(){
+	this.tConst = tConst;
 }
 DataHandler.prototype = {
-	pressureInt: function(forceInternal, numUpdates, SA){
-		
-	},
-	pressureExt: function(mass, SA){
-		return pConst*mass*g/SA;
-	},
 	temp: function(info){
 		info = defaultTo({}, info);
 		//info can have attrs spcName and/or tag
-		return this.KEAvg(info)*tConst;
+		return this.KEAvg(info)*this.tConst;
 	},
 	velocities: function(info){
 		info = defaultTo({}, info);

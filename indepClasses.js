@@ -10,6 +10,10 @@ function Dot(x, y, v, mass, radius, name, idNum, tag, returnTo){
 	this.idNum = idNum;
 	this.tag = tag;
 	this.returnTo = returnTo;
+	this.tConst = tConst;
+	this.pxToMS = pxToMS;
+	return this;
+	
 }
 function Species(mass, radius, colors, def){
 	var spc = [];
@@ -265,7 +269,7 @@ Dot.prototype = {
 		return .5*this.m*vSqr;
 	},
 	temp: function(){
-		return this.KE()*tConst;
+		return this.KE()*this.tConst;
 	},
 	setTemp: function(newTemp){
 		var curTemp = this.temp();
@@ -273,13 +277,8 @@ Dot.prototype = {
 		this.v.mult(scalar);
 		return this;
 	},
-	setEnergy: function(energy){
-		this.v.setMag(Math.sqrt((2/this.m)*energy*N/(tConst*cV)))
-		//this.v.setMag(Math.sqrt((2*energy)/(this.m*tConst*R)));
-		return this;
-	},
 	speed: function(){
-		return this.v.mag()*pxToMS;
+		return this.v.mag()*this.pxToMS;
 		//return pxToMS*Math.sqrt(this.temp()/(this.m*10));
 	}
 }
