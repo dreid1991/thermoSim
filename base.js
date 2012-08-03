@@ -36,6 +36,10 @@ $(function(){
 	borderCol = Col(155,155,155);
 	setInterval('curLevel.update()', updateInterval);
 	setInterval('curLevel.addData()', dataInterval);
+
+	started = false;
+	counted = 0;
+	total = 0;
 	/*Timing stuff
 	started = false;
 	counted = 0;
@@ -254,17 +258,7 @@ Arrow.prototype = {
 		removeListener(curLevel, 'update', 'drawArrow' + this.handle);
 	}
 }
-function move(){
-	var spcsLocal = spcs;
-	for (var spcName in spcsLocal){
-		var dots = spcsLocal[spcName];
-		for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
-			var dot = dots[dotIdx];
-			dot.x += dot.v.dx;
-			dot.y += dot.v.dy;
-		}
-	}
-}
+
 function gauss(avg, stdev){
 	var numStdev = (Math.random() + Math.random() + Math.random())-1.5;
 	return avg + numStdev*stdev;

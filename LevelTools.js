@@ -13,6 +13,7 @@ LevelTools = {
 		addListener(this, 'update', 'run', this.updateRun, this);
 		addListener(this, 'data', 'run', this.dataRun, this);
 		collide.setDefaultHandler({func:collide.impactStd, obj:collide})
+		this.spcs = spcs;
 	},
 	changeWallSetPt: function(wallInfo, dest, compType, speed){
 		var wallIdx = walls.idxByInfo(wallInfo);
@@ -48,6 +49,16 @@ LevelTools = {
 					}
 				},
 			this);
+		}
+	},
+	move: function(){
+		var spcLocal = this.spcs;
+		for (var spcName in spcLocal){
+			var dots = spcLocal[spcName];
+			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
+				dots[dotIdx].x += dots[dotIdx].v.dx;
+				dots[dotIdx].y += dots[dotIdx].v.dy;
+			}
 		}
 	},
 	checkDotHits: function(){
@@ -130,7 +141,7 @@ LevelTools = {
 		this.numUpdates = 0;
 	},
 	updateRun: function(){
-		move();
+		this.move();
 		this.checkDotHits(); 
 		this.checkWallHits();
 		this.drawRun();
