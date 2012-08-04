@@ -145,6 +145,7 @@ CollideHandler.prototype = {
 	pickRxn: function(a, b, perpAB, perpBA, rxns){
 		//HEY - THIS WILL NOT WORK.  YOU ARE NORMALIZING TO THE MAX DELTAH RXN.  THAT MEANS THAT THE MAX WILL NEVER HAPPEN.  
 		//ALSO WHAT IF DELTAHRXN IS 0?
+		/*
 		var collideEnergy = this.collideEnergy(a, b, perpAB, perpBA)
 		var maxDeltaHRxn = -Number.MAX_VALUE;
 		var totalDeltaH = 0;
@@ -179,7 +180,8 @@ CollideHandler.prototype = {
 		}else{
 			return -1;
 		}
-		
+		*/
+		return Math.floor(Math.random()*rxns.length);
 		
 	},
 	react: function(a, b, bX, bY, rxn){
@@ -190,10 +192,14 @@ CollideHandler.prototype = {
 		} else {
 			var killedA = false;
 		}
+		//HEY - a.name and b.name can reference the same thing.  Need to add a tag to reaction saying 1 or 2 reactants involved.
 		if(rxn.reactants[b.name]){
 			b.kill();
 			var bGridSquare = this.grid[bX][bY];
 			bGridSquare.splice(bGridSquare.indexOf(b), 1);			
+			var killedB = true;
+		}else{
+			var killedB = false;
 		}
 
 		var added = [];
@@ -201,8 +207,8 @@ CollideHandler.prototype = {
 		var avgY = (a.y + b.y)/2;
 		for (var prodIdx=0; prodIdx<rxn.products.length; prodIdx++){
 			var product = rxn.products[prodIdx];
-			var spc = this.spcs[rxn.product.spc];
-			var def = this.defs[rxn.product.spc];
+			var spc = this.spcs[product.spc];
+			var def = this.defs[product.spc];
 			for (var countIdx=0; countIdx<product.count; countIdx++){
 				var dir = Math.random()*2*Math.PI;
 				var v = V(Math.cos(dir), Math.sin(dir));
@@ -211,7 +217,7 @@ CollideHandler.prototype = {
 				added.push(newDot);
 			}
 		}
-		var tF = (a.temp() + b.temp() - rxn.deltaH/this.cV)/added.length;
+		var tF = (a.temp()*killedA + b.temp()*killedB - rxn.deltaH/this.cV)/added.length;
 		for(var addedIdx=0; addedIdx<added.length; addedIdx++){
 			var dot = added[addedIdx];
 			dot.setTemp(tF);
@@ -222,25 +228,23 @@ CollideHandler.prototype = {
 		//deltaHRxn *= .8;
 		//NOT converting from Cp of 5/2R to 4/2R to make the temp change in this be what it should be, I think
 		//deltaHRxn converted to joules
-		if(deltaHRxn.toString().toLowerCase().indexOf('kj')!=-1){
-			deltaHRxn = parseFloat(deltaHRxn);
-			deltaHRxn*=1000;
+		if(deltaH.toString().toLowerCase().indexOf('kj')!=-1){
+			deltaH = parseFloat(deltaH);
+			deltaH*=1000;
 		}
-		deltaHRxn = parseFloat(deltaHRxn);
+		deltaH = parseFloat(deltaH);
 		
-		var spcA = this.spcs[spcAName];
-		var spcB = this.spcs[spcBName];
+		var spcA = defaultTo({}, this.spcs[spcAName]);
+		var spcB = defaultTo({}, this.spcs[spcBName]);
 		this.includeSpcs(spcAName, spcBName, products);
 		var idA = spcA.idNum;
 		var idB = spcB.idNum;
-		var min = Math.min(idA, idB);
-		var max = Math.max(idA, idB);
 		this.checkMassConserve(spcA, spcB, products);
 		var rxnName = this.nameRxn(spcAName, spcBName, products);
 		if(track){
 			this.addTracking(spcAName, spcBName, products, rxnName);
 		}
-		var rxn = {reactants:{}, products:products};
+		var rxn = {reactants:{}, products:products, deltaH:deltaH, activationE:activationE};
 		if(spcAName){
 			rxn.reactants[spcAName] = true;
 		}
@@ -262,6 +266,7 @@ CollideHandler.prototype = {
 		var rxnName = '';
 		if(a){rxnName+=a;}	
 		if(b){rxnName+=b;}
+		rxnName+='to';
 		for(var prodIdx=0; prodIdx<prods.length; prodIdx++){
 			var prod = prods[prodIdx];
 			rxnName += prod.count + prod.spc;
@@ -281,14 +286,18 @@ CollideHandler.prototype = {
 	},
 	appendRxn: function(spcAName, spcBName, idA, idB, rxn){
 		if(spcAName && spcBName){
-			this.reactions[Math.min(idA, idB) + '-' + Math.max(idA, idB)].push(rxn);
+			var min = Math.min(idA, idB);
+			var max = Math.max(idA, idB);
+			this.reactions[min + '-' + max].push(rxn);
+			this[min + '-' + max] = {func:this.checkReact, obj:this};
 		} else {
 			var fixed = defaultTo(idA, idB);
 			var numSpcs = this.getNumSpcs();
-			for (var spcsIdx=0; spcIdx<numSpcs; spcIdx++){
-				var min = Math.min(fixed, spcsIdx);
-				var max = Math.max(fixed, spcsIdx);
+			for (var spcIdx=0; spcIdx<numSpcs; spcIdx++){
+				var min = Math.min(fixed, spcIdx);
+				var max = Math.max(fixed, spcIdx);
 				this.reactions[min + '-' + max].push(rxn);
+				this[min + '-' + max] = {func:this.checkReact, obj:this};
 			}
 		}
 	},

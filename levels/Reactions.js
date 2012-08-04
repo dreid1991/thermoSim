@@ -42,11 +42,12 @@ _.extend(Reactions.prototype,
 
 	},
 	block1Start: function(){
-		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
-		spcs['spc1'].populate(P(45,35), V(460, 350), 400, 300);
-		spcs['spc3'].populate(P(45,35), V(450, 350), 400, 300);		
-		collide.addReaction('spc3', 'spc1', 900, 0/*-cV*300*/, [{spc:'spc4', count:1}], true);
-		collide.addReaction('spc4', undefined, 900, 0, [{spc:'spc1', count:1}, {spc:'spc3', count:1}], true);
+		//walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
+		walls = WallHandler([[P(40,30), P(100,30), P(100,100), P(40,100)]], 'staticAdiabatic', ['container']);
+		spcs['spc1'].populate(P(45,35), V(60, 50), 2, 300);
+		spcs['spc3'].populate(P(45,35), V(50, 50), 2, 300);		
+		collide.addReaction('spc3', 'spc1', 900, 0/*-cV*300*/, [{spc:'spc4', count:1}], false);
+		collide.addReaction('spc4', undefined, 900, 0, [{spc:'spc1', count:1}, {spc:'spc3', count:1}], false);
 		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
 							{x:{min:0, step:4}, y:{min:250, step:50}});
 		this.graphs.tVSv.addSet('t', 'Sys\nTemp', Col(255,0,0), Col(255,200,200),
