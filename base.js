@@ -279,7 +279,7 @@ function boundedStep(cur, setPt, step){
 function addSpecies(toAdd){
 	var didAdd = false;
 	if (String(toAdd)===toAdd){
-		if(!spcs[toAdd]){
+		if(!spcs[toAdd] && toAdd){
 			var def = speciesDefs[toAdd];
 			spcs[toAdd] = Species(def.m, def.r, def.cols, def);
 			didAdd = true;
@@ -288,7 +288,7 @@ function addSpecies(toAdd){
 	} else if (toAdd instanceof Array){
 		for (var toAddIdx=0; toAddIdx<toAdd.length; toAddIdx++){
 			var name = toAdd[toAddIdx];
-			if(!spcs[name]){
+			if(!spcs[name] && name){
 				var def = speciesDefs[name];
 				spcs[name] = Species(def.m, def.r, def.cols, def);
 				didAdd = true;

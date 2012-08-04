@@ -280,5 +280,9 @@ Dot.prototype = {
 	speed: function(){
 		return this.v.mag()*this.pxToMS;
 		//return pxToMS*Math.sqrt(this.temp()/(this.m*10));
-	}
+	},
+	kill: function(){
+		var dotList = spcs[this.name];
+		dotList.splice(dotList.indexOf(this), 1);
+	},
 }
