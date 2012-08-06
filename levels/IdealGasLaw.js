@@ -6,7 +6,6 @@ function IdealGasLaw(){
 	this.data.v = [];
 	this.data.e = [];
 	this.wallSpeed = 1;
-	this.makeListeners()
 	this.readout = new Readout('mainReadout', 30, myCanvas.width-180, 25, '13pt calibri', Col(255,255,255),this);
 	this.compMode = 'Isothermal';
 	this.prompts=[
