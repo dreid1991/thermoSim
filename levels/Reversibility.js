@@ -12,12 +12,12 @@ function Reversibility(){
 	this.readout = new Readout('mainReadout', 15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), this);
 	var self = this;
 	this.prompts=[
-		{block:0, title:"Current step", finished: false, text:"Good day.  I have an important task for you.  This system above, it must be compressed to 10 L using as little energy as possible.  You can drag the weight onto the piston to compress to this volume with a pressure of 6 atm.  If you compress with this block, how much work will you do on the system?"},
+		{block:0, title:"Current step", conditions: this.block0Conditions, finished: false, text:"Good day.  I have an important task for you.  This system above, it must be compressed to 10 L using as little energy as possible.  You can drag the weight onto the piston to compress to this volume with a pressure of 6 atm.  If you compress with this block, how much work will you do on the system?"},
 		{block:1, title:"", finished: false, text:""},
-		{block:2, title:"Current step", finished:false, text:"In our previous compression, we compressed at 6 atm the whole time.  Are we always at 6 atm in this new compression?  How does this affect the work we have to do to compress?"},
+		{block:2, title:"Current step", conditions: this.block2Conditions, finished:false, text:"In our previous compression, we compressed at 6 atm the whole time.  Are we always at 6 atm in this new compression?  How does this affect the work we have to do to compress?"},
 		{block:3, title:'', finished: false, text:""},
 		{block:4, title:'', finished: false, text:""},
-		{block:5, title:'Current step', finished: false, text:"Alright, here are the blocks.  To compress, P<sub>ext</sub> must only be barely greater than P<sub>int</sub>.  When it is more than a tiny amount higher, we’re doing more work than we have to.  How much work does it take to compress to 10 liters this time?"},
+		{block:5, title:'Current step', conditions: this.block5Conditions, finished: false, text:"Alright, here are the blocks.  To compress, P<sub>ext</sub> must only be barely greater than P<sub>int</sub>.  When it is more than a tiny amount higher, we’re doing more work than we have to.  How much work does it take to compress to 10 liters this time?"},
 		{block:6, title:'', finished: false, text:''},
 		{block:7, title:'', finished: false, text:''},
 		{block:8, title:'Current step', finished: false, text:"Now I have another equally important task for you.  I want this piston expanded in a way that gets as much work out as possible.  When we compressed, we used the blocks to do work on the system.  When expanding, the system can do work on the blocks, lifting them to a higher potential energy.  Let’s start with just one block.  How much work can you get out?"},
@@ -26,7 +26,7 @@ function Reversibility(){
 		{block:11, title:'', finished: false, text:""},
 		{block:12, title:'', finished: false, text:""},
 		{block:13, title:'Current step', finished: false, text:"Your final and most important task is to compress this container and then bring it back to its original volume.  We can call this going through a cycle.  After you go through a cycle using this block, how do the initial and final temperatures compare?"},
-		{block:14, title:'Current step', finished: false, text:"Just like before, let’s split up our block.  With more blocks, we’ll be doing less work when we compress and getting more work out when we expand.  Try going through a cycle with these blocks.  Last time T<sub>i</sub> was XX K and T<sub>f</sub> was YY K.  How do the initial and final temperatures compare this time?"},
+		{block:14, title:'Current step', finished: false, text:this.block14Text},
 		{block:15, title:'', finished: false, text:""},
 		//{block:N, title:'Current step', finished: false, text:""},
 	]
@@ -70,18 +70,15 @@ _.extend(Reversibility.prototype,
 		walls[0].trackWorkStart(this.readout);
 		this.dragWeights = this.makeDragWeights([{name:'lrg', count:1, mass:90}], wallHandle, this.massInit).init().trackPressureStart();
 		this.trackVolumeStart(0);
-		this.volListener10 = new StateListener(10, this.data.v, .05, {v:this.data.v});
+		this.volListener10 = new StateListener(10, this.data.v, .05, {v:this.data.v}, {func:function(){this.workInLrg = round(walls[0].work,1)},obj:this});
 		this.readout.show();
 	},	
 	block0Conditions: function(){
-		
 		if(this.volListener10.isSatisfied()){
 			return {result:true};
 		}else{
 			return {result:false, alert:'Compress thy system!'};
 		}
-		
-		
 	},
 	block0CleanUp: function(){
 		this.trackVolumeStop();
@@ -90,11 +87,12 @@ _.extend(Reversibility.prototype,
 		this.dragWeights.remove();
 	},
 	block1Start: function(){
+		this.volListener10 = new StateListener(10, this.data.v, .05, {v:this.data.v});
 		var self = this;
 		var addOnce2 = function(){self.numBlocks=2;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:2}, 'container', self.massInit, {trackPressure:true}), self)};
 		var addOnce4 = function(){self.numBlocks=4;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:4}, 'container', self.massInit, {trackPressure:true}), self)};
 		var addOnce8 = function(){self.numBlocks=8;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:8}, 'container', self.massInit, {trackPressure:true}), self)};
-		this.cutSceneStart("<p>So we compressed our container with XX J of work.  Do you think it’s possible to compress our system using less energy?  What if we break our block into smaller pieces? </p><p>How many pieces would you like to break the block into?</p>",
+		this.cutSceneStart(replaceString("<p>So we compressed our container with XX kJ of work.  Do you think it’s possible to compress our system using less energy?  What if we break our block into smaller pieces? </p><p>How many pieces would you like to break the block into?</p>", 'XX', this.workInLrg),
 			'quiz',
 			{quizOptions:
 			[{buttonID:'button2blocks', buttonText:'2', func:function(){addOnce2()}, isCorrect:true},
@@ -102,6 +100,13 @@ _.extend(Reversibility.prototype,
 			{buttonID:'button8blocks', buttonText:'8', func:function(){addOnce8()}, isCorrect:true}
 			]}
 		);
+	},
+	block1Conditions: function(){
+		if(this.volListener10.isSatisfied()){
+			return {result:true};
+		}else{
+			return {result:false, alert:'Compress thy system!'};
+		}		
 	},
 	block1CleanUp: function(){
 		this.removeAllGraphs();
@@ -112,6 +117,14 @@ _.extend(Reversibility.prototype,
 		this.trackVolumeStart();
 		this.unCompSetup();
 		walls[0].trackWorkStart(this.readout);
+		this.volListener10 = new StateListener(10, this.data.v, .05, {v:this.data.v}, {func:function(){this.workInMed = round(walls[0].work,1)},obj:this});
+	},
+	block2Conditions: function(){
+		if(this.volListener10.isSatisfied()){
+			return {result:true};
+		}else{
+			return {result:false, alert:'Compress thy system!'};
+		}
 	},
 	block2CleanUp: function(){
 		this.removeAllGraphs();
@@ -152,6 +165,14 @@ _.extend(Reversibility.prototype,
 		this.unCompSetup();
 		walls[0].trackWorkStart(this.readout);		
 		this.dragWeights = this.makeDragWeights({mass:90, count:2*this.numBlocks}, 'container', this.massInit).init().trackPressureStart();
+		this.volListener10 = new StateListener(10, this.data.v, .05, {v:this.data.v}, {func:function(){this.workInSml = round(walls[0].work,1)},obj:this});
+	},
+	block5Conditions: function(){
+		if(this.volListener10.isSatisfied()){
+			return {result:true};
+		}else{
+			return {result:false, alert:'Compress thy system!'};
+		}
 	},
 	block5CleanUp: function(){
 		this.removeAllGraphs();
@@ -161,7 +182,9 @@ _.extend(Reversibility.prototype,
 		
 	},
 	block6Start: function(){
-		this.cutSceneStart('<p>So in the three compressions, you did XX, YY, and finally ZZ kJ of work.  What if we kept breaking our blocks into smaller pieces?</p><p>If they were small enough, every time we put a new block on, would P<sub>ext</sub> even be noticeably different than P<sub>int</sub>?</p> <p> If we kept those pressures almost equal, would we ever be doing any more work than we had to? </p><p> By the way, the answer is the same to both questions.</p>',
+		var text = '<p>So in the three compressions, you did XX, YY, and finally ZZ kJ of work.  What if we kept breaking our blocks into smaller pieces?</p><p>If they were small enough, every time we put a new block on, would P<sub>ext</sub> even be noticeably different than P<sub>int</sub>?</p> <p> If we kept those pressures almost equal, would we ever be doing any more work than we had to? </p><p> By the way, the answer is the same to both questions.</p>'
+		text = replaceString(replaceString(replaceString(text, 'XX', this.workInLrg), 'YY', this.workInMed), 'ZZ', this.workInSml);
+		this.cutSceneStart(text,
 			'quiz',
 			{quizOptions:
 			[{buttonID:'yes', buttonText:'Yes', message:'No', isCorrect: false},
@@ -182,6 +205,7 @@ _.extend(Reversibility.prototype,
 	block8Start: function(){
 		this.makeGraphsRev();
 		this.compSetup();
+		this.volListener16 = new StateListener(16, this.data.v, .05, {v:this.data.v}, {func:function(){this.workOutLrg = Math.abs(round(walls[0].work,1))},obj:this});
 		walls[0].trackWorkStart(this.readout);
 		this.dragWeights = this.makeDragWeights({mass:90, count:1}, 'container', this.massInit).init().dropAllIntoPistons('instant').trackPressureStart();
 	},
@@ -193,7 +217,9 @@ _.extend(Reversibility.prototype,
 		var self = this;
 		var addOnce12 = function(){self.numBlocks=12;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:12}, 'container', self.massInit, {trackPressure:true}), self)};
 		var addOnceDropInstant = function(){addListenerOnce(curLevel, 'update', 'dropToPiston', function(){self['dragWeights'].dropAllIntoPistons('instant')}, self)};
-		this.cutSceneStart("<p>Well that didn’t go very well.  From before, we know it takes at least XX kJ to compress to that volume and we only got YY kJ out!  We can do better.</p><p>What if we break up our block like we did before?</p><p>How many pieces would you like?</p>",
+		var text = "<p>Well that didn’t go very well.  From before, we know it takes at least XX kJ to compress to that volume and we only got YY kJ out!  We can do better.</p><p>What if we break up our block like we did before?</p><p>How many pieces would you like?</p>";
+		text = replaceString(replaceString(text, 'XX', this.workInSml),'YY', this.workOutLrg);
+		this.cutSceneStart(text,
 			'quiz',
 			{quizOptions:
 			[{buttonID:'button2blocks', buttonText:'4', isCorrect:false, message:'I think you want more blocks than that.'},
@@ -209,6 +235,7 @@ _.extend(Reversibility.prototype,
 	block10Start: function(){
 		this.compSetup();
 		this.makeGraphsRev();
+		this.volListener16 = new StateListener(16, this.data.v, .05, {v:this.data.v}, {func:function(){this.workOutSml = Math.abs(round(walls[0].work,1))},obj:this});
 		walls[0].trackWorkStart(this.readout);
 	},
 	block10CleanUp: function(){
@@ -217,7 +244,9 @@ _.extend(Reversibility.prototype,
 		this.dragWeights.remove();
 	},
 	block11Start: function(){
-		this.cutSceneStart('So you got XX kJ out versus YY kJ with the big block.  Why do you think you got more work out this time?');
+		var text = 'So you got XX kJ out versus YY kJ with the big block.  This is much closer to the ZZ kJ minimum we had to put in.  Why do you think you got more work out this time?';
+		text = replaceString(replaceString(replaceString(text, 'XX', this.workOutSml), 'YY', this.workOutLrg), 'ZZ', this.workInSml);
+		this.cutSceneStart(text);
 	},
 	block11CleanUp: function(){
 		this.cutSceneEnd();
@@ -232,6 +261,18 @@ _.extend(Reversibility.prototype,
 		this.unCompSetup();
 		this.makeGraphsRev();
 		walls[0].trackWorkStart(this.readout);
+		this.cycleLrgInit = this.dataHandler.temp();
+		this.volListener10 = new StateListener(10, this.data.v, .05, {v:this.data.v}, {func:
+			function(){
+				
+				this.volListener16 = new StateListener(16, this.data.v, .05, {v:this.data.v}, {func:
+				function(){
+					this.cycleLrgFinal = this.dataHandler.temp();
+				},obj:this}
+				);
+			},
+			obj:this}
+		);
 		this.dragWeights = this.makeDragWeights({mass:90, count:1}, 'container', this.massInit).init().trackPressureStart();		
 	},
 	block13CleanUp: function(){
@@ -243,6 +284,8 @@ _.extend(Reversibility.prototype,
 		this.unCompSetup();
 		this.makeGraphsRev();
 		walls[0].trackWorkStart(this.readout);
+		this.block14Text = "Just like before, let’s split up our block.  With more blocks, we’ll be doing less work when we compress and getting more work out when we expand.  Try going through a cycle with these blocks.  Last time T<sub>i</sub> was XX K and T<sub>f</sub> was YY K.  How do the initial and final temperatures compare this time (check the graphs)?";
+		this.block14Text = replaceString(replaceString(this.block14Text, 'XX', this.cycleLrgInit), 'YY', this.cycleLrgFinal);
 		this.dragWeights = this.makeDragWeights({mass:90, count:12}, 'container', this.massInit).init().trackPressureStart();		
 	},
 	block14CleanUp: function(){

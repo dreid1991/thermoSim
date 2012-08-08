@@ -10,6 +10,7 @@ LevelTools = {
 		this.promptIdx = -1;
 		this.blockIdx = -1;
 		this.data = {};
+		this.dataHandler = dataHandler;
 		addListener(this, 'update', 'run', this.updateRun, this);
 		addListener(this, 'data', 'run', this.dataRun, this);
 		collide.setDefaultHandler({func:collide.impactStd, obj:collide})
