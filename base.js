@@ -366,6 +366,14 @@ function round(val, dec){
 function addListener(object, typeName, funcName, func, destObj){
 	object[typeName + 'Listeners'].listeners[funcName] = {func:func, obj:destObj};
 }
+function addListenerOnce(object, typeName, funcName, func, destObj){
+	var removeFunc = function(){
+		removeListener(object, typeName, funcName);
+		removeListener(object, typeName, funcName+'Remove');
+	}
+	object[typeName + 'Listeners'].listeners[funcName] = {func:func, obj:destObj};
+	object[typeName + 'Listeners'].listeners[funcName + 'Remove'] = {func:removeFunc, obj:''};
+}
 function removeListener(object, typeName, funcName){
 	delete object[typeName + 'Listeners'].listeners[funcName];
 }
@@ -514,10 +522,6 @@ function showPrompt(prev, prompt){
 		$('#baseHeader').html(title);
 		if(func){
 			func.apply(curLevel);
-		}
-		if(curLevel.storeFunc){
-			curLevel.storeFunc();
-			curLevel.storeFunc = undefined;
 		}
 	}
 

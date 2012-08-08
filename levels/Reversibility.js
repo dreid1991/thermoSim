@@ -85,12 +85,15 @@ _.extend(Reversibility.prototype,
 	},
 	block1Start: function(){
 		var self = this;
+		var addOnce2 = function(){addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:2}, 'container', self.massInit, {trackPressure:true}), self)};
+		var addOnce4 = function(){addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:4}, 'container', self.massInit, {trackPressure:true}), self)};
+		var addOnce8 = function(){addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:8}, 'container', self.massInit, {trackPressure:true}), self)};
 		this.cutSceneStart("<p>So we compressed our container with XX J of work.  Do you think it’s possible to compress our system using less energy?  What if we break our block into smaller pieces? </p><p>How many pieces would you like to break the block into?</p>",
 			'quiz',
 			{quizOptions:
-			[{buttonID:'button2blocks', buttonText:'2', func:function(){self.storeFunc = self.makeDragWeightsFunc({mass:90, count:2}, 'container', self.massInit, {trackPressure:true});nextPrompt()}},
-			{buttonID:'button4blocks', buttonText:'4', func:function(){self.storeFunc = self.makeDragWeightsFunc({mass:90, count:4}, 'container', self.massInit, {trackPressure:true});nextPrompt()}},
-			{buttonID:'button8blocks', buttonText:'8', func:function(){self.storeFunc = self.makeDragWeightsFunc({mass:90, count:8}, 'container', self.massInit, {trackPressure:true});nextPrompt()}}
+			[{buttonID:'button2blocks', buttonText:'2', func:function(){addOnce2();nextPrompt()}},
+			{buttonID:'button4blocks', buttonText:'4', func:function(){addOnce4();nextPrompt()}},
+			{buttonID:'button8blocks', buttonText:'8', func:function(){addOnce8();nextPrompt()}}
 			]}
 		);
 	},
