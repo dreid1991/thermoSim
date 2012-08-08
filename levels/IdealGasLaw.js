@@ -267,7 +267,7 @@ _.extend(IdealGasLaw.prototype,
 		"This gives us the second idea.<br>"+
 		"Then we put it all together and get"+
 		"<center><img src=img/ideal/last.gif></img></center>"+
-		"Now look at that!  Remember that Y is proportional to mV<sup>2</sup> as well?  This means that we have just derived that <i>P is directly proportional to T</i> from a simple model of balls bouncing around!  Does this sound familiar to the ideal gas law or what?"
+		"Now look at that!  Remember that T is proportional to mV<sup>2</sup> as well?  This means that we have just derived that <i>P is directly proportional to T</i> from a simple model of balls bouncing around!  Does this sound familiar to the ideal gas law or what?"
 		
 		);
 	},

@@ -11,6 +11,7 @@
 }
 .graph{
 	padding:20px;
+	padding:20px;
 }
 
 .noSelect{
@@ -31,7 +32,7 @@
 	padding:2px;
 }
 .displayLong{
-	height:510px;
+	height:500px;
 	background-color:#05111a;
 	border-top: 3px solid;
 	border-bottom:3px solid;

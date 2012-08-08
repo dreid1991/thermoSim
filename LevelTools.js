@@ -67,7 +67,11 @@ LevelTools = {
 	checkWallHits: function(){
 		walls.check();
 	},
-	cutSceneStart: function(text, mode){
+	cutSceneStart: function(text, mode, data){
+		$('#intText').html('');
+		if(text){
+			$('#intText').html(text);
+		}
 		this.pause();
 		$('#dashRun').hide();
 		if(!mode){
@@ -78,12 +82,14 @@ LevelTools = {
 		}else if(mode=='outro'){
 			$('#dashOutro').show();
 			$('#base').hide();
+		}else if(mode=='quiz'){
+			$('#dashCutScene').show();
+			$('#base').hide();
+			this.appendQuiz(data.quizOptions)
 		}
 		$('#canvasDiv').hide();
 		$('#display').show();
-		if(text){
-			$('#intText').html(text);
-		}
+
 		$('#intText').show();
 		
 	},
@@ -111,6 +117,25 @@ LevelTools = {
 	resume: function(){
 		loadListener(this, 'update');
 		loadListener(this, 'data');
+	},
+	appendQuiz: function(options){
+		var quizHTML = "<center><table border='0'><tr>";
+		for (var optionIdx=0; optionIdx<options.length; optionIdx++){
+			var option = options[optionIdx];
+			quizHTML += "<td><button id='" + option.buttonID + "' class='noSelect'>" + option.buttonText + "</button></td>"
+		}
+		quizHTML += "</tr></table></center>";
+		$('#intText').html($('#intText').html() + quizHTML);
+		$('button').button();
+		this.attachQuizListeners(options);
+	},
+	attachQuizListeners: function(options){
+		for (var optionIdx=0; optionIdx<options.length; optionIdx++){
+			var option = options[optionIdx];
+			var id = option.buttonID;
+			var func = option.func;
+			buttonBind(id, func);
+		}		
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();
@@ -245,12 +270,33 @@ LevelTools = {
 	trackExtentRxnStop: function(handle){
 		removeListener(curLevel, 'data', 'trackExtentRxn' + handle);
 	},
-	makeDragWeights: function(weights, wallHandle){
+	makeDragWeightsFunc: function(weights, wallHandle, massInit, track){
+		var self = curLevel;
+		var func = function(){
+			self.dragWeights = self.makeDragWeights(weights, wallHandle, massInit).init();
+			for (var tracker in track){
+				if(track[tracker]){
+					self.dragWeights[tracker+'Start']();
+				}else{
+					self.dragWeights[tracker+'Stop']();
+				}
+			}
+		}
+		return function(){
+			func.apply(self);
+		}
+	},
+	makeDragWeights: function(weights, wallHandle, massInit){
 		var self = this;
-		var massInit = 25;
+		massInit = defaultTo(25, massInit);
 		wallHandle = defaultTo('0', wallHandle);
 		min = walls[0][2].y;
 		var wall = walls[wallHandle];
+		if(!(weights instanceof Array)){
+			//then is a total mass with count
+			var mass = weights.mass/weights.count;
+			weights = [{name:'onlyWeights', count:weights.count, mass:mass}]
+		}
 		var dragWeights = new DragWeights(weights,
 									min,
 									function(){return wall[0].y},

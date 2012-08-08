@@ -176,6 +176,8 @@ WallMethods = {
 			for (var ptIdx=0; ptIdx<init.length; ptIdx++){
 				this[wallIdx][ptIdx] = init[ptIdx].copy();
 			}
+			this[wallIdx].forceInternal = 0;
+			this[wallIdx].v = 0;
 			this.setupWall(wallIdx);
 		},
 		copyWallPts: function(wall){
@@ -624,16 +626,15 @@ WallMethods = {
 		},
 		moveInit: function(){
 			var gLocal = g;
-			var yMax = this.bounds.yMax;
-			var yMin = this.bounds.yMin;
+			var bounds = this.bounds;
 			addListener(curLevel, 'update', 'moveWall'+this.handle,
 				function(){
 					var lastY = this[0].y
 					var nextY;
 					var unboundedY = lastY + this.v + .5*gLocal;
 					var dyWeight = null;
-					if(unboundedY>yMax || unboundedY<yMin){
-						nextY = this.hitBounds(lastY, gLocal, yMin, yMax);
+					if(unboundedY>bounds.yMax || unboundedY<bounds.yMin){
+						nextY = this.hitBounds(lastY, gLocal, bounds.yMin, bounds.yMax);
 					}else{
 						nextY = unboundedY;
 						this.v += gLocal;
@@ -726,6 +727,34 @@ WallMethods = {
 		removeBorder: function(){
 			removeListener(curLevel, 'update', 'drawBorder' + this.handle);
 		},
+		trackWorkStart: function(readout, decPlaces){
+			var LTOM3LOCAL = LtoM3;
+			var PCONSTLOCAL = pConst;
+			var ATMTOPALOCAL = ATMtoPA;
+			var VCONSTLOCAL = vConst;
+			var JTOKJLOCAL = JtoKJ;
+			this.workReadout = readout;
+			decPlaces = defaultTo(1, decPlaces);
+			var trackPt = this[0];
+			var width = this[1].x-this[0].x;
+			var heightLast = trackPt.y;
+			var work = 0;
+			readout.addEntry('work', 'Work:', 'kJ', 0, undefined, decPlaces);
+			addListener(curLevel, 'update', 'trackWork'+this.handle,
+				function(){
+					var dV = LTOM3LOCAL*VCONSTLOCAL*width*(heightLast-trackPt.y)
+					var p = this.pExt()*ATMTOPALOCAL;
+					work -= JTOKJLOCAL*p*dV;
+					this.workReadout.hardUpdate(work, 'work');
+					heightLast = trackPt.y;
+				},
+			this);
+		},
+		trackWorkStop: function(){
+			this.workReadout.removeEntry('work');
+			
+			removeListener(curLevel, 'update', 'trackWork'+this.handle);
+		}
 	},
 	collideMethods:{
 		cPAdiabaticDamped: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){

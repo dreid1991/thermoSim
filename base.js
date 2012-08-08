@@ -453,6 +453,9 @@ function makeSlider(handle, attrs, handlers, initVisibility, toChange){
 function sliderBind(div, eventType, func, obj){
 	div.bind(eventType, function(event, ui){func.apply(obj, [event, ui])});
 }
+function buttonBind(id, func){
+	$('#'+id).click(func);
+}
 function hideSliders(){
 	for (var handleIdx=0; handleIdx<sliderList.length; idIdx++){
 		var handle = sliderList[handleIdx];
@@ -511,6 +514,10 @@ function showPrompt(prev, prompt){
 		$('#baseHeader').html(title);
 		if(func){
 			func.apply(curLevel);
+		}
+		if(curLevel.storeFunc){
+			curLevel.storeFunc();
+			curLevel.storeFunc = undefined;
 		}
 	}
 

@@ -84,12 +84,13 @@
 <script src = '../base.js'></script>
 <script type = 'text/javascript'>
 var curLevel;
-canvasHeight = 530;
+canvasHeight = 500;
 $(function(){
 	animText = new AnimText(c);
 	myCanvas.height = canvasHeight;
 	curLevel = new Reversibility();
 	curLevel.init();
+	curLevel.cutSceneEnd();
 	$('button').button();
 	$('#toSim').click(function(){nextPrompt()});
 	$('#toLastStep').click(function(){prevPrompt()});

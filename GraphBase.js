@@ -2,7 +2,7 @@ function GraphBase(){};
 GraphBase.prototype = {
 	makeCanvas: function(name, dims){
 		addListener(curLevel, 'reset', 'clearGraph'+this.name, this.clear, this);
-		var str = "<div class='graphSpacer noSelect' id='"+this.name + "GraphSpacer'></div><div id = '" + this.name +"GraphDiv'><canvas id ='" + this.name + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas></div>"
+		var str = "</div><div id = '" + this.name +"GraphDiv'><canvas id ='" + this.name + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas></div><div class='graphSpacer noSelect' id='"+this.name + "GraphSpacer'>"
 		var canvasDiv = $(str);
 		$('#graphs').append(canvasDiv);
 		

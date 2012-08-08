@@ -43,7 +43,7 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	}
 
 	this.wall.setMass(this.massChunkName, this.massInit);
-	this.trackEnergy = true;
+	this.trackEnergy = false;
 	this.trackMass = true;
 	this.trackPressure = false;
 	return this;
@@ -121,7 +121,7 @@ DragWeights.prototype = {
 		return this;
 	},
 	addStdReadoutEntries: function(){
-		this.addEnergyEntry();
+		//this.addEnergyEntry();
 		this.addMassEntry();
 	},
 	addEnergyEntry: function(){
