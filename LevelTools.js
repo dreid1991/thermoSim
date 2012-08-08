@@ -83,10 +83,14 @@ LevelTools = {
 		}else if(mode=='outro'){
 			$('#dashOutro').show();
 			$('#base').hide();
-		}else if(mode=='quiz'){
+		}else if(mode=='buttons'){
 			$('#dashCutScene').show();
 			$('#base').hide();
-			this.appendQuiz(data.quizOptions)
+			this.appendButtons(data.buttonOptions)
+		}else if(mode=='multChoice'){
+			$('#dashCutScene').show();
+			$('#base').hide();
+			this.appendMultChoice(data.multChoiceOptions);
 		}
 		$('#canvasDiv').hide();
 		$('#display').show();
@@ -119,34 +123,64 @@ LevelTools = {
 		loadListener(this, 'update');
 		loadListener(this, 'data');
 	},
-	appendQuiz: function(options){
-		var quizHTML = "<center><table border='0'><tr>";
-		for (var optionIdx=0; optionIdx<options.length; optionIdx++){
-			var option = options[optionIdx];
-			quizHTML += "<td><button id='" + option.buttonID + "' class='noSelect'>" + option.buttonText + "</button></td>"
+	appendButtons: function(buttons){
+		var buttonHtml = "<br><center><table border='0'><tr>";
+		for (var buttonIdx=0; buttonIdx<buttons.length; buttonIdx++){
+			var button = buttons[buttonIdx];
+			buttonHtml += "<td><button id='" + button.buttonID + "' class='noSelect'>" + button.buttonText + "</button></td>"
 		}
-		quizHTML += "</tr></table></center>";
-		$('#intText').html($('#intText').html() + quizHTML);
+		buttonHtml += "</tr></table></center>";
+		$('#intText').html($('#intText').html() + buttonHtml);
 		$('button').button();
-		this.attachQuizListeners(options);
+		this.attachButtonListeners(buttons);
 	},
-	attachQuizListeners: function(options){
-		for (var optionIdx=0; optionIdx<options.length; optionIdx++){
-			var option = options[optionIdx];
-			this.attachQuizButtonListeners(option);
+	attachButtonListeners: function(buttons){
+		for (var buttonIdx=0; buttonIdx<buttons.length; buttonIdx++){
+			var button = buttons[buttonIdx];
+			this.attachButtonListener(button);
 
 		}		
 	},
-	attachQuizButtonListeners: function(option){
-		var id = option.buttonID;
-		var func = defaultTo(function(){}, option.func);
-		if(option.message){
-			func = extend(func, function(){alert(option.message)});
+	attachButtonListener: function(button){
+		var id = button.buttonID;
+		var func = defaultTo(function(){}, button.func);
+		if(button.message){
+			func = extend(func, function(){alert(button.message)});
 		}
-		if(option.isCorrect){
+		if(button.isCorrect){
 			func = extend(func, nextPrompt);
 		}
 		buttonBind(id, func);		
+	},
+	attachMultChoice: function(options){
+		var multChoiceHTML = '<br><center><table border=0>';
+		for (var optionIdx=0; optionIdx<options.length; optionIdx++){
+			var option = options[optionIdx];
+			multChoiceHTML += '<tr>';
+			multChoiceHTML += '<td>';
+			multChoiceHTML += "<input type='radio' name='multChoice' value='" + option.optionVal + "'>";
+			multChoiceHTML += '</td>'
+			multChoiceHTML += '<td>';
+			multChoiceHTML += option.optionText;
+			multChoiceHTML += '</td>';
+			multChoiceHTML += '</tr>';
+		}
+		multChoiceHTML += '</table>';
+		multChoiceHTML += '<br>';
+		multChoiceHTML += "<button id='multChoiceSubmit' class='noSelect'>Submit</button>"
+		$('#intText').html($('#intText').html() + buttonHtml);
+		$('button').button();
+		var checkFunc = function(){
+			var pickedVal = $("input:radio[name='multChoice']:checked").val();
+			var pickedOption = byAttr(options, pickedVal, 'optionVal');
+			if(pickedOption.message){
+				alert(pickedOption.message);
+			}
+			if(pickedOption.isCorrect){
+				nextPrompt();
+			}
+		}
+		buttonBind('multChoiceSubmit', checkFunc);
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();

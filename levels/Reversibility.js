@@ -93,8 +93,8 @@ _.extend(Reversibility.prototype,
 		var addOnce4 = function(){self.numBlocks=4;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:4}, 'container', self.massInit, {trackPressure:true}), self)};
 		var addOnce8 = function(){self.numBlocks=8;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:8}, 'container', self.massInit, {trackPressure:true}), self)};
 		this.cutSceneStart(replaceString("<p>So we compressed our container with XX kJ of work.  Do you think it’s possible to compress our system using less energy?  What if we break our block into smaller pieces? </p><p>How many pieces would you like to break the block into?</p>", 'XX', this.workInLrg),
-			'quiz',
-			{quizOptions:
+			'buttons',
+			{buttonOptions:
 			[{buttonID:'button2blocks', buttonText:'2', func:function(){addOnce2()}, isCorrect:true},
 			{buttonID:'button4blocks', buttonText:'4', func:function(){addOnce4()}, isCorrect:true},
 			{buttonID:'button8blocks', buttonText:'8', func:function(){addOnce8()}, isCorrect:true}
@@ -136,8 +136,8 @@ _.extend(Reversibility.prototype,
 	},
 	block3Start: function(){
 		this.cutSceneStart("Now to compress a system, what condition <i>must</i> be true?",
-			'quiz',
-			{quizOptions:
+			'buttons',
+			{buttonOptions:
 			[{buttonID:"extgreaterint", buttonText:"P<sub>ext</sub>&#62P<sub>int</sub>", message:'Correct!', isCorrect: true},
 			{buttonID:"extequalint", buttonText:"P<sub>ext</sub>=P<sub>int</sub>", message:'NO', isCorrect: false},
 			{buttonID:"extlessint", buttonText:"P<sub>ext</sub>&#60P<sub>int</sub>", message:'NOOO', isCorrect: false}
@@ -150,8 +150,8 @@ _.extend(Reversibility.prototype,
 	},
 	block4Start: function(){
 		this.cutSceneStart("<p>So when we compressed with the biggest block, P<sub>ext</sub> was much greater than P<sub>int</sub>.  We did more work than we had to because when P<sub>int</sub> was low, we didn’t need to apply such a high external pressure to compress.<p></p>When we compressed with the smaller blocks, P<sub>ext</sub> stepped more smoothly with P<sub>int</sub>.</p><p>Since we weren’t compressing at the maximum pressure the whole time, we did less work.</p><p>What if we split all of our blocks in half and compress with those?  How do you think the amount of work we have to do will change?</p>",
-			'quiz',
-			{quizOptions:
+			'buttons',
+			{buttonOptions:
 			[{buttonID:'increase', buttonText:'Increase', message:'Hmm, you should compare the work done in your two previous compressions.', isCorrect: false},
 			{buttonID:'decrease', buttonText:'Decrease', message:'Correct!', isCorrect: true}
 			]}
@@ -185,8 +185,8 @@ _.extend(Reversibility.prototype,
 		var text = '<p>So in the three compressions, you did XX, YY, and finally ZZ kJ of work.  What if we kept breaking our blocks into smaller pieces?</p><p>If they were small enough, every time we put a new block on, would P<sub>ext</sub> even be noticeably different than P<sub>int</sub>?</p> <p> If we kept those pressures almost equal, would we ever be doing any more work than we had to? </p><p> By the way, the answer is the same to both questions.</p>'
 		text = replaceString(replaceString(replaceString(text, 'XX', this.workInLrg), 'YY', this.workInMed), 'ZZ', this.workInSml);
 		this.cutSceneStart(text,
-			'quiz',
-			{quizOptions:
+			'buttons',
+			{buttonOptions:
 			[{buttonID:'yes', buttonText:'Yes', message:'No', isCorrect: false},
 			{buttonID:'no', buttonText:'No', message:'Yes (correct)!', isCorrect: true}
 			]}
@@ -220,8 +220,8 @@ _.extend(Reversibility.prototype,
 		var text = "<p>Well that didn’t go very well.  From before, we know it takes at least XX kJ to compress to that volume and we only got YY kJ out!  We can do better.</p><p>What if we break up our block like we did before?</p><p>How many pieces would you like?</p>";
 		text = replaceString(replaceString(text, 'XX', this.workInSml),'YY', this.workOutLrg);
 		this.cutSceneStart(text,
-			'quiz',
-			{quizOptions:
+			'buttons',
+			{buttonOptions:
 			[{buttonID:'button2blocks', buttonText:'4', isCorrect:false, message:'I think you want more blocks than that.'},
 			{buttonID:'button4blocks', buttonText:'8', isCorrect:false, message:'I think you want more blocks than that.'},
 			{buttonID:'button8blocks', buttonText:'12', func:function(){addOnce12(); addOnceDropInstant()}, isCorrect:true}
