@@ -377,6 +377,9 @@ function addListenerOnce(object, typeName, funcName, func, destObj){
 function removeListener(object, typeName, funcName){
 	delete object[typeName + 'Listeners'].listeners[funcName];
 }
+function removeSave(object, typeName, funcName){
+	delete object[typeName + 'Listeners'].save[funcName];
+}
 function removeListenerByName(object, typeName, pieceToRemoveBy){
 	var didDelete = false;
 	var funcName = getListenerByName(object, typeName, pieceToRemoveBy);
@@ -384,6 +387,12 @@ function removeListenerByName(object, typeName, pieceToRemoveBy){
 		didDelete = true;
 		delete object[typeName+'Listeners'].listeners[funcName];
 		funcName = getListenerByName(object, typeName, pieceToRemoveBy);
+	}
+	var funcName = getSavedByName(object, typeName, pieceToRemoveBy);
+	while (funcName!==undefined){
+		didDelete = true;
+		delete object[typeName+'Listeners'].save[funcName];
+		funcName = getSavedByName(object, typeName, pieceToRemoveBy);
 	}
 	return didDelete
 }
@@ -397,6 +406,13 @@ function emptyListener(object, typeName){
 }
 function getListenerByName(object, typeName, pieceName){
 	for (thisFuncName in object[typeName + 'Listeners'].listeners){
+		if(thisFuncName.indexOf(pieceName)!=-1){
+			return thisFuncName;
+		}
+	}
+}
+function getSavedByName(object, typeName, pieceName){
+	for (thisFuncName in object[typeName + 'Listeners'].save){
 		if(thisFuncName.indexOf(pieceName)!=-1){
 			return thisFuncName;
 		}

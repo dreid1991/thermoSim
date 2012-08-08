@@ -172,6 +172,7 @@ _.extend(Reversibility.prototype,
 	},
 	block7CleanUp: function(){
 		this.cutSceneEnd();
+		this.removeAllGraphs();
 	},
 	block8Start: function(){
 		this.makeGraphsRev();
@@ -185,22 +186,27 @@ _.extend(Reversibility.prototype,
 	},
 	block9Start: function(){
 		var self = this;
-		var addOnce2 = function(){self.numBlocks=2;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:2}, 'container', self.massInit, {trackPressure:true}), self)};
-		var addOnce4 = function(){self.numBlocks=4;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:4}, 'container', self.massInit, {trackPressure:true}), self)};
 		var addOnce8 = function(){self.numBlocks=8;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:8}, 'container', self.massInit, {trackPressure:true}), self)};
-		var addOnceDropInstant = function(){self.dragWeights.dropAllIntoPistons('instant')};
+		var addOnceDropInstant = function(){addListenerOnce(curLevel, 'update', 'dropToPiston', function(){self['dragWeights'].dropAllIntoPistons('instant')}, self)};
 		this.cutSceneStart("<p>Well that didn’t go very well.  From before, we know it takes at least XX kJ to compress to that volume and we only got YY kJ out!  We can do better.</p><p>What if we break up our block like we did before?</p><p>How many pieces would you like?</p>",
 			'quiz',
 			{quizOptions:
-			[{buttonID:'button2blocks', buttonText:'2', func:function(){addOnce2(); addOnceDropInstant()}, isCorrect:true},
-			{buttonID:'button4blocks', buttonText:'4', func:function(){addOnce4(); addOnceDropInstant()}, isCorrect:true},
+			[{buttonID:'button2blocks', buttonText:'2', isCorrect:false, message:'I think you want more blocks than that.'},
+			{buttonID:'button4blocks', buttonText:'4', isCorrect:false, message:'I think you want more blocks than that.'},
 			{buttonID:'button8blocks', buttonText:'8', func:function(){addOnce8(); addOnceDropInstant()}, isCorrect:true}
 			]}
 		);
 	},
 	block9CleanUp: function(){
 		this.removeAllGraphs();
+		this.cutSceneEnd();
+	},
+	block10Start: function(){
 		this.compSetup();
+		walls[0].trackWorkStart();
+	},
+	block10CleanUp: function(){
+		this.dragWeights.remove();
 	},
 	blockNStart: function(){
 	
@@ -232,8 +238,8 @@ _.extend(Reversibility.prototype,
 		this.borderStd({min:68});
 		var maxY = walls[0][0].y;
 		var height = walls[0][3].y-walls[0][0].y;
-		spcs['spc1'].populate(P(35, maxY+10), V(460, height-20), 800, 200);
-		spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 600, 200);
+		spcs['spc1'].populate(P(35, maxY+10), V(460, height-20), 800, 320);
+		spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 600, 320);
 		this.stops = new Stops({volume:10}, 'container').init();		
 	},
 	dataRun: function(){
