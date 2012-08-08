@@ -23,6 +23,11 @@ function Reversibility(){
 		{block:8, title:'Current step', finished: false, text:"Now I have another equally important task for you.  I want this piston expanded in a way that gets as much work out as possible.  When we compressed, we used the blocks to do work on the system.  When expanding, the system can do work on the blocks, lifting them to a higher potential energy.  Let’s start with just one block.  How much work can you get out?"},
 		{block:9, title:'', finished: false, text:""},
 		{block:10, title:'Current step', finished: false, text:"Ah, good choice.  How much work can you get out this time?"},
+		{block:11, title:'', finished: false, text:""},
+		{block:12, title:'', finished: false, text:""},
+		{block:13, title:'Current step', finished: false, text:"Your final and most important task is to compress this container and then bring it back to its original volume.  We can call this going through a cycle.  After you go through a cycle using this block, how do the initial and final temperatures compare?"},
+		{block:14, title:'Current step', finished: false, text:"Just like before, let’s split up our block.  With more blocks, we’ll be doing less work when we compress and getting more work out when we expand.  Try going through a cycle with these blocks.  Last time T<sub>i</sub> was XX K and T<sub>f</sub> was YY K.  How do the initial and final temperatures compare this time?"},
+		{block:15, title:'', finished: false, text:""},
 		//{block:N, title:'Current step', finished: false, text:""},
 	]
 	
@@ -63,7 +68,7 @@ _.extend(Reversibility.prototype,
 		var wallHandle = 'container';
 		this.unCompSetup();
 		walls[0].trackWorkStart(this.readout);
-		this.dragWeights = this.makeDragWeights([{name:'lrg', count:1, mass:90}], wallHandle, this.massInit).init().trackEnergyStop().trackPressureStart();
+		this.dragWeights = this.makeDragWeights([{name:'lrg', count:1, mass:90}], wallHandle, this.massInit).init().trackPressureStart();
 		this.trackVolumeStart(0);
 		this.volListener10 = new StateListener(10, this.data.v, .05, {v:this.data.v});
 		this.readout.show();
@@ -186,14 +191,14 @@ _.extend(Reversibility.prototype,
 	},
 	block9Start: function(){
 		var self = this;
-		var addOnce8 = function(){self.numBlocks=8;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:8}, 'container', self.massInit, {trackPressure:true}), self)};
+		var addOnce12 = function(){self.numBlocks=12;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:12}, 'container', self.massInit, {trackPressure:true}), self)};
 		var addOnceDropInstant = function(){addListenerOnce(curLevel, 'update', 'dropToPiston', function(){self['dragWeights'].dropAllIntoPistons('instant')}, self)};
 		this.cutSceneStart("<p>Well that didn’t go very well.  From before, we know it takes at least XX kJ to compress to that volume and we only got YY kJ out!  We can do better.</p><p>What if we break up our block like we did before?</p><p>How many pieces would you like?</p>",
 			'quiz',
 			{quizOptions:
-			[{buttonID:'button2blocks', buttonText:'2', isCorrect:false, message:'I think you want more blocks than that.'},
-			{buttonID:'button4blocks', buttonText:'4', isCorrect:false, message:'I think you want more blocks than that.'},
-			{buttonID:'button8blocks', buttonText:'8', func:function(){addOnce8(); addOnceDropInstant()}, isCorrect:true}
+			[{buttonID:'button2blocks', buttonText:'4', isCorrect:false, message:'I think you want more blocks than that.'},
+			{buttonID:'button4blocks', buttonText:'8', isCorrect:false, message:'I think you want more blocks than that.'},
+			{buttonID:'button8blocks', buttonText:'12', func:function(){addOnce12(); addOnceDropInstant()}, isCorrect:true}
 			]}
 		);
 	},
@@ -203,10 +208,54 @@ _.extend(Reversibility.prototype,
 	},
 	block10Start: function(){
 		this.compSetup();
-		walls[0].trackWorkStart();
+		this.makeGraphsRev();
+		walls[0].trackWorkStart(this.readout);
 	},
 	block10CleanUp: function(){
+		walls[0].trackWorkStop();
+		this.removeAllGraphs();
 		this.dragWeights.remove();
+	},
+	block11Start: function(){
+		this.cutSceneStart('So you got XX kJ out versus YY kJ with the big block.  Why do you think you got more work out this time?');
+	},
+	block11CleanUp: function(){
+		this.cutSceneEnd();
+	},
+	block12Start: function(){
+		this.cutSceneStart('<p>Now say we split our blocks into tiny pieces again.  The maximum amount of work we can get out at any point is</p><center><img src=img/rev/eq2.gif></img></center><p>over a tiny (or differential) change in volume.  As we use smaller and smaller blocks, we again approach</p><center><img src=img/rev/eq1.gif></img></center>');
+	},
+	block12CleanUp: function(){
+		this.cutSceneEnd();
+	},	
+	block13Start: function(){
+		this.unCompSetup();
+		this.makeGraphsRev();
+		walls[0].trackWorkStart(this.readout);
+		this.dragWeights = this.makeDragWeights({mass:90, count:1}, 'container', this.massInit).init().trackPressureStart();		
+	},
+	block13CleanUp: function(){
+		this.removeAllGraphs();
+		this.dragWeights.remove();
+		walls[0].trackWorkStop();
+	},
+	block14Start: function(){
+		this.unCompSetup();
+		this.makeGraphsRev();
+		walls[0].trackWorkStart(this.readout);
+		this.dragWeights = this.makeDragWeights({mass:90, count:12}, 'container', this.massInit).init().trackPressureStart();		
+	},
+	block14CleanUp: function(){
+		this.removeAllGraphs();
+		walls[0].trackWorkStop();
+		this.dragWeights.remove();
+	},
+	block15Start: function(){
+		this.cutSceneStart('<p>The temperatures were much closer this time, yes?</p><p>If we again split our blocks up into so many pieces that</p><center><img src=’img/rev/eq1.gif></img></center><p>we can say that when compressing, we’re only doing as much work as we have to, and when expanding, we’re getting as much work out as we can.  If we did this, then P<sub>ext</sub> at any volume in our cycle is the same whether we’re compressing or expanding.  This means that we do the same amount of work compressing as we get out expanding.</p><p>If we do that same amount of work in either direction, we can say that in a cycle, the net work done is zero, so our system has a net energy and temperature change of zero!  </p><p>Our final system now looks exactly like our initial system.  Our compression was reversed!  This brings us to the meaning of reversibility:  If a volume change is done reversibly, with</p><center><img src=img/rev/eq1.gif></img></center><p>the system can be brought back to its original state through another reversible volume change.  The volume change can be...  reversed!</p>',
+		'outro');
+	},
+	block15CleanUp: function(){
+		this.cutSceneEnd();
 	},
 	blockNStart: function(){
 	

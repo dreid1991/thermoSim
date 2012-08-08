@@ -12,7 +12,9 @@ GraphBase.prototype = {
 	},
 	remove: function(){
 		removeListener(curLevel, 'reset', 'clearGraph'+this.name);
+		removeSave(curLevel, 'reset', 'clearGraph'+this.name);
 		removeListener(curLevel, 'update', 'flash' + this.name);
+		removeSave(curLevel, 'update', 'flash' + this.name);
 		$('#'+this.name+'GraphDiv').remove();
 		$('#'+this.name+'GraphSpacer').remove();
 		delete this;//DOESN'T DO ANYTHING
