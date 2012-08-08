@@ -1,8 +1,8 @@
-function WallHandler(pts, handlers, handles, bounds, includes){
+function WallHandler(pts, handlers, handles, bounds, includes, vols){
 	var newWall = new Array(pts.length)
 	_.extend(newWall, WallMethods.main, WallMethods.collideMethods);
 
-	newWall.assemble(pts, handles, bounds, includes)
+	newWall.assemble(pts, handles, bounds, includes, vols)
 	
 	if(handles.length!=pts.length){
 		console.log('NAME YOUR WALLS');
@@ -15,11 +15,12 @@ function WallHandler(pts, handlers, handles, bounds, includes){
 };
 WallMethods = {
 	main: {
-		assemble: function(pts, handles, bounds, includes){
+		assemble: function(pts, handles, bounds, includes, vols){
 			includes = defaultTo([], includes);
 			bounds = defaultTo([], bounds);
+			vols = defaultTo([], vols);
 			for (var wallIdx=0; wallIdx<pts.length; wallIdx++){
-				this.setWallVals(wallIdx, pts[wallIdx], handles[wallIdx], bounds[wallIdx], includes[wallIdx]);
+				this.setWallVals(wallIdx, pts[wallIdx], handles[wallIdx], bounds[wallIdx], includes[wallIdx], vols[wallIdx]);
 
 			}
 			this.setup();
@@ -139,7 +140,7 @@ WallMethods = {
 			}
 			return wallGrid;
 		},
-		setWallVals: function(wallIdx, pts, handle, bounds, include){
+		setWallVals: function(wallIdx, pts, handle, bounds, include, vol){
 			bounds = defaultTo({yMin:30, yMax: 435}, bounds);
 			include = defaultTo(1, include);
 			this[wallIdx] = pts;
@@ -148,6 +149,9 @@ WallMethods = {
 			this[wallIdx].hitMode = 'Std';
 			this[wallIdx].v = 0;
 			this[wallIdx].bounds = bounds;
+			if(vol){
+				this.setVol(this[wallIdx], vol);
+			}
 			this.closeWall(this[wallIdx]);
 			this[wallIdx].ptsInit = this.copyWallPts(this[wallIdx]);
 			this[wallIdx].g = g;
@@ -159,10 +163,18 @@ WallMethods = {
 			this[handle] = this[wallIdx];
 			_.extend(this[wallIdx], WallMethods.wall);	
 		},
-		addWall: function(pts, handler, handle, bounds, include){
+		setVol: function(pts, vol){
+			var width = pts[2].distTo(pts[3]);
+			var height = vol/(vConst*width);
+			var extendUV = pts[2].VTo(pts[3]).UV().perp('cw');
+			var setY = pts[2].y - height;
+			pts[0].position({y:setY});
+			pts[1].position({y:setY});
+		},
+		addWall: function(pts, handler, handle, bounds, include, vol){
 			
 			var newIdx = this.length;
-			this.setWallVals(newIdx, pts, handle, bounds, include);
+			this.setWallVals(newIdx, pts, handle, bounds, include, vol);
 			this.setupWall(newIdx);
 			this.setWallHandler(newIdx, handler);
 		},

@@ -132,10 +132,20 @@ LevelTools = {
 	attachQuizListeners: function(options){
 		for (var optionIdx=0; optionIdx<options.length; optionIdx++){
 			var option = options[optionIdx];
-			var id = option.buttonID;
-			var func = option.func;
-			buttonBind(id, func);
+			this.attachQuizButtonListeners(option);
+
 		}		
+	},
+	attachQuizButtonListeners: function(option){
+		var id = option.buttonID;
+		var func = defaultTo(function(){}, option.func);
+		if(option.message){
+			func = extend(func, function(){alert(option.message)});
+		}
+		if(option.isCorrect){
+			func = extend(func, nextPrompt);
+		}
+		buttonBind(id, func);		
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();

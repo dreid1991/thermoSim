@@ -29,14 +29,13 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.eAdded = 0;
 	this.pressure = this.getPressure();
 	this.readout = readout;
-	this.moveToDropOrders = [];
-	this.moveToPistonOrders = [];
 	this.weightsOnPiston = [];
 	this.tempWeightDefs = weightDefs;
 	this.flySpeed = 20;
 	this.eBarFont = '12pt Calibri';
 	this.eBarFontCol = Col(255,255,255);
 	this.addStdReadoutEntries();
+	
 	var self = this;
 	if(obj){
 		addListener(obj, 'init', 'dragWeights', this.init, this);
@@ -62,7 +61,7 @@ DragWeights.prototype = {
 		addListener(curLevel, 'update', 'drawDragWeights', this.draw, this);
 		addListener(curLevel, 'mousedown', 'weights', this.mousedown, this);
 		addListener(curLevel, 'reset', 'dragWeights', this.reset, this);
-		this.dropAllIntoStores();
+		this.dropAllIntoStores('instant');
 		delete this.tempWeightDefs;
 		return this;
 		
@@ -147,6 +146,7 @@ DragWeights.prototype = {
 	makeWeights: function(weightDefs){
 		var weightGroups = {};
 		var weightDims = this.getWeightDims(weightDefs)
+		var weightId = 0;
 		for (var groupIdx=0; groupIdx<weightDefs.length; groupIdx++){
 			var weightDef = weightDefs[groupIdx];
 			var weightGroup = {}; 
@@ -159,8 +159,11 @@ DragWeights.prototype = {
 				weight.pos = P(300,500);
 				weight.name = weightDef.name;
 				weight.status = '';
+				weight.id = weightId;
 				weightGroup.weights.push(weight)
+				weightId++;
 			}
+			
 			weightGroups[weightGroup.name] = weightGroup;
 		}
 		return weightGroups;
@@ -352,7 +355,7 @@ DragWeights.prototype = {
 	pistonMinusVal: function(val){
 		return function(){return walls[0][0].y-val}
 	},
-	dropAllIntoStores: function(){
+	dropAllIntoStores: function(special){
 		for (var group in this.weightGroups){
 			var weightGroup = this.weightGroups[group];
 			for (var weightIdx=0; weightIdx<weightGroup.weights.length; weightIdx++){
@@ -361,22 +364,48 @@ DragWeights.prototype = {
 					weight.status = 'inTransit';
 					weight.slot.isFull = false;
 					this.takeOffPiston(weight);
-					this.dropIntoBin(weight, 'store');
-				}else if(weight.status!='store' && weight.status!='inTransit'){
+					this.dropIntoBin(weight, 'store', special);
+				}else if(weight.status!='store'/* && weight.status!='inTransit'*/){
 					weight.status = 'inTransit';
-					this.dropIntoBin(weight, 'store');
+					this.dropIntoBin(weight, 'store', special);
 				}//NOTE - BLOCKS AREADY MOVING WILL NOT GET DROPPED. SHOULD ADD DESTINATION AND IF DEST==PISTON, DROP TO BIN
 				
 			}
 		}
+		return this;
 	},
-	dropIntoBin: function(weight, binType){
+	dropAllIntoPistons: function(special){
+		for (var group in this.weightGroups){
+			var weightGroup = this.weightGroups[group];
+			for (var weightIdx=0; weightIdx<weightGroup.weights.length; weightIdx++){
+				var weight = weightGroup.weights[weightIdx];
+				if(weight.status=='store'){
+					weight.status = 'inTransit';
+					weight.slot.isFull = false;
+					this.takeOffPiston(weight);
+					this.dropIntoBin(weight, 'piston', special);
+				}else if(weight.status!='piston'/* && weight.status!='inTransit'*/){
+					weight.status = 'inTransit';
+					this.dropIntoBin(weight, 'piston', special);
+				}//NOTE - BLOCKS AREADY MOVING WILL NOT GET DROPPED. SHOULD ADD DESTINATION AND IF DEST==PISTON, DROP TO BIN
+				
+			}
+		}
+		return this;
+	},
+	dropIntoBin: function(weight, binType, special){
 		weight.status = 'inTransit';
 		var dropSlotInfo = this.getDropSlot(weight.name, binType);
 		var slot = dropSlotInfo.slot;
 		slot.isFull = true;
 		var slotIdNum = dropSlotInfo.id;
-		var listenerName = 'moveWeight'+weight.name+binType+slotIdNum;
+		if(special=='instant'){
+			weight.pos.x = slot.x;
+			weight.pos.y = slot.y();
+		}
+		var uniqueNamePiece = weight.name+weight.id + 'endId';
+		var listenerName = 'moveWeight'+ uniqueNamePiece + binType+slotIdNum;
+		removeListenerByName(curLevel, 'update', uniqueNamePiece);
 		addListener(curLevel, 'update', listenerName,
 			function(){
 				var slotY = slot.y();

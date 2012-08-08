@@ -74,7 +74,7 @@ Readout.prototype = {
 				return this;
 			}
 		}
-		console.log('Entry does not exist');
+		console.log('Tried to remove entry that does not exist: ' + toRemove);
 	},
 	entryExists: function(entryName){
 		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++){
