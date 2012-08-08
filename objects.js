@@ -398,6 +398,7 @@ DragWeights.prototype = {
 		var dropSlotInfo = this.getDropSlot(weight.name, binType);
 		var slot = dropSlotInfo.slot;
 		slot.isFull = true;
+		
 		var slotIdNum = dropSlotInfo.id;
 		if(special=='instant'){
 			weight.pos.x = slot.x;
@@ -405,7 +406,11 @@ DragWeights.prototype = {
 		}
 		var uniqueNamePiece = weight.name+weight.id + 'endId';
 		var listenerName = 'moveWeight'+ uniqueNamePiece + binType+slotIdNum;
-		removeListenerByName(curLevel, 'update', uniqueNamePiece);
+		if(removeListenerByName(curLevel, 'update', uniqueNamePiece)){
+			weight.slot.isFull = false;
+			weight.slot = undefined;
+		};
+		weight.slot = slot;
 		addListener(curLevel, 'update', listenerName,
 			function(){
 				var slotY = slot.y();
@@ -414,7 +419,7 @@ DragWeights.prototype = {
 				weight.pos.y = boundedStep(weight.pos.y, slotY, UV.dy*this.moveSpeed);
 				if(this.weightArrived(weight, slot)){
 					removeListener(curLevel, 'update', listenerName);
-					weight.slot = slot;
+					//weight.slot = slot;
 					weight.status = slot.type;
 					if(weight.status=='piston'){
 						this.putOnPiston(weight);

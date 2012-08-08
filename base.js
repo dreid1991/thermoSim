@@ -378,11 +378,14 @@ function removeListener(object, typeName, funcName){
 	delete object[typeName + 'Listeners'].listeners[funcName];
 }
 function removeListenerByName(object, typeName, pieceToRemoveBy){
+	var didDelete = false;
 	var funcName = getListenerByName(object, typeName, pieceToRemoveBy);
 	while (funcName!==undefined){
+		didDelete = true;
 		delete object[typeName+'Listeners'].listeners[funcName];
 		funcName = getListenerByName(object, typeName, pieceToRemoveBy);
 	}
+	return didDelete
 }
 function listenerExists(object, typeName, funcName){
 	return object[typeName + 'Listeners'].listeners[funcName]!==undefined;

@@ -53,22 +53,13 @@ _.extend(Reversibility.prototype,
 			func.apply(obj);
 		}
 		var self = this;
-		this.graphs.pVSv = new GraphScatter('pVSv', 400,293, "Volume (L)", "Pressure (atm)",
-							{x:{min:0, step:4}, y:{min:0, step:2}});
-		this.graphs.tVSv = new GraphScatter('tVSv', 400, 293,"Volume (L)", "Temperature (K)",
-							{x:{min:0, step:4}, y:{min:180, step:60}});
-		this.graphs.pVSv.addSet('pInt', 'P Int.', Col(0,0,255), Col(200,200,255),
-								{data:this.data, x:'v', y:'pInt'});
-		this.graphs.pVSv.addSet('pExt', 'P Ext.', Col(0,255,0), Col(200,255,200),
-								{data:this.data, x:'v', y:'pExt'});
-		this.graphs.tVSv.addSet('t', 'Sys\nTemp', Col(255,0,0), Col(255,200,200),
-								{data:this.data, x:'v', y:'t'});		
 		
 		
 		
 		nextPrompt();
 	},
 	block0Start: function(){
+		this.makeGraphsRev();
 		var wallHandle = 'container';
 		this.unCompSetup();
 		walls[0].trackWorkStart(this.readout);
@@ -78,6 +69,7 @@ _.extend(Reversibility.prototype,
 		this.readout.show();
 	},	
 	block0Conditions: function(){
+		
 		if(this.volListener10.isSatisfied()){
 			return {result:true};
 		}else{
@@ -107,14 +99,17 @@ _.extend(Reversibility.prototype,
 		);
 	},
 	block1CleanUp: function(){
+		this.removeAllGraphs();
 		this.cutSceneEnd();
 	},
 	block2Start: function(){
+		this.makeGraphsRev();
 		this.trackVolumeStart();
 		this.unCompSetup();
 		walls[0].trackWorkStart(this.readout);
 	},
 	block2CleanUp: function(){
+		this.removeAllGraphs();
 		this.dragWeights.remove();
 		this.dragWeights = undefined;
 		walls[0].trackWorkStop();
@@ -148,11 +143,13 @@ _.extend(Reversibility.prototype,
 		this.cutSceneEnd();
 	},
 	block5Start: function(){
+		this.makeGraphsRev();
 		this.unCompSetup();
 		walls[0].trackWorkStart(this.readout);		
 		this.dragWeights = this.makeDragWeights({mass:90, count:2*this.numBlocks}, 'container', this.massInit).init().trackPressureStart();
 	},
 	block5CleanUp: function(){
+		this.removeAllGraphs();
 		this.dragWeights.remove();
 		this.dragWeights = undefined;
 		walls[0].trackWorkStop();
@@ -177,18 +174,51 @@ _.extend(Reversibility.prototype,
 		this.cutSceneEnd();
 	},
 	block8Start: function(){
+		this.makeGraphsRev();
 		this.compSetup();
 		walls[0].trackWorkStart(this.readout);
 		this.dragWeights = this.makeDragWeights({mass:90, count:1}, 'container', this.massInit).init().dropAllIntoPistons('instant').trackPressureStart();
 	},
 	block8CleanUp: function(){
-	
+		walls[0].trackWorkStop();
+		this.dragWeights.remove();
+	},
+	block9Start: function(){
+		var self = this;
+		var addOnce2 = function(){self.numBlocks=2;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:2}, 'container', self.massInit, {trackPressure:true}), self)};
+		var addOnce4 = function(){self.numBlocks=4;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:4}, 'container', self.massInit, {trackPressure:true}), self)};
+		var addOnce8 = function(){self.numBlocks=8;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:8}, 'container', self.massInit, {trackPressure:true}), self)};
+		var addOnceDropInstant = function(){self.dragWeights.dropAllIntoPistons('instant')};
+		this.cutSceneStart("<p>Well that didn’t go very well.  From before, we know it takes at least XX kJ to compress to that volume and we only got YY kJ out!  We can do better.</p><p>What if we break up our block like we did before?</p><p>How many pieces would you like?</p>",
+			'quiz',
+			{quizOptions:
+			[{buttonID:'button2blocks', buttonText:'2', func:function(){addOnce2(); addOnceDropInstant()}, isCorrect:true},
+			{buttonID:'button4blocks', buttonText:'4', func:function(){addOnce4(); addOnceDropInstant()}, isCorrect:true},
+			{buttonID:'button8blocks', buttonText:'8', func:function(){addOnce8(); addOnceDropInstant()}, isCorrect:true}
+			]}
+		);
+	},
+	block9CleanUp: function(){
+		this.removeAllGraphs();
+		this.compSetup();
 	},
 	blockNStart: function(){
 	
 	},
 	blockNCleanUp: function(){
 	
+	},
+	makeGraphsRev: function(){
+		this.graphs.pVSv = new GraphScatter('pVSv', 400,293, "Volume (L)", "Pressure (atm)",
+							{x:{min:0, step:4}, y:{min:0, step:2}});
+		this.graphs.tVSv = new GraphScatter('tVSv', 400, 293,"Volume (L)", "Temperature (K)",
+							{x:{min:0, step:4}, y:{min:180, step:60}});
+		this.graphs.pVSv.addSet('pInt', 'P Int.', Col(0,0,255), Col(200,200,255),
+								{data:this.data, x:'v', y:'pInt'});
+		this.graphs.pVSv.addSet('pExt', 'P Ext.', Col(0,255,0), Col(200,255,200),
+								{data:this.data, x:'v', y:'pExt'});
+		this.graphs.tVSv.addSet('t', 'Sys\nTemp', Col(255,0,0), Col(255,200,200),
+								{data:this.data, x:'v', y:'t'});		
 	},
 	unCompSetup: function(){
 		walls = WallHandler([[P(40,68), P(510,68), P(510,410), P(40,410)]], 'staticAdiabatic', ['container'], [{yMin:68, yMax:435}]);
