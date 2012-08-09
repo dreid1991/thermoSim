@@ -524,9 +524,7 @@ function showPrompt(prev, prompt){
 			}
 		}
 		var block = prompt.block
-		var text = prompt.text;
 		var func = prompt.start;
-		var title = prompt.title;
 		if(block!=curLevel.blockIdx){
 			var spcsLocal = spcs;
 			for (var spcName in spcsLocal){
@@ -541,7 +539,16 @@ function showPrompt(prev, prompt){
 			}
 			curLevel.blockIdx = block;
 		}
-		$('#prompt').html(text);
+		var text = prompt.text;
+		var title = prompt.title;
+		if(prompt.quiz){
+			$('#submitDiv').hide();
+			$('#prompt').html('');
+			curLevel.appendQuizDash(prompt.quiz)
+		}else{
+			$('#prompt').html(text);
+		}
+		
 		$('#baseHeader').html(title);
 		if(func){
 			func.apply(curLevel);

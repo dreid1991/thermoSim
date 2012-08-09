@@ -105,6 +105,7 @@ LevelTools = {
 		$('#intText').show();
 		
 	},
+	appendQuizDash: function(
 	cutSceneText: function(text){
 		$('#intText').html(text);
 	},
@@ -115,6 +116,7 @@ LevelTools = {
 		$('#dashOutro').hide();
 		$('#dashIntro').hide();
 		$('#dashCutScene').hide();
+		$('#submitDiv').show();
 		$('#base').show();
 		$('#canvasDiv').show();
 		$('#display').hide();
@@ -139,7 +141,7 @@ LevelTools = {
 			buttonHTML += "<td><button id='" + button.buttonID + "' class='noSelect'>" + button.buttonText + "</button></td>"
 		}
 		buttonHTML += "</tr></table></center>";
-		$('#'+appendTo).html($('#intText').html() + buttonHtml);
+		$('#'+appendTo).html($('#intText').html() + buttonHTML);
 		$('button').button();
 		this.attachButtonListeners(buttons);
 	},
@@ -181,7 +183,7 @@ LevelTools = {
 		multChoiceHTML += '</td></tr></table>'
 		multChoiceHTML += '<p>';
 		multChoiceHTML += "<center><button id='multChoiceSubmit' class='noSelect'>Submit</button></center></p>"
-		$('#'+appendTo).html($('#intText').html() + multChoiceHTML);
+		$('#'+appendTo).html($('#'+appendTo).html() + multChoiceHTML);
 		$('button').button();
 		var checkFunc = function(){
 			var pickedVal = $("input:radio[name='multChoice']:checked").val();

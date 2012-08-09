@@ -32,8 +32,7 @@ function Reversibility(){
 	]
 	
 	
-	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300)
-	;
+	//this.heater = new Heater(heaterX, heaterY, heaterWidth, heaterHeight, 50, 300);
 	//walls.setSubWallHandler(0, 0, {func:this.onWallImpactTop, obj:this});
 	/*
 	this.workTracker = new WorkTracker('tracky',
@@ -87,27 +86,21 @@ _.extend(Reversibility.prototype,
 		this.dragWeights.remove();
 	},
 	block1Start: function(){
-		this.volListener10 = new StateListener(10, this.data.v, .05, {v:this.data.v});
 		var self = this;
+	
 		var addOnce2 = function(){self.numBlocks=2;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:2}, 'container', self.massInit, {trackPressure:true}), self)};
 		var addOnce4 = function(){self.numBlocks=4;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:4}, 'container', self.massInit, {trackPressure:true}), self)};
-		var addOnce8 = function(){self.numBlocks=8;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:8}, 'container', self.massInit, {trackPressure:true}), self)};
+		var addOnce6 = function(){self.numBlocks=6;addListenerOnce(curLevel, 'update', 'addWeights', self.makeDragWeightsFunc({mass:90, count:6}, 'container', self.massInit, {trackPressure:true}), self)};
 		this.cutSceneStart(replaceString("<p>So we compressed our container with XX kJ of work.  Do you think it’s possible to compress our system using less energy?  What if we break our block into smaller pieces? </p><p>How many pieces would you like to break the block into?</p>", 'XX', this.workInLrg),
-			'buttons',
+			'quiz',
 			{buttonOptions:
 			[{buttonID:'button2blocks', buttonText:'2', func:function(){addOnce2()}, isCorrect:true},
 			{buttonID:'button4blocks', buttonText:'4', func:function(){addOnce4()}, isCorrect:true},
-			{buttonID:'button8blocks', buttonText:'8', func:function(){addOnce8()}, isCorrect:true}
+			{buttonID:'button8blocks', buttonText:'6', func:function(){addOnce6()}, isCorrect:true}
 			]}
 		);
 	},
-	block1Conditions: function(){
-		if(this.volListener10.isSatisfied()){
-			return {result:true};
-		}else{
-			return {result:false, alert:'Compress thy system!'};
-		}		
-	},
+
 	block1CleanUp: function(){
 		this.removeAllGraphs();
 		this.cutSceneEnd();
@@ -118,7 +111,7 @@ _.extend(Reversibility.prototype,
 		this.trackVolumeStart();
 		this.unCompSetup();
 		walls[0].trackWorkStart(this.readout);
-		this.volListener10 = new StateListener(10, this.data.v, .05, {v:this.data.v}, {func:function(){this.workInMed = round(walls[0].work,1)},obj:this});
+		this.volListener10 = new StateListener(10, this.data.v, .02, {v:this.data.v}, {func:function(){this.workInMed = round(walls[0].work,1)},obj:this});
 	},
 	block2Conditions: function(){
 		if(this.volListener10.isSatisfied()){
@@ -151,7 +144,7 @@ _.extend(Reversibility.prototype,
 		this.cutSceneEnd();
 	},
 	block4Start: function(){
-		this.cutSceneStart("<p>So when we compressed with the biggest block, P<sub>ext</sub> was much greater than P<sub>int</sub>.  We did more work than we had to because when P<sub>int</sub> was low, we didn’t need to apply such a high external pressure to compress.<p></p>When we compressed with the smaller blocks, P<sub>ext</sub> stepped more smoothly with P<sub>int</sub>.</p><p>Since we weren’t compressing at the maximum pressure the whole time, we did less work.</p><p>What if we split all of our blocks in half and compress with those?  How do you think the amount of work we have to do will change?</p>",
+		this.cutSceneStart("<p>So when we compressed with the biggest block, P<sub>ext</sub> was much greater than P<sub>int</sub>.  We did more work than we had to because when P<sub>int</sub> was low, we didn’t need to apply such a high external pressure to compress.<p></p>When we compressed with the smaller blocks, P<sub>ext</sub> stepped more smoothly with P<sub>int</sub>.</p><p>Since we weren’t compressing at the maximum pressure the whole time, we did less work.</p><p>What if we split all of our blocks up again and compress with those?  How do you think the amount of work we have to do will change?</p>",
 			'quiz',
 			{buttonOptions:
 			[{buttonID:'increase', buttonText:'Increase', message:'Hmm, you should compare the work done in your two previous compressions.', isCorrect: false},
@@ -166,8 +159,8 @@ _.extend(Reversibility.prototype,
 		this.makeGraphsRev();
 		this.unCompSetup();
 		walls[0].trackWorkStart(this.readout);		
-		this.dragWeights = this.makeDragWeights({mass:90, count:2*this.numBlocks}, 'container', this.massInit).init().trackPressureStart();
-		this.volListener10 = new StateListener(10, this.data.v, .05, {v:this.data.v}, {func:function(){this.workInSml = round(walls[0].work,1)},obj:this});
+		this.dragWeights = this.makeDragWeights({mass:90, count:16}, 'container', this.massInit).init().trackPressureStart();
+		this.volListener10 = new StateListener(10, this.data.v, .02, {v:this.data.v}, {func:function(){this.workInSml = round(walls[0].work,1)},obj:this});
 	},
 	block5Conditions: function(){
 		if(this.volListener10.isSatisfied()){
@@ -263,13 +256,12 @@ _.extend(Reversibility.prototype,
 		this.unCompSetup();
 		this.makeGraphsRev();
 		walls[0].trackWorkStart(this.readout);
-		this.cycleLrgInit = this.dataHandler.temp();
-		this.volListener10 = new StateListener(10, this.data.v, .05, {v:this.data.v}, {func:
+		this.volListener10 = new StateListener(10, this.data.v, .02, {v:this.data.v}, {func:
 			function(){
-				
-				this.volListener16 = new StateListener(16, this.data.v, .05, {v:this.data.v}, {func:
+				this.cycleLargeCompWork = walls[0].work;
+				this.volListener16 = new StateListener(16, this.data.v, .02, {v:this.data.v}, {func:
 				function(){
-					this.cycleLrgFinal = this.dataHandler.temp();
+					this.cycleLargeUnCompWork = this.cycleLargeCompWork - walls[0].work;
 				},obj:this}
 				);
 			},
@@ -287,7 +279,7 @@ _.extend(Reversibility.prototype,
 		this.makeGraphsRev();
 		walls[0].trackWorkStart(this.readout);
 		this.block14Text = "Just like before, let’s split up our block.  With more blocks, we’ll be doing less work when we compress and getting more work out when we expand.  Try going through a cycle with these blocks.  Last time T<sub>i</sub> was XX K and T<sub>f</sub> was YY K.  How do the initial and final temperatures compare this time (check the graphs)?";
-		this.block14Text = replaceString(replaceString(this.block14Text, 'XX', this.cycleLrgInit), 'YY', this.cycleLrgFinal);
+		this.block14Text = replaceString(replaceString(this.block14Text, 'XX', round(this.cycleLrgInit,0)), 'YY', round(this.cycleLrgFinal,0));
 		this.dragWeights = this.makeDragWeights({mass:90, count:12}, 'container', this.massInit).init().trackPressureStart();		
 	},
 	block14CleanUp: function(){
