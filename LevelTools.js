@@ -70,28 +70,35 @@ LevelTools = {
 	},
 	cutSceneStart: function(text, mode, data){
 		$('#intText').html('');
-		if(text){
-			$('#intText').html(text);
-		}
+		text = defaultTo('',text);
+		
 		this.pause();
 		$('#dashRun').hide();
 		if(!mode){
 			$('#dashCutScene').show();
+			$('#intText').html(text);
 		}else if(mode=='intro'){
 			$('#dashIntro').show();
 			$('#base').hide();
+			$('#intText').html(text);
 		}else if(mode=='outro'){
 			$('#dashOutro').show();
 			$('#base').hide();
-		}else if(mode=='buttons'){
+			$('#intText').html(text);
+		}else if(mode=='quiz'){
 			$('#dashCutScene').show();
 			$('#base').hide();
-			this.appendButtons(data.buttonOptions)
-		}else if(mode=='multChoice'){
-			$('#dashCutScene').show();
-			$('#base').hide();
-			this.appendMultChoice(data.multChoiceOptions);
+			if(data.buttonOptions){
+				this.appendButtons(text, data.buttonOptions, 'intText')
+			}else if (data.multChoiceOptions){
+				this.appendMultChoice(text, data.multChoiceOptions, 'intText');
+			}
 		}
+		/*Hey, so if there's a quiz, I want to just pass the text along to the quiz handlers
+		so if I do quiz stuff not in the cutscene, I want the text handling to be done the same way.
+		Having two things capable of doing that seems weird
+		
+		*/
 		$('#canvasDiv').hide();
 		$('#display').show();
 
@@ -123,14 +130,16 @@ LevelTools = {
 		loadListener(this, 'update');
 		loadListener(this, 'data');
 	},
-	appendButtons: function(buttons){
-		var buttonHtml = "<br><center><table border='0'><tr>";
+	appendButtons: function(text, buttons, appendTo){
+		var buttonHTML = '';
+		buttonHTML += defaultTo('', text);
+		buttonHTML += "<br><center><table border='0'><tr>";
 		for (var buttonIdx=0; buttonIdx<buttons.length; buttonIdx++){
 			var button = buttons[buttonIdx];
-			buttonHtml += "<td><button id='" + button.buttonID + "' class='noSelect'>" + button.buttonText + "</button></td>"
+			buttonHTML += "<td><button id='" + button.buttonID + "' class='noSelect'>" + button.buttonText + "</button></td>"
 		}
-		buttonHtml += "</tr></table></center>";
-		$('#intText').html($('#intText').html() + buttonHtml);
+		buttonHTML += "</tr></table></center>";
+		$('#'+appendTo).html($('#intText').html() + buttonHtml);
 		$('button').button();
 		this.attachButtonListeners(buttons);
 	},
@@ -152,23 +161,27 @@ LevelTools = {
 		}
 		buttonBind(id, func);		
 	},
-	attachMultChoice: function(options){
-		var multChoiceHTML = '<br><center><table border=0>';
+	appendMultChoice: function(text, options, appendTo){
+		var multChoiceHTML = '';
+		multChoiceHTML += defaultTo('', text);
+		multChoiceHTML += "<table width=100%><tr><td width=10%></td><td>"
+		multChoiceHTML += "<table border=0>";
 		for (var optionIdx=0; optionIdx<options.length; optionIdx++){
 			var option = options[optionIdx];
 			multChoiceHTML += '<tr>';
 			multChoiceHTML += '<td>';
 			multChoiceHTML += "<input type='radio' name='multChoice' value='" + option.optionVal + "'>";
 			multChoiceHTML += '</td>'
-			multChoiceHTML += '<td>';
+			multChoiceHTML += "<td><div class='whiteFont'>";
 			multChoiceHTML += option.optionText;
-			multChoiceHTML += '</td>';
+			multChoiceHTML += '</div></td>';
 			multChoiceHTML += '</tr>';
 		}
 		multChoiceHTML += '</table>';
-		multChoiceHTML += '<br>';
-		multChoiceHTML += "<button id='multChoiceSubmit' class='noSelect'>Submit</button>"
-		$('#intText').html($('#intText').html() + buttonHtml);
+		multChoiceHTML += '</td></tr></table>'
+		multChoiceHTML += '<p>';
+		multChoiceHTML += "<center><button id='multChoiceSubmit' class='noSelect'>Submit</button></center></p>"
+		$('#'+appendTo).html($('#intText').html() + multChoiceHTML);
 		$('button').button();
 		var checkFunc = function(){
 			var pickedVal = $("input:radio[name='multChoice']:checked").val();
