@@ -542,9 +542,10 @@ function showPrompt(prev, prompt){
 		var text = prompt.text;
 		var title = prompt.title;
 		if(prompt.quiz){
+			var quiz = prompt.quiz;
 			$('#submitDiv').hide();
 			$('#prompt').html('');
-			curLevel.appendQuizDash(prompt.quiz)
+			curLevel.appendQuiz(text, prompt.quiz, 'prompt')
 		}else{
 			$('#prompt').html(text);
 		}

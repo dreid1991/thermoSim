@@ -129,6 +129,7 @@ $(function(){
 	$('#reset').click(function(){curLevel.reset()});
 	$('#reset').hide();
 	curLevel.init();
+	curLevel.setDefaultPromptVals()
 	var sliderName = 'sliderPiston';
 	makeSlider(
 		sliderName, 

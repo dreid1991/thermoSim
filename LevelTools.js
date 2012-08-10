@@ -1,4 +1,3 @@
-
 LevelTools = {
 	setStds: function(){
 		this.graphs = {};
@@ -68,7 +67,7 @@ LevelTools = {
 	checkWallHits: function(){
 		walls.check();
 	},
-	cutSceneStart: function(text, mode, data){
+	cutSceneStart: function(text, mode, quiz){
 		$('#intText').html('');
 		text = defaultTo('',text);
 		
@@ -88,11 +87,8 @@ LevelTools = {
 		}else if(mode=='quiz'){
 			$('#dashCutScene').show();
 			$('#base').hide();
-			if(data.buttonOptions){
-				this.appendButtons(text, data.buttonOptions, 'intText')
-			}else if (data.multChoiceOptions){
-				this.appendMultChoice(text, data.multChoiceOptions, 'intText');
-			}
+			this.appendQuiz(text, quiz, 'intText');
+			
 		}
 		/*Hey, so if there's a quiz, I want to just pass the text along to the quiz handlers
 		so if I do quiz stuff not in the cutscene, I want the text handling to be done the same way.
@@ -105,7 +101,15 @@ LevelTools = {
 		$('#intText').show();
 		
 	},
-	appendQuizDash: function(
+	appendQuiz: function(text, quiz, appendTo){
+		if(quiz.type == 'buttons'){
+			this.appendButtons(text, quiz, appendTo)
+		}else if (quiz.type == 'multChoice'){
+			this.appendMultChoice(text, quiz, appendTo);
+		}else if (quiz.type == 'text'){
+			this.appendTextBox(text, quiz appendTo);
+		}
+	},
 	cutSceneText: function(text){
 		$('#intText').html(text);
 	},
@@ -132,13 +136,19 @@ LevelTools = {
 		loadListener(this, 'update');
 		loadListener(this, 'data');
 	},
-	appendButtons: function(text, buttons, appendTo){
+	/*
+	type: 'buttons'
+	options:list of buttons with: 	buttonId, buttonText, isCorrect
+			can have: 				func, message
+	*/
+	appendButtons: function(text, quiz, appendTo){
 		var buttonHTML = '';
+		var buttons = quiz.options;
 		buttonHTML += defaultTo('', text);
 		buttonHTML += "<br><center><table border='0'><tr>";
 		for (var buttonIdx=0; buttonIdx<buttons.length; buttonIdx++){
 			var button = buttons[buttonIdx];
-			buttonHTML += "<td><button id='" + button.buttonID + "' class='noSelect'>" + button.buttonText + "</button></td>"
+			buttonHTML += "<td><button id='" + button.buttonId + "' class='noSelect'>" + button.buttonText + "</button></td>"
 		}
 		buttonHTML += "</tr></table></center>";
 		$('#'+appendTo).html($('#intText').html() + buttonHTML);
@@ -153,7 +163,7 @@ LevelTools = {
 		}		
 	},
 	attachButtonListener: function(button){
-		var id = button.buttonID;
+		var id = button.buttonId;
 		var func = defaultTo(function(){}, button.func);
 		if(button.message){
 			func = extend(func, function(){alert(button.message)});
@@ -163,7 +173,13 @@ LevelTools = {
 		}
 		buttonBind(id, func);		
 	},
-	appendMultChoice: function(text, options, appendTo){
+	/*
+	type: 'multChoice'
+	list of options wit:	 optionText, isCorrect
+	each option can have:	 message
+	*/
+	appendMultChoice: function(text, quiz, appendTo){
+		var options = quiz.options
 		var multChoiceHTML = '';
 		multChoiceHTML += defaultTo('', text);
 		multChoiceHTML += "<table width=100%><tr><td width=10%></td><td>"
@@ -172,6 +188,7 @@ LevelTools = {
 			var option = options[optionIdx];
 			multChoiceHTML += '<tr>';
 			multChoiceHTML += '<td>';
+			option.optionVal = 'answer'+optionIdx;
 			multChoiceHTML += "<input type='radio' name='multChoice' value='" + option.optionVal + "'>";
 			multChoiceHTML += '</td>'
 			multChoiceHTML += "<td><div class='whiteFont'>";
@@ -182,7 +199,7 @@ LevelTools = {
 		multChoiceHTML += '</table>';
 		multChoiceHTML += '</td></tr></table>'
 		multChoiceHTML += '<p>';
-		multChoiceHTML += "<center><button id='multChoiceSubmit' class='noSelect'>Submit</button></center></p>"
+		multChoiceHTML += "<table border=0><tr><td width=75%></td><td><button id='multChoiceSubmit' class='noSelect'>Submit</button></td></tr></table></p>"
 		$('#'+appendTo).html($('#'+appendTo).html() + multChoiceHTML);
 		$('button').button();
 		var checkFunc = function(){
@@ -196,6 +213,37 @@ LevelTools = {
 			}
 		}
 		buttonBind('multChoiceSubmit', checkFunc);
+	},
+	/*
+	type: 'text'
+	can have:			text, messageRight, messageWrong, answer
+	*/
+	appendTextBox: function(text, quiz, appendTo){
+		var textBoxHTML = '';
+		var boxText = defaultTo('Type your answer here.', quiz.text);
+		textBoxHTML += text;
+		textBoxHTML += '<br>';
+		textBoxHTML += "<textarea id='answerTextArea' rows='3' cols='20>" + boxText + "</textarea>";
+		textBoxHTML += "<table border=0><tr><td width=75%></td><td><button id='textAreaSubmit' class='noSelect'>Submit</button></td></tr></table></p>";
+		var checkFunc = function(){
+			if(quiz.answer){
+				var submitted = $('#answerTextArea').val();
+				if(fracDiff(parseFloat(quiz.answer), parseFloat(submitted))<.05){
+					if(quiz.messageRight){
+						alert(quiz.messageRight);
+						nextPrompt();
+					}
+				}else{
+					if(quiz.messageWrong){
+						alert(quiz.messageWrong);
+					}
+				}
+			}else{
+				nextPrompt();
+			}
+		}
+		$('#'+appendTo).html($('#'+appendTo).html() + textBoxHTML);
+		buttonBind('textAreaSubmit', checkFunc);
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();
@@ -252,9 +300,7 @@ LevelTools = {
 		}	
 	},
 	trackVolumeStart: function(decPlaces){
-		if(decPlaces===undefined){
-			decPlaces = 1;
-		}
+		decPlaces = defaultTo(1, decPlaces);
 		this.readout.addEntry('vol', 'Volume:', 'L', dataHandler.volume(), undefined, decPlaces);
 		addListener(curLevel, 'update', 'trackVolume',
 			function(){
@@ -407,4 +453,12 @@ LevelTools = {
 
 		
 	},
+	setDefaultPromptVals: function(){
+		for (var promptIdx=0; promptIdx<this.prompts.length; promptIdx++){
+			var prompt = this.prompts[promptIdx];
+			prompt.finished = false;
+			prompt.title = defaultTo('', prompt.title);
+			prompt.text = defaultTo('', prompt.text);
+		}
+	}
 }
