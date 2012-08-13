@@ -1,5 +1,7 @@
 LevelTools = {
 	setStds: function(){
+		this.declarePrompts();
+		this.setDefaultPromptVals()
 		this.graphs = {};
 		this.eUnits = 'kJ';
 		this.bgCol = Col(5, 17, 26);
@@ -9,6 +11,7 @@ LevelTools = {
 		this.promptIdx = -1;
 		this.blockIdx = -1;
 		this.data = {};
+		dataHandler = new DataHandler();
 		this.dataHandler = dataHandler;
 		addListener(this, 'update', 'run', this.updateRun, this);
 		addListener(this, 'data', 'run', this.dataRun, this);
@@ -68,14 +71,16 @@ LevelTools = {
 		walls.check();
 	},
 	cutSceneStart: function(text, mode, quiz){
+		this.inCutScene = true;
 		$('#intText').html('');
 		text = defaultTo('',text);
 		
 		this.pause();
 		$('#dashRun').hide();
-		if(!mode){
+		if(mode===true && !quiz){
 			$('#dashCutScene').show();
 			$('#intText').html(text);
+			$('#prompt').html('');
 		}else if(mode=='intro'){
 			$('#dashIntro').show();
 			$('#base').hide();
@@ -84,7 +89,7 @@ LevelTools = {
 			$('#dashOutro').show();
 			$('#base').hide();
 			$('#intText').html(text);
-		}else if(mode=='quiz'){
+		}else if(quiz){
 			$('#dashCutScene').show();
 			$('#base').hide();
 			this.appendQuiz(text, quiz, 'intText');
@@ -107,13 +112,14 @@ LevelTools = {
 		}else if (quiz.type == 'multChoice'){
 			this.appendMultChoice(text, quiz, appendTo);
 		}else if (quiz.type == 'text'){
-			this.appendTextBox(text, quiz appendTo);
+			this.appendTextBox(text, quiz, appendTo);
 		}
 	},
 	cutSceneText: function(text){
 		$('#intText').html(text);
 	},
 	cutSceneEnd: function(){
+		this.inCutScene = false;
 		this.resume();
 		$('#intText').html('');
 		$('#dashRun').show();
@@ -223,7 +229,7 @@ LevelTools = {
 		var boxText = defaultTo('Type your answer here.', quiz.text);
 		textBoxHTML += text;
 		textBoxHTML += '<br>';
-		textBoxHTML += "<textarea id='answerTextArea' rows='3' cols='20>" + boxText + "</textarea>";
+		textBoxHTML += "<textarea id='answerTextArea' rows='3' cols='60'>" + boxText + "</textarea>";
 		textBoxHTML += "<table border=0><tr><td width=75%></td><td><button id='textAreaSubmit' class='noSelect'>Submit</button></td></tr></table></p>";
 		var checkFunc = function(){
 			if(quiz.answer){
@@ -243,6 +249,7 @@ LevelTools = {
 			}
 		}
 		$('#'+appendTo).html($('#'+appendTo).html() + textBoxHTML);
+		$('button').button();
 		buttonBind('textAreaSubmit', checkFunc);
 	},
 	hideDash: function(){

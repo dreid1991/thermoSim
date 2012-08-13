@@ -45,7 +45,7 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.trackEnergy = false;
 	this.trackMass = true;
 	this.trackPressure = false;
-	return this;
+	return this.init();
 }
 
 DragWeights.prototype = {
@@ -968,7 +968,7 @@ function CompArrow(nameInfo, compAttrs){
 	var canvasElement = canvas;
 	var listeners = {};
 	if(makeStops){
-		this.stops = new Stops({height:bounds.y.max}, wallIdx).init();
+		this.stops = new Stops({height:bounds.y.max}, wallIdx);
 	}
  
 	listeners.onDown = function(){};
@@ -1332,7 +1332,7 @@ function Stops(stopPt, wallInfo){
 	}
 
 	this.draw = this.makeDrawFunc(this.height);
-	return this;
+	return this.init();
 }
 Stops.prototype = {
 	makeDrawFunc: function(height){

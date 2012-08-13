@@ -32,6 +32,7 @@ $(function(){
 	borderCol = Col(155,155,155);
 	sliderList = [];
 	spcs = {};
+	stored = {};
 	draw = new drawingTools();
 	collide = new CollideHandler();
 	setInterval('curLevel.update()', updateInterval);
@@ -439,7 +440,19 @@ function loadListener(object, typeName){
 	}
 	
 }
-
+function store(attrName, val){
+	stored[attrName] = val;
+}
+function getStore(attrName){
+	return stored[attrName];
+}
+function eraseStore(attrName){
+	if(attrName){
+		stored[attrName] = undefined;
+	}else{
+		stored = {};
+	}
+}
 function makeSlider(handle, attrs, handlers, initVisibility, toChange){
 	//var newDiv = $('<div>');
 	//newDiv.attr({id:id});
@@ -506,8 +519,11 @@ function showPrompt(prev, prompt){
 	var indexOfPrev = _.indexOf(curLevel.prompts, prev);
 	var indexOfCur = _.indexOf(curLevel.prompts, prompt);
 	forward = indexOfCur>indexOfPrev;
-	if(!finishedPrev && forward && prev.conditions){
-		var condResult = prev.conditions.apply(curLevel);
+	if(prev){
+		var conditions = defaultTo(curLevel['block'+indexOfPrev+'Conditions'], prev.conditions);
+	}
+	if(!finishedPrev && forward && conditions){
+		var condResult = conditions.apply(curLevel);
 		didWin = condResult.result;
 		if(condResult.alert){
 			alert(condResult.alert);
@@ -525,6 +541,11 @@ function showPrompt(prev, prompt){
 		}
 		var block = prompt.block
 		var func = prompt.start;
+		if(prompt.replace){
+			prompt.text = replaceStrings(prompt.text, prompt.replace);
+		}
+		var text = prompt.text;
+		
 		if(block!=curLevel.blockIdx){
 			var spcsLocal = spcs;
 			for (var spcName in spcsLocal){
@@ -533,23 +554,28 @@ function showPrompt(prev, prompt){
 			if(prev && curLevel['block'+prev.block+'CleanUp']){
 				curLevel['block'+prev.block+'CleanUp'].apply(curLevel);
 			}
-
+			if(curLevel.inCutScene){
+				curLevel.cutSceneEnd();
+			}
 			if(curLevel['block'+block+'Start']){
 				curLevel['block'+block+'Start'].apply(curLevel);
 			}
 			curLevel.blockIdx = block;
 		}
-		var text = prompt.text;
-		var title = prompt.title;
-		if(prompt.quiz){
-			var quiz = prompt.quiz;
-			$('#submitDiv').hide();
-			$('#prompt').html('');
-			curLevel.appendQuiz(text, prompt.quiz, 'prompt')
-		}else{
-			$('#prompt').html(text);
+			
+		if(!prompt.cutScene){	
+			if(prompt.quiz){
+				var quiz = prompt.quiz;
+				$('#submitDiv').hide();
+				$('#prompt').html('');
+				curLevel.appendQuiz(text, prompt.quiz, 'prompt')
+			}else{
+				$('#prompt').html(text);
+			}
+		} else{
+			curLevel.cutSceneStart(prompt.text, prompt.cutScene, prompt.quiz)
 		}
-		
+		var title = prompt.title;
 		$('#baseHeader').html(title);
 		if(func){
 			func.apply(curLevel);
@@ -575,6 +601,21 @@ function prevPrompt(){
 	var promptIdx = Math.max(0, curLevel.promptIdx-1);;
 	var prompt = curLevel.prompts[promptIdx];
 	showPrompt(prev, prompt);
+}
+function replaceStrings(text, replaceList){
+	for (var replaceIdx=0; replaceIdx<replaceList.length; replaceIdx++){
+		var replace = replaceList[replaceIdx];
+		var oldStr = replace.oldStr;
+		var newStr = replace.newStr;
+		if(typeof newStr == 'string' && newStr.indexOf('GET')==0){
+			
+			newStr = getStore(newStr.slice(3,newStr.length));
+		} else if (typeof newStr == 'function'){
+			newStr = newStr();
+		}
+		text = replaceString(text, oldStr, newStr);
+	}
+	return text;
 }
 function log10(val){
 	return Math.log(val)/Math.log(10);
