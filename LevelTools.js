@@ -177,7 +177,13 @@ LevelTools = {
 		if(button.isCorrect){
 			func = extend(func, nextPrompt);
 		}
-		buttonBind(id, func);		
+		condFunc = 
+			function(){
+				if(curLevel.checkConditions()){
+					func.apply(curLevel);
+				}
+			}
+		buttonBind(id, condFunc);		
 	},
 	/*
 	type: 'multChoice'
@@ -213,11 +219,13 @@ LevelTools = {
 		var checkFunc = function(){
 			var pickedVal = $("input:radio[name='multChoice']:checked").val();
 			var pickedOption = byAttr(options, pickedVal, 'optionVal');
-			if(pickedOption.message){
-				alert(pickedOption.message);
-			}
-			if(pickedOption.isCorrect){
-				nextPrompt();
+			if(this.checkConditions()){
+				if(pickedOption.message){
+					alert(pickedOption.message);
+				}
+				if(pickedOption.isCorrect){
+					nextPrompt();
+				}
 			}
 		}
 		buttonBind('multChoiceSubmit', checkFunc);
@@ -234,25 +242,42 @@ LevelTools = {
 		textBoxHTML += "<textarea id='answerTextArea' rows='3' cols='60'>" + boxText + "</textarea>";
 		textBoxHTML += "<table border=0><tr><td width=75%></td><td><button id='textAreaSubmit' class='noSelect'>Submit</button></td></tr></table></p>";
 		var checkFunc = function(){
-			if(quiz.answer){
-				var submitted = $('#answerTextArea').val();
-				if(fracDiff(parseFloat(quiz.answer), parseFloat(submitted))<.05){
-					if(quiz.messageRight){
-						alert(quiz.messageRight);
-						nextPrompt();
+			if(this.checkConditions()){
+				if(quiz.answer){
+					var submitted = $('#answerTextArea').val();
+					if(fracDiff(parseFloat(quiz.answer), parseFloat(submitted))<.05){
+						if(quiz.messageRight){
+							alert(quiz.messageRight);
+							nextPrompt();
+						}
+					}else{
+						if(quiz.messageWrong){
+							alert(quiz.messageWrong);
+						}
 					}
 				}else{
-					if(quiz.messageWrong){
-						alert(quiz.messageWrong);
-					}
+					nextPrompt();
 				}
-			}else{
-				nextPrompt();
 			}
 		}
 		$('#'+appendTo).html($('#'+appendTo).html() + textBoxHTML);
 		$('button').button();
 		buttonBind('textAreaSubmit', checkFunc);
+	},
+	checkConditions: function(){
+		var prompt = this.prompts[this.promptIdx];
+		var conditions = defaultTo(this['block'+this.promptIdx+'Conditions'], prompt.conditions);
+		if(!conditions){
+			return true;
+		}else{
+			var condResult = conditions.apply(this);
+			
+			if(condResult.alert){
+				alert(condResult.alert);
+			}
+			return condResult.result;
+		}
+	
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();
