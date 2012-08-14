@@ -13,6 +13,7 @@ $(function(){
 	canvas = document.getElementById("myCanvas");
 	c = canvas.getContext("2d");	
 	R = 8.314;
+	//set compAdj to '' have collisions for cv of R, cp of 2R
 	cv = 1.5*R;
 	cp = 2.5*R;
 	compAdj = '32';

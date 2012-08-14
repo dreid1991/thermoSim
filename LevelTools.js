@@ -1,8 +1,5 @@
 LevelTools = {
 	setStds: function(){
-		cv = 1.5*R;
-		cp = 2.5*R;
-		compAdj = '32';
 		this.declarePrompts();
 		this.setDefaultPromptVals()
 		this.graphs = {};
