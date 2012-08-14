@@ -972,7 +972,7 @@ function CompArrow(nameInfo, compAttrs){
 	}
  
 	listeners.onDown = function(){};
-	listeners.onMove = function(){curLevel.changeWallSetPt(wallIdx, this.pos.y, compMode, speed)};
+	listeners.onMove = function(){curLevel.changeWallSetPt(wallIdx, this.pos.y, compMode + compAdj, speed)};
 	listeners.onUp = function(){};
 	this.dragArrow = new DragArrow(pos, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds).show();
 	return this;
@@ -1015,7 +1015,7 @@ function Piston(handle, wallInfo, pInit, obj){
 	this.readout = new Readout('pistonReadout', readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, undefined, 'center');
 	obj.mass = function(){return self.mass};
 	this.wall.moveInit();
-	walls.setSubWallHandler(this.wallIdx, 0, 'cPAdiabaticDamped');		
+	walls.setSubWallHandler(this.wallIdx, 0, 'cPAdiabaticDamped' + compAdj);		
 	this.obj = obj;
 	return this;
 }
@@ -1280,32 +1280,11 @@ Heater.prototype = {
 		walls.addWall(this.bodyPts, {func:this.hit, obj:this}, 'heater' + this.handle, undefined, -1);
 	},
 	hit: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){
-		/*
-		var vPar = dot.v.dotProd(wallUV);
-		var tempOld = dot.temp();
-		if(tempOld==0){
-			console.log('ahh!');
-		}
-		var tempNew = Math.max(tempOld + this.temp, 1);
-		var vTotOld = dot.v.mag();
-		var vTotNew = vTotOld*Math.sqrt(tempNew/tempOld);
-		var sqrtBit = vTotNew*vTotNew - vPar*vPar;
-		if(sqrtBit<0){
-			dot.setTemp(tempNew);
-		}else{
-			var vPerpNew = Math.sqrt(sqrtBit);
-			dot.v.dx = wallUV.dx*vPar + perpUV.dx*vPerpNew;
-			dot.v.dy = wallUV.dy*vPar + perpUV.dy*vPerpNew;
-		}
-		if(isNaN(dot.v.dx) || isNaN(dot.v.dy)){
-			console.log('foo');
-		}
-		*/
 		if(this.temp!=0){
 			var tempOld = dot.temp();
 			var tempNew = Math.max(tempOld + this.temp, 50);
 			dot.setTemp(tempNew);
-			this.eAdded+=(tempNew-tempOld)*R/N*JtoKJ;
+			this.eAdded+=(tempNew-tempOld)*cv/N*JtoKJ;
 		}
 	},
 	remove: function(){

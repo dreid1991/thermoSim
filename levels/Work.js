@@ -1,5 +1,4 @@
 function Work(){
-	dataHandler = new DataHandler();
 	this.setStds();
 	this.data.t = [];
 	this.data.pInt = [];
@@ -8,22 +7,8 @@ function Work(){
 	this.wallSpeed = 1;
 	this.readout = new Readout('mainReadout', 30, myCanvas.width-125, 25, '13pt calibri', Col(255,255,255),this, 'left');
 	this.compMode = 'Isothermal';
-	this.prompts=[
-		{block:0},
-		{block:1, title: 'Current step', finished: false, conditions: this.block1Conditions, text:"Alright, let’s do some work.  Above we have a piston and cylinder setup.  You can change the piston’s pressure with the slider.  If you compress the system, how does the temperature behave?  Does the change seem consistent with the previous equation?"},
-		{block:1, title: 'Current step', finished: false, text:"Now these molecules undergo perfectly elastic collisions when they hit a wall.  That is to say they behave like a bouncy ball would when you throw it against a wall.  If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving, that is not true."},
-		{block:2, title: 'Current step', finished: false, conditions: this.block2Conditions, text:"Let’s see if we can relate that idea to work by looking at just one molecule.  If you compress the cylinder, why does the molecule’s speed change?  How does this relate to temperature change and work?"},
-		{block:3},
-		{block:4, title: 'Current step', finished: false, conditions: this.block4Conditions, text:"So here we have a big weight we can use to bring our system to a pressure of 6 atm.  There are some stops on the piston that let us compress to 10 liters.  We have 1.5 moles of gas. Its heat capacity is R as opposed to the standard 3/2R for a monatomic ideal gas.  <a href = extras/heatCapacity.html target = ‘_blank’>Here’s why.</a>).  What final temperature should we expect if we compress our piston all the way?  Once you have a value, try the experiment!  "},
-		{block:5, title: 'Current step', finished: false, text:''},
-		{block:6, title: 'Current step', finished: false, conditions: this.block6Conditions, text:'So why is work dependant on pressure?  Here we have two containers, one at low pressure, the other at high pressure.  If you compress these two containers to their stops, which system did you do more work on, and why?  Consider collision frequency with the moving wall.  This is a nearly reversible compression, so we’re going to say P<sub>ext</sub> = P<sub>int</sub>.'},
-		{block:7},
-		{block:8, title: '', finished: false, conditions: this.block8Conditions, text:'Well, let’s figure it out.  Here we have two containers.  Both contain 1 mole of gas at 300 K.  One is held at constant volume, the other at constant pressure.  You can heat or cool them with their corresponding sliders.  If you heat both containers to some new temperature, how do the energies used compare?  The piston tracks the work it does on the system.  Remember that it takes energy to speed up molecules <i>and</i> to expand against a pressure.'},
-		{block:9},
-		{block:10},
-		{block:11},
-	]
-	walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
+
+	
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
 	this.yMin = 30;
 	this.yMax = 350;
@@ -31,6 +16,32 @@ function Work(){
 _.extend(Work.prototype, 
 			LevelTools, 
 {
+	declarePrompts: function(){
+		this.prompts=[
+			{block:0,
+				cutScene:'intro',
+				text:"<p>Good afternoon!</p>"+
+					"Today we’re going to try to figure out why work changes a system’s temperature.  Let’s start with the equation for relating work to a temperature change:"+
+					"<p><center><img src='img/work/eq1.gif' alt='hoverhoverhover'></img></center></p>"+
+					"<p>This equation says that work is equal to how hard you compress a container times how much you compress it.  It also says that as you compress that container, the gas inside heats up.  But why does that happen?  What is it about pushing on a container that makes its molecules speed up?</p>"+
+					"<p> One might say that it’s because energy is being added, and that is true, but we’re going to try to pin down the physical event that makes molecules speed up as a result of the container compressing.",
+				
+			},
+			//{block:1, title: 'Current step', finished: false, conditions: this.block1Conditions, text:"Alright, let’s do some work.  Above we have a piston and cylinder setup.  You can change the piston’s pressure with the slider.  If you compress the system, how does the temperature behave?  Does the change seem consistent with the previous equation?"},
+			//{block:1, title: 'Current step', finished: false, text:"Now these molecules undergo perfectly elastic collisions when they hit a wall.  That is to say they behave like a bouncy ball would when you throw it against a wall.  If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving, that is not true."},
+			{block:2, title: 'Current step', finished: false, conditions: this.block2Conditions, text:"Let’s see if we can relate that idea to work by looking at just one molecule.  If you compress the cylinder, why does the molecule’s speed change?  How does this relate to temperature change and work?"},
+			{block:3},
+			{block:4, title: 'Current step', finished: false, conditions: this.block4Conditions, text:"So here we have a big weight we can use to bring our system to a pressure of 6 atm.  There are some stops on the piston that let us compress to 10 liters.  We have 1.5 moles of gas. Its heat capacity is R as opposed to the standard 3/2R for a monatomic ideal gas.  <a href = extras/heatCapacity.html target = ‘_blank’>Here’s why.</a>).  What final temperature should we expect if we compress our piston all the way?  Once you have a value, try the experiment!  "},
+			{block:5, title: 'Current step', finished: false, text:''},
+			{block:6, title: 'Current step', finished: false, conditions: this.block6Conditions, text:'So why is work dependant on pressure?  Here we have two containers, one at low pressure, the other at high pressure.  If you compress these two containers to their stops, which system did you do more work on, and why?  Consider collision frequency with the moving wall.  This is a nearly reversible compression, so we’re going to say P<sub>ext</sub> = P<sub>int</sub>.'},
+			{block:7},
+			{block:8, title: '', finished: false, conditions: this.block8Conditions, text:'Well, let’s figure it out.  Here we have two containers.  Both contain 1 mole of gas at 300 K.  One is held at constant volume, the other at constant pressure.  You can heat or cool them with their corresponding sliders.  If you heat both containers to some new temperature, how do the energies used compare?  The piston tracks the work it does on the system.  Remember that it takes energy to speed up molecules <i>and</i> to expand against a pressure.'},
+			{block:9},
+			{block:10},
+			{block:11},
+		]
+		store('prompts', this.prompts);
+	},
 	init: function(){
 		for (var initListenerName in this.initListeners.listeners){
 			var func = this.initListeners.listeners[initListenerName].func;
@@ -41,11 +52,7 @@ _.extend(Work.prototype,
 	},
 
 	block0Start: function(){
-		this.cutSceneStart("<p>Good afternoon!</p>"+
-		"Today we’re going to try to figure out why work changes a system’s temperature.  Let’s start with the equation for relating work to a temperature change:"+
-		"<p><center><img src='img/work/eq1.gif' alt='hoverhoverhover'></img></center></p>"+
-		"<p>This equation says that work is equal to how hard you compress a container times how much you compress it.  It also says that as you compress that container, the gas inside heats up.  But why does that happen?  What is it about pushing on a container that makes its molecules speed up?</p>"+
-		"<p> One might say that it’s because energy is being added, and that is true, but we’re going to try to pin down the physical event that makes molecules speed up as a result of the container compressing.",
+		this.cutSceneStart(
 		'intro'
 		);
 		

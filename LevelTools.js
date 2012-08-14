@@ -1,5 +1,8 @@
 LevelTools = {
 	setStds: function(){
+		cv = 1.5*R;
+		cp = 2.5*R;
+		compAdj = '32';
 		this.declarePrompts();
 		this.setDefaultPromptVals()
 		this.graphs = {};
@@ -186,9 +189,10 @@ LevelTools = {
 	*/
 	appendMultChoice: function(text, quiz, appendTo){
 		var options = quiz.options
-		var multChoiceHTML = '';
+		var multChoiceHTML = "";
 		multChoiceHTML += defaultTo('', text);
-		multChoiceHTML += "<table width=100%><tr><td width=10%></td><td>"
+		multChoiceHTML += "<p></p><table width=100%><tr><td width=10%></td><td>"
+		multChoiceHTML += "<div class='borderTest'>";
 		multChoiceHTML += "<table border=0>";
 		for (var optionIdx=0; optionIdx<options.length; optionIdx++){
 			var option = options[optionIdx];
@@ -199,13 +203,14 @@ LevelTools = {
 			multChoiceHTML += '</td>'
 			multChoiceHTML += "<td><div class='whiteFont'>";
 			multChoiceHTML += option.optionText;
-			multChoiceHTML += '</div></td>';
+			multChoiceHTML += '</div>';
+			multChoiceHTML += "</td>";
 			multChoiceHTML += '</tr>';
 		}
 		multChoiceHTML += '</table>';
 		multChoiceHTML += '</td></tr></table>'
-		multChoiceHTML += '<p>';
-		multChoiceHTML += "<table border=0><tr><td width=75%></td><td><button id='multChoiceSubmit' class='noSelect'>Submit</button></td></tr></table></p>"
+		multChoiceHTML += "<div style='float:right'><button id='multChoiceSubmit' class='noSelect'>Submit</button></div>"
+		multChoiceHTML += "</div>";
 		$('#'+appendTo).html($('#'+appendTo).html() + multChoiceHTML);
 		$('button').button();
 		var checkFunc = function(){
@@ -420,7 +425,7 @@ LevelTools = {
 									massInit,
 									this.readout,
 									wallHandle,
-									'cPAdiabaticDamped',
+									'cPAdiabaticDamped' + compAdj,
 									this
 									);
 

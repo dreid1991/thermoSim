@@ -21,7 +21,8 @@ _.extend(Reversibility.prototype,
 		this.prompts=[
 			{block:0,	
 				title:"Current step", 
-				text:"Good day.  I have an important task for you.  This system above, it must be compressed to 10 L using as little energy as possible.  You can drag the weight onto the piston to compress to this volume with a pressure of 6 atm.  If you compress with this block, how much work will you do on the system?"},
+				text:"Good day.  I have an important task for you.  This system above, it must be compressed to 10 L using as little energy as possible.  You can drag the weight onto the piston to compress to this volume with a pressure of 6 atm.  If you compress with this block, how much work will you do on the system?"
+			},
 			{block:1, 	
 				cutScene:true, 
 				text: "<p>So we compressed our container with XX kJ of work.  Do you think it’s possible to compress our system using less energy?  What if we break our block into smaller pieces? </p><p>How many pieces would you like to break the block into?</p>",
@@ -403,8 +404,8 @@ _.extend(Reversibility.prototype,
 		this.borderStd({min:68});
 		var maxY = walls[0][0].y;
 		var height = walls[0][3].y-walls[0][0].y;
-		spcs['spc1'].populate(P(35, maxY+10), V(460, height-20), 800, 320);
-		spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 600, 320);
+		spcs['spc1'].populate(P(35, maxY+10), V(460, height-20), 800, 273);
+		spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 600, 273);
 		this.stops = new Stops({volume:10}, 'container');		
 	},
 	dataRun: function(){

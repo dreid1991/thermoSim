@@ -13,7 +13,10 @@
 	padding:20px;
 	padding:20px;
 }
-
+.borderTest{
+	border:3px solid;
+	border-color:#b3b2b1;
+}
 .noSelect{
 	-moz-user-select: none; 
 	-khtml-user-select: none; 
@@ -53,6 +56,7 @@
 	border-color:#b3b2b1;	
 }
 .displayText{
+	font-family:georgia, garamond;/*WHAT IS GARAMOND?  SHOULD GET OTHER FALLBACKS.*/
 	font-size:medium;
 	color:white;
 	padding:5px;
@@ -75,6 +79,7 @@
 	border-bottom-right-radius:20px;
 	background-color:#05111a;
 	color:white;
+	padding:10px;
 	padding:10px;
 }
 .whiteFont{

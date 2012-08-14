@@ -13,15 +13,15 @@ $(function(){
 	canvas = document.getElementById("myCanvas");
 	c = canvas.getContext("2d");	
 	R = 8.314;
-	cV = R;
-	cP = 2*R
+	cv = 1.5*R;
+	cp = 2.5*R;
+	compAdj = '32';
 	vConst = 1/10000;
 	pConst = 16.1423;
 	tConst = 20;
 	LtoM3 = .001;
 	ATMtoPA = 101325;
 	JtoKJ = .001;
-	//cp = 2*R;//joules/(kelvin*mole)
 	N = 1000;//Avagadro's number
 	//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
 	pxToMS = 157.9;
@@ -38,9 +38,6 @@ $(function(){
 	setInterval('curLevel.update()', updateInterval);
 	setInterval('curLevel.addData()', dataInterval);
 
-	started = false;
-	counted = 0;
-	total = 0;
 	/*Timing stuff
 	started = false;
 	counted = 0;
@@ -613,7 +610,7 @@ function replaceStrings(text, replaceList){
 		} else if (typeof newStr == 'function'){
 			newStr = newStr();
 		}
-		text = replaceString(text, oldStr, newStr);
+		text = text.replace(oldStr, newStr);
 	}
 	return text;
 }
@@ -671,19 +668,6 @@ function inRect(pos, dims, curCanvas){
 function ptInRect(pos, dims, pt){
 	return pt.x>=pos.x && pt.x<=(pos.x+dims.dx) && pt.y>=pos.y && pt.y<=(pos.y+dims.dy);
 }
-
-function replaceString(source, oldStr, newStr){
-	var start = source.indexOf(oldStr);
-	if(start!=-1){
-		oldLen = oldStr.length;
-		var a = source.substring(0, start);
-		var b = newStr;
-		var c = source.substring(start+oldLen, source.length)
-		source = a+b+c;
-	}
-	return source;
-} 
-
 function extend(old, add){
 	return function(){
 		return add(old());

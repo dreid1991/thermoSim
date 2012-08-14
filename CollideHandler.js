@@ -2,8 +2,8 @@ function CollideHandler(){
 	this.spcs = spcs;
 	this.defs = speciesDefs;
 	this.tConst = tConst;
-	this.cP = cP;
-	this.cV = cV;
+	this.cp = cp;
+	this.cv = cv;
 	this.reactions = this.setupBlankReactions();
 	console.log("Made supercollider");
 }
