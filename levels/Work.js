@@ -20,7 +20,7 @@ _.extend(Work.prototype,
 		this.prompts=[
 			{block:0,
 				cutScene:true,
-				text:"<p>Good afternoon!</p><p>Today we’re going to try to figure out how work adds energy to a system.  First we’re going to put together the equations that describe doing work on an adiabatic system, </p><p>Which of these equations describes work done on a system?</p>,",
+				text:"<p>Good afternoon!</p><p>Today we’re going to try to figure out how work adds energy to a system.  First we’re going to put together the equations that describe doing work on an adiabatic system, </p><p>Which of these equations describes work done on a system?</p>",
 				quiz:{	
 					type:'multChoice',
 					options:
@@ -33,7 +33,7 @@ _.extend(Work.prototype,
 			},
 			{block:1, 
 				cutScene: true,
-				text: "<p>Indeed.  This tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p><p><center><img src='img/work/eq5.gif></img></center></p><p>We’re going to be looking at an adiabatic system.  Which is these simplifications is correct?</p>",
+				text: "<p>Indeed.  This tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p><p><center><img src='img/work/eq5.gif'></img></center></p><p>We’re going to be looking at an adiabatic system.  Which is these simplifications is correct?</p>",
 				quiz:{	
 					type:'multChoice',
 					options:
@@ -43,7 +43,8 @@ _.extend(Work.prototype,
 						{optionText:"It cannot be simplified", isCorrect: false, message:"Yes it can.  What is Q equal to?"}
 					]
 				},
-			{block:3, 
+			},
+			{block:2, 
 				cutScene: true,
 				text:"<p>Excellent, so as we add energy through work our system heats up since energy is conserved.  We know that temperature is an expression of molecular kinetic energy.  This tells us that as we compress our container, the molecules speed up.</p><p> But why does that happen?  Why does pushing on a container make molecules speed up?  There must be some event in the compression that makes a molecule speed up.  </p><p><p>Shall we investigate?</p>",
 				quiz:{	
@@ -52,32 +53,34 @@ _.extend(Work.prototype,
 						[{buttonId:'yes', buttonText:'Yes', isCorrect:true}
 					]
 				},
-			{block:4,
+			},
+			{block:3,
 				title:"Current step",
 				text:"Alright, let’s do some work (sorry).  Above we have a piston and cylinder setup.  You can change the piston’s pressure with the slider.  If you compress the system, how does the temperature behave?  Does the change seem consistent with the previous equation?",
 				quiz:{	
 					type:'buttons',
 					options:
 						[{buttonId:'inc', buttonText:'Increases', isCorrect:true},
-						[{buttonId:'dec', buttonText:'Decreases', isCorrect:false}
+						{buttonId:'dec', buttonText:'Decreases', isCorrect:false}
 					]
 				},				
 			},
-			{block:4, 
+			{block:3, 
 				title: 'Current step', 
 				text: "<p>Now these molecules undergo perfectly elastic collisions when they hit a wall.  This means that they behave like a bouncy ball would when you throw it against a wall.</p><p>If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving towards the ball, what should happen?</p>",
 				quiz:{	
 					type:'buttons',
 					options:
 						[{buttonId:'up', buttonText:'Speeds up', isCorrect:true},
-						[{buttonId:'down', buttonText:'Slows down', isCorrect:false}
+						{buttonId:'down', buttonText:'Slows down', isCorrect:false}
 					]
-				},				
-			{block:5, 
+				},
+			},
+			{block:4, 
 				title: 'Current step', 
 				text:"Let’s see if we can relate that idea to work by looking at just one molecule. If you compress the cylinder, at what point does the molecule’s speed change?  How could this relate to a temperature change?"
 			},
-			{block:6,
+			{block:5,
 				text:"<p>Okay, now which of the following would you say describes what happened?</p>",
 				quiz:{	
 					type:'multChoice',
@@ -90,7 +93,7 @@ _.extend(Work.prototype,
 				},				
 			
 			},
-			{block:7,
+			{block:6,
 				cutScene: true,
 				text:"<p>So we can say that if we hit a molecule with a moving wall, it’ll be speed up, but will this idea really lead to the correct temperature change for a system of many molecules?  Let’s do an experiment and find out! </p><p>Let’s compress a system at YYY K from XX L to 10 L at a constant pressure of 6 atm and see if calculated and simulated results line up.</p><p>One other thing - these collisions are the <i>only</i> way energy is added in these simulations, so if our idea it wrong, the simulation will give the wrong result.</p><p>Now, how much work will we do on this system?</p>",
 				quiz:{	
@@ -101,7 +104,7 @@ _.extend(Work.prototype,
 					messageWrong: "That's not correct.  Check your units maybe?"
 				},
 			},
-			{block:8,
+			{block:7,
 				cutScene: true,
 				text:"<p>Okay, and what final temperature should we expect from doing that much work?  T<sub>i</sub> is YYY K.  The system will contain 1.4 moles and the gas has a heat capacity of 3/2R.</p>",
 				quiz:{	
@@ -112,18 +115,18 @@ _.extend(Work.prototype,
 					messageWrong: "That's not correct.  Are you using the right R?"
 				},
 			},			
-			{block:9,
+			{block:8,
 				title:'Current step',
 				text:'And... Experiment!'
 			},
-			{block:10,
+			{block:9,
 				cutScene: true,
 				text:"<p>Alright, we got XXX K experimental versus YYY K theoretical.  So our idea was that work increased temperature through collisions with the moving wall.</p><p>Does our experiment back up the idea?</p>",
 				quiz:{	
 					type:'buttons',
 					options:
 						[{buttonId:'yes', buttonText:'Yes', isCorrect:true},
-						[{buttonId:'no', buttonText:'No', isCorrect:false, message:"Yeah it does!  Look how close they were!"}
+						{buttonId:'no', buttonText:'No', isCorrect:false, message:"Yeah it does!  Look how close they were!"}
 					]
 				},
 				replace:
@@ -132,10 +135,10 @@ _.extend(Work.prototype,
 					//FILL IN
 				]
 			},
-			{block:11,
+			{block:10,
 				text:"<p>I thought so too.  Now we know how work adds energy to a system.</p><p>Here’s another conundrum:  Why is work equal to</p><p><center><img src=img/work/eq1.gif></img></center></p><p>and NOT</p><p><center><img src=img/work/eq3.gif></img></center></p><p>Let’s find out.</p>",
 			},
-			{block:12,
+			{block:11,
 				cutScene: true,
 				text:"<p>First, shall we convince ourselves that work actually <i>is</i> dependant on external pressure?</p><p> If we compress a high pressure system and a low pressure system with the same external pressure over the same volume, how should the temperature changes of the two compare?</p>",
 				quiz:{	
@@ -148,17 +151,18 @@ _.extend(Work.prototype,
 					]
 				},
 			},
-			{block:13, 
+			{block:12, 
 				title: 'Current step', 
-				text:'Okay, let’s see if an experiment gives matching changes in temperature.  The graphs should show the data well.<br>Did it?'},
+				text:'Okay, let’s see if an experiment gives matching changes in temperature.  The graphs should show the data well.<br>Did it?',
 				quiz:{	
 					type:'buttons',
 					options:
 						[{buttonId:'yes', buttonText:'Yes', isCorrect:true},
-						[{buttonId:'no', buttonText:'No', isCorrect:false, message:"Yeah it does!  Look at the graphs!"}
+						{buttonId:'no', buttonText:'No', isCorrect:false, message:"Yeah it does!  Look at the graphs!"}
 					]
-				},				
-			{block:14,
+				},		
+			},
+			{block:13,
 				cutScene: true,
 				text:"<p>Alright, it looks like work does in fact depend on P<sub>ext</sub>.  But we need to figure out why!</p><p>Say we compress with P<sub>ext</sub> >> P<sub>int</sub>  What will happen to the speed of the wall?</p>",
 				quiz:{	
@@ -171,7 +175,7 @@ _.extend(Work.prototype,
 					]
 				},				
 			},
-			{block:15,
+			{block:14,
 				cutScene: true,
 				text:"<p>Indeed!  So why would this translate to a greater temperature change than if P<sub>ext</sub> were only slightly greater than P<sub>int</sub>?  Consider the bouncy ball and moving wall.</p>",
 				quiz:{	
@@ -183,17 +187,17 @@ _.extend(Work.prototype,
 					]
 				},				
 			},
-			{block:16,
+			{block:15,
 				text:"Okay, let’s fit an experiment to that.  Take a look at how the two containers behave when you compress them with their respective weights.  Can you <i>see</i> the temperature increase more with the high P<sub>ext</sub>?",
 				quiz:{	
 					type:'buttons',
 					options:
 						[{buttonId:'yes', buttonText:'I see it!', isCorrect:true},
-						[{buttonId:'no', buttonText:'No, I am blind', isCorrect:false, message:"Look harder."}
+						{buttonId:'no', buttonText:'No, I am blind', isCorrect:false, message:"Look harder."}
 					]
 				},					
 			},
-			{block:17,
+			{block:16,
 				cutScene: 'outro',
 				text:"<p>So it seems that energy added depends only on external pressure.  If P<sub>ext</sub> >> P<sub>int</sub>, the wall gets a lot of momentum and hit the molecules really hard, speeding them up a lot.  If it’s not much greater, it means that it hit the molecules <i>a lot</i> of times, with each impact adding some speeding them up a little bit.  </p><p>No matter the path, the energy you add is equal to</p><p><center><img src=’img/work/eq1.gif></img></center></p><p>And thus we have work.</p><p>Fin.</p>"
 			}

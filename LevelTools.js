@@ -219,7 +219,7 @@ LevelTools = {
 		var checkFunc = function(){
 			var pickedVal = $("input:radio[name='multChoice']:checked").val();
 			var pickedOption = byAttr(options, pickedVal, 'optionVal');
-			if(this.checkConditions()){
+			if(curLevel.checkConditions()){
 				if(pickedOption.message){
 					alert(pickedOption.message);
 				}

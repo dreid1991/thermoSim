@@ -6,7 +6,7 @@ function Reversibility(){
 	this.data.v = [];
 	this.data.e = [];
 	var wallHandle = 'container';
-	walls = WallHandler([[P(40,75), P(510,75), P(510,440), P(40,440)]], 'staticAdiabatic', [wallHandle], [{yMin:60, yMax:435}]);
+	
 
 	this.readout = new Readout('mainReadout', 15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), this);
 
