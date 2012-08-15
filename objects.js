@@ -1191,13 +1191,15 @@ function Heater(handle, pos, dims, rotation, tempMax, drawCanvas){
 	this.tempMax = tempMax;
 	this.pos = pos;
 	this.dims = dims;
+	this.center = this.pos.copy().movePt(this.dims.copy().mult(.5));
 	this.rot = rotation;
 	var colMax = Col(200,0,0);
 	var colMin = Col(0,0,200);
 	var colDefault = Col(100, 100, 100);
 	this.draw = this.makeDrawFunc(colMin, colDefault, colMax);
+	this.wallPts = this.getWallPts();
 	this.eAdded=0;
-	return this;
+	return this.init();
 }
 
 Heater.prototype = {
@@ -1209,58 +1211,58 @@ Heater.prototype = {
 		var pos = this.pos;
 		var dims = this.dims;
 		var rnd = this.cornerRound;
-		var legThickness = 10;
-
-		var center = this.pos.copy().movePt(dims.copy().mult(.5));
-		this.bodyPts = this.getBodyPts(pos, dims, rnd);
-		this.legPts = this.getLegPts(pos, dims, legThickness, center);
-		rotatePts(this.bodyPts, center, this.rot);
-		rotatePts(this.legPts[0], center, this.rot);
-		rotatePts(this.legPts[1], center, this.rot);
+		var center = this.center;
+		this.pts = this.getPts(pos, dims);
+		rotatePts(this.pts, center, this.rot);
 		var colorSteps = this.getColorSteps(colMin, colDefault, colMax)
 		var strokeCol = Col(0,0,0)
 		var self = this;
-		var bodyPts = this.bodyPts;
-		var leg1 = this.legPts[0];
-		var leg2 = this.legPts[1];
+		var pts = this.pts;
 		var drawFunc = function(){
 			var sign = getSign(self.temp);
 			var steps = colorSteps[String(sign)];
 			var fracToEnd = sign*self.temp/self.tempMax
 			var curCol = colDefault.copy().adjust(steps[0]*fracToEnd, steps[1]*fracToEnd, steps[2]*fracToEnd);
-			draw.fillPtsStroke(bodyPts, curCol, curCol, self.drawCanvas);
-			draw.fillPtsStroke(leg1, colDefault, colDefault, self.drawCanvas);
-			draw.fillPtsStroke(leg2, colDefault, colDefault, self.drawCanvas);
-			
+			draw.path(pts, curCol, self.drawCanvas);
 		}
 		return drawFunc;
 	},
-	getBodyPts: function(pos, dims, rnd){
-		var pts = new Array(9);
-		pts[0] = pos.copy().movePt({						dy:dims.dy*rnd			});
-		pts[1] = pos.copy().movePt({						dy:dims.dy*(1-rnd)		});
-		pts[2] = pos.copy().movePt({dx:dims.dx*rnd,			dy:dims.dy				});
-		pts[3] = pos.copy().movePt({dx:dims.dx/2,			dy:dims.dy + 3			});
-		pts[4] = pos.copy().movePt({dx:dims.dx*(1-rnd),		dy:dims.dy				});
-		pts[5] = pos.copy().movePt({dx:dims.dx, 			dy:dims.dy*(1-rnd)		});
-		pts[6] = pos.copy().movePt({dx:dims.dx, 			dy:dims.dy*rnd			});
-		pts[7] = pos.copy().movePt({dx:dims.dx*(1-rnd)							});
-		pts[8] = pos.copy().movePt({dx:dims.dx*rnd								});	
+	getPts: function(pos, dims, rnd){
+		var pts = new Array();
+		var halfCircleLen = 15;
+		var circlePos = pos.copy().movePt({dy:dims.dy/2});
+		
+		var forwardDx = dims.dy+2.5;
+		var backwardDx = dims.dy-2.5;
+		var numElipses = Math.floor((dims.dx-(forwardDx-backwardDx))/(forwardDx - backwardDx));
+		pts.push(circlePos.copy().movePt({dy:200}));
+		pts = pts.concat(this.halfElipse(circlePos, forwardDx, dims.dy/2, 0, 5));
+		circlePos.movePt({dx:forwardDx});
+		for (var elipseIdx=0; elipseIdx<numElipses; elipseIdx++){
+			pts = pts.concat(this.halfElipse(circlePos, backwardDx, dims.dy/2, Math.PI, 5));
+			circlePos.movePt({dx:-backwardDx});
+			pts = pts.concat(this.halfElipse(circlePos, forwardDx, dims.dy/2, 0, 5));
+			circlePos.movePt({dx:forwardDx});
+		}
+		pts.push(circlePos.copy());
+		pts.push(circlePos.copy().movePt({dy:200}));
 		return pts;
 	},
-	getLegPts: function(pos, dims, width, center){
-		var legs = [new Array(4), new Array(4)];
-		var leg = legs[0]
-		leg[0] = pos.copy().movePt({dx:dims.dx*.25-width/2,	dy:dims.dy	});
-		leg[1] = pos.copy().movePt({dx:-width/2,	dy:dims.dy+150	});
-		leg[2] = pos.copy().movePt({dx:+width/2,	dy:dims.dy+150	});
-		leg[3] = pos.copy().movePt({dx:dims.dx*.25+width/2,	dy:dims.dy	});
-		
-		for (var ptIdx=0; ptIdx<leg.length; ptIdx++){
-			legs[1][ptIdx]=legs[0][ptIdx].copy()
+	halfElipse: function(start, rx, ry, rot, numPts){
+		//hey - this goes UP TO the point to complete the half circle
+		var numPts = defaultTo(5, numPts);
+		var pts = new Array(numPts);
+		var rotPerPt = Math.PI/(numPts);
+		var center = start.x + rx;
+		var arcRot = Math.PI;
+		for (var ptIdx=0; ptIdx<numPts; ptIdx++){
+			var x = center.x + rx*Math.sin(arcRot);
+			var y = center.y + ry*Math.cos(arcRot);
+			pts[ptIdx] = P(x, y);
+			arcRot -= rotPerPt;
 		}
-		mirrorPts(legs[1], center, V(0, 1));
-		return legs;
+		rotatePts(pts, start, rot);
+		return pts;
 	},
 	getColorSteps: function(min, def, max){
 		var steps = {};
@@ -1270,6 +1272,17 @@ Heater.prototype = {
 		steps['1']=up;
 		return steps;
 	},
+	getWallPts: function(){
+		var wallPts = new Array(4);
+		var pos = this.pos;
+		var dims = this.dims;
+		wallPts[0] = pos.copy();
+		wallPts[1] = pos.copy().movePt({dy:dims.dy});
+		wallPts[2] = pos.copy().movePt(dims);
+		wallPts[3] = pos.copy().movePt({dx:dims.dx});
+		rotatePts(wallPts, this.center, this.rot);
+		return wallPts;
+	},
 	init: function(){
 		addListener(curLevel, 'update', 'drawHeater'+this.handle, this.draw, '');
 		this.setupWalls()
@@ -1278,9 +1291,10 @@ Heater.prototype = {
 	},
 	setupWalls: function(){
 		//legs don't go into collision - too little space between lines
-		walls.addWall(this.bodyPts, {func:this.hit, obj:this}, 'heater' + this.handle, undefined, -1);
+		walls.addWall(this.wallPts, {func:this.hit, obj:this}, 'heater' + this.handle, undefined, -1);
 	},
 	hit: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){
+		walls.reflect(dot, wallUV, vPerp);
 		if(this.temp!=0){
 			var tempOld = dot.temp();
 			var tempNew = Math.max(tempOld + this.temp, 50);

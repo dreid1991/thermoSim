@@ -163,6 +163,16 @@ drawingTools.prototype = {
 		drawCanvas.lineTo(line.x, line.y);
 		drawCanvas.quadraticCurveTo(curvePt.x, curvePt.y, quadEnd.x, quadEnd.y);
 	},
+	path: function(pts, col, drawCanvas){
+		drawCanvas.strokeStyle = col.hex;
+		drawCanvas.beginPath();
+		drawCanvas.moveTo(pts[0].x, pts[0].y);
+		for(var ptIdx=1; ptIdx<pts.length; ptIdx++){
+			drawCanvas.lineTo(pts[ptIdx].x, pts[ptIdx].y);
+		}
+		drawCanvas.closePath();
+		drawCanvas.stroke();		
+	},
 	text: function(text, pos, font, col, align, rotation, drawCanvas){
 		drawCanvas.save();
 		drawCanvas.translate(pos.x, pos.y);
