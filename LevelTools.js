@@ -313,6 +313,11 @@ LevelTools = {
 		this.checkWallHits();
 		this.drawRun();
 	},
+	updateGraphs: function(){
+		for(var graphName in this.graphs){
+			this.graphs[graphName].addLast();
+		}
+	},
 	drawRun: function(){
 		draw.clear(this.bgCol);
 		draw.dots();

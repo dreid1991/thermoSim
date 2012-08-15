@@ -164,7 +164,7 @@ _.extend(Work.prototype,
 			},
 			{block:12, 
 				title: 'Current step', 
-				text:'Okay, let’s see if an experiment gives matching changes in temperature.  The graphs should show the data well.<br>Did it?',
+				text:'Okay, let’s see if an experiment gives matching changes in temperature.  The left container’s internal pressure is half the right’s.  The graphs should show the temperature change.  <br>Did it?',
 				quiz:{	
 					type:'buttons',
 					options:
@@ -193,13 +193,13 @@ _.extend(Work.prototype,
 					type:'multChoice',
 					options:
 						[{optionText:"Magic", isCorrect: false, message:'Not correct.'},
-						{optionText:"A faster wall will speed up the molecules more, increasing system temperature.", isCorrect: true},
+						{optionText:"A faster wall will speed up the molecules more on impact, increasing system temperature.", isCorrect: true},
 						{optionText:"It won't becacuse the wall speed isn't affected by the difference between internal and external pressure.", isCorrect: false, message:'Not correct.'}
 					]
 				},				
 			},
 			{block:15,
-				text:"Okay, let’s fit an experiment to that.  Take a look at how the two containers behave when you compress them with their respective weights.  Can you <i>see</i> the temperature increase more with the high P<sub>ext</sub>?",
+				text:"Okay, let’s fit an experiment to that.  Take a look at how the two containers behave when you compress them with their respective weights.  Initially they have the same internal pressure.  Can you <i>see</i> the temperature increase more with the high P<sub>ext</sub>?",
 				quiz:{	
 					type:'buttons',
 					options:
@@ -210,7 +210,7 @@ _.extend(Work.prototype,
 			},
 			{block:16,
 				cutScene: 'outro',
-				text:"<p>So it seems that energy added depends only on external pressure.  If P<sub>ext</sub> >> P<sub>int</sub>, the wall gets a lot of momentum and hit the molecules really hard, speeding them up a lot.  If it’s not much greater, it means that it hit the molecules <i>a lot</i> of times, with each impact adding some speeding them up a little bit.  </p><p>No matter the path, the energy you add is equal to</p><p><center><img src=’img/work/eq1.gif></img></center></p><p>And thus we have work.</p><p>Fin.</p>"
+				text:"<p>So it seems that energy added depends only on external pressure.  If P<sub>ext</sub> is much greater then P<sub>int</sub>, the wall gets a lot of momentum and hit the molecules really hard, speeding them up a lot.  If it’s not much greater, it means that the wall just hits the molecules <i>a lot</i> of times, with each impact adding some speeding them up a little bit.  </p><p>In both cases, the energy you add is equal to</p><p><center><img src=’img/work/eq1.gif></img></center></p><p>Fin.</p>"
 			}
 
 		]
@@ -320,7 +320,7 @@ _.extend(Work.prototype,
 		this.readout.show();
 		wallHandle = 'container';
 		walls = WallHandler([[P(40,31), P(510,31), P(510,350), P(40,350)]], 'staticAdiabatic', [wallHandle], [{yMin:30, yMax:300}], undefined, [15]);
-		this.stops = new Stops({volume:10}, 'container').init();
+		this.stops = new Stops({volume:10}, 'container');
 		this.borderStd();
 		spcs['spc1'].populate(P(45,35), V(445, 325), 850, 200);
 		spcs['spc3'].populate(P(45,35), V(445, 325), 650, 200);
@@ -351,180 +351,125 @@ _.extend(Work.prototype,
 		this.dragWeights = undefined;
 	},
 	block12Start: function(){
+		$('#reset').show();
 		this.readout.show();
 		wallHandle = 'container';
-		walls = WallHandler([[P(40,30), P(255,30), P(255,440), P(40,440)], [P(295,30), P(510,30), P(510,440), P(295,440)]], 'staticAdiabatic', ['left', 'right']);
+		walls = WallHandler([[P(40,30), P(255,30), P(255,350), P(40,350)], [P(295,30), P(510,30), P(510,350), P(295,350)]], 'staticAdiabatic', ['left', 'right']);
 		this.borderStd({wallInfo:'left'});
 		this.borderStd({wallInfo:'right'});
-		spcs['spc1'].populate(P(45,35), V(200, 375), 450, 200, 'left', 'left');
-		spcs['spc3'].populate(P(45,35), V(200, 375), 350, 200, 'left', 'left');	
+		spcs['spc1'].populate(P(45,35), V(200, 300), 250, 200, 'left', 'left');
+		spcs['spc3'].populate(P(45,35), V(200, 300), 150, 200, 'left', 'left');	
 		
-		spcs['spc1'].populate(P(300,35), V(200, 375), 450, 400, 'right', 'right');
-		spcs['spc3'].populate(P(300,35), V(200, 375), 350, 400, 'right', 'right');	
+		spcs['spc1'].populate(P(300,35), V(200, 300), 250, 400, 'right', 'right');
+		spcs['spc3'].populate(P(300,35), V(200, 300), 150, 400, 'right', 'right');	
 		this.data.tLeft = [];
 		this.data.tRight = [];
 		this.data.vLeft = [];
 		this.data.vRight = [];		
 		this.dragWeightsLeft = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'left', 5).trackMassStop().trackPressureStart();
 		this.dragWeightsRight = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'right', 5).trackMassStop().trackPressureStart();
-	},
-	block12Conditions: function(){
-	
-	},
-	block12CleanUp: function(){
-		this.readout.hide();
-	},
-	/*
-	block5Start: function(){
-		var str = "<p>Okay, so your calculations should have looked something like this:<p><center><img src = img/work/eq3.gif></img></p><img src=img/work/eq4.gif></img></center></p>You had an initial temperature of INITIAL K and a final temperature of FINAL K.  Are the two results close to each other?  What does this say about our idea that work adds energy through molecules’ collisions with a moving wall?</p>";
-		var results15 = this.volListener15.getResults();
-		var results10 = this.volListener10.getResults();
-		if(results15 && results10 && !isNaN(results15.t) && !isNaN(results10.t)){
-			this.results15 = round(results15.t,0);
-			this.results10 = round(results10.t,0);
-			
-		}
-		str = replaceString(replaceString(str, 'INITIAL', this.results15), 'FINAL', this.results10);
-		this.cutSceneStart(str);
-	},
-	block5CleanUp: function(){
-		this.cutSceneEnd();
-	},
-	block6Start: function(){
-		wallHandle = 'container';
-		walls = WallHandler([[P(40,30), P(255,30), P(255,440), P(40,440)], [P(295,30), P(510,30), P(510,440), P(295,440)]], 'staticAdiabatic', ['left', 'right']);
-		this.borderStd({wallInfo:'left'});
-		this.borderStd({wallInfo:'right'});
-		spcs['spc1'].populate(P(45,35), V(200, 375), 450, 200, 'left', 'left');
-		spcs['spc3'].populate(P(45,35), V(200, 375), 350, 200, 'left', 'left');	
-
-		spcs['spc1'].populate(P(300,35), V(200, 375), 450, 400, 'right', 'right');
-		spcs['spc3'].populate(P(300,35), V(200, 375), 350, 400, 'right', 'right');	
-		this.data.tLeft = [];
-		this.data.tRight = [];
-		this.data.vLeft = [];
-		this.data.vRight = [];
-		addListener(curLevel, 'data', 'updateData',
+		this.stopsLeft = new Stops({volume:3.5}, 'left');
+		this.stopsRight = new Stops({volume:3.5}, 'right');		
+		removeListener(curLevel, 'data', 'run');
+		addListener(curLevel, 'data', 'run',
 			function(){
-				this.data.tLeft.push(dataHandler.temp({tag:'left'}));
-				this.data.tRight.push(dataHandler.temp({tag:'right'}));
-				this.data.vLeft.push(dataHandler.volume('left'));
-				this.data.vRight.push(dataHandler.volume('right'));
+				this.data.tLeft.push(this.dataHandler.temp({tag:'left'}));
+				this.data.tRight.push(this.dataHandler.temp({tag:'right'}));
+				this.data.vLeft.push(this.dataHandler.volume('left'));
+				this.data.vRight.push(this.dataHandler.volume('right'));
 			},
 		this);
-		var stopMax = this.yMax-110;
-		this.compArrowLeft = new CompArrow({wallInfo:'left', handle:'left'}, {mode:'adiabatic', bounds:{y:{min:this.yMin, max:stopMax}}});
-		this.compArrowRight = new CompArrow({wallInfo:'right', handle:'right'}, {mode:'adiabatic', bounds:{y:{min:this.yMin, max:stopMax}}});
-		
-		this.graphs.tVSv = new GraphScatter('tVSv', 400, 350,"Volume (L)", "Temperature (K)",
+		addListener(curLevel, 'data', 'updateGraphs',
+			this.updateGraphs,
+		this);
+		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
 							{x:{min:0, step:2}, y:{min:150, step:50}});
-
-
+		this.graphs.tVSv.addSet('tRight', 'Temp\nRight', Col(255,200,0), Col(255,200,200),
+								{data:this.data, x:'vRight', y:'tRight'});									
 		this.graphs.tVSv.addSet('tLeft', 'Temp\nLeft', Col(255,0,0), Col(255,200,200),
-								{data:this.data, x:'vLeft', y:'tLeft'});			
-		this.graphs.tVSv.addSet('tRight', 'Temp\nRight', Col(0,100,200), Col(255,200,200),
-								{data:this.data, x:'vRight', y:'tRight'});	
+								{data:this.data, x:'vLeft', y:'tLeft'});	
 		
-		this.volListenerLeft = new StateListener(stopMax, function(){return walls['left'][0].y}, .15, {}, {func:function(){}, obj:''});
-		this.volListenerRight = new StateListener(stopMax, function(){return walls['right'][0].y}, .15, {}, {func:function(){}, obj:''});
-		
-		
+		this.volListenerLeft = new StateListener(3.5, this.data.vLeft, .02, {});
+		this.volListenerRight = new StateListener(3.5, this.data.vRight, .02, {});
 	},
-	block6Conditions: function(){
+	block12Conditions: function(){
 		if(this.volListenerLeft.isSatisfied() && this.volListenerRight.isSatisfied()){
 			return {result:true};
 		}
-		return {result:false, alert:'Compress MORE!'};
-
+		return {result:false, alert:'Compress the containers!'};
 	},
-	block6CleanUp: function(){
-		removeListener(curLevel, 'data', 'updateData');
-		walls['left'].removeBorder();
-		walls['right'].removeBorder();
-		this.compArrowLeft.remove();
-		this.compArrowLeft = undefined;
-		this.compArrowRight.remove();
-		this.compArrowRight = undefined;
+	block12CleanUp: function(){
+		$('#reset').hide();
+		removeListener(curLevel, 'data', 'updateGraphs');
+		removeListener(curLevel, 'data', 'run');
+		addListener(curLevel, 'data', 'run', this.dataRun, this);
 		this.removeAllGraphs();
-		
+		this.stopsLeft.remove();
+		this.stopsRight.remove();
+		this.dragWeightsLeft.remove();
+		this.dragWeightsRight.remove();
+		this.readout.hide();
 	},
-	block7Start: function(){
-		this.cutSceneStart('<p>So each collision with a moving wall adds some energy to the system.  In the high pressure container, molecules hit the walls more frequently.  This means that over our volume change, more molecules in the high pressure container hit the moving wall and gained energy, giving a greater change in temperature.  Since pressure increases as compress, you get a a greater-than-linear increase in temperature.</p> <p>Now let’s shift topics and try to figure out why constant pressure and constant volume heat capacities are different.</p><p>  For the gas in these simulations, C<sub>v</sub> is R and C<sub>p</sub> is 2R.  This means that is takes more energy to heat up a gas at constant pressure than one at constant volume.  Huh?  The gas is the same.  Why do they take different amounts of energy?</p><p>Any thoughts?</p>');
-	},
-	block7CleanUp: function(){
-		this.cutSceneEnd();
-	},
-
-	block8Start: function(){
-		$('#sliderHeaterHolder').show();
-		walls = WallHandler([[P(40,30), P(255,30), P(255,440), P(40,440)], [P(295,250), P(510,250), P(510,440), P(295,440)]], 'staticAdiabatic', ['left', 'right']);
-		//this.piston = new Piston('pistony', 'right', 5, function(){return this.g}, this);
-		this.tempInit = 300;
-		spcs['spc1'].populate(P(40,30), V(200,350), 400, this.tempInit, 'left', 'left');
-		spcs['spc3'].populate(P(40,30), V(200,350), 400, this.tempInit, 'left', 'left');
-		spcs['spc1'].populate(P(295,250), V(200,140), 400, this.tempInit, 'right', 'right');
-		spcs['spc3'].populate(P(295,250), V(200,140), 400, this.tempInit, 'right', 'right');
-		this.heaterLeft = new Heater('left', P(67,400), V(160, 25), 0, 20, c).init();
-		this.heaterRight = new Heater('right', P(322,400), V(160, 25), 0, 20, c).init()
-		this.piston = new Piston('tootoo', 'right', 5, this).show().trackWork();
+	block15Start: function(){
+		$('#reset').show();
 		this.readout.show();
-		this.readout.addEntry('tLeft', 'Temp:', 'K', dataHandler.temp('left'), undefined, 0);
-		this.readout.addEntry('eLeft', 'E added:', 'kJ', this.heaterLeft.eAdded, undefined, 1);
-		this.readout.addEntry('tRight', 'Temp:', 'K', dataHandler.temp('right'), undefined, 0);
-		this.readout.addEntry('eRight', 'E added:', 'kJ', this.heaterRight.eAdded, undefined, 1);
-		addListener(curLevel, 'data', 'updateT',
+		wallHandle = 'container';
+		walls = WallHandler([[P(40,30), P(255,30), P(255,350), P(40,350)], [P(295,30), P(510,30), P(510,350), P(295,350)]], 'staticAdiabatic', ['left', 'right']);
+		this.borderStd({wallInfo:'left'});
+		this.borderStd({wallInfo:'right'});
+		spcs['spc1'].populate(P(45,35), V(200, 300), 250, 200, 'left', 'left');
+		spcs['spc3'].populate(P(45,35), V(200, 300), 150, 200, 'left', 'left');	
+		
+		spcs['spc1'].populate(P(300,35), V(200, 300), 250, 200, 'right', 'right');
+		spcs['spc3'].populate(P(300,35), V(200, 300), 150, 200, 'right', 'right');	
+		this.data.tLeft = [];
+		this.data.tRight = [];
+		this.data.vLeft = [];
+		this.data.vRight = [];		
+		this.dragWeightsLeft = this.makeDragWeights([{name:'lrg', count:1, mass:35}], 'left', 5).trackMassStop().trackPressureStart();
+		this.dragWeightsRight = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'right', 5).trackMassStop().trackPressureStart();
+		this.stopsLeft = new Stops({volume:3.5}, 'left');
+		this.stopsRight = new Stops({volume:3.5}, 'right');		
+		removeListener(curLevel, 'data', 'run');
+		addListener(curLevel, 'data', 'run',
 			function(){
-				this.readout.tick(dataHandler.temp({tag:'left'}), 'tLeft');
-				this.readout.tick(dataHandler.temp({tag:'right'}), 'tRight');
-				this.readout.tick(this.heaterLeft.eAdded, 'eLeft');
-				this.readout.tick(this.heaterRight.eAdded, 'eRight');
+				this.data.tLeft.push(this.dataHandler.temp({tag:'left'}));
+				this.data.tRight.push(this.dataHandler.temp({tag:'right'}));
+				this.data.vLeft.push(this.dataHandler.volume('left'));
+				this.data.vRight.push(this.dataHandler.volume('right'));
 			},
 		this);
+		addListener(curLevel, 'data', 'updateGraphs',
+			this.updateGraphs,
+		this);
+		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
+							{x:{min:0, step:2}, y:{min:150, step:50}});
+		this.graphs.tVSv.addSet('tRight', 'Temp\nRight', Col(255,200,0), Col(255,200,200),
+								{data:this.data, x:'vRight', y:'tRight'});									
+		this.graphs.tVSv.addSet('tLeft', 'Temp\nLeft', Col(255,0,0), Col(255,200,200),
+								{data:this.data, x:'vLeft', y:'tLeft'});	
+		
+		this.volListenerLeft = new StateListener(3.5, this.data.vLeft, .02, {});
+		this.volListenerRight = new StateListener(3.5, this.data.vRight, .02, {});
 	},
-	block8Conditions: function(){
-		var tempLeft = dataHandler.temp({tag:'left'});
-		var tempRight = dataHandler.temp({tag:'right'});
-		var heatBy = 1.5;
-		if(fracDiff(tempLeft, tempRight) < .1 && tempLeft>this.tempInit*heatBy && tempRight>this.tempInit*heatBy){
+	block15Conditions: function(){
+		if(this.volListenerLeft.isSatisfied() && this.volListenerRight.isSatisfied()){
 			return {result:true};
-		}else if(tempLeft<this.tempInit*heatBy || tempRight<this.tempInit*heatBy){
-			return {result:false, alert:'Heat the containers more!'};
 		}
-		return {result:false, alert:'Make your containers have the same temperature!'};
-		
+		return {result:false, alert:'Compress the containers!'};
 	},
-	block8CleanUp: function(){
-		$('#sliderHeaterHolder').hide();
-		this.readout.removeAllEntries();
+	block15CleanUp: function(){
+		$('#reset').hide();
+		removeListener(curLevel, 'data', 'updateGraphs');
+		removeListener(curLevel, 'data', 'run');
+		addListener(curLevel, 'data', 'run', this.dataRun, this);
+		this.removeAllGraphs();
+		this.stopsLeft.remove();
+		this.stopsRight.remove();
+		this.dragWeightsLeft.remove();
+		this.dragWeightsRight.remove();
 		this.readout.hide();
-		this.piston.remove();
-		this.heaterLeft.remove();
-		this.heaterRight.remove();
-		this.piston = undefined;
-		this.heaterLeft = undefined;
-		this.heaterRight = undefined;
 	},
-	block9Start: function(){
-		this.cutSceneStart('<p>So, what happened?  Why did the constant pressure system take more energy to heat up?  Because it was doing work on its surroundings to maintain that constant pressure?  Why yes, that’s it!  Well done.  Shall we formalize?</p><p> To heat up the C<sub>v</sub> container, you just had to put energy into the molecules to make them move more quickly.</p>We can say that like...</p><center><p><img src = img/work/eq6.gif></img></center></p>  But there’s more going on in the C<sub>p</sub> container.  To maintain constant pressure, it had to expand, doing work on its surroundings.</p><p>This means that the energy we added to the C<sub>p</sub> went to <i>two</i> places:  to the molecules to make them move more quickly, and to the wall to push it outwards.  That looks like...</p><center><p><img src=img/work/eq7.gif></img></p></center><p>Having another place for the energy to go means that you have to put more energy in to change the temperature a given amount.</p>');		
-		
-	},
-	block9CleanUp: function(){
-		this.cutSceneEnd();
-	},
-	block10Start: function(){
-		this.cutSceneStart('<p>If you substitute in PV = RT from the ideal gas law, you’ll find that C<sub>V</sub> + R = C<sub>P</sub>.  Or, the energy that goes into speeding up the molecules plus work done to maintain constant pressure equals heat capacity at constant pressure.  </p>');
-	},
-	block10CleanUp: function(){
-		this.cutSceneEnd();
-	},
-	block11Start: function(){
-		this.cutSceneStart('<p>And thus we have demystified work</p>  <p>By knowing that our molecules behave like bouncy balls, we figured out that that molecules change speed as a result of collisions with a moving wall.  On a macroscopic scale, we say that work is being done on the container.  The higher the system pressure, the more work is done per volume change.  We can justify this by saying there are more collisions with the wall at higher pressure and that each collision speeds up the colliding molecule.</p> <p> From there, we looked at heat capacities and decided that C<sub>P</sub> is greater than C<sub>V</sub> because of the work done by the constant pressure container. </p><p> Now go forth and conquer.  </p>',
-		'outro');
-	},
-	block11CleanUp: function(){
-		this.cutSceneEnd();
-	},
-	*/
 	dataRun: function(){
 		var wall = walls[0];
 		this.data.p.push(wall.pInt())
@@ -534,8 +479,6 @@ _.extend(Work.prototype,
 		for(var graphName in this.graphs){
 			this.graphs[graphName].addLast();
 		}
-		this.numUpdates=0;
-		this.forceInternal=0;
 	},
 
 }
