@@ -39,7 +39,7 @@ _.extend(cvcp.prototype,
 		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
 		spcs['spc1'].populate(P(45,35), V(460, 350), 0, 300);
 		spcs['spc3'].populate(P(45,35), V(450, 350), 5, 300);
-		this.heater = new Heater('heaty', P(200,350), V(100,30), 0, 10, c);
+		this.heater = new Heater('heaty', P(200,350), V(190,40), 0, 10, c);
 		
 	},
 	

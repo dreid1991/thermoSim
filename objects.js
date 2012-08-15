@@ -1197,7 +1197,7 @@ function Heater(handle, pos, dims, rotation, tempMax, drawCanvas){
 	var colMin = Col(0,0,200);
 	var colDefault = Col(100, 100, 100);
 	this.draw = this.makeDrawFunc(colMin, colDefault, colMax);
-	this.wallPts = this.getWallPts();
+	this.wallPts = this.pos.roundedRect(this.dims, .2);
 	this.eAdded=0;
 	return this.init();
 }
@@ -1211,9 +1211,8 @@ Heater.prototype = {
 		var pos = this.pos;
 		var dims = this.dims;
 		var rnd = this.cornerRound;
-		var center = this.center;
 		this.pts = this.getPts(pos, dims);
-		rotatePts(this.pts, center, this.rot);
+		rotatePts(this.pts, this.center, this.rot);
 		var colorSteps = this.getColorSteps(colMin, colDefault, colMax)
 		var strokeCol = Col(0,0,0)
 		var self = this;
@@ -1229,23 +1228,28 @@ Heater.prototype = {
 	},
 	getPts: function(pos, dims, rnd){
 		var pts = new Array();
-		var halfCircleLen = 15;
 		var circlePos = pos.copy().movePt({dy:dims.dy/2});
 		
-		var forwardDx = dims.dy+2.5;
-		var backwardDx = dims.dy-2.5;
-		var numElipses = Math.floor((dims.dx-(forwardDx-backwardDx))/(forwardDx - backwardDx));
+		var forwardDx = dims.dy/2+2.5;
+		var backwardDx = dims.dy/2-2.5;
+		var numElipses = Math.floor((dims.dx-2*forwardDx)/(2*(forwardDx - backwardDx)));
 		pts.push(circlePos.copy().movePt({dy:200}));
+		pts.push(circlePos.copy());
 		pts = pts.concat(this.halfElipse(circlePos, forwardDx, dims.dy/2, 0, 5));
-		circlePos.movePt({dx:forwardDx});
+		circlePos.movePt({dx:2*forwardDx});
+	
 		for (var elipseIdx=0; elipseIdx<numElipses; elipseIdx++){
 			pts = pts.concat(this.halfElipse(circlePos, backwardDx, dims.dy/2, Math.PI, 5));
-			circlePos.movePt({dx:-backwardDx});
+			circlePos.movePt({dx:-2*backwardDx});
 			pts = pts.concat(this.halfElipse(circlePos, forwardDx, dims.dy/2, 0, 5));
-			circlePos.movePt({dx:forwardDx});
+			circlePos.movePt({dx:2*forwardDx});
 		}
+		
 		pts.push(circlePos.copy());
 		pts.push(circlePos.copy().movePt({dy:200}));
+		this.endX = pts[pts.length-1].x;
+		this.dims = V(this.endX-this.pos.x, dims.dy);
+		this.center = this.pos.copy().movePt(this.dims.copy().mult(.5));
 		return pts;
 	},
 	halfElipse: function(start, rx, ry, rot, numPts){
@@ -1256,10 +1260,10 @@ Heater.prototype = {
 		var center = start.x + rx;
 		var arcRot = Math.PI;
 		for (var ptIdx=0; ptIdx<numPts; ptIdx++){
-			var x = center.x + rx*Math.sin(arcRot);
-			var y = center.y + ry*Math.cos(arcRot);
+			var x = center + rx*Math.cos(arcRot);
+			var y = start.y + ry*Math.sin(arcRot);
 			pts[ptIdx] = P(x, y);
-			arcRot -= rotPerPt;
+			arcRot += rotPerPt;
 		}
 		rotatePts(pts, start, rot);
 		return pts;
@@ -1271,17 +1275,6 @@ Heater.prototype = {
 		steps['-1']=down;
 		steps['1']=up;
 		return steps;
-	},
-	getWallPts: function(){
-		var wallPts = new Array(4);
-		var pos = this.pos;
-		var dims = this.dims;
-		wallPts[0] = pos.copy();
-		wallPts[1] = pos.copy().movePt({dy:dims.dy});
-		wallPts[2] = pos.copy().movePt(dims);
-		wallPts[3] = pos.copy().movePt({dx:dims.dx});
-		rotatePts(wallPts, this.center, this.rot);
-		return wallPts;
 	},
 	init: function(){
 		addListener(curLevel, 'update', 'drawHeater'+this.handle, this.draw, '');

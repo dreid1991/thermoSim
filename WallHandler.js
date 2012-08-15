@@ -1,8 +1,8 @@
-function WallHandler(pts, handlers, handles, bounds, includes, vols){
+function WallHandler(pts, handlers, handles, bounds, includes, vols, shows){
 	var newWall = new Array(pts.length)
 	_.extend(newWall, WallMethods.main, WallMethods.collideMethods);
 
-	newWall.assemble(pts, handles, bounds, includes, vols)
+	newWall.assemble(pts, handles, bounds, includes, vols, shows)
 	
 	if(handles.length!=pts.length){
 		console.log('NAME YOUR WALLS');
@@ -15,12 +15,13 @@ function WallHandler(pts, handlers, handles, bounds, includes, vols){
 };
 WallMethods = {
 	main: {
-		assemble: function(pts, handles, bounds, includes, vols){
+		assemble: function(pts, handles, bounds, includes, vols, shows){
 			includes = defaultTo([], includes);
 			bounds = defaultTo([], bounds);
 			vols = defaultTo([], vols);
+			shows = defaultTo([], shows);
 			for (var wallIdx=0; wallIdx<pts.length; wallIdx++){
-				this.setWallVals(wallIdx, pts[wallIdx], handles[wallIdx], bounds[wallIdx], includes[wallIdx], vols[wallIdx]);
+				this.setWallVals(wallIdx, pts[wallIdx], handles[wallIdx], bounds[wallIdx], includes[wallIdx], vols[wallIdx], shows[wallIdx]);
 
 			}
 			this.setup();
@@ -140,7 +141,7 @@ WallMethods = {
 			}
 			return wallGrid;
 		},
-		setWallVals: function(wallIdx, pts, handle, bounds, include, vol){
+		setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show){
 			bounds = defaultTo({yMin:30, yMax: 435}, bounds);
 			include = defaultTo(1, include);
 			this[wallIdx] = pts;
@@ -152,6 +153,7 @@ WallMethods = {
 			if(vol){
 				this.setVol(this[wallIdx], vol);
 			}
+			this[wallIdx].show = defaultTo(true, show);
 			this.closeWall(this[wallIdx]);
 			this[wallIdx].ptsInit = this.copyWallPts(this[wallIdx]);
 			this[wallIdx].g = g;
@@ -171,10 +173,10 @@ WallMethods = {
 			pts[0].position({y:setY});
 			pts[1].position({y:setY});
 		},
-		addWall: function(pts, handler, handle, bounds, include, vol){
+		addWall: function(pts, handler, handle, bounds, include, vol, show){
 			
 			var newIdx = this.length;
-			this.setWallVals(newIdx, pts, handle, bounds, include, vol);
+			this.setWallVals(newIdx, pts, handle, bounds, include, vol, show);
 			this.setupWall(newIdx);
 			this.setWallHandler(newIdx, handler);
 		},

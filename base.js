@@ -89,14 +89,16 @@ drawingTools.prototype = {
 		c.strokeStyle = col.hex;		
 		for (var wallIdx=0; wallIdx<walls.length; wallIdx++){
 			var wall = walls[wallIdx];
-			c.moveTo(wall[0].x, wall[0].y);
-			for (var ptIdx=1; ptIdx<wall.length; ptIdx++){
-				var pt = wall[ptIdx];
-				c.lineTo(pt.x, pt.y);
+			if(wall.show){
+				c.moveTo(wall[0].x, wall[0].y);
+				for (var ptIdx=1; ptIdx<wall.length-1; ptIdx++){
+					var pt = wall[ptIdx];
+					c.lineTo(pt.x, pt.y);
+				}
+				c.closePath();
+				c.stroke();
 			}
 		}
-		c.closePath();
-		c.stroke();
 	},
 	fillPts: function(pts, col, drawCanvas){
 		drawCanvas.fillStyle = col.hex;
@@ -170,7 +172,6 @@ drawingTools.prototype = {
 		for(var ptIdx=1; ptIdx<pts.length; ptIdx++){
 			drawCanvas.lineTo(pts[ptIdx].x, pts[ptIdx].y);
 		}
-		drawCanvas.closePath();
 		drawCanvas.stroke();		
 	},
 	text: function(text, pos, font, col, align, rotation, drawCanvas){

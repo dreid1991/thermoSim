@@ -185,7 +185,10 @@ Color.prototype = {
 		this.b = Math.round(Math.min(255, Math.max(0, this.b*scalar)));
 		this.setHex();
 		return this;
-	}
+	},
+	sameAs: function(b){
+		return (this.dx==b.dx && this.dy==b.dy);
+	},
 }
 Point.prototype = {
 	distTo: function(pTo){
@@ -195,6 +198,13 @@ Point.prototype = {
 	},
 	VTo: function(b){
 		return V(b.x-this.x, b.y-this.y);
+	},
+	fracVTo: function(b, frac){
+		return this.VTo(b).mult(frac);
+	},
+	fracMoveTo: function(b, frac){
+		this.movePt(this.fracVTo(b, frac));
+		return this;
 	},
 	avg: function(b){
 		return P((this.x+b.x)/2, (this.y+b.y)/2);
@@ -262,6 +272,36 @@ Point.prototype = {
 		return this;
 		
 	},
+	rect: function(dims){
+		var pts = new Array(4);
+		pts[0] = this.copy();
+		pts[1] = this.copy().movePt({dx:dims.dx});
+		pts[2] = this.copy().movePt(dims);
+		pts[3] = this.copy().movePt({dy:dims.dy});
+		return pts;;
+	},
+	roundedRect: function(dims, fracRnd){
+		var rectPts = this.rect(dims);
+		return this.roundPts(rectPts, fracRnd);
+	},
+	roundPts: function(pts, fracRnd){
+		if(!this.sameAs(pts[0])){
+			pts = [this].concat(pts);
+		}
+		var rndPts = new Array(2*(pts.length+1));
+		pts['-1'] = pts[pts.length-1];
+		pts.push(pts[0]);
+		for (var ptIdx=0; ptIdx<pts.length-1; ptIdx++){
+			rndPts[2*ptIdx] = pts[ptIdx].copy().fracMoveTo(pts[String(ptIdx-1)], fracRnd/2);
+			rndPts[2*ptIdx+1] = pts[ptIdx].copy().fracMoveTo(pts[String(ptIdx+1)], fracRnd/2);
+		}
+		return rndPts;
+	},
+	sameAs: function(b){
+		return (this.x==b.x && this.y==b.y);
+	}
+	
+	
 }
 Dot.prototype = {
 	KE: function(){
