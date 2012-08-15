@@ -518,7 +518,7 @@ function showPrompt(prev, prompt){
 	var indexOfCur = _.indexOf(curLevel.prompts, prompt);
 	forward = indexOfCur>indexOfPrev;
 	if(prev){
-		var conditions = defaultTo(curLevel['block'+indexOfPrev+'Conditions'], prev.conditions);
+		var conditions = defaultTo(curLevel['block'+prev.block+'Conditions'], prev.conditions);
 	}
 	if(!finishedPrev && forward && conditions){
 		var condResult = conditions.apply(curLevel);
@@ -560,7 +560,9 @@ function showPrompt(prev, prompt){
 			}
 			curLevel.blockIdx = block;
 		}
-			
+		if(!prompt.quiz){
+			$('#submitDiv').show();
+		}
 		if(!prompt.cutScene){	
 			if(prompt.quiz){
 				var quiz = prompt.quiz;

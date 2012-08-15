@@ -38,6 +38,9 @@ Readout.prototype = {
 	},
 	tick: function(setPt, name){
 		var entry = byAttr(this.entries, name, 'name');
+		if(isNaN(entry.val)){
+			entry.val = setPt;
+		}
 		var init = entry.val
 		var step = (setPt - init)/10;
 		removeListener(curLevel, 'update', this.handle + entry.name +'tick');

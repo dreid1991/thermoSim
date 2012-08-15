@@ -5,7 +5,7 @@ function Work(){
 	this.data.v = [];
 	this.data.p = [];
 	this.wallSpeed = 1;
-	this.readout = new Readout('mainReadout', 30, myCanvas.width-125, 25, '13pt calibri', Col(255,255,255),this, 'left');
+	this.readout = new Readout('mainReadout', 30, myCanvas.width-155, 25, '13pt calibri', Col(255,255,255),this, 'left');
 	this.compMode = 'Isothermal';
 
 	
@@ -38,7 +38,7 @@ _.extend(Work.prototype,
 					type:'multChoice',
 					options:
 						[{optionText:"<img src='img/work/eq6.gif'></img>", isCorrect: true},
-						{optionText:"<img src='img/work/eq7.gif'></img>", isCorrect: false, message:"Why c<sub>P</sub>?"},
+						{optionText:"<img src='img/work/eq7.gif'></img>", isCorrect: false, message:"Why C<sub>P</sub>?"},
 						{optionText:"<img src='img/work/eq8.gif'></img>", isCorrect: false, message:"But it's adiabatic!"},
 						{optionText:"It cannot be simplified", isCorrect: false, message:"Yes it can.  What is Q equal to?"}
 					]
@@ -46,7 +46,7 @@ _.extend(Work.prototype,
 			},
 			{block:2, 
 				cutScene: true,
-				text:"<p>Excellent, so as we add energy through work our system heats up since energy is conserved.  We know that temperature is an expression of molecular kinetic energy.  This tells us that as we compress our container, the molecules speed up.</p><p> But why does that happen?  Why does pushing on a container make molecules speed up?  There must be some event in the compression that makes a molecule speed up.  </p><p><p>Shall we investigate?</p>",
+				text:"<p>Excellent, so as we add energy through work our system heats up since energy is conserved.  We know that temperature is an expression of molecular kinetic energy.  This tells us that as we compress our container, the molecules speed up.</p><p> But why does that happen?  There must be some event in the compression that makes a molecule speed up.  </p><p><p>Shall we investigate?</p>",
 				quiz:{	
 					type:'buttons',
 					options:
@@ -56,23 +56,34 @@ _.extend(Work.prototype,
 			},
 			{block:3,
 				title:"Current step",
-				text:"Alright, let’s do some work (sorry).  Above we have a piston and cylinder setup.  You can change the piston’s pressure with the slider.  If you compress the system, how does the temperature behave?  Does the change seem consistent with the previous equation?",
+				text:"Alright, let’s do some work (sorry).  Above we have a piston and cylinder setup.  You can change the piston’s pressure with the slider.  If you compress the system, how does the temperature behave?",
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:'inc', buttonText:'Increases', isCorrect:true},
-						{buttonId:'dec', buttonText:'Decreases', isCorrect:false}
+						[{buttonId:'inc', buttonText:'Temp Increases', isCorrect:true},
+						{buttonId:'dec', buttonText:'Temp Decreases', isCorrect:false, message: "Do look at the graphs"}
 					]
 				},				
 			},
-			{block:3, 
-				title: 'Current step', 
-				text: "<p>Now these molecules undergo perfectly elastic collisions when they hit a wall.  This means that they behave like a bouncy ball would when you throw it against a wall.</p><p>If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving towards the ball, what should happen?</p>",
+			{block:3,
+				title:"Current step",
+				text:"Does this temperature change seem consistant with the equation below?<br><center><img src='img/work/eq6.gif'></img></center>",
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:'up', buttonText:'Speeds up', isCorrect:true},
-						{buttonId:'down', buttonText:'Slows down', isCorrect:false}
+						[{buttonId:'yes', buttonText:'Yes', isCorrect:true},
+						{buttonId:'no', buttonText:'No', isCorrect:false, message:"But wouldn't delta V be negative since we compressing?  A negative negative volume change gives us a positive temperature change!"}
+					]
+				},
+			},
+			{block:3, 
+				title: 'Current step', 
+				text: "Now these molecules undergo perfectly elastic collisions when they hit a wall.  This means that they behave like a bouncy ball would when you throw it against a wall.</p><p>If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving towards the ball, what will the ball do?",
+				quiz:{	
+					type:'buttons',
+					options:
+						[{buttonId:'up', buttonText:'Speed up', isCorrect:true},
+						{buttonId:'down', buttonText:'Slow down', isCorrect:false}
 					]
 				},
 			},
@@ -81,11 +92,12 @@ _.extend(Work.prototype,
 				text:"Let’s see if we can relate that idea to work by looking at just one molecule. If you compress the cylinder, at what point does the molecule’s speed change?  How could this relate to a temperature change?"
 			},
 			{block:5,
+				cutScene: true,
 				text:"<p>Okay, now which of the following would you say describes what happened?</p>",
 				quiz:{	
 					type:'multChoice',
 					options:
-						[{optionText:"The molecules sped up becase it was hit with the moving wall.", isCorrect: true},
+						[{optionText:"The molecule sped up becase it was hit with the moving wall.", isCorrect: true},
 						{optionText:"Something else.", isCorrect: false},
 						{optionText:"Filler.", isCorrect: false}
 
@@ -95,23 +107,21 @@ _.extend(Work.prototype,
 			},
 			{block:6,
 				cutScene: true,
-				text:"<p>So we can say that if we hit a molecule with a moving wall, it’ll be speed up, but will this idea really lead to the correct temperature change for a system of many molecules?  Let’s do an experiment and find out! </p><p>Let’s compress a system at YYY K from XX L to 10 L at a constant pressure of 6 atm and see if calculated and simulated results line up.</p><p>One other thing - these collisions are the <i>only</i> way energy is added in these simulations, so if our idea it wrong, the simulation will give the wrong result.</p><p>Now, how much work will we do on this system?</p>",
+				text:"<p>So we can say that if we hit a molecule with a moving wall, it’ll speed up, but will this idea really lead to the correct temperature change when compressing a system of many molecules?  Let’s do an experiment and find out! </p><p>Let’s compress a system at 200 K from 15 L to 10 L at a constant pressure of 6 atm and see if calculated and simulated results line up.</p><p>One other thing - these collisions are the <i>only</i> way energy is added in these simulations, so if our idea it wrong, the simulation will give the wrong result.</p><p>Now, how much work will we do on this system?</p>",
 				quiz:{	
 					type:'text', 
 					text:"Work in in kJ", 
-					answer:-1, //MAKE AN ANSWER
-					messageRight: 'Correct!', 
-					messageWrong: "That's not correct.  Check your units maybe?"
+					answer:3.04, 
+					messageWrong: "That's not correct.  Check your units maybe?  Also, the work done on the system is positive since we're compressing."
 				},
 			},
 			{block:7,
 				cutScene: true,
-				text:"<p>Okay, and what final temperature should we expect from doing that much work?  T<sub>i</sub> is YYY K.  The system will contain 1.4 moles and the gas has a heat capacity of 3/2R.</p>",
+				text:"<p>Yes, and what final temperature should we expect from doing 3.04 kJ of work on the system?  T<sub>o</sub> is 200 K.  The system will contain 1.5 moles and the gas has a heat capacity of 3/2R.</p>",
 				quiz:{	
 					type:'text', 
 					text:"Final temperature in kelvin", 
-					answer:-1, //MAKE AN ANSWER
-					messageRight: 'Correct!', 
+					answer:362.6, //MAKE AN ANSWER
 					messageWrong: "That's not correct.  Are you using the right R?"
 				},
 			},			
@@ -121,7 +131,7 @@ _.extend(Work.prototype,
 			},
 			{block:9,
 				cutScene: true,
-				text:"<p>Alright, we got XXX K experimental versus YYY K theoretical.  So our idea was that work increased temperature through collisions with the moving wall.</p><p>Does our experiment back up the idea?</p>",
+				text:"<p>Alright, we got 363 K experimental versus XXX K theoretical.  So our idea was that work increases temperature through molecules' collisions with the moving wall.</p><p>Does our experiment back up the idea?</p>",
 				quiz:{	
 					type:'buttons',
 					options:
@@ -130,23 +140,24 @@ _.extend(Work.prototype,
 					]
 				},
 				replace:
-					[{oldStr:'XXX', newStr:'GETstuffstuffstuff'},
-					{oldStr:'YYY', newStr:'GETstuffstuffstuff'}
+					[{oldStr:'XXX', newStr:'GETtFinal'}
 					//FILL IN
 				]
 			},
 			{block:10,
+				cutScene: true,
 				text:"<p>I thought so too.  Now we know how work adds energy to a system.</p><p>Here’s another conundrum:  Why is work equal to</p><p><center><img src=img/work/eq1.gif></img></center></p><p>and NOT</p><p><center><img src=img/work/eq3.gif></img></center></p><p>Let’s find out.</p>",
 			},
 			{block:11,
 				cutScene: true,
-				text:"<p>First, shall we convince ourselves that work actually <i>is</i> dependant on external pressure?</p><p> If we compress a high pressure system and a low pressure system with the same external pressure over the same volume, how should the temperature changes of the two compare?</p>",
+				text:"<p>First, we must convince ourselves that work actually <i>is</i> dependant on external pressure?</p><p> If we compress a high pressure system and a low pressure system with the same external pressure over the same volume, how should the temperature changes of the two compare?</p>",
 				quiz:{	
 					type:'multChoice',
 					options:
-						[{optionText:"<img src='img/work/eq9.gif'></img>", isCorrect: true},
-						{optionText:"<img src='img/work/eq10.gif'></img>", isCorrect: false},
-						{optionText:"<img src='img/work/eq11.gif'></img>", isCorrect: false}
+						[{optionText:"<img src='img/work/eq9.gif'></img>", isCorrect: false},
+						{optionText:"<img src='img/work/eq10.gif'></img>", isCorrect: true},
+						{optionText:"<img src='img/work/eq11.gif'></img>", isCorrect: false},
+						{optionText:"Can't tell", isCorrect: false}
 
 					]
 				},
@@ -214,17 +225,8 @@ _.extend(Work.prototype,
 		nextPrompt();
 	},
 
-	block0Start: function(){
-		this.cutSceneStart(
-		'intro'
-		);
-		
-	},
-	block0CleanUp: function(){
-		this.cutSceneEnd()
-	},
 	
-	block1Start: function(){
+	block3Start: function(){
 		this.playedWithSlider = false;
 		var self = this;
 		var sliderMin = $('#sliderPressure').slider('option', 'min');
@@ -252,18 +254,21 @@ _.extend(Work.prototype,
 		
 		this.piston = new Piston('tootoo', 'container', 2, this).show().trackWork().trackPressure();
 		this.borderStd();
+		this.volListener8 = new StateListener(10, this.data.v, .1, {})
 		//this.heater = new Heater('spaceHeater', P(150,360), V(250,50), 0, 20, c);//P(40,425), V(470,10)
 		//this.heater.init();
 
 	},
-	block1Conditions: function(){
-		if(this.playedWithSlider){
+	block3Conditions: function(){
+		if(this.volListener8.isSatisfied()){
 			return {result:true};
 		}
-		return {result:false, alert:'Play with the slider, I insist.'};
+		return {result:false, alert:'Compress more!'};
 	},
-	block1CleanUp: function(){
+	
+	block3CleanUp: function(){
 		this.playedWithSlider = undefined;
+		this.volListener8 = undefined;
 		this.wallV=0;
 		$('#sliderPressureHolder').hide();
 		this.removeAllGraphs();
@@ -274,7 +279,8 @@ _.extend(Work.prototype,
 		walls.setWallHandler(0, 'staticAdiabatic')
 		walls['container'].removeBorder();
 	},
-	block2Start: function(){
+	
+	block4Start: function(){
 
 		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
 		walls.setHitMode('container', 'Arrow');
@@ -293,13 +299,13 @@ _.extend(Work.prototype,
 			},
 		this);
 	},
-	block2Conditions: function(){
+	block4Conditions: function(){
 		if(this.tempChanged){
 			return {result:true};
 		}
 		return {result:false, alert:"Try hitting the molecule with the wall while the wall's moving"};	
 	},
-	block2CleanUp: function(){
+	block4CleanUp: function(){
 		this.tempChanged = undefined;
 		walls['container'].v = 0;
 		walls['container'].removeBorder();
@@ -309,40 +315,22 @@ _.extend(Work.prototype,
 		removeListenerByName(curLevel, 'update', 'drawArrow');
 		removeListenerByName(curLevel, 'update', 'animText');
 	},
-	block3Start: function(){
-		this.cutSceneStart("<p>So it would seem the molecule speeds up as a result of its collisions with a moving wall!  Could simple elastic collisions with moving walls really explain why compressing or expanding (against non-zero pressure) changes system temperature? I think that’s it, but to make sure, we need to do an experiment. </p><p> First we should note that the only way energy is added to the system in these simulations is through <a href=http://en.wikipedia.org/wiki/Elastic_collision  target='_blank'>elastic collisions</a> with the wall.  There’s no magically speeding up the molecules to match how much work was put in.  If work is expressed in some way other than through elastic collisions with the wall, our experiment will produce the wrong temperature change. </p><p>That being said, I propose the following experiment:<br>From the equation <p><center><img src='img/work/eq2.gif' alt='Don't click me, it hurts!'></img></center></p><p>If we compress with a fixed pressure over some volume, we can calculate the expected temperature change and compare it to experiment.  If they match, we can probably say that when you do work on a system, the system’s temperature increases because of elastic (or shall we say bouncy) collisions with a moving wall.</p>");
-	},
-	block3CleanUp: function(){
-		this.cutSceneEnd();
-	},
-	block4Start: function(){
+	block8Start: function(){
 		$('#reset').show()
 		this.readout.show();
 		wallHandle = 'container';
-		walls = WallHandler([[P(40,30), P(510,30), P(510,350), P(40,350)]], 'staticAdiabatic', [wallHandle]);
-		//walls.setSubWallHandler(0, 0, {func:this.cPAdiabaticDamped, obj:this});
+		walls = WallHandler([[P(40,31), P(510,31), P(510,350), P(40,350)]], 'staticAdiabatic', [wallHandle], [{yMin:30, yMax:300}], undefined, [15]);
 		this.stops = new Stops({volume:10}, 'container').init();
 		this.borderStd();
-		spcs['spc1'].populate(P(45,35), V(445, 325), 850, 198);
-		spcs['spc3'].populate(P(45,35), V(445, 325), 650, 198);
-		this.dragWeights = this.makeDragWeights([{name:'lrg', count:1, mass:75}], wallHandle).init().trackEnergyStop().trackMassStop().trackPressureStart();
+		spcs['spc1'].populate(P(45,35), V(445, 325), 850, 200);
+		spcs['spc3'].populate(P(45,35), V(445, 325), 650, 200);
+		this.dragWeights = this.makeDragWeights([{name:'lrg', count:1, mass:75}], wallHandle).trackMassStop().trackPressureStart();
 		this.trackTempStart();
 		this.trackVolumeStart(0);
 		this.volListener15 = new StateListener(15, this.data.v, .05, {p:this.data.p, t:this.data.t});
-		this.volListener10 = new StateListener(10, this.data.v, .03, {p:this.data.p, t:this.data.t});
+		this.volListener10 = new StateListener(10, this.data.v, .03, {p:this.data.p, t:this.data.t}, {func:function(){store('tFinal', round(this.data.t[this.data.t.length-1],0))}, obj:this});
 	},
-	block4CleanUp: function(){
-		this.wallV=0;
-		$('#reset').hide();
-		this.trackTempStop();
-		this.trackVolumeStop();
-		walls['container'].removeBorder();
-		this.stops.remove();
-		this.stop = undefined;
-		this.dragWeights.remove();
-		this.dragWeights = undefined;
-	},
-	block4Conditions: function(){
+	block8Conditions: function(){
 		if(this.volListener10.isSatisfied() && this.volListener15.isSatisfied()){
 			return {result:true};
 		}
@@ -350,6 +338,43 @@ _.extend(Work.prototype,
 			return {result:false, alert:'Compress the container!'};
 		}
 	},
+	block8CleanUp: function(){
+		this.wallV=0;
+		$('#reset').hide();
+		this.trackTempStop();
+		this.trackVolumeStop();
+		walls['container'].removeBorder();
+		this.readout.hide();
+		this.stops.remove();
+		this.stop = undefined;
+		this.dragWeights.remove();
+		this.dragWeights = undefined;
+	},
+	block12Start: function(){
+		this.readout.show();
+		wallHandle = 'container';
+		walls = WallHandler([[P(40,30), P(255,30), P(255,440), P(40,440)], [P(295,30), P(510,30), P(510,440), P(295,440)]], 'staticAdiabatic', ['left', 'right']);
+		this.borderStd({wallInfo:'left'});
+		this.borderStd({wallInfo:'right'});
+		spcs['spc1'].populate(P(45,35), V(200, 375), 450, 200, 'left', 'left');
+		spcs['spc3'].populate(P(45,35), V(200, 375), 350, 200, 'left', 'left');	
+		
+		spcs['spc1'].populate(P(300,35), V(200, 375), 450, 400, 'right', 'right');
+		spcs['spc3'].populate(P(300,35), V(200, 375), 350, 400, 'right', 'right');	
+		this.data.tLeft = [];
+		this.data.tRight = [];
+		this.data.vLeft = [];
+		this.data.vRight = [];		
+		this.dragWeightsLeft = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'left', 5).trackMassStop().trackPressureStart();
+		this.dragWeightsRight = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'right', 5).trackMassStop().trackPressureStart();
+	},
+	block12Conditions: function(){
+	
+	},
+	block12CleanUp: function(){
+		this.readout.hide();
+	},
+	/*
 	block5Start: function(){
 		var str = "<p>Okay, so your calculations should have looked something like this:<p><center><img src = img/work/eq3.gif></img></p><img src=img/work/eq4.gif></img></center></p>You had an initial temperature of INITIAL K and a final temperature of FINAL K.  Are the two results close to each other?  What does this say about our idea that work adds energy through molecules’ collisions with a moving wall?</p>";
 		var results15 = this.volListener15.getResults();
@@ -499,6 +524,7 @@ _.extend(Work.prototype,
 	block11CleanUp: function(){
 		this.cutSceneEnd();
 	},
+	*/
 	dataRun: function(){
 		var wall = walls[0];
 		this.data.p.push(wall.pInt())

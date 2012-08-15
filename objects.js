@@ -7,8 +7,9 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	this.pistonY = pistonY;
 	this.binY = binY;
 	this.weightCol = weightCol;
-	this.wallHandler = wallHandler;
+	this.wallHandler = wallHandler + compAdj;
 	this.eBarCol = this.weightCol;
+	this.wallInfo = wallInfo;
 	this.wallIdx = walls.idxByInfo(wallInfo);
 	this.wall = walls[this.wallIdx];
 	this.eBar = {x:eBarX, scalar: .7};
@@ -38,7 +39,7 @@ function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol,
 	
 	var self = this;
 	if(obj){
-		addListener(obj, 'init', 'dragWeights', this.init, this);
+		addListener(obj, 'init', 'dragWeights' + this.wallInfo, this.init, this);
 	}
 
 	this.wall.setMass(this.massChunkName, this.massInit);
@@ -56,11 +57,11 @@ DragWeights.prototype = {
 		this.bins['piston'] = this.makePistonBins();
 		//this.dropAllstores();
 		this.wall.moveInit();
-		addListener(curLevel, 'update', 'moveWeightsOnPiston', this.moveWeightsOnPiston, this);
+		addListener(curLevel, 'update', 'moveWeightsOnPiston' + this.wallInfo, this.moveWeightsOnPiston, this);
 		walls.setSubWallHandler(this.wallIdx, 0, this.wallHandler);
-		addListener(curLevel, 'update', 'drawDragWeights', this.draw, this);
-		addListener(curLevel, 'mousedown', 'weights', this.mousedown, this);
-		addListener(curLevel, 'reset', 'dragWeights', this.reset, this);
+		addListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo, this.draw, this);
+		addListener(curLevel, 'mousedown', 'weights' + this.wallInfo, this.mousedown, this);
+		addListener(curLevel, 'reset', 'dragWeights' + this.wallInfo, this.reset, this);
 		this.dropAllIntoStores('instant');
 		delete this.tempWeightDefs;
 		return this;
@@ -68,55 +69,54 @@ DragWeights.prototype = {
 	},
 	remove: function(){
 		this.wall.moveStop();
-		removeListener(curLevel, 'update', 'moveWalls');
-		removeListener(curLevel, 'update', 'moveWeightsOnPiston');
-		removeListener(curLevel, 'update', 'drawDragWeights');
-		removeListener(curLevel, 'mousedown', 'weights');
-		removeListener(curLevel, 'reset', 'dragWeights');
+		removeListener(curLevel, 'update', 'moveWeightsOnPiston' + this.wallInfo);
+		removeListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo);
+		removeListener(curLevel, 'mousedown', 'weights' + this.wallInfo);
+		removeListener(curLevel, 'reset', 'dragWeights' + this.wallInfo);
 		if(this.trackEnergy){
-			this.readout.removeEntry('eAdd');
+			this.readout.removeEntry('eAdd' + this.wallInfo);
 		}
 		if(this.trackMass){
-			this.readout.removeEntry('mass');
+			this.readout.removeEntry('mass' + this.wallInfo);
 		}
 		if(this.trackPressure){
-			this.readout.removeEntry('pressure');
+			this.readout.removeEntry('pressure' + this.wallInfo);
 		}
 	},
 	trackEnergyStart: function(){
 		this.trackEnergy = true;
-		if(!this.readout.entryExists('eAdd')){
+		if(!this.readout.entryExists('eAdd' + this.wallInfo)){
 			this.addEnergyEntry();
 		}
 		return this;
 	},
 	trackEnergyStop: function(){
 		this.trackEnergy = false;
-		this.readout.removeEntry('eAdd');
+		this.readout.removeEntry('eAdd' + this.wallInfo);
 		return this;
 	},
 	trackMassStart: function(){
 		this.trackMass = true;
-		if(!this.readout.entryExists('mass')){
+		if(!this.readout.entryExists('mass' + this.wallInfo)){
 			this.addMassEntry();
 		}
 		return this;
 	},
 	trackMassStop: function(){
 		this.trackMass = false;
-		this.readout.removeEntry('mass');
+		this.readout.removeEntry('mass' + this.wallInfo);
 		return this;
 	},
 	trackPressureStart: function(){
 		this.trackPressure = true;
-		if(!this.readout.entryExists('pressure')){
+		if(!this.readout.entryExists('pressure' + this.wallInfo)){
 			this.addPressureEntry();	
 		}
 		return this;
 	},
 	trackPressureStop: function(){
 		this.trackPressure = false;
-		this.readout.removeEntry('pressure');	
+		this.readout.removeEntry('pressure' + this.wallInfo);	
 		return this;
 	},
 	addStdReadoutEntries: function(){
@@ -124,13 +124,13 @@ DragWeights.prototype = {
 		this.addMassEntry();
 	},
 	addEnergyEntry: function(){
-		this.readout.addEntry('eAdd', 'E Added:', 'kJ', this.eAdded, undefined, 1);
+		this.readout.addEntry('eAdd' + this.wallInfo, 'E Added:', 'kJ', this.eAdded, undefined, 1);
 	},
 	addMassEntry: function(){
-		this.readout.addEntry('mass', 'Mass:', 'kg', this.pistonMass, undefined, 0);
+		this.readout.addEntry('mass' + this.wallInfo, 'Mass:', 'kg', this.pistonMass, undefined, 0);
 	},
 	addPressureEntry: function(){
-		this.readout.addEntry('pressure', 'Pressure:', 'atm', this.pressure, undefined, 1); 
+		this.readout.addEntry('pressure' + this.wallInfo, 'Pressure:', 'atm', this.pressure, undefined, 1); 
 	},
 	getWeightDims: function(weightDefs){
 		var dims = {};
@@ -353,7 +353,8 @@ DragWeights.prototype = {
 		return this.pistonMass*g*pConst/(this.wall[1].x-this.wall[0].x);
 	},
 	pistonMinusVal: function(val){
-		return function(){return walls[0][0].y-val}
+		var wall = this.wall
+		return function(){return wall[0].y-val}
 	},
 	dropAllIntoStores: function(special){
 		for (var group in this.weightGroups){
@@ -404,7 +405,7 @@ DragWeights.prototype = {
 			weight.pos.x = slot.x;
 			weight.pos.y = slot.y();
 		}
-		var uniqueNamePiece = weight.name+weight.id + 'endId';
+		var uniqueNamePiece = weight.name+weight.id + 'endId' + this.wallInfo;
 		var listenerName = 'moveWeight'+ uniqueNamePiece + binType+slotIdNum;
 		if(removeListenerByName(curLevel, 'update', uniqueNamePiece)){
 			weight.slot.isFull = false;
@@ -542,10 +543,10 @@ DragWeights.prototype = {
 		this.wall.setMass(this.massChunkName, this.pistonMass);
 		this.pressure = this.getPressure();
 		if(this.trackMass){
-			this.readout.tick(this.pistonMass, 'mass');
+			this.readout.tick(this.pistonMass, 'mass' + this.wallInfo);
 		}
 		if(this.trackPressure){
-			this.readout.tick(this.pressure, 'pressure');
+			this.readout.tick(this.pressure, 'pressure' + this.wallInfo);
 		}
 	},	
 	takeOffPiston: function(weight){
@@ -972,7 +973,7 @@ function CompArrow(nameInfo, compAttrs){
 	}
  
 	listeners.onDown = function(){};
-	listeners.onMove = function(){curLevel.changeWallSetPt(wallIdx, this.pos.y, compMode + compAdj, speed)};
+	listeners.onMove = function(){curLevel.changeWallSetPt(wallIdx, this.pos.y, compMode, speed)};
 	listeners.onUp = function(){};
 	this.dragArrow = new DragArrow(pos, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds).show();
 	return this;

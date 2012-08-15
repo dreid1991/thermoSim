@@ -22,9 +22,9 @@ LevelTools = {
 		var wallIdx = walls.idxByInfo(wallInfo);
 		var wall = walls[wallIdx]
 		var wallMoveMethod;
-		if(compType=='isothermal'){
+		if(compType.indexOf('isothermal')!=-1){
 			var wallMoveMethod = 'cVIsothermal';
-		} else if (compType=='adiabatic'){
+		} else if (compType.indexOf('adiabatic')!=-1){
 			var wallMoveMethod = 'cVAdiabatic';
 		}
 		removeListener(curLevel, 'update', 'moveWall');
@@ -39,7 +39,7 @@ LevelTools = {
 			var sign = getSign(dist);
 			var speed = defaultTo(this.wallSpeed, speed);
 			wall.v = speed*sign;
-			walls.setSubWallHandler(wallIdx, 0, wallMoveMethod);
+			walls.setSubWallHandler(wallIdx, 0, wallMoveMethod + compAdj);
 			addListener(curLevel, 'update', 'moveWall'+wallInfo,
 				function(){
 					var y = wall[0].y
@@ -242,14 +242,14 @@ LevelTools = {
 		textBoxHTML += "<textarea id='answerTextArea' rows='3' cols='60'>" + boxText + "</textarea>";
 		textBoxHTML += "<table border=0><tr><td width=75%></td><td><button id='textAreaSubmit' class='noSelect'>Submit</button></td></tr></table></p>";
 		var checkFunc = function(){
-			if(this.checkConditions()){
+			if(curLevel.checkConditions()){
 				if(quiz.answer){
 					var submitted = $('#answerTextArea').val();
 					if(fracDiff(parseFloat(quiz.answer), parseFloat(submitted))<.05){
 						if(quiz.messageRight){
 							alert(quiz.messageRight);
-							nextPrompt();
 						}
+						nextPrompt();
 					}else{
 						if(quiz.messageWrong){
 							alert(quiz.messageWrong);
@@ -266,7 +266,7 @@ LevelTools = {
 	},
 	checkConditions: function(){
 		var prompt = this.prompts[this.promptIdx];
-		var conditions = defaultTo(this['block'+this.promptIdx+'Conditions'], prompt.conditions);
+		var conditions = defaultTo(this['block'+this.blockIdx+'Conditions'], prompt.conditions);
 		if(!conditions){
 			return true;
 		}else{
@@ -430,28 +430,27 @@ LevelTools = {
 		var self = this;
 		massInit = defaultTo(25, massInit);
 		wallHandle = defaultTo('0', wallHandle);
-		min = walls[0][2].y;
+		min = walls[wallHandle][2].y;
 		var wall = walls[wallHandle];
 		if(!(weights instanceof Array)){
 			//then is a total mass with count
 			var mass = weights.mass/weights.count;
 			weights = [{name:'onlyWeights', count:weights.count, mass:mass}]
 		}
-		var dragWeights = new DragWeights(weights,
-									min,
-									function(){return wall[0].y},
-									myCanvas.height-15,
-									20,
-									Col(218, 187, 41),
-									Col(150, 150, 150),
-									massInit,
-									this.readout,
-									wallHandle,
-									'cPAdiabaticDamped' + compAdj,
-									this
-									);
+		return new DragWeights(weights,
+								min,
+								function(){return wall[0].y},
+								myCanvas.height-15,
+								20,
+								Col(218, 187, 41),
+								Col(150, 150, 150),
+								massInit,
+								this.readout,
+								wallHandle,
+								'cPAdiabaticDamped',
+								this
+								);
 
-		return dragWeights;		
 	},
 	makeListeners: function(){
 		this.updateListeners = {listeners:{}, save:{}};
