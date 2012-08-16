@@ -42,7 +42,7 @@ Good evening:  I am keeping histogram data in data.someName, not just data, even
 Trying to make functions where base references data.someName as reusable as possible
 and leaving open possibility of multiple sets (though that would probably look confusing)
 */
-_.extend(GraphHist.prototype, GraphBase.prototype, 
+_.extend(GraphHist.prototype, GraphBase, 
 	{
 		addSet: function(address, barCol, dataPath){
 			var set = {};

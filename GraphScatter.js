@@ -45,7 +45,7 @@ function GraphScatter(name, width, height, xLabel, yLabel, axisInit){
 	this.drawAllBG();
 	
 }
-_.extend(GraphScatter.prototype, GraphBase.prototype, 
+_.extend(GraphScatter.prototype, GraphBase, 
 	{
 		addSet: function(address, label, pointCol, flashCol, dataPaths){
 			var set = {};
