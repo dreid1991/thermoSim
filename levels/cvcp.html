@@ -8,7 +8,7 @@
 <div class='noSelect wrapper'>
 	<div id='main' class='main noSelect'>
 		<div id='mainHeader' class='header noSelect'>
-			Work
+			Heat capacities
 		</div>
 		<div id='canvasDiv' class='canvasDiv noSelect'>
 			<canvas id='myCanvas'>
@@ -109,6 +109,7 @@ var curLevel;
 canvasHeight = 450;
 $(function(){
 	//HEY - COULD PUT INIT STUFF HERE. 
+	imgPath = 'cvcp';
 	myCanvas.height = canvasHeight;
 	curLevel = new cvcp();
 	animText = new AnimText(c);

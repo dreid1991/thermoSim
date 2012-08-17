@@ -26,10 +26,10 @@ _.extend(cvcp.prototype,
 					type:'multChoice', 
 					options:
 						[
-						{optionText:"||EQ2||", isCorrect: false},
-						{optionText:"||EQ2||", isCorrect: false},
-						{optionText:"||EQ", isCorrect: true},
-						{optionText:"<img src=img/cvcp/eq4.gif>", isCorrect: false}
+						{optionText:"||EQ1|| and ||EQ3||", isCorrect: false},
+						{optionText:"||EQ2|| and ||EQ3||", isCorrect: false},
+						{optionText:"||EQ1|| and ||EQ4||", isCorrect: true},
+						{optionText:"||EQ2|| and ||EQ5||", isCorrect: false}
 					]
 				},
 			},
@@ -42,9 +42,9 @@ _.extend(cvcp.prototype,
 				quiz: {	
 					type:'buttons',
 					options:
-						[{buttonId:'less', buttonText:'E<sub>C<sub>V</sub></sub>><E<sub>C<sub>P</sub></sub>>', isCorrect:true},
-						{buttonId:'equal', buttonText:'E<sub>C<sub>V</sub></sub>>=E<sub>C<sub>P</sub></sub>>', isCorrect:false, message:"No it's not"},
-						{buttonId:'greater', buttonText:'E<sub>C<sub>V</sub></sub>>&#60E<sub>C<sub>P</sub></sub>>', isCorrect:false, message:"No it's not"}					
+						[{buttonId:'less', buttonText:'E<sub>C<sub>V</sub></sub>><E<sub>C<sub>P</sub></sub>', isCorrect:true},
+						{buttonId:'equal', buttonText:'E<sub>C<sub>V</sub></sub>=E<sub>C<sub>P</sub></sub>', isCorrect:false, message:"No it's not"},
+						{buttonId:'greater', buttonText:'E<sub>C<sub>V</sub></sub>&#60E<sub>C<sub>P</sub></sub>', isCorrect:false, message:"No it's not"}					
 					]
 				},
 			}
