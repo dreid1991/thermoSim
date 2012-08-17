@@ -1,4 +1,5 @@
 function Reversibility(){
+
 	this.setStds();
 	this.data.t = [];
 	this.data.pInt = [];
@@ -93,7 +94,7 @@ _.extend(Reversibility.prototype,
 			},
 			{block:7, 
 				cutScene: true, 
-				text:"<p>Indeed!  We could even say that when using such tiny blocks</p><center><img src=img/rev/eq1.gif></img></center>"},
+				text:"<p>Indeed!  We could even say that when using such tiny blocks</p><center>||EQ1||</center>"},
 			{block:8, 
 				title:'Current step', 
 				text:"Now I have another equally important task for you.  I want this piston expanded in a way that gets as much work out as possible.  When we compressed, we used the blocks to do work on the system.  When expanding, the system can do work on the blocks, lifting them to a higher potential energy.  Let’s start with just one block.  How much work can you get out?"},
@@ -136,7 +137,7 @@ _.extend(Reversibility.prototype,
 			},
 			{block:12, 
 				cutScene: true, 
-				text: "<p>Now say we split our blocks into tiny pieces again.  The maximum amount of work we can get out at any point is</p><center><img src=img/rev/eq2.gif></img></center><p>over a tiny (or differential) change in volume.  As we use smaller and smaller blocks, we again approach</p><center><img src=img/rev/eq1.gif></img></center>"
+				text: "<p>Now say we split our blocks into tiny pieces again.  The maximum amount of work we can get out at any point is</p><center>||EQ2||</center><p>over a tiny (or differential) change in volume.  As we use smaller and smaller blocks, we again approach</p><center>||EQ1||</center>"
 			},
 			{block:13, 
 				title:'Current step', 
@@ -180,7 +181,7 @@ _.extend(Reversibility.prototype,
 			},
 			{block:16, 
 				cutScene:'outro', 
-				text:"<p>We got a lot more work out this time, yes?</p><p>If we again split our blocks up into so many pieces that</p><center><img src=’img/rev/eq1.gif’></img></center><p>we can say that when compressing, we’re only doing as much work as we have to, and when expanding, we’re getting as much work out as we can.  If we did this, then P<sub>ext</sub> at any volume in our cycle is the same whether we’re compressing or expanding.  This means that we do the same amount of work compressing as we get out expanding.</p><p>If we do that same amount of work in either direction, we can say that in a cycle, the net work done is zero, so our system has a net energy and temperature change of zero!  </p><p>Our final system now looks exactly like our initial system.  Our compression was reversed!  This brings us to the meaning of reversibility:  If a volume change is done reversibly, with</p><center><img src=’img/rev/eq1.gif’></img></center><p>the system can be brought back to its original state through another reversible volume change.  The volume change can be...  reversed!</p>"},
+				text:"<p>We got a lot more work out this time, yes?</p><p>If we again split our blocks up into so many pieces that</p><center>||EQ1||</center><p>we can say that when compressing, we’re only doing as much work as we have to, and when expanding, we’re getting as much work out as we can.  If we did this, then P<sub>ext</sub> at any volume in our cycle is the same whether we’re compressing or expanding.  This means that we do the same amount of work compressing as we get out expanding.</p><p>If we do that same amount of work in either direction, we can say that in a cycle, the net work done is zero, so our system has a net energy and temperature change of zero!  </p><p>Our final system now looks exactly like our initial system.  Our compression was reversed!  This brings us to the meaning of reversibility:  If a volume change is done reversibly, with</p><center>||EQ1||</img></center><p>the system can be brought back to its original state through another reversible volume change.  The volume change can be...  reversed!</p>"},
 		]
 		store('prompts', this.prompts);
 	

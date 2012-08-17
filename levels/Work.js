@@ -24,22 +24,22 @@ _.extend(Work.prototype,
 				quiz:{	
 					type:'multChoice',
 					options:
-						[{optionText:"<img src='img/work/eq1.gif'></img>", isCorrect: true},
-						{optionText:"<img src='img/work/eq2.gif'></img>", isCorrect: false, message:'No!  You do no work with constant volume'},
-						{optionText:"<img src='img/work/eq3.gif'></img>", isCorrect: false, message:"No!"},
-						{optionText:"<img src='img/work/eq4.gif'></img>", isCorrect: false, message:"It is dependant of change in volume, but T?"}
+						[{optionText:"||EQ1||", isCorrect: true},
+						{optionText:"||EQ2||", isCorrect: false, message:'No!  You do no work with constant volume'},
+						{optionText:"||EQ3||", isCorrect: false, message:"No!"},
+						{optionText:"||EQ4||", isCorrect: false, message:"It is dependant of change in volume, but T?"}
 					]
 				},
 			},
 			{block:1, 
 				cutScene: true,
-				text: "<p>Indeed.  This tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p><p><center><img src='img/work/eq5.gif'></img></center></p><p>We’re going to be looking at an adiabatic system.  Which is these simplifications is correct?</p>",
+				text: "<p>Indeed.  This tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p><p><center>||EQ5||</center></p><p>We’re going to be looking at an adiabatic system.  Which is these simplifications is correct?</p>",
 				quiz:{	
 					type:'multChoice',
 					options:
-						[{optionText:"<img src='img/work/eq6.gif'></img>", isCorrect: true},
-						{optionText:"<img src='img/work/eq7.gif'></img>", isCorrect: false, message:"Why C<sub>P</sub>?"},
-						{optionText:"<img src='img/work/eq8.gif'></img>", isCorrect: false, message:"But it's adiabatic!"},
+						[{optionText:"||EQ6||", isCorrect: true},
+						{optionText:"||EQ7||", isCorrect: false, message:"Why C<sub>P</sub>?"},
+						{optionText:"||EQ8||", isCorrect: false, message:"But it's adiabatic!"},
 						{optionText:"It cannot be simplified", isCorrect: false, message:"Yes it can.  What is Q equal to?"}
 					]
 				},
@@ -67,7 +67,7 @@ _.extend(Work.prototype,
 			},
 			{block:3,
 				title:"Current step",
-				text:"Does this temperature change seem consistant with the equation below?<br><center><img src='img/work/eq6.gif'></img></center>",
+				text:"Does this temperature change seem consistant with the equation below?<br><center>||EQ6||</center>",
 				quiz:{	
 					type:'buttons',
 					options:
@@ -146,7 +146,7 @@ _.extend(Work.prototype,
 			},
 			{block:10,
 				cutScene: true,
-				text:"<p>I thought so too.  Now we know how work adds energy to a system.</p><p>Here’s another conundrum:  Why is work equal to</p><p><center><img src=img/work/eq1.gif></img></center></p><p>and NOT</p><p><center><img src=img/work/eq3.gif></img></center></p><p>Let’s find out.</p>",
+				text:"<p>I thought so too.  Now we know how work adds energy to a system.</p><p>Here’s another conundrum:  Why is work equal to</p><p><center>||EQ1||</center></p><p>and NOT</p><p><center>||EQ3||</center></p><p>Let’s find out.</p>",
 			},
 			{block:11,
 				cutScene: true,
@@ -154,9 +154,9 @@ _.extend(Work.prototype,
 				quiz:{	
 					type:'multChoice',
 					options:
-						[{optionText:"<img src='img/work/eq9.gif'></img>", isCorrect: false},
-						{optionText:"<img src='img/work/eq10.gif'></img>", isCorrect: true},
-						{optionText:"<img src='img/work/eq11.gif'></img>", isCorrect: false},
+						[{optionText:"||EQ9||", isCorrect: false},
+						{optionText:"||EQ10||", isCorrect: true},
+						{optionText:"||EQ11||", isCorrect: false},
 						{optionText:"Can't tell", isCorrect: false}
 
 					]
@@ -210,7 +210,7 @@ _.extend(Work.prototype,
 			},
 			{block:16,
 				cutScene: 'outro',
-				text:"<p>So it seems that energy added depends only on external pressure.  If P<sub>ext</sub> is much greater then P<sub>int</sub>, the wall gets a lot of momentum and hit the molecules really hard, speeding them up a lot.  If it’s not much greater, it means that the wall just hits the molecules <i>a lot</i> of times, with each impact adding some speeding them up a little bit.  </p><p>In both cases, the energy you add is equal to</p><p><center><img src=’img/work/eq1.gif></img></center></p><p>Fin.</p>"
+				text:"<p>So it seems that energy added depends only on external pressure.  If P<sub>ext</sub> is much greater then P<sub>int</sub>, the wall gets a lot of momentum and hit the molecules really hard, speeding them up a lot.  If it’s not much greater, it means that the wall just hits the molecules <i>a lot</i> of times, with each impact adding some speeding them up a little bit.  </p><p>In both cases, the energy you add is equal to</p><p><center>||EQ1||</img></center></p><p>Fin.</p>"
 			}
 
 		]

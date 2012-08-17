@@ -1,6 +1,7 @@
 LevelTools = {
 	setStds: function(){
 		this.declarePrompts();
+		this.addEqs();
 		this.setDefaultPromptVals()
 		this.graphs = {};
 		this.eUnits = 'kJ';
@@ -17,6 +18,27 @@ LevelTools = {
 		addListener(this, 'data', 'run', this.dataRun, this);
 		collide.setDefaultHandler({func:collide.impactStd, obj:collide})
 		this.spcs = spcs;
+	},
+	addEqs: function(){
+		for(var promptIdx=0; promptIdx<this.prompts.length; promptIdx++){
+			var prompt = this.prompts[promptIdx];
+			var title = prompt.title;
+			var text = prompt.text;
+			var quiz = prompt.quiz;
+			if(title){prompt.title = addEqs(title);}
+			if(text){prompt.text = addEqs(text);}
+			if(quiz && quiz.options){
+				for(optionIdx=0; optionIdx<quiz.options.length; optionIdx++){
+					var option = quiz.options[optionIdx];
+					for(optionElement in option){
+						var element = option[optionElement];
+						if(typeof(element)=='string'){
+							option[optionElement] = addEqs(element);
+						}						
+					}
+				}
+			}
+		}
 	},
 	changeWallSetPt: function(wallInfo, dest, compType, speed){
 		var wallIdx = walls.idxByInfo(wallInfo);

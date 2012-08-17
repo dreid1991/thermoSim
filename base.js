@@ -462,6 +462,28 @@ function eraseStore(attrName){
 		stored = {};
 	}
 }
+function addEqs(text){
+	var eqIdx = text.indexOf('||EQ');
+	var toHTML = function(eqNum){
+		return "<img src = 'img/"+imgPath+"/eq"+eqNum+".gif'</img>";
+	}
+
+	while(eqIdx!=-1){
+		for(var charIdx=eqIdx+4; charIdx<text.length; charIdx++){
+			if(text.substring(charIdx, charIdx+2)=="||"){
+				break
+			}else if(charIdx+2==text.length){
+				break
+			}
+		}
+		var eqNum = parseFloat(text.substring(eqIdx+4, charIdx));
+		var eqHTML = toHTML(eqNum);
+		text = text.replace("||EQ"+eqNum+"||", eqHTML);
+		eqIdx = text.indexOf('||EQ');
+	}
+	return text;
+}
+
 function makeSlider(handle, attrs, handlers, initVisibility, toChange){
 	//var newDiv = $('<div>');
 	//newDiv.attr({id:id});

@@ -12,6 +12,7 @@ function cvcp(){
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
 	this.yMin = 30;
 	this.yMax = 350;
+	this.imgPath = 'cvcp';
 }
 _.extend(cvcp.prototype, 
 			LevelTools, 
@@ -20,19 +21,33 @@ _.extend(cvcp.prototype,
 		this.prompts=[
 			{block:0,
 				cutScene: true,
-				text:'For an ideal monatomic gas, which of these is correct?  cv means heat capacity at constant volume, cp means heat capacity at constant pressure.'
+				text:'For an ideal monatomic gas, which of these is correct?  cv means heat capacity at constant volume, cp means heat capacity at constant pressure.',
 				quiz:{	
 					type:'multChoice', 
 					options:
-						[{optionText:'The average difference between P<sub>ext</sub> and P<sub>int</sub> was lower so the system did more work on its surroundings.', isCorrect: true},
-						{optionText:'The smaller blocks are easier to lift so the system can do more work on them.', isCorrect: false},
-						{optionText:'Luck', isCorrect: false},
-						{optionText:'Can anyone else think of one?', isCorrect: false}
+						[
+						{optionText:"||EQ2||", isCorrect: false},
+						{optionText:"||EQ2||", isCorrect: false},
+						{optionText:"||EQ", isCorrect: true},
+						{optionText:"<img src=img/cvcp/eq4.gif>", isCorrect: false}
 					]
 				},
 			},
-
-
+			{block:1,
+				cutScene: true,
+				text:"Indeed!  This means that is takes more energy to heat up a gas at constant pressure than one at constant volume.  Huh?  The gas is the same.  Why does it take different amounts of energy?</p><p>WE MUST FIND OUT!</p>",
+			},
+			{block:2,
+				text:"Okay, here’s a constant volume and a constant pressure container.  Both are adiabatic.  If you heat them both to a new temperature, How do the energies used compare?  ",
+				quiz: {	
+					type:'buttons',
+					options:
+						[{buttonId:'less', buttonText:'E<sub>C<sub>V</sub></sub>><E<sub>C<sub>P</sub></sub>>', isCorrect:true},
+						{buttonId:'equal', buttonText:'E<sub>C<sub>V</sub></sub>>=E<sub>C<sub>P</sub></sub>>', isCorrect:false, message:"No it's not"},
+						{buttonId:'greater', buttonText:'E<sub>C<sub>V</sub></sub>>&#60E<sub>C<sub>P</sub></sub>>', isCorrect:false, message:"No it's not"}					
+					]
+				},
+			}
 		]
 		store('prompts', this.prompts);
 	},
