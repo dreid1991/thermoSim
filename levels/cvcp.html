@@ -36,7 +36,7 @@
 					<div id='sliderHeaterHolder'>
 						<div id='sliderHeaterLeftHolder' style='float:left' class='niceFont'>
 							<center>Left heater
-								<div id='sliderHeaterLeft' style = 'width:200px'></div>
+								<div id='sliderHeater' style = 'width:200px'></div>
 							</center>
 						</div>
 						<div id='sliderHeaterRightHolder' style='float:right' class='niceFont'>
@@ -112,7 +112,7 @@ $(function(){
 	myCanvas.height = canvasHeight;
 	curLevel = new cvcp();
 	animText = new AnimText(c);
-	$('#sliderHeaterHolder').hide();
+	$('#sliderHeaterHolder').show();
 	$('#sliderPressureHolder').hide();
 
 	$('#checkAns').hide();
@@ -131,21 +131,8 @@ $(function(){
 	curLevel.cutSceneEnd();
 	curLevel.init();
 	curLevel.setDefaultPromptVals()
-	var sliderName = 'sliderPiston';
-	makeSlider(
-		sliderName, 
-		{
-			min:2, 
-			max:15, 
-			value:2, 
-		},
-		[
-			{eventType:'slide', obj:curLevel, funcStr:sliderName + 'Set'},
-		],
-		'show',
-		'Pressure'
-	);
-	var sliderName = 'sliderHeaterLeft';
+
+	var sliderName = 'sliderHeater';
 	makeSlider(
 		sliderName, 
 		{
@@ -155,35 +142,11 @@ $(function(){
 		},
 		[
 			{eventType:'slidestop', obj:curLevel, func:function(event, ui){
-															$('#sliderHeaterLeft').slider('option', {value:0});
+															$('#sliderHeater').slider('option', {value:0});
 															ui.value=0;
-															
-															this.sliderHeaterLeftSet(event, ui);
+															this[sliderName + 'Set'](event, ui)
 														}
 			},
-			{eventType:'slide', obj:curLevel, funcStr:sliderName+'Set'}, 
-			
-		],
-		'show',
-		'Temp'
-	);
-	var sliderName = 'sliderHeaterRight';
-	makeSlider(
-		"sliderHeaterRight", 
-		{
-			min:-20, 
-			max:20, 
-			value:0, 
-		},
-		[
-			{eventType:'slidestop', obj:curLevel, func:function(event, ui){
-															$('#sliderHeaterRight').slider('option', {value:0});
-															ui.value=0;
-															this.sliderHeaterRightSet(event, ui)
-														}
-			},
-			{eventType:'slide', obj:curLevel, funcStr:sliderName+'Set'}, 
-			
 		],
 		'show',
 		'Temp'

@@ -1197,7 +1197,7 @@ function Heater(handle, pos, dims, rotation, tempMax, drawCanvas){
 	var colMin = Col(0,0,200);
 	var colDefault = Col(100, 100, 100);
 	this.draw = this.makeDrawFunc(colMin, colDefault, colMax);
-	this.wallPts = this.pos.roundedRect(this.dims, .2);
+	this.wallPts = this.pos.roundedRect(this.dims, .3, 'ccw');
 	this.eAdded=0;
 	return this.init();
 }
@@ -1214,7 +1214,6 @@ Heater.prototype = {
 		this.pts = this.getPts(pos, dims);
 		rotatePts(this.pts, this.center, this.rot);
 		var colorSteps = this.getColorSteps(colMin, colDefault, colMax)
-		var strokeCol = Col(0,0,0)
 		var self = this;
 		var pts = this.pts;
 		var drawFunc = function(){
@@ -1284,7 +1283,7 @@ Heater.prototype = {
 	},
 	setupWalls: function(){
 		//legs don't go into collision - too little space between lines
-		walls.addWall(this.wallPts, {func:this.hit, obj:this}, 'heater' + this.handle, undefined, -1);
+		walls.addWall(this.wallPts, {func:this.hit, obj:this}, 'heater' + this.handle, undefined, -1, undefined, false);
 	},
 	hit: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){
 		walls.reflect(dot, wallUV, vPerp);

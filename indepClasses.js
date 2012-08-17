@@ -272,23 +272,30 @@ Point.prototype = {
 		return this;
 		
 	},
-	rect: function(dims){
+	rect: function(dims, dir){
 		var pts = new Array(4);
-		pts[0] = this.copy();
-		pts[1] = this.copy().movePt({dx:dims.dx});
-		pts[2] = this.copy().movePt(dims);
-		pts[3] = this.copy().movePt({dy:dims.dy});
-		return pts;;
+		if(dir=='ccw'){
+			pts[0] = this.copy();
+			pts[1] = this.copy().movePt({dy:dims.dy});
+			pts[2] = this.copy().movePt(dims);
+			pts[3] = this.copy().movePt({dx:dims.dx});
+		}else{
+			pts[0] = this.copy();
+			pts[1] = this.copy().movePt({dx:dims.dx});			
+			pts[2] = this.copy().movePt(dims);
+			pts[3] = this.copy().movePt({dy:dims.dy});
+		}
+		return pts;
 	},
-	roundedRect: function(dims, fracRnd){
-		var rectPts = this.rect(dims);
+	roundedRect: function(dims, fracRnd, dir){
+		var rectPts = this.rect(dims, dir);
 		return this.roundPts(rectPts, fracRnd);
 	},
 	roundPts: function(pts, fracRnd){
 		if(!this.sameAs(pts[0])){
 			pts = [this].concat(pts);
 		}
-		var rndPts = new Array(2*(pts.length+1));
+		var rndPts = new Array(2*(pts.length));
 		pts['-1'] = pts[pts.length-1];
 		pts.push(pts[0]);
 		for (var ptIdx=0; ptIdx<pts.length-1; ptIdx++){

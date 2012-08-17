@@ -19,8 +19,17 @@ _.extend(cvcp.prototype,
 	declarePrompts: function(){
 		this.prompts=[
 			{block:0,
-				title:'lalala',
-				text:'Eat me.'
+				cutScene: true,
+				text:'For an ideal monatomic gas, which of these is correct?  cv means heat capacity at constant volume, cp means heat capacity at constant pressure.'
+				quiz:{	
+					type:'multChoice', 
+					options:
+						[{optionText:'The average difference between P<sub>ext</sub> and P<sub>int</sub> was lower so the system did more work on its surroundings.', isCorrect: true},
+						{optionText:'The smaller blocks are easier to lift so the system can do more work on them.', isCorrect: false},
+						{optionText:'Luck', isCorrect: false},
+						{optionText:'Can anyone else think of one?', isCorrect: false}
+					]
+				},
 			},
 
 
@@ -39,7 +48,7 @@ _.extend(cvcp.prototype,
 		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
 		spcs['spc1'].populate(P(45,35), V(460, 350), 0, 300);
 		spcs['spc3'].populate(P(45,35), V(450, 350), 5, 300);
-		this.heater = new Heater('heaty', P(200,350), V(190,40), 0, 10, c);
+		this.heater = new Heater('heaty', P(200,375), V(190,40), 0, 20, c);
 		
 	},
 	

@@ -468,16 +468,18 @@ function makeSlider(handle, attrs, handlers, initVisibility, toChange){
 	
 	var objName = handle.slice('slider'.length, handle.length);
 	objName = objName.slice(0,1).toLowerCase() + objName.slice(1, objName.length);
+	var div = $('#' + handle);
+	div.slider({});
+	div.slider("option",attrs);
+	div.attr({width:300});
 	if(toChange){
 		curLevel[handle+'Set'] = function(event, ui){
 			this.playedWithSlider = true;
 			this[objName]['set' + toChange](ui.value);
 		}
+		sliderBind(div, 'slide', curLevel[handle+'Set'], curLevel);
 	}
-	var div = $('#' + handle);
-	div.slider({});
-	div.slider("option",attrs);
-	div.attr({width:300});
+
 	for (var handlerIdx=0; handlerIdx<handlers.length; handlerIdx++){
 		var handler=handlers[handlerIdx];
 		var eventType = handler.eventType;
