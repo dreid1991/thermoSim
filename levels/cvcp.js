@@ -133,6 +133,10 @@ _.extend(cvcp.prototype,
 		nextPrompt();
 	},
 	block2Start: function(){
+		recordDataStart('tLeft', this.dataHandler.tempFunc({tag:'left'}), this);
+		recordDataStart('tRight', this.dataHandler.tempFunc({tag:'right'}), this);
+		addListener(curLevel, 'record', 'tLeft', this.dataHandler.tempFunc({tag:'left'}), this);
+		addListener(curLevel, 'record', 'tRight', this.dataHandler.tempFunc({tag:'right'}), this);
 		walls = WallHandler([[P(40,190), P(255,190), P(255,425), P(40,425)], [P(295,190), P(510,190), P(510,425), P(295,425)]], 'staticAdiabatic', ['left', 'right'], [undefined, {yMin:50, yMax:275}], undefined, [5,5]);
 		this.borderStd({wallInfo:'left', min:50});
 		this.borderStd({wallInfo:'right', min:50});
@@ -146,17 +150,7 @@ _.extend(cvcp.prototype,
 		this.heaterRight = new Heater('heaterRight', P(352, 350), V(100,40), 0, {init:0, max:20}, 'sliderHeaterRight', c);
 		
 	},
-	
-	dataRun: function(){
-		var wall = walls[0];
-		this.data.p.push(wall.pInt())
-		this.data.t.push(dataHandler.temp());
-		this.data.v.push(dataHandler.volume());
-		
-		for(var graphName in this.graphs){
-			this.graphs[graphName].addLast();
-		}
-	},
+
 
 }
 )

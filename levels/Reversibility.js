@@ -13,6 +13,7 @@ function Reversibility(){
 
 	addSpecies(['spc1', 'spc3']);
 	this.massInit = 10;
+
 }
 _.extend(Reversibility.prototype, 
 			LevelTools, 
@@ -195,6 +196,10 @@ _.extend(Reversibility.prototype,
 			func.apply(obj);
 		}
 		var self = this;
+		recordDataStart('pInt', function(){return walls[0].pInt()}, this);
+		recordDataStart('pExt', function(){return walls[0].pExt()}, this);
+		recordDataStart('v', dataHandler.volumeFunc(), this);
+		recordDataStart('t', dataHandler.tempFunc(), this);
 		nextPrompt();
 	},
 	block0Start: function(){
@@ -409,18 +414,20 @@ _.extend(Reversibility.prototype,
 		spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 600, 273);
 		this.stops = new Stops({volume:10}, 'container');		
 	},
+	/*
 	dataRun: function(){
 		var wall = walls[0];
 		this.data.pInt.push(wall.pInt());
 		this.data.pExt.push(wall.pExt());
 		this.data.t.push(dataHandler.temp());
 		this.data.v.push(dataHandler.volume());
-		this.forceInternal = 0;
+
 		for(var graphName in this.graphs){
 			this.graphs[graphName].addLast();
 		}
 		
 	},
+	*/
 
 }
 )

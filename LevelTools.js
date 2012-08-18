@@ -40,6 +40,7 @@ LevelTools = {
 			}
 		}
 	},
+
 	changeWallSetPt: function(wallInfo, dest, compType, speed){
 		var wallIdx = walls.idxByInfo(wallInfo);
 		var wall = walls[wallIdx]
@@ -322,12 +323,23 @@ LevelTools = {
 			listener.func.apply(listener.obj);
 		}
 	},
-	addData: function(){
+	updateData: function(){
+
 		for (var dataListener in this.dataListeners.listeners){
 			var listener = this.dataListeners.listeners[dataListener];
 			listener.func.apply(listener.obj);
 		}
+
 		this.numUpdates = 0;
+	},
+	dataRun: function(){
+		for (var datum in this.recordListeners.listeners){
+			var recordInfo = this.recordListeners.listeners[datum];
+			this.data[datum].push(recordInfo.func.apply(recordInfo.obj));
+		}	
+		for(var graphName in this.graphs){
+			this.graphs[graphName].addLast();
+		}
 	},
 	updateRun: function(){
 		this.move();
@@ -335,6 +347,7 @@ LevelTools = {
 		this.checkWallHits();
 		this.drawRun();
 	},
+	
 	updateGraphs: function(){
 		for(var graphName in this.graphs){
 			this.graphs[graphName].addLast();
@@ -486,7 +499,8 @@ LevelTools = {
 		this.mouseupListeners = {listeners:{}, save:{}};
 		this.mousemoveListeners = {listeners:{}, save:{}};
 		this.resetListeners = {listeners:{}, save:{}};
-		this.initListeners = {listeners:{}, save:{}};		
+		this.initListeners = {listeners:{}, save:{}};	
+		this.recordListeners = {listeners:{}, save:{}};
 	},
 	reset: function(){
 		

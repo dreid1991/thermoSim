@@ -7,6 +7,13 @@ DataHandler.prototype = {
 		//info can have attrs spcName and/or tag
 		return this.KEAvg(info)*this.tConst;
 	},
+	tempFunc: function(info){
+		info = defaultTo({}, info);
+		var self = this;
+		return function(){
+			return self.KEAvg(info)*self.tConst;
+		}
+	},
 	velocities: function(info){
 		info = defaultTo({}, info);
 		var tag = info.tag;
@@ -74,4 +81,10 @@ DataHandler.prototype = {
 		}
 		return area*vConst;
 	},
+	volumeFunc: function(wallInfo){
+		var self = this;
+		return function(){
+			return self.volume(wallInfo);
+		}
+	}
 }

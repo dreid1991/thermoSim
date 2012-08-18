@@ -37,7 +37,7 @@ $(function(){
 	draw = new drawingTools();
 	collide = new CollideHandler();
 	setInterval('curLevel.update()', updateInterval);
-	setInterval('curLevel.addData()', dataInterval);
+	setInterval('curLevel.updateData()', dataInterval);
 
 	/*Timing stuff
 	started = false;
@@ -461,6 +461,13 @@ function eraseStore(attrName){
 	}else{
 		stored = {};
 	}
+}
+function recordDataStart(handle, func, obj){
+	curLevel.data[handle] = [];
+	addListener(curLevel, 'record', handle, func, obj);
+}
+function recordDataStop(handle){
+	removeListener(curLevel, 'record', handle);
 }
 function addEqs(text){
 	var eqIdx = text.indexOf('||EQ');
