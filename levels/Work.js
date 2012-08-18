@@ -33,7 +33,7 @@ _.extend(Work.prototype,
 			},
 			{block:1, 
 				cutScene: true,
-				text: "<p>Indeed.  This tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p><p><center>||EQ5||</center></p><p>We’re going to be looking at an adiabatic system.  Which is these simplifications is correct?</p>",
+				text: "<p>Indeed.  This tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p>||EQ5CE<p>We’re going to be looking at an adiabatic system.  Which is these simplifications is correct?</p>",
 				quiz:{	
 					type:'multChoice',
 					options:
@@ -252,7 +252,7 @@ _.extend(Work.prototype,
 								{data:this.data, x:'v', y:'t'});		
 		
 		
-		this.piston = new Piston('tootoo', 'container', 2, this).show().trackWork().trackPressure();
+		this.piston = new Piston('tootoo', 'container', {init:2, min:2, max:15}, 'sliderPiston').show().trackWork().trackPressure();
 		this.borderStd();
 		this.volListener8 = new StateListener(10, this.data.v, .1, {})
 		//this.heater = new Heater('spaceHeater', P(150,360), V(250,50), 0, 20, c);//P(40,425), V(470,10)

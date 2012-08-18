@@ -464,21 +464,26 @@ function eraseStore(attrName){
 }
 function addEqs(text){
 	var eqIdx = text.indexOf('||EQ');
-	var toHTML = function(eqNum){
-		return "<img src = 'img/"+imgPath+"/eq"+eqNum+".gif'</img>";
+	var toHTML = function(eqNum, subStr){
+		if(subStr && subStr =="CE"){
+			return "<p><center><img src = 'img/"+imgPath+"/eq"+eqNum+".gif'</img></center></p>";
+		} else {
+			return "<img src = 'img/"+imgPath+"/eq"+eqNum+".gif'</img>";
+		}
 	}
 
 	while(eqIdx!=-1){
 		for(var charIdx=eqIdx+4; charIdx<text.length; charIdx++){
-			if(text.substring(charIdx, charIdx+2)=="||"){
+			var subStr = text.substring(charIdx, charIdx+2);
+			if(subStr=="||" || subStr=="CE"){
 				break
 			}else if(charIdx+2==text.length){
 				break
 			}
 		}
-		var eqNum = parseFloat(text.substring(eqIdx+4, charIdx));
-		var eqHTML = toHTML(eqNum);
-		text = text.replace("||EQ"+eqNum+"||", eqHTML);
+		var eqNum = text.substring(eqIdx+4, charIdx);
+		var eqHTML = toHTML(eqNum, subStr);
+		text = text.replace("||EQ"+eqNum+subStr, eqHTML);
 		eqIdx = text.indexOf('||EQ');
 	}
 	return text;

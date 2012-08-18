@@ -33,18 +33,6 @@
 						<div id='sliderPiston' style='width:300px'></div>
 					</div>
 					<br>
-					<div id='sliderHeaterHolder'>
-						<div id='sliderHeaterLeftHolder' style='float:left' class='niceFont'>
-							<center>Left heater
-								<div id='sliderHeaterLeft' style = 'width:200px'></div>
-							</center>
-						</div>
-						<div id='sliderHeaterRightHolder' style='float:right' class='niceFont'>
-							<center>Right heater
-								<div id='sliderHeaterRight' style = 'width:200px'></div>
-							</center>
-						</div>
-					</div>
 					<button id='reset' class='noSelect'>Reset experiment</button>
 					<button id='checkAns' class='noSelect'>Check answer</button>
 					<button id='clearGraphs' class='noSelect'>Clear graphs</button>
@@ -112,9 +100,7 @@ $(function(){
 	myCanvas.height = canvasHeight;
 	curLevel = new Work();
 	animText = new AnimText(c);
-	$('#sliderHeaterHolder').hide();
 	$('#sliderPressureHolder').hide();
-
 	$('#checkAns').hide();
 	$('#clearGraphs').hide();
 	$('button').button();
@@ -135,9 +121,6 @@ $(function(){
 	makeSlider(
 		sliderName, 
 		{
-			min:2, 
-			max:15, 
-			value:2, 
 		},
 		[
 			{eventType:'slide', obj:curLevel, funcStr:sliderName + 'Set'},
@@ -145,51 +128,6 @@ $(function(){
 		'show',
 		'Pressure'
 	);
-	var sliderName = 'sliderHeaterLeft';
-	makeSlider(
-		sliderName, 
-		{
-			min:-20, 
-			max:20, 
-			value:0, 
-		},
-		[
-			{eventType:'slidestop', obj:curLevel, func:function(event, ui){
-															$('#sliderHeaterLeft').slider('option', {value:0});
-															ui.value=0;
-															
-															this.sliderHeaterLeftSet(event, ui);
-														}
-			},
-			{eventType:'slide', obj:curLevel, funcStr:sliderName+'Set'}, 
-			
-		],
-		'show',
-		'Temp'
-	);
-	var sliderName = 'sliderHeaterRight';
-	makeSlider(
-		"sliderHeaterRight", 
-		{
-			min:-20, 
-			max:20, 
-			value:0, 
-		},
-		[
-			{eventType:'slidestop', obj:curLevel, func:function(event, ui){
-															$('#sliderHeaterRight').slider('option', {value:0});
-															ui.value=0;
-															this.sliderHeaterRightSet(event, ui)
-														}
-			},
-			{eventType:'slide', obj:curLevel, funcStr:sliderName+'Set'}, 
-			
-		],
-		'show',
-		'Temp'
-	);
-
-
 });
 
 myCanvas.width = $('#main').width();

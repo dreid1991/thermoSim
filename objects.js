@@ -991,9 +991,15 @@ CompArrow.prototype = {
 //PISTON
 //////////////////////////////////////////////////////////////////////////
 
-function Piston(handle, wallInfo, pInit, obj){
+function Piston(handle, wallInfo, vals, slider){
 	var self = this;
-	this.p = pInit;
+	this.p = vals.init;
+	this.pMin = vals.min;
+	this.pMax = vals.max;
+	if(slider){
+		this.slider = slider;
+		this.setSliderVal();
+	}
 	this.slant = .07;
 	this.drawCanvas = c;
 	this.wallIdx = walls.idxByInfo(wallInfo);
@@ -1014,11 +1020,9 @@ function Piston(handle, wallInfo, pInit, obj){
 	var readoutFont = '12pt calibri';
 	var readoutFontCol = Col(255, 255, 255);
 	this.readout = new Readout('pistonReadout', readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, undefined, 'center');
-	obj.mass = function(){return self.mass};
 	this.wall.moveInit();
 	walls.setSubWallHandler(this.wallIdx, 0, 'cPAdiabaticDamped' + compAdj);		
-	this.obj = obj;
-	return this;
+	return this.show();
 }
 
 Piston.prototype = {
@@ -1095,8 +1099,8 @@ Piston.prototype = {
 		removeListener(curLevel, 'update', 'drawPiston'+this.handle);
 		this.readout.hide();
 	},
-	setPressure: function(p){
-		var pSetPt = p;
+	setPressure: function(sliderVal){
+		var pSetPt = (this.pMax - this.pMin)*sliderVal/100 + this.pMin
 		var dp = pSetPt - this.p;
 		addListener(curLevel, 'update', 'piston'+this.handle+'adjP', 
 			function(){
@@ -1110,6 +1114,10 @@ Piston.prototype = {
 				}
 			},
 			this);
+	},
+	setSliderVal: function(){
+		var sliderVal = 100*(this.p - this.pMin)/(this.pMax-this.pMin);
+		$('#'+this.slider).slider('option', {value:sliderVal});
 	},
 	setMass: function(){
 		this.mass = this.p*this.width/(pConst*g);
@@ -1170,7 +1178,7 @@ Piston.prototype = {
 	},
 	remove: function(){
 		this.wall.moveStop();
-		this.obj.mass = undefined;
+		this.wall.unsetMass('piston' + this.handle);
 		this.hide();
 		removeListener(curLevel, 'update', 'moveWalls');
 	}
@@ -1179,7 +1187,7 @@ Piston.prototype = {
 //////////////////////////////////////////////////////////////////////////
 //HEATER
 //////////////////////////////////////////////////////////////////////////
-function Heater(handle, pos, dims, rotation, tempMax, drawCanvas){
+function Heater(handle, pos, dims, rotation, vals, slider, drawCanvas){
 	/*
 	dims.dx corresponds to long side w/ wires
 	dims.dy corresponds to short side
@@ -1187,8 +1195,11 @@ function Heater(handle, pos, dims, rotation, tempMax, drawCanvas){
 	this.handle = handle;
 	this.drawCanvas = drawCanvas;
 	this.cornerRound = .2;
-	this.temp = 0;
-	this.tempMax = tempMax;
+	this.temp = vals.init;
+	this.tempMax = vals.max;
+	this.tempMin = -vals.max;
+	this.slider = slider;
+	this.setSliderVal(this.temp);
 	this.pos = pos;
 	this.dims = dims;
 	this.center = this.pos.copy().movePt(this.dims.copy().mult(.5));
@@ -1203,9 +1214,12 @@ function Heater(handle, pos, dims, rotation, tempMax, drawCanvas){
 }
 
 Heater.prototype = {
-	setTemp: function(val){
-		var sign = getSign(val)
-		this.temp = sign*Math.min(this.tempMax,sign*val);
+	setTemp: function(val){		
+		this.temp = .02*(val-50)*this.tempMax
+	},
+	setSliderVal: function(){
+		var sliderVal = this.temp/(.02*this.tempMax)+50;
+		$('#'+this.slider).slider('option', {value:sliderVal});
 	},
 	makeDrawFunc: function(colMin, colDefault, colMax){
 		var pos = this.pos;

@@ -38,6 +38,7 @@ _.extend(cvcp.prototype,
 				text:"Indeed!  This means that is takes more energy to heat up a gas at constant pressure than one at constant volume.  Huh?  The gas is the same.  Why does it take different amounts of energy?</p><p>WE MUST FIND OUT!</p>",
 			},
 			{block:2,
+				title:"Current step",
 				text:"Okay, here’s a constant volume and a constant pressure container.  Both are adiabatic.  If you heat them both to a new temperature, How do the energies used compare?  ",
 				quiz: {	
 					type:'buttons',
@@ -47,6 +48,78 @@ _.extend(cvcp.prototype,
 						{buttonId:'greater', buttonText:'E<sub>C<sub>V</sub></sub>&#60E<sub>C<sub>P</sub></sub>', isCorrect:false, message:"No it's not"}					
 					]
 				},
+			},
+			{block:2,
+				title:"Current step",
+				text:"Good.  Now try heating them up again and try to figure out <i>why</i> the constant pressure system takes more energy to heat up.  By the way, work.",
+			},
+			{block:3,
+				cutScene: true,
+				text:"So what’s the verdict?",
+				quiz:{	
+					type:'multChoice', 
+					options:
+						[
+						{optionText:"Constant pressure heating takes more energy because the system must expand as it heats.", isCorrect: true},
+						{optionText:"I'm a cabbage.", isCorrect: false},
+						{optionText:"I really can't think of any.", isCorrect: false}
+					]
+				},
+			},
+			{block:4,
+				text:"Good, so when we’re heating at constant volume, where does the energy go?",
+				quiz:{	
+					type:'multChoice', 
+					options:
+						[
+						{optionText:"To the molecules, to speed them up, and to the surroundings by expanding the system.", isCorrect: false},
+						{optionText:"To the molecules, to speed them up", isCorrect: true},
+						{optionText:"To the surroundings through work", isCorrect: false}
+					]
+				},
+			},
+			{block:5,
+				cutScene: true,
+				text:"Yes, and we express this how?",
+				quiz:{
+					type:'multChoice', 
+					options:
+						[
+						{optionText:"||EQ7||", isCorrect: false},
+						{optionText:"||EQ6||", isCorrect: true},
+						{optionText:"||EQ8||", isCorrect: false}
+					]				
+				},
+			},
+			{block:6,
+				cutScene: true,
+				text:"<p>Yes.</p><p>It takes some amount of energy to heat up one mole these molecules one degree kelvin.  That amount is C<sub>V</sub>.  To get the total energy change in a temperature change, we multiply that amount by the change in temperature and the number of moles.  Thus we get<p>||EQ6CE<p>Okay, now what about in the constant pressure case?  Where does the energy go then?</p>",
+				quiz:{
+					type:'multChoice', 
+					options:
+						[
+						{optionText:"To the molecules, to speed them up.", isCorrect: false, message:"Yes, but doesn't the system expand as well?  That sounds like work."},
+						{optionText:"To the molecules, to speed them up, and to the surroundings by expanding the system.", isCorrect: true},
+						{optionText:"To the surroundings by expanding the system.", isCorrect: false, message:"But the system heats up!  You're increasing the molecules' kinetic energy.  Isn't that a place for the energy to go?"}
+					]				
+				},				
+			},
+			{block:7,
+				cutScene: true,
+				text:"So we’re putting energy into <i>two</i> things now!  So we know that </p>||EQ6aCE||<p> is the energy that goes into heating the system.  How could we express the energy that goes into expanding the system again constant pressure?</p>",
+				quiz:{
+					type:'multChoice', 
+					options:
+						[
+						{optionText:"||EQ10||", isCorrect: false, message:"Wait, but at constant volume (there's no delta in front of the V), there's no work being done."},
+						{optionText:"||EQ9||", isCorrect: true}
+						
+					]				
+				},
+			},
+			{block:8,
+				cutScene: true,
+				text:"And if we put those two things together, we get...</p>||EQ11CE<p>OKAY.  We have our idea.  To heat under constant pressure, we have to expand the system, doing work.  This means that it will take more energy to heat something under constant pressure.   This means that C<sub>P</sub> is greater than C<sub>V</sub>.</p><p>Now watch this:</p><p>Since the definition of enthalpy is</p>||EQ12CE<p>doesn’t change in energy (above) really mean change in enthalpy?  If we rewrite the equation, we get</p>||EQ13CE<p>Then, from the ideal gas law, we know</p>||EQ14CE<p>"
 			}
 		]
 		store('prompts', this.prompts);
@@ -59,258 +132,21 @@ _.extend(cvcp.prototype,
 		}		
 		nextPrompt();
 	},
-	block0Start: function(){
-		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
-		spcs['spc1'].populate(P(45,35), V(460, 350), 0, 300);
-		spcs['spc3'].populate(P(45,35), V(450, 350), 5, 300);
-		this.heater = new Heater('heaty', P(200,375), V(190,40), 0, 20, c);
+	block2Start: function(){
+		walls = WallHandler([[P(40,190), P(255,190), P(255,425), P(40,425)], [P(295,190), P(510,190), P(510,425), P(295,425)]], 'staticAdiabatic', ['left', 'right'], [undefined, {yMin:50, yMax:275}], undefined, [5,5]);
+		this.borderStd({wallInfo:'left', min:50});
+		this.borderStd({wallInfo:'right', min:50});
+		spcs['spc1'].populate(P(45,200), V(200, 200), 350, 200, 'left', 'left');
+		spcs['spc3'].populate(P(45,200), V(200, 200), 250, 200, 'left', 'left');	
+		
+		spcs['spc1'].populate(P(300,200), V(200, 200), 350, 200, 'right', 'right');
+		spcs['spc3'].populate(P(300,200), V(200, 200), 250, 200, 'right', 'right');	
+		this.piston = new Piston('piston', 'right', {min:2,init:2, max:2}).trackPressure();
+		this.heaterLeft = new Heater('heaterLeft', P(97,350), V(100,40), 0, {init:0, max:20}, 'sliderHeaterLeft', c);
+		this.heaterRight = new Heater('heaterRight', P(352, 350), V(100,40), 0, {init:0, max:20}, 'sliderHeaterRight', c);
 		
 	},
 	
-	block3Start: function(){
-		this.playedWithSlider = false;
-		var self = this;
-		var sliderMin = $('#sliderPressure').slider('option', 'min');
-		$('#sliderPressure').slider('option', {value:sliderMin});
-		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
-		spcs['spc1'].populate(P(45,35), V(460, 350), 800, 300);
-		spcs['spc3'].populate(P(45,35), V(450, 350), 600, 300);
-		
-		$('#canvasDiv').show();
-		$('#clearGraphs').hide();
-		$('#dashRun').show();
-		$('#sliderPressureHolder').show();
-		$('#base').show();
-		
-		this.graphs.pVSv = new GraphScatter('pVSv', 400,275, "Volume (L)", "Pressure (atm)",
-							{x:{min:0, step:4}, y:{min:0, step:3}});
-		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
-							{x:{min:0, step:4}, y:{min:250, step:50}});
-		this.graphs.pVSv.addSet('p', 'P Int.', Col(50,50,255), Col(200,200,255),
-								{data:this.data, x:'v', y:'p'});
-
-		this.graphs.tVSv.addSet('t', 'Sys\nTemp', Col(255,0,0), Col(255,200,200),
-								{data:this.data, x:'v', y:'t'});		
-		
-		
-		this.piston = new Piston('tootoo', 'container', 2, this).show().trackWork().trackPressure();
-		this.borderStd();
-		this.volListener8 = new StateListener(10, this.data.v, .1, {})
-		//this.heater = new Heater('spaceHeater', P(150,360), V(250,50), 0, 20, c);//P(40,425), V(470,10)
-		//this.heater.init();
-
-	},
-	block3Conditions: function(){
-		if(this.volListener8.isSatisfied()){
-			return {result:true};
-		}
-		return {result:false, alert:'Compress more!'};
-	},
-	
-	block3CleanUp: function(){
-		this.playedWithSlider = undefined;
-		this.volListener8 = undefined;
-		this.wallV=0;
-		$('#sliderPressureHolder').hide();
-		this.removeAllGraphs();
-		this.readout.removeAllEntries();
-		this.readout.hide();
-		this.piston.remove();
-		this.piston = undefined;
-		walls.setWallHandler(0, 'staticAdiabatic')
-		walls['container'].removeBorder();
-	},
-	
-	block4Start: function(){
-
-		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
-		walls.setHitMode('container', 'Arrow');
-		this.borderStd();
-		this.compArrow = new CompArrow({wallInfo:'container'}, {mode:'adiabatic', speed:1.5});
-		spcs['spc4'].populate(P(45,235), V(460, 100), 1, 600);
-		this.tempChanged = false;
-		var initTemp = dataHandler.temp();
-		addListener(curLevel, 'data', 'checkTempChanged',
-			function(){
-				var curTemp = dataHandler.temp();
-				if(curTemp!=initTemp){
-					this.tempChanged = true;
-					removeListener(curLevel, 'data', 'checkTempChanged');
-				}
-			},
-		this);
-	},
-	block4Conditions: function(){
-		if(this.tempChanged){
-			return {result:true};
-		}
-		return {result:false, alert:"Try hitting the molecule with the wall while the wall's moving"};	
-	},
-	block4CleanUp: function(){
-		this.tempChanged = undefined;
-		walls['container'].v = 0;
-		walls['container'].removeBorder();
-		this.compArrow.remove();
-		this.compArrow = undefined;
-		walls.setHitMode('container', 'Std');
-		removeListenerByName(curLevel, 'update', 'drawArrow');
-		removeListenerByName(curLevel, 'update', 'animText');
-	},
-	block8Start: function(){
-		$('#reset').show()
-		this.readout.show();
-		wallHandle = 'container';
-		walls = WallHandler([[P(40,31), P(510,31), P(510,350), P(40,350)]], 'staticAdiabatic', [wallHandle], [{yMin:30, yMax:300}], undefined, [15]);
-		this.stops = new Stops({volume:10}, 'container');
-		this.borderStd();
-		spcs['spc1'].populate(P(45,35), V(445, 325), 850, 200);
-		spcs['spc3'].populate(P(45,35), V(445, 325), 650, 200);
-		this.dragWeights = this.makeDragWeights([{name:'lrg', count:1, mass:75}], wallHandle).trackMassStop().trackPressureStart();
-		this.trackTempStart();
-		this.trackVolumeStart(0);
-		this.volListener15 = new StateListener(15, this.data.v, .05, {p:this.data.p, t:this.data.t});
-		this.volListener10 = new StateListener(10, this.data.v, .03, {p:this.data.p, t:this.data.t}, {func:function(){store('tFinal', round(this.data.t[this.data.t.length-1],0))}, obj:this});
-	},
-	block8Conditions: function(){
-		if(this.volListener10.isSatisfied() && this.volListener15.isSatisfied()){
-			return {result:true};
-		}
-		if(!this.volListener10.isSatisfied()){
-			return {result:false, alert:'Compress the container!'};
-		}
-	},
-	block8CleanUp: function(){
-		this.wallV=0;
-		$('#reset').hide();
-		this.trackTempStop();
-		this.trackVolumeStop();
-		walls['container'].removeBorder();
-		this.readout.hide();
-		this.stops.remove();
-		this.stop = undefined;
-		this.dragWeights.remove();
-		this.dragWeights = undefined;
-	},
-	block12Start: function(){
-		$('#reset').show();
-		this.readout.show();
-		wallHandle = 'container';
-		walls = WallHandler([[P(40,30), P(255,30), P(255,350), P(40,350)], [P(295,30), P(510,30), P(510,350), P(295,350)]], 'staticAdiabatic', ['left', 'right']);
-		this.borderStd({wallInfo:'left'});
-		this.borderStd({wallInfo:'right'});
-		spcs['spc1'].populate(P(45,35), V(200, 300), 250, 200, 'left', 'left');
-		spcs['spc3'].populate(P(45,35), V(200, 300), 150, 200, 'left', 'left');	
-		
-		spcs['spc1'].populate(P(300,35), V(200, 300), 250, 400, 'right', 'right');
-		spcs['spc3'].populate(P(300,35), V(200, 300), 150, 400, 'right', 'right');	
-		this.data.tLeft = [];
-		this.data.tRight = [];
-		this.data.vLeft = [];
-		this.data.vRight = [];		
-		this.dragWeightsLeft = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'left', 5).trackMassStop().trackPressureStart();
-		this.dragWeightsRight = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'right', 5).trackMassStop().trackPressureStart();
-		this.stopsLeft = new Stops({volume:3.5}, 'left');
-		this.stopsRight = new Stops({volume:3.5}, 'right');		
-		removeListener(curLevel, 'data', 'run');
-		addListener(curLevel, 'data', 'run',
-			function(){
-				this.data.tLeft.push(this.dataHandler.temp({tag:'left'}));
-				this.data.tRight.push(this.dataHandler.temp({tag:'right'}));
-				this.data.vLeft.push(this.dataHandler.volume('left'));
-				this.data.vRight.push(this.dataHandler.volume('right'));
-			},
-		this);
-		addListener(curLevel, 'data', 'updateGraphs',
-			this.updateGraphs,
-		this);
-		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
-							{x:{min:0, step:2}, y:{min:150, step:50}});
-		this.graphs.tVSv.addSet('tRight', 'Temp\nRight', Col(255,200,0), Col(255,200,200),
-								{data:this.data, x:'vRight', y:'tRight'});									
-		this.graphs.tVSv.addSet('tLeft', 'Temp\nLeft', Col(255,0,0), Col(255,200,200),
-								{data:this.data, x:'vLeft', y:'tLeft'});	
-		
-		this.volListenerLeft = new StateListener(3.5, this.data.vLeft, .02, {});
-		this.volListenerRight = new StateListener(3.5, this.data.vRight, .02, {});
-	},
-	block12Conditions: function(){
-		if(this.volListenerLeft.isSatisfied() && this.volListenerRight.isSatisfied()){
-			return {result:true};
-		}
-		return {result:false, alert:'Compress the containers!'};
-	},
-	block12CleanUp: function(){
-		$('#reset').hide();
-		removeListener(curLevel, 'data', 'updateGraphs');
-		removeListener(curLevel, 'data', 'run');
-		addListener(curLevel, 'data', 'run', this.dataRun, this);
-		this.removeAllGraphs();
-		this.stopsLeft.remove();
-		this.stopsRight.remove();
-		this.dragWeightsLeft.remove();
-		this.dragWeightsRight.remove();
-		this.readout.hide();
-	},
-	block15Start: function(){
-		$('#reset').show();
-		this.readout.show();
-		wallHandle = 'container';
-		walls = WallHandler([[P(40,30), P(255,30), P(255,350), P(40,350)], [P(295,30), P(510,30), P(510,350), P(295,350)]], 'staticAdiabatic', ['left', 'right']);
-		this.borderStd({wallInfo:'left'});
-		this.borderStd({wallInfo:'right'});
-		spcs['spc1'].populate(P(45,35), V(200, 300), 250, 200, 'left', 'left');
-		spcs['spc3'].populate(P(45,35), V(200, 300), 150, 200, 'left', 'left');	
-		
-		spcs['spc1'].populate(P(300,35), V(200, 300), 250, 200, 'right', 'right');
-		spcs['spc3'].populate(P(300,35), V(200, 300), 150, 200, 'right', 'right');	
-		this.data.tLeft = [];
-		this.data.tRight = [];
-		this.data.vLeft = [];
-		this.data.vRight = [];		
-		this.dragWeightsLeft = this.makeDragWeights([{name:'lrg', count:1, mass:35}], 'left', 5).trackMassStop().trackPressureStart();
-		this.dragWeightsRight = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'right', 5).trackMassStop().trackPressureStart();
-		this.stopsLeft = new Stops({volume:3.5}, 'left');
-		this.stopsRight = new Stops({volume:3.5}, 'right');		
-		removeListener(curLevel, 'data', 'run');
-		addListener(curLevel, 'data', 'run',
-			function(){
-				this.data.tLeft.push(this.dataHandler.temp({tag:'left'}));
-				this.data.tRight.push(this.dataHandler.temp({tag:'right'}));
-				this.data.vLeft.push(this.dataHandler.volume('left'));
-				this.data.vRight.push(this.dataHandler.volume('right'));
-			},
-		this);
-		addListener(curLevel, 'data', 'updateGraphs',
-			this.updateGraphs,
-		this);
-		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
-							{x:{min:0, step:2}, y:{min:150, step:50}});
-		this.graphs.tVSv.addSet('tRight', 'Temp\nRight', Col(255,200,0), Col(255,200,200),
-								{data:this.data, x:'vRight', y:'tRight'});									
-		this.graphs.tVSv.addSet('tLeft', 'Temp\nLeft', Col(255,0,0), Col(255,200,200),
-								{data:this.data, x:'vLeft', y:'tLeft'});	
-		
-		this.volListenerLeft = new StateListener(3.5, this.data.vLeft, .02, {});
-		this.volListenerRight = new StateListener(3.5, this.data.vRight, .02, {});
-	},
-	block15Conditions: function(){
-		if(this.volListenerLeft.isSatisfied() && this.volListenerRight.isSatisfied()){
-			return {result:true};
-		}
-		return {result:false, alert:'Compress the containers!'};
-	},
-	block15CleanUp: function(){
-		$('#reset').hide();
-		removeListener(curLevel, 'data', 'updateGraphs');
-		removeListener(curLevel, 'data', 'run');
-		addListener(curLevel, 'data', 'run', this.dataRun, this);
-		this.removeAllGraphs();
-		this.stopsLeft.remove();
-		this.stopsRight.remove();
-		this.dragWeightsLeft.remove();
-		this.dragWeightsRight.remove();
-		this.readout.hide();
-	},
 	dataRun: function(){
 		var wall = walls[0];
 		this.data.p.push(wall.pInt())

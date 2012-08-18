@@ -52,11 +52,11 @@ _.extend(Reversibility.prototype,
 			},
 			{block:3, 
 				cutScene:true, 
-				text: "Now to compress a system, what condition <i>must</i> be true?",
+				text: "Good.  Now to compress a system, what condition <i>must</i> be true?",
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:"extgreaterint", buttonText:"P<sub>ext</sub>&#62P<sub>int</sub>", message:'Correct!', isCorrect: true},
+						[{buttonId:"extgreaterint", buttonText:"P<sub>ext</sub>&#62P<sub>int</sub>", isCorrect: true},
 						{buttonId:"extequalint", buttonText:"P<sub>ext</sub>=P<sub>int</sub>", message:'NO', isCorrect: false},
 						{buttonId:"extlessint", buttonText:"P<sub>ext</sub>&#60P<sub>int</sub>", message:'NOOO', isCorrect: false}
 					]
@@ -64,12 +64,12 @@ _.extend(Reversibility.prototype,
 			},
 			{block:4, 
 				cutScene: true, 
-				text: "<p>So when we compressed with the biggest block, P<sub>ext</sub> was much greater than P<sub>int</sub>.  We did more work than we had to because when P<sub>int</sub> was low, we didn’t need to apply such a high external pressure to compress.<p></p>When we compressed with the smaller blocks, P<sub>ext</sub> stepped more smoothly with P<sub>int</sub>.</p><p>Since we weren’t compressing at the maximum pressure the whole time, we did less work and heated the system less.</p><p>What if we split all of our blocks up again and compress with those?  How do you think the amount of work we have to do will change?</p>",
+				text: "<p>Yes!</p><p>So when we compressed with the biggest block, P<sub>ext</sub> was much greater than P<sub>int</sub>.  We did more work than we had to because when P<sub>int</sub> was low, we didn’t need to apply such a high external pressure to compress.<p></p>When we compressed with the smaller blocks, P<sub>ext</sub> stepped more smoothly with P<sub>int</sub>.</p><p>Since we weren’t compressing at the maximum pressure the whole time, we did less work and heated the system less.</p><p>What if we split all of our blocks up again and compress with those?  How do you think the amount of work we have to do will change?</p>",
 				quiz:{	
 					type:'buttons',
 					options:
 						[{buttonId:'increase', buttonText:'Increase', message:'Hmm, you should compare the work done in your two previous compressions.', isCorrect: false},
-						{buttonId:'decrease', buttonText:'Decrease', message:'Correct!', isCorrect: true}
+						{buttonId:'decrease', buttonText:'Decrease', isCorrect: true}
 					]
 				}
 			},
@@ -83,7 +83,7 @@ _.extend(Reversibility.prototype,
 					type:'buttons',
 					options:
 						[{buttonId:'yes', buttonText:'Yes', message:'No', isCorrect: false},
-						{buttonId:'no', buttonText:'No', message:'Yes (correct)!', isCorrect: true}
+						{buttonId:'no', buttonText:'No', isCorrect: true}
 					]
 				},
 				replace:
@@ -146,7 +146,7 @@ _.extend(Reversibility.prototype,
 					type:'buttons', 
 					options:
 						[{buttonId:'yes', buttonText:'Yes', isCorrect:false, message:"That's not correct."},
-						{buttonId:'no', buttonText:'No', isCorrect:true, message:"Correct!"}
+						{buttonId:'no', buttonText:'No', isCorrect:true}
 					]
 				}		
 			},
@@ -157,7 +157,7 @@ _.extend(Reversibility.prototype,
 					type:'buttons', 
 					options:
 						[{buttonId:'less', buttonText:'Recover less', isCorrect:false, message:"That's not correct."},
-						{buttonId:'more', buttonText:'Recover more', isCorrect:true, message:"Correct!"}
+						{buttonId:'more', buttonText:'Recover more', isCorrect:true}
 					]
 				}			
 			},
