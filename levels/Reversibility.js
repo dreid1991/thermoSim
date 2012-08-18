@@ -31,9 +31,9 @@ _.extend(Reversibility.prototype,
 				quiz: {	
 					type:'buttons',
 					options:
-						[{buttonId:'button2blocks', buttonText:'2', func:function(){store('numBlocks', 2)}, isCorrect:true},
-						{buttonId:'button4blocks', buttonText:'4', func:function(){store('numBlocks', 4)}, isCorrect:true},
-						{buttonId:'button8blocks', buttonText:'6', func:function(){store('numBlocks', 6)}, isCorrect:true}					
+						[{buttonId:'button2blocks', text:'2', func:function(){store('numBlocks', 2)}, isCorrect:true},
+						{buttonId:'button4blocks', text:'4', func:function(){store('numBlocks', 4)}, isCorrect:true},
+						{buttonId:'button8blocks', text:'6', func:function(){store('numBlocks', 6)}, isCorrect:true}					
 					]
 				},
 				replace: 
@@ -46,8 +46,8 @@ _.extend(Reversibility.prototype,
 				quiz:{	
 					type:'buttons', 
 					options:
-						[{buttonId:'decrease', buttonText:'Decreases work', isCorrect:true, message:"Correct!"},
-						{buttonId:'increase', buttonText:'Increases work', isCorrect:false, message:"That's not correct"}
+						[{buttonId:'decrease', text:'Decreases work', isCorrect:true, message:"Correct!"},
+						{buttonId:'increase', text:'Increases work', isCorrect:false, message:"That's not correct"}
 					]
 				}
 			},
@@ -57,9 +57,9 @@ _.extend(Reversibility.prototype,
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:"extgreaterint", buttonText:"P<sub>ext</sub>&#62P<sub>int</sub>", isCorrect: true},
-						{buttonId:"extequalint", buttonText:"P<sub>ext</sub>=P<sub>int</sub>", message:'NO', isCorrect: false},
-						{buttonId:"extlessint", buttonText:"P<sub>ext</sub>&#60P<sub>int</sub>", message:'NOOO', isCorrect: false}
+						[{buttonId:"extgreaterint", text:"P<sub>ext</sub>&#62P<sub>int</sub>", isCorrect: true},
+						{buttonId:"extequalint", text:"P<sub>ext</sub>=P<sub>int</sub>", message:'NO', isCorrect: false},
+						{buttonId:"extlessint", text:"P<sub>ext</sub>&#60P<sub>int</sub>", message:'NOOO', isCorrect: false}
 					]
 				}
 			},
@@ -69,8 +69,8 @@ _.extend(Reversibility.prototype,
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:'increase', buttonText:'Increase', message:'Hmm, you should compare the work done in your two previous compressions.', isCorrect: false},
-						{buttonId:'decrease', buttonText:'Decrease', isCorrect: true}
+						[{buttonId:'increase', text:'Increase', message:'Hmm, you should compare the work done in your two previous compressions.', isCorrect: false},
+						{buttonId:'decrease', text:'Decrease', isCorrect: true}
 					]
 				}
 			},
@@ -83,8 +83,8 @@ _.extend(Reversibility.prototype,
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:'yes', buttonText:'Yes', message:'No', isCorrect: false},
-						{buttonId:'no', buttonText:'No', isCorrect: true}
+						[{buttonId:'yes', text:'Yes', message:'No', isCorrect: false},
+						{buttonId:'no', text:'No', isCorrect: true}
 					]
 				},
 				replace:
@@ -105,9 +105,9 @@ _.extend(Reversibility.prototype,
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:'button2blocks', buttonText:'4', isCorrect:false, message:'I think you want more blocks than that.'},
-						{buttonId:'button4blocks', buttonText:'8', isCorrect:false, message:'I think you want more blocks than that.'},
-						{buttonId:'button8blocks', buttonText:'12', isCorrect:true}
+						[{buttonId:'button2blocks', text:'4', isCorrect:false, message:'I think you want more blocks than that.'},
+						{buttonId:'button4blocks', text:'8', isCorrect:false, message:'I think you want more blocks than that.'},
+						{buttonId:'button8blocks', text:'12', isCorrect:true}
 					]
 				},
 				replace:
@@ -124,10 +124,10 @@ _.extend(Reversibility.prototype,
 				quiz:{	
 					type:'multChoice', 
 					options:
-						[{optionText:'The average difference between P<sub>ext</sub> and P<sub>int</sub> was lower so the system did more work on its surroundings.', isCorrect: true},
-						{optionText:'The smaller blocks are easier to lift so the system can do more work on them.', isCorrect: false},
-						{optionText:'Luck', isCorrect: false},
-						{optionText:'Can anyone else think of one?', isCorrect: false}
+						[{text:'The average difference between P<sub>ext</sub> and P<sub>int</sub> was lower so the system did more work on its surroundings.', isCorrect: true},
+						{text:'The smaller blocks are easier to lift so the system can do more work on them.', isCorrect: false},
+						{text:'Luck', isCorrect: false},
+						{text:'Can anyone else think of one?', isCorrect: false}
 					]
 				},
 				replace:
@@ -146,8 +146,8 @@ _.extend(Reversibility.prototype,
 				quiz:{	
 					type:'buttons', 
 					options:
-						[{buttonId:'yes', buttonText:'Yes', isCorrect:false, message:"That's not correct."},
-						{buttonId:'no', buttonText:'No', isCorrect:true}
+						[{buttonId:'yes', text:'Yes', isCorrect:false, message:"That's not correct."},
+						{buttonId:'no', text:'No', isCorrect:true}
 					]
 				}		
 			},
@@ -157,8 +157,8 @@ _.extend(Reversibility.prototype,
 				quiz:{
 					type:'buttons', 
 					options:
-						[{buttonId:'less', buttonText:'Recover less', isCorrect:false, message:"That's not correct."},
-						{buttonId:'more', buttonText:'Recover more', isCorrect:true}
+						[{buttonId:'less', text:'Recover less', isCorrect:false, message:"That's not correct."},
+						{buttonId:'more', text:'Recover more', isCorrect:true}
 					]
 				}			
 			},

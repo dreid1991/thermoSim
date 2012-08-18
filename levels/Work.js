@@ -24,10 +24,10 @@ _.extend(Work.prototype,
 				quiz:{	
 					type:'multChoice',
 					options:
-						[{optionText:"||EQ1||", isCorrect: true},
-						{optionText:"||EQ2||", isCorrect: false, message:'No!  You do no work with constant volume'},
-						{optionText:"||EQ3||", isCorrect: false, message:"No!"},
-						{optionText:"||EQ4||", isCorrect: false, message:"It is dependant of change in volume, but T?"}
+						[{text:"||EQ1||", isCorrect: true},
+						{text:"||EQ2||", isCorrect: false, message:'No!  You do no work with constant volume'},
+						{text:"||EQ3||", isCorrect: false, message:"No!"},
+						{text:"||EQ4||", isCorrect: false, message:"It is dependant of change in volume, but T?"}
 					]
 				},
 			},
@@ -37,10 +37,10 @@ _.extend(Work.prototype,
 				quiz:{	
 					type:'multChoice',
 					options:
-						[{optionText:"||EQ6||", isCorrect: true},
-						{optionText:"||EQ7||", isCorrect: false, message:"Why C<sub>P</sub>?"},
-						{optionText:"||EQ8||", isCorrect: false, message:"But it's adiabatic!"},
-						{optionText:"It cannot be simplified", isCorrect: false, message:"Yes it can.  What is Q equal to?"}
+						[{text:"||EQ6||", isCorrect: true},
+						{text:"||EQ7||", isCorrect: false, message:"Why C<sub>P</sub>?"},
+						{text:"||EQ8||", isCorrect: false, message:"But it's adiabatic!"},
+						{text:"It cannot be simplified", isCorrect: false, message:"Yes it can.  What is Q equal to?"}
 					]
 				},
 			},
@@ -50,7 +50,7 @@ _.extend(Work.prototype,
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:'yes', buttonText:'Yes', isCorrect:true}
+						[{buttonId:'yes', text:'Yes', isCorrect:true}
 					]
 				},
 			},
@@ -60,8 +60,8 @@ _.extend(Work.prototype,
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:'inc', buttonText:'Temp Increases', isCorrect:true},
-						{buttonId:'dec', buttonText:'Temp Decreases', isCorrect:false, message: "Do look at the graphs"}
+						[{buttonId:'inc', text:'Temp Increases', isCorrect:true},
+						{buttonId:'dec', text:'Temp Decreases', isCorrect:false, message: "Do look at the graphs"}
 					]
 				},				
 			},
@@ -71,8 +71,8 @@ _.extend(Work.prototype,
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:'yes', buttonText:'Yes', isCorrect:true},
-						{buttonId:'no', buttonText:'No', isCorrect:false, message:"But wouldn't delta V be negative since we compressing?  A negative negative volume change gives us a positive temperature change!"}
+						[{buttonId:'yes', text:'Yes', isCorrect:true},
+						{buttonId:'no', text:'No', isCorrect:false, message:"But wouldn't delta V be negative since we compressing?  A negative negative volume change gives us a positive temperature change!"}
 					]
 				},
 			},
@@ -82,8 +82,8 @@ _.extend(Work.prototype,
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:'up', buttonText:'Speed up', isCorrect:true},
-						{buttonId:'down', buttonText:'Slow down', isCorrect:false}
+						[{buttonId:'up', text:'Speed up', isCorrect:true},
+						{buttonId:'down', text:'Slow down', isCorrect:false}
 					]
 				},
 			},
@@ -97,9 +97,9 @@ _.extend(Work.prototype,
 				quiz:{	
 					type:'multChoice',
 					options:
-						[{optionText:"The molecule sped up becase it was hit with the moving wall.", isCorrect: true},
-						{optionText:"Something else.", isCorrect: false},
-						{optionText:"Filler.", isCorrect: false}
+						[{text:"The molecule sped up becase it was hit with the moving wall.", isCorrect: true},
+						{text:"Something else.", isCorrect: false},
+						{text:"Filler.", isCorrect: false}
 
 					]
 				},				
@@ -135,8 +135,8 @@ _.extend(Work.prototype,
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:'yes', buttonText:'Yes', isCorrect:true},
-						{buttonId:'no', buttonText:'No', isCorrect:false, message:"Yeah it does!  Look how close they were!"}
+						[{buttonId:'yes', text:'Yes', isCorrect:true},
+						{buttonId:'no', text:'No', isCorrect:false, message:"Yeah it does!  Look how close they were!"}
 					]
 				},
 				replace:
@@ -154,10 +154,10 @@ _.extend(Work.prototype,
 				quiz:{	
 					type:'multChoice',
 					options:
-						[{optionText:"||EQ9||", isCorrect: false},
-						{optionText:"||EQ10||", isCorrect: true},
-						{optionText:"||EQ11||", isCorrect: false},
-						{optionText:"Can't tell", isCorrect: false}
+						[{text:"||EQ9||", isCorrect: false},
+						{text:"||EQ10||", isCorrect: true},
+						{text:"||EQ11||", isCorrect: false},
+						{text:"Can't tell", isCorrect: false}
 
 					]
 				},
@@ -168,8 +168,8 @@ _.extend(Work.prototype,
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:'yes', buttonText:'Yes', isCorrect:true},
-						{buttonId:'no', buttonText:'No', isCorrect:false, message:"Yeah it does!  Look at the graphs!"}
+						[{buttonId:'yes', text:'Yes', isCorrect:true},
+						{buttonId:'no', text:'No', isCorrect:false, message:"Yeah it does!  Look at the graphs!"}
 					]
 				},		
 			},
@@ -179,10 +179,10 @@ _.extend(Work.prototype,
 				quiz:{	
 					type:'multChoice',
 					options:
-						[{optionText:"It will compress at a constant speed because speeding up would make P<sub>int</sub> be greater than P<sub>ext</sub>", isCorrect: false, message:'Not correct.'},
-						{optionText:"It will speed up since the external force will be much greater than the internal force", isCorrect: true},
-						{optionText:"It will compress at a constant slow speed because fast compression will cause an unsafe rise in blood pressure.", isCorrect: false, message:'Not correct.'},
-						{optionText:"I’ll take that one out as soon as I can think of something else to take its place.", isCorrect: false, message:'Not correct.'}
+						[{text:"It will compress at a constant speed because speeding up would make P<sub>int</sub> be greater than P<sub>ext</sub>", isCorrect: false, message:'Not correct.'},
+						{text:"It will speed up since the external force will be much greater than the internal force", isCorrect: true},
+						{text:"It will compress at a constant slow speed because fast compression will cause an unsafe rise in blood pressure.", isCorrect: false, message:'Not correct.'},
+						{text:"I’ll take that one out as soon as I can think of something else to take its place.", isCorrect: false, message:'Not correct.'}
 					]
 				},				
 			},
@@ -192,9 +192,9 @@ _.extend(Work.prototype,
 				quiz:{	
 					type:'multChoice',
 					options:
-						[{optionText:"Magic", isCorrect: false, message:'Not correct.'},
-						{optionText:"A faster wall will speed up the molecules more on impact, increasing system temperature.", isCorrect: true},
-						{optionText:"It won't becacuse the wall speed isn't affected by the difference between internal and external pressure.", isCorrect: false, message:'Not correct.'}
+						[{text:"Magic", isCorrect: false, message:'Not correct.'},
+						{text:"A faster wall will speed up the molecules more on impact, increasing system temperature.", isCorrect: true},
+						{text:"It won't becacuse the wall speed isn't affected by the difference between internal and external pressure.", isCorrect: false, message:'Not correct.'}
 					]
 				},				
 			},
@@ -203,8 +203,8 @@ _.extend(Work.prototype,
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:'yes', buttonText:'I see it!', isCorrect:true},
-						{buttonId:'no', buttonText:'No, I am blind', isCorrect:false, message:"Look harder."}
+						[{buttonId:'yes', text:'I see it!', isCorrect:true},
+						{buttonId:'no', text:'No, I am blind', isCorrect:false, message:"Look harder."}
 					]
 				},					
 			},

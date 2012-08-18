@@ -1,6 +1,6 @@
 //shared startup stuff
 $(function(){
-
+	hoverCol = Col(0, 81, 117);
 	turn = 0;
 	$('#canvasDiv').hide();
 	$('#base').hide();
@@ -31,6 +31,7 @@ $(function(){
 	updateInterval = 30;
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);
+	multChoiceMaxSnapHeight = 100;
 	sliderList = [];
 	spcs = {};
 	stored = {};
@@ -372,6 +373,17 @@ function defaultTo(defaultVal, inputVal){
 function round(val, dec){
 	var pow = Math.pow(10,dec);
 	return Math.round(val*pow)/pow;
+}
+function unique(name, obj){
+	if(!obj[name]){
+		return name;
+	}else{
+		var uniqueId = 1;
+		while(!obj[name+uniqueId]){
+			uniqueId++;
+		}
+		return name+uniqueId;
+	}
 }
 function addListener(object, typeName, funcName, func, destObj){
 	object[typeName + 'Listeners'].listeners[funcName] = {func:func, obj:destObj};

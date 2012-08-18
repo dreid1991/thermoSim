@@ -13,10 +13,12 @@
 	padding:20px;
 	padding:20px;
 }
+/*
 .borderTest{
 	border:3px solid;
 	border-color:#b3b2b1;
 }
+*/
 .noSelect{
 	-moz-user-select: none; 
 	-khtml-user-select: none; 
@@ -33,6 +35,14 @@
 	font-size:x-large;
 	color:white;
 	padding:2px;
+}
+.multChoiceBlock{
+	width:400px;
+	padding:5px;
+	border-radius:15px;
+	color:white;
+	border:3px solid;
+	border-color:#b3b2b1;
 }
 .displayLong{
 	height:500px;
@@ -113,11 +123,13 @@
 	border-bottom:3px solid;
 	border-color:#b3b2b1;
 }
+/*
 .question{
 	background-color:#05111a;
 	color:white;
 	padding:10px;
 }
+*/
 .base{
 	padding-top:10px;
 	display:inline-block;

@@ -1,18 +1,13 @@
 function cvcp(){
 	this.setStds();
-	this.data.t = [];
-	this.data.pInt = [];
-	this.data.v = [];
-	this.data.p = [];
 	this.wallSpeed = 1;
 	this.readout = new Readout('mainReadout', 30, myCanvas.width-155, 25, '13pt calibri', Col(255,255,255),this, 'left');
-	this.compMode = 'Isothermal';
+	this.compMode = 'Isothermal';//is this used?
 
 	
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
 	this.yMin = 30;
 	this.yMax = 350;
-	this.imgPath = 'cvcp';
 }
 _.extend(cvcp.prototype, 
 			LevelTools, 
@@ -26,10 +21,10 @@ _.extend(cvcp.prototype,
 					type:'multChoice', 
 					options:
 						[
-						{optionText:"||EQ1|| and ||EQ3||", isCorrect: false},
-						{optionText:"||EQ2|| and ||EQ3||", isCorrect: false},
-						{optionText:"||EQ1|| and ||EQ4||", isCorrect: true},
-						{optionText:"||EQ2|| and ||EQ5||", isCorrect: false}
+						{text:"||EQ1|| and ||EQ3||", isCorrect: false},
+						{text:"||EQ2|| and ||EQ3||", isCorrect: false},
+						{text:"||EQ1|| and ||EQ4||", isCorrect: true},
+						{text:"||EQ2|| and ||EQ5||", isCorrect: false}
 					]
 				},
 			},
@@ -43,9 +38,9 @@ _.extend(cvcp.prototype,
 				quiz: {	
 					type:'buttons',
 					options:
-						[{buttonId:'less', buttonText:'E<sub>C<sub>V</sub></sub>><E<sub>C<sub>P</sub></sub>', isCorrect:true},
-						{buttonId:'equal', buttonText:'E<sub>C<sub>V</sub></sub>=E<sub>C<sub>P</sub></sub>', isCorrect:false, message:"No it's not"},
-						{buttonId:'greater', buttonText:'E<sub>C<sub>V</sub></sub>&#60E<sub>C<sub>P</sub></sub>', isCorrect:false, message:"No it's not"}					
+						[{buttonId:'less', text:'E<sub>C<sub>V</sub></sub>><E<sub>C<sub>P</sub></sub>', isCorrect:true},
+						{buttonId:'equal', text:'E<sub>C<sub>V</sub></sub>=E<sub>C<sub>P</sub></sub>', isCorrect:false, message:"No it's not"},
+						{buttonId:'greater', text:'E<sub>C<sub>V</sub></sub>&#60E<sub>C<sub>P</sub></sub>', isCorrect:false, message:"No it's not"}					
 					]
 				},
 			},
@@ -60,9 +55,9 @@ _.extend(cvcp.prototype,
 					type:'multChoice', 
 					options:
 						[
-						{optionText:"Constant pressure heating takes more energy because the system must expand as it heats.", isCorrect: true},
-						{optionText:"I'm a cabbage.", isCorrect: false},
-						{optionText:"I really can't think of any.", isCorrect: false}
+						{text:"Constant pressure heating takes more energy because the system must expand as it heats.", isCorrect: true},
+						{text:"I'm a cabbage.", isCorrect: false},
+						{text:"I really can't think of any.", isCorrect: false}
 					]
 				},
 			},
@@ -72,9 +67,9 @@ _.extend(cvcp.prototype,
 					type:'multChoice', 
 					options:
 						[
-						{optionText:"To the molecules, to speed them up, and to the surroundings by expanding the system.", isCorrect: false},
-						{optionText:"To the molecules, to speed them up", isCorrect: true},
-						{optionText:"To the surroundings through work", isCorrect: false}
+						{text:"To the molecules, to speed them up, and to the surroundings by expanding the system.", isCorrect: false},
+						{text:"To the molecules, to speed them up", isCorrect: true},
+						{text:"To the surroundings through work", isCorrect: false}
 					]
 				},
 			},
@@ -85,9 +80,9 @@ _.extend(cvcp.prototype,
 					type:'multChoice', 
 					options:
 						[
-						{optionText:"||EQ7||", isCorrect: false},
-						{optionText:"||EQ6||", isCorrect: true},
-						{optionText:"||EQ8||", isCorrect: false}
+						{text:"||EQ7||", isCorrect: false},
+						{text:"||EQ6||", isCorrect: true},
+						{text:"||EQ8||", isCorrect: false}
 					]				
 				},
 			},
@@ -98,9 +93,9 @@ _.extend(cvcp.prototype,
 					type:'multChoice', 
 					options:
 						[
-						{optionText:"To the molecules, to speed them up.", isCorrect: false, message:"Yes, but doesn't the system expand as well?  That sounds like work."},
-						{optionText:"To the molecules, to speed them up, and to the surroundings by expanding the system.", isCorrect: true},
-						{optionText:"To the surroundings by expanding the system.", isCorrect: false, message:"But the system heats up!  You're increasing the molecules' kinetic energy.  Isn't that a place for the energy to go?"}
+						{text:"To the molecules, to speed them up.", isCorrect: false, message:"Yes, but doesn't the system expand as well?  That sounds like work."},
+						{text:"To the molecules, to speed them up, and to the surroundings by expanding the system.", isCorrect: true},
+						{text:"To the surroundings by expanding the system.", isCorrect: false, message:"But the system heats up!  You're increasing the molecules' kinetic energy.  Isn't that a place for the energy to go?"}
 					]				
 				},				
 			},
@@ -111,8 +106,8 @@ _.extend(cvcp.prototype,
 					type:'multChoice', 
 					options:
 						[
-						{optionText:"||EQ10||", isCorrect: false, message:"Wait, but at constant volume (there's no delta in front of the V), there's no work being done."},
-						{optionText:"||EQ9||", isCorrect: true}
+						{text:"||EQ10||", isCorrect: false, message:"Wait, but at constant volume (there's no delta in front of the V), there's no work being done."},
+						{text:"||EQ9||", isCorrect: true}
 						
 					]				
 				},

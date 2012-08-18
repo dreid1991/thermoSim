@@ -167,7 +167,7 @@ LevelTools = {
 	},
 	/*
 	type: 'buttons'
-	options:list of buttons with: 	buttonId, buttonText, isCorrect
+	options:list of buttons with: 	buttonId, text, isCorrect
 			can have: 				func, message
 	*/
 	appendButtons: function(text, quiz, appendTo){
@@ -177,7 +177,7 @@ LevelTools = {
 		buttonHTML += "<br><center><table border='0'><tr>";
 		for (var buttonIdx=0; buttonIdx<buttons.length; buttonIdx++){
 			var button = buttons[buttonIdx];
-			buttonHTML += "<td><button id='" + button.buttonId + "' class='noSelect'>" + button.buttonText + "</button></td>"
+			buttonHTML += "<td><button id='" + button.buttonId + "' class='noSelect'>" + button.text + "</button></td>"
 		}
 		buttonHTML += "</tr></table></center>";
 		$('#'+appendTo).html($('#intText').html() + buttonHTML);
@@ -210,48 +210,52 @@ LevelTools = {
 	},
 	/*
 	type: 'multChoice'
-	list of options wit:	 optionText, isCorrect
+	list of options wit:	 text, isCorrect
 	each option can have:	 message
 	*/
 	appendMultChoice: function(text, quiz, appendTo){
 		var options = quiz.options
 		var multChoiceHTML = "";
 		multChoiceHTML += defaultTo('', text);
-		multChoiceHTML += "<p></p><table width=100%><tr><td width=10%></td><td>"
-		multChoiceHTML += "<div class='borderTest'>";
-		multChoiceHTML += "<table border=0>";
+		multChoiceHTML += "<p></p><table width=100%<tr><td width=10%></td><td>";
+		var idOptionPairs = new Array(options.length);
 		for (var optionIdx=0; optionIdx<options.length; optionIdx++){
 			var option = options[optionIdx];
-			multChoiceHTML += '<tr>';
-			multChoiceHTML += '<td>';
-			option.optionVal = 'answer'+optionIdx;
-			multChoiceHTML += "<input type='radio' name='multChoice' value='" + option.optionVal + "'>";
-			multChoiceHTML += '</td>'
-			multChoiceHTML += "<td><div class='whiteFont'>";
-			multChoiceHTML += option.optionText;
-			multChoiceHTML += '</div>';
-			multChoiceHTML += "</td>";
-			multChoiceHTML += '</tr>';
+			var divId = optionIdx;
+			var uniqueTag = 0
+			//while($('#response ' +divId + 'tag' +uniqueTag)){
+			//	uniqueTag++;
+			//}
+			divId = 'response' + divId + 'tag' + uniqueTag;
+			multChoiceHTML += "<div id='"+divId+"' class='multChoiceBlock'>"+option.text+"</div>";
+			idOptionPairs[optionIdx] = {id:divId, option:option};
 		}
-		multChoiceHTML += '</table>';
-		multChoiceHTML += '</td></tr></table>'
-		multChoiceHTML += "<div style='float:right'><button id='multChoiceSubmit' class='noSelect'>Submit</button></div>"
-		multChoiceHTML += "</div>";
 		$('#'+appendTo).html($('#'+appendTo).html() + multChoiceHTML);
-		$('button').button();
+		this.bindMultChoiceFuncs(idOptionPairs);
+	},
+	bindMultChoiceFuncs: function(idOptionPairs){
+		for (var optionIdx=0; optionIdx<idOptionPairs.length; optionIdx++){
+			var id = idOptionPairs[optionIdx].id;
+			var option = idOptionPairs[optionIdx].option;
+			this.bindMultChoiceFunc(id, option);
+		}
+	},
+	bindMultChoiceFunc: function(id, option){
 		var checkFunc = function(){
-			var pickedVal = $("input:radio[name='multChoice']:checked").val();
-			var pickedOption = byAttr(options, pickedVal, 'optionVal');
 			if(curLevel.checkConditions()){
-				if(pickedOption.message){
-					alert(pickedOption.message);
+				if(option.message){
+					alert(option.message);
 				}
-				if(pickedOption.isCorrect){
+				if(option.isCorrect){
 					nextPrompt();
 				}
 			}
 		}
-		buttonBind('multChoiceSubmit', checkFunc);
+		$('#'+id).click(checkFunc);
+		$('#'+id).hover(
+			function(){$(this).css('background-color', hoverCol.hex)}, 
+			function(){$(this).css('background-color', 'transparent')}
+		);
 	},
 	/*
 	type: 'text'
