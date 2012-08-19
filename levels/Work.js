@@ -327,7 +327,7 @@ _.extend(Work.prototype,
 		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:wallHandle, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
 		this.trackTempStart();
 		this.trackVolumeStart(0);
-		this.volListener15 = new StateListener({condition:15, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{p:this.data.p, t:this.data.t});
+		this.volListener15 = new StateListener({condition:15, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{p:this.data.p, t:this.data.t}});
 		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.03, recordAtSatisfy:{p:this.data.p, t:this.data.t}, atSatisfyFunc:{func:function(){store('tFinal', round(this.data.t[this.data.t.length-1],0))}, obj:this}});
 	},
 	block8Conditions: function(){
@@ -389,8 +389,8 @@ _.extend(Work.prototype,
 		this.graphs.tVSv.addSet('tLeft', 'Temp\nLeft', Col(255,0,0), Col(255,200,200),
 								{data:this.data, x:'vLeft', y:'tLeft'});	
 		
-		this.volListenerLeft = new StateListener({condition:3.5, checkAgainst:this.data.vLeft, tolerance:.02);
-		this.volListenerRight = new StateListener({condition:3.5, checkAgainst:this.data.vRight, tolerance:.02);
+		this.volListenerLeft = new StateListener({condition:3.5, checkAgainst:this.data.vLeft, tolerance:.05});
+		this.volListenerRight = new StateListener({condition:3.5, checkAgainst:this.data.vRight, tolerance:.05});
 	},
 	block12Conditions: function(){
 		if(this.volListenerLeft.isSatisfied() && this.volListenerRight.isSatisfied()){

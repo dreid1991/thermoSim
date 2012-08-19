@@ -12,7 +12,7 @@ function DragWeights(attrs){
 	this.readout = 				defaultTo(curLevel.readout, attrs.readout);
 	this.binY = 				defaultTo(myCanvas.height-15, attrs.binY);
 	this.eBar = 				{x:defaultTo(20, attrs.eBarX), scalar:.7};
-	this.blockCol = 			defaultTo(Col(224, 190, 138), attrs.blockCol);
+	this.blockCol = 			defaultTo(Col(224, 165, 75), attrs.blockCol);
 	this.binCol = 				defaultTo(Col(150, 150, 150), attrs.binCol);
 	this.massInit = 			defaultTo(25, defaultTo(curLevel.massInit, attrs.massInit));
 	this.binHeight = 			defaultTo(65, attrs.binHeight);
@@ -974,7 +974,7 @@ function CompArrow(nameInfo, compAttrs){
 	var canvasElement = canvas;
 	var listeners = {};
 	if(makeStops){
-		this.stops = new Stops({height:bounds.y.max}, wallIdx);
+		this.stops = new Stops({stopPt:{height:bounds.y.max}, wallInfo:wallIdx});
 	}
  
 	listeners.onDown = function(){};
@@ -1003,7 +1003,7 @@ function Piston(attrs){
 	this.p = defaultTo(2, attrs.init);
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	if(attrs.slider){
-		this.slider = slider;
+		this.slider = attrs.slider;
 		this.setSliderVal();
 	}
 	this.slant = .07;
