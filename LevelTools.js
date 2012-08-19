@@ -423,17 +423,26 @@ LevelTools = {
 		this.readout.removeEntry(handle);
 		removeListener(curLevel, 'data', 'trackTemp' + handle);
 	},
-	trackStart: function(handle, label, units, dataSet, decPlaces){
+	trackStart: function(handle, label, data, decPlaces, units){
 		decPlaces = defaultTo(1, decPlaces);
-		this.readout.addEntry(handle, label, units, dataSet[dataSet.length-1], undefined, decPlaces);
-		addListener(curLevel, 'data', 'track'+handle,
-			function(){
-				//this.readout.tick(dataSet
-			},
-		this);
+		if(typeof(data)=='Array'){
+			this.readout.addEntry(handle, label, units, data[data.length-1], undefined, decPlaces);
+			addListener(curLevel, 'data', 'track'+handle,
+				function(){
+					this.readout.tick(handle, data[data.length-1]);
+				},
+			this);
+		}else if (typeof(data)=='function'){
+			this.readout.addEntry(handle, label, units, data(), undefined, decPlaces);
+			addListener(curLevel, 'data', 'track'+handle,
+				function(){
+					this.readout.tick(handle, data());
+				},
+			this);		
+		}
 	},
 	trackStop: function(handle){
-		
+		removeListener(curLevel, 'data', 'track' + handle);
 	},
 	trackExtentRxnStart: function(handle, rxnInfo){
 		var spcsLocal = spcs;

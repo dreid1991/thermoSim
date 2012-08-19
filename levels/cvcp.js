@@ -1,7 +1,7 @@
 function cvcp(){
 	this.setStds();
 	this.wallSpeed = 1;
-	this.readout = new Readout('mainReadout', 30, myCanvas.width-155, 25, '13pt calibri', Col(255,255,255),this, 'left');
+	this.readout = new Readout('mainReadout', 30, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255),this, 'left');
 	this.compMode = 'Isothermal';//is this used?
 
 	
@@ -38,9 +38,9 @@ _.extend(cvcp.prototype,
 				quiz: {	
 					type:'buttons',
 					options:
-						[{buttonId:'less', text:'E<sub>C<sub>V</sub></sub>><E<sub>C<sub>P</sub></sub>', isCorrect:true},
+						[{buttonId:'less', text:'E<sub>C<sub>V</sub></sub>>E<sub>C<sub>P</sub></sub>', isCorrect:false, message:"No it's not"},
 						{buttonId:'equal', text:'E<sub>C<sub>V</sub></sub>=E<sub>C<sub>P</sub></sub>', isCorrect:false, message:"No it's not"},
-						{buttonId:'greater', text:'E<sub>C<sub>V</sub></sub>&#60E<sub>C<sub>P</sub></sub>', isCorrect:false, message:"No it's not"}					
+						{buttonId:'greater', text:'E<sub>C<sub>V</sub></sub>&#60E<sub>C<sub>P</sub></sub>', isCorrect:true}					
 					]
 				},
 			},
@@ -128,22 +128,40 @@ _.extend(cvcp.prototype,
 		nextPrompt();
 	},
 	block2Start: function(){
+		var self = this;
+		this.readout.show();
 		recordDataStart('tLeft', this.dataHandler.tempFunc({tag:'left'}), this);
 		recordDataStart('tRight', this.dataHandler.tempFunc({tag:'right'}), this);
-		addListener(curLevel, 'record', 'tLeft', this.dataHandler.tempFunc({tag:'left'}), this);
-		addListener(curLevel, 'record', 'tRight', this.dataHandler.tempFunc({tag:'right'}), this);
 		walls = WallHandler([[P(40,190), P(255,190), P(255,425), P(40,425)], [P(295,190), P(510,190), P(510,425), P(295,425)]], 'staticAdiabatic', ['left', 'right'], [undefined, {yMin:50, yMax:275}], undefined, [5,5]);
 		this.borderStd({wallInfo:'left', min:50});
 		this.borderStd({wallInfo:'right', min:50});
-		spcs['spc1'].populate(P(45,200), V(200, 200), 350, 200, 'left', 'left');
-		spcs['spc3'].populate(P(45,200), V(200, 200), 250, 200, 'left', 'left');	
+		spcs['spc1'].populate(P(45,200), V(200, 200), 350, 185, 'left', 'left');
+		spcs['spc3'].populate(P(45,200), V(200, 200), 250, 185, 'left', 'left');	
 		
-		spcs['spc1'].populate(P(300,200), V(200, 200), 350, 200, 'right', 'right');
-		spcs['spc3'].populate(P(300,200), V(200, 200), 250, 200, 'right', 'right');	
+		spcs['spc1'].populate(P(300,200), V(200, 200), 350, 185, 'right', 'right');
+		spcs['spc3'].populate(P(300,200), V(200, 200), 250, 185, 'right', 'right');	
 		this.piston = new Piston('piston', 'right', {min:2,init:2, max:2}).trackPressure();
-		this.heaterLeft = new Heater('heaterLeft', P(97,350), V(100,40), 0, {init:0, max:20}, 'sliderHeaterLeft', c);
-		this.heaterRight = new Heater('heaterRight', P(352, 350), V(100,40), 0, {init:0, max:20}, 'sliderHeaterRight', c);
+		this.heaterLeft = new Heater('heaterLeft', P(97,350), V(100,40), 0, {init:0, max:35}, 'sliderHeaterLeft', c);
+		this.heaterRight = new Heater('heaterRight', P(352, 350), V(100,40), 0, {init:0, max:35}, 'sliderHeaterRight', c);
 		
+		this.trackTempStart('tleft', 'Temp:', this.data.tLeft, 0);
+		this.trackStart('eLeft', 'Energy in:', function(){return self.heaterLeft.eAdded}, 1, 'kJ');
+		
+		this.trackTempStart('tRight', 'Temp:', this.data.tRight, 0);
+		this.trackStart('eRight', 'Energy in:', function(){return self.heaterRight.eAdded}, 1, 'kJ');
+	
+	},
+	block2Conditions: function(){
+		return {result:true};
+	},
+	block2CleanUp: function(){
+		this.heaterLeft.remove();
+		this.heaterRight.remove();
+		this.trackTempStop('tLeft');
+		this.trackTempStop('tRight');
+		this.trackStop('eLeft');
+		this.trackStop('eRight');
+		this.piston.remove();
 	},
 
 
