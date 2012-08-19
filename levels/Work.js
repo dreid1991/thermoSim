@@ -320,7 +320,7 @@ _.extend(Work.prototype,
 		this.readout.show();
 		wallHandle = 'container';
 		walls = WallHandler([[P(40,31), P(510,31), P(510,350), P(40,350)]], 'staticAdiabatic', [wallHandle], [{yMin:30, yMax:300}], undefined, [15]);
-		this.stops = new Stops({volume:10}, 'container');
+		this.stops = new Stops({stopPt:{volume:10}});
 		this.borderStd();
 		spcs['spc1'].populate(P(45,35), V(445, 325), 850, 200);
 		spcs['spc3'].populate(P(45,35), V(445, 325), 650, 200);
@@ -368,8 +368,8 @@ _.extend(Work.prototype,
 		this.data.vRight = [];		
 		this.dragWeightsLeft = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:'left', massInit: 5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
 		this.dragWeightsRight = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:'right', massInit: 5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
-		this.stopsLeft = new Stops({volume:3.5}, 'left');
-		this.stopsRight = new Stops({volume:3.5}, 'right');		
+		this.stopsLeft = new Stops({stopPt:{volume:3.5}, wallInfo:'left'});
+		this.stopsRight = new Stops({stopPt:{volume:3.5}, wallInfo:'right'});		
 		removeListener(curLevel, 'data', 'run');
 		addListener(curLevel, 'data', 'run',
 			function(){
@@ -428,8 +428,8 @@ _.extend(Work.prototype,
 		this.data.vRight = [];		
 		this.dragWeightsLeft = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:35}], wallInfo:'left', massInit:5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
 		this.dragWeightsRight = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:'right', massInit:5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
-		this.stopsLeft = new Stops({volume:3.5}, 'left');
-		this.stopsRight = new Stops({volume:3.5}, 'right');		
+		this.stopsLeft = new Stops({stopPt:{volume:3.5}, wallInfo:'left'});
+		this.stopsRight = new Stops({stopPt:{volume:3.5}, wallInfo:'right'});		
 		removeListener(curLevel, 'data', 'run');
 		addListener(curLevel, 'data', 'run',
 			function(){
@@ -449,8 +449,8 @@ _.extend(Work.prototype,
 		this.graphs.tVSv.addSet('tLeft', 'Temp\nLeft', Col(255,0,0), Col(255,200,200),
 								{data:this.data, x:'vLeft', y:'tLeft'});	
 		
-		this.volListenerLeft = new StateListener({condition:3.5, checkAgainst:this.data.vLeft, tolerance:.02);
-		this.volListenerRight = new StateListener(condition:3.5, checkAgainst:this.data.vRight, tolerance:.02);
+		this.volListenerLeft = new StateListener({condition:3.5, checkAgainst:this.data.vLeft, tolerance:.02});
+		this.volListenerRight = new StateListener({condition:3.5, checkAgainst:this.data.vRight, tolerance:.02});
 	},
 	block15Conditions: function(){
 		if(this.volListenerLeft.isSatisfied() && this.volListenerRight.isSatisfied()){

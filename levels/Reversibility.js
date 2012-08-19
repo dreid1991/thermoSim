@@ -413,7 +413,7 @@ _.extend(Reversibility.prototype,
 		this.borderStd({min:68});
 		spcs['spc1'].populate(P(35, 80), V(460, 320), 800, 200);
 		spcs['spc3'].populate(P(35, 80), V(460, 320), 600, 200);
-		this.stops = new Stops({volume:10}, 'container');	
+		this.stops = new Stops({stopPt:{volume:10}});	
 	},
 	compSetup: function(){
 		walls = WallHandler([[P(40,68), P(510,68), P(510,410), P(40,410)]], 'staticAdiabatic', ['container'], [{yMin:68, yMax:435}], undefined, [10.1]);
@@ -422,7 +422,7 @@ _.extend(Reversibility.prototype,
 		var height = walls[0][3].y-walls[0][0].y;
 		spcs['spc1'].populate(P(35, maxY+10), V(460, height-20), 800, 273);
 		spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 600, 273);
-		this.stops = new Stops({volume:10}, 'container');		
+		this.stops = new Stops({stopPt:{volume:10}});		
 	},
 	/*
 	dataRun: function(){

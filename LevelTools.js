@@ -473,55 +473,6 @@ LevelTools = {
 	trackExtentRxnStop: function(handle){
 		removeListener(curLevel, 'data', 'trackExtentRxn' + handle);
 	},
-	makeDragWeightsFunc: function(weights, wallHandle, massInit, track){
-		var self = curLevel;
-		var func = function(){
-			self.dragWeights = self.makeDragWeights(weights, wallHandle, massInit).init();
-			for (var tracker in track){
-				if(track[tracker]){
-					self.dragWeights[tracker+'Start']();
-				}else{
-					self.dragWeights[tracker+'Stop']();
-				}
-			}
-		}
-		return function(){
-			func.apply(self);
-		}
-	},
-	makeDragWeights: function(weights, wallHandle, attrs){
-		/*
-		var self = this;
-		attrs = defaultTo({}, attrs);
-		var compMode = defaultTo('cPAdiabaticDamped', attrs.compMode);
-		
-		var blockCol = defaultTo(Col(218,187,41), attrs.blockCol);
-		var binCol = defaultTo(Col(150,150,150), attrs.binCol);
-		massInit = defaultTo(25, defaultTo(this.massInit, attrs.massInit));
-		wallHandle = defaultTo('0', wallHandle);
-		min = walls[wallHandle][2].y;
-		var wall = walls[wallHandle];
-		if(!(weights instanceof Array)){
-			//then is a total mass with count
-			var mass = weights.mass/weights.count;
-			weights = [{name:'onlyWeights', count:weights.count, mass:mass}]
-		}
-		return new DragWeights(weights,
-								min,
-								function(){return wall[0].y},
-								myCanvas.height-15,
-								20,
-								blockCol,
-								binCol,
-								massInit,
-								readout,
-								wallHandle,
-								compMode,
-								this
-								);
-		*/
-
-	},
 	makeListeners: function(){
 		this.updateListeners = {listeners:{}, save:{}};
 		this.dataListeners = {listeners:{}, save:{}};
