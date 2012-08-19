@@ -2,45 +2,50 @@
 //DRAG WEIGHTS
 //////////////////////////////////////////////////////////////////////////
 
-function DragWeights(weightDefs, zeroY, pistonY, binY, eBarX, weightCol, binCol, massInit, readout, wallInfo, wallHandler, obj){
-	this.zeroY = zeroY;
-	this.pistonY = pistonY;
-	this.binY = binY;
-	this.weightCol = weightCol;
-	this.wallHandler = wallHandler + compAdj;
-	this.eBarCol = this.weightCol;
-	this.wallInfo = wallInfo;
-	this.wallIdx = walls.idxByInfo(wallInfo);
-	this.wall = walls[this.wallIdx];
-	this.eBar = {x:eBarX, scalar: .7};
-	this.binCol = binCol;
-	this.binHeight = 65;
+function DragWeights(attrs){
+	this.tempWeightDefs = 		attrs.weightDefs;
+	this.wallInfo = 			defaultTo(0, attrs.wallInfo);
+	this.wall = 				walls[this.wallInfo];
+	this.zeroY = 				defaultTo(this.wall[2].y, attrs.min);
+	this.pistonY = 				defaultTo(function(){return this.wall[0].y}, attrs.pistonY);
+	this.wallHandler = 			defaultTo('cPAdiabaticDamped', attrs.compMode) + compAdj;
+	this.readout = 				defaultTo(curLevel.readout, attrs.readout);
+	this.binY = 				defaultTo(myCanvas.height-15, attrs.binY);
+	this.eBar = 				{x:defaultTo(20, attrs.eBarX), scalar:.7};
+	this.blockCol = 			defaultTo(Col(224, 190, 138), attrs.blockCol);
+	this.binCol = 				defaultTo(Col(150, 150, 150), attrs.binCol);
+	this.massInit = 			defaultTo(25, defaultTo(curLevel.massInit, attrs.massInit));
+	this.binHeight = 			defaultTo(65, attrs.binHeight);
+	this.weightDimRatio = 		defaultTo(.5, attrs.weightDimRatio);
+	this.flySpeed =				defaultTo(20, attrs.flySpeed);
+	
+	if(!(this.tempWeightDefs instanceof Array)){
+		//then is a total mass with count
+		var mass = this.tempWeightDefs.mass/this.tempWeightDefs.count;
+		this.tempWeightDefs = [{name:'onlyWeights', count:this.tempWeightDefs.count, mass:mass}]
+	}
+	
+	
+	this.eBarCol = this.blockCol;
 	this.binSlant = 1.3;
 	this.storeBinWidth = 110;
 	this.storeBinSpacing = 60;
 	this.pistonBinWidth = 150;
 	this.pistonBinSpacing = 15;
 	this.blockSpacing = 2;
-	this.weightDimRatio = .5;
 	this.weightScalar = 40;
 	this.moveSpeed = 20;
-	this.pistonMass = massInit;
+	this.pistonMass = this.massInit;
 	this.massChunkName = 'dragWeights';
-	this.massInit = massInit
 	this.eAdded = 0;
 	this.pressure = this.getPressure();
-	this.readout = readout;
 	this.weightsOnPiston = [];
-	this.tempWeightDefs = weightDefs;
-	this.flySpeed = 20;
 	this.eBarFont = '12pt Calibri';
 	this.eBarFontCol = Col(255,255,255);
 	this.addStdReadoutEntries();
 	
 	var self = this;
-	if(obj){
-		addListener(obj, 'init', 'dragWeights' + this.wallInfo, this.init, this);
-	}
+
 
 	this.wall.setMass(this.massChunkName, this.massInit);
 	this.trackEnergy = false;
@@ -58,7 +63,7 @@ DragWeights.prototype = {
 		//this.dropAllstores();
 		this.wall.moveInit();
 		addListener(curLevel, 'update', 'moveWeightsOnPiston' + this.wallInfo, this.moveWeightsOnPiston, this);
-		walls.setSubWallHandler(this.wallIdx, 0, this.wallHandler);
+		walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);
 		addListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo, this.draw, this);
 		addListener(curLevel, 'mousedown', 'weights' + this.wallInfo, this.mousedown, this);
 		addListener(curLevel, 'reset', 'dragWeights' + this.wallInfo, this.reset, this);
@@ -470,7 +475,7 @@ DragWeights.prototype = {
 			var weights = weightGroup.weights;
 			var dims = weightGroup.dims;
 			for (var weightIdx=0; weightIdx<weights.length; weightIdx++){
-				draw.fillRect(weights[weightIdx].pos, dims, this.weightCol, drawCanvas);
+				draw.fillRect(weights[weightIdx].pos, dims, this.blockCol, drawCanvas);
 			}
 		}
 	},
@@ -559,10 +564,10 @@ DragWeights.prototype = {
 		this.wall.setMass(this.massChunkName, this.pistonMass);
 		this.pressure = this.getPressure();
 		if(this.trackMass){
-			this.readout.tick('mass', this.pistonMass);
+			this.readout.tick('mass' + this.wallInfo, this.pistonMass);
 		}
 		if(this.trackPressure){
-			this.readout.tick('pressure', this.pressure);
+			this.readout.tick('pressure' + this.wallInfo, this.pressure);
 		}
 	},
 	mousedown: function(){
@@ -991,20 +996,19 @@ CompArrow.prototype = {
 //PISTON
 //////////////////////////////////////////////////////////////////////////
 
-function Piston(handle, wallInfo, vals, slider){
-	var self = this;
-	this.p = vals.init;
-	this.pMin = vals.min;
-	this.pMax = vals.max;
-	if(slider){
+function Piston(attrs){
+	this.wallInfo = defaultTo(0, attrs.wallInfo);
+	this.pMin = defaultTo(2, attrs.min);
+	this.pMax = defaultTo(15, attrs.max);
+	this.p = defaultTo(2, attrs.init);
+	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
+	if(attrs.slider){
 		this.slider = slider;
 		this.setSliderVal();
 	}
 	this.slant = .07;
 	this.trackingP = false;
-	this.drawCanvas = c;
-	this.wallIdx = walls.idxByInfo(wallInfo);
-	this.wall = walls[this.wallIdx];
+	this.wall = walls[this.wallInfo];
 	this.left = this.wall[0].x;
 	this.width = this.wall[1].x-this.left;
 	var myWall = this.wall
@@ -1022,7 +1026,7 @@ function Piston(handle, wallInfo, vals, slider){
 	var readoutFontCol = Col(255, 255, 255);
 	this.readout = new Readout('pistonReadout', readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, undefined, 'center');
 	this.wall.moveInit();
-	walls.setSubWallHandler(this.wallIdx, 0, 'cPAdiabaticDamped' + compAdj);		
+	walls.setSubWallHandler(this.wallInfo, 0, 'cPAdiabaticDamped' + compAdj);		
 	return this.show();
 }
 
@@ -1170,23 +1174,29 @@ Piston.prototype = {
 //////////////////////////////////////////////////////////////////////////
 //HEATER
 //////////////////////////////////////////////////////////////////////////
-function Heater(handle, pos, dims, rotation, vals, slider, drawCanvas){
+function Heater(attrs){
 	/*
 	dims.dx corresponds to long side w/ wires
 	dims.dy corresponds to short side
 	*/
-	this.handle = handle;
-	this.drawCanvas = drawCanvas;
+	this.dims = defaultTo(V(100,40), attrs.dims);
+	if(attrs.wallInfo){
+		this.pos = this.centerOnWall(attrs.wallInfo, this.dims);
+	}else{
+		this.pos = attrs.pos;
+	}
+	this.handle = defaultTo('heaty', attrs.handle);
+	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	this.cornerRound = .2;
-	this.temp = vals.init;
-	this.tempMax = vals.max;
-	this.tempMin = -vals.max;
-	this.slider = slider;
-	this.setSliderVal(this.temp);
-	this.pos = pos;
-	this.dims = dims;
+	this.temp = defaultTo(0, attrs.init);
+	this.tempMax = defaultTo(35, attrs.max);
+	this.tempMin = -this.tempMax;
+	this.rot = defaultTo(0, attrs.rotation);
+	if(attrs.slider){
+		this.slider = attrs.slider;
+		this.setSliderVal(this.temp);
+	}
 	this.center = this.pos.copy().movePt(this.dims.copy().mult(.5));
-	this.rot = rotation;
 	var colMax = Col(200,0,0);
 	var colMin = Col(0,0,200);
 	var colDefault = Col(100, 100, 100);
@@ -1221,6 +1231,15 @@ Heater.prototype = {
 			draw.path(pts, curCol, self.drawCanvas);
 		}
 		return drawFunc;
+	},
+	centerOnWall: function(wallInfo, dims){
+		var wall = walls[wallInfo];
+		var center = (wall[3].x + wall[2].x)/2;
+		var floor = wall[2].y;
+		var floorSpacing = 30;
+		var x = center - dims.dx/2;
+		var y = floor - floorSpacing - dims.dy;
+		return P(x, y);
 	},
 	getPts: function(pos, dims, rnd){
 		var pts = new Array();
@@ -1345,18 +1364,16 @@ Stops.prototype = {
 //////////////////////////////////////////////////////////////////////////
 //STATE LISTENER
 //////////////////////////////////////////////////////////////////////////
-function StateListener(condition, checkAgainst, tolerance, recordAtSatisfy, atSatisfyFunc){
-	this.condition = condition;
-	this.checkAgainst = checkAgainst;
-	this.recordAtSatisfy = recordAtSatisfy;
-	this.tolerance = .07;
-	if(tolerance){
-		this.tolerance = tolerance;
-	}
+function StateListener(attrs){
+	this.condition = attrs.condition;
+	this.checkAgainst = attrs.checkAgainst;//can be func that returns value or list
+	this.recordAtSatisfy = defaultTo({}, attrs.recordAtSatisfy);
+	this.tolerance = defaultTo(.05, attrs.tolerance);
+	this.atSatisfyFunc = defaultTo(undefined, attrs.atSatisfyFunc);
+
 	this.amSatisfied = false;
-	this.atSatisfyFunc = atSatisfyFunc;
-	this.init();
-	return this;
+
+	return this.init();
 }
 StateListener.prototype = {
 	init: function(){

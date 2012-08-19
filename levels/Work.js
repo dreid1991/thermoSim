@@ -252,9 +252,9 @@ _.extend(Work.prototype,
 								{data:this.data, x:'v', y:'t'});		
 		
 		
-		this.piston = new Piston('tootoo', 'container', {init:2, min:2, max:15}, 'sliderPiston').trackWorkStart().trackPressureStart();
+		this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, slider:'sliderPiston'}).trackWorkStart().trackPressureStart();
 		this.borderStd();
-		this.volListener8 = new StateListener(10, this.data.v, .1, {})
+		this.volListener8 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.1});
 		//this.heater = new Heater('spaceHeater', P(150,360), V(250,50), 0, 20, c);//P(40,425), V(470,10)
 		//this.heater.init();
 
@@ -324,11 +324,11 @@ _.extend(Work.prototype,
 		this.borderStd();
 		spcs['spc1'].populate(P(45,35), V(445, 325), 850, 200);
 		spcs['spc3'].populate(P(45,35), V(445, 325), 650, 200);
-		this.dragWeights = this.makeDragWeights([{name:'lrg', count:1, mass:75}], wallHandle, {compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
+		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:wallHandle, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
 		this.trackTempStart();
 		this.trackVolumeStart(0);
-		this.volListener15 = new StateListener(15, this.data.v, .05, {p:this.data.p, t:this.data.t});
-		this.volListener10 = new StateListener(10, this.data.v, .03, {p:this.data.p, t:this.data.t}, {func:function(){store('tFinal', round(this.data.t[this.data.t.length-1],0))}, obj:this});
+		this.volListener15 = new StateListener({condition:15, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{p:this.data.p, t:this.data.t});
+		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.03, recordAtSatisfy:{p:this.data.p, t:this.data.t}, atSatisfyFunc:{func:function(){store('tFinal', round(this.data.t[this.data.t.length-1],0))}, obj:this}});
 	},
 	block8Conditions: function(){
 		if(this.volListener10.isSatisfied() && this.volListener15.isSatisfied()){
@@ -366,8 +366,8 @@ _.extend(Work.prototype,
 		this.data.tRight = [];
 		this.data.vLeft = [];
 		this.data.vRight = [];		
-		this.dragWeightsLeft = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'left', {massInit: 5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
-		this.dragWeightsRight = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'right', {massInit: 5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
+		this.dragWeightsLeft = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:'left', massInit: 5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
+		this.dragWeightsRight = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:'right', massInit: 5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
 		this.stopsLeft = new Stops({volume:3.5}, 'left');
 		this.stopsRight = new Stops({volume:3.5}, 'right');		
 		removeListener(curLevel, 'data', 'run');
@@ -389,8 +389,8 @@ _.extend(Work.prototype,
 		this.graphs.tVSv.addSet('tLeft', 'Temp\nLeft', Col(255,0,0), Col(255,200,200),
 								{data:this.data, x:'vLeft', y:'tLeft'});	
 		
-		this.volListenerLeft = new StateListener(3.5, this.data.vLeft, .02, {});
-		this.volListenerRight = new StateListener(3.5, this.data.vRight, .02, {});
+		this.volListenerLeft = new StateListener({condition:3.5, checkAgainst:this.data.vLeft, tolerance:.02);
+		this.volListenerRight = new StateListener({condition:3.5, checkAgainst:this.data.vRight, tolerance:.02);
 	},
 	block12Conditions: function(){
 		if(this.volListenerLeft.isSatisfied() && this.volListenerRight.isSatisfied()){
@@ -426,8 +426,8 @@ _.extend(Work.prototype,
 		this.data.tRight = [];
 		this.data.vLeft = [];
 		this.data.vRight = [];		
-		this.dragWeightsLeft = this.makeDragWeights([{name:'lrg', count:1, mass:35}], 'left', {massInit:5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
-		this.dragWeightsRight = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'right', {massInit:5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
+		this.dragWeightsLeft = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:35}], wallInfo:'left', massInit:5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
+		this.dragWeightsRight = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:'right', massInit:5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
 		this.stopsLeft = new Stops({volume:3.5}, 'left');
 		this.stopsRight = new Stops({volume:3.5}, 'right');		
 		removeListener(curLevel, 'data', 'run');
@@ -449,8 +449,8 @@ _.extend(Work.prototype,
 		this.graphs.tVSv.addSet('tLeft', 'Temp\nLeft', Col(255,0,0), Col(255,200,200),
 								{data:this.data, x:'vLeft', y:'tLeft'});	
 		
-		this.volListenerLeft = new StateListener(3.5, this.data.vLeft, .02, {});
-		this.volListenerRight = new StateListener(3.5, this.data.vRight, .02, {});
+		this.volListenerLeft = new StateListener({condition:3.5, checkAgainst:this.data.vLeft, tolerance:.02);
+		this.volListenerRight = new StateListener(condition:3.5, checkAgainst:this.data.vRight, tolerance:.02);
 	},
 	block15Conditions: function(){
 		if(this.volListenerLeft.isSatisfied() && this.volListenerRight.isSatisfied()){

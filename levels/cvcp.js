@@ -140,15 +140,15 @@ _.extend(cvcp.prototype,
 		
 		spcs['spc1'].populate(P(300,200), V(200, 200), 350, 185, 'right', 'right');
 		spcs['spc3'].populate(P(300,200), V(200, 200), 250, 185, 'right', 'right');	
-		this.piston = new Piston('piston', 'right', {min:2,init:2, max:2}).trackPressure();
-		this.heaterLeft = new Heater('heaterLeft', P(97,350), V(100,40), 0, {init:0, max:35}, 'sliderHeaterLeft', c);
-		this.heaterRight = new Heater('heaterRight', P(352, 350), V(100,40), 0, {init:0, max:35}, 'sliderHeaterRight', c);
+		this.piston = new Piston({wallInfo:'right', min:2, init:2, max:2}).trackPressureStart();
+		this.heaterLeft = new Heater({handle:'heaterLeft', wallInfo:'left', slider:'sliderHeaterLeft'});
+		this.heaterRight = new Heater({handle:'heaterRight', wallInfo:'right', slider:'sliderHeaterRight'});
 		
 		this.trackTempStart('tleft', 'Temp:', this.data.tLeft, 0);
-		this.trackStart('eLeft', 'Energy in:', function(){return self.heaterLeft.eAdded}, 1, 'kJ');
+		//this.trackStart('eLeft', 'Energy in:', function(){return self.heaterLeft.eAdded}, 1, 'kJ');
 		
 		this.trackTempStart('tRight', 'Temp:', this.data.tRight, 0);
-		this.trackStart('eRight', 'Energy in:', function(){return self.heaterRight.eAdded}, 1, 'kJ');
+		//this.trackStart('eRight', 'Energy in:', function(){return self.heaterRight.eAdded}, 1, 'kJ');
 	
 	},
 	block2Conditions: function(){

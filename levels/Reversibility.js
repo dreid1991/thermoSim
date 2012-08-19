@@ -208,8 +208,8 @@ _.extend(Reversibility.prototype,
 		this.unCompSetup();
 		walls[0].trackWorkStart(this.readout);
 		this.trackVolumeStart(0);
-		this.dragWeights = this.makeDragWeights([{name:'lrg', count:1, mass:90}], wallHandle).trackPressureStart();
-		this.volListener10 = new StateListener(10, this.data.v, .05, {v:this.data.v}, {func:function(){store('workInLrg',round(walls[0].work,1))},obj:''});
+		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:90}]}).trackPressureStart()//this.makeDragWeights([{name:'lrg', count:1, mass:90}], wallHandle).trackPressureStart();
+		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInLrg',round(walls[0].work,1))},obj:''}});
 		this.readout.show();
 	},	
 	block0Conditions: function(){
@@ -233,9 +233,9 @@ _.extend(Reversibility.prototype,
 		var numBlocks = getStore('numBlocks');
 		this.unCompSetup();
 		walls[0].trackWorkStart(this.readout);
-		this.dragWeights = this.makeDragWeights({mass:90, count:numBlocks}, 'container').trackPressureStart();
+		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:numBlocks}}).trackPressureStart();
 		this.trackVolumeStart(0);
-		this.volListener10 = new StateListener(10, this.data.v, .02, {v:this.data.v}, {func:function(){store('workInMed', round(walls[0].work,1))},obj:''});
+		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.02, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInMed', round(walls[0].work,1))},obj:''}});
 	},
 	block2Conditions: function(){
 		if(this.volListener10.isSatisfied()){
@@ -258,8 +258,8 @@ _.extend(Reversibility.prototype,
 		this.unCompSetup();
 		walls[0].trackWorkStart(this.readout);
 		this.trackVolumeStart(0);		
-		this.dragWeights = this.makeDragWeights({mass:90, count:16}, 'container').trackPressureStart();
-		this.volListener10 = new StateListener(10, this.data.v, .02, {v:this.data.v}, {func:function(){store('workInSml', round(walls[0].work,1))},obj:''});
+		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:16}}).trackPressureStart();
+		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.02, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInSml', round(walls[0].work,1))},obj:''}});
 	},
 	block5Conditions: function(){
 		if(this.volListener10.isSatisfied()){
@@ -283,9 +283,16 @@ _.extend(Reversibility.prototype,
 		this.makeGraphsRev();
 		this.compSetup();
 		this.trackVolumeStart(0);
-		this.volListener16 = new StateListener(16, this.data.v, .05, {v:this.data.v}, {func:function(){store('workOutLrg', Math.abs(round(walls[0].work,1)))},obj:''});
+		this.volListener16 = new StateListener({condition:16, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workOutLrg', Math.abs(round(walls[0].work,1)))},obj:''}});
 		walls[0].trackWorkStart(this.readout);
-		this.dragWeights = this.makeDragWeights({mass:90, count:1}, 'container').dropAllIntoPistons('instant').trackPressureStart();
+		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:1}}).dropAllIntoPistons('instant').trackPressureStart();
+	},
+	block8Conditions: function(){
+		if(this.volListener16.isSatisfied){
+			return{result:true};
+		}else{
+			return{result:false, alert:"Expand the system!"}
+		}
 	},
 	block8CleanUp: function(){
 		walls[0].trackWorkStop();
@@ -297,9 +304,9 @@ _.extend(Reversibility.prototype,
 	},
 	block10Start: function(){
 		this.compSetup();
-		this.dragWeights = this.makeDragWeights({mass:90, count:12}, 'container').trackPressureStart().dropAllIntoPistons('instant');
+		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:12}}).trackPressureStart().dropAllIntoPistons('instant');
 		this.makeGraphsRev();
-		this.volListener16 = new StateListener(16, this.data.v, .05, {v:this.data.v}, {func:function(){store('workOutSml', Math.abs(round(walls[0].work,1)))},obj:''});
+		this.volListener16 = new StateListener({condition:16, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workOutSml', Math.abs(round(walls[0].work,1)))},obj:''}});
 		walls[0].trackWorkStart(this.readout);
 		this.trackVolumeStart(0);
 	},
@@ -313,19 +320,22 @@ _.extend(Reversibility.prototype,
 		this.unCompSetup();
 		this.makeGraphsRev();
 		walls[0].trackWorkStart(this.readout);
-		this.volListener10 = new StateListener(10, this.data.v, .02, {v:this.data.v}, {func:
-			function(){
-				var compWork = walls[0].work;
-				store('cycleLrgCompWork', round(compWork,1));
-				this.volListener16 = new StateListener(16, this.data.v, .02, {v:this.data.v}, {func:
+		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.02, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:
 				function(){
-					store('cycleLrgUnCompWork', round(compWork - walls[0].work,1));
-				},obj:this}
-				);
-			},
-			obj:this}
+					var compWork = walls[0].work;
+					store('cycleLrgCompWork', round(compWork,1));
+					this.volListener16 = new StateListener({condition:16, checkAgainst:this.data.v, tolerance:.02, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:
+					function(){
+						store('cycleLrgUnCompWork', round(compWork - walls[0].work,1));
+					},obj:this}
+					}
+					);
+				},
+				obj:this}
+			}
+			
 		);
-		this.dragWeights = this.makeDragWeights({mass:90, count:1}, 'container').trackPressureStart();		
+		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:1}}).trackPressureStart();		
 		this.trackVolumeStart(0);
 	},
 	block13Conditions: function(){
@@ -351,16 +361,17 @@ _.extend(Reversibility.prototype,
 			function(){
 				var compWork = walls[0].work;
 				store('cycleSmlCompWork', round(compWork, 1));
-				this.volListener16 = new StateListener(16, this.data.v, .02, {v:this.data.v}, {func:
+				this.volListener16 = new StateListener({condition:16, checkAgainst:this.data.v, tolerance:.02, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:
 				function(){
 					store('cycleSmlUnCompWork', round(compWork - walls[0].work, 1));
 				},obj:this}
+				}
 				);
 			},
 			obj:this}
 		);
 		this.trackVolumeStart(0);
-		this.dragWeights = this.makeDragWeights({mass:90, count:12}, 'container').trackPressureStart();		
+		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:12}}).trackPressureStart();		
 	},
 	block14Conditions: function(){
 		if(this.volListener10.isSatisfied() && this.volListener16.isSatisfied()){

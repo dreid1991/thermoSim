@@ -490,10 +490,11 @@ LevelTools = {
 		}
 	},
 	makeDragWeights: function(weights, wallHandle, attrs){
+		/*
 		var self = this;
 		attrs = defaultTo({}, attrs);
 		var compMode = defaultTo('cPAdiabaticDamped', attrs.compMode);
-		var readout = defaultTo(this.readout, attrs.readout);
+		
 		var blockCol = defaultTo(Col(218,187,41), attrs.blockCol);
 		var binCol = defaultTo(Col(150,150,150), attrs.binCol);
 		massInit = defaultTo(25, defaultTo(this.massInit, attrs.massInit));
@@ -518,6 +519,7 @@ LevelTools = {
 								compMode,
 								this
 								);
+		*/
 
 	},
 	makeListeners: function(){
