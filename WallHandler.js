@@ -759,7 +759,7 @@ WallMethods = {
 					var dV = LTOM3LOCAL*VCONSTLOCAL*width*(heightLast-trackPt.y)
 					var p = this.pExt()*ATMTOPALOCAL;
 					this.work -= JTOKJLOCAL*p*dV;
-					this.workReadout.hardUpdate(this.work, 'work');
+					this.workReadout.hardUpdate('work', this.work);
 					heightLast = trackPt.y;
 				},
 			this);

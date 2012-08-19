@@ -382,7 +382,7 @@ LevelTools = {
 		this.readout.addEntry('vol', 'Volume:', 'L', dataHandler.volume(), undefined, decPlaces);
 		addListener(curLevel, 'update', 'trackVolume',
 			function(){
-				this.readout.hardUpdate(dataHandler.volume(), 'vol');
+				this.readout.hardUpdate('vol',dataHandler.volume());
 			},
 		this);
 	},
@@ -406,17 +406,15 @@ LevelTools = {
 	trackIntPressureStop: function(handle){
 		removeListener(curLevel, 'data', 'trackIntPressure'+handle);
 	},
-	trackTempStart: function(decPlaces, handle, label, dataSet){
-		if(decPlaces===undefined){
-			decPlaces = 0;
-		}
-		dataSet = defaultTo('t', dataSet);
+	trackTempStart: function(handle, label, dataSet, decPlaces){
+		decPlaces = defaultTo(0, decPlaces);
+		dataSet = defaultTo(this.data.t, dataSet);
 		label = defaultTo('Temp:', label);
 		handle = defaultTo('temp', handle);
-		this.readout.addEntry(handle, label, 'K', this.data[dataSet][this.data[dataSet].length-1], undefined, decPlaces);
+		this.readout.addEntry(handle, label, 'K', dataSet[dataSet.length-1], undefined, decPlaces);
 		addListener(curLevel, 'data', 'trackTemp' + handle,
 			function(){
-				this.readout.tick(this.data[dataSet][this.data[dataSet].length-1], 'temp');
+				this.readout.tick(handle, dataSet[dataSet.length-1]);
 			},
 		this);	
 	},
@@ -424,6 +422,18 @@ LevelTools = {
 		handle = defaultTo('temp', handle)
 		this.readout.removeEntry(handle);
 		removeListener(curLevel, 'data', 'trackTemp' + handle);
+	},
+	trackStart: function(handle, label, units, dataSet, decPlaces){
+		decPlaces = defaultTo(1, decPlaces);
+		this.readout.addEntry(handle, label, units, dataSet[dataSet.length-1], undefined, decPlaces);
+		addListener(curLevel, 'data', 'track'+handle,
+			function(){
+				//this.readout.tick(dataSet
+			},
+		this);
+	},
+	trackStop: function(handle){
+		
 	},
 	trackExtentRxnStart: function(handle, rxnInfo){
 		var spcsLocal = spcs;
@@ -518,7 +528,7 @@ LevelTools = {
 		for (var spcName in spcs){
 			spcs[spcName].depopulate();
 		}		
-		
+		this.removeAllGraphs();
 		for (resetListenerName in this.resetListeners.listeners){
 			var func = this.resetListeners.listeners[resetListenerName].func;
 			var obj = this.resetListeners.listeners[resetListenerName].obj;

@@ -31,12 +31,12 @@ Readout.prototype = {
 		}
 		this.drawCanvas.restore();
 	},
-	hardUpdate: function(setPt, name){
+	hardUpdate: function(name, setPt){
 		var entry = byAttr(this.entries, name, 'name');
 		var decPlaces = entry.decPlaces;
 		entry.val = round(setPt, decPlaces);
 	},
-	tick: function(setPt, name){
+	tick: function(name, setPt){
 		var entry = byAttr(this.entries, name, 'name');
 		if(isNaN(entry.val)){
 			entry.val = setPt;

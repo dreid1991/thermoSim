@@ -16,7 +16,7 @@ _.extend(cvcp.prototype,
 		this.prompts=[
 			{block:0,
 				cutScene: true,
-				text:'For an ideal monatomic gas, which of these is correct?  cv means heat capacity at constant volume, cp means heat capacity at constant pressure.',
+				text:'For an ideal monatomic gas, which of these is correct?  C<sub>V</sub> means heat capacity at constant volume, C<sub>P</sub> means heat capacity at constant pressure.',
 				quiz:{	
 					type:'multChoice', 
 					options:

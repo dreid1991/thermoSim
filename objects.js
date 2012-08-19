@@ -543,10 +543,10 @@ DragWeights.prototype = {
 		this.wall.setMass(this.massChunkName, this.pistonMass);
 		this.pressure = this.getPressure();
 		if(this.trackMass){
-			this.readout.tick(this.pistonMass, 'mass' + this.wallInfo);
+			this.readout.tick('mass' + this.wallInfo, this.pistonMass);
 		}
 		if(this.trackPressure){
-			this.readout.tick(this.pressure, 'pressure' + this.wallInfo);
+			this.readout.tick('pressure' + this.wallInfo, this.pressure);
 		}
 	},	
 	takeOffPiston: function(weight){
@@ -559,10 +559,10 @@ DragWeights.prototype = {
 		this.wall.setMass(this.massChunkName, this.pistonMass);
 		this.pressure = this.getPressure();
 		if(this.trackMass){
-			this.readout.tick(this.pistonMass, 'mass');
+			this.readout.tick('mass', this.pistonMass);
 		}
 		if(this.trackPressure){
-			this.readout.tick(this.pressure, 'pressure');
+			this.readout.tick('pressure', this.pressure);
 		}
 	},
 	mousedown: function(){
@@ -607,7 +607,7 @@ DragWeights.prototype = {
 		if(energyChanged){
 			this.eAdded+=this.eBar.eChange;
 			if(this.trackEnergy){
-				this.readout.tick(this.eAdded, 'eAdd');
+				this.readout.tick('eAdd', this.eAdded);
 				this.animText();
 				this.shrinkEBar();
 			}
@@ -1174,7 +1174,7 @@ Piston.prototype = {
 		this.readout.removeEntry(handle);
 	},
 	setDataVal: function(value, handle){
-		this.readout.hardUpdate(value, handle);
+		this.readout.hardUpdate(handle, value);
 	},
 	remove: function(){
 		this.wall.moveStop();

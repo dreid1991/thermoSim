@@ -231,7 +231,6 @@ _.extend(Reversibility.prototype,
 	block2Start: function(){
 		this.makeGraphsRev();
 		var numBlocks = getStore('numBlocks');
-		eraseStore('numBlocks');
 		this.unCompSetup();
 		walls[0].trackWorkStart(this.readout);
 		this.dragWeights = this.makeDragWeights({mass:90, count:numBlocks}, 'container', this.massInit).trackPressureStart();
