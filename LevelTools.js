@@ -489,9 +489,14 @@ LevelTools = {
 			func.apply(self);
 		}
 	},
-	makeDragWeights: function(weights, wallHandle, massInit){
+	makeDragWeights: function(weights, wallHandle, attrs){
 		var self = this;
-		massInit = defaultTo(25, massInit);
+		attrs = defaultTo({}, attrs);
+		var compMode = defaultTo('cPAdiabaticDamped', attrs.compMode);
+		var readout = defaultTo(this.readout, attrs.readout);
+		var blockCol = defaultTo(Col(218,187,41), attrs.blockCol);
+		var binCol = defaultTo(Col(150,150,150), attrs.binCol);
+		massInit = defaultTo(25, defaultTo(this.massInit, attrs.massInit));
 		wallHandle = defaultTo('0', wallHandle);
 		min = walls[wallHandle][2].y;
 		var wall = walls[wallHandle];
@@ -505,12 +510,12 @@ LevelTools = {
 								function(){return wall[0].y},
 								myCanvas.height-15,
 								20,
-								Col(218, 187, 41),
-								Col(150, 150, 150),
+								blockCol,
+								binCol,
 								massInit,
-								this.readout,
+								readout,
 								wallHandle,
-								'cPAdiabaticDamped',
+								compMode,
 								this
 								);
 

@@ -38,7 +38,7 @@ _.extend(Work.prototype,
 					type:'multChoice',
 					options:
 						[{text:"||EQ6||", isCorrect: true},
-						{text:"||EQ7||", isCorrect: false, message:"Why C<sub>P</sub>?"},
+						{text:"||EQ7||", isCorrect: false, message:"Why Cp?"},
 						{text:"||EQ8||", isCorrect: false, message:"But it's adiabatic!"},
 						{text:"It cannot be simplified", isCorrect: false, message:"Yes it can.  What is Q equal to?"}
 					]
@@ -252,7 +252,7 @@ _.extend(Work.prototype,
 								{data:this.data, x:'v', y:'t'});		
 		
 		
-		this.piston = new Piston('tootoo', 'container', {init:2, min:2, max:15}, 'sliderPiston').show().trackWork().trackPressure();
+		this.piston = new Piston('tootoo', 'container', {init:2, min:2, max:15}, 'sliderPiston').trackWorkStart().trackPressureStart();
 		this.borderStd();
 		this.volListener8 = new StateListener(10, this.data.v, .1, {})
 		//this.heater = new Heater('spaceHeater', P(150,360), V(250,50), 0, 20, c);//P(40,425), V(470,10)
@@ -324,7 +324,7 @@ _.extend(Work.prototype,
 		this.borderStd();
 		spcs['spc1'].populate(P(45,35), V(445, 325), 850, 200);
 		spcs['spc3'].populate(P(45,35), V(445, 325), 650, 200);
-		this.dragWeights = this.makeDragWeights([{name:'lrg', count:1, mass:75}], wallHandle).trackMassStop().trackPressureStart();
+		this.dragWeights = this.makeDragWeights([{name:'lrg', count:1, mass:75}], wallHandle, {compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
 		this.trackTempStart();
 		this.trackVolumeStart(0);
 		this.volListener15 = new StateListener(15, this.data.v, .05, {p:this.data.p, t:this.data.t});
@@ -366,8 +366,8 @@ _.extend(Work.prototype,
 		this.data.tRight = [];
 		this.data.vLeft = [];
 		this.data.vRight = [];		
-		this.dragWeightsLeft = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'left', 5).trackMassStop().trackPressureStart();
-		this.dragWeightsRight = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'right', 5).trackMassStop().trackPressureStart();
+		this.dragWeightsLeft = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'left', {massInit: 5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
+		this.dragWeightsRight = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'right', {massInit: 5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
 		this.stopsLeft = new Stops({volume:3.5}, 'left');
 		this.stopsRight = new Stops({volume:3.5}, 'right');		
 		removeListener(curLevel, 'data', 'run');
@@ -426,8 +426,8 @@ _.extend(Work.prototype,
 		this.data.tRight = [];
 		this.data.vLeft = [];
 		this.data.vRight = [];		
-		this.dragWeightsLeft = this.makeDragWeights([{name:'lrg', count:1, mass:35}], 'left', 5).trackMassStop().trackPressureStart();
-		this.dragWeightsRight = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'right', 5).trackMassStop().trackPressureStart();
+		this.dragWeightsLeft = this.makeDragWeights([{name:'lrg', count:1, mass:35}], 'left', {massInit:5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
+		this.dragWeightsRight = this.makeDragWeights([{name:'lrg', count:1, mass:75}], 'right', {massInit:5, compMode:'cPAdiabatic'}).trackMassStop().trackPressureStart();
 		this.stopsLeft = new Stops({volume:3.5}, 'left');
 		this.stopsRight = new Stops({volume:3.5}, 'right');		
 		removeListener(curLevel, 'data', 'run');

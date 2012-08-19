@@ -960,8 +960,8 @@ function CompArrow(nameInfo, compAttrs){
 	var pos = walls[wallIdx][1].copy()
 	var rotation = 0;
 	var cols = {};
-	cols.outer = Col(247, 240,9);
-	cols.onClick = Col(247, 240,9);
+	cols.outer = Col(44, 118, 172);
+	cols.onClick = Col(44, 118, 172);
 	cols.inner = curLevel.bgCol.copy();
 	var dims = V(25, 15);
 	var handle = 'volDragger' + defaultTo('', nameInfo.handle);
@@ -1001,6 +1001,7 @@ function Piston(handle, wallInfo, vals, slider){
 		this.setSliderVal();
 	}
 	this.slant = .07;
+	this.trackingP = false;
 	this.drawCanvas = c;
 	this.wallIdx = walls.idxByInfo(wallInfo);
 	this.wall = walls[this.wallIdx];
@@ -1126,30 +1127,12 @@ Piston.prototype = {
 	setReadoutY: function(){
 		this.readout.position({y:this.pistonBottom.pos.y-2+this.y()});
 	},
-	trackWork: function(){
-		var self = this;
-		this.workTracker = new WorkTracker(
-						'pistonWorkTracker',
-						function(){return self.y()},
-						this.width,
-						function(){return self.mass},
-						{readout:this.readout, idx:undefined}
-						);
-		this.workTracker.start();
-		return this;
-	},
 	trackWorkStart: function(){
-		this.workTracker.start();
+		this.wall.trackWorkStart(this.readout, 1)
 		return this;
 	},
 	trackWorkStop: function(){
-		this.workTracker.stop();
-		return this;
-	},
-	trackPressure: function(){
-		this.addData('pressure', 'P:', this.p, 'atm');
-		this.trackingP = new Boolean();
-		this.trackingP = true;
+		this.wall.trackWorkStop();
 		return this;
 	},
 	trackPressureStart: function(){

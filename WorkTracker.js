@@ -25,7 +25,7 @@ WorkTracker.prototype = {
 		var dV = LtoM3*vConst*(this.heightLast-heightCur)*this.width;
 		this.work -= JtoKJ*p*dV;
 		this.heightLast = heightCur;
-		this.readout.hardUpdate(this.work, 'work');
+		this.readout.hardUpdate('work', this.work);
 	},
 	updateReadout: function(){
 		//this.readout.tick(this.work, 'work');
