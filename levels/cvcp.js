@@ -15,6 +15,7 @@ _.extend(cvcp.prototype,
 	declarePrompts: function(){
 		this.prompts=[
 			{block:0,
+				/*
 				cutScene: true,
 				text:'For an ideal monatomic gas, which of these is correct?  C<sub>V</sub> means heat capacity at constant volume, C<sub>P</sub> means heat capacity at constant pressure.',
 				quiz:{	
@@ -27,6 +28,7 @@ _.extend(cvcp.prototype,
 						{text:"||EQ2|| and ||EQ5||", isCorrect: false}
 					]
 				},
+				*/
 			},
 			{block:1,
 				cutScene: true,
@@ -126,6 +128,13 @@ _.extend(cvcp.prototype,
 			func.apply(obj);
 		}		
 		nextPrompt();
+	},
+	//testing fill
+	block0Start: function(){
+		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
+		spcs['spc1'].populate(P(300,100), V(200, 200), 350, 185);
+		spcs['spc3'].populate(P(300,100), V(200, 200), 250, 185);		
+		this.pool = new Pool();
 	},
 	block2Start: function(){
 		var self = this;
