@@ -1,3 +1,19 @@
+getBinPts = {
+	getBinPts: function(pos, slant, dims, thickness){
+		var pts = []
+		var thickness = defaultTo(5, thickness);
+		pts.push(P(pos.x - slant*dims.dx/2, pos.y - dims.dy));
+		pts.push(P(pos.x - dims.dx/2, pos.y));
+		pts.push(P(pos.x + dims.dx/2, pos.y));
+		pts.push(P(pos.x + slant*dims.dx/2, pos.y - dims.dy));
+		pts.push(P(pos.x + slant*dims.dx/2+thickness, pos.y - dims.dy));
+		pts.push(P(pos.x + dims.dx/2 + thickness, pos.y +thickness));
+		pts.push(P(pos.x - dims.dx/2 - thickness, pos.y +thickness));
+		pts.push(P(pos.x - slant*dims.dx/2 - thickness, pos.y - dims.dy));
+		pts.push(P(pos.x - slant*dims.dx/2, pos.y - dims.dy));
+		return pts;
+	},
+}
 //////////////////////////////////////////////////////////////////////////
 //DRAG WEIGHTS
 //////////////////////////////////////////////////////////////////////////
@@ -33,7 +49,7 @@ function DragWeights(attrs){
 	this.pistonBinWidth = 150;
 	this.pistonBinSpacing = 15;
 	this.blockSpacing = 2;
-	this.weightScalar = 40;
+	this.weightScalar = 40;//specific volume
 	this.moveSpeed = 20;
 	this.pistonMass = this.massInit;
 	this.massChunkName = 'dragWeights';
@@ -43,7 +59,7 @@ function DragWeights(attrs){
 	this.eBarFont = '12pt Calibri';
 	this.eBarFontCol = Col(255,255,255);
 	this.addStdReadoutEntries();
-	
+	this.binThickness = 5;
 	var self = this;
 
 
@@ -54,7 +70,7 @@ function DragWeights(attrs){
 	return this.init();
 }
 
-DragWeights.prototype = {
+_.extend(DragWeights.prototype, getBinPts, {
 	init: function(){
 		this.weightGroups = this.makeWeights(this.tempWeightDefs);
 		this.bins = {};
@@ -188,7 +204,7 @@ DragWeights.prototype = {
 	},
 	makeStoreBin: function(posX, weightGroup){
 		var bin = {}
-		bin.pts = this.getBinPts(posX);
+		bin.pts = this.getBinPts(P(posX, this.binY), this.binSlant, V(this.storeBinWidth, this.binHeight), this.binThickness);
 		bin.x = posX - this.storeBinWidth/2;
 		bin.y = this.binY;
 		bin.slots = this.getBinSlots(P(bin.x, bin.y), weightGroup);
@@ -216,20 +232,7 @@ DragWeights.prototype = {
 		bin.visible = false;
 		return bin
 	},
-	getBinPts: function(posX){
-		var pts = []
-		var thickness = 5;
-		pts.push(P(posX - this.binSlant*this.storeBinWidth/2, this.binY - this.binHeight));
-		pts.push(P(posX - this.storeBinWidth/2, this.binY));
-		pts.push(P(posX + this.storeBinWidth/2, this.binY));
-		pts.push(P(posX + this.binSlant*this.storeBinWidth/2, this.binY - this.binHeight));
-		pts.push(P(posX + this.binSlant*this.storeBinWidth/2+thickness, this.binY - this.binHeight));
-		pts.push(P(posX + this.storeBinWidth/2 + thickness, this.binY +thickness));
-		pts.push(P(posX - this.storeBinWidth/2 - thickness, this.binY +thickness));
-		pts.push(P(posX - this.binSlant*this.storeBinWidth/2 - thickness, this.binY - this.binHeight));
-		pts.push(P(posX - this.binSlant*this.storeBinWidth/2, this.binY - this.binHeight));
-		return pts;
-	},
+
 	getBinSlots: function(pt, weightGroup){
 		var numSlots = weightGroup.weights.length;
 		var dims = weightGroup.dims;
@@ -748,7 +751,55 @@ DragWeights.prototype = {
 		this.eAdded=0;
 		curLevel.wallV=0;
 	}
+})
+//////////////////////////////////////////////////////////////////////////
+//HOSE
+//////////////////////////////////////////////////////////////////////////
+function Hose(attrs){
+	this.rate = defaultTo(.15, attrs.rate);
+	this.wall = walls[defaultTo(0, attrs.wallInfo)];
+	this.liquidCol = defaultTo(Col(83, 87, 239), attrs.liquidCol);
+	this.mass = defaultTo(10, attrs.massInit);
+	this.binCol = defaultTo(Col(150, 150, 150), attrs.binCol);
+	this.binSlant = defualtTo(1.3, attrs.binSlant);
+	this.binWidth = 110;
+	this.binWidthUpper = this.binWidth*this.binSlant;
+	this.binHeight = 60;
+	this.binThickness = defaultTo(5, attrs.binThickness);
+	this.spcVol = 40; //specific volume
+	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
+	this.binPts = this.getBinPts(P(-this.binWidth/2,0), this.binSlant, V(this.binWidth, this.binHeight), this.binThickness);
+	this.binX = (this.wall[1].x+this.wall[0].x)/2;
+	this.pistonY = function(){return this.wall[0].y};
+	
 }
+_.extend(Hose.prototype, getBinPts, {
+
+	draw: function(){
+		this.drawCanvas.save();
+		this.translate(this.binX, this.pistonY());
+		draw.fillPts(this.binPts, this.binCol, this.drawCanvas);
+		draw.fillPts(this.liquidPts, this.liquidCol, this.drawCanvas);
+		this.drawCanvas.restore();		
+	},
+	getLiquidPts: function(){
+		var dWidth = this.binWidthUpper - this.binWidth;
+		var height = this.mass*this.spcVol/(this.binWidth + (dWidth)/this.binHeight);
+		var pts = new Array(4);
+		var liquidDWidth = dWidch*height/this.binHeight;
+		pts[0] = P(-this.binWidth/2, -this.binThickness);
+		pts[1] = P(this.binWidth/2, -this.binThickness);
+		pts[2] = P(this.binWidth/2 + liquidDWidth, -height-this.binThickness);
+		pts[3] = P(-this.binWidth/2 - liquidDWidth, -height-this.binThickness);
+		return pts;
+	},
+
+
+})
+
+
+
+
 //////////////////////////////////////////////////////////////////////////
 //DRAG ARROW
 //////////////////////////////////////////////////////////////////////////
