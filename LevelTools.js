@@ -41,42 +41,6 @@ LevelTools = {
 		}
 	},
 
-	changeWallSetPt: function(wallInfo, dest, compType, speed){
-		var wallIdx = walls.idxByInfo(wallInfo);
-		var wall = walls[wallIdx]
-		var wallMoveMethod;
-		if(compType.indexOf('isothermal')!=-1){
-			var wallMoveMethod = 'cVIsothermal';
-		} else if (compType.indexOf('adiabatic')!=-1){
-			var wallMoveMethod = 'cVAdiabatic';
-		}
-		removeListener(curLevel, 'update', 'moveWall');
-		var setY = function(curY){
-			wall[0].y = curY;
-			wall[1].y = curY;
-			wall[wall.length-1].y = curY;
-		}
-		var y = wall[0].y
-		var dist = dest-y;
-		if(dist!=0){
-			var sign = getSign(dist);
-			var speed = defaultTo(this.wallSpeed, speed);
-			wall.v = speed*sign;
-			walls.setSubWallHandler(wallIdx, 0, wallMoveMethod + compAdj);
-			addListener(curLevel, 'update', 'moveWall'+wallInfo,
-				function(){
-					var y = wall[0].y
-					setY(boundedStep(y, dest, wall.v))
-					walls.setupWall(wallIdx);
-					if(round(y,2)==round(dest,2)){
-						removeListener(curLevel, 'update', 'moveWall' + wallInfo);
-						walls.setSubWallHandler(wallIdx, 0, 'staticAdiabatic');
-						wall.v = 0;
-					}
-				},
-			this);
-		}
-	},
 	move: function(){
 		var spcLocal = this.spcs;
 		for (var spcName in spcLocal){

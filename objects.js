@@ -956,29 +956,32 @@ DragArrow.prototype = {
 //////////////////////////////////////////////////////////////////////////
 //COMP ARROW
 //////////////////////////////////////////////////////////////////////////
-function CompArrow(nameInfo, compAttrs){
-	var wallIdx = walls.idxByInfo(nameInfo.wallInfo);
-	var compMode = compAttrs.mode;
-	var speed = compAttrs.speed;
-	var makeStops = defaultTo(true, compAttrs.stops);
-	var bounds = defaultTo({y:{min:30, max:350}}, compAttrs.bounds);
-	var pos = walls[wallIdx][1].copy()
+function CompArrow(attrs){
+	//YOU WERE HERE
+	var wallInfo = defaultTo(0, attrs.wallInfo);
+	var speed = defaultTo(1.5, attrs.speed);
+	var compMode = defaultTo('adiabatic', attrs.compMode);
+	compMode += compAdj;
+	var makeStops = defaultTo(true, attrs.stops);
+	var bounds = defaultTo({y:{min:30, max:350}}, attrs.bounds);
+	var wall = walls[wallInfo];
+	var pos = wall[1].copy()
 	var rotation = 0;
 	var cols = {};
 	cols.outer = Col(44, 118, 172);
 	cols.onClick = Col(44, 118, 172);
 	cols.inner = curLevel.bgCol.copy();
 	var dims = V(25, 15);
-	var handle = 'volDragger' + defaultTo('', nameInfo.handle);
+	var handle = 'volDragger' + defaultTo('', attrs.handle);
 	var drawCanvas = c;
 	var canvasElement = canvas;
 	var listeners = {};
 	if(makeStops){
-		this.stops = new Stops({stopPt:{height:bounds.y.max}, wallInfo:wallIdx});
+		this.stops = new Stops({stopPt:{height:bounds.y.max}, wallInfo:wallInfo});
 	}
  
 	listeners.onDown = function(){};
-	listeners.onMove = function(){curLevel.changeWallSetPt(wallIdx, this.pos.y, compMode, speed)};
+	listeners.onMove = function(){wall.changeSetPt(this.pos.y, compMode, speed)};
 	listeners.onUp = function(){};
 	this.dragArrow = new DragArrow(pos, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds).show();
 	return this;

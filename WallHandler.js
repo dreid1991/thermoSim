@@ -596,6 +596,40 @@ WallMethods = {
 	//WALL FUNCS
 	////////////////////////////////////////////////////////////
 	wall: {
+		changeSetPt: function(dest, compType, speed){
+			if(compType.indexOf('isothermal')!=-1){
+				var wallMoveMethod = 'cVIsothermal';
+			} else if (compType.indexOf('adiabatic')!=-1){
+				var wallMoveMethod = 'cVAdiabatic';
+			}
+			removeListener(curLevel, 'update', 'moveWall');
+			var setY = function(curY){
+				this[0].y = curY;
+				this[1].y = curY;
+				this[this.length-1].y = curY;
+			}
+			var y = this[0].y
+			var dist = dest-y;
+			if(dist!=0){
+				var sign = getSign(dist);
+				this.v = speed*sign;
+				this.parent.setSubWallHandler(this.handle, 0, wallMoveMethod + compAdj);
+				addListener(curLevel, 'update', 'moveWall'+this.handle,
+					function(){
+						var y = this[0].y
+						setY.apply(this, [boundedStep(y, dest, this.v)])
+						this.parent.setupWall(this.handle);
+						if(round(y,2)==round(dest,2)){
+							removeListener(curLevel, 'update', 'moveWall' + this.handle);
+							this.parent.setSubWallHandler(this.handle, 0, 'staticAdiabatic');
+							this.v = 0;
+						}
+					},
+				this);
+			}		
+		
+		
+		},
 		pExt: function(){
 			var SA = this[1].x - this[0].x;
 			return this.pConst*this.mass()*this.g/SA;

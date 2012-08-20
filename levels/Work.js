@@ -285,7 +285,7 @@ _.extend(Work.prototype,
 		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
 		walls.setHitMode('container', 'Arrow');
 		this.borderStd();
-		this.compArrow = new CompArrow({wallInfo:'container'}, {mode:'adiabatic', speed:1.5});
+		this.compArrow = new CompArrow({mode:'adiabatic', speed:1.5});
 		spcs['spc4'].populate(P(45,235), V(460, 100), 1, 600);
 		this.tempChanged = false;
 		var initTemp = dataHandler.temp();
