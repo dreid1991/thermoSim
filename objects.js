@@ -570,7 +570,7 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 		}
 		this.mass = this.getPistonMass();
 		this.wall.setMass(this.massChunkName, this.mass);
-		this.pressure = this.getPressure();
+		this.pressure = this.wall.pExt();
 		if(this.trackMass){
 			this.readout.tick('mass' + this.wallInfo, this.mass);
 		}
@@ -761,6 +761,7 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 //Pool
 //////////////////////////////////////////////////////////////////////////
 function Pool(attrs){
+	var self = this;
 	attrs = defaultTo({}, attrs);
 	this.bin = {};
 	this.tube = {};
@@ -795,17 +796,17 @@ function Pool(attrs){
 	this.spcVol = 70; //specific volume
 	this.liquid.col = defaultTo(Col(83, 87, 239), attrs.liquidCol);
 	this.liquid.pts = this.getLiquidPts();
+	this.liquid.level = function(){return -self.bin.thickness - self.liquid.height};
+	
 	this.bin.pts = this.getBinPts(P(0,0-this.bin.thickness), this.bin.slant, V(this.bin.width, this.bin.height), this.bin.thickness);
 	this.binX = (this.wall[1].x+this.wall[0].x)/2;
 	this.pistonY = function(){return this.wall[0].y};
 	
 
-
 	this.tube.speed = defaultTo(8, attrs.tubeSpeed);
 	this.tube.walls.col = defaultTo(Col(175,175,175), attrs.tubeWallCol);
 	this.tube.ID = 10; //inner diameter
 	this.tube.OD = 20; //outer diameter
-	var self = this;
 	this.tube.liquid.y1 = function(){return -self.pistonY();};
 	this.tube.liquid.y2 = undefined;
 	this.tube.walls.y = undefined;
@@ -852,7 +853,8 @@ _.extend(Pool.prototype, compressorFuncs, {
 	},
 	getLiquidPts: function(){
 		var dWidth = this.bin.widthUpper - this.bin.width;
-		var height = this.mass*this.spcVol/(this.bin.width + (dWidth)/this.bin.height);
+		this.liquid.height = this.mass*this.spcVol/(this.bin.width + (dWidth)/this.bin.height);
+		var height = this.liquid.height;
 		var pts = new Array(4);
 		var liquidDWidth = dWidth*height/this.bin.height;
 		pts[0] = P(-this.bin.width/2, -this.bin.thickness);
@@ -925,9 +927,10 @@ _.extend(Pool.prototype, compressorFuncs, {
 			function(){
 				
 				tube.walls.y+=this.tube.speed
-				var tubeDown = -tube.walls.y <this.tube.floor;
-				var liquidDown = -tube.liquid.y2 < this.tube.floor;	
+				var tubeDown = -tube.walls.y <this.liquid.level();
+				var liquidDown = -tube.liquid.y2 < this.liquid.level();	
 				if(tubeDown){
+					tube.walls.y = this.liquid.level;
 					removeListener(curLevel, 'update', 'extendTube');
 				}
 			}

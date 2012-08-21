@@ -620,7 +620,7 @@ WallMethods = {
 						setY.apply(this, [boundedStep(y, dest, this.v)])
 						this.parent.setupWall(this.handle);
 						if(round(y,2)==round(dest,2)){
-							removeListener(curLevel, 'moveWall', 'cV' + this.handle);
+							removeListener(curLevel, 'wallMove', 'cV' + this.handle);
 							this.parent.setSubWallHandler(this.handle, 0, 'staticAdiabatic');
 							this.v = 0;
 						}

@@ -67,7 +67,7 @@ _.extend(Work.prototype,
 			},
 			{block:3,
 				title:"Current step",
-				text:"Does this temperature change seem consistant with the equation below?<br><center>||EQ6||</center>",
+				text:"Does this temperature change seem consistent with the equation below?<br><center>||EQ6||</center>",
 				quiz:{	
 					type:'buttons',
 					options:
@@ -150,7 +150,7 @@ _.extend(Work.prototype,
 			},
 			{block:11,
 				cutScene: true,
-				text:"<p>First, we must convince ourselves that work actually <i>is</i> dependant on external pressure?</p><p> If we compress a high pressure system and a low pressure system with the same external pressure over the same volume, how should the temperature changes of the two compare?</p>",
+				text:"<p>First, we must convince ourselves that work actually <i>is</i> dependent on external pressure</p><p> If we compress a high pressure system and a low pressure system with the same external pressure over the same volume, how should the temperature changes of the two compare?</p>",
 				quiz:{	
 					type:'multChoice',
 					options:
