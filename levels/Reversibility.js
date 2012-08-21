@@ -190,11 +190,6 @@ _.extend(Reversibility.prototype,
 
 
 	init: function(){
-		for (var initListenerName in this.initListeners.listeners){
-			var func = this.initListeners.listeners[initListenerName].func;
-			var obj = this.initListeners.listeners[initListenerName].obj;
-			func.apply(obj);
-		}
 		var self = this;
 		recordDataStart('pInt', function(){return walls[0].pInt()}, this);
 		recordDataStart('pExt', function(){return walls[0].pExt()}, this);

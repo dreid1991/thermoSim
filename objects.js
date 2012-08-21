@@ -38,10 +38,10 @@ getBinPts = {
 		return this;
 	},
 	addMassEntry: function(){
-		this.readout.addEntry('mass' + this.wallInfo, 'Mass:', 'kg', this.pistonMass, undefined, 0);
+		this.readout.addEntry('mass' + this.wallInfo, 'Mass:', 'kg', this.mass, undefined, 0);
 	},
 	addPressureEntry: function(){
-		this.readout.addEntry('pressure' + this.wallInfo, 'Pressure:', 'atm', this.pressure, undefined, 1); 
+		this.readout.addEntry('pressure' + this.wallInfo, 'Pressure:', 'atm', this.wall.pExt(), undefined, 1); 
 	},
 }
 //////////////////////////////////////////////////////////////////////////
@@ -81,10 +81,10 @@ function DragWeights(attrs){
 	this.blockSpacing = 2;
 	this.weightScalar = 40;//specific volume
 	this.moveSpeed = 20;
-	this.pistonMass = this.massInit;
+	this.mass = this.massInit;
 	this.massChunkName = 'dragWeights';
 	this.eAdded = 0;
-	this.pressure = this.getPressure();
+	this.pressure = this.wall.pExt();
 	this.weightsOnPiston = [];
 	this.eBarFont = '12pt Calibri';
 	this.eBarFontCol = Col(255,255,255);
@@ -544,11 +544,11 @@ _.extend(DragWeights.prototype, getBinPts, {
 	putOnPiston: function(weight){
 		this.weightsOnPiston.push(weight);
 		weight.status = 'piston';
-		this.pistonMass = this.getPistonMass();
-		this.wall.setMass(this.massChunkName, this.pistonMass);
+		this.mass = this.getPistonMass();
+		this.wall.setMass(this.massChunkName, this.mass);
 		this.pressure = this.wall.pExt();
 		if(this.trackMass){
-			this.readout.tick('mass' + this.wallInfo, this.pistonMass);
+			this.readout.tick('mass' + this.wallInfo, this.mass);
 		}
 		if(this.trackPressure){
 			this.readout.tick('pressure' + this.wallInfo, this.pressure);
@@ -560,11 +560,11 @@ _.extend(DragWeights.prototype, getBinPts, {
 				this.weightsOnPiston.splice([idx],1);
 			}
 		}
-		this.pistonMass = this.getPistonMass();
-		this.wall.setMass(this.massChunkName, this.pistonMass);
+		this.mass = this.getPistonMass();
+		this.wall.setMass(this.massChunkName, this.mass);
 		this.pressure = this.getPressure();
 		if(this.trackMass){
-			this.readout.tick('mass' + this.wallInfo, this.pistonMass);
+			this.readout.tick('mass' + this.wallInfo, this.mass);
 		}
 		if(this.trackPressure){
 			this.readout.tick('pressure' + this.wallInfo, this.pressure);
@@ -741,7 +741,7 @@ _.extend(DragWeights.prototype, getBinPts, {
 		return true;
 	},
 	mass: function(){
-		return this.pistonMass;
+		return this.mass;
 	},
 	reset: function(){
 		this.dropAllIntoStores();

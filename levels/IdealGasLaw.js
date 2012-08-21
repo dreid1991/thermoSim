@@ -38,11 +38,6 @@ _.extend(IdealGasLaw.prototype,
 		LevelTools, 
 {
 	init: function(){
-		for (var initListenerName in this.initListeners.listeners){
-			var func = this.initListeners.listeners[initListenerName].func;
-			var obj = this.initListeners.listeners[initListenerName].obj;
-			func.apply(obj);
-		}		
 		nextPrompt();
 	},
 	block0Start: function(){

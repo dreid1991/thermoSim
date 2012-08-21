@@ -122,11 +122,6 @@ _.extend(cvcp.prototype,
 		store('prompts', this.prompts);
 	},
 	init: function(){
-		for (var initListenerName in this.initListeners.listeners){
-			var func = this.initListeners.listeners[initListenerName].func;
-			var obj = this.initListeners.listeners[initListenerName].obj;
-			func.apply(obj);
-		}		
 		nextPrompt();
 	},
 	//testing fill
@@ -134,7 +129,8 @@ _.extend(cvcp.prototype,
 		this.readout.show();
 		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
 		spcs['spc1'].populate(P(300,100), V(200, 200), 350, 185);
-		spcs['spc3'].populate(P(300,100), V(200, 200), 250, 185);		
+		spcs['spc3'].populate(P(300,100), V(200, 200), 250, 185);	
+		walls[0].trackWorkStart(this.readout);
 		this.pool = new Pool();
 	},
 	block2Start: function(){

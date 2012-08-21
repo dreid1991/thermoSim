@@ -12,13 +12,13 @@ function Readout(handle, leftBound, rightBound, y, font, fontCol, obj, align){
 	this.y = y;
 	this.entries = [];
 	if(obj){
-		addListener(obj, 'init', 'Readout', this.init, this);
+		addListener(obj, 'reset', 'resetReadout' + this.handle, this.resetAll, this);
+	}else if(curLevel){
+		addListener(curLevel, 'reset', 'resetReadout' + this.handle, this.resetAll, this);
 	}
 }
 Readout.prototype = {
-	init: function(){
-		addListener(curLevel, 'reset', 'resetReadout', this.resetAll, this);
-	},
+
 	draw: function(){
 		this.drawCanvas.save();
 		this.drawCanvas.translate(this.leftBound, this.y);
