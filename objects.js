@@ -1,4 +1,4 @@
-getBinPts = {
+compressorFuncs = {
 	getBinPts: function(pos, slant, dims, thickness){
 		var pts = []
 		var thickness = defaultTo(5, thickness);
@@ -12,6 +12,16 @@ getBinPts = {
 		pts.push(P(pos.x - slant*dims.dx/2 - thickness, pos.y - dims.dy));
 		pts.push(P(pos.x - slant*dims.dx/2, pos.y - dims.dy));
 		return pts;
+	},
+	trackWorkStart: function(){
+		this.trackWork = true;
+		this.wall.trackWorkStart(this.readout);
+		return this;
+	},
+	trackWorkStop: function(){
+		this.trackWork = false;
+		this.wall.trackWorkStop();
+		return this;
 	},
 	trackMassStart: function(){
 		this.trackMass = true;
@@ -42,6 +52,12 @@ getBinPts = {
 	},
 	addPressureEntry: function(){
 		this.readout.addEntry('pressure' + this.wallInfo, 'Pressure:', 'atm', this.wall.pExt(), undefined, 1); 
+	},
+	removeEntries: function(){
+		if(this.trackMass){this.trackMassStop();};
+		if(this.trackPressure){this.trackPressureStop();};
+		if(this.trackWork){this.trackWorkStop();};
+		return this;
 	},
 }
 //////////////////////////////////////////////////////////////////////////
@@ -100,7 +116,7 @@ function DragWeights(attrs){
 	return this.init();
 }
 
-_.extend(DragWeights.prototype, getBinPts, {
+_.extend(DragWeights.prototype, compressorFuncs, {
 	init: function(){
 		this.weightGroups = this.makeWeights(this.tempWeightDefs);
 		this.bins = {};
@@ -124,15 +140,7 @@ _.extend(DragWeights.prototype, getBinPts, {
 		removeListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo);
 		removeListener(curLevel, 'mousedown', 'weights' + this.wallInfo);
 		removeListener(curLevel, 'reset', 'dragWeights' + this.wallInfo);
-		if(this.trackEnergy){
-			this.readout.removeEntry('eAdd' + this.wallInfo);
-		}
-		if(this.trackMass){
-			this.readout.removeEntry('mass' + this.wallInfo);
-		}
-		if(this.trackPressure){
-			this.readout.removeEntry('pressure' + this.wallInfo);
-		}
+		this.removeEntries();
 	},
 	trackEnergyStart: function(){
 		this.trackEnergy = true;
@@ -807,7 +815,7 @@ function Pool(attrs){
 	return this.init();
 }
 
-_.extend(Pool.prototype, getBinPts, {
+_.extend(Pool.prototype, compressorFuncs, {
 	init: function(){	
 		addListener(curLevel, 'update', 'drawPool', this.draw, this);
 		this.wall.moveInit();	
@@ -1298,7 +1306,7 @@ function Piston(attrs){
 	return this.show();
 }
 
-Piston.prototype = {
+_.extend(Piston.prototype, compressorFuncs, {
 	makeDrawFunc: function(height, left, pistonWidth){
 		var shaftThickness = 30;
 		var shaftLength = height - 45;
@@ -1379,8 +1387,8 @@ Piston.prototype = {
 			function(){
 				this.p = boundedStep(this.p, pSetPt, this.pStep);
 				this.setMass();			
-				if(this.trackingP){
-					this.setDataVal(this.p, 'pressure');
+				if(this.trackPressure){
+					this.readout.hardUpdate('pressure'+this.wallInfo, this.p);
 				}
 				if(round(this.p,2)==pSetPt){
 					removeListener(curLevel, 'update', 'piston'+this.handle+'adjP');
@@ -1399,45 +1407,23 @@ Piston.prototype = {
 	setReadoutY: function(){
 		this.readout.position({y:this.pistonBottom.pos.y-2+this.y()});
 	},
-	trackWorkStart: function(){
-		this.wall.trackWorkStart(this.readout, 1)
-		return this;
-	},
-	trackWorkStop: function(){
-		this.wall.trackWorkStop();
-		return this;
-	},
-	trackPressureStart: function(){
-		if(!this.trackingP){
-			this.addData('pressure', 'P:', this.p, 'atm');
-			this.trackingP = true;
-		}
-		return this;
-	},
-	trackPressureStop: function(){
-		this.removeData('pressure')
-		this.trackingP = false;
-		return this;
-	},
+
 	reset: function(){
 		//this.dataHandler.slots.work.value = 0;
 	},
-	addData: function(handle, label, value, units){
-		this.readout.addEntry(handle, label, units, value, undefined, 1);
-	},
+
 	removeData: function(handle){
 		this.readout.removeEntry(handle);
-	},
-	setDataVal: function(value, handle){
-		this.readout.hardUpdate(handle, value);
 	},
 	remove: function(){
 		this.wall.moveStop();
 		this.wall.unsetMass('piston' + this.handle);
 		this.hide();
+		this.removeEntries();
 		removeListener(curLevel, 'update', 'moveWalls');
 	}
 }
+)
 
 //////////////////////////////////////////////////////////////////////////
 //HEATER
