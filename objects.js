@@ -800,11 +800,13 @@ function Pool(attrs){
 	this.tube.walls.col = defaultTo(Col(175,175,175), attrs.tubeWallCol);
 	this.tube.ID = 10; //inner diameter
 	this.tube.OD = 20; //outer diameter
-	this.tube.liquid.y1 = -this.pistonY();
-	this.tube.liquid.y2 = -this.pistonY();
-	this.tube.walls.y = -this.pistonY();
+	var self = this;
+	this.tube.liquid.y1 = function(){return -self.pistonY();};
+	this.tube.liquid.y2 = undefined;
+	this.tube.walls.y = undefined;
 	this.tube.wallThickness = (this.tube.OD-this.tube.ID)/2
-	this.tube.walls.xPts = this.getTubeXPts(this.tube.OD, this.tube.ID);
+	this.tube.walls.xPts = this.getTubeXPts(this.tube.ID, this.tube.OD);
+	this.tube.floor = this.tube.wallThickness+5;
 	return this.init();
 }
 
@@ -832,7 +834,7 @@ _.extend(Pool.prototype, getBinPts, {
 		var pistonY = this.pistonY();
 		var y1Walls = -pistonY;
 		var dyWalls = this.tube.walls.y - y1Walls;
-		var y1Liq = this.tube.liquid.y1;
+		var y1Liq = this.tube.liquid.y1();
 		this.dyLiq = this.tube.liquid.y2 - y1Liq;
 		this.drawCanvas.save();
 		this.drawCanvas.translate(this.binX, pistonY);
@@ -855,25 +857,25 @@ _.extend(Pool.prototype, getBinPts, {
 	},
 	getTubeXPts: function(ID, OD){
 		var xPts = new Array(2);
-		xPts[0] = -(ID + OD)/2;
+		xPts[0] = -(ID/2 + this.tube.wallThickness); 
 		xPts[1] = ID/2;
 		return xPts;
 	},
 	buttonFillDown: function(){
-		this.extendTube(this.liquidDown, 1)
+		this.extendTubeFill();
 	},
 	buttonFillUp: function(){
 		this.retractTube();
 		
 	},
 	buttonDrainDown: function(){
-		
-		this.extendTube(this.liquidUp, -1)
+		this.extendTubeDrain();
 	},
 	buttonDrainUp: function(){
 		this.retractTube();
 	},
 	changeMassFunc: function(sign){
+		console.log(sign);
 		return function(){
 			this.mass += sign*this.rate;
 			this.liquid.pts = this.getLiquidPts();
@@ -896,52 +898,82 @@ _.extend(Pool.prototype, getBinPts, {
 	},
 	The general case of the extensions and retractions below.  I end up just defining the cases when calling the functions instead of in functions.  Kind of icky to use
 	*/
-	extendTube: function(liquidSign){
+	extendTubeFill: function(){
+		if(this.tube.liquid.y2==undefined && this.tube.walls.y==undefined){
+			this.tube.liquid.y2 = -this.pistonY();
+			this.tube.walls.y = -this.pistonY();			
+		}
+
+		removeListener(curLevel, 'update', 'retract');
 		var tube = this.tube;
-		tube.liquid.y1 = 0;
-		tube.liquid.y2 = 0;
-		tube.walls.y = -this.pistonY()
+		var self = this;
+		tube.liquid.y1 = function(){return -self.pistonY();};
+		var thickness = this.tube.wallThickness
 		addListener(curLevel, 'update', 'extendTube',
 			function(){
-				this.drawTube();
-				this.tube.walls.y = boundedStep(tube.walls.y, 0, tube.speed);
-				if(round(this.tube.walls.y,2)==0){
-					removeListener(curLevel, 'update', 'extendTube');
-					onExtend.apply(this, [liquidSign]);
 				
+				tube.walls.y+=this.tube.speed
+				var tubeDown = -tube.walls.y <this.tube.floor;
+				var liquidDown = -tube.liquid.y2 < this.tube.floor;	
+				if(tubeDown){
+					removeListener(curLevel, 'update', 'extendTube');
+				}else if(tubeDown && liquidDown){
+					removeListener(curLevel, 'update', 'extendTube');
+					removeListener(curLevel, 'update', 'extendFluid');
+					addListener(curLevel, 'update', 'changePoolMass', this.changeMassFunc(1), this);
 				}
 			}
 		,this);
-		//addListener(curLevel, 'update', 'extendFluid',
-			//function
+		addListener(curLevel, 'update', 'extendFluid',
+				function(){
+				tube.liquid.y2 += .8*this.tube.spped
+				var tubeDown = -tube.walls.y <this.tube.floor;
+				var liquidDown = -tube.liquid.y2 < this.tube.floor;				
+				if(liquidDown){
+					removeListener(curLevel, 'update', 'extendFluid');
+				}else if(tubeDown && liquidDown){
+					removeListener(curLevel, 'update', 'extendTube');
+					removeListener(curLevel, 'update', 'extendFluid');				
+					addListener(curLevel, 'update', 'changePoolMass', this.changeMassFunc(1), this);
+				}
+			},
+		this);
+		addListener(curLevel, 'update', 'drawTube', this.drawTube, this);
 	},
-
-	liquidDown: function(liquidSign){
+	extendTubeDrain: function(){
+		if(this.tube.liquid.y2==undefined && this.tube.walls.y==undefined){
+			this.tube.liquid.y2 = -this.pistonY();
+			this.tube.walls.y = -this.pistonY();			
+		}
+		removeListener(curLevel, 'update', 'retract');
 		var tube = this.tube;
-		tube.liquid.y1 = -this.pistonY();
-		tube.liquid.y2 = -this.pistonY();
-		addListener(curLevel, 'update', 'liquidDown',
+		tube.liquid.y1 = function(){return 0};
+		tube.liquid.y2 = 0;
+		var thickness = this.bin.thickness;
+		addListener(curLevel, 'update', 'extendTube',
 			function(){
-				this.drawTube();
-				this.tube.liquid.y2 = boundedStep(tube.liquid.y2, 0, tube.speed);
-				if(round(this.tube.liquid.y2,2)==0){
-					removeListener(curLevel, 'update', 'liquidDown');
-					addListener(curLevel, 'update', 'changeLiquidMass', this.changeMassFunc(liquidSign), this);
 				
+				tube.walls.y += this.tube.speed;
+				var tubeDown = -tube.walls.y < this.tube.floor;
+				if(tubeDown){
+					removeListener(curLevel, 'update', 'extendTube');
+					this.liquidUp();
+					addListener(curLevel, 'update', 'changePoolMass', this.changeMassFunc(-1), this);
 				}
 			}
-		,this);		
+		,this);
+		addListener(curLevel, 'update', 'drawTube', this.drawTube, this);
 	},
-	liquidUp: function(liquidSign){
+	liquidUp: function(){
 		var tube = this.tube;
-		tube.liquid.y1 = 0;
-		tube.liquid.y2 = 0;
+		tube.liquid.y1 = function(){return 0};
+		tube.liquid.y2 = this.tube.floor;
 		addListener(curLevel, 'update', 'liquidUp',
 			function(){
-				this.drawTube();
 				var dest = -this.pistonY();
-				this.tube.liquid.y1 = boundedStep(tube.liquid.y1, dest, -tube.speed);
-				if(round(tube.liquid.y1,2)==dest){
+				var liqY1 = tube.liquid.y1() -tube.speed;
+				this.tube.liquid.y1 = function(){return liqY1};
+				if(liqY1 < dest){
 					removeListener(curLevel, 'update', 'liquidUp');
 					addListener(curLevel, 'update', 'changeLiquidMass', this.changeMass(liquidSign), this);
 				
@@ -950,20 +982,25 @@ _.extend(Pool.prototype, getBinPts, {
 		,this);			
 	},
 	retractTube: function(){
-		removeListener(curLevel, 'update', 'changeLiquidMass');
+		removeListener(curLevel, 'update', 'extendTube');
+		removeListener(curLevel, 'update', 'extendFluid');
 		removeListener(curLevel, 'update', 'changeLiquidMass');
 		removeListener(curLevel, 'update', 'liquidUp');
-		removeListener(curLevel, 'update', 'liquidDown');
 		var tube = this.tube;
 		addListener(curLevel, 'update', 'retract',
 			function(){
-				this.drawTube();
-				var dest = -this.pistonY()
-				tube.liquid.y1 = boundedStep(tube.liquid.y1, dest, -tube.speed);
-				tube.liquid.y2 = boundedStep(tube.liquid.y2, dest, -tube.speed);
-				tube.walls.y = boundedStep(tube.walls.y, dest, -tube.speed);
-				if(round(tube.liquid.y1,2)==dest && round(tube.liquid.y2,2)==dest && round(tube.walls.y,2)==dest){
+				var dest = -this.pistonY();
+				var liqY1 = tube.liquid.y1() - tube.speed;
+				tube.liquid.y1 = function(){return liqY1};
+				tube.liquid.y2 -= tube.speed*1.5;
+				tube.walls.y -= tube.speed;
+				if(tube.liquid.y1() < dest && tube.liquid.y2 < dest && tube.walls.y < dest){
 					removeListener(curLevel, 'update', 'retract');
+					removeListener(curLevel, 'update', 'drawTube');
+					this.tube.liquid.y2 = undefined;
+					this.tube.walls.y = undefined;			
+		
+					
 				}
 			},
 		this);
