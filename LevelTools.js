@@ -287,7 +287,11 @@ LevelTools = {
 		this.numUpdates++;
 		turn++;
 		for (var updateListener in this.updateListeners.listeners){
-			var listener = this.updateListeners.listeners[updateListener]
+			var listener = this.updateListeners.listeners[updateListener];
+			listener.func.apply(listener.obj);
+		}
+		for (var wallMoveListener in this.wallMoveListeners.listeners){
+			var listener = this.wallMoveListeners.listeners[wallMoveListener];
 			listener.func.apply(listener.obj);
 		}
 	},
@@ -439,6 +443,7 @@ LevelTools = {
 	},
 	makeListeners: function(){
 		this.updateListeners = {listeners:{}, save:{}};
+		this.wallMoveListeners = {listeners:{}, save:{}};
 		this.dataListeners = {listeners:{}, save:{}};
 		this.mousedownListeners = {listeners:{}, save:{}};
 		this.mouseupListeners = {listeners:{}, save:{}};

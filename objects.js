@@ -77,12 +77,12 @@ _.extend(DragWeights.prototype, getBinPts, {
 		this.bins['store'] = this.makeStoreBins();
 		this.bins['piston'] = this.makePistonBins();
 		//this.dropAllstores();
-		this.wall.moveInit();
 		addListener(curLevel, 'update', 'moveWeightsOnPiston' + this.wallInfo, this.moveWeightsOnPiston, this);
 		walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);
 		addListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo, this.draw, this);
 		addListener(curLevel, 'mousedown', 'weights' + this.wallInfo, this.mousedown, this);
 		addListener(curLevel, 'reset', 'dragWeights' + this.wallInfo, this.reset, this);
+		this.wall.moveInit();
 		this.dropAllIntoStores('instant');
 		delete this.tempWeightDefs;
 		return this;
@@ -777,20 +777,20 @@ function Pool(attrs){
 
 	this.wallHandler = defaultTo('cPAdiabaticDamped', attrs.compMode) + compAdj;	
 	walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);	
-	this.wall.moveInit();	
+	
 		
 	
 	this.bin.col = defaultTo(Col(150, 150, 150), attrs.binCol);
 	this.bin.slant = defaultTo(1.3, attrs.binSlant);
 	this.bin.width = 110;
-	this.bin.widthUpper = this.binWidth*this.binSlant;
-	this.bin.height = 60;
+	this.bin.widthUpper = this.bin.width*this.bin.slant;
+	this.bin.height = 30;
 	this.bin.thickness = defaultTo(5, attrs.binThickness);
 	
 	this.spcVol = 40; //specific volume
 	this.liquid.col = defaultTo(Col(83, 87, 239), attrs.liquidCol);
 	this.liquid.pts = this.getLiquidPts();
-	this.bin.pts = this.getBinPts(P(-this.binWidth/2,0), this.binSlant, V(this.binWidth, this.binHeight), this.binThickness);
+	this.bin.pts = this.getBinPts(P(0,0-this.bin.thickness), this.bin.slant, V(this.bin.width, this.bin.height), this.bin.thickness);
 	this.binX = (this.wall[1].x+this.wall[0].x)/2;
 	this.pistonY = function(){return this.wall[0].y};
 	
@@ -805,10 +805,14 @@ function Pool(attrs){
 	this.tube.walls.y = -this.pistonY();
 	this.tube.wallThickness = (this.tube.OD-this.tube.ID)/2
 	this.tube.walls.xPts = this.getTubeXPts(this.tube.OD, this.tube.ID);
-	addListener(curLevel, 'update', 'drawPool', this.draw, this);
+	return this.init();
 }
 
 _.extend(Pool.prototype, getBinPts, {
+	init: function(){	
+		addListener(curLevel, 'update', 'drawPool', this.draw, this);
+		this.wall.moveInit();	
+	},
 	bindButtons: function(){
 		var self = this;
 		$('#'+this.buttonFillId).mousedown(function(){self.buttonFillDown()});
@@ -834,7 +838,7 @@ _.extend(Pool.prototype, getBinPts, {
 		this.drawCanvas.translate(this.binX, pistonY);
 		draw.fillRect(P(this.tube.walls.xPts[0], y1Walls), V(this.tube.wallThickness, dyWalls), this.tube.walls.col, this.drawCanvas);
 		draw.fillRect(P(this.tube.walls.xPts[1], y1Walls), V(this.tube.wallThickness, dyWalls), this.tube.walls.col, this.drawCanvas);
-		draw.fillRect(P(-this.tube.walls.xPts[1], y1Liq), V(this.tube.ID, dyLiq), this.liquid.col, this.drawCanvas);
+		draw.fillRect(P(-this.tube.walls.xPts[1], y1Liq), V(this.tube.ID, this.dyLiq), this.liquid.col, this.drawCanvas);
 		this.drawCanvas.restore();				
 		
 	},
@@ -853,6 +857,7 @@ _.extend(Pool.prototype, getBinPts, {
 		var xPts = new Array(2);
 		xPts[0] = -(ID + OD)/2;
 		xPts[1] = ID/2;
+		return xPts;
 	},
 	buttonFillDown: function(){
 		this.extendTube(this.liquidDown, 1)
@@ -862,15 +867,18 @@ _.extend(Pool.prototype, getBinPts, {
 		
 	},
 	buttonDrainDown: function(){
+		
 		this.extendTube(this.liquidUp, -1)
 	},
 	buttonDrainUp: function(){
 		this.retractTube();
 	},
-	changeMass: function(sign){
-		this.mass += sign*this.rate;
-		this.liquid.pts = this.getLiquidPts();
-		this.wall.setMass(this.massChunkName, this.massInit);
+	changeMassFunc: function(sign){
+		return function(){
+			this.mass += sign*this.rate;
+			this.liquid.pts = this.getLiquidPts();
+			this.wall.setMass(this.massChunkName, this.mass);
+		}
 	},
 	/*
 	changeRects: function(onInit, listenerName, onRun, conditions, onEnd){
@@ -888,7 +896,7 @@ _.extend(Pool.prototype, getBinPts, {
 	},
 	The general case of the extensions and retractions below.  I end up just defining the cases when calling the functions instead of in functions.  Kind of icky to use
 	*/
-	extendTube: function(onExtend, liquidSign){
+	extendTube: function(liquidSign){
 		var tube = this.tube;
 		tube.liquid.y1 = 0;
 		tube.liquid.y2 = 0;
@@ -904,6 +912,8 @@ _.extend(Pool.prototype, getBinPts, {
 				}
 			}
 		,this);
+		//addListener(curLevel, 'update', 'extendFluid',
+			//function
 	},
 
 	liquidDown: function(liquidSign){
@@ -916,7 +926,7 @@ _.extend(Pool.prototype, getBinPts, {
 				this.tube.liquid.y2 = boundedStep(tube.liquid.y2, 0, tube.speed);
 				if(round(this.tube.liquid.y2,2)==0){
 					removeListener(curLevel, 'update', 'liquidDown');
-					addListener(curLevel, 'update', 'changeLiquidMass', this.changeMass(liquidSign), this);
+					addListener(curLevel, 'update', 'changeLiquidMass', this.changeMassFunc(liquidSign), this);
 				
 				}
 			}
