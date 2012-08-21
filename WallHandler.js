@@ -602,7 +602,7 @@ WallMethods = {
 			} else if (compType.indexOf('adiabatic')!=-1){
 				var wallMoveMethod = 'cVAdiabatic';
 			}
-			removeListener(curLevel, 'moveWall', 'cV' + this.handle);
+			removeListener(curLevel, 'wallMove', 'cV' + this.handle);
 			var setY = function(curY){
 				this[0].y = curY;
 				this[1].y = curY;
@@ -614,7 +614,7 @@ WallMethods = {
 				var sign = getSign(dist);
 				this.v = speed*sign;
 				this.parent.setSubWallHandler(this.handle, 0, wallMoveMethod + compAdj);
-				addListener(curLevel, 'moveWall', 'cV' + this.handle,
+				addListener(curLevel, 'wallMove', 'cV' + this.handle,
 					function(){
 						var y = this[0].y
 						setY.apply(this, [boundedStep(y, dest, this.v)])

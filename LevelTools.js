@@ -230,7 +230,7 @@ LevelTools = {
 		var boxText = defaultTo('Type your answer here.', quiz.text);
 		textBoxHTML += text;
 		textBoxHTML += '<br>';
-		textBoxHTML += "<textarea id='answerTextArea' rows='3' cols='60'>" + boxText + "</textarea>";
+		textBoxHTML += "<textarea id='answerTextArea' rows='3' cols='60' placeholder='"+boxText+"'></textarea>";
 		textBoxHTML += "<table border=0><tr><td width=75%></td><td><button id='textAreaSubmit' class='noSelect'>Submit</button></td></tr></table></p>";
 		var checkFunc = function(){
 			if(curLevel.checkConditions()){
