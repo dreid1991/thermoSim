@@ -42,11 +42,11 @@ _.extend(Reversibility.prototype,
 			},
 			{block:2, 
 				title:"Current step", 
-				text:"In our previous compression, we compressed at 6 atm the whole time.  Are we always at 6 atm in this new compression?  How does this affect the work we have to do to compress?",
+				text:"In the first compression, we compressed at 6 atm the whole time.  Are we always at 6 atm in this new compression?  How does this affect the work we have to do to compress?",
 				quiz:{	
 					type:'buttons', 
 					options:
-						[{buttonId:'decrease', text:'Decreases work', isCorrect:true, message:"Correct!"},
+						[{buttonId:'decrease', text:'Decreases work', isCorrect:true},
 						{buttonId:'increase', text:'Increases work', isCorrect:false, message:"That's not correct"}
 					]
 				}
@@ -65,7 +65,7 @@ _.extend(Reversibility.prototype,
 			},
 			{block:4, 
 				cutScene: true, 
-				text: "<p>Yes!</p><p>So when we compressed with the biggest block, P<sub>ext</sub> was much greater than P<sub>int</sub>.  We did more work than we had to because when P<sub>int</sub> was low, we didn’t need to apply such a high external pressure to compress.<p></p>When we compressed with the smaller blocks, P<sub>ext</sub> stepped more smoothly with P<sub>int</sub>.</p><p>Since we weren’t compressing at the maximum pressure the whole time, we did less work and heated the system less.</p><p>What if we split all of our blocks up again and compress with those?  How do you think the amount of work we have to do will change?</p>",
+				text: "<p>Yes!</p><p>So when we compressed with the biggest block, P<sub>ext</sub> was much greater than P<sub>int</sub>.  We did more work than we had to because when P<sub>int</sub> was low, we didn’t need to apply such a high external pressure to compress.<p></p>When we compressed with the smaller blocks, P<sub>ext</sub> stepped more smoothly with P<sub>int</sub>.</p><p>Since we weren’t compressing at the maximum pressure the whole time, we did less work and heated the system less.</p><p>What if we ground up our block into a dust and slowly placed it on top?  How do you think the amount of work we have to do will change?</p>",
 				quiz:{	
 					type:'buttons',
 					options:
@@ -76,7 +76,7 @@ _.extend(Reversibility.prototype,
 			},
 			{block:5,
 				title:'Current step', 
-				text:"Alright, here are the blocks.  To compress, P<sub>ext</sub> must only be barely greater than P<sub>int</sub>.  When it is more than a tiny amount higher, we’re doing more work than we have to.  How much work does it take to compress to 10 liters this time?"},
+				text:"Okay, here's our liquid.  To compress, P<sub>ext</sub> must only be barely greater than P<sub>int</sub>.  When it is more than a tiny amount higher, we’re doing more work than we have to.  How much work does it take to compress to 10 liters this time?"},
 			{block:6, 
 				cutScene: true, 
 				text:"<p>So in the three compressions, you did XX, YY, and finally ZZ kJ of work.  What if we kept breaking our blocks into smaller pieces?</p><p>If they were small enough, every time we put a new block on, would P<sub>ext</sub> even be noticeably different than P<sub>int</sub>?</p> <p> If we kept those pressures almost equal, would we ever be doing any more work than we had to? </p><p> By the way, the answer is the same to both questions.</p>",
@@ -101,13 +101,12 @@ _.extend(Reversibility.prototype,
 				text:"Now I have another equally important task for you.  I want this piston expanded in a way that gets as much work out as possible.  When we compressed, we used the blocks to do work on the system.  When expanding, the system can do work on the blocks, lifting them to a higher potential energy.  Let’s start with just one block.  How much work can you get out?"},
 			{block:9, 
 				cutScene: true, 
-				text:"<p>Well that didn't go very well.  From before, we know it takes at least XX kJ to compress to that volume and we only got YY kJ out!  We can do better.</p><p>What if we break up our block like we did before?</p><p>How many pieces would you like?</p>",
+				text:"<p>Well that didn't go very well.  From before, we know it takes at least XX kJ to compress to that volume and we only got YY kJ out!  We can do better.</p><p>What if we use the liquid so we incease P<sub>int</sub> in very small steps?  Do you think we'll get more work out that way?</p>",
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:'button2blocks', text:'4', isCorrect:false, message:'I think you want more blocks than that.'},
-						{buttonId:'button4blocks', text:'8', isCorrect:false, message:'I think you want more blocks than that.'},
-						{buttonId:'button8blocks', text:'12', isCorrect:true}
+						[{buttonId:'yes', text:'Yes', isCorrect:true},
+						{buttonId:'no', text:'No', isCorrect:false, message:'But the system will be pushing against a higher average pressure!'},
 					]
 				},
 				replace:
@@ -153,7 +152,7 @@ _.extend(Reversibility.prototype,
 			},
 			{block:14, 
 				title:'Current step', 
-				text:"Just like before, let’s split up our block.  Do you think you’ll be able to recover more or less work with these?  Try going through a cycle to find out!",
+				text:"Just like before, let’s use the liquid for tiny pressure steps.  Do you think you’ll be able to recover more or less work with these?  Try going through a cycle to find out!",
 				quiz:{
 					type:'buttons', 
 					options:
@@ -201,9 +200,8 @@ _.extend(Reversibility.prototype,
 		this.makeGraphsRev();
 		var wallHandle = 'container';
 		this.unCompSetup();
-		walls[0].trackWorkStart(this.readout);
+		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:90}]}).trackPressureStart().trackWorkStart();//this.makeDragWeights([{name:'lrg', count:1, mass:90}], wallHandle).trackPressureStart();
 		this.trackVolumeStart(0);
-		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:90}]}).trackPressureStart()//this.makeDragWeights([{name:'lrg', count:1, mass:90}], wallHandle).trackPressureStart();
 		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInLrg',round(walls[0].work,1))},obj:''}});
 		this.readout.show();
 	},	
@@ -216,8 +214,6 @@ _.extend(Reversibility.prototype,
 	},
 	block0CleanUp: function(){
 		this.trackVolumeStop();
-		walls[0].trackWorkStop();
-		this.readout.removeAllEntries();
 		this.dragWeights.remove();
 	},
 	block1CleanUp: function(){
@@ -227,8 +223,7 @@ _.extend(Reversibility.prototype,
 		this.makeGraphsRev();
 		var numBlocks = getStore('numBlocks');
 		this.unCompSetup();
-		walls[0].trackWorkStart(this.readout);
-		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:numBlocks}}).trackPressureStart();
+		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:numBlocks}}).trackPressureStart().trackWorkStart();
 		this.trackVolumeStart(0);
 		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.02, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInMed', round(walls[0].work,1))},obj:''}});
 	},
@@ -244,17 +239,18 @@ _.extend(Reversibility.prototype,
 		this.removeAllGraphs();
 		this.dragWeights.remove();
 		this.dragWeights = undefined;
-		walls[0].trackWorkStop();
-		this.trackVolumeStop();
-		this.readout.removeAllEntries();
+		//walls[0].trackWorkStop();
 	},
 	block5Start: function(){
 		this.makeGraphsRev();
 		this.unCompSetup();
-		walls[0].trackWorkStart(this.readout);
 		this.trackVolumeStart(0);		
-		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:16}}).trackPressureStart();
+		this.pool = new Pool({massMax:100, massMin:10}).trackWorkStart().trackMassStart().trackPressureStart();
 		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.02, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInSml', round(walls[0].work,1))},obj:''}});
+		$('#reset').hide();
+		$('#clearGraphs').hide();
+		$('#buttonFill').show();
+		$('#buttonDrain').show();
 	},
 	block5Conditions: function(){
 		if(this.volListener10.isSatisfied()){
@@ -264,10 +260,15 @@ _.extend(Reversibility.prototype,
 		}
 	},
 	block5CleanUp: function(){
+		$('#reset').show();
+		$('#clearGraphs').show();
+		$('#buttonFill').hide();
+		$('#buttonDrain').hide();
 		this.trackVolumeStop();
 		this.removeAllGraphs();
-		this.dragWeights.remove();
-		this.dragWeights = undefined;
+		this.pool.remove();
+		this.pool = undefined;
+		this.stops.remove();
 		walls[0].trackWorkStop();
 		
 	},
@@ -299,17 +300,26 @@ _.extend(Reversibility.prototype,
 	},
 	block10Start: function(){
 		this.compSetup();
-		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:12}}).trackPressureStart().dropAllIntoPistons('instant');
+		this.pool = new Pool({massInit:60});
+		//this.dragWeights = new DragWeights({weightDefs:{mass:90, count:12}}).trackPressureStart().dropAllIntoPistons('instant');
 		this.makeGraphsRev();
 		this.volListener16 = new StateListener({condition:16, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workOutSml', Math.abs(round(walls[0].work,1)))},obj:''}});
 		walls[0].trackWorkStart(this.readout);
 		this.trackVolumeStart(0);
+		$('#reset').hide();
+		$('#clearGraphs').hide();
+		$('#buttonFill').show();
+		$('#buttonDrain').show();
 	},
 	block10CleanUp: function(){
+		$('#reset').show();
+		$('#clearGraphs').show();
+		$('#buttonFill').hide();
+		$('#buttonDrain').hide();
 		this.trackVolumeStop();
 		walls[0].trackWorkStop();
 		this.removeAllGraphs();
-		this.dragWeights.remove();
+		this.pool.remove();
 	},
 	block13Start: function(){
 		this.unCompSetup();
@@ -349,10 +359,14 @@ _.extend(Reversibility.prototype,
 		this.trackVolumeStop();
 	},
 	block14Start: function(){
+		$('#reset').hide();
+		$('#clearGraphs').hide();
+		$('#buttonFill').show();
+		$('#buttonDrain').show();
 		this.unCompSetup();
 		this.makeGraphsRev();
 		walls[0].trackWorkStart(this.readout);
-		this.volListener10 = new StateListener(10, this.data.v, .02, {v:this.data.v}, {func:
+		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:
 			function(){
 				var compWork = walls[0].work;
 				store('cycleSmlCompWork', round(compWork, 1));
@@ -364,9 +378,9 @@ _.extend(Reversibility.prototype,
 				);
 			},
 			obj:this}
-		);
+		});
 		this.trackVolumeStart(0);
-		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:12}}).trackPressureStart();		
+		this.pool = new Pool().trackPressureStart().trackMassStart().trackWorkStart();
 	},
 	block14Conditions: function(){
 		if(this.volListener10.isSatisfied() && this.volListener16.isSatisfied()){
@@ -378,10 +392,14 @@ _.extend(Reversibility.prototype,
 		}
 	},
 	block14CleanUp: function(){
+		$('#reset').show();
+		$('#clearGraphs').show();
+		$('#buttonFill').hide();
+		$('#buttonDrain').hide();
 		this.removeAllGraphs();
 		this.trackVolumeStop();
 		walls[0].trackWorkStop();
-		this.dragWeights.remove();
+		this.pool.remove();
 		this.prompts[15].quiz.answer = 100*getStore('cycleSmlUnCompWork')/getStore('cycleSmlCompWork');
 	},
 

@@ -28,6 +28,8 @@
 		</div>
 		<div id='dashRun' class='dashShort noSelect'>
 			<center>
+				<button id='buttonFill' class='noSelect'>Fill</button>
+				<button id='buttonDrain' class='noSelect'>Drain</button>
 				<button id='reset' class='noSelect'>Reset experiment</button>
 				<button id='clearGraphs' class='noSelect'>Clear graphs</button>
 				
@@ -92,6 +94,8 @@ $(function(){
 	//curLevel.setDefaultPromptVals()
 	curLevel.init();
 	curLevel.cutSceneEnd();
+	$('#buttonFill').hide();
+	$('#buttonDrain').hide();
 	$('button').button();
 	$('#toSim').click(function(){nextPrompt()});
 	$('#toLastStep').click(function(){prevPrompt()});

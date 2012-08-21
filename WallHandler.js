@@ -787,19 +787,20 @@ WallMethods = {
 			var width = this[1].x-this[0].x;
 			var heightLast = trackPt.y;
 			this.work = 0;
-			readout.addEntry('work', 'Work:', 'kJ', 0, undefined, decPlaces);
+			var wallIdx = walls.idxByInfo(this.handle);
+			readout.addEntry('work' + wallIdx, 'Work:', 'kJ', 0, undefined, decPlaces);
 			addListener(curLevel, 'update', 'trackWork'+this.handle,
 				function(){
 					var dV = LTOM3LOCAL*VCONSTLOCAL*width*(heightLast-trackPt.y)
 					var p = this.pExt()*ATMTOPALOCAL;
 					this.work -= JTOKJLOCAL*p*dV;
-					this.workReadout.hardUpdate('work', this.work);
+					this.workReadout.hardUpdate('work' + wallIdx, this.work);
 					heightLast = trackPt.y;
 				},
 			this);
 		},
 		trackWorkStop: function(){
-			this.workReadout.removeEntry('work');
+			this.workReadout.removeEntry('work' + walls.idxByInfo(this.handle));
 			
 			removeListener(curLevel, 'update', 'trackWork'+this.handle);
 		}

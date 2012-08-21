@@ -25,33 +25,33 @@ compressorFuncs = {
 	},
 	trackMassStart: function(){
 		this.trackMass = true;
-		if(!this.readout.entryExists('mass' + this.wallInfo)){
+		if(!this.readout.entryExists('mass' +  walls.idxByInfo(this.wallInfo))){
 			this.addMassEntry();
 		}
 		return this;
 	},
 	trackMassStop: function(){
 		this.trackMass = false;
-		this.readout.removeEntry('mass' + this.wallInfo);
+		this.readout.removeEntry('mass' + walls.idxByInfo(this.wallInfo));
 		return this;
 	},
 	trackPressureStart: function(){
 		this.trackPressure = true;
-		if(!this.readout.entryExists('pressure' + this.wallInfo)){
+		if(!this.readout.entryExists('pressure' +  walls.idxByInfo(this.wallInfo))){
 			this.addPressureEntry();	
 		}
 		return this;
 	},
 	trackPressureStop: function(){
 		this.trackPressure = false;
-		this.readout.removeEntry('pressure' + this.wallInfo);	
+		this.readout.removeEntry('pressure' + walls.idxByInfo(this.wallInfo));	
 		return this;
 	},
 	addMassEntry: function(){
-		this.readout.addEntry('mass' + this.wallInfo, 'Mass:', 'kg', this.mass, undefined, 0);
+		this.readout.addEntry('mass' +  walls.idxByInfo(this.wallInfo), 'Mass:', 'kg', this.mass, undefined, 0);
 	},
 	addPressureEntry: function(){
-		this.readout.addEntry('pressure' + this.wallInfo, 'Pressure:', 'atm', this.wall.pExt(), undefined, 1); 
+		this.readout.addEntry('pressure' +  walls.idxByInfo(this.wallInfo), 'Pressure:', 'atm', this.wall.pExt(), undefined, 1); 
 	},
 	removeEntries: function(){
 		if(this.trackMass){this.trackMassStop();};
@@ -772,6 +772,8 @@ function Pool(attrs){
 	this.rate = defaultTo(.15, attrs.rate);
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.wall = walls[this.wallInfo];
+	this.massMax = defaultTo(75, attrs.massMax);
+	this.massMin = defaultTo(10, attrs.massMin);
 	this.mass = defaultTo(10, attrs.massInit);
 	this.readout = defaultTo(curLevel.readout, attrs.readout);
 	this.buttonFillId = defaultTo('buttonFill', attrs.fillButtonId);
@@ -883,9 +885,8 @@ _.extend(Pool.prototype, compressorFuncs, {
 		this.retractTube();
 	},
 	changeMassFunc: function(sign){
-		console.log(sign);
 		return function(){
-			this.mass  = Math.max(this.mass + sign*this.rate, 1);
+			this.mass  = Math.min(this.massMax, Math.max(this.mass + sign*this.rate, this.massMin));
 			this.liquid.pts = this.getLiquidPts();
 			this.wall.setMass(this.massChunkName, this.mass);
 			if(this.trackMass){
@@ -1019,7 +1020,17 @@ _.extend(Pool.prototype, compressorFuncs, {
 		this);
 		
 	},
-
+	remove: function(){
+		removeListener(curLevel, 'update', 'extendTube');
+		removeListener(curLevel, 'update', 'extendFluid');
+		removeListener(curLevel, 'update', 'changeLiquidMass');
+		removeListener(curLevel, 'update', 'liquidUp');
+		removeListener(curLevel, 'update', 'drawTube');
+		removeListener(curLevel, 'update', 'drawPool');	
+		this.wall.moveStop();
+		this.removeEntries();
+		//this.stops.remove();
+	},
 })
 
 

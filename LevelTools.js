@@ -347,6 +347,7 @@ LevelTools = {
 	},
 	trackVolumeStart: function(decPlaces){
 		decPlaces = defaultTo(1, decPlaces);
+		//DO THIS BY WALL
 		this.readout.addEntry('vol', 'Volume:', 'L', dataHandler.volume(), undefined, decPlaces);
 		addListener(curLevel, 'update', 'trackVolume',
 			function(){
