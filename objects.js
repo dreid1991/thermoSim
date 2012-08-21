@@ -877,7 +877,7 @@ _.extend(Pool.prototype, getBinPts, {
 	changeMassFunc: function(sign){
 		console.log(sign);
 		return function(){
-			this.mass += sign*this.rate;
+			this.mass  = Math.max(this.mass + sign*this.rate, 1);
 			this.liquid.pts = this.getLiquidPts();
 			this.wall.setMass(this.massChunkName, this.mass);
 		}
@@ -917,24 +917,19 @@ _.extend(Pool.prototype, getBinPts, {
 				var liquidDown = -tube.liquid.y2 < this.tube.floor;	
 				if(tubeDown){
 					removeListener(curLevel, 'update', 'extendTube');
-				}else if(tubeDown && liquidDown){
-					removeListener(curLevel, 'update', 'extendTube');
-					removeListener(curLevel, 'update', 'extendFluid');
-					addListener(curLevel, 'update', 'changePoolMass', this.changeMassFunc(1), this);
 				}
 			}
 		,this);
 		addListener(curLevel, 'update', 'extendFluid',
 				function(){
-				tube.liquid.y2 += .8*this.tube.spped
+				tube.liquid.y2 += .8*this.tube.speed;
+				
 				var tubeDown = -tube.walls.y <this.tube.floor;
 				var liquidDown = -tube.liquid.y2 < this.tube.floor;				
 				if(liquidDown){
-					removeListener(curLevel, 'update', 'extendFluid');
-				}else if(tubeDown && liquidDown){
 					removeListener(curLevel, 'update', 'extendTube');
 					removeListener(curLevel, 'update', 'extendFluid');				
-					addListener(curLevel, 'update', 'changePoolMass', this.changeMassFunc(1), this);
+					addListener(curLevel, 'update', 'changeLiquidMass', this.changeMassFunc(1), this);
 				}
 			},
 		this);
@@ -958,7 +953,6 @@ _.extend(Pool.prototype, getBinPts, {
 				if(tubeDown){
 					removeListener(curLevel, 'update', 'extendTube');
 					this.liquidUp();
-					addListener(curLevel, 'update', 'changePoolMass', this.changeMassFunc(-1), this);
 				}
 			}
 		,this);
@@ -966,8 +960,9 @@ _.extend(Pool.prototype, getBinPts, {
 	},
 	liquidUp: function(){
 		var tube = this.tube;
-		tube.liquid.y1 = function(){return 0};
-		tube.liquid.y2 = this.tube.floor;
+		var self = this;
+		tube.liquid.y1 = function(){return -self.tube.floor};
+		tube.liquid.y2 = -this.tube.floor;
 		addListener(curLevel, 'update', 'liquidUp',
 			function(){
 				var dest = -this.pistonY();
@@ -975,7 +970,7 @@ _.extend(Pool.prototype, getBinPts, {
 				this.tube.liquid.y1 = function(){return liqY1};
 				if(liqY1 < dest){
 					removeListener(curLevel, 'update', 'liquidUp');
-					addListener(curLevel, 'update', 'changeLiquidMass', this.changeMass(liquidSign), this);
+					addListener(curLevel, 'update', 'changeLiquidMass', this.changeMassFunc(-1), this);
 				
 				}
 			}
