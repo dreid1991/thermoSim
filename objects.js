@@ -13,6 +13,36 @@ getBinPts = {
 		pts.push(P(pos.x - slant*dims.dx/2, pos.y - dims.dy));
 		return pts;
 	},
+	trackMassStart: function(){
+		this.trackMass = true;
+		if(!this.readout.entryExists('mass' + this.wallInfo)){
+			this.addMassEntry();
+		}
+		return this;
+	},
+	trackMassStop: function(){
+		this.trackMass = false;
+		this.readout.removeEntry('mass' + this.wallInfo);
+		return this;
+	},
+	trackPressureStart: function(){
+		this.trackPressure = true;
+		if(!this.readout.entryExists('pressure' + this.wallInfo)){
+			this.addPressureEntry();	
+		}
+		return this;
+	},
+	trackPressureStop: function(){
+		this.trackPressure = false;
+		this.readout.removeEntry('pressure' + this.wallInfo);	
+		return this;
+	},
+	addMassEntry: function(){
+		this.readout.addEntry('mass' + this.wallInfo, 'Mass:', 'kg', this.pistonMass, undefined, 0);
+	},
+	addPressureEntry: function(){
+		this.readout.addEntry('pressure' + this.wallInfo, 'Pressure:', 'atm', this.pressure, undefined, 1); 
+	},
 }
 //////////////////////////////////////////////////////////////////////////
 //DRAG WEIGHTS
@@ -116,42 +146,13 @@ _.extend(DragWeights.prototype, getBinPts, {
 		this.readout.removeEntry('eAdd' + this.wallInfo);
 		return this;
 	},
-	trackMassStart: function(){
-		this.trackMass = true;
-		if(!this.readout.entryExists('mass' + this.wallInfo)){
-			this.addMassEntry();
-		}
-		return this;
-	},
-	trackMassStop: function(){
-		this.trackMass = false;
-		this.readout.removeEntry('mass' + this.wallInfo);
-		return this;
-	},
-	trackPressureStart: function(){
-		this.trackPressure = true;
-		if(!this.readout.entryExists('pressure' + this.wallInfo)){
-			this.addPressureEntry();	
-		}
-		return this;
-	},
-	trackPressureStop: function(){
-		this.trackPressure = false;
-		this.readout.removeEntry('pressure' + this.wallInfo);	
-		return this;
-	},
+
 	addStdReadoutEntries: function(){
 		//this.addEnergyEntry();
 		this.addMassEntry();
 	},
 	addEnergyEntry: function(){
 		this.readout.addEntry('eAdd' + this.wallInfo, 'E Added:', 'kJ', this.eAdded, undefined, 1);
-	},
-	addMassEntry: function(){
-		this.readout.addEntry('mass' + this.wallInfo, 'Mass:', 'kg', this.pistonMass, undefined, 0);
-	},
-	addPressureEntry: function(){
-		this.readout.addEntry('pressure' + this.wallInfo, 'Pressure:', 'atm', this.pressure, undefined, 1); 
 	},
 	getWeightDims: function(weightDefs){
 		var dims = {};
@@ -356,10 +357,6 @@ _.extend(DragWeights.prototype, getBinPts, {
 		}
 		return totalMass+this.massInit;
 	},
-	getPressure: function(){
-		
-		return this.pistonMass*g*pConst/(this.wall[1].x-this.wall[0].x);
-	},
 	pistonMinusVal: function(val){
 		var wall = this.wall
 		return function(){return wall[0].y-val}
@@ -549,7 +546,7 @@ _.extend(DragWeights.prototype, getBinPts, {
 		weight.status = 'piston';
 		this.pistonMass = this.getPistonMass();
 		this.wall.setMass(this.massChunkName, this.pistonMass);
-		this.pressure = this.getPressure();
+		this.pressure = this.wall.pExt();
 		if(this.trackMass){
 			this.readout.tick('mass' + this.wallInfo, this.pistonMass);
 		}
@@ -767,7 +764,7 @@ function Pool(attrs){
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.wall = walls[this.wallInfo];
 	this.mass = defaultTo(10, attrs.massInit);
-	
+	this.readout = defaultTo(curLevel.readout, attrs.readout);
 	this.buttonFillId = defaultTo('buttonFill', attrs.fillButtonId);
 	this.buttonDrainId = defaultTo('buttonDrain', attrs.drainButtonId);
 	this.bindButtons();
@@ -782,12 +779,12 @@ function Pool(attrs){
 	
 	this.bin.col = defaultTo(Col(150, 150, 150), attrs.binCol);
 	this.bin.slant = defaultTo(1.3, attrs.binSlant);
-	this.bin.width = 110;
+	this.bin.width = defaultTo(220, attrs.binWidth);
 	this.bin.widthUpper = this.bin.width*this.bin.slant;
 	this.bin.height = 30;
 	this.bin.thickness = defaultTo(5, attrs.binThickness);
 	
-	this.spcVol = 40; //specific volume
+	this.spcVol = 70; //specific volume
 	this.liquid.col = defaultTo(Col(83, 87, 239), attrs.liquidCol);
 	this.liquid.pts = this.getLiquidPts();
 	this.bin.pts = this.getBinPts(P(0,0-this.bin.thickness), this.bin.slant, V(this.bin.width, this.bin.height), this.bin.thickness);
@@ -796,7 +793,7 @@ function Pool(attrs){
 	
 
 
-	this.tube.speed = defaultTo(4, attrs.tubeSpeed);
+	this.tube.speed = defaultTo(8, attrs.tubeSpeed);
 	this.tube.walls.col = defaultTo(Col(175,175,175), attrs.tubeWallCol);
 	this.tube.ID = 10; //inner diameter
 	this.tube.OD = 20; //outer diameter
@@ -814,6 +811,7 @@ _.extend(Pool.prototype, getBinPts, {
 	init: function(){	
 		addListener(curLevel, 'update', 'drawPool', this.draw, this);
 		this.wall.moveInit();	
+		return this.trackMassStart().trackPressureStart();
 	},
 	bindButtons: function(){
 		var self = this;
@@ -851,8 +849,8 @@ _.extend(Pool.prototype, getBinPts, {
 		var liquidDWidth = dWidth*height/this.bin.height;
 		pts[0] = P(-this.bin.width/2, -this.bin.thickness);
 		pts[1] = P(this.bin.width/2, -this.bin.thickness);
-		pts[2] = P(this.bin.width/2 + liquidDWidth, -height-this.bin.thickness);
-		pts[3] = P(-this.bin.width/2 - liquidDWidth, -height-this.bin.thickness);
+		pts[2] = P((this.bin.width + liquidDWidth)/2, -height-this.bin.thickness);
+		pts[3] = P((-this.bin.width - liquidDWidth)/2, -height-this.bin.thickness);
 		return pts;
 	},
 	getTubeXPts: function(ID, OD){
@@ -880,6 +878,12 @@ _.extend(Pool.prototype, getBinPts, {
 			this.mass  = Math.max(this.mass + sign*this.rate, 1);
 			this.liquid.pts = this.getLiquidPts();
 			this.wall.setMass(this.massChunkName, this.mass);
+			if(this.trackMass){
+				this.readout.tick('mass' + this.wallInfo, this.mass);
+			}
+			if(this.trackPressure){
+				this.readout.tick('pressure' + this.wallInfo, this.wall.pExt());
+			}
 		}
 	},
 	/*
@@ -927,6 +931,8 @@ _.extend(Pool.prototype, getBinPts, {
 				var tubeDown = -tube.walls.y <this.tube.floor;
 				var liquidDown = -tube.liquid.y2 < this.tube.floor;				
 				if(liquidDown){
+					tube.liquid.y2 = -this.tube.floor;
+					tube.walls.y = -this.tube.floor;
 					removeListener(curLevel, 'update', 'extendTube');
 					removeListener(curLevel, 'update', 'extendFluid');				
 					addListener(curLevel, 'update', 'changeLiquidMass', this.changeMassFunc(1), this);
@@ -951,6 +957,7 @@ _.extend(Pool.prototype, getBinPts, {
 				tube.walls.y += this.tube.speed;
 				var tubeDown = -tube.walls.y < this.tube.floor;
 				if(tubeDown){
+					tube.walls.y = -this.tube.floor;
 					removeListener(curLevel, 'update', 'extendTube');
 					this.liquidUp();
 				}
@@ -985,9 +992,9 @@ _.extend(Pool.prototype, getBinPts, {
 		addListener(curLevel, 'update', 'retract',
 			function(){
 				var dest = -this.pistonY();
-				var liqY1 = tube.liquid.y1() - tube.speed;
+				var liqY1 = tube.liquid.y1() - 1.5*tube.speed;
 				tube.liquid.y1 = function(){return liqY1};
-				tube.liquid.y2 -= tube.speed*1.5;
+				tube.liquid.y2 -= 1.5*tube.speed;
 				tube.walls.y -= tube.speed;
 				if(tube.liquid.y1() < dest && tube.liquid.y2 < dest && tube.walls.y < dest){
 					removeListener(curLevel, 'update', 'retract');

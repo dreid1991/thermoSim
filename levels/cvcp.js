@@ -131,6 +131,7 @@ _.extend(cvcp.prototype,
 	},
 	//testing fill
 	block0Start: function(){
+		this.readout.show();
 		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
 		spcs['spc1'].populate(P(300,100), V(200, 200), 350, 185);
 		spcs['spc3'].populate(P(300,100), V(200, 200), 250, 185);		
