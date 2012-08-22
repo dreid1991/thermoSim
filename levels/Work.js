@@ -131,7 +131,7 @@ _.extend(Work.prototype,
 			},
 			{block:9,
 				cutScene: true,
-				text:"<p>Alright, we got 363 K experimental versus XXX K theoretical.  So our idea was that work increases temperature through molecules' collisions with the moving wall.</p><p>Does our experiment back up the idea?</p>",
+				text:"<p>Alright, we got XXX K experimental versus 363 K theoretical.  So our idea was that work increases temperature through molecules' collisions with the moving wall.</p><p>Does our experiment back up the idea?</p>",
 				quiz:{	
 					type:'buttons',
 					options:
@@ -164,12 +164,14 @@ _.extend(Work.prototype,
 			},
 			{block:12, 
 				title: 'Current step', 
-				text:'Okay, let’s see if an experiment gives matching changes in temperature.  The left container’s internal pressure is half the right’s.  The graphs should show the temperature change.  <br>Did it?',
+				text:'Okay, let’s see if an experiment gives matching changes in temperature.  The left container’s internal pressure is half the right’s.  The graphs should show the temperature change.  <br>How do the temperature changes compare?',
 				quiz:{	
 					type:'buttons',
 					options:
-						[{buttonId:'yes', text:'Yes', isCorrect:true},
-						{buttonId:'no', text:'No', isCorrect:false, message:"Yeah it does!  Look at the graphs!"}
+						[{buttonId:'EQ9', text:'||EQ9||', isCorrect:false, message:"No it's not, look at the graphs!"},
+						{buttonId:'EQ10', text:'||EQ10||', isCorrect:true},
+						{buttonId:'EQ11', text:'||EQ11||', isCorrect:false, message:"No it's not, look at the graphs!"}
+						
 					]
 				},		
 			},
@@ -210,7 +212,7 @@ _.extend(Work.prototype,
 			},
 			{block:16,
 				cutScene: 'outro',
-				text:"<p>So it seems that energy added depends only on external pressure.  If P<sub>ext</sub> is much greater then P<sub>int</sub>, the wall gets a lot of momentum and hit the molecules really hard, speeding them up a lot.  If it’s not much greater, it means that the wall just hits the molecules <i>a lot</i> of times, with each impact adding some speeding them up a little bit.  </p><p>In both cases, the energy you add is equal to</p><p><center>||EQ1||</img></center></p><p>Fin.</p>"
+				text:"<p>So it seems that energy added depends only on external pressure.  If P<sub>ext</sub> is much greater then P<sub>int</sub>, the wall gets a lot of momentum and hit the molecules really hard, speeding them up a lot.  If it’s not much greater, it means that the wall just hits the molecules <i>a lot</i> of times, with each impact adding some speeding them up a little bit.  </p><p>To generalize, no matter the internal pressure, the energy you add is equal to</p><p><center>||EQ1||</img></center></p><p>Fin.</p>"
 			}
 
 		]
