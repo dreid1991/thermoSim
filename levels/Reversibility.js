@@ -65,7 +65,7 @@ _.extend(Reversibility.prototype,
 			},
 			{block:4, 
 				cutScene: true, 
-				text: "<p>Yes!</p><p>So when we compressed with the biggest block, P<sub>ext</sub> was much greater than P<sub>int</sub>.  We did more work than we had to because when P<sub>int</sub> was low, we didn’t need to apply such a high external pressure to compress.<p></p>When we compressed with the smaller blocks, P<sub>ext</sub> stepped more smoothly with P<sub>int</sub>.</p><p>Since we weren’t compressing at the maximum pressure the whole time, we did less work and heated the system less.</p><p>What if we ground up our block into a dust and slowly placed it on top?  How do you think the amount of work we have to do will change?</p>",
+				text: "<p>Yes!</p><p>So when we compressed with the biggest block, P<sub>ext</sub> was much greater than P<sub>int</sub>.  We did more work than we had to because when P<sub>int</sub> was low, we didn’t need to apply such a high external pressure to compress.<p></p>When we compressed with the smaller blocks, P<sub>ext</sub> stepped more smoothly with P<sub>int</sub>.</p><p>Since we weren’t compressing at the maximum pressure the whole time, we did less work and heated the system less.</p><p>What if we ground up our block into a paste and slowly placed it on top?  How do you think the amount of work we have to do will change?</p>",
 				quiz:{	
 					type:'buttons',
 					options:
@@ -76,10 +76,10 @@ _.extend(Reversibility.prototype,
 			},
 			{block:5,
 				title:'Current step', 
-				text:"Okay, here's our liquid.  To compress, P<sub>ext</sub> must only be barely greater than P<sub>int</sub>.  When it is more than a tiny amount higher, we’re doing more work than we have to.  How much work does it take to compress to 10 liters this time?"},
+				text:"Okay, here's our paste.  To compress, P<sub>ext</sub> must only be barely greater than P<sub>int</sub>.  When it is more than a tiny amount higher, we’re doing more work than we have to.  How much work does it take to compress to 10 liters this time?"},
 			{block:6, 
 				cutScene: true, 
-				text:"<p>So in the three compressions, you did XX, YY, and finally ZZ kJ of work.  What if we kept breaking our blocks into smaller pieces?</p><p>If they were small enough, every time we put a new block on, would P<sub>ext</sub> even be noticeably different than P<sub>int</sub>?</p> <p> If we kept those pressures almost equal, would we ever be doing any more work than we had to? </p><p> By the way, the answer is the same to both questions.</p>",
+				text:"<p>So in the three compressions, you did XX, YY, and finally ZZ kJ of work.  But even when we compressed with the paste, we added it quickly enough so that P<sub>ext</sub> was significantly greater than P<sub>int</sub>. </p><p>If we added paste slowly enough, one little droplet at a time, would P<sub>ext</sub> even be noticeably different than P<sub>int</sub>?</p> <p> If we kept those pressures almost equal, would we ever be doing any more work than we had to? </p><p> By the way, the answer is the same to both questions.</p>",
 				quiz:{	
 					type:'buttons',
 					options:
@@ -95,7 +95,7 @@ _.extend(Reversibility.prototype,
 			},
 			{block:7, 
 				cutScene: true, 
-				text:"<p>Indeed!  We could even say that when using such tiny blocks</p><center>||EQ1||</center>"},
+				text:"<p>Indeed!  We could even say that when increasing the pressure in such small steps</p><center>||EQ1||</center>"},
 			{block:8, 
 				title:'Current step', 
 				text:"Now I have another equally important task for you.  I want this piston expanded in a way that gets as much work out as possible.  When we compressed, we used the blocks to do work on the system.  When expanding, the system can do work on the blocks, lifting them to a higher potential energy.  Let’s start with just one block.  How much work can you get out?"},
@@ -137,7 +137,7 @@ _.extend(Reversibility.prototype,
 			},
 			{block:12, 
 				cutScene: true, 
-				text: "<p>Now say we split our blocks into tiny pieces again.  The maximum amount of work we can get out at any point is</p><center>||EQ2||</center><p>over a tiny (or differential) change in volume.  As we use smaller and smaller blocks, we again approach</p><center>||EQ1||</center>"
+				text: "<p>Now say we mash our block into a paste again.  The maximum amount of work we can get out at any point is</p><center>||EQ2||</center><p>over a tiny (or differential) change in volume.  As we take smaller and smaller pressure steps by adding just a little bit of paste at a time, we again approach</p><center>||EQ1||</center>"
 			},
 			{block:13, 
 				title:'Current step', 
@@ -269,7 +269,6 @@ _.extend(Reversibility.prototype,
 		this.pool.remove();
 		this.pool = undefined;
 		this.stops.remove();
-		walls[0].trackWorkStop();
 		
 	},
 	block7CleanUp: function(){
@@ -324,7 +323,7 @@ _.extend(Reversibility.prototype,
 	block13Start: function(){
 		this.unCompSetup();
 		this.makeGraphsRev();
-		walls[0].trackWorkStart(this.readout);
+
 		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.02, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:
 				function(){
 					var compWork = walls[0].work;
@@ -340,7 +339,7 @@ _.extend(Reversibility.prototype,
 			}
 			
 		);
-		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:1}}).trackPressureStart();		
+		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:1}}).trackPressureStart().trackWorkStart();		
 		this.trackVolumeStart(0);
 	},
 	block13Conditions: function(){
@@ -355,7 +354,6 @@ _.extend(Reversibility.prototype,
 	block13CleanUp: function(){
 		this.removeAllGraphs();
 		this.dragWeights.remove();
-		walls[0].trackWorkStop();
 		this.trackVolumeStop();
 	},
 	block14Start: function(){
@@ -365,7 +363,6 @@ _.extend(Reversibility.prototype,
 		$('#buttonDrain').show();
 		this.unCompSetup();
 		this.makeGraphsRev();
-		walls[0].trackWorkStart(this.readout);
 		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:
 			function(){
 				var compWork = walls[0].work;

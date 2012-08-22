@@ -788,7 +788,7 @@ function Pool(attrs){
 	
 		
 	
-	this.bin.col = defaultTo(Col(150, 150, 150), attrs.binCol);
+	this.bin.col = defaultTo(Col(175, 175, 175), attrs.binCol);
 	this.bin.slant = defaultTo(1.3, attrs.binSlant);
 	this.bin.width = defaultTo(220, attrs.binWidth);
 	this.bin.widthUpper = this.bin.width*this.bin.slant;
@@ -796,7 +796,7 @@ function Pool(attrs){
 	this.bin.thickness = defaultTo(5, attrs.binThickness);
 	
 	this.spcVol = 70; //specific volume
-	this.liquid.col = defaultTo(Col(83, 87, 239), attrs.liquidCol);
+	this.liquid.col = defaultTo(Col(224, 165, 75), attrs.blockCol);
 	this.liquid.pts = this.getLiquidPts();
 	this.liquid.level = function(){return -self.bin.thickness - self.liquid.height};
 	
@@ -931,7 +931,7 @@ _.extend(Pool.prototype, compressorFuncs, {
 				var tubeDown = -tube.walls.y <this.liquid.level();
 				var liquidDown = -tube.liquid.y2 < this.liquid.level();	
 				if(tubeDown){
-					tube.walls.y = this.liquid.level;
+					tube.walls.y = -this.tube.floor;
 					removeListener(curLevel, 'update', 'extendTube');
 				}
 			}

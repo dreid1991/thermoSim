@@ -306,6 +306,9 @@ Point.prototype = {
 	},
 	sameAs: function(b){
 		return (this.x==b.x && this.y==b.y);
+	},
+	track: function(){
+		//FILL IN - HAVE LIKE {x:{obj, offset}, y:{obj, offset}}
 	}
 	
 	
