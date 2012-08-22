@@ -345,7 +345,7 @@ LevelTools = {
 			delete this.graphs[graphName];
 		}	
 	},
-	trackVolumeStart: function(decPlaces){
+	trackVolume: function(decPlaces){
 		decPlaces = defaultTo(1, decPlaces);
 		//DO THIS BY WALL
 		this.readout.addEntry('vol', 'Volume:', 'L', dataHandler.volume(), undefined, decPlaces);
@@ -359,7 +359,7 @@ LevelTools = {
 		this.readout.removeEntry('vol');
 		removeListener(curLevel, 'update', 'trackVolume');
 	},
-	trackIntPressureStart: function(handle){
+	trackIntPresure: function(handle){
 		this.data['pInt'+handle] = [];
 		var dataList = this.data['pInt'+handle]
 		var wall = walls[handle];
@@ -375,7 +375,7 @@ LevelTools = {
 	trackIntPressureStop: function(handle){
 		removeListener(curLevel, 'data', 'trackIntPressure'+handle);
 	},
-	trackTempStart: function(handle, label, dataSet, decPlaces){
+	trackTemp: function(handle, label, dataSet, decPlaces){
 		decPlaces = defaultTo(0, decPlaces);
 		dataSet = defaultTo(this.data.t, dataSet);
 		label = defaultTo('Temp:', label);
@@ -392,7 +392,7 @@ LevelTools = {
 		this.readout.removeEntry(handle);
 		removeListener(curLevel, 'data', 'trackTemp' + handle);
 	},
-	trackStart: function(handle, label, data, decPlaces, units){
+	track: function(handle, label, data, decPlaces, units){
 		decPlaces = defaultTo(1, decPlaces);
 		if(typeof(data)=='Array'){
 			this.readout.addEntry(handle, label, units, data[data.length-1], undefined, decPlaces);

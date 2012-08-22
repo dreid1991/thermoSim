@@ -775,7 +775,7 @@ WallMethods = {
 		removeBorder: function(){
 			removeListener(curLevel, 'update', 'drawBorder' + this.handle);
 		},
-		trackWorkStart: function(readout, decPlaces){
+		trackWork: function(readout, decPlaces){
 			var LTOM3LOCAL = LtoM3;
 			var PCONSTLOCAL = pConst;
 			var ATMTOPALOCAL = ATMtoPA;

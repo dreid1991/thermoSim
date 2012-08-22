@@ -13,37 +13,37 @@ compressorFuncs = {
 		pts.push(P(pos.x - slant*dims.dx/2, pos.y - dims.dy));
 		return pts;
 	},
-	trackWorkStart: function(){
-		this.trackWork = true;
-		this.wall.trackWorkStart(this.readout);
+	trackWork: function(){
+		this.trackingWork = true;
+		this.wall.trackWork(this.readout);
 		return this;
 	},
 	trackWorkStop: function(){
-		this.trackWork = false;
+		this.trackingWork = false;
 		this.wall.trackWorkStop();
 		return this;
 	},
-	trackMassStart: function(){
-		this.trackMass = true;
+	trackMass: function(){
+		this.trackingMass = true;
 		if(!this.readout.entryExists('mass' + this.wallInfo)){
 			this.addMassEntry();
 		}
 		return this;
 	},
 	trackMassStop: function(){
-		this.trackMass = false;
+		this.trackingMass = false;
 		this.readout.removeEntry('mass' + this.wallInfo);
 		return this;
 	},
-	trackPressureStart: function(){
-		this.trackPressure = true;
+	trackPressure: function(){
+		this.trackingPressure = true;
 		if(!this.readout.entryExists('pressure' +  this.wallInfo)){
 			this.addPressureEntry();	
 		}
 		return this;
 	},
 	trackPressureStop: function(){
-		this.trackPressure = false;
+		this.trackingPressure = false;
 		this.readout.removeEntry('pressure' + this.wallInfo);	
 		return this;
 	},
@@ -54,9 +54,9 @@ compressorFuncs = {
 		this.readout.addEntry('pressure' + this.wallInfo, 'Pressure:', 'atm', this.wall.pExt(), undefined, 1); 
 	},
 	removeEntries: function(){
-		if(this.trackMass){this.trackMassStop();};
-		if(this.trackPressure){this.trackPressureStop();};
-		if(this.trackWork){this.trackWorkStop();};
+		if(this.trackingMass){this.trackMassStop();};
+		if(this.trackingPressure){this.trackPressureStop();};
+		if(this.trackingWork){this.trackWorkStop();};
 		return this;
 	},
 }
@@ -110,9 +110,9 @@ function DragWeights(attrs){
 
 
 	this.wall.setMass(this.massChunkName, this.massInit);
-	this.trackEnergy = false;
-	this.trackMass = true;
-	this.trackPressure = false;
+	this.trackingEnergy = false;
+	this.trackingMass = true;
+	this.trackingPressure = false;
 	return this.init();
 }
 
@@ -555,10 +555,10 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 		this.mass = this.getPistonMass();
 		this.wall.setMass(this.massChunkName, this.mass);
 		this.pressure = this.wall.pExt();
-		if(this.trackMass){
+		if(this.trackingMass){
 			this.readout.tick('mass' + this.wallInfo, this.mass);
 		}
-		if(this.trackPressure){
+		if(this.trackingPressure){
 			this.readout.tick('pressure' + this.wallInfo, this.pressure);
 		}
 	},	
@@ -571,10 +571,10 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 		this.mass = this.getPistonMass();
 		this.wall.setMass(this.massChunkName, this.mass);
 		this.pressure = this.wall.pExt();
-		if(this.trackMass){
+		if(this.trackingMass){
 			this.readout.tick('mass' + this.wallInfo, this.mass);
 		}
-		if(this.trackPressure){
+		if(this.trackingPressure){
 			this.readout.tick('pressure' + this.wallInfo, this.pressure);
 		}
 	},
@@ -822,7 +822,7 @@ _.extend(Pool.prototype, compressorFuncs, {
 	init: function(){	
 		addListener(curLevel, 'update', 'drawPool', this.draw, this);
 		this.wall.moveInit();	
-		return this.trackMassStart().trackPressureStart();
+		return this.trackMass().trackPressure();
 	},
 	bindButtons: function(){
 		var self = this;
@@ -889,10 +889,10 @@ _.extend(Pool.prototype, compressorFuncs, {
 			this.mass  = Math.min(this.massMax, Math.max(this.mass + sign*this.rate, this.massMin));
 			this.liquid.pts = this.getLiquidPts();
 			this.wall.setMass(this.massChunkName, this.mass);
-			if(this.trackMass){
+			if(this.trackingMass){
 				this.readout.tick('mass' + this.wallInfo, this.mass);
 			}
-			if(this.trackPressure){
+			if(this.trackingPressure){
 				this.readout.tick('pressure' + this.wallInfo, this.wall.pExt());
 			}
 		}
@@ -1402,7 +1402,7 @@ _.extend(Piston.prototype, compressorFuncs, {
 			function(){
 				this.p = boundedStep(this.p, pSetPt, this.pStep);
 				this.setMass();			
-				if(this.trackPressure){
+				if(this.trackingPressure){
 					this.readout.hardUpdate('pressure'+this.wallInfo, this.p);
 				}
 				if(round(this.p,2)==pSetPt){

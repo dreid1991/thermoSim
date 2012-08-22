@@ -307,7 +307,11 @@ Point.prototype = {
 	sameAs: function(b){
 		return (this.x==b.x && this.y==b.y);
 	},
-	track: function(){
+	track: function(trackInfo){
+		var listenerId = unique(this.x+','this.y+'tracksWithUniqueId', curLevel.updateListeners.listeners);
+		if(xTrack && yTrack){
+			
+		}
 		//FILL IN - HAVE LIKE {x:{obj, offset}, y:{obj, offset}}
 	}
 	

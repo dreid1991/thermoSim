@@ -200,8 +200,8 @@ _.extend(Reversibility.prototype,
 		this.makeGraphsRev();
 		var wallHandle = 'container';
 		this.unCompSetup();
-		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:90}]}).trackPressureStart().trackWorkStart();//this.makeDragWeights([{name:'lrg', count:1, mass:90}], wallHandle).trackPressureStart();
-		this.trackVolumeStart(0);
+		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:90}]}).trackPressure().trackWork();//this.makeDragWeights([{name:'lrg', count:1, mass:90}], wallHandle).trackPressure();
+		this.trackVolume(0);
 		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInLrg',round(walls[0].work,1))},obj:''}});
 		this.readout.show();
 	},	
@@ -223,8 +223,8 @@ _.extend(Reversibility.prototype,
 		this.makeGraphsRev();
 		var numBlocks = getStore('numBlocks');
 		this.unCompSetup();
-		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:numBlocks}}).trackPressureStart().trackWorkStart();
-		this.trackVolumeStart(0);
+		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:numBlocks}}).trackPressure().trackWork();
+		this.trackVolume(0);
 		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.02, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInMed', round(walls[0].work,1))},obj:''}});
 	},
 	block2Conditions: function(){
@@ -244,8 +244,8 @@ _.extend(Reversibility.prototype,
 	block5Start: function(){
 		this.makeGraphsRev();
 		this.unCompSetup();
-		this.trackVolumeStart(0);		
-		this.pool = new Pool({massMax:100, massMin:10}).trackWorkStart().trackMassStart().trackPressureStart();
+		this.trackVolume(0);		
+		this.pool = new Pool({massMax:100, massMin:10}).trackWork().trackMass().trackPressure();
 		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.02, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInSml', round(walls[0].work,1))},obj:''}});
 		$('#reset').hide();
 		$('#clearGraphs').hide();
@@ -277,10 +277,10 @@ _.extend(Reversibility.prototype,
 	block8Start: function(){
 		this.makeGraphsRev();
 		this.compSetup();
-		this.trackVolumeStart(0);
+		this.trackVolume(0);
 		this.volListener16 = new StateListener({condition:16, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workOutLrg', Math.abs(round(walls[0].work,1)))},obj:''}});
-		walls[0].trackWorkStart(this.readout);
-		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:1}}).dropAllIntoPistons('instant').trackPressureStart();
+		walls[0].trackWork(this.readout);
+		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:1}}).dropAllIntoPistons('instant').trackPressure();
 	},
 	block8Conditions: function(){
 		if(this.volListener16.isSatisfied){
@@ -300,11 +300,11 @@ _.extend(Reversibility.prototype,
 	block10Start: function(){
 		this.compSetup();
 		this.pool = new Pool({massInit:60});
-		//this.dragWeights = new DragWeights({weightDefs:{mass:90, count:12}}).trackPressureStart().dropAllIntoPistons('instant');
+		//this.dragWeights = new DragWeights({weightDefs:{mass:90, count:12}}).trackPressure().dropAllIntoPistons('instant');
 		this.makeGraphsRev();
 		this.volListener16 = new StateListener({condition:16, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workOutSml', Math.abs(round(walls[0].work,1)))},obj:''}});
-		walls[0].trackWorkStart(this.readout);
-		this.trackVolumeStart(0);
+		walls[0].trackWork(this.readout);
+		this.trackVolume(0);
 		$('#reset').hide();
 		$('#clearGraphs').hide();
 		$('#buttonFill').show();
@@ -339,8 +339,8 @@ _.extend(Reversibility.prototype,
 			}
 			
 		);
-		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:1}}).trackPressureStart().trackWorkStart();		
-		this.trackVolumeStart(0);
+		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:1}}).trackPressure().trackWork();		
+		this.trackVolume(0);
 	},
 	block13Conditions: function(){
 		if(this.volListener10.isSatisfied() && this.volListener16.isSatisfied()){
@@ -376,8 +376,8 @@ _.extend(Reversibility.prototype,
 			},
 			obj:this}
 		});
-		this.trackVolumeStart(0);
-		this.pool = new Pool().trackPressureStart().trackMassStart().trackWorkStart();
+		this.trackVolume(0);
+		this.pool = new Pool().trackPressure().trackMass().trackWork();
 	},
 	block14Conditions: function(){
 		if(this.volListener10.isSatisfied() && this.volListener16.isSatisfied()){
