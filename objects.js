@@ -25,33 +25,33 @@ compressorFuncs = {
 	},
 	trackMassStart: function(){
 		this.trackMass = true;
-		if(!this.readout.entryExists('mass' +  walls.idxByInfo(this.wallInfo))){
+		if(!this.readout.entryExists('mass' + this.wallInfo)){
 			this.addMassEntry();
 		}
 		return this;
 	},
 	trackMassStop: function(){
 		this.trackMass = false;
-		this.readout.removeEntry('mass' + walls.idxByInfo(this.wallInfo));
+		this.readout.removeEntry('mass' + this.wallInfo);
 		return this;
 	},
 	trackPressureStart: function(){
 		this.trackPressure = true;
-		if(!this.readout.entryExists('pressure' +  walls.idxByInfo(this.wallInfo))){
+		if(!this.readout.entryExists('pressure' +  this.wallInfo)){
 			this.addPressureEntry();	
 		}
 		return this;
 	},
 	trackPressureStop: function(){
 		this.trackPressure = false;
-		this.readout.removeEntry('pressure' + walls.idxByInfo(this.wallInfo));	
+		this.readout.removeEntry('pressure' + this.wallInfo);	
 		return this;
 	},
 	addMassEntry: function(){
-		this.readout.addEntry('mass' +  walls.idxByInfo(this.wallInfo), 'Mass:', 'kg', this.mass, undefined, 0);
+		this.readout.addEntry('mass' + this.wallInfo, 'Mass:', 'kg', this.mass, undefined, 0);
 	},
 	addPressureEntry: function(){
-		this.readout.addEntry('pressure' +  walls.idxByInfo(this.wallInfo), 'Pressure:', 'atm', this.wall.pExt(), undefined, 1); 
+		this.readout.addEntry('pressure' + this.wallInfo, 'Pressure:', 'atm', this.wall.pExt(), undefined, 1); 
 	},
 	removeEntries: function(){
 		if(this.trackMass){this.trackMassStop();};
@@ -1397,6 +1397,7 @@ _.extend(Piston.prototype, compressorFuncs, {
 	setPressure: function(sliderVal){
 		var pSetPt = (this.pMax - this.pMin)*sliderVal/100 + this.pMin
 		var dp = pSetPt - this.p;
+
 		addListener(curLevel, 'update', 'piston'+this.handle+'adjP', 
 			function(){
 				this.p = boundedStep(this.p, pSetPt, this.pStep);
