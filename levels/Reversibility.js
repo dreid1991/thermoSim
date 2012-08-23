@@ -190,10 +190,7 @@ _.extend(Reversibility.prototype,
 
 	init: function(){
 		var self = this;
-		//recordData('pInt', function(){return walls[0].pInt()}, this);
-		//recordData('pExt', function(){return walls[0].pExt()}, this);
-		//recordData('v', dataHandler.volumeFunc(), this);
-		//recordData('t', dataHandler.tempFunc(), this);
+
 		nextPrompt();
 	},
 	block0Start: function(){
@@ -201,7 +198,7 @@ _.extend(Reversibility.prototype,
 		this.unCompSetup();
 		this.makeGraphsRev();
 		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:90}]}).wall.displayPExt();
-		//this.volListener10 = new StateListener({condition:10, checkAgainst:walls['0'].data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInLrg',round(walls[0].work,1))},obj:''}});
+		this.volListener10 = new StateListener({condition:10, checkAgainst:walls[0].data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInLrg',round(walls[0].work,1))},obj:''}});
 		this.readout.show();
 	},	
 	block0Conditions: function(){

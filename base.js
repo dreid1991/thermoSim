@@ -40,7 +40,7 @@ $(function(){
 	setInterval('curLevel.update()', updateInterval);
 	setInterval('curLevel.updateData()', dataInterval);
 	//_.extend(Array.prototype, pushNumber);
-	Array.prototype.pushNumber = pushNumber;
+	_.extend(Array.prototype, ArrayExtenders);
 	
 	/*Timing stuff
 	started = false;
@@ -482,11 +482,25 @@ function eraseStore(attrName){
 		stored = {};
 	}
 }
-function pushNumber(number){
-	if(!isNaN(number) && number!==undefined){
-		this.push(number);
-	}
-	return this;
+ArrayExtenders = {
+	pushNumber: function(number){
+		if(!isNaN(number) && number!==undefined){
+			this.push(number);
+		}
+		return this;
+	},
+	deepCopy: function(){
+		var copy = new Array(this.length);
+		for (var idx=0; idx<this.length; idx++){
+			if(this[idx] instanceof Array){
+				copy[idx] = this[idx].deepCopy();
+			}else{
+				copy[idx] = this[idx];
+			}
+		}
+		return copy;
+
+	},
 }
 function recordData(handle, list, func, obj, listenerType){
 	var listenerType = defaultTo('record', listenerType)

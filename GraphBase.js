@@ -18,6 +18,9 @@ GraphBase = {
 		$('#'+this.name+'GraphSpacer').remove();
 		delete this;//DOESN'T DO ANYTHING
 	},
+	save: function(){
+		
+	},
 	makeCheck: function(address, legend, toggleCol){
 		var entry = legend[address];
 		var oversize = this.checkMarkOversize;
