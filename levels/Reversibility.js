@@ -190,19 +190,18 @@ _.extend(Reversibility.prototype,
 
 	init: function(){
 		var self = this;
-		recordDataStart('pInt', function(){return walls[0].pInt()}, this);
-		recordDataStart('pExt', function(){return walls[0].pExt()}, this);
-		recordDataStart('v', dataHandler.volumeFunc(), this);
-		recordDataStart('t', dataHandler.tempFunc(), this);
+		//recordData('pInt', function(){return walls[0].pInt()}, this);
+		//recordData('pExt', function(){return walls[0].pExt()}, this);
+		//recordData('v', dataHandler.volumeFunc(), this);
+		//recordData('t', dataHandler.tempFunc(), this);
 		nextPrompt();
 	},
 	block0Start: function(){
 		this.makeGraphsRev();
 		var wallHandle = 'container';
 		this.unCompSetup();
-		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:90}]}).trackPressure().trackWork();//this.makeDragWeights([{name:'lrg', count:1, mass:90}], wallHandle).trackPressure();
-		this.trackVolume(0);
-		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInLrg',round(walls[0].work,1))},obj:''}});
+		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:90}]}).wall.displayPExt();
+		//this.volListener10 = new StateListener({condition:10, checkAgainst:walls['0'].data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInLrg',round(walls[0].work,1))},obj:''}});
 		this.readout.show();
 	},	
 	block0Conditions: function(){

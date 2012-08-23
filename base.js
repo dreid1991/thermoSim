@@ -39,7 +39,9 @@ $(function(){
 	collide = new CollideHandler();
 	setInterval('curLevel.update()', updateInterval);
 	setInterval('curLevel.updateData()', dataInterval);
-
+	//_.extend(Array.prototype, pushNumber);
+	Array.prototype.pushNumber = pushNumber;
+	
 	/*Timing stuff
 	started = false;
 	counted = 0;
@@ -370,6 +372,12 @@ function defaultTo(defaultVal, inputVal){
 	}
 	return defaultVal;
 } 
+function validNumber(num){
+	if(!isNaN(num)){
+		return num;
+	}
+	return false;
+}
 function round(val, dec){
 	var pow = Math.pow(10,dec);
 	return Math.round(val*pow)/pow;
@@ -474,12 +482,20 @@ function eraseStore(attrName){
 		stored = {};
 	}
 }
-function recordDataStart(handle, func, obj){
-	curLevel.data[handle] = [];
-	addListener(curLevel, 'record', handle, func, obj);
+function pushNumber(number){
+	if(!isNaN(number) && number!==undefined){
+		this.push(number);
+	}
+	return this;
+}
+function recordData(handle, list, func, obj, listenerType){
+	var listenerType = defaultTo('record', listenerType)
+	store('record' + handle, listenerType);
+	addListener(curLevel, listenerType, handle, function(){list.pushNumber(func.apply(obj))}, obj);
 }
 function recordDataStop(handle){
-	removeListener(curLevel, 'record', handle);
+	var listenerType = getStore('record' + handle);
+	removeListener(curLevel, listenerType, handle);
 }
 function addEqs(text){
 	var eqIdx = text.indexOf('||EQ');
@@ -564,6 +580,9 @@ function hideSliders(){
 	}
 }
 function showPrompt(prev, prompt){
+	if(window['walls']!==undefined){
+		walls.remove();
+	}
 	var finishedPrev = new Boolean();
 	var forward = new Boolean();
 	var didWin = new Boolean();

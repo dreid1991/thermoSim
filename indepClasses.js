@@ -308,7 +308,7 @@ Point.prototype = {
 		return (this.x==b.x && this.y==b.y);
 	},
 	track: function(trackInfo){
-		var listenerId = unique(this.x+','this.y+'tracksWithUniqueId', curLevel.updateListeners.listeners);
+		var listenerId = unique(this.x+','+this.y+'tracksWithUniqueId', curLevel.updateListeners.listeners);
 		if(xTrack && yTrack){
 			
 		}

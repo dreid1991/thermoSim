@@ -1,8 +1,8 @@
-function WallHandler(pts, handlers, handles, bounds, includes, vols, shows){
+function WallHandler(pts, handlers, handles, bounds, includes, vols, shows, records){//records is a verb
 	var newWall = new Array(pts.length)
 	_.extend(newWall, WallMethods.main, WallMethods.collideMethods);
 
-	newWall.assemble(pts, handles, bounds, includes, vols, shows)
+	newWall.assemble(pts, handles, bounds, includes, vols, shows, records)
 	
 	if(handles.length!=pts.length){
 		console.log('NAME YOUR WALLS');
@@ -15,18 +15,21 @@ function WallHandler(pts, handlers, handles, bounds, includes, vols, shows){
 };
 WallMethods = {
 	main: {
-		assemble: function(pts, handles, bounds, includes, vols, shows){
+		assemble: function(pts, handles, bounds, includes, vols, shows, records){
+			this.numWalls = pts.length;
 			includes = defaultTo([], includes);
 			bounds = defaultTo([], bounds);
 			vols = defaultTo([], vols);
 			shows = defaultTo([], shows);
+			records = defaultTo([], records);
 			for (var wallIdx=0; wallIdx<pts.length; wallIdx++){
-				this.setWallVals(wallIdx, pts[wallIdx], handles[wallIdx], bounds[wallIdx], includes[wallIdx], vols[wallIdx], shows[wallIdx]);
+				this.setWallVals(wallIdx, pts[wallIdx], handles[wallIdx], bounds[wallIdx], includes[wallIdx], vols[wallIdx], shows[wallIdx], records[wallIdx]);
 
 			}
 			this.setup();
 
 		},
+		
 		setBounds: function(wallInfo, bounds){
 			var wallBounds = this[this.idxByInfo(wallInfo)].bounds;
 			for (var boundName in bounds){
@@ -141,7 +144,7 @@ WallMethods = {
 			}
 			return wallGrid;
 		},
-		setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show){
+		setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show, record){
 			bounds = defaultTo({yMin:30, yMax: 435}, bounds);
 			include = defaultTo(1, include);
 			this[wallIdx] = pts;
@@ -158,12 +161,23 @@ WallMethods = {
 			this[wallIdx].ptsInit = this.copyWallPts(this[wallIdx]);
 			this[wallIdx].g = g;
 			this[wallIdx].pConst = pConst;
+			this[wallIdx].data = {};
+			this[wallIdx].data.pInt = new Array();
+			this[wallIdx].data.pExt = new Array();
+			this[wallIdx].data.t = new Array();
+			this[wallIdx].data.v = new Array();
+			this[wallIdx].data.m = new Array();
+			this[wallIdx].data.work = new Array();
 			this[wallIdx].massChunks = {};
 			this[wallIdx].forceInternal = 0;
 			this[wallIdx].pLastRecord = turn;
 			this[wallIdx].parent = this;
 			this[handle] = this[wallIdx];
 			_.extend(this[wallIdx], WallMethods.wall);	
+			record = defaultTo(true, record);
+			if(record){	
+				this[wallIdx].recordDefaults();
+			}
 		},
 		setVol: function(pts, vol){
 			var width = pts[2].distTo(pts[3]);
@@ -173,10 +187,10 @@ WallMethods = {
 			pts[0].position({y:setY});
 			pts[1].position({y:setY});
 		},
-		addWall: function(pts, handler, handle, bounds, include, vol, show){
-			
+		addWall: function(pts, handler, handle, bounds, include, vol, show, record){
+			this.numWalls++;
 			var newIdx = this.length;
-			this.setWallVals(newIdx, pts, handle, bounds, include, vol, show);
+			this.setWallVals(newIdx, pts, handle, bounds, include, vol, show, record);
 			this.setupWall(newIdx);
 			this.setWallHandler(newIdx, handler);
 		},
@@ -220,7 +234,15 @@ WallMethods = {
 				return info;
 			}
 		},
+		remove: function(){
+			for(var wallIdx=this.length-1; wallIdx>=0; wallIdx-=1){
+				this.removeWall(wallIdx);
+			}
+		},
 		removeWall: function(wallInfo){
+			this.numWalls-=1;
+			this[wallInfo].recordAllStop();
+			this[wallInfo].displayAllStop();
 			var wallIdx = this.idxByInfo(wallInfo);
 			this[this[wallIdx].handle] = undefined;
 			this.splice(wallIdx, 1);
@@ -344,15 +366,15 @@ WallMethods = {
 		},
 		
 		//One wall, assuming first/last points do not overlap
-		totalArea: function(){
+		totalVolume: function(){
 			var area=0;
 			for (var wallIdx=0; wallIdx<this.length; wallIdx++){
 				area+=this[wallIdx].include*this.wallArea(wallIdx);
 			}
-			return area;
+			return area*vConst;
 		},
-		wallArea: function(wallInfo){
-			return this.area(this[wallInfo].slice(0,this[wallInfo].length-1));
+		wallVolume: function(wallInfo){
+			return this.area(this[wallInfo].slice(0,this[wallInfo].length-1))*vConst;
 		},
 		area: function(pts){
 			var area=0;
@@ -630,6 +652,7 @@ WallMethods = {
 		
 		
 		},
+
 		pExt: function(){
 			var SA = this[1].x - this[0].x;
 			return this.pConst*this.mass()*this.g/SA;
@@ -775,35 +798,299 @@ WallMethods = {
 		removeBorder: function(){
 			removeListener(curLevel, 'update', 'drawBorder' + this.handle);
 		},
-		trackWork: function(readout, decPlaces){
+		
+		recordDefaults: function(){
+			this.recordTemp();
+			this.recordPInt();
+			this.recordVol();
+			/*
+			addListenerOnce(curLevel, 'data', 'initData' + this.handle, 
+				function(){
+					if(this.parent.numWalls>1){
+						var tempFunc = dataHandler.tempFunc({tag:this.handle})
+					}else{
+						var tempFunc = dataHandler.tempFunc();
+					}
+					recordData('temp' + this.handle, this.data.t, tempFunc, this);
+					recordData('pInt' + this.handle, this.data.pInt, this.pInt, this);
+					recordData('v' + this.handle, this.data.v, this.parent.wallVolume(this.handle), this);
+				},
+			this);
+			*/
+		},
+		recordTemp: function(){
+			this.recordingTemp = true;
+			if(this.parent.numWalls>1){
+				var tempFunc = dataHandler.tempFunc({tag:this.handle})
+			}else{
+				var tempFunc = dataHandler.tempFunc();
+			}		
+			recordData('t' + this.handle, this.data.t, tempFunc, this);
+			return this;
+		},
+		recordPInt: function(){
+			this.recordingPInt = true;
+			recordData('pInt' + this.handle, this.data.pInt, this.pInt, this);
+			return this;
+		},
+		recordPExt: function(){
+			this.recordingPExt = true;
+			recordData('pExt' + this.handle, this.data.pExt, this.pExt, this, 'update');
+			return this;
+		},
+		recordVol: function(){
+			this.recordingVol = true;
+			recordData('v' + this.handle, this.data.v, function(){return this.parent.wallVolume(this.handle)}, this, 'update');
+			return this;
+		},
+		recordWork: function(){
+			this.recordingWork = true;
+			this.work = 0;
 			var LTOM3LOCAL = LtoM3;
 			var PCONSTLOCAL = pConst;
 			var ATMTOPALOCAL = ATMtoPA;
 			var VCONSTLOCAL = vConst;
 			var JTOKJLOCAL = JtoKJ;
-			this.workReadout = readout;
-			decPlaces = defaultTo(1, decPlaces);
 			var trackPt = this[0];
 			var width = this[1].x-this[0].x;
 			var heightLast = trackPt.y;
-			this.work = 0;
-			var wallIdx = walls.idxByInfo(this.handle);
-			readout.addEntry('work' + wallIdx, 'Work:', 'kJ', 0, undefined, decPlaces);
-			addListener(curLevel, 'update', 'trackWork'+this.handle,
+			addListener(curLevel, 'update', 'recordWork'+this.handle,
 				function(){
 					var dV = LTOM3LOCAL*VCONSTLOCAL*width*(heightLast-trackPt.y)
 					var p = this.pExt()*ATMTOPALOCAL;
 					this.work -= JTOKJLOCAL*p*dV;
-					this.workReadout.hardUpdate('work' + wallIdx, this.work);
 					heightLast = trackPt.y;
 				},
 			this);
+			recordData('work' + this.handle, this.data.work, function(){return this.data.work[this.data.work.length-1]}, this);
+			return this;
 		},
-		trackWorkStop: function(){
+		recordMass: function(){
+			this.recordingMass = true;
+			recordData('mass' + this.handle, this.data.m, this.mass(), this);		
+			return this;			
+		},
+		recordTempStop: function(){
+			this.recordingTemp = false;
+			recordDataStop('t' + this.handle);
+			return this;
+		},
+		recordPIntStop: function(){
+			this.recordingPInt = false;
+			recordDataStop('pInt' + this.handle);
+			return this;
+		},
+		recordPExtStop: function(){	
+			this.recordingPExt = false;
+			recordDataStop('pExt' + this.handle);
+			return this;
+		},
+		recordVolStop: function(){
+			this.recordingVol = false;
+			recordDataStop('v' + this.handle);
+			return this;
+		},
+		recordWorkStop: function(){
+			this.recordingWork = false;
+			removeListener(curLevel, 'update', 'recordWork'+this.handle);
+			recordDataStop('work' + this.handle);
+			return this;
+		},
+		recordMassStop: function(){
+			this.recordingMass = false;
+			recordDataStop('mass' + this.handle);
+			return this;
+		},
+		recordAllStop: function(){
+			this.recordTempStop();
+			this.recordPIntStop();
+			this.recordPExtStop();
+			this.recordVolumeStop();
+			this.recordWorkStop();
+			this.recordMassStop();
+			return this;
+		},	
+		
+		displayWork: function(readout, label, decPlaces){
+			if(this.recordingWork){
+				this.displayingWork = true;
+				decPlaces = defaultTo(1, decPlaces);
+				var dataSet = this.data.work;
+				label = defaultTo('Work:', label);
+				this.workReadout = defaultTo(curLevel.readout, readout);
+				var firstVal = dataSet[dataSet.length-1];
+				if(!validNumber(firstVal)){
+					firstVal = 0;
+				}
+				this.workReadout.addEntry('work' + this.handle, label, 'K', firstVal, undefined, decPlaces);
+				addListener(curLevel, 'data', 'displayWork' + this.handle,
+					function(){
+						this.workReadout.tick(this.handle, dataSet[dataSet.length-1]);
+					},
+				this);	
+			}else{
+				console.log('Tried to display work of wall ' + this.handle + ' while not recording.  Will not display.');
+			}
+			return this;
+		},
+
+		displayTemp: function(readout, label, decPlaces){
+			if(this.recordingTemp){
+				this.displayingTemp = true;
+				decPlaces = defaultTo(0, decPlaces);
+				var dataSet = this.data.t;
+				label = defaultTo('Temp:', label);
+				this.tempReadout = defaultTo(curLevel.readout, readout);
+				var firstVal = dataSet[dataSet.length-1];
+				if(!validNumber(firstVal)){
+					firstVal = 0;
+				}
+				this.tempReadout.addEntry('temp' + this.handle, label, 'K', firstVal, undefined, decPlaces);
+				addListener(curLevel, 'data', 'displayTemp' + this.handle,
+					function(){
+						this.tempReadout.tick('temp' + this.handle, dataSet[dataSet.length-1]);
+					},
+				this);	
+			}else{
+				console.log('Tried to display temp of wall ' + this.handle + ' while not recording.  Will not display.');
+			}
+			return this;
+		},
+		displayPInt: function(readout, label, decPlaces){
+			if(this.recordingPInt){
+				this.displayingPInt = true;
+				decPlaces = defaultTo(1, decPlaces);
+				var dataSet = this.data.pInt;
+				label = defaultTo('Pint:', label);
+				this.pIntReadout = defaultTo(curLevel.readout, readout);
+				var firstVal = dataSet[dataSet.length-1];
+				if(!validNumber(firstVal)){
+					firstVal = 0;
+				}
+				this.pIntReadout.addEntry('pInt' + this.handle, label, 'atm', firstVal, undefined, decPlaces);
+				addListener(curLevel, 'data', 'displayPInt'+this.handle,
+					function(){
+						this.pIntReadout.tick('pInt' + this.handle, dataSet[dataSet.length-1]);
+					},
+				this);
+			}else{
+				console.log('Tried to display pInt of wall ' + this.handle + ' while not recording.  Will not display.');
+			}
+			return this;
+		},
+		displayPExt: function(readout, label, decPlaces){
+			if(this.recordingPExt){
+				this.displayingPExt = true;
+				decPlaces = defaultTo(1, decPlaces);
+				var dataSet = this.data.pExt;
+				label = defaultTo('Pext:', label);
+				this.pExtReadout = defaultTo(curLevel.readout, readout);
+				var firstVal = dataSet[dataSet.length-1];
+				if(!validNumber(firstVal)){
+					firstVal = 0;
+				}
+				this.pExtReadout.addEntry('pExt' + this.handle, label, 'atm', firstVal, undefined, decPlaces);
+				addListener(curLevel, 'update', 'displayPExt'+this.handle,
+					function(){
+						this.pExtReadout.tick('pExt' + this.handle, dataSet[dataSet.length-1]);
+					},
+				this);
+			}else{
+				console.log('Tried to display pExt of wall ' + this.handle + ' while not recording.  Will not display.');
+			}
+			return this;
+		},
+		displayVol: function(readout, label, decPlaces){
+			if(this.recordingVol){
+				this.displayingVol = true;
+				decPlaces = defaultTo(1, decPlaces);
+				var dataSet = this.data.v;
+				label = defaultTo('Volume:', label);
+				this.volReadout = defaultTo(curLevel.readout, readout);
+				var firstVal = dataSet[dataSet.length-1];
+				if(!validNumber(firstVal)){
+					firstVal = 0;
+				}
+				this.volReadout.addEntry('vol' + this.handle, label, 'L', firstVal, undefined, decPlaces);
+				addListener(curLevel, 'update', 'displayVolume' + this.handle,
+					function(){
+						this.volReadout.hardUpdate('vol' + this.handle, dataSet[dataSet.length-1]);
+					},
+				this);
+			}else{
+				console.log('Tried to display volume of wall ' + this.handle + ' while not recording.  Will not display.');			
+			}
+			return this;
+		},
+		displayMass: function(readout, label, decPlaces){
+			if(this.recordingMass){
+				this.displayingMass = true;
+				decPlaces = defaultTo(0, decPlaces);
+				var dataSet = this.data.m;
+				label = defaultTo('Mass:', label);
+				//DO THIS BY WALL
+				this.volReadout = defaultTo(curLevel.readout, readout);
+				var firstVal = dataSet[dataSet.length-1];
+				if(!validNumber(firstVal)){
+					firstVal = 0;
+				}
+				this.volReadout.addEntry('mass' + this.handle, label, 'kg', firstVal, undefined, decPlaces);
+				addListener(curLevel, 'update', 'displayVolume' + this.handle,
+					function(){
+						this.volReadout.hardUpdate('mass' + this.handle, dataSet[dataSet.length-1]);
+					},
+				this);
+			}else{
+				console.log('Tried to display mass of wall ' + this.handle + ' while not recording.  Will not display.');			
+			}
+			return this;			
+		},
+		displayVolStop: function(){
+			this.displayingVol = false;
+			this.volReadout.removeEntry('vol' + this.handle);
+			removeListener(curLevel, 'update', 'displayVolume' + this.handle);
+			return this;
+		},
+		displayPIntStop: function(){
+			this.displayingPInt = false;
+			removeListener(curLevel, 'data', 'displayPInt'+this.handle);
+			this.pIntReadout.removeEntry('pInt' + this.handle);
+			return this;
+		},
+		displayPExtStop: function(){
+			this.displayingPInt = false;
+			removeListener(curLevel, 'update', 'displayPExt'+this.handle);
+			this.pExtReadout.removeEntry('pExt' + this.handle);
+			return this;
+		},
+		displayWorkStop: function(){
+			this.displayingWork = false;
 			this.workReadout.removeEntry('work' + walls.idxByInfo(this.handle));
-			
 			removeListener(curLevel, 'update', 'trackWork'+this.handle);
-		}
+			return this;
+		},
+		displayTempStop: function(){
+			this.displayingTemp = false;
+			removeListener(curLevel, 'data', 'displayTemp' + this.handle)
+			this.tempReadout.removeEntry('temp' + this.handle);
+			return this;
+		},
+		displayMassStop: function(){
+			this.displayingMass = false;
+			removeListener(curLevel, 'data', 'displayMass' + this.handle)
+			this.massReadout.removeEntry('mass' + this.handle);	
+			return this;			
+		},
+		displayAllStop: function(){
+			if(this.displayingVol){this.displayVolStop();};
+			if(this.displayingTemp){this.displayPIntStop();};
+			if(this.displayingPExt){this.displayPExtStop();};
+			if(this.displayingWork){this.displayWorkStop();};
+			if(this.displayingTemp){this.displayTempStop();};
+			if(this.displayingMass){this.displayMassStop();};
+			return this;
+		},
+		
 	},
 	collideMethods:{
 	//32 denotes converting from cv of R to 3/2 R

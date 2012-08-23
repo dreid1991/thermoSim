@@ -75,11 +75,11 @@ DataHandler.prototype = {
 	},
 	volume: function(wallInfo){
 		if(wallInfo===undefined){
-			var area = walls.totalArea();
+			var volume = walls.totalVolume();
 		}else{
-			var area = walls.wallArea(wallInfo);
+			var volume = walls.wallVolume(wallInfo);
 		}
-		return area*vConst;
+		return volume;
 	},
 	volumeFunc: function(wallInfo){
 		var self = this;

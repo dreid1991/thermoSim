@@ -307,7 +307,8 @@ LevelTools = {
 	dataRun: function(){
 		for (var datum in this.recordListeners.listeners){
 			var recordInfo = this.recordListeners.listeners[datum];
-			this.data[datum].push(recordInfo.func.apply(recordInfo.obj));
+			recordInfo.func.apply(recordInfo.obj);
+			//this.data[datum].pushNumber(recordInfo.func.apply(recordInfo.obj));
 		}	
 		for(var graphName in this.graphs){
 			this.graphs[graphName].addLast();
@@ -345,53 +346,9 @@ LevelTools = {
 			delete this.graphs[graphName];
 		}	
 	},
-	trackVolume: function(decPlaces){
-		decPlaces = defaultTo(1, decPlaces);
-		//DO THIS BY WALL
-		this.readout.addEntry('vol', 'Volume:', 'L', dataHandler.volume(), undefined, decPlaces);
-		addListener(curLevel, 'update', 'trackVolume',
-			function(){
-				this.readout.hardUpdate('vol',dataHandler.volume());
-			},
-		this);
-	},
-	trackVolumeStop: function(){
-		this.readout.removeEntry('vol');
-		removeListener(curLevel, 'update', 'trackVolume');
-	},
-	trackIntPresure: function(handle){
-		this.data['pInt'+handle] = [];
-		var dataList = this.data['pInt'+handle]
-		var wall = walls[handle];
-		wall.forceInternal = 0;
-		wall.pLastRecord = turn;
-		addListener(curLevel, 'data', 'trackIntPressure'+handle,
-			function(){
-				dataList.push(wall.pInt());
-			},
-		'');
-		
-	},
-	trackIntPressureStop: function(handle){
-		removeListener(curLevel, 'data', 'trackIntPressure'+handle);
-	},
-	trackTemp: function(handle, label, dataSet, decPlaces){
-		decPlaces = defaultTo(0, decPlaces);
-		dataSet = defaultTo(this.data.t, dataSet);
-		label = defaultTo('Temp:', label);
-		handle = defaultTo('temp', handle);
-		this.readout.addEntry(handle, label, 'K', dataSet[dataSet.length-1], undefined, decPlaces);
-		addListener(curLevel, 'data', 'trackTemp' + handle,
-			function(){
-				this.readout.tick(handle, dataSet[dataSet.length-1]);
-			},
-		this);	
-	},
-	trackTempStop: function(handle){
-		handle = defaultTo('temp', handle)
-		this.readout.removeEntry(handle);
-		removeListener(curLevel, 'data', 'trackTemp' + handle);
-	},
+
+
+
 	track: function(handle, label, data, decPlaces, units){
 		decPlaces = defaultTo(1, decPlaces);
 		if(typeof(data)=='Array'){

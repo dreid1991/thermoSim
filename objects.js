@@ -13,52 +13,6 @@ compressorFuncs = {
 		pts.push(P(pos.x - slant*dims.dx/2, pos.y - dims.dy));
 		return pts;
 	},
-	trackWork: function(){
-		this.trackingWork = true;
-		this.wall.trackWork(this.readout);
-		return this;
-	},
-	trackWorkStop: function(){
-		this.trackingWork = false;
-		this.wall.trackWorkStop();
-		return this;
-	},
-	trackMass: function(){
-		this.trackingMass = true;
-		if(!this.readout.entryExists('mass' + this.wallInfo)){
-			this.addMassEntry();
-		}
-		return this;
-	},
-	trackMassStop: function(){
-		this.trackingMass = false;
-		this.readout.removeEntry('mass' + this.wallInfo);
-		return this;
-	},
-	trackPressure: function(){
-		this.trackingPressure = true;
-		if(!this.readout.entryExists('pressure' +  this.wallInfo)){
-			this.addPressureEntry();	
-		}
-		return this;
-	},
-	trackPressureStop: function(){
-		this.trackingPressure = false;
-		this.readout.removeEntry('pressure' + this.wallInfo);	
-		return this;
-	},
-	addMassEntry: function(){
-		this.readout.addEntry('mass' + this.wallInfo, 'Mass:', 'kg', this.mass, undefined, 0);
-	},
-	addPressureEntry: function(){
-		this.readout.addEntry('pressure' + this.wallInfo, 'Pressure:', 'atm', this.wall.pExt(), undefined, 1); 
-	},
-	removeEntries: function(){
-		if(this.trackingMass){this.trackMassStop();};
-		if(this.trackingPressure){this.trackPressureStop();};
-		if(this.trackingWork){this.trackWorkStop();};
-		return this;
-	},
 }
 //////////////////////////////////////////////////////////////////////////
 //DRAG WEIGHTS
@@ -104,15 +58,12 @@ function DragWeights(attrs){
 	this.weightsOnPiston = [];
 	this.eBarFont = '12pt Calibri';
 	this.eBarFontCol = Col(255,255,255);
-	this.addStdReadoutEntries();
 	this.binThickness = 5;
 	var self = this;
 
-
 	this.wall.setMass(this.massChunkName, this.massInit);
-	this.trackingEnergy = false;
-	this.trackingMass = true;
-	this.trackingPressure = false;
+	this.wall.recordPExt();
+	this.wall.recordWork();
 	return this.init();
 }
 
@@ -140,8 +91,9 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 		removeListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo);
 		removeListener(curLevel, 'mousedown', 'weights' + this.wallInfo);
 		removeListener(curLevel, 'reset', 'dragWeights' + this.wallInfo);
-		this.removeEntries();
 	},
+	/*
+	DEFUNCT
 	trackEnergyStart: function(){
 		this.trackEnergy = true;
 		if(!this.readout.entryExists('eAdd' + this.wallInfo)){
@@ -154,14 +106,13 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 		this.readout.removeEntry('eAdd' + this.wallInfo);
 		return this;
 	},
-
-	addStdReadoutEntries: function(){
-		//this.addEnergyEntry();
-		this.addMassEntry();
-	},
+	*/
+	/*
+	DEFUNCT
 	addEnergyEntry: function(){
 		this.readout.addEntry('eAdd' + this.wallInfo, 'E Added:', 'kJ', this.eAdded, undefined, 1);
 	},
+	*/
 	getWeightDims: function(weightDefs){
 		var dims = {};
 		for (var groupIdx=0; groupIdx<weightDefs.length; groupIdx++){
@@ -782,7 +733,8 @@ function Pool(attrs){
 	
 	this.massChunkName = 'liquidMass' + defaultTo('', attrs.handle);
 	this.wall.setMass(this.massChunkName, this.mass);	
-
+	this.wall.recordPExt();
+	this.wall.recordWork();
 	this.wallHandler = defaultTo('cPAdiabaticDamped', attrs.compMode) + compAdj;	
 	walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);	
 	
@@ -805,6 +757,7 @@ function Pool(attrs){
 	this.pistonY = function(){return this.wall[0].y};
 	
 
+	
 	this.tube.speed = defaultTo(8, attrs.tubeSpeed);
 	this.tube.walls.col = defaultTo(Col(175,175,175), attrs.tubeWallCol);
 	this.tube.ID = 10; //inner diameter
@@ -822,7 +775,7 @@ _.extend(Pool.prototype, compressorFuncs, {
 	init: function(){	
 		addListener(curLevel, 'update', 'drawPool', this.draw, this);
 		this.wall.moveInit();	
-		return this.trackMass().trackPressure();
+		return this.displayMass().displayPressure();
 	},
 	bindButtons: function(){
 		var self = this;
@@ -1028,7 +981,6 @@ _.extend(Pool.prototype, compressorFuncs, {
 		removeListener(curLevel, 'update', 'drawTube');
 		removeListener(curLevel, 'update', 'drawPool');	
 		this.wall.moveStop();
-		this.removeEntries();
 		//this.stops.remove();
 	},
 })
@@ -1316,6 +1268,10 @@ function Piston(attrs){
 	var readoutFontCol = Col(255, 255, 255);
 	this.readout = new Readout('pistonReadout', readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, undefined, 'center');
 	this.wall.moveInit();
+	
+	this.wall.recordPExt();
+	this.wall.recordWork();
+	
 	walls.setSubWallHandler(this.wallInfo, 0, 'cPAdiabaticDamped' + compAdj);		
 	return this.show();
 }
@@ -1434,7 +1390,6 @@ _.extend(Piston.prototype, compressorFuncs, {
 		this.wall.moveStop();
 		this.wall.unsetMass('piston' + this.handle);
 		this.hide();
-		this.removeEntries();
 		removeListener(curLevel, 'update', 'moveWalls');
 	}
 }
@@ -1568,7 +1523,7 @@ Heater.prototype = {
 	},
 	setupWalls: function(){
 		//legs don't go into collision - too little space between lines
-		walls.addWall(this.wallPts, {func:this.hit, obj:this}, 'heater' + this.handle, undefined, -1, undefined, false);
+		walls.addWall(this.wallPts, {func:this.hit, obj:this}, 'heater' + this.handle, undefined, -1, undefined, false, false);
 	},
 	hit: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){
 		walls.reflect(dot, wallUV, vPerp);
