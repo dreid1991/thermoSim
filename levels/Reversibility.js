@@ -197,9 +197,9 @@ _.extend(Reversibility.prototype,
 		nextPrompt();
 	},
 	block0Start: function(){
-		this.makeGraphsRev();
 		var wallHandle = 'container';
 		this.unCompSetup();
+		this.makeGraphsRev();
 		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:90}]}).wall.displayPExt();
 		//this.volListener10 = new StateListener({condition:10, checkAgainst:walls['0'].data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInLrg',round(walls[0].work,1))},obj:''}});
 		this.readout.show();
@@ -408,14 +408,14 @@ _.extend(Reversibility.prototype,
 	makeGraphsRev: function(){
 		this.graphs.pVSv = new GraphScatter('pVSv', 400,293, "Volume (L)", "Pressure (atm)",
 							{x:{min:0, step:4}, y:{min:0, step:2}});
-		this.graphs.tVSv = new GraphScatter('tVSv', 400, 293,"Volume (L)", "Temperature (K)",
-							{x:{min:0, step:4}, y:{min:180, step:60}});
+		//this.graphs.tVSv = new GraphScatter('tVSv', 400, 293,"Volume (L)", "Temperature (K)",
+		//					{x:{min:0, step:4}, y:{min:180, step:60}});
 		this.graphs.pVSv.addSet('pInt', 'P Int.', Col(0,0,255), Col(200,200,255),
-								{data:this.data, x:'v', y:'pInt'});
+								{data:walls[0].data, x:'v', y:'pInt'});
 		this.graphs.pVSv.addSet('pExt', 'P Ext.', Col(0,255,0), Col(200,255,200),
-								{data:this.data, x:'v', y:'pExt'});
-		this.graphs.tVSv.addSet('t', 'Sys\nTemp', Col(255,0,0), Col(255,200,200),
-								{data:this.data, x:'v', y:'t'});		
+								{data:walls[0].data, x:'v', y:'pExt'});
+		//this.graphs.tVSv.addSet('t', 'Sys\nTemp', Col(255,0,0), Col(255,200,200),
+		//						{data:this.data, x:'v', y:'t'});		
 	},
 	unCompSetup: function(){
 		walls = WallHandler([[P(40,68), P(510,68), P(510,410), P(40,410)]], 'staticAdiabatic', ['container'], [{yMin:68, yMax:435}]);
