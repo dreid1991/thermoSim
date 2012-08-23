@@ -1,5 +1,7 @@
 //shared startup stuff
 $(function(){
+	_.extend(Array.prototype, ArrayExtenders);
+	_.extend(Math, MathExtenders);
 	hoverCol = Col(0, 81, 117);
 	turn = 0;
 	$('#canvasDiv').hide();
@@ -40,7 +42,6 @@ $(function(){
 	setInterval('curLevel.update()', updateInterval);
 	setInterval('curLevel.updateData()', dataInterval);
 	//_.extend(Array.prototype, pushNumber);
-	_.extend(Array.prototype, ArrayExtenders);
 	
 	/*Timing stuff
 	started = false;
@@ -502,6 +503,12 @@ ArrayExtenders = {
 
 	},
 }
+MathExtenders = {
+	log10: function(val){
+		return Math.log(val)/Math.log(10);	
+	},
+
+}
 function recordData(handle, list, func, obj, listenerType){
 	var listenerType = defaultTo('record', listenerType)
 	store('record' + handle, listenerType);
@@ -709,9 +716,7 @@ function replaceStrings(text, replaceList){
 	}
 	return text;
 }
-function log10(val){
-	return Math.log(val)/Math.log(10);
-}
+
 function rotatePts(pts, center, rotation){
 	for(var ptIdx=0; ptIdx<pts.length; ptIdx++){
 		var pt = pts[ptIdx];

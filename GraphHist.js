@@ -1,5 +1,6 @@
-function GraphHist(name, width, height, xLabel, yLabel, axisInit, dataPath){
-	this.name = name;
+function GraphHist(handle, width, height, xLabel, yLabel, axisInit, dataPath){
+	this.active = true;
+	this.handle = handle;
 	this.dims = V(width, height);
 	this.xLabel = xLabel;
 	this.yLabel = yLabel;
@@ -32,10 +33,10 @@ function GraphHist(name, width, height, xLabel, yLabel, axisInit, dataPath){
 	this.graphBoundCol = Col(255,255,255);
 	var barCol = Col(255,100,0);
 
-	var canvasData = this.makeCanvas(this.name, this.dims);
+	var canvasData = this.makeCanvas(this.handle, this.dims);
 	this.drawAllBG();
 	this.addSet('only', barCol, dataPath);
-	addListener(curLevel, 'reset', 'clearGraph'+name, this.clear, this);
+	addListener(curLevel, 'reset', 'clearGraph'+handle, this.clear, this);
 }
 /*
 Good evening:  I am keeping histogram data in data.someName, not just data, even though there is only one for now.

@@ -1,5 +1,6 @@
-function GraphScatter(name, width, height, xLabel, yLabel, axisInit){
-	this.name = name;
+function GraphScatter(handle, width, height, xLabel, yLabel, axisInit){
+	this.active = true;
+	this.handle = handle;
 	this.dims = V(width, height);
 	this.xLabel = xLabel;
 	this.yLabel = yLabel;
@@ -40,7 +41,7 @@ function GraphScatter(name, width, height, xLabel, yLabel, axisInit){
 	this.rectSideLen = 8;
 	this.characLen = Math.sqrt(Math.pow(this.rectSideLen, 2)/2);
 	//characLen, characteristic length, is the radius of the shape being used
-	this.makeCanvas(this.name, this.dims);
+	this.makeCanvas(this.handle, this.dims);
 
 	this.drawAllBG();
 	

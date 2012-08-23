@@ -324,7 +324,9 @@ LevelTools = {
 			//this.data[datum].pushNumber(recordInfo.func.apply(recordInfo.obj));
 		}	
 		for(var graphName in this.graphs){
-			this.graphs[graphName].addLast();
+			if(this.graphs[graphName].active){
+				this.graphs[graphName].addLast();
+			}
 		}
 	},
 	updateRun: function(){
@@ -332,12 +334,6 @@ LevelTools = {
 		this.checkDotHits(); 
 		this.checkWallHits();
 		this.drawRun();
-	},
-	
-	updateGraphs: function(){
-		for(var graphName in this.graphs){
-			this.graphs[graphName].addLast();
-		}
 	},
 	drawRun: function(){
 		draw.clear(this.bgCol);

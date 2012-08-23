@@ -1,25 +1,65 @@
 GraphBase = {
-	makeCanvas: function(name, dims){
-		addListener(curLevel, 'reset', 'clearGraph'+this.name, this.clear, this);
-		var str = "</div><div id = '" + this.name +"GraphDiv'><canvas id ='" + this.name + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas></div><div class='graphSpacer noSelect' id='"+this.name + "GraphSpacer'>"
+	makeCanvas: function(handle, dims){
+		addListener(curLevel, 'reset', 'clearGraph'+this.handle, this.clear, this);
+		var str = "</div><div id = '" + this.handle +"GraphDiv'><canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas></div><div class='graphSpacer noSelect' id='"+this.handle + "GraphSpacer'>"
 		var canvasDiv = $(str);
 		$('#graphs').append(canvasDiv);
 		
-		this.graphHTMLElement = document.getElementById(name+'Graph');
+		this.graphHTMLElement = document.getElementById(this.handle+'Graph');
 		this.graph = this.graphHTMLElement.getContext('2d');
 		
 	},
 	remove: function(){
-		removeListener(curLevel, 'reset', 'clearGraph'+this.name);
-		removeSave(curLevel, 'reset', 'clearGraph'+this.name);
-		removeListener(curLevel, 'update', 'flash' + this.name);
-		removeSave(curLevel, 'update', 'flash' + this.name);
-		$('#'+this.name+'GraphDiv').remove();
-		$('#'+this.name+'GraphSpacer').remove();
-		delete this;//DOESN'T DO ANYTHING
+		this.freeze();
+		removeListener(curLevel, 'reset', 'clearGraph'+this.handle);
+		removeSave(curLevel, 'reset', 'clearGraph'+this.handle);
+		removeListener(curLevel, 'update', 'flash' + this.handle);
+		removeSave(curLevel, 'update', 'flash' + this.handle);
+		$('#'+this.handle+'GraphDiv').remove();
+		$('#'+this.handle+'GraphSpacer').remove();
+		return this;
+	},
+	unfreeze: function(){
+		this.active = true;
+		return this;
+	},
+	freeze: function(){
+		this.active = false;
+		return this;
 	},
 	save: function(){
+	
+		var saveName = 'graph'+this.handle;
+		saveName = unique(saveName, stored)
+		this.dataSave = {};
+		for (var set in this.data){
+			this.dataSave[set] = {};
+			this.dataSave[set].x = this.data[set].x.deepCopy();
+			this.dataSave[set].y = this.data[set].y.deepCopy();
+		}
+		store(saveName, this);
+		return saveName;
+	},
+	load: function(){
+		if(!$('#' + this.handle + 'GraphDiv').length){
+			this.makeCanvas(this.handle, this.dims);
+		}
+		var toAdd = []
+		for (var set in this.data){
+			this.data[set].x = [];
+			this.data[set].y = [];
+			var toAdd = toAdd.concat(this.setsToPts(this.dataSave[set].x, this.dataSave[set].y, set));
 		
+		}
+		this.addPts(toAdd, false, true);
+		
+	},
+	setsToPts: function(x, y, setName){
+		var pts = new Array(x.length);
+		for(var ptIdx=0; ptIdx<x.length; ptIdx++){
+			pts[ptIdx] = {x:x[ptIdx], y:y[ptIdx], address:setName};
+		}
+		return pts;
 	},
 	makeCheck: function(address, legend, toggleCol){
 		var entry = legend[address];
@@ -89,9 +129,9 @@ GraphBase = {
 			this.drawPtStd(pt, pt.col);
 		}
 	},
-	addPts: function(toAdd){
-		var mustRedraw = new Boolean()
-		mustRedraw = false;
+	addPts: function(toAdd, flash, mustRedraw){
+		mustRedraw = defaultTo(false, mustRedraw);
+		flash = defaultTo(true, flash);
 		var val = this.valRange;
 		var oldValRange = {x:{min:val.x.min, max:val.x.max}, y:{min:val.y.min, max:val.y.max}};
 		for (var addIdx=0; addIdx<toAdd.length; addIdx++){
@@ -119,9 +159,9 @@ GraphBase = {
 			this.drawLastData(toAdd)
 
 		}
-		
-		this.flashInit(toAdd);
-		
+		if(flash){
+			this.flashInit(toAdd);
+		}
 	},
 	rangeIsSame: function(a, b){
 		return !(a.max!=b.max || a.min!=b.min);
@@ -173,7 +213,7 @@ GraphBase = {
 		var rangeX = this.valRange.x.max-this.valRange.x.min;
 		if(rangeX!=0){
 			var unroundStepX = rangeX/(this.numGridLines.x-2);
-			var expStepX = Math.pow(10, Math.floor(log10(unroundStepX)))
+			var expStepX = Math.pow(10, Math.floor(Math.log10(unroundStepX)))
 			this.stepSize.x = Math.ceil(unroundStepX/expStepX)*expStepX;
 			this.axisRange.x.min = Math.floor(this.valRange.x.min/this.stepSize.x)*this.stepSize.x;
 			this.axisRange.x.max = this.axisRange.x.min + (this.numGridLines.x-1)*this.stepSize.x;
@@ -187,7 +227,7 @@ GraphBase = {
 		var rangeY = Math.abs(this.valRange.y.max-this.valRange.y.min);
 		if(rangeY!=0){
 			var unroundStepY = rangeY/(this.numGridLines.y-2);
-			var expStepY = Math.pow(10, Math.floor(log10(unroundStepY)))
+			var expStepY = Math.pow(10, Math.floor(Math.log10(unroundStepY)))
 			this.stepSize.y = Math.ceil(unroundStepY/expStepY)*expStepY;
 			this.axisRange.y.min = Math.floor(this.valRange.y.min/this.stepSize.y)*this.stepSize.y;
 			this.axisRange.y.max = this.axisRange.y.min + (this.numGridLines.y-1)*this.stepSize.y;
@@ -239,13 +279,13 @@ GraphBase = {
 									if(set.show){
 										set.show = false;
 										self.flashers = [];
-										removeListener(curLevel, 'update', 'flash'+self.name);
+										removeListener(curLevel, 'update', 'flash'+self.handle);
 										self.drawAllBG();
 										self.drawAllData();
 									}else{
 										set.show = true;
 										self.flashers = [];
-										removeListener(curLevel, 'update', 'flash'+self.name);
+										removeListener(curLevel, 'update', 'flash'+self.handle);
 										self.drawAllBG();
 										self.drawAllData();
 									}
@@ -345,7 +385,7 @@ GraphBase = {
 			}
 		}
 		if(this.flashers.length>0){
-			addListener(curLevel, 'update', 'flash'+this.name, this.flashRun, this);
+			addListener(curLevel, 'update', 'flash'+this.handle, this.flashRun, this);
 		}
 	},
 	flashRun: function(){
@@ -358,7 +398,7 @@ GraphBase = {
 		}
 		if(this.doneFlashing()){
 			
-			removeListener(curLevel, 'update', 'flash'+this.name);
+			removeListener(curLevel, 'update', 'flash'+this.handle);
 			this.eraseFlashers();
 			this.flashers = undefined;
 		}
