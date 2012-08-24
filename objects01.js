@@ -35,7 +35,7 @@ function DragWeights(attrs){
 	this.wallInfo = 			defaultTo(0, attrs.wallInfo);
 	this.wall = 				walls[this.wallInfo];
 	this.zeroY = 				defaultTo(this.wall[2].y, attrs.min);
-	this.pistonY = 				defaultTo(function(){return this.wall[0].y}, attrs.pistonY);
+	this.pistonPt = 			defaultTo(this.wall[0], attrs.pistonPt)
 	this.wallHandler = 			defaultTo('cPAdiabaticDamped', attrs.compMode) + compAdj;
 	this.readout = 				defaultTo(curLevel.readout, attrs.readout);
 	this.binY = 				defaultTo(myCanvas.height-15, attrs.binY);
@@ -86,7 +86,7 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 		this.bins['store'] = this.makeStoreBins();
 		this.bins['piston'] = this.makePistonBins();
 		//this.dropAllstores();
-		addListener(curLevel, 'update', 'moveWeightsOnPiston' + this.wallInfo, this.moveWeightsOnPiston, this);
+		//addListener(curLevel, 'update', 'moveWeightsOnPiston' + this.wallInfo, this.moveWeightsOnPiston, this);
 		walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);
 		addListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo, this.draw, this);
 		addListener(curLevel, 'mousedown', 'weights' + this.wallInfo, this.mousedown, this);
@@ -99,32 +99,11 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 	},
 	remove: function(){
 		this.wall.moveStop();
-		removeListener(curLevel, 'update', 'moveWeightsOnPiston' + this.wallInfo);
+		//removeListener(curLevel, 'update', 'moveWeightsOnPiston' + this.wallInfo);
 		removeListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo);
 		removeListener(curLevel, 'mousedown', 'weights' + this.wallInfo);
 		removeListener(curLevel, 'reset', 'dragWeights' + this.wallInfo);
 	},
-	/*
-	DEFUNCT
-	trackEnergyStart: function(){
-		this.trackEnergy = true;
-		if(!this.readout.entryExists('eAdd' + this.wallInfo)){
-			this.addEnergyEntry();
-		}
-		return this;
-	},
-	trackEnergyStop: function(){
-		this.trackEnergy = false;
-		this.readout.removeEntry('eAdd' + this.wallInfo);
-		return this;
-	},
-	*/
-	/*
-	DEFUNCT
-	addEnergyEntry: function(){
-		this.readout.addEntry('eAdd' + this.wallInfo, 'E Added:', 'kJ', this.eAdded, undefined, 1);
-	},
-	*/
 	getWeightDims: function(weightDefs){
 		var dims = {};
 		for (var groupIdx=0; groupIdx<weightDefs.length; groupIdx++){
@@ -198,9 +177,8 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 	},
 	makePistonBin: function(posX, weightGroup){
 		var bin = {};
-		bin.x = posX - this.pistonBinWidth/2;
-		bin.y = this.pistonY();
-		bin.slots = this.getPistonBinSlots(bin.x, weightGroup);
+		bin.pos = P(posX - this.pistonBinWidth/2, 0).track({pt:this.pistonPt, noTrack:'x'});
+		bin.slots = this.getPistonBinSlots(bin.pos.x, weightGroup);
 		bin.visible = false;
 		return bin
 	},
@@ -219,10 +197,10 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 			var row = [];
 			var x = pt.x + this.blockSpacing;
 			for (var colIdx=0; colIdx<numCols; colIdx++){
-				fy = this.stationaryYFunc(y);
+				var pos = P(x, y);
 				var isFull = new Boolean();
 				var isFull = false;
-				row.push(this.newSlot(isFull, x, fy, weightGroup.name, 'store', rowIdx, colIdx));
+				row.push(this.newSlot(isFull, pos, weightGroup.name, 'store', rowIdx, colIdx));
 				x += dims.dx+this.blockSpacing;
 			}
 			slots.push(row);
@@ -249,10 +227,10 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 			var row = [];
 			var blockX = startX + this.blockSpacing;
 			for (var colIdx=0; colIdx<numCols; colIdx++){
-				var fy = this.pistonMinusVal(yOffset+dims.dy);
+				var pos = P(blockX, 0).track({pt:this.pistonPt, offset:{dy:-(yOffset+dims.dy)}, noTrack:'x'});
 				var isFull = new Boolean();
 				var isFull = false;
-				row.push(this.newSlot(isFull, blockX, fy, weightGroup.name, 'piston', rowIdx, colIdx));
+				row.push(this.newSlot(isFull, pos, weightGroup.name, 'piston', rowIdx, colIdx));
 				blockX += dims.dx+this.blockSpacing;
 			}
 			slots.push(row);
@@ -261,8 +239,8 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 		return slots;
 		
 	},
-	newSlot: function(isFull, x, fy, name, type, row, col){
-		return {isFull:isFull, x:x, y:fy, name:name, type:type, row:row, col:col};
+	newSlot: function(isFull, pos, name, type, row, col){
+		return {isFull:isFull, pos:pos, name:name, type:type, row:row, col:col};
 	},
 	binIsFull: function(type, size){
 		var bin = this.bins[type][size];
@@ -328,10 +306,6 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 		}
 		return totalMass+this.massInit;
 	},
-	pistonMinusVal: function(val){
-		var wall = this.wall
-		return function(){return wall[0].y-val}
-	},
 	dropAllIntoStores: function(special){
 		for (var group in this.weightGroups){
 			var weightGroup = this.weightGroups[group];
@@ -378,8 +352,7 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 		
 		var slotIdNum = dropSlotInfo.id;
 		if(special=='instant'){
-			weight.pos.x = slot.x;
-			weight.pos.y = slot.y();
+			weight.pos = slot.pos.copy();
 		}
 		var uniqueNamePiece = weight.name+weight.id + 'endId' + this.wallInfo;
 		var listenerName = 'moveWeight'+ uniqueNamePiece + binType+slotIdNum;
@@ -390,23 +363,23 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 		weight.slot = slot;
 		addListener(curLevel, 'update', listenerName,
 			function(){
-				var slotY = slot.y();
-				var UV = V(slot.x-weight.pos.x, slotY-weight.pos.y).UV();
-				weight.pos.x = boundedStep(weight.pos.x, slot.x, UV.dx*this.moveSpeed);
-				weight.pos.y = boundedStep(weight.pos.y, slotY, UV.dy*this.moveSpeed);
+				var slotPos = slot.pos;
+				var UV = V(slotPos.x-weight.pos.x, slotPos.y-weight.pos.y).UV();
+				weight.pos.x = boundedStep(weight.pos.x, slotPos.x, UV.dx*this.moveSpeed);
+				weight.pos.y = boundedStep(weight.pos.y, slotPos.y, UV.dy*this.moveSpeed);
 				if(this.weightArrived(weight, slot)){
 					removeListener(curLevel, 'update', listenerName);
 					//weight.slot = slot;
 					weight.status = slot.type;
 					if(weight.status=='piston'){
-						this.putOnPiston(weight);
+						this.putOnPiston(weight, slot);
 					}
 				}
 			},
 		this);
 	},
 	weightArrived: function(weight, slot){
-		return weight.pos.x==slot.x && weight.pos.y==slot.y();
+		return weight.pos.sameAs(slot.pos);
 	},
 	getDropSlot: function(weightName, binType){
 		var bin = this.bins[binType][weightName];
@@ -421,12 +394,13 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 		}
 		alert('BOX IS FULL!  WHY IS THIS HAPPENING?');
 	},
-
+/*
 	moveWeightsOnPiston: function(){
 		for (var weightIdx=0; weightIdx<this.weightsOnPiston.length; weightIdx++){
 			this.weightsOnPiston[weightIdx].pos.y = this.weightsOnPiston[weightIdx].slot.y();
 		}
 	},
+*/
 	getNumGroups: function(){
 		var count = 0;
 		for (idx in this.weightGroups){
@@ -512,18 +486,13 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 	},
 
 
-	putOnPiston: function(weight){
+	putOnPiston: function(weight, slot){
 		this.weightsOnPiston.push(weight);
+		weight.pos.track({pt:slot.pos, noTrack:'x'});
 		weight.status = 'piston';
 		this.mass = this.getPistonMass();
 		this.wall.setMass(this.massChunkName, this.mass);
 		this.pressure = this.wall.pExt();
-		if(this.trackingMass){
-			this.readout.tick('mass' + this.wallInfo, this.mass);
-		}
-		if(this.trackingPressure){
-			this.readout.tick('pressure' + this.wallInfo, this.pressure);
-		}
 	},	
 	takeOffPiston: function(weight){
 		for (var idx=0; idx<this.weightsOnPiston.length; idx++){
@@ -531,15 +500,10 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 				this.weightsOnPiston.splice([idx],1);
 			}
 		}
+		weight.pos.trackStop();
 		this.mass = this.getPistonMass();
 		this.wall.setMass(this.massChunkName, this.mass);
 		this.pressure = this.wall.pExt();
-		if(this.trackingMass){
-			this.readout.tick('mass' + this.wallInfo, this.mass);
-		}
-		if(this.trackingPressure){
-			this.readout.tick('pressure' + this.wallInfo, this.pressure);
-		}
 	},
 	mousedown: function(){
 		var clicked = this.getClicked();
@@ -596,7 +560,7 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 	getDest: function(){
 		var selected = this.selected;
 		var blockHeight = this.weightGroups[selected.name].dims.dy;
-		if(selected.cameFrom=='piston' || selected.pos.y+blockHeight>this.pistonY()){
+		if(selected.cameFrom=='piston' || selected.pos.y+blockHeight>this.pistonPt.y){
 			return 'store';
 		}else{
 			return 'piston';
@@ -609,7 +573,7 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 				var selected = this.selected;
 				var m = this.weightGroups[selected.name].mass;
 				this.eBar.eChange = this.getSelectedEnergy();
-				var dh = Math.min(this.zeroY - this.pistonY(), Math.max(0, this.zeroY - selected.pos.y));
+				var dh = Math.min(this.zeroY - this.pistonPt.y, Math.max(0, this.zeroY - selected.pos.y));
 				this.drawEBar(m, dh);
 				this.drawEBarText(m, this.eBar.eChange);
 				
@@ -620,7 +584,7 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 	eBarFromPiston: function(){
 		var eBarType = 'FromPistonHolding';
 		var m = this.weightGroups[this.selected.name].mass;
-		var dh =this.pistonY() - this.zeroY;
+		var dh =this.pistonPt.y - this.zeroY;
 		this.eBar.eChange = this.heightToE(dh, m);
 		addListener(curLevel, 'update', 'eBar' + eBarType, 
 			function(){
@@ -644,7 +608,7 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 		var destEntry = byAttr(this.readout.entries, 'eAdd', 'name');
 		destPos = destEntry.pos.copy();
 		destPos.x+=40;
-		animText.newAnim({pos:P(this.eBar.x,this.pistonY()-15)},
+		animText.newAnim({pos:P(this.eBar.x,this.pistonPt.y-15)},
 			{pos:destPos, col:curLevel.bgCol},
 			{text:this.eText(round(this.eBar.eChange,1))})
 	},
@@ -667,7 +631,7 @@ _.extend(DragWeights.prototype, compressorFuncs, {
 		var grpName = selected.name;
 		var m = this.weightGroups[grpName].mass;
 		var pos = selected.pos.copy();
-		var dh = Math.min(this.zeroY - this.pistonY(), Math.max(0, this.zeroY - selected.pos.y));
+		var dh = Math.min(this.zeroY - this.pistonPt.y, Math.max(0, this.zeroY - selected.pos.y));
 		return this.heightToE(dh, m);		
 	},
 	getClicked: function(){

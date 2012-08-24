@@ -322,26 +322,29 @@ Point.prototype = {
 		}
 
 		this.trackListenerId = unique(this.x+','+this.y+'tracksWithUniqueId', curLevel.updateListeners.listeners);
+		if(this.trackListenerId.indexOf('NaN')!=-1){
+			console.log('OMGOMG');
+		}
 		if(!noTrackX && !noTrackY){
 			if(!offset){
 				var trackFunc = function(){
 					this.x = pt.x;
 					this.y = pt.y;
 				}
-			}else if(offset.x){
+			}else if(offset.dx){
 				var trackFunc = function(){
-					this.x = pt.x + offset.x;
+					this.x = pt.x + offset.dx;
 					this.y = pt.y;
 				}
-			}else if(offset.y){
+			}else if(offset.dy){
 				var trackFunc = function(){
 					this.x = pt.x;
-					this.y = pt.y + offset.y;
+					this.y = pt.y + offset.dy;
 				}
-			}else if(offset.y && offset.x){
+			}else if(offset.y && offset.dx){
 				var trackFunc = function(){
-					this.x = pt.x + offset.x;
-					this.y = pt.y + offset.y;
+					this.x = pt.x + offset.dx;
+					this.y = pt.y + offset.dy;
 				}
 			}
 		}else if(noTrackX){
@@ -349,9 +352,9 @@ Point.prototype = {
 				var trackFunc = function(){
 					this.y = pt.y;
 				}
-			}else if(offset.y){
+			}else if(offset.dy){
 				var trackFunc = function(){
-					this.y = pt.y + offset.y;
+					this.y = pt.y + offset.dy;
 				}
 			}			
 		}else if(noTrackY){
@@ -359,9 +362,9 @@ Point.prototype = {
 				var trackFunc = function(){
 					this.x = pt.x;
 				}
-			}else if(offset.x){
+			}else if(offset.dx){
 				var trackFunc = function(){
-					this.x = pt.x + offset.x;
+					this.x = pt.x + offset.dx;
 				}
 			}		
 		}
@@ -370,10 +373,12 @@ Point.prototype = {
 		}else{
 			console.log('tried to track ' + this.trackListenerId + " but input wasn't right");
 		}
+		return this;
 	},
 	trackStop: function(){
 		removeListener(curLevel, 'update', this.trackListenerId);
 		this.trackListenerId = undefined;
+		return this;
 	}
 }
 Dot.prototype = {
