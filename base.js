@@ -643,7 +643,7 @@ function showPrompt(prev, prompt){
 		if(block!=curLevel.blockIdx){
 			if(window['walls']!==undefined){
 				walls.remove();
-				walls=undefined;
+				walls = undefined;
 			}
 			var spcsLocal = spcs;
 			for (var spcName in spcsLocal){

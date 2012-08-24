@@ -258,6 +258,7 @@ _.extend(Work.prototype,
 
 	},
 	block3Conditions: function(){
+		//FOR CONDITIONS - NEED TO MAKE LIKE A IS LESS THAN OR IS GREATER THAN THING
 		//if(this.volListener8.isSatisfied()){
 		//	return {result:true};
 		//}
@@ -268,15 +269,12 @@ _.extend(Work.prototype,
 	block3CleanUp: function(){
 		this.playedWithSlider = undefined;
 		this.volListener8 = undefined;
-		this.wallV=0;
 		$('#sliderPressureHolder').hide();
 		this.removeAllGraphs();
 		this.readout.removeAllEntries();
 		this.readout.hide();
 		this.piston.remove();
 		this.piston = undefined;
-		//walls.setWallHandler(0, 'staticAdiabatic')
-		//walls['container'].removeBorder();
 	},
 	
 	block4Start: function(){

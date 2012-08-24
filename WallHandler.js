@@ -245,6 +245,7 @@ WallMethods = {
 			for(var wallIdx=this.length-1; wallIdx>=0; wallIdx-=1){
 				this.removeWall(wallIdx);
 			}
+			emptyListener(curLevel, 'wallMove');
 		},
 		removeWall: function(wallInfo){
 			this.numWalls-=1;
