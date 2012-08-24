@@ -1229,8 +1229,8 @@ function Piston(attrs){
 	this.wall = walls[this.wallInfo];
 	this.left = this.wall[0].x;
 	this.width = this.wall[1].x-this.left;
-	var myWall = this.wall
-	this.y = function(){return myWall[0].y};
+	this.pistonPt = this.wall[0];
+
 	this.height = 500;
 	this.setMass();
 	this.draw = this.makeDrawFunc(this.height, this.left, this.width);
@@ -1239,7 +1239,7 @@ function Piston(attrs){
 	this.pStep = .05;
 	var readoutLeft = this.left + this.width*this.slant;
 	var readoutRight = this.left + this.width - this.width*this.slant;
-	var readoutY = this.pistonBottom.pos.y-2+this.y();
+	var readoutY = this.pistonBottom.pos.y-2+this.pistonPt.y;
 	var readoutFont = '12pt calibri';
 	var readoutFontCol = Col(255, 255, 255);
 	this.readout = new Readout('pistonReadout', readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, undefined, 'center');
@@ -1249,6 +1249,7 @@ function Piston(attrs){
 	this.wall.recordWork();
 	
 	walls.setSubWallHandler(this.wallInfo, 0, 'cPAdiabaticDamped' + compAdj);		
+	this.wall.setDefaultReadout(this.readout);
 	return this.show();
 }
 
@@ -1277,7 +1278,7 @@ _.extend(Piston.prototype, compressorFuncs, {
 				self.setReadoutY();
 			}
 			self.drawCanvas.save();
-			self.drawCanvas.translate(0, self.y());
+			self.drawCanvas.translate(0, self.pistonPt.y);
 			draw.fillPts(self.pistonTop.pts, self.pistonTop.col, self.drawCanvas);
 			draw.fillRect(self.pistonBottom.pos, self.pistonBottom.dims, self.pistonBottom.col, self.drawCanvas);
 			self.drawCanvas.restore();
@@ -1352,7 +1353,7 @@ _.extend(Piston.prototype, compressorFuncs, {
 		this.wall.setMass('piston' + this.handle, this.mass);
 	},
 	setReadoutY: function(){
-		this.readout.position({y:this.pistonBottom.pos.y-2+this.y()});
+		this.readout.position({y:this.pistonBottom.pos.y-2+this.pistonPt.y});
 	},
 
 	reset: function(){

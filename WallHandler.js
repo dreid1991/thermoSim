@@ -29,7 +29,14 @@ WallMethods = {
 			this.setup();
 
 		},
-		
+		setDefaultReadout: function(readout){
+			this.defaultReadout = readout;
+			return this;
+		},
+		unsetDefaultReadout: function(){
+			this.defaultReadout = undefined;
+			return this;
+		},
 		setBounds: function(wallInfo, bounds){
 			var wallBounds = this[this.idxByInfo(wallInfo)].bounds;
 			for (var boundName in bounds){
@@ -243,6 +250,9 @@ WallMethods = {
 			this.numWalls-=1;
 			this[wallInfo].recordAllStop();
 			this[wallInfo].displayAllStop();
+			if(this[wallInfo].bordered){
+				this[wallInfo].removeBorder();
+			}
 			var wallIdx = this.idxByInfo(wallInfo);
 			this[this[wallIdx].handle] = undefined;
 			this.splice(wallIdx, 1);
@@ -652,7 +662,14 @@ WallMethods = {
 		
 		
 		},
-
+		setDefaultReadout: function(readout){
+			this.defaultReadout = readout;
+			return this;
+		},
+		unsetDefaultReadout: function(){
+			this.defaultReadout = undefined;
+			return this;
+		},
 		pExt: function(){
 			var SA = this[1].x - this[0].x;
 			return this.pConst*this.mass()*this.g/SA;
@@ -754,6 +771,7 @@ WallMethods = {
 		},
 	
 		border: function(wallPts, thickness, col, ptAdjusts){
+			this.bordered = true;
 			var drawCanvas = c;
 			var pts = new Array(wallPts.length);
 			var perpUVs = new Array(wallPts.length-1)
@@ -796,6 +814,7 @@ WallMethods = {
 			return pt.copy().movePt(adjust.mult(thickness));
 		},
 		removeBorder: function(){
+			this.bordered = false;
 			removeListener(curLevel, 'update', 'drawBorder' + this.handle);
 		},
 		
@@ -860,6 +879,7 @@ WallMethods = {
 					var p = this.pExt()*ATMTOPALOCAL;
 					this.work -= JTOKJLOCAL*p*dV;
 					heightLast = trackPt.y;
+					this.data.work.push(this.work);
 				},
 			this);
 			recordData('work' + this.handle, this.data.work, function(){return this.data.work[this.data.work.length-1]}, this);
@@ -902,12 +922,12 @@ WallMethods = {
 			return this;
 		},
 		recordAllStop: function(){
-			this.recordTempStop();
-			this.recordPIntStop();
-			this.recordPExtStop();
-			this.recordVolumeStop();
-			this.recordWorkStop();
-			this.recordMassStop();
+			if(this.recordingTemp){this.recordTempStop();};
+			if(this.recordingPInt){this.recordPIntStop();};
+			if(this.recordingPExt){this.recordPExtStop();};
+			if(this.recordingVol){this.recordVolStop();};
+			if(this.recordingWork){this.recordWorkStop();};
+			if(this.recordingMass){this.recordMassStop();};
 			return this;
 		},	
 		
@@ -917,15 +937,15 @@ WallMethods = {
 				decPlaces = defaultTo(1, decPlaces);
 				var dataSet = this.data.work;
 				label = defaultTo('Work:', label);
-				this.workReadout = defaultTo(curLevel.readout, readout);
+				this.workReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
 				var firstVal = dataSet[dataSet.length-1];
 				if(!validNumber(firstVal)){
 					firstVal = 0;
 				}
-				this.workReadout.addEntry('work' + this.handle, label, 'K', firstVal, undefined, decPlaces);
-				addListener(curLevel, 'data', 'displayWork' + this.handle,
+				this.workReadout.addEntry('work' + this.handle, label, 'kJ', firstVal, undefined, decPlaces);
+				addListener(curLevel, 'update', 'displayWork' + this.handle,
 					function(){
-						this.workReadout.tick(this.handle, dataSet[dataSet.length-1]);
+						this.workReadout.hardUpdate('work' + this.handle, dataSet[dataSet.length-1]);
 					},
 				this);	
 			}else{
@@ -940,7 +960,7 @@ WallMethods = {
 				decPlaces = defaultTo(0, decPlaces);
 				var dataSet = this.data.t;
 				label = defaultTo('Temp:', label);
-				this.tempReadout = defaultTo(curLevel.readout, readout);
+				this.tempReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
 				var firstVal = dataSet[dataSet.length-1];
 				if(!validNumber(firstVal)){
 					firstVal = 0;
@@ -962,7 +982,7 @@ WallMethods = {
 				decPlaces = defaultTo(1, decPlaces);
 				var dataSet = this.data.pInt;
 				label = defaultTo('Pint:', label);
-				this.pIntReadout = defaultTo(curLevel.readout, readout);
+				this.pIntReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
 				var firstVal = dataSet[dataSet.length-1];
 				if(!validNumber(firstVal)){
 					firstVal = 0;
@@ -984,7 +1004,7 @@ WallMethods = {
 				decPlaces = defaultTo(1, decPlaces);
 				var dataSet = this.data.pExt;
 				label = defaultTo('Pext:', label);
-				this.pExtReadout = defaultTo(curLevel.readout, readout);
+				this.pExtReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
 				var firstVal = dataSet[dataSet.length-1];
 				if(!validNumber(firstVal)){
 					firstVal = 0;
@@ -992,7 +1012,7 @@ WallMethods = {
 				this.pExtReadout.addEntry('pExt' + this.handle, label, 'atm', firstVal, undefined, decPlaces);
 				addListener(curLevel, 'update', 'displayPExt'+this.handle,
 					function(){
-						this.pExtReadout.tick('pExt' + this.handle, dataSet[dataSet.length-1]);
+						this.pExtReadout.hardUpdate('pExt' + this.handle, dataSet[dataSet.length-1]);
 					},
 				this);
 			}else{
@@ -1006,7 +1026,7 @@ WallMethods = {
 				decPlaces = defaultTo(1, decPlaces);
 				var dataSet = this.data.v;
 				label = defaultTo('Volume:', label);
-				this.volReadout = defaultTo(curLevel.readout, readout);
+				this.volReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
 				var firstVal = dataSet[dataSet.length-1];
 				if(!validNumber(firstVal)){
 					firstVal = 0;
@@ -1029,7 +1049,7 @@ WallMethods = {
 				var dataSet = this.data.m;
 				label = defaultTo('Mass:', label);
 				//DO THIS BY WALL
-				this.volReadout = defaultTo(curLevel.readout, readout);
+				this.volReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
 				var firstVal = dataSet[dataSet.length-1];
 				if(!validNumber(firstVal)){
 					firstVal = 0;
@@ -1065,8 +1085,8 @@ WallMethods = {
 		},
 		displayWorkStop: function(){
 			this.displayingWork = false;
-			this.workReadout.removeEntry('work' + walls.idxByInfo(this.handle));
-			removeListener(curLevel, 'update', 'trackWork'+this.handle);
+			this.workReadout.removeEntry('work' + this.handle);
+			removeListener(curLevel, 'update', 'displayWork'+this.handle);
 			return this;
 		},
 		displayTempStop: function(){

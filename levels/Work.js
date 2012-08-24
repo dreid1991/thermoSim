@@ -249,18 +249,20 @@ _.extend(Work.prototype,
 								{data:this.data, x:'v', y:'t'});		
 		
 		
-		this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, slider:'sliderPiston'}).trackWork().trackPressure();
+		this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, slider:'sliderPiston'});
+		this.piston.wall.displayWork().displayPExt();
 		this.borderStd();
-		this.volListener8 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.1});
+		//this.volListener8 = new StateListener({condition:10, checkAgainst:walls[0].data.v, tolerance:.1});
 		//this.heater = new Heater('spaceHeater', P(150,360), V(250,50), 0, 20, c);//P(40,425), V(470,10)
 		//this.heater.init();
 
 	},
 	block3Conditions: function(){
-		if(this.volListener8.isSatisfied()){
-			return {result:true};
-		}
-		return {result:false, alert:'Compress more!'};
+		//if(this.volListener8.isSatisfied()){
+		//	return {result:true};
+		//}
+		//return {result:false, alert:'Compress more!'};
+		return {result:true};
 	},
 	
 	block3CleanUp: function(){
@@ -273,8 +275,8 @@ _.extend(Work.prototype,
 		this.readout.hide();
 		this.piston.remove();
 		this.piston = undefined;
-		walls.setWallHandler(0, 'staticAdiabatic')
-		walls['container'].removeBorder();
+		//walls.setWallHandler(0, 'staticAdiabatic')
+		//walls['container'].removeBorder();
 	},
 	
 	block4Start: function(){
@@ -321,7 +323,8 @@ _.extend(Work.prototype,
 		this.borderStd();
 		spcs['spc1'].populate(P(45,35), V(445, 325), 850, 200);
 		spcs['spc3'].populate(P(45,35), V(445, 325), 650, 200);
-		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:wallHandle, compMode:'cPAdiabatic'}).trackMassStop().trackPressure();
+		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:wallHandle, compMode:'cPAdiabatic'});
+		this.dragWeights.wall.displayWork().displayMass().displayPExt().displayVol();
 		this.trackTemp();
 		this.trackVolume(0);
 		this.volListener15 = new StateListener({condition:15, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{p:this.data.p, t:this.data.t}});
@@ -467,16 +470,5 @@ _.extend(Work.prototype,
 		this.dragWeightsRight.remove();
 		this.readout.hide();
 	},
-	dataRun: function(){
-		var wall = walls[0];
-		this.data.p.push(wall.pInt())
-		this.data.t.push(dataHandler.temp());
-		this.data.v.push(dataHandler.volume());
-		
-		for(var graphName in this.graphs){
-			this.graphs[graphName].addLast();
-		}
-	},
-
 }
 )

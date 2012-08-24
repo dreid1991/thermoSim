@@ -601,9 +601,6 @@ function hideSliders(){
 	}
 }
 function showPrompt(prev, prompt){
-	if(window['walls']!==undefined){
-		walls.remove();
-	}
 	var finishedPrev = new Boolean();
 	var forward = new Boolean();
 	var didWin = new Boolean();
@@ -644,6 +641,10 @@ function showPrompt(prev, prompt){
 		var text = prompt.text;
 		
 		if(block!=curLevel.blockIdx){
+			if(window['walls']!==undefined){
+				walls.remove();
+				walls=undefined;
+			}
 			var spcsLocal = spcs;
 			for (var spcName in spcsLocal){
 				spcsLocal[spcName].depopulate();
