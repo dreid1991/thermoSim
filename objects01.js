@@ -1,3 +1,15 @@
+/*
+Contains:
+	DragWeights
+	Pool
+	DragArrow
+	CompArrow
+	Piston
+	Heater
+	Stops
+	StateListener
+in that order
+*/
 compressorFuncs = {
 	getBinPts: function(pos, slant, dims, thickness){
 		var pts = []

@@ -307,15 +307,74 @@ Point.prototype = {
 	sameAs: function(b){
 		return (this.x==b.x && this.y==b.y);
 	},
-	track: function(trackInfo){
-		var listenerId = unique(this.x+','+this.y+'tracksWithUniqueId', curLevel.updateListeners.listeners);
-		if(xTrack && yTrack){
-			
+	track: function(trackData){
+		if(trackData instanceof Point){
+			pt = trackData;
+			offset = false;
+			noTrackX = false;
+			noTrackY = false;
+		}else{
+			var pt = trackData.pt;
+			var offset = trackData.offset;
+			var noTrack = defaultTo('',trackData.noTrack);
+			var noTrackX = noTrack.indexOf('x')+1;// so is 0 if not there
+			var noTrackY = noTrack.indexOf('y')+1;
 		}
-		//FILL IN - HAVE LIKE {x:{obj, offset}, y:{obj, offset}}
+
+		this.trackListenerId = unique(this.x+','+this.y+'tracksWithUniqueId', curLevel.updateListeners.listeners);
+		if(!noTrackX && !noTrackY){
+			if(!offset){
+				var trackFunc = function(){
+					this.x = pt.x;
+					this.y = pt.y;
+				}
+			}else if(offset.x){
+				var trackFunc = function(){
+					this.x = pt.x + offset.x;
+					this.y = pt.y;
+				}
+			}else if(offset.y){
+				var trackFunc = function(){
+					this.x = pt.x;
+					this.y = pt.y + offset.y;
+				}
+			}else if(offset.y && offset.x){
+				var trackFunc = function(){
+					this.x = pt.x + offset.x;
+					this.y = pt.y + offset.y;
+				}
+			}
+		}else if(noTrackX){
+			if(!offset){
+				var trackFunc = function(){
+					this.y = pt.y;
+				}
+			}else if(offset.y){
+				var trackFunc = function(){
+					this.y = pt.y + offset.y;
+				}
+			}			
+		}else if(noTrackY){
+			if(!offset){
+				var trackFunc = function(){
+					this.x = pt.x;
+				}
+			}else if(offset.x){
+				var trackFunc = function(){
+					this.x = pt.x + offset.x;
+				}
+			}		
+		}
+		if(trackFunc){
+			addListener(curLevel, 'update', this.trackListenerId, trackFunc, this);
+		}else{
+			console.log('tried to track ' + this.trackListenerId + " but input wasn't right");
+		}
+	},
+	trackStop: function(){
+		removeListener(curLevel, 'update', this.trackListenerId);
+		this.trackListenerId = undefined;
 	}
-	
-	
 }
 Dot.prototype = {
 	KE: function(){

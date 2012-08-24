@@ -582,8 +582,8 @@ WallMethods = {
 			var area = 0;
 			var originPt = pts[0];
 			for (var ptIdx=2; ptIdx<pts.length; ptIdx++){
-				pt1 = pts[ptIdx-1];
-				pt2 = pts[ptIdx];
+				var pt1 = pts[ptIdx-1];
+				var pt2 = pts[ptIdx];
 				area += originPt.area(pt1, pt2);
 			}
 			return area;
