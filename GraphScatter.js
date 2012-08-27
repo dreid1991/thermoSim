@@ -28,35 +28,27 @@ function GraphScatter(handle, width, height, xLabel, yLabel, axisInit){
 	this.legend = {};
 	this.resetRanges();
 	this.stepSize = {x:0, y:0};
-	this.checkMarkOversize = 3;
-	this.bgCol = curLevel.bgCol
-	this.gridCol = Col(72,72,72);
-	this.toggleCol = Col(255,255,255);
-	
-	this.textCol = Col(255, 255, 255);
-	this.flashMult = 1.5;
-	this.flashRate = .1;
-	this.graphBoundCol = Col(255,255,255);
-	this.ptStroke = Col(0,0,0);
-	this.rectSideLen = 8;
-	this.characLen = Math.sqrt(Math.pow(this.rectSideLen, 2)/2);
-	//characLen, characteristic length, is the radius of the shape being used
-	this.makeCanvas(this.handle, this.dims);
 
+
+	this.setStds();
+	this.makeCanvas(this.handle, this.dims);
 	this.drawAllBG();
 	
 }
 _.extend(GraphScatter.prototype, GraphBase, 
 	{
-		addSet: function(address, label, pointCol, flashCol, dataPaths){
+		addSet: function(address, label, pointCol, flashCol, data){
 			var set = {};
 			set.label = label;
 			set.x = [];
 			set.y = [];
+			set.xInitDataIdx = data.x.length-1;
+			set.yInitDataIdx = data.y.length-1;
 			set.pointCol = pointCol;
 			set.flashCol = flashCol;
-			set.getLast = this.makePtDataGrabFunc(dataPaths);
+			set.getLast = this.makePtDataGrabFunc(data);
 			set.show = true;
+			set.src = data;
 			this.data[address] = set;
 			this.makeLegendEntry(set, address);
 			this.drawAllBG();
@@ -77,8 +69,6 @@ _.extend(GraphScatter.prototype, GraphBase,
 				}
 			}	
 		},
-
-
 		addLast: function(){
 			var toAdd = [];
 			for (var address in this.data){
@@ -89,8 +79,6 @@ _.extend(GraphScatter.prototype, GraphBase,
 				this.addPts(toAdd);
 			}
 		},
-
-
 		plotData: function(xVals, yVals, address){
 			if (xVals.length==yVals.length && xVals.length>1){
 				this.data[address].x = xVals;

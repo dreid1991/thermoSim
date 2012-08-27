@@ -114,6 +114,12 @@ drawingTools.prototype = {
 		drawCanvas.closePath();
 		drawCanvas.fill();
 	},
+	fillPtsAlpha: function(pts, col, alpha, drawCanvas){
+		var prevAlpha = drawCanvas.globalAlpha;
+		drawCanvas.globalAlpha = alpha;
+		draw.fillPts(pts, col, drawCanvas);
+		drawCanvas.globalAlpha = prevAlpha;
+	},
 	fillPtsStroke: function(pts, fillCol, strokeCol, drawCanvas){
 		drawCanvas.fillStyle = fillCol.hex
 		drawCanvas.strokeStyle = strokeCol.hex
@@ -490,9 +496,11 @@ ArrayExtenders = {
 		}
 		return this;
 	},
-	deepCopy: function(){
+	deepCopy: function(startIdx, endIdx){
+		startIdx = defaultTo(0, startIdx);
+		endIdx = Math.min(this.length, defaultTo(this.length, endIdx));
 		var copy = new Array(this.length);
-		for (var idx=0; idx<this.length; idx++){
+		for (var idx=startIdx; idx<endIdx; idx++){
 			if(this[idx] instanceof Array){
 				copy[idx] = this[idx].deepCopy();
 			}else{
@@ -502,6 +510,7 @@ ArrayExtenders = {
 		return copy;
 
 	},
+	
 }
 MathExtenders = {
 	log10: function(val){

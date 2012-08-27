@@ -26,13 +26,9 @@ function GraphHist(handle, width, height, xLabel, yLabel, axisInit, dataPath){
 	this.legend = {};
 	this.resetRanges();
 	this.stepSize = {x:0, y:0};
-	this.bgCol = curLevel.bgCol
-	this.gridCol = Col(72,72,72);
 	
-	this.textCol = Col(255, 255, 255);
-	this.graphBoundCol = Col(255,255,255);
 	var barCol = Col(255,100,0);
-
+	this.setStds();
 	var canvasData = this.makeCanvas(this.handle, this.dims);
 	this.drawAllBG();
 	this.addSet('only', barCol, dataPath);

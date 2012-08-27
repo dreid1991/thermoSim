@@ -410,20 +410,20 @@ _.extend(Reversibility.prototype,
 		//this.graphs.tVSv = new GraphScatter('tVSv', 400, 293,"Volume (L)", "Temperature (K)",
 		//					{x:{min:0, step:4}, y:{min:180, step:60}});
 		this.graphs.pVSv.addSet('pInt', 'P Int.', Col(0,0,255), Col(200,200,255),
-								{data:walls[0].data, x:'v', y:'pInt'});
+								{x:walls[0].data.v, y:walls[0].data.pInt});
 		this.graphs.pVSv.addSet('pExt', 'P Ext.', Col(0,255,0), Col(200,255,200),
-								{data:walls[0].data, x:'v', y:'pExt'});
+								{x:walls[0].data.v, y:walls[0].data.pExt});
 		//this.graphs.tVSv.addSet('t', 'Sys\nTemp', Col(255,0,0), Col(255,200,200),
 		//						{data:this.data, x:'v', y:'t'});		
 	},
 	unCompSetup: function(){
-		walls = WallHandler([[P(40,68), P(510,68), P(510,410), P(40,410)]], 'staticAdiabatic', ['container'], [{yMin:68, yMax:435}], undefined, [14]);
+		walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'cVIsothermal', handles:['container'], bounds:[{yMin:68, yMax:435}], vols:[14], temps:[200]);
 		this.borderStd({min:68});
 		spcs['spc1'].populate(P(35, 150), V(460, 250), 814, 215.38);
 		spcs['spc3'].populate(P(35, 150), V(460, 250), 611, 215.38);
 	},
 	compSetup: function(){
-		walls = WallHandler([[P(40,68), P(510,68), P(510,410), P(40,410)]], 'staticAdiabatic', ['container'], [{yMin:68, yMax:435}], undefined, [10.1]);
+		walls = WallHandler([[P(40,68), P(510,68), P(510,410), P(40,410)]], 'cVIsothermal', ['container'], [{yMin:68, yMax:435}], undefined, [10.1]);
 		this.borderStd({min:68});
 		var maxY = walls[0][0].y;
 		var height = walls[0][3].y-walls[0][0].y;
@@ -431,20 +431,7 @@ _.extend(Reversibility.prototype,
 		spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 611, 273);
 		this.stops = new Stops({stopPt:{volume:10}});		
 	},
-	/*
-	dataRun: function(){
-		var wall = walls[0];
-		this.data.pInt.push(wall.pInt());
-		this.data.pExt.push(wall.pExt());
-		this.data.t.push(dataHandler.temp());
-		this.data.v.push(dataHandler.volume());
 
-		for(var graphName in this.graphs){
-			this.graphs[graphName].addLast();
-		}
-		
-	},
-	*/
 
 }
 )

@@ -1,8 +1,7 @@
-function WallHandler(pts, handlers, handles, bounds, includes, vols, shows, records){//records is a verb
+function WallHandler(attrs)//pts, handlers, handles, bounds, includes, vols, shows, records, temps){//records is a verb, like what the wall records.  Defaults to recording q, pint, t, v
 	var newWall = new Array(pts.length)
 	_.extend(newWall, WallMethods.main, WallMethods.collideMethods);
-
-	newWall.assemble(pts, handles, bounds, includes, vols, shows, records)
+	newWall.assemble(attrs);//pts, handles, bounds, includes, vols, shows, records)
 	
 	if(handles.length!=pts.length){
 		console.log('NAME YOUR WALLS');
@@ -15,16 +14,18 @@ function WallHandler(pts, handlers, handles, bounds, includes, vols, shows, reco
 };
 WallMethods = {
 	main: {
-		assemble: function(pts, handles, bounds, includes, vols, shows, records){
+		assemble: function(attrs){//pts, handles, bounds, includes, vols, shows, records){
+			var pts = attrs.pts;
 			addListener(curLevel, 'cleanUp', 'walls', this.remove, this)
 			this.numWalls = pts.length;
-			includes = defaultTo([], includes);
-			bounds = defaultTo([], bounds);
-			vols = defaultTo([], vols);
-			shows = defaultTo([], shows);
-			records = defaultTo([], records);
+			includes = defaultTo([], attrs.includes);
+			bounds = defaultTo([], attrs.bounds);
+			vols = defaultTo([], attrs.vols);
+			shows = defaultTo([], attrs.shows);
+			records = defaultTo([], attrs.records);
+			temps = defaultTo([], attrs.temps);
 			for (var wallIdx=0; wallIdx<pts.length; wallIdx++){
-				this.setWallVals(wallIdx, pts[wallIdx], handles[wallIdx], bounds[wallIdx], includes[wallIdx], vols[wallIdx], shows[wallIdx], records[wallIdx]);
+				this.setWallVals(wallIdx, pts[wallIdx], handles[wallIdx], bounds[wallIdx], includes[wallIdx], vols[wallIdx], shows[wallIdx], records[wallIdx], temps[wallIdx]);
 
 			}
 			this.setup();
@@ -152,7 +153,7 @@ WallMethods = {
 			}
 			return wallGrid;
 		},
-		setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show, record){
+		setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show, record, temp){
 			bounds = defaultTo({yMin:30, yMax: 435}, bounds);
 			include = defaultTo(1, include);
 			this[wallIdx] = pts;
@@ -176,6 +177,10 @@ WallMethods = {
 			this[wallIdx].data.v = new Array();
 			this[wallIdx].data.m = new Array();
 			this[wallIdx].data.work = new Array();
+			this[wallIdx].data.q = new Array();
+			this[wallIdx].q = 0;
+			this[wallIdx].tempAdj = 20;
+			this[wallIdx].temp = temp;
 			this[wallIdx].massChunks = {};
 			this[wallIdx].forceInternal = 0;
 			this[wallIdx].pLastRecord = turn;
@@ -195,10 +200,10 @@ WallMethods = {
 			pts[0].position({y:setY});
 			pts[1].position({y:setY});
 		},
-		addWall: function(pts, handler, handle, bounds, include, vol, show, record){
+		addWall: function(attrs){
 			this.numWalls++;
 			var newIdx = this.length;
-			this.setWallVals(newIdx, pts, handle, bounds, include, vol, show, record);
+			this.setWallVals(newIdx, attrs.pts, attrs.handle, attrs.bounds, attrs.include, attrs.vol, attrs.show, attrs.record, attrs.temp);
 			this.setupWall(newIdx);
 			this.setWallHandler(newIdx, handler);
 		},
@@ -825,6 +830,7 @@ WallMethods = {
 			this.recordTemp();
 			this.recordPInt();
 			this.recordVol();
+			this.recordQ();
 			/*
 			addListenerOnce(curLevel, 'data', 'initData' + this.handle, 
 				function(){
@@ -893,6 +899,11 @@ WallMethods = {
 			recordData('mass' + this.handle, this.data.m, this.mass, this, 'update');		
 			return this;			
 		},
+		recordQ: function(){
+			this.recordingQ = true;
+			recordData('q' + this.handle, this.data.q, function(){return this.q}, this, 'update');
+			return this;
+		},
 		recordTempStop: function(){
 			this.recordingTemp = false;
 			recordDataStop('t' + this.handle);
@@ -924,6 +935,11 @@ WallMethods = {
 			recordDataStop('mass' + this.handle);
 			return this;
 		},
+		recordQStop: function(){
+			this.recordingQ = false
+			recordDataStop('q' + this.handle);
+			return this;
+		},
 		recordAllStop: function(){
 			if(this.recordingTemp){this.recordTempStop();};
 			if(this.recordingPInt){this.recordPIntStop();};
@@ -931,9 +947,10 @@ WallMethods = {
 			if(this.recordingVol){this.recordVolStop();};
 			if(this.recordingWork){this.recordWorkStop();};
 			if(this.recordingMass){this.recordMassStop();};
+			if(this.recordingQ){this.recordQStop();};
 			return this;
 		},	
-		
+		//HEY - YOU SHOULD _PROBABLY_ MAKE A FUNCTION THAT DOES THESE DISPLAY THINGS GIVEN SOME INPUTS.  I MEAN, THIS IS A LOT OF NEARLY IDENTICAL CODE
 		displayWork: function(readout, label, decPlaces){
 			if(this.recordingWork){
 				this.displayingWork = true;
@@ -1057,7 +1074,6 @@ WallMethods = {
 				decPlaces = defaultTo(0, decPlaces);
 				var dataSet = this.data.m;
 				label = defaultTo('Mass:', label);
-				//DO THIS BY WALL
 				this.massReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
 				var firstVal = dataSet[dataSet.length-1];
 				if(!validNumber(firstVal)){
@@ -1078,6 +1094,34 @@ WallMethods = {
 				console.log('Tried to display mass of wall ' + this.handle + ' while not recording.  Will not display.');			
 			}
 			return this;			
+		},
+		displayQ: function(readout, label, decPlaces){
+			if(this.recordingQ){
+				this.displayingQ = true;
+				decPlaces = defaultTo(1, decPlaces);
+				var dataSet = this.data.q;
+				label = defaultTo('Q:', label);
+				this.qReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
+				var firstVal = dataSet[dataSet.length-1];
+				if(!validNumber(firstVal)){
+					firstVal = 0;
+				}
+				this.qReadout.addEntry('q' + this.handle, label, 'kJ', firstVal, undefined, decPlaces);
+				var lastVal = 0;
+				addListener(curLevel, 'update', 'displayQ'+this.handle,
+					function(){
+						var curVal = dataSet[dataSet.length-1];
+						if(curVal!=lastVal){
+							this.qReadout.hardUpdate('q' + this.handle, curVal);
+							lastVal = curVal;
+						}
+						
+					},
+				this);
+			}else{
+				console.log('Tried to display q of wall ' + this.handle + ' while not recording.  Will not display.');
+			}
+			return this;
 		},
 		displayVolStop: function(){
 			this.displayingVol = false;
@@ -1115,6 +1159,12 @@ WallMethods = {
 			this.massReadout.removeEntry('mass' + this.handle);	
 			return this;			
 		},
+		displayQStop: function(){
+			this.displayingQ = false;
+			removeListener(curLevel, 'update', 'displayQ' + this.handle);
+			this.qReadout.removeEntry('q' + this.handle);
+			return this;
+		},
 		displayAllStop: function(){
 			if(this.displayingVol){this.displayVolStop();};
 			if(this.displayingTemp){this.displayPIntStop();};
@@ -1122,6 +1172,7 @@ WallMethods = {
 			if(this.displayingWork){this.displayWorkStop();};
 			if(this.displayingTemp){this.displayTempStop();};
 			if(this.displayingMass){this.displayMassStop();};
+			if(this.displayingQ){this.displayQStop();};
 			return this;
 		},
 		
@@ -1244,10 +1295,13 @@ WallMethods = {
 			this[wallIdx].forceInternal += 2*dot.m*Math.abs(perpV);
 		},
 		cVIsothermal: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
-			dot.y+=perpUV.dy;
-			this.reflect(dot, wallUV, perpV);
-			this[wallIdx].forceInternal += 2*dot.m*Math.abs(perpV);
-			//this is really not correct, but it's not in use yet, so...
+			var inTemp = dot.temp();
+			var outTemp = boundedStep(inTemp, this[wallIdx].temp, this[wallIdx].tempAdj);
+			var spdRatio = Math.sqrt(outTemp/inTemp);
+			var outPerpV = perpV*spdRatio;
+			this.reflectChangeSpd(dot, wallUV, perpV, perpV*spdRatio);
+			this[wallIdx].forceInternal += dot.m*(Math.abs(perpV) + Math.abs(outPerpV));
+			this.q += (outTemp - inTemp)*cV/N;
 		},
 		cVAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 			var v = dot.v;
@@ -1270,5 +1324,11 @@ WallMethods = {
 			dot.x -= wallUV.dy
 			dot.y += wallUV.dx
 		},
+		reflectChangeSpd: function(dot, wallUV, perpVIn, perpVOut){
+			dot.v.dx -= wallUV.dy*perpVIn + wallUV.dy*perpVOut;
+			dot.v.dy += wallUV.dx*perpV + wallUV,dx*perpVOut;
+			dot.x -= wallUV.dy
+			dot.y += wallUV.dx		
+		}
 	},
 }

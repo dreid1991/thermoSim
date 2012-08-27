@@ -1,4 +1,21 @@
 GraphBase = {
+	setStds: function(){
+		this.checkMarkOversize = 3;
+		this.bgCol = curLevel.bgCol
+		this.gridCol = Col(72,72,72);
+		this.toggleCol = Col(255,255,255);
+		
+		this.textCol = Col(255, 255, 255);
+		this.flashMult = 1.5;
+		this.flashRate = .1;
+		this.graphBoundCol = Col(255,255,255);
+		this.integralCol = Col(150, 150, 150);
+		this.integralAlpha = .5;
+		this.ptStroke = Col(0,0,0);
+		this.rectSideLen = 8;
+		//characLen, characteristic length, is the radius of the shape being used
+		this.characLen = Math.sqrt(Math.pow(this.rectSideLen, 2)/2);		
+	},
 	makeCanvas: function(handle, dims){
 		addListener(curLevel, 'reset', 'clearGraph'+this.handle, this.clear, this);
 		var str = "</div><div id = '" + this.handle +"GraphDiv'><canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas></div><div class='graphSpacer noSelect' id='"+this.handle + "GraphSpacer'>"
@@ -27,16 +44,46 @@ GraphBase = {
 		this.active = false;
 		return this;
 	},
+	integrate: function(set){
+		this.data[set].integralPts = this.getIntegralPts(set);
+		this.drawIntegral(set);
+		this.drawAllPts();
+	},
+	getIntegralPts: function(set){
+		var xPts = set.src.x;
+		var yPts = set.src.y;
+		var integralPts = new Array(xPts.length);
+		for(var ptIdx=0; ptIdx<xPts.length; ptIdx.length){
+			integralPts[ptIdx] = this.translateValToCoord(P(xPts[ptIdx], yPts[ptIdx]));
+		}
+		var yMin = this.axisRange.y.min;
+		var lastX = integralPts[integralPts.length].x;
+		var firstX = integralPts[0].x;
+		integralPts.push(lastX, yMin);
+		integralPts.push(firstX, yMin);
+		return integralPts;
+		
+	},
+	drawIntegral: function(set){
+		var pts = this.data[set].integralPts;
+		draw.fillPtsAlpha(pts, this.integralCol, this.integralAlpha, this.canvas);
+		this.graphPts();
+	},
 	save: function(saveName){
 	
 		var saveName = defaultTo('graph'+this.handle, saveName);
 		saveName = unique(saveName, stored);
-		//HEY - STORE ALL DATA STORED WHILE YOU WERE AROUND
 		this.dataSave = {};
 		for (var set in this.data){
 			this.dataSave[set] = {};
-			this.dataSave[set].x = this.data[set].x.deepCopy();
-			this.dataSave[set].y = this.data[set].y.deepCopy();
+			this.dataSave[set].pts.x = this.data[set].x.deepCopy();
+			this.dataSave[set].pts.y = this.data[set].y.deepCopy();
+			if(this.data[set].xInitDataIdx){
+				this.dataSave[set].src.x = this.data[set].src.x.deepCopy(this.data[set].xInitDataIdx);
+			}
+			if(this.data[set].yInitDataIdx){
+				this.dataSave[set].src.y = this.data[set].src.y.deepCopy(this.data[set].yInitDataIdx);
+			}
 		}
 		store(saveName, this);
 		return saveName;
@@ -49,7 +96,10 @@ GraphBase = {
 		for (var set in this.data){
 			this.data[set].x = [];
 			this.data[set].y = [];
-			var toAdd = toAdd.concat(this.setsToPts(this.dataSave[set].x, this.dataSave[set].y, set));
+			this.data[set].src.x = this.dataSave[set].src.x.deepCopy();
+			this.data[set].src.y = this.dataSave[set].src.y.deepCopy();
+						
+			var toAdd = toAdd.concat(this.setsToPts(this.dataSave[set].pts.x, this.dataSave[set].pts.y, set));
 		
 		}
 		this.addPts(toAdd, false, true);
@@ -330,22 +380,17 @@ GraphBase = {
 		this.axisRange = {x:{min:Number.MAX_VALUE, max:-Number.MAX_VALUE}, y:{min:Number.MAX_VALUE, max:-Number.MAX_VALUE}};
 		this.valRange = {x:{min:Number.MAX_VALUE, max:-Number.MAX_VALUE}, y:{min:Number.MAX_VALUE, max:-Number.MAX_VALUE}};
 	},
-	makePtDataGrabFunc: function(paths){
+	makePtDataGrabFunc: function(data){
 		return function(address){
-			var data = paths.data;
-			var xPtr = paths.x;
-			var yPtr = paths.y;
-			var xData = data[xPtr];
-			var yData = data[yPtr];
-			var xLast = xData[xData.length-1];
-			var yLast = yData[yData.length-1];
+			var xLast = data.x[data.x.length-1];
+			var yLast = data.y[data.y.length-1];
 			return {x:xLast, y:yLast, address:address};
 		}
 	},
 	ptsExist: function(pts){
 		for (var ptIdx=0; ptIdx<pts.length; ptIdx++){
 			var pt = pts[ptIdx];
-			if(pt.x===undefined || pt.y===undefined){
+			if(pt.x===undefined || pt.y===undefined || isNaN(pt.x) || isNaN(pt.y)){
 				return false;
 			}
 		}
