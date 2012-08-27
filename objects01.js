@@ -26,11 +26,19 @@ compressorFuncs = {
 		return pts;
 	},
 }
+
+objectFuncs = {
+	addCleanUp: function(){
+		addListener(curLevel, 'cleanUp', unique(typeof(this) + defaultTo('', this.handle), curLevel.cleanUpListeners), this.remove, this);
+	},
+
+}
 //////////////////////////////////////////////////////////////////////////
 //DRAG WEIGHTS
 //////////////////////////////////////////////////////////////////////////
 
 function DragWeights(attrs){
+	this.handle = 				unique('dragWeights' + attrs.handle, curLevel);
 	this.tempWeightDefs = 		attrs.weightDefs;
 	this.wallInfo = 			defaultTo(0, attrs.wallInfo);
 	this.wall = 				walls[this.wallInfo];
@@ -76,10 +84,13 @@ function DragWeights(attrs){
 	this.wall.setMass(this.massChunkName, this.massInit);
 	this.wall.recordPExt();
 	this.wall.recordWork();
+	this.wall.recordMass();
+	
+	this.addCleanUp();
 	return this.init();
 }
 
-_.extend(DragWeights.prototype, compressorFuncs, {
+_.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	init: function(){
 		this.weightGroups = this.makeWeights(this.tempWeightDefs);
 		this.bins = {};
@@ -744,10 +755,13 @@ function Pool(attrs){
 	this.tube.wallThickness = (this.tube.OD-this.tube.ID)/2
 	this.tube.walls.xPts = this.getTubeXPts(this.tube.ID, this.tube.OD);
 	this.tube.floor = this.tube.wallThickness+5;
+	
+	this.addCleanUp();
+	
 	return this.init();
 }
 
-_.extend(Pool.prototype, compressorFuncs, {
+_.extend(Pool.prototype, objectFuncs, compressorFuncs, {
 	init: function(){	
 		addListener(curLevel, 'update', 'drawPool', this.draw, this);
 		this.wall.moveInit();	
@@ -1199,9 +1213,12 @@ function CompArrow(attrs){
 	listeners.onMove = function(){wall.changeSetPt(this.pos.y, compMode, speed)};
 	listeners.onUp = function(){};
 	this.dragArrow = new DragArrow(pos, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds).show();
+	
+	this.addCleanUp();
+	
 	return this;
 }
-CompArrow.prototype = {
+_.extend(CompArrow.prototype, objectFuncs, {
 	remove: function(){
 		this.dragArrow.remove();
 		if(this.stop){
@@ -1209,6 +1226,7 @@ CompArrow.prototype = {
 		}
 	},
 }
+)
 
 //////////////////////////////////////////////////////////////////////////
 //PISTON
@@ -1250,10 +1268,13 @@ function Piston(attrs){
 	
 	walls.setSubWallHandler(this.wallInfo, 0, 'cPAdiabaticDamped' + compAdj);		
 	this.wall.setDefaultReadout(this.readout);
+	
+	this.addCleanUp();
+	
 	return this.show();
 }
 
-_.extend(Piston.prototype, compressorFuncs, {
+_.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 	makeDrawFunc: function(height, left, pistonWidth){
 		var shaftThickness = 30;
 		var shaftLength = height - 45;
@@ -1404,10 +1425,13 @@ function Heater(attrs){
 	this.draw = this.makeDrawFunc(colMin, colDefault, colMax);
 	this.wallPts = this.pos.roundedRect(this.dims, .3, 'ccw');
 	this.eAdded=0;
+	
+	this.addCleanUp();
+	
 	return this.init();
 }
 
-Heater.prototype = {
+_.extend(Heater.prototype, objectFuncs, {
 	setTemp: function(val){		
 		this.temp = .02*(val-50)*this.tempMax
 	},
@@ -1516,6 +1540,7 @@ Heater.prototype = {
 		walls.removeWall('heater' + this.handle);
 	}
 }
+)
 //////////////////////////////////////////////////////////////////////////
 //STOPS
 //////////////////////////////////////////////////////////////////////////
@@ -1536,9 +1561,12 @@ function Stops(attrs){
 	}
 
 	this.draw = this.makeDrawFunc(this.height);
+	
+	this.addCleanUp();	
+	
 	return this.init();
 }
-Stops.prototype = {
+_.extend(Stops.prototype, objectFuncs, {
 	makeDrawFunc: function(height){
 		var pLeft = this.pts[3].copy().position({y:height});
 		var pRight = this.pts[2].copy().position({y:height}).movePt({dx:-this.stopWidth});
@@ -1563,40 +1591,66 @@ Stops.prototype = {
 		return this;
 	},
 }
+)
 //////////////////////////////////////////////////////////////////////////
 //STATE LISTENER
 //////////////////////////////////////////////////////////////////////////
-function StateListener(attrs){
-	this.condition = attrs.condition;
-	this.checkAgainst = attrs.checkAgainst;//can be func that returns value or list
-	this.recordAtSatisfy = defaultTo({}, attrs.recordAtSatisfy);
+function StateListener(attrs){//like dataList... is:'greaterThan', ... targetVal
+	this.dataList = attrs.dataList;
+	this.is = attrs.is
+	this.targetVal = attrs.targetVal;
 	this.tolerance = defaultTo(.05, attrs.tolerance);
+	
+	this.alerts = {true:attrs.alertSatisfied, false:attrs.alertUnsatisfied};
+	
+	this.priorities = {true:defaultTo(0, attrs.prioritySatisfied), false:defaultTo(0, attrs.priorityUnsatisfied)};
+	
+	this.recordAtSatisfy = defaultTo({}, attrs.recordAtSatisfy);
 	this.atSatisfyFunc = defaultTo(undefined, attrs.atSatisfyFunc);
-
 	this.amSatisfied = false;
-
+	this.makeConditionFunc();
 	return this.init();
 }
-StateListener.prototype = {
+_.extend(StateListener.prototype, objectFuncs, {
 	init: function(){
-		var handle = 'StateListener' + this.condition + Math.round(Math.random()*10000);
-		addListener(curLevel, 'data', handle,
+		var handle = unique('StateListener' + this.is, curLevel.updateListeners.listeners);
+		addListener(curLevel, 'update', handle,
 			function(){
-				if(this.checkAgainst instanceof Array){
-					var last = this.checkAgainst[this.checkAgainst.length-1];
-				} else {
-					var last = this.checkAgainst();
-				}
-				if(fracDiff(this.condition, last)<this.tolerance){
+				if(this.condition()){
 					this.amSatisfied = true;
 					this.recordVals();
 					if(this.atSatisfyFunc){
 						this.atSatisfyFunc.func.apply(this.atSatisfyFunc.obj);
 					}
-					removeListener(curLevel, 'data', handle);
+					removeListener(curLevel, 'update', handle);
 				}
 			},
 		this);
+		addListener(curLevel, 'condition', handle,
+			function(){
+				return {didWin: this.amSatisfied, alert:this.alerts[this.amSatisfied], priority:this.priorities[this.amSatisfied]};
+			},
+		this);
+	},
+	makeConditionFunc: function(){
+		switch(this.is){
+			case 'greaterThan':
+				this.condition = function(){
+					return this.dataList[this.dataList.length-1]>this.targetVal;
+				};
+				break;
+			case 'lessThan':
+				this.condition = function(){
+					return this.dataList[this.dataList.length-1]<this.targetVal;
+				};
+				break;
+			case 'equalTo':
+				this.condition = function(){
+					return fracDiff(this.dataList[this.dataList.length-1], this.targetVal)<this.tolerance;
+				}
+				break;
+		}
+		
 	},
 	recordVals: function(){
 		this.results = {}
@@ -1616,3 +1670,4 @@ StateListener.prototype = {
 		}
 	},
 }
+)

@@ -614,16 +614,18 @@ function showPrompt(prev, prompt){
 	var indexOfCur = _.indexOf(curLevel.prompts, prompt);
 	forward = indexOfCur>indexOfPrev;
 	if(prev){
-		var conditions = defaultTo(curLevel['block'+prev.block+'Conditions'], prev.conditions);
+		var conditions = defaultTo(curLevel.conditions, defaultTo(curLevel['block'+prev.block+'Conditions'], prev.conditions));
 	}
 	if(!finishedPrev && forward && conditions){
 		var condResult = conditions.apply(curLevel);
-		didWin = condResult.result;
+		didWin = condResult.didWin;
 		if(condResult.alert){
 			alert(condResult.alert);
 		}
 	}
 	if(didWin || finishedPrev){
+		curLevel.saveAllGraphs();
+		curLevel.removeAllGraphs();
 		curLevel.promptIdx = indexOfCur;
 		if(prev){
 			if(forward){
@@ -641,17 +643,14 @@ function showPrompt(prev, prompt){
 		var text = prompt.text;
 		
 		if(block!=curLevel.blockIdx){
-			if(window['walls']!==undefined){
-				walls.remove();
-				walls = undefined;
-			}
 			var spcsLocal = spcs;
 			for (var spcName in spcsLocal){
 				spcsLocal[spcName].depopulate();
 			}
-			if(prev && curLevel['block'+prev.block+'CleanUp']){
-				curLevel['block'+prev.block+'CleanUp'].apply(curLevel);
-			}
+			curLevel.cleanUp.apply(curLevel);
+
+			emptyListener(curLevel, 'cleanUp');
+			emptyListener(curLevel, 'condition');
 			if(curLevel.inCutScene){
 				curLevel.cutSceneEnd();
 			}

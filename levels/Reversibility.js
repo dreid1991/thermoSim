@@ -12,7 +12,7 @@ function Reversibility(){
 	this.readout = new Readout('mainReadout', 15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), this);
 
 	addSpecies(['spc1', 'spc3']);
-	this.massInit = 10;
+	this.massInit = 30;
 
 }
 _.extend(Reversibility.prototype, 
@@ -197,10 +197,12 @@ _.extend(Reversibility.prototype,
 		var wallHandle = 'container';
 		this.unCompSetup();
 		this.makeGraphsRev();
-		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:90}]}).wall.displayPExt();
-		this.volListener10 = new StateListener({condition:10, checkAgainst:walls[0].data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInLrg',round(walls[0].work,1))},obj:''}});
+		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:90}]})
+		this.dragWeights.wall.displayPExt().displayWork().recordMass().displayMass().displayVol();
+		this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:10, alertUnsatisfied:'NO', alertSatisfied:'YES', atSatisfyFunc:{func:function(){store('workInLrg',round(walls[0].work,1))},obj:''}});
 		this.readout.show();
 	},	
+	/*
 	block0Conditions: function(){
 		if(this.volListener10.isSatisfied()){
 			return {result:true};
@@ -209,12 +211,12 @@ _.extend(Reversibility.prototype,
 		}
 	},
 	block0CleanUp: function(){
-		this.trackVolumeStop();
 		this.dragWeights.remove();
 	},
-	block1CleanUp: function(){
-		this.removeAllGraphs();
-	},
+	*/
+	//block1CleanUp: function(){
+	//	this.removeAllGraphs();
+	//},
 	block2Start: function(){
 		this.makeGraphsRev();
 		var numBlocks = getStore('numBlocks');
@@ -404,7 +406,7 @@ _.extend(Reversibility.prototype,
 	},
 	makeGraphsRev: function(){
 		this.graphs.pVSv = new GraphScatter('pVSv', 400,293, "Volume (L)", "Pressure (atm)",
-							{x:{min:0, step:4}, y:{min:0, step:2}});
+							{x:{min:0, step:3}, y:{min:0, step:2}});
 		//this.graphs.tVSv = new GraphScatter('tVSv', 400, 293,"Volume (L)", "Temperature (K)",
 		//					{x:{min:0, step:4}, y:{min:180, step:60}});
 		this.graphs.pVSv.addSet('pInt', 'P Int.', Col(0,0,255), Col(200,200,255),
@@ -415,19 +417,18 @@ _.extend(Reversibility.prototype,
 		//						{data:this.data, x:'v', y:'t'});		
 	},
 	unCompSetup: function(){
-		walls = WallHandler([[P(40,68), P(510,68), P(510,410), P(40,410)]], 'staticAdiabatic', ['container'], [{yMin:68, yMax:435}]);
+		walls = WallHandler([[P(40,68), P(510,68), P(510,410), P(40,410)]], 'staticAdiabatic', ['container'], [{yMin:68, yMax:435}], undefined, [14]);
 		this.borderStd({min:68});
-		spcs['spc1'].populate(P(35, 80), V(460, 320), 800, 200);
-		spcs['spc3'].populate(P(35, 80), V(460, 320), 600, 200);
-		this.stops = new Stops({stopPt:{volume:10}});	
+		spcs['spc1'].populate(P(35, 150), V(460, 250), 814, 215.38);
+		spcs['spc3'].populate(P(35, 150), V(460, 250), 611, 215.38);
 	},
 	compSetup: function(){
 		walls = WallHandler([[P(40,68), P(510,68), P(510,410), P(40,410)]], 'staticAdiabatic', ['container'], [{yMin:68, yMax:435}], undefined, [10.1]);
 		this.borderStd({min:68});
 		var maxY = walls[0][0].y;
 		var height = walls[0][3].y-walls[0][0].y;
-		spcs['spc1'].populate(P(35, maxY+10), V(460, height-20), 800, 273);
-		spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 600, 273);
+		spcs['spc1'].populate(P(35, maxY+10), V(460, height-20), 814, 273);
+		spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 611, 273);
 		this.stops = new Stops({stopPt:{volume:10}});		
 	},
 	/*

@@ -27,10 +27,11 @@ GraphBase = {
 		this.active = false;
 		return this;
 	},
-	save: function(){
+	save: function(saveName){
 	
-		var saveName = 'graph'+this.handle;
-		saveName = unique(saveName, stored)
+		var saveName = defaultTo('graph'+this.handle, saveName);
+		saveName = unique(saveName, stored);
+		//HEY - STORE ALL DATA STORED WHILE YOU WERE AROUND
 		this.dataSave = {};
 		for (var set in this.data){
 			this.dataSave[set] = {};

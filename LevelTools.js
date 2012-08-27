@@ -355,9 +355,16 @@ LevelTools = {
 			delete this.graphs[graphName];
 		}	
 	},
+	saveAllGraphs: function(){
+		//OOH - made load graphs by block/prompt idx
+		for(var graphName in this.graphs){
+			var saveName = graphName + 'block' + this.blockIdx + 'prompt' + this.promptIdx;
+			this.graphs[graphName].save(saveName);
+		}
+	},
 
-
-
+/*
+CONVERT THIS STUFF TO RECORD/DISPLAY
 	track: function(handle, label, data, decPlaces, units){
 		decPlaces = defaultTo(1, decPlaces);
 		if(typeof(data)=='Array'){
@@ -408,6 +415,7 @@ LevelTools = {
 	trackExtentRxnStop: function(handle){
 		removeListener(curLevel, 'data', 'trackExtentRxn' + handle);
 	},
+	*/
 	makeListeners: function(){
 		this.updateListeners = {listeners:{}, save:{}};
 		this.wallMoveListeners = {listeners:{}, save:{}};
@@ -418,16 +426,17 @@ LevelTools = {
 		this.resetListeners = {listeners:{}, save:{}};
 		this.initListeners = {listeners:{}, save:{}};	
 		this.recordListeners = {listeners:{}, save:{}};
+		this.conditionListeners = {listeners:{}, save:{}};
+		this.cleanUpListeners = {listeners:{}, save:{}};
 	},
 	reset: function(){
 		
 		var curPrompt = this.prompts[this.promptIdx];
-		if(this['block'+this.blockIdx+'CleanUp']){
-			this['block'+this.blockIdx+'CleanUp']()
-		}
 		if(curPrompt.cleanUp){
 			curPrompt.cleanUp();
 		}	
+		this.cleanUp();
+		
 		for (var spcName in spcs){
 			spcs[spcName].depopulate();
 		}		
@@ -451,5 +460,30 @@ LevelTools = {
 			prompt.title = defaultTo('', prompt.title);
 			prompt.text = defaultTo('', prompt.text);
 		}
-	}
+	},
+
+	conditions: function(){
+		//ALERT NOT BUBBLING UP CORRECTLY.  IT GETS TO THIS FUNCTION FROM STATE LISTENERS BUT IS NOT RETURNED
+		var didWin = 1;
+		var alerts = {1:undefined, 0:undefined};
+		var priorities = {1:0, 0:0};
+		for (var conditionName in this.conditionListeners.listeners){
+			var condition = this.conditionListeners.listeners[conditionName]
+			winResults = condition.func.apply(condition.obj); //returns didWin, alert, priority (high takes precidence);
+			didWin = Math.min(didWin, winResults.didWin);
+			if(winResults.alert){
+				var priority = defaultTo(0, winResults.priority);
+				if(priority>=priorities[Number(winResults.didWin)]){
+					alerts[Number(winResults.didWin)] = winResults.alert;
+				}
+			}	
+		}	
+		return {didWin:didWin, alert:alerts[didWin]};
+	},
+	cleanUp: function(){
+		for (var cleanUpListener in this.cleanUpListeners.listeners){
+			var listener = this.cleanUpListeners.listeners[cleanUpListener];
+			listener.func.apply(listener.obj);
+		}
+	},
 }

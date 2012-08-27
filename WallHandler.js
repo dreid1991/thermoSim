@@ -16,6 +16,7 @@ function WallHandler(pts, handlers, handles, bounds, includes, vols, shows, reco
 WallMethods = {
 	main: {
 		assemble: function(pts, handles, bounds, includes, vols, shows, records){
+			addListener(curLevel, 'cleanUp', 'walls', this.remove, this)
 			this.numWalls = pts.length;
 			includes = defaultTo([], includes);
 			bounds = defaultTo([], bounds);
@@ -245,6 +246,7 @@ WallMethods = {
 			for(var wallIdx=this.length-1; wallIdx>=0; wallIdx-=1){
 				this.removeWall(wallIdx);
 			}
+			//Hey - if I want to remove just one wall when multiple are present, will need to remove wallMove by wall, but I don't think that case will happen
 			emptyListener(curLevel, 'wallMove');
 		},
 		removeWall: function(wallInfo){
@@ -888,7 +890,7 @@ WallMethods = {
 		},
 		recordMass: function(){
 			this.recordingMass = true;
-			recordData('mass' + this.handle, this.data.m, this.mass(), this);		
+			recordData('mass' + this.handle, this.data.m, this.mass, this, 'update');		
 			return this;			
 		},
 		recordTempStop: function(){
@@ -1011,9 +1013,15 @@ WallMethods = {
 					firstVal = 0;
 				}
 				this.pExtReadout.addEntry('pExt' + this.handle, label, 'atm', firstVal, undefined, decPlaces);
+				var lastVal = 0;
 				addListener(curLevel, 'update', 'displayPExt'+this.handle,
 					function(){
-						this.pExtReadout.hardUpdate('pExt' + this.handle, dataSet[dataSet.length-1]);
+						var curVal = dataSet[dataSet.length-1];
+						if(curVal!=lastVal){
+							this.pExtReadout.tick('pExt' + this.handle, curVal);
+							lastVal = curVal;
+						}
+						
 					},
 				this);
 			}else{
@@ -1050,15 +1058,20 @@ WallMethods = {
 				var dataSet = this.data.m;
 				label = defaultTo('Mass:', label);
 				//DO THIS BY WALL
-				this.volReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
+				this.massReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
 				var firstVal = dataSet[dataSet.length-1];
 				if(!validNumber(firstVal)){
 					firstVal = 0;
 				}
-				this.volReadout.addEntry('mass' + this.handle, label, 'kg', firstVal, undefined, decPlaces);
-				addListener(curLevel, 'update', 'displayVolume' + this.handle,
+				this.massReadout.addEntry('mass' + this.handle, label, 'kg', firstVal, undefined, decPlaces);
+				var lastVal = 0;
+				addListener(curLevel, 'update', 'displayMass' + this.handle,
 					function(){
-						this.volReadout.hardUpdate('mass' + this.handle, dataSet[dataSet.length-1]);
+						var curVal = dataSet[dataSet.length-1];
+						if(curVal!=lastVal){
+							this.massReadout.tick('mass' + this.handle, curVal);
+							lastVal = curVal;
+						}
 					},
 				this);
 			}else{
