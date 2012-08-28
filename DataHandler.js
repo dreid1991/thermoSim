@@ -14,6 +14,32 @@ DataHandler.prototype = {
 			return self.KEAvg(info)*self.tConst;
 		}
 	},
+	countFunc: function(info){
+		if(info && info.tag){//assuming you only send one thing in info
+			return function(){
+				var tag = info.tag;
+				var count = 0;
+				for(var spcName in spcs){
+					var spc = spcs[spcName];
+					for(var dotIdx=0; dotIdx<spc.length; dotIdx++){
+						if(spc[dotIdx].tag==tag){
+							count++;
+						}
+					}
+					
+				}
+				return count;
+			}
+		}else{
+			return function(){
+				var count = 0;
+				for(var spcName in spcs){
+					count += spcs[spcName].length;
+				}
+				return count;
+			}
+		}
+	},
 	velocities: function(info){
 		info = defaultTo({}, info);
 		var tag = info.tag;

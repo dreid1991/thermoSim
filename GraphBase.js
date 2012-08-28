@@ -396,10 +396,8 @@ GraphBase = {
 		}
 		return true;
 	},
-	makeHistDataGrabFunc: function(path){
+	makeHistDataGrabFunc: function(data){
 		return function(address){
-			var data = path.data[path.x];
-			
 			return {address:address, data:data[data.length-1]};
 		}
 	},

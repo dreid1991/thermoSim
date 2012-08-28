@@ -417,10 +417,11 @@ _.extend(Reversibility.prototype,
 		//						{data:this.data, x:'v', y:'t'});		
 	},
 	unCompSetup: function(){
-		walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'cVIsothermal', handles:['container'], bounds:[{yMin:68, yMax:435}], vols:[14], temps:[200]);
+		walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'cVIsothermal', handles:['container'], bounds:[{yMin:68, yMax:435}], vols:[14], temps:[200]});
 		this.borderStd({min:68});
-		spcs['spc1'].populate(P(35, 150), V(460, 250), 814, 215.38);
-		spcs['spc3'].populate(P(35, 150), V(460, 250), 611, 215.38);
+		//spcs['spc1'].populate(P(35, 150), V(460, 250), 2, 215.38);
+		spcs['spc1'].populate(P(35, 150), V(460, 250), 814, 200);
+		//spcs['spc3'].populate(P(35, 150), V(460, 250), 611, 215.38);
 	},
 	compSetup: function(){
 		walls = WallHandler([[P(40,68), P(510,68), P(510,410), P(40,410)]], 'cVIsothermal', ['container'], [{yMin:68, yMax:435}], undefined, [10.1]);

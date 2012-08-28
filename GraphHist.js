@@ -1,4 +1,4 @@
-function GraphHist(handle, width, height, xLabel, yLabel, axisInit, dataPath){
+function GraphHist(handle, width, height, xLabel, yLabel, axisInit, data){
 	this.active = true;
 	this.handle = handle;
 	this.dims = V(width, height);
@@ -31,7 +31,7 @@ function GraphHist(handle, width, height, xLabel, yLabel, axisInit, dataPath){
 	this.setStds();
 	var canvasData = this.makeCanvas(this.handle, this.dims);
 	this.drawAllBG();
-	this.addSet('only', barCol, dataPath);
+	this.addSet('only', barCol, data);
 	addListener(curLevel, 'reset', 'clearGraph'+handle, this.clear, this);
 }
 /*
@@ -41,12 +41,12 @@ and leaving open possibility of multiple sets (though that would probably look c
 */
 _.extend(GraphHist.prototype, GraphBase, 
 	{
-		addSet: function(address, barCol, dataPath){
+		addSet: function(address, barCol, data){
 			var set = {};
 			set.x = [];
 			set.y = [];
 			set.barCol = barCol;
-			set.getLast = this.makeHistDataGrabFunc(dataPath);
+			set.getLast = this.makeHistDataGrabFunc(data);
 			this.data[address] = set;
 			this.drawAllBG();
 		},

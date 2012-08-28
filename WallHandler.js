@@ -1,14 +1,14 @@
-function WallHandler(attrs)//pts, handlers, handles, bounds, includes, vols, shows, records, temps){//records is a verb, like what the wall records.  Defaults to recording q, pint, t, v
-	var newWall = new Array(pts.length)
+function WallHandler(attrs){//pts, handlers, handles, bounds, includes, vols, shows, records, temps){//records is a verb, like what the wall records.  Defaults to recording q, pint, t, v
+	var newWall = new Array(attrs.pts.length)
 	_.extend(newWall, WallMethods.main, WallMethods.collideMethods);
 	newWall.assemble(attrs);//pts, handles, bounds, includes, vols, shows, records)
 	
-	if(handles.length!=pts.length){
+	if(attrs.handles.length!=attrs.pts.length){
 		console.log('NAME YOUR WALLS');
 	}
 
-	if(handlers){
-		newWall.doInitHandlers(handlers);
+	if(attrs.handlers){
+		newWall.doInitHandlers(attrs.handlers);
 	}
 	return newWall;
 };
@@ -16,16 +16,20 @@ WallMethods = {
 	main: {
 		assemble: function(attrs){//pts, handles, bounds, includes, vols, shows, records){
 			var pts = attrs.pts;
+			var handles = attrs.handles;
+
 			addListener(curLevel, 'cleanUp', 'walls', this.remove, this)
+			
 			this.numWalls = pts.length;
-			includes = defaultTo([], attrs.includes);
-			bounds = defaultTo([], attrs.bounds);
-			vols = defaultTo([], attrs.vols);
-			shows = defaultTo([], attrs.shows);
-			records = defaultTo([], attrs.records);
-			temps = defaultTo([], attrs.temps);
+			
+			var includes = defaultTo([], attrs.includes);
+			var bounds = defaultTo([], attrs.bounds);
+			var vols = defaultTo([], attrs.vols);
+			var shows = defaultTo([], attrs.shows);
+			var records = defaultTo([], attrs.records);
+			var tSets = defaultTo([], attrs.temps);
 			for (var wallIdx=0; wallIdx<pts.length; wallIdx++){
-				this.setWallVals(wallIdx, pts[wallIdx], handles[wallIdx], bounds[wallIdx], includes[wallIdx], vols[wallIdx], shows[wallIdx], records[wallIdx], temps[wallIdx]);
+				this.setWallVals(wallIdx, pts[wallIdx], handles[wallIdx], bounds[wallIdx], includes[wallIdx], vols[wallIdx], shows[wallIdx], records[wallIdx], tSets[wallIdx]);
 
 			}
 			this.setup();
@@ -79,7 +83,7 @@ WallMethods = {
 			} else if(typeof handlers == 'string' || typeof handlers=='object'){
 				this.setAllHandler(handlers);
 			}else{
-				console.log('YOU SEND POOR WALL HANDLERS.  THEY ARE NEITHER STRING NOR ARRAY');
+				console.log('YOU SEND POOR WALL HANDLERS.  THEY ARE NEITHER STRING NOR ARRAY NOR OBJECT');
 			}
 		},
 		setAllHandler: function(handler){
@@ -92,15 +96,21 @@ WallMethods = {
 			for (var subWallIdx=0; subWallIdx<this[wallIdx].length; subWallIdx++){
 				this.setSubWallHandler(wallIdx, subWallIdx, handler);
 			}
-		},
-		
+		},		
 		setSubWallHandler: function(wallInfo, subWallIdx, handler){
 			var wallIdx = this.idxByInfo(wallInfo)
 			if(typeof handler == 'string'){
 				this[wallIdx+ '-' + subWallIdx] = {obj:this, func:this[handler]};
+				if(handler.toLowerCase().indexOf('isothermal')!=-1){
+					this[wallIdx].isothermalInit();
+				}
 			}else if(typeof handler=='object'){
 				this[wallIdx+ '-' + subWallIdx] = {obj:handler.obj, func: handler.func};
+				if(handler.isothermal){
+					this[wallIdx].isothermalInit();
+				}
 			}
+			
 		},
 		setupWall: function(wallIdx){
 	
@@ -153,7 +163,7 @@ WallMethods = {
 			}
 			return wallGrid;
 		},
-		setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show, record, temp){
+		setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show, record, tSet){
 			bounds = defaultTo({yMin:30, yMax: 435}, bounds);
 			include = defaultTo(1, include);
 			this[wallIdx] = pts;
@@ -176,11 +186,12 @@ WallMethods = {
 			this[wallIdx].data.t = new Array();
 			this[wallIdx].data.v = new Array();
 			this[wallIdx].data.m = new Array();
-			this[wallIdx].data.work = new Array();
-			this[wallIdx].data.q = new Array();
+			this[wallIdx].data.work = new Array(); // kj
+			this[wallIdx].data.q = new Array(); //kj
 			this[wallIdx].q = 0;
-			this[wallIdx].tempAdj = 20;
-			this[wallIdx].temp = temp;
+			this[wallIdx].eToAdd = 0;
+			this[wallIdx].isothermal = false;
+			this[wallIdx].tSet = tSet;
 			this[wallIdx].massChunks = {};
 			this[wallIdx].forceInternal = 0;
 			this[wallIdx].pLastRecord = turn;
@@ -677,6 +688,32 @@ WallMethods = {
 		unsetDefaultReadout: function(){
 			this.defaultReadout = undefined;
 			return this;
+		},
+		setTemp: function(temp){
+			this.tSet = temp;
+		},
+		isothermalInit: function(){
+			this.eToAdd = 0;
+			if(this.parent.numWalls>1){
+				var countFunc = dataHandler.countFunc({tag:this.handle})
+			}else{
+				var countFunc = dataHandler.countFunc();
+			}		
+			if(!this.isothermal){
+				addListener(curLevel, 'data', 'recordEnergyForIsothermal' + this.handle,
+					function(){
+						var tLast = defaultTo(this.tSet, this.data.t[this.data.t.length-1]);
+						var dt = this.tSet - tLast;
+						this.eToAdd = cv*countFunc()*dt/N;
+					},
+				this);
+			}
+			this.isothermal = true;
+		
+		},
+		isothermalStop: function(){
+			this.isothermal = false;
+			removeListener(curLevel, 'data', 'recordEnergyForIsothermal' + this.handle);
 		},
 		pExt: function(){
 			var SA = this[1].x - this[0].x;
@@ -1295,13 +1332,19 @@ WallMethods = {
 			this[wallIdx].forceInternal += 2*dot.m*Math.abs(perpV);
 		},
 		cVIsothermal: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
+			var eAddSign = getSign(this[wallIdx].eToAdd);
 			var inTemp = dot.temp();
-			var outTemp = boundedStep(inTemp, this[wallIdx].temp, this[wallIdx].tempAdj);
+			var eToAddMax = eAddSign*Math.min(1, eAddSign*this[wallIdx].eToAdd);
+			var eToAdd = eAddSign*Math.min(eAddSign*eToAddMax, cv*(inTemp-Math.min(inTemp, 20))/N);
+			this[wallIdx].eToAdd-=eToAdd;
+			var outTemp = inTemp + eToAdd*N/cv;
 			var spdRatio = Math.sqrt(outTemp/inTemp);
 			var outPerpV = perpV*spdRatio;
-			this.reflectChangeSpd(dot, wallUV, perpV, perpV*spdRatio);
+			this.reflect(dot, wallUV, perpV);
+			dot.v.dx*=spdRatio;
+			dot.v.dy*=spdRatio;
 			this[wallIdx].forceInternal += dot.m*(Math.abs(perpV) + Math.abs(outPerpV));
-			this.q += (outTemp - inTemp)*cV/N;
+			this[wallIdx].q += eToAdd/JtoKJ;
 		},
 		cVAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 			var v = dot.v;
@@ -1326,7 +1369,7 @@ WallMethods = {
 		},
 		reflectChangeSpd: function(dot, wallUV, perpVIn, perpVOut){
 			dot.v.dx -= wallUV.dy*perpVIn + wallUV.dy*perpVOut;
-			dot.v.dy += wallUV.dx*perpV + wallUV,dx*perpVOut;
+			dot.v.dy += wallUV.dx*perpVIn + wallUV.dx*perpVOut;
 			dot.x -= wallUV.dy
 			dot.y += wallUV.dx		
 		}
