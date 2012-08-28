@@ -20,10 +20,13 @@ $(function(){
 	cp = 2.5*R;
 	compAdj = '32';
 	vConst = 1/10000;
-	pConst = 16.1423;
+	//pConst = 16.1423; //for atm
+	pConst = 16.3562; //for bar
 	tConst = 20;
 	LtoM3 = .001;
 	ATMtoPA = 101325;
+	BARTOPA = 100000;
+	PUNITTOPA = BARTOPA;
 	JtoKJ = .001;
 	N = 1000;//Avagadro's number
 	//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
@@ -62,7 +65,18 @@ $(function(){
 	}
 	*/
 })
-
+function lalala(){
+	var theData = walls[0].data;
+	var pInt = theData.pInt[theData.pInt.length-1]
+	var t = theData.t[theData.t.length-1]
+	var v = theData.v[theData.v.length-1]
+	console.log(pInt);
+	console.log(t);
+	console.log(v);
+	console.log('nrt ' + 1*.0831*t);
+	console.log('pv ' + pInt*v);
+	
+}
 
 drawingTools.prototype = {
 

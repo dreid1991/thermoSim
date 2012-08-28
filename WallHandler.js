@@ -678,8 +678,6 @@ WallMethods = {
 					},
 				this);
 			}		
-		
-		
 		},
 		setDefaultReadout: function(readout){
 			this.defaultReadout = readout;
@@ -913,7 +911,7 @@ WallMethods = {
 			this.work = 0;
 			var LTOM3LOCAL = LtoM3;
 			var PCONSTLOCAL = pConst;
-			var ATMTOPALOCAL = ATMtoPA;
+			var PUNITTOPALOCAL = PUNITTOPA;
 			var VCONSTLOCAL = vConst;
 			var JTOKJLOCAL = JtoKJ;
 			var trackPt = this[0];
@@ -922,7 +920,7 @@ WallMethods = {
 			addListener(curLevel, 'update', 'recordWork'+this.handle,
 				function(){
 					var dV = LTOM3LOCAL*VCONSTLOCAL*width*(heightLast-trackPt.y)
-					var p = this.pExt()*ATMTOPALOCAL;
+					var p = this.pExt()*PUNITTOPALOCAL;
 					this.work -= JTOKJLOCAL*p*dV;
 					heightLast = trackPt.y;
 					this.data.work.push(this.work);
@@ -1044,7 +1042,7 @@ WallMethods = {
 				if(!validNumber(firstVal)){
 					firstVal = 0;
 				}
-				this.pIntReadout.addEntry('pInt' + this.handle, label, 'atm', firstVal, undefined, decPlaces);
+				this.pIntReadout.addEntry('pInt' + this.handle, label, 'bar', firstVal, undefined, decPlaces);
 				addListener(curLevel, 'data', 'displayPInt'+this.handle,
 					function(){
 						this.pIntReadout.tick('pInt' + this.handle, dataSet[dataSet.length-1]);
@@ -1066,7 +1064,7 @@ WallMethods = {
 				if(!validNumber(firstVal)){
 					firstVal = 0;
 				}
-				this.pExtReadout.addEntry('pExt' + this.handle, label, 'atm', firstVal, undefined, decPlaces);
+				this.pExtReadout.addEntry('pExt' + this.handle, label, 'bar', firstVal, undefined, decPlaces);
 				var lastVal = 0;
 				addListener(curLevel, 'update', 'displayPExt'+this.handle,
 					function(){
