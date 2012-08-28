@@ -47,26 +47,28 @@ GraphBase = {
 	integrate: function(set){
 		this.data[set].integralPts = this.getIntegralPts(set);
 		this.drawIntegral(set);
-		this.drawAllPts();
+		return this;
 	},
 	getIntegralPts: function(set){
-		var xPts = set.src.x;
-		var yPts = set.src.y;
+		var xPts = this.data[set].src.x;
+		var yPts = this.data[set].src.y;
 		var integralPts = new Array(xPts.length);
-		for(var ptIdx=0; ptIdx<xPts.length; ptIdx.length){
+		for(var ptIdx=0; ptIdx<xPts.length; ptIdx++){
 			integralPts[ptIdx] = this.translateValToCoord(P(xPts[ptIdx], yPts[ptIdx]));
 		}
-		var yMin = this.axisRange.y.min;
-		var lastX = integralPts[integralPts.length].x;
+		//this.makeIntegralBeFunction(integralPts);
+		//HEY - YOU SHOULD *PROBABLY* MAKE A THING THAT MAKES POINTS ABOVE OTHERS REMOVE THE LOWER POINT SO IT LOOKS LIKE WE INTEGRATED A FUNCTION
+		var yMax = this.yStart*this.dims.dy;
+		var lastX = integralPts[integralPts.length-1].x;
 		var firstX = integralPts[0].x;
-		integralPts.push(lastX, yMin);
-		integralPts.push(firstX, yMin);
+		integralPts.push(P(lastX, yMax));
+		integralPts.push(P(firstX, yMax));
 		return integralPts;
 		
 	},
 	drawIntegral: function(set){
 		var pts = this.data[set].integralPts;
-		draw.fillPtsAlpha(pts, this.integralCol, this.integralAlpha, this.canvas);
+		draw.fillPtsAlpha(pts, this.integralCol, this.integralAlpha, this.graph);
 		this.graphPts();
 	},
 	save: function(saveName){
@@ -75,7 +77,7 @@ GraphBase = {
 		saveName = unique(saveName, stored);
 		this.dataSave = {};
 		for (var set in this.data){
-			this.dataSave[set] = {};
+			this.dataSave[set] = {pts:{}, src:{}};
 			this.dataSave[set].pts.x = this.data[set].x.deepCopy();
 			this.dataSave[set].pts.y = this.data[set].y.deepCopy();
 			if(this.data[set].xInitDataIdx){
@@ -103,7 +105,7 @@ GraphBase = {
 		
 		}
 		this.addPts(toAdd, false, true);
-		
+		return this;
 	},
 	setsToPts: function(x, y, setName){
 		var pts = new Array(x.length);

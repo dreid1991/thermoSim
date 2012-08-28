@@ -69,7 +69,7 @@ function DragWeights(attrs){
 	this.pistonBinWidth = 150;
 	this.pistonBinSpacing = 15;
 	this.blockSpacing = 2;
-	this.weightScalar = 40;//specific volume
+	this.weightScalar = 70;//specific volume
 	this.moveSpeed = 20;
 	this.mass = this.massInit;
 	this.massChunkName = 'dragWeights';

@@ -12,7 +12,7 @@ function Reversibility(){
 	this.readout = new Readout('mainReadout', 15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), this);
 
 	addSpecies(['spc1', 'spc3']);
-	this.massInit = 30;
+	this.massInit = 33;
 
 }
 _.extend(Reversibility.prototype, 
@@ -197,9 +197,9 @@ _.extend(Reversibility.prototype,
 		var wallHandle = 'container';
 		this.unCompSetup();
 		this.makeGraphsRev();
-		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:90}]})
+		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:33}]})
 		this.dragWeights.wall.displayPExt().displayWork().recordMass().displayMass().displayVol();
-		this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:10, alertUnsatisfied:'NO', alertSatisfied:'YES', atSatisfyFunc:{func:function(){store('workInLrg',round(walls[0].work,1))},obj:''}});
+		this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7, alertUnsatisfied:'NO', alertSatisfied:'YES', atSatisfyFunc:{func:function(){store('workInLrg',round(walls[0].work,1))},obj:''}});
 		this.readout.show();
 	},	
 	/*
@@ -417,11 +417,11 @@ _.extend(Reversibility.prototype,
 		//						{data:this.data, x:'v', y:'t'});		
 	},
 	unCompSetup: function(){
-		walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'staticAdiabatic', handles:['container'], bounds:[{yMin:68, yMax:435}], vols:[14], temps:[200]});
+		walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'cVIsothermal', handles:['container'], bounds:[{yMin:68, yMax:435}], vols:[14], temps:[236]});
 		this.borderStd({min:68});
 		//spcs['spc1'].populate(P(35, 150), V(460, 250), 2, 215.38);
-		spcs['spc1'].populate(P(35, 150), V(460, 250), 814, 200);
-		spcs['spc3'].populate(P(35, 150), V(460, 250), 611, 200);
+		spcs['spc1'].populate(P(35, 110), V(460, 250), 814, 236);
+		spcs['spc3'].populate(P(35, 110), V(460, 250), 611, 236);
 	},
 	compSetup: function(){
 		walls = WallHandler([[P(40,68), P(510,68), P(510,410), P(40,410)]], 'cVIsothermal', ['container'], [{yMin:68, yMax:435}], undefined, [10.1]);

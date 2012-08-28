@@ -73,7 +73,7 @@ function lalala(){
 	console.log(pInt);
 	console.log(t);
 	console.log(v);
-	console.log('nrt ' + 1*.0831*t);
+	console.log('nrt ' + 1.425*.0831*t);
 	console.log('pv ' + pInt*v);
 	
 }
@@ -648,6 +648,7 @@ function showPrompt(prev, prompt){
 	}
 	if(didWin || finishedPrev){
 		curLevel.saveAllGraphs();
+		curLevel.freezeAllGraphs();
 		curLevel.removeAllGraphs();
 		curLevel.promptIdx = indexOfCur;
 		if(prev){

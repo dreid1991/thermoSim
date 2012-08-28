@@ -362,6 +362,11 @@ LevelTools = {
 			this.graphs[graphName].save(saveName);
 		}
 	},
+	freezeAllGraphs: function(){
+		for(var graphName in this.graphs){
+			this.graphs[graphName].freeze();
+		}
+	},
 
 /*
 CONVERT THIS STUFF TO RECORD/DISPLAY
