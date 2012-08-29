@@ -1590,7 +1590,6 @@ _.extend(Heater.prototype, objectFuncs, {
 		return this;
 	},
 	setupWalls: function(){
-		//legs don't go into collision - too little space between lines
 		walls.addWall({pts:this.wallPts, handler:{func:this.hit, obj:this}, handle:'heater' + this.handle, record:false, show:false});
 	},
 	hit: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){

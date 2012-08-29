@@ -610,9 +610,19 @@ function makeSlider(wrapperDivId, sliderDivId, title, attrs, handlers, initVisib
 }
 function sliderBind(div, eventType, func, obj){
 	div.bind(eventType, function(event, ui){func.apply(obj, [event, ui])});
+	return div;
+}
+function addButton(id, text, divId){
+	divId = defaultTo('buttons', divId);
+	$('#'+divId).append('<button id='+id+'>'+text+'</button>');
+	var button = $('button#'+id);
+	button.button();
+	return button;
 }
 function buttonBind(id, func){
-	$('#'+id).click(func);
+	var button = $('#'+id);
+	button.click(func);
+	return button;
 }
 function hideSliders(){
 	for (var handleIdx=0; handleIdx<sliderList.length; idIdx++){
