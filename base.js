@@ -644,10 +644,8 @@ function showPrompt(prev, prompt){
 		}
 	}
 	if(didWin || finishedPrev){
-		curLevel.saveAllGraphs();
-		curLevel.freezeAllGraphs();
-		curLevel.removeAllGraphs();
-		curLevel.promptIdx = indexOfCur;
+
+
 		if(prev){
 			if(forward){
 				prev.finished = true;
@@ -664,9 +662,11 @@ function showPrompt(prev, prompt){
 		var text = prompt.text;
 		
 		if(block!=curLevel.blockIdx){
-			var spcsLocal = spcs;
-			for (var spcName in spcsLocal){
-				spcsLocal[spcName].depopulate();
+			curLevel.saveAllGraphs();
+			curLevel.freezeAllGraphs();
+			curLevel.removeAllGraphs();
+			for (var spcName in spcs){
+				spcs[spcName].depopulate();
 			}
 			curLevel.cleanUp.apply(curLevel);
 
@@ -680,6 +680,7 @@ function showPrompt(prev, prompt){
 			}
 			curLevel.blockIdx = block;
 		}
+		curLevel.promptIdx = indexOfCur;	
 		if(!prompt.quiz){
 			$('#submitDiv').show();
 		}

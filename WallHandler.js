@@ -216,7 +216,7 @@ WallMethods = {
 			var newIdx = this.length;
 			this.setWallVals(newIdx, attrs.pts, attrs.handle, attrs.bounds, attrs.include, attrs.vol, attrs.show, attrs.record, attrs.temp);
 			this.setupWall(newIdx);
-			this.setWallHandler(newIdx, handler);
+			this.setWallHandler(newIdx, attrs.handler);
 		},
 		setPtsInit: function(){
 			for (var wallIdx=0; wallIdx<this.length; wallIdx++){

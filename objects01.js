@@ -1407,9 +1407,11 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		this.setPressure(ui.value);
 	},
 	setPressure: function(sliderVal){
+	this.p = this.percentToP(sliderVal);
+	this.setMass();
+	/*
 		var pSetPt = this.percentToP(sliderVal);
 		var dp = pSetPt - this.p;
-
 		addListener(curLevel, 'update', 'piston'+this.handle+'adjP', 
 			function(){
 				this.p = boundedStep(this.p, pSetPt, this.pStep);
@@ -1422,6 +1424,7 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 				}
 			},
 			this);
+*/
 	},
 	pToPercent: function(p){
 		return sliderVal = 100*(p - this.pMin)/(this.pMax-this.pMin);;
@@ -1463,6 +1466,7 @@ function Heater(attrs){
 	}else{
 		this.pos = attrs.pos;
 	}
+	this.makeSlider = defaultTo(true, attrs.makeSlider);
 	this.handle = defaultTo('heaty', attrs.handle);
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	this.cornerRound = .2;
@@ -1470,10 +1474,7 @@ function Heater(attrs){
 	this.tempMax = defaultTo(35, attrs.max);
 	this.tempMin = -this.tempMax;
 	this.rot = defaultTo(0, attrs.rotation);
-	if(attrs.slider){
-		this.slider = attrs.slider;
-		this.setSliderVal(this.temp);
-	}
+
 	this.center = this.pos.copy().movePt(this.dims.copy().mult(.5));
 	var colMax = Col(200,0,0);
 	var colMin = Col(0,0,200);
@@ -1483,17 +1484,27 @@ function Heater(attrs){
 	this.eAdded=0;
 	
 	this.addCleanUp();
-	
+	if(this.makeSlider){
+
+		this.sliderId = this.addSlider('Heater', {value:50}, 
+			[{eventType:'slide', obj:this, func:this.parseSlider},
+			{eventType:'slidestop', obj:this, func:function(event, ui){
+												$('#'+this.sliderId).slider('option', {value:50});
+												ui.value=50;
+												this.parseSlider(event, ui)
+											}
+			},		
+			]);
+	}
 	return this.init();
 }
 
 _.extend(Heater.prototype, objectFuncs, {
+	parseSlider: function(event, ui){
+		this.setTemp(ui.value);
+	},
 	setTemp: function(val){		
 		this.temp = .02*(val-50)*this.tempMax
-	},
-	setSliderVal: function(){
-		var sliderVal = this.temp/(.02*this.tempMax)+50;
-		$('#'+this.slider).slider('option', {value:sliderVal});
 	},
 	makeDrawFunc: function(colMin, colDefault, colMax){
 		var pos = this.pos;
@@ -1580,7 +1591,7 @@ _.extend(Heater.prototype, objectFuncs, {
 	},
 	setupWalls: function(){
 		//legs don't go into collision - too little space between lines
-		walls.addWall(this.wallPts, {func:this.hit, obj:this}, 'heater' + this.handle, undefined, -1, undefined, false, false);
+		walls.addWall({pts:this.wallPts, handler:{func:this.hit, obj:this}, handle:'heater' + this.handle, record:false, show:false});
 	},
 	hit: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){
 		walls.reflect(dot, wallUV, vPerp);
@@ -1703,6 +1714,11 @@ _.extend(StateListener.prototype, objectFuncs, {
 			case 'equalTo':
 				this.condition = function(){
 					return fracDiff(this.dataList[this.dataList.length-1], this.targetVal)<this.tolerance;
+				}
+				break;
+			case 'notEqualTo':
+				this.condition = function(){
+					return this.dataList[this.dataList.length-1]!=this.targetVal;
 				}
 				break;
 		}

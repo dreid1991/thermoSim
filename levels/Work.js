@@ -226,18 +226,12 @@ _.extend(Work.prototype,
 	block3Start: function(){
 		this.playedWithSlider = false;
 		var self = this;
-		//var sliderMin = $('#sliderPressure').slider('option', 'min');
-		//$('#sliderPressure').slider('option', {value:sliderMin});
+
 		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});
 		spcs['spc1'].populate(P(45,35), V(460, 350), 800, 300);
 		spcs['spc3'].populate(P(45,35), V(450, 350), 600, 300);
 		
-		$('#canvasDiv').show();
-		$('#clearGraphs').hide();
-		$('#dashRun').show();
-		//$('#sliderPressureHolder').show();
-		$('#base').show();
-		
+	
 		this.graphs.pVSv = new GraphScatter('pVSv', 400,275, "Volume (L)", "Pressure (atm)",
 							{x:{min:0, step:4}, y:{min:0, step:3}});
 		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
@@ -249,37 +243,15 @@ _.extend(Work.prototype,
 								{x:walls[0].data.v, y:walls[0].data.t});		
 		
 		
-		this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15});
-		this.piston.wall.displayWork().displayPExt();
+		this.heater = new Heater({wallInfo:'container'});
+		//this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15});
+		//this.piston.wall.displayWork().displayPExt();
 		this.borderStd();
-		//this.volListener8 = new StateListener({condition:10, checkAgainst:walls[0].data.v, tolerance:.1});
-		//this.heater = new Heater('spaceHeater', P(150,360), V(250,50), 0, 20, c);//P(40,425), V(470,10)
-		//this.heater.init();
-
+		this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:10, alertUnsatisfied:'Compress the system more!'});		
 	},
-	block3Conditions: function(){
-		//FOR CONDITIONS - NEED TO MAKE LIKE A IS LESS THAN OR IS GREATER THAN THING
-		//if(this.volListener8.isSatisfied()){
-		//	return {result:true};
-		//}
-		//return {result:false, alert:'Compress more!'};
-		return {result:true};
-	},
-	
-	block3CleanUp: function(){
-		this.playedWithSlider = undefined;
-		this.volListener8 = undefined;
-		$('#sliderPressureHolder').hide();
-		this.removeAllGraphs();
-		this.readout.removeAllEntries();
-		this.readout.hide();
-		this.piston.remove();
-		this.piston = undefined;
-	},
-	
 	block4Start: function(){
 
-		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
+		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handler:'staticAdiabatic', handles:['container']});
 		walls.setHitMode('container', 'Arrow');
 		this.borderStd();
 		this.compArrow = new CompArrow({mode:'adiabatic', speed:1.5});
