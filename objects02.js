@@ -26,7 +26,7 @@ function Sandbox(attrs){
 	this.wallHandler = defaultTo('cPAdiabaticDamped', attrs.compMode) + compAdj;	
 	walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);	
 	
-		
+	this.emitters = new Array();
 	this.spcVol = 70; //specific volume
 	this.sand.col = defaultTo(Col(224, 165, 75), attrs.sandCol);
 	this.sand.pts = this.getLiquidPts();
@@ -42,7 +42,10 @@ function Sandbox(attrs){
 _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 {
 	init: function(){	
-		addListener(curLevel, 'update', 'drawPool', this.draw, this);
+		this.drawListenerName = unique('drawSand' + this.handle, curLevel.updateListeners.listeners);
+		this.cleanUpEmittersListenerName = unique('cleanUpSandEmitters' + this.handle, curLevel.updateListener.listeners);
+		addListener(curLevel, 'update', this.drawListenerName, this.draw, this);
+		addListener(curLevel, 'data', this.cleanUpEmittersListenerName, this.cleanUpEmitters, this);
 		this.wall.moveInit();	
 		return this.displayMass().displayPressure();
 	},
@@ -63,7 +66,13 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		draw.fillPts(this.sand.pts, this.liquid.col, this.drawCanvas);
 		this.drawCanvas.restore();		
 	},
-
+	cleanUpEmitters: function(){
+		for(var emitterIdx=this.emitters.length-1; emitterIdx>=0; emitterIdx-=1){
+			if(this.emitters[emitterIdx].removed){
+				this.emitters.slice(emitterIdx, 1);
+			}
+		}
+	},
 	getSandPts: function(){
 		var dWidth = this.bin.widthUpper - this.bin.width;
 		this.liquid.height = this.mass*this.spcVol/(this.bin.width + (dWidth)/this.bin.height);
@@ -80,8 +89,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		this.addMass();
 	},
 	buttonAddUp: function(){
-		this.addMassStop();
-		
+		this.addMassStop();	
 	},
 	buttonRemoveDown: function(){
 		this.removeMass();
@@ -98,22 +106,22 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 	},
 	addMass: function(){
 		addListener(curLevel, 'update', 'changeMassSand' + this.handle, this.changeMassFunc(1), this);
-	
+		this.emitters.push(this.makeDownEmitter())
 	},
 	addMassStop: function(){
 		removeListener(curLevel, 'update', 'changeMassSand' + this.handle);
+		this.emitters[this.emitters.length-1].stopFlow();
 	},
 	removeMass: function(){
 		addListener(curLevel, 'update', 'changeMassSand' + this.handle, this.changeMassFunc(-1), this);
 	},
 	removeMassStop: function(){
 		addListener(curLevel, 'update', 'changeMassSand' + this.handle);
-	},
-	getSandPts: function(){
-	
+		this.emitters[this.emitters.length-1].stopFlow();
 	},
 	remove: function(){
-		removeListener(curLevel, 'update', 'drawPile');	
+		removeListener(curLevel, 'update', this.drawListenerName);
+		removeListener(curLevel, 'data', this.cleanUpEmittersListenerName);	
 		this.wall.moveStop();
 		//this.stops.remove();
 	},
@@ -121,7 +129,9 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 
 }
 )
-
+function testPart(){
+	sillyParticles = new ParticleEmitter({pos:P(300,50), dir:0, width:100, dist:300, col:Col(0,0,255)});
+}
 function ParticleEmitter(attrs){
 	this.pos = attrs.pos;
 	this.handle = unique('emitter' + defaultTo('', attrs.handle), curLevel.updateListeners.listeners);
@@ -148,22 +158,42 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 	init: function(){
 		this.runListenerName = unique('particle' + this.handle, curLevel.updateListeners.listeners);
 		addListener(curLevel, 'update', this.runListenerName, this.run, this);
+		return this;
+	},
+	adjust: function(attrs){
+		if(attrs.angle){
+			this.dir+=attrs.angle;
+		}
+		if(attrs.v){
+			this.pos.movePt(attrs.v);
+		}
+		if(attrs.col){
+			this.col = attrs.col.copy();
+		}
+		this.makeBounds();
 	},
 	makeBounds: function(){
-		var UV = angleToUV(this.dir);
+		this.UV = angleToUV(this.dir);
 		//var dir1 = UV.rotate(-Math.PI/2);
 		//var dir2 = UV.rotate(Math.PI/2);
-		var edgePt1 = this.pos.copy().movePt(UV.copy().rotate(-Math.PI/2).mult(this.width/2));
-		var edgePt2 = this.pos.copy().movePt(UV.copy().rotate(Math.PI/2).mult(this.width/2));
+		var edgePt1 = this.pos.copy().movePt(this.UV.copy().rotate(-Math.PI/2).mult(this.width/2));
+		var edgePt2 = this.pos.copy().movePt(this.UV.copy().rotate(Math.PI/2).mult(this.width/2));
 		this.prodPt = edgePt1;
 		this.prodV = edgePt1.VTo(edgePt2);
-		this.finishPt = edgePt1.copy().movePt(UV.mult(this.dist))
+		this.finishPt = edgePt1.copy().movePt(this.UV.copy().mult(this.dist))
 		this.finishV = this.finishPt.VTo(this.prodPt);
 	},
 	run: function(){
 		this.generateNew();
 		this.updateParticles();
 		this.draw();
+	},
+	trickleOut: function(){
+		this.updateParticles();
+		this.draw();
+		if(this.particles.length==0){
+			this.remove();
+		}
 	},
 	generateNew: function(){
 		var numNew = Math.round(Math.random()*this.rate);
@@ -175,20 +205,31 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 		var initPos = this.prodPt.copy().movePt(this.prodV.copy().mult(Math.random()));
 		var initSpeed = Math.max(.01, this.speed + this.speedSpread*(Math.random()-.5));
 		var accel = Math.max(0, this.accel + this.accelSpread*(Math.random()-.5));
-		
 		var UV = angleToUV(this.dir + this.dirSpread*(Math.random()-.5));
-		return {pos:initPos, V:UV.copy().mult(initSpeed), accelV:UV.copy().mult(accel)};
+		var lifetime = this.getLifetime(initPos, initSpeed, accel, UV);
+		return {pos:initPos, V:UV.copy().mult(initSpeed), accelV:UV.copy().mult(accel), age:0, lifetime:lifetime};
+	},
+	getLifetime: function(initPos, initSpeed, accel, UV){
+		var coLinRatio = UV.dotProd(this.UV);
+		var coLinAccel = accel*coLinRatio;
+		var coLinSpeed = initSpeed*coLinRatio;
+		var a = .5*coLinAccel;
+		var b = coLinSpeed;
+		var c = -this.dist;
+		return (-b + Math.sqrt(b*b - 4*a*c))/(2*a);
 	},
 	updateParticles: function(){
 		for (var particleIdx=this.particles.length-1; particleIdx>=0; particleIdx-=1){
 			var particle = this.particles[particleIdx];
 			particle.pos.movePt(particle.V);
 			particle.V.add(particle.accelV);
-			if(this.isFinished(particle)){
+			particle.age++;
+			if(particle.age>particle.lifetime){
 				this.particles.splice(particleIdx, 1);
 			}	
 		}
 	},
+	/*
 	isFinished: function(particle){
 		var particleV = this.finishPt.VTo(particle.pos);
 		if(particleV.dotProd(this.finishV)<0){
@@ -196,6 +237,7 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 		}
 		return false;
 	},
+	*/
 	draw: function(){
 		this.drawCanvas.strokeStyle = this.col.hex;
 		for (var particleIdx = 0; particleIdx<this.particles.length; particleIdx++){
@@ -210,9 +252,14 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 		
 		}	
 	},
+	stopFlow: function(){
+		removeListener(curLevel, 'update', this.runListenerName);
+		addListener(curLevel, 'update', this.runListenerName, this.trickleOut, this)
+	},
 	remove: function(){
 		removeListener(curLevel, 'update', this.runListenerName);
 		removeListener(curLevel, 'cleanUp', this.cleanUpListenerName);
+		this.removed = true;
 	},
 
 }
