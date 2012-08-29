@@ -29,7 +29,12 @@ compressorFuncs = {
 
 objectFuncs = {
 	addCleanUp: function(){
-		addListener(curLevel, 'cleanUp', unique(typeof(this) + defaultTo('', this.handle), curLevel.cleanUpListeners), this.remove, this);
+		this.cleanUpListenerName = unique(typeof(this) + defaultTo('', this.handle), curLevel.cleanUpListeners),
+		addListener(curLevel, 'cleanUp', this.cleanUplistenerName, function(){
+															this.remove();
+															removeListener(curLevel, cleanUp, this.cleanUpListenerName)
+														},
+														this);
 	},
 	pickSliderPos: function(){
 		var xPos;

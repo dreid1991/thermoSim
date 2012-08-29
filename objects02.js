@@ -1,6 +1,7 @@
 /*
 Contains:
 	Sandbox
+	ParticleEmitter
 */
 function Sandbox(attrs){
 	var self = this;
@@ -26,19 +27,11 @@ function Sandbox(attrs){
 	walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);	
 	
 		
-	
-	this.bin.col = defaultTo(Col(175, 175, 175), attrs.binCol);
-	this.bin.slant = defaultTo(1.3, attrs.binSlant);
-	this.bin.width = defaultTo(220, attrs.binWidth);
-	this.bin.widthUpper = this.bin.width*this.bin.slant;
-	this.bin.height = 30;
-	this.bin.thickness = defaultTo(5, attrs.binThickness);
-	
 	this.spcVol = 70; //specific volume
-	this.sand.col = defaultTo(Col(224, 165, 75), attrs.blockCol);
+	this.sand.col = defaultTo(Col(224, 165, 75), attrs.sandCol);
 	this.sand.pts = this.getLiquidPts();
 
-	this.bin.pts = this.getBinPts(P(0,0-this.bin.thickness), this.bin.slant, V(this.bin.width, this.bin.height), this.bin.thickness);
+	
 	this.binX = (this.wall[1].x+this.wall[0].x)/2;
 	this.pistonPt = this.wall[0].y;
 	
@@ -83,37 +76,144 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		pts[3] = P((-this.bin.width - liquidDWidth)/2, -height-this.bin.thickness);
 		return pts;
 	},
-	buttonFillDown: function(){
-		this.extendTubeFill();
+	buttonAddDown: function(){
+		this.addMass();
 	},
-	buttonFillUp: function(){
-		this.retractTube();
+	buttonAddUp: function(){
+		this.addMassStop();
 		
 	},
-	buttonDrainDown: function(){
-		this.extendTubeDrain();
+	buttonRemoveDown: function(){
+		this.removeMass();
 	},
-	buttonDrainUp: function(){
-		this.retractTube();
+	buttonRemoveUp: function(){
+		this.removeMassStop();
 	},
 	changeMassFunc: function(sign){
 		return function(){
 			this.mass  = Math.min(this.massMax, Math.max(this.mass + sign*this.rate, this.massMin));
-			this.liquid.pts = this.getLiquidPts();
+			this.sand.pts = this.getSandPts();
 			this.wall.setMass(this.massChunkName, this.mass);
 		}
 	},
-
+	addMass: function(){
+		addListener(curLevel, 'update', 'changeMassSand' + this.handle, this.changeMassFunc(1), this);
+	
+	},
+	addMassStop: function(){
+		removeListener(curLevel, 'update', 'changeMassSand' + this.handle);
+	},
+	removeMass: function(){
+		addListener(curLevel, 'update', 'changeMassSand' + this.handle, this.changeMassFunc(-1), this);
+	},
+	removeMassStop: function(){
+		addListener(curLevel, 'update', 'changeMassSand' + this.handle);
+	},
+	getSandPts: function(){
+	
+	},
 	remove: function(){
-		removeListener(curLevel, 'update', 'extendTube');
-		removeListener(curLevel, 'update', 'extendFluid');
-		removeListener(curLevel, 'update', 'changeLiquidMass');
-		removeListener(curLevel, 'update', 'liquidUp');
-		removeListener(curLevel, 'update', 'drawTube');
-		removeListener(curLevel, 'update', 'drawPool');	
+		removeListener(curLevel, 'update', 'drawPile');	
 		this.wall.moveStop();
 		//this.stops.remove();
 	},
 
 
 }
+)
+
+function ParticleEmitter(attrs){
+	this.pos = attrs.pos;
+	this.handle = unique('emitter' + defaultTo('', attrs.handle), curLevel.updateListeners.listeners);
+	this.dir = attrs.dir;
+	this.width = attrs.width;
+	this.col = attrs.col;
+	this.dist = attrs.dist;
+	this.rate = defaultTo(Math.round(.1*this.width), attrs.rate);
+	this.speed = defaultTo(5, attrs.speed);
+	this.speedSpread = defaultTo(1, attrs.speedSpread);
+	if(2*this.speedSpread>this.speed){
+		console.log('Uh-oh.  Making particle emitter with handle ' + this.handle + ' with speed spread such that particles will hit ~0 speed');
+	}
+	this.accel = defaultTo(.5, attrs.accel);
+	this.accelSpread = defaultTo(1, attrs.accelSpread);
+	this.dirSpread = defaultTo(0, attrs.dirSpread);
+	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
+	this.makeBounds();
+	this.addCleanUp();
+	this.particles = [];
+	return this.init();
+}
+_.extend(ParticleEmitter.prototype, objectFuncs, {
+	init: function(){
+		this.runListenerName = unique('particle' + this.handle, curLevel.updateListeners.listeners);
+		addListener(curLevel, 'update', this.runListenerName, this.run, this);
+	},
+	makeBounds: function(){
+		var UV = angleToUV(this.dir);
+		//var dir1 = UV.rotate(-Math.PI/2);
+		//var dir2 = UV.rotate(Math.PI/2);
+		var edgePt1 = this.pos.copy().movePt(UV.copy().rotate(-Math.PI/2).mult(this.width/2));
+		var edgePt2 = this.pos.copy().movePt(UV.copy().rotate(Math.PI/2).mult(this.width/2));
+		this.prodPt = edgePt1;
+		this.prodV = edgePt1.VTo(edgePt2);
+		this.finishPt = edgePt1.copy().movePt(UV.mult(this.dist))
+		this.finishV = this.finishPt.VTo(this.prodPt);
+	},
+	run: function(){
+		this.generateNew();
+		this.updateParticles();
+		this.draw();
+	},
+	generateNew: function(){
+		var numNew = Math.round(Math.random()*this.rate);
+		for(var newIdx=0; newIdx<numNew; newIdx++){
+			this.particles.push(this.newParticle());
+		}
+	},
+	newParticle: function(){
+		var initPos = this.prodPt.copy().movePt(this.prodV.copy().mult(Math.random()));
+		var initSpeed = Math.max(.01, this.speed + this.speedSpread*(Math.random()-.5));
+		var accel = Math.max(0, this.accel + this.accelSpread*(Math.random()-.5));
+		
+		var UV = angleToUV(this.dir + this.dirSpread*(Math.random()-.5));
+		return {pos:initPos, V:UV.copy().mult(initSpeed), accelV:UV.copy().mult(accel)};
+	},
+	updateParticles: function(){
+		for (var particleIdx=this.particles.length-1; particleIdx>=0; particleIdx-=1){
+			var particle = this.particles[particleIdx];
+			particle.pos.movePt(particle.V);
+			particle.V.add(particle.accelV);
+			if(this.isFinished(particle)){
+				this.particles.splice(particleIdx, 1);
+			}	
+		}
+	},
+	isFinished: function(particle){
+		var particleV = this.finishPt.VTo(particle.pos);
+		if(particleV.dotProd(this.finishV)<0){
+			return true;
+		}
+		return false;
+	},
+	draw: function(){
+		this.drawCanvas.strokeStyle = this.col.hex;
+		for (var particleIdx = 0; particleIdx<this.particles.length; particleIdx++){
+			var particle = this.particles[particleIdx];
+			//c.globalAlpha = dotsLocal[dotIdx].col.a;
+			c.beginPath();
+			c.moveTo(particle.pos.x, particle.pos.y);
+			c.lineTo(particle.pos.x+1, particle.pos.y+1);
+			c.closePath();
+			//perhaps can more stroke outside of this function?  I think I can, actually.
+			c.stroke();
+		
+		}	
+	},
+	remove: function(){
+		removeListener(curLevel, 'update', this.runListenerName);
+		removeListener(curLevel, 'cleanUp', this.cleanUpListenerName);
+	},
+
+}
+)

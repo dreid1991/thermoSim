@@ -65,7 +65,9 @@ $(function(){
 	}
 	*/
 })
-function lalala(){
+/*
+function checkIdeality(){
+	var count = dataHandler.countFunc()
 	var theData = walls[0].data;
 	var pInt = theData.pInt[theData.pInt.length-1]
 	var t = theData.t[theData.t.length-1]
@@ -73,11 +75,11 @@ function lalala(){
 	console.log(pInt);
 	console.log(t);
 	console.log(v);
-	console.log('nrt ' + 1.425*.0831*t);
+	console.log('nrt ' + count()/N*.0831*t);
 	console.log('pv ' + pInt*v);
 	
 }
-
+*/
 drawingTools.prototype = {
 
 	clear: function(col){
@@ -760,6 +762,9 @@ function mirrorPts(pts, center, line){
 		pts[ptIdx].mirror(center, line);
 	}
 	return pts;
+}
+function angleToUV(dir){
+	return V(Math.cos(dir), Math.sin(dir));
 }
 function getSign(val){
 	var sign=1;
