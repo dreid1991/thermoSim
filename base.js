@@ -568,16 +568,17 @@ function addEqs(text){
 	return text;
 }
 
-function makeSlider(handle, attrs, handlers, initVisibility, toChange){
-	//var newDiv = $('<div>');
-	//newDiv.attr({id:id});
-	
-	var objName = handle.slice('slider'.length, handle.length);
-	objName = objName.slice(0,1).toLowerCase() + objName.slice(1, objName.length);
-	var div = $('#' + handle);
-	div.slider({});
-	div.slider("option",attrs);
-	div.attr({width:300});
+function makeSlider(wrapperDivId, sliderDivId, title, attrs, handlers, initVisibility){
+	var wrapperDiv = $('#' + wrapperDivId);
+	wrapperDiv.html('');
+	wrapperDiv.append('<center>'+title+'</center>');
+	wrapperDiv.append("<div id='"+sliderDivId+"parent' style='padding:5px'><div id='"+sliderDivId+"'></div></div>");
+	divParent = $('#'+sliderDivId+'parent');
+	sliderDiv = $('#' + sliderDivId);
+	sliderDiv.slider({});
+	sliderDiv.slider("option",attrs);
+	//sliderDiv.attr({width:divParent.width()-10});
+	/*
 	if(toChange){
 		curLevel[handle+'Set'] = function(event, ui){
 			this.playedWithSlider = true;
@@ -585,31 +586,27 @@ function makeSlider(handle, attrs, handlers, initVisibility, toChange){
 		}
 		sliderBind(div, 'slide', curLevel[handle+'Set'], curLevel);
 	}
-
+	*/
 	for (var handlerIdx=0; handlerIdx<handlers.length; handlerIdx++){
 		var handler=handlers[handlerIdx];
 		var eventType = handler.eventType;
 		var obj = handler.obj;
-		if(handler.func){
-			var func = handler.func;
-		}else if(handler.funcStr){
-			var func = obj[handler.funcStr];
-		}
+		var func = handler.func;
 
 		var event;
 		var ui;
 		if(obj===undefined){
-			sliderBind(div, eventType, func, '');
+			sliderBind(sliderDiv, eventType, func, '');
 		}else{
-			sliderBind(div, eventType, func, obj);
+			sliderBind(sliderDiv, eventType, func, obj);
 		}
 		
 	}
 	if(initVisibility){
 		div[initVisibility]();
 	}
-	sliderList.push(handle);
-	return div;
+	sliderList.push(sliderDivId);
+	return sliderDiv;
 }
 function sliderBind(div, eventType, func, obj){
 	div.bind(eventType, function(event, ui){func.apply(obj, [event, ui])});

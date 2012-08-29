@@ -29,14 +29,30 @@
 		<div id='dashRun' class='dashMed noSelect'>
 			<center>
 				<div>
-					<div id='sliderPressureHolder' class='niceFont'>Piston pressure<br>
-						<div id='sliderPiston' style='width:300px'></div>
-					</div>
-					<br>
+					<!div id='sliderPressureHolder' class='niceFont'><!Piston pressure><!br>
+						<!div id='sliderPiston' style='width:300px'><!/div>
+					<!/div>
+					<!br>
 					<button id='reset' class='noSelect'>Reset experiment</button>
-					<button id='checkAns' class='noSelect'>Check answer</button>
 					<button id='clearGraphs' class='noSelect'>Clear graphs</button>
 
+				</div>
+			</center>
+			<center>
+				<div id='sliderHolderSingle'>
+					<div id='sliderHolderCenter' style='width:300px'>
+					
+					</div>
+				</div>
+			</center>
+			<center>
+				<div id='sliderHolderDouble'>
+					<div id='sliderHolderLeft' style='display:inline-block;width:200px'>
+					</div>
+					<div id='sliderSpacer' style='width:100px'>
+					</div>
+					<div id='sliderHolderRight' style='width:200px'>
+					</div>
 				</div>
 			</center>
 		</div>
@@ -101,7 +117,6 @@ $(function(){
 	curLevel = new Work();
 	animText = new AnimText(c);
 	$('#sliderPressureHolder').hide();
-	$('#checkAns').hide();
 	$('#clearGraphs').hide();
 	$('button').button();
 	$('#longSliderHolder').hide();
@@ -117,6 +132,7 @@ $(function(){
 	curLevel.cutSceneEnd();
 	curLevel.init();
 	curLevel.setDefaultPromptVals()
+	/*
 	var sliderName = 'sliderPiston';
 	makeSlider(
 		sliderName, 
@@ -128,6 +144,7 @@ $(function(){
 		'show',
 		'Pressure'
 	);
+	*/
 });
 
 myCanvas.width = $('#main').width();

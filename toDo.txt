@@ -5,6 +5,8 @@ make save/load graphs by block/promptIdx
 
 atm->bar
 
+make sand thing
+
 make graph save grab all the data it can from its data list (not just pts)
 
 make cleanUp listener to be run on block change.  Piston, weights, etc, all have one

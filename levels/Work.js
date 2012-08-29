@@ -226,30 +226,30 @@ _.extend(Work.prototype,
 	block3Start: function(){
 		this.playedWithSlider = false;
 		var self = this;
-		var sliderMin = $('#sliderPressure').slider('option', 'min');
-		$('#sliderPressure').slider('option', {value:sliderMin});
-		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
+		//var sliderMin = $('#sliderPressure').slider('option', 'min');
+		//$('#sliderPressure').slider('option', {value:sliderMin});
+		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});
 		spcs['spc1'].populate(P(45,35), V(460, 350), 800, 300);
 		spcs['spc3'].populate(P(45,35), V(450, 350), 600, 300);
 		
 		$('#canvasDiv').show();
 		$('#clearGraphs').hide();
 		$('#dashRun').show();
-		$('#sliderPressureHolder').show();
+		//$('#sliderPressureHolder').show();
 		$('#base').show();
 		
 		this.graphs.pVSv = new GraphScatter('pVSv', 400,275, "Volume (L)", "Pressure (atm)",
 							{x:{min:0, step:4}, y:{min:0, step:3}});
 		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
 							{x:{min:0, step:4}, y:{min:250, step:50}});
-		this.graphs.pVSv.addSet('p', 'P Int.', Col(50,50,255), Col(200,200,255),
-								{data:this.data, x:'v', y:'p'});
+		this.graphs.pVSv.addSet('p', 'P Ext.', Col(50,50,255), Col(200,200,255),
+								{x:walls[0].data.v, y:walls[0].data.pExt});
 
 		this.graphs.tVSv.addSet('t', 'Sys\nTemp', Col(255,0,0), Col(255,200,200),
-								{data:this.data, x:'v', y:'t'});		
+								{x:walls[0].data.v, y:walls[0].data.t});		
 		
 		
-		this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, slider:'sliderPiston'});
+		this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15});
 		this.piston.wall.displayWork().displayPExt();
 		this.borderStd();
 		//this.volListener8 = new StateListener({condition:10, checkAgainst:walls[0].data.v, tolerance:.1});

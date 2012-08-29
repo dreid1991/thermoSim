@@ -31,7 +31,63 @@ objectFuncs = {
 	addCleanUp: function(){
 		addListener(curLevel, 'cleanUp', unique(typeof(this) + defaultTo('', this.handle), curLevel.cleanUpListeners), this.remove, this);
 	},
-
+	pickSliderPos: function(){
+		var xPos;
+		if(this.wall){
+			xPos = (this.wall[0].x + this.wall[1].x)/2;
+		}else if(this.pos && this.dims){
+			xPos = this.pos.x + this.dims.dx;
+		}else if(this.pos){
+			xPos = this.pos.x;
+		}
+		if(!xPos){
+			return 'center';
+			//ooh - maybe make it check if that div is empty.  If not, move contents of center to left/right
+		}else{
+			var width = $('#main').width();
+			var segmentWidth = width/3;
+			var divDest = Math.floor(xPos/segmentWidth);
+			if(divDest==0){
+				return 'left';
+			}else if(divDest==1){
+				return 'center';
+			}
+			else if(divDest==2){
+				return 'right';
+			}
+		}
+		return 'center';
+	},
+	addSlider: function(title, attrs, handlers, position){
+		if(!position){
+			position = this.pickSliderPos();
+		}
+		var toAppendId;
+		switch(position){
+			case 'left':
+				toAppendId = 'sliderHolderLeft';
+				$('#sliderHolderSingle').hide();
+				$('#sliderHolderDouble').show();
+				break;
+			case 'center':
+				toAppendId = 'sliderHolderCenter';
+				$('#sliderHolderSingle').show();
+				$('#sliderHolderDouble').hide();
+				break;
+			case 'right':
+				toAppendId = 'sliderHolderRight';
+				$('#sliderHolderSingle').hide();
+				$('#sliderHolderDouble').show();
+				break;
+		}
+		var sliderId = 'slider' + this.handle;
+		makeSlider(toAppendId, sliderId, title, attrs, handlers);
+		return sliderId;
+	},
+	hideSliderDivs: function(){
+		$('#sliderHolderSingle').hide();
+		$('#sliderHolderDouble').hide();
+	}
 }
 //////////////////////////////////////////////////////////////////////////
 //DRAG WEIGHTS
@@ -1236,12 +1292,9 @@ function Piston(attrs){
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.pMin = defaultTo(2, attrs.min);
 	this.pMax = defaultTo(15, attrs.max);
+	this.makeSlider = defaultTo(true, attrs.makeSlider);
 	this.p = defaultTo(2, attrs.init);
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
-	if(attrs.slider){
-		this.slider = attrs.slider;
-		this.setSliderVal();
-	}
 	this.slant = .07;
 	this.trackingP = false;
 	this.wall = walls[this.wallInfo];
@@ -1268,7 +1321,9 @@ function Piston(attrs){
 	
 	walls.setSubWallHandler(this.wallInfo, 0, 'cPAdiabaticDamped' + compAdj);		
 	this.wall.setDefaultReadout(this.readout);
-	
+	if(this.makeSlider){
+		this.sliderId = this.addSlider('Pressure', {value:this.pToPercent(this.p)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
+	}
 	this.addCleanUp();
 	
 	return this.show();
@@ -1348,8 +1403,11 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		removeListener(curLevel, 'update', 'drawPiston'+this.handle);
 		this.readout.hide();
 	},
+	parseSlider: function(event, ui){
+		this.setPressure(ui.value);
+	},
 	setPressure: function(sliderVal){
-		var pSetPt = (this.pMax - this.pMin)*sliderVal/100 + this.pMin
+		var pSetPt = this.percentToP(sliderVal);
 		var dp = pSetPt - this.p;
 
 		addListener(curLevel, 'update', 'piston'+this.handle+'adjP', 
@@ -1365,9 +1423,11 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 			},
 			this);
 	},
-	setSliderVal: function(){
-		var sliderVal = 100*(this.p - this.pMin)/(this.pMax-this.pMin);
-		$('#'+this.slider).slider('option', {value:sliderVal});
+	pToPercent: function(p){
+		return sliderVal = 100*(p - this.pMin)/(this.pMax-this.pMin);;
+	},
+	percentToP: function(percent){
+		return (this.pMax - this.pMin)*percent/100 + this.pMin;
 	},
 	setMass: function(){
 		this.mass = this.p*this.width/(pConst*g);
@@ -1376,18 +1436,14 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 	setReadoutY: function(){
 		this.readout.position({y:this.pistonBottom.pos.y-2+this.pistonPt.y});
 	},
-
-	reset: function(){
-		//this.dataHandler.slots.work.value = 0;
-	},
-
-	removeData: function(handle){
-		this.readout.removeEntry(handle);
-	},
 	remove: function(){
 		this.wall.moveStop();
 		this.wall.unsetMass('piston' + this.handle);
 		this.hide();
+		if(this.sliderId){
+			$('#'+this.sliderId).remove();
+		}
+		this.hideSliderDivs();
 		removeListener(curLevel, 'update', 'moveWalls');
 	}
 }
