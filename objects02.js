@@ -16,7 +16,7 @@ function Sandbox(attrs){
 	this.mass = defaultTo(10, attrs.massInit);
 	this.buttonAdd = defaultTo('buttonAddMass', attrs.addButtonId);
 	this.buttonRemove = defaultTo('buttonRemoveMass', attrs.removeButtonId);
-
+	this.particleMass = .05;
 	this.makeButtons();
 	
 	this.massChunkName = 'sandMass' + defaultTo('', attrs.handle);
@@ -97,33 +97,42 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 	buttonRemoveUp: function(){
 		this.removeMassStop();
 	},
-	changeMassFunc: function(sign){
-		return function(){
-			this.mass  = Math.min(this.massMax, Math.max(this.mass + sign*this.rate, this.massMin));
-			this.sand.pts = this.getSandPts();
-			this.wall.setMass(this.massChunkName, this.mass);
-		}
-	},
+	
 	addMass: function(){
-		addListener(curLevel, 'update', 'changeMassSand' + this.handle, this.changeMassFunc(1), this);
-		this.emitters.push(this.makeDownEmitter())
+		this.emitters.push(this.makeAddEmitter())
 	},
 	addMassStop: function(){
-		removeListener(curLevel, 'update', 'changeMassSand' + this.handle);
 		this.emitters[this.emitters.length-1].stopFlow();
 	},
 	removeMass: function(){
-		addListener(curLevel, 'update', 'changeMassSand' + this.handle, this.changeMassFunc(-1), this);
+		this.emitters.push(this.madeRemoveEmitter());
 	},
 	removeMassStop: function(){
-		addListener(curLevel, 'update', 'changeMassSand' + this.handle);
 		this.emitters[this.emitters.length-1].stopFlow();
 	},
+	makeAddEmitter: function(){
+		var onFinish = {func:this.onFinishAdd, obj:this};
+		var emitterIdx = this.emitters.length-1;
+		addListener(curLevel, 'update', 
+		//You were here.  Need to make a listener that adjusts dist of emitter and then removes when emitter is done
+		//Maybe give the emitter an onRemove func (OH YEAH, DO THAT)
+	},
+	onGenerateRemove: function(){
+		this.mass-=this.particleMass;
+		this.wall.setMass(this.massChunkName, this.mass);
+	},
+	onFinishAdd: function(){
+		this.mass+=this.particleMass;
+		this.wall.setMass(this.massChunkName, this.mass);	
+	},
 	remove: function(){
+		for(var emitterIdx=0; emitterIdx<this.emitters.length; emitterIdx++){
+			this.emitters[emitterIdx].remove();
+		}
+		this.emitters = [];
 		removeListener(curLevel, 'update', this.drawListenerName);
 		removeListener(curLevel, 'data', this.cleanUpEmittersListenerName);	
 		this.wall.moveStop();
-		//this.stops.remove();
 	},
 
 
@@ -139,6 +148,8 @@ function ParticleEmitter(attrs){
 	this.width = attrs.width;
 	this.col = attrs.col;
 	this.dist = attrs.dist;
+	this.onGenerate = attrs.onGenerate;
+	this.onFinish = attrs.onFinish;
 	this.rate = defaultTo(Math.round(.1*this.width), attrs.rate);
 	this.speed = defaultTo(5, attrs.speed);
 	this.speedSpread = defaultTo(1, attrs.speedSpread);
@@ -161,21 +172,13 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 		return this;
 	},
 	adjust: function(attrs){
-		if(attrs.angle){
-			this.dir+=attrs.angle;
-		}
-		if(attrs.v){
-			this.pos.movePt(attrs.v);
-		}
-		if(attrs.col){
-			this.col = attrs.col.copy();
+		for(var attr in attrs){
+			this[attr] = attrs[attr];
 		}
 		this.makeBounds();
 	},
 	makeBounds: function(){
 		this.UV = angleToUV(this.dir);
-		//var dir1 = UV.rotate(-Math.PI/2);
-		//var dir2 = UV.rotate(Math.PI/2);
 		var edgePt1 = this.pos.copy().movePt(this.UV.copy().rotate(-Math.PI/2).mult(this.width/2));
 		var edgePt2 = this.pos.copy().movePt(this.UV.copy().rotate(Math.PI/2).mult(this.width/2));
 		this.prodPt = edgePt1;
@@ -199,6 +202,9 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 		var numNew = Math.round(Math.random()*this.rate);
 		for(var newIdx=0; newIdx<numNew; newIdx++){
 			this.particles.push(this.newParticle());
+			if(this.onGenerate){
+				this.onGenerate.func.apply(this.onGenerate.obj);
+			}
 		}
 	},
 	newParticle: function(){
@@ -226,6 +232,9 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 			particle.age++;
 			if(particle.age>particle.lifetime){
 				this.particles.splice(particleIdx, 1);
+				if(this.onFinish){
+					this.onFinish.func.apply(this.onFinish.obj);
+				}
 			}	
 		}
 	},
@@ -242,14 +251,11 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 		this.drawCanvas.strokeStyle = this.col.hex;
 		for (var particleIdx = 0; particleIdx<this.particles.length; particleIdx++){
 			var particle = this.particles[particleIdx];
-			//c.globalAlpha = dotsLocal[dotIdx].col.a;
 			c.beginPath();
 			c.moveTo(particle.pos.x, particle.pos.y);
-			c.lineTo(particle.pos.x+1, particle.pos.y+1);
-			c.closePath();
-			//perhaps can more stroke outside of this function?  I think I can, actually.
+			c.lineTo(particle.pos.x+2, particle.pos.y+2);
+			//if lines start behaving strangely, not closing the path here may have something to do with it
 			c.stroke();
-		
 		}	
 	},
 	stopFlow: function(){
