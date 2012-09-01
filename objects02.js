@@ -2,6 +2,7 @@
 Contains:
 	Sandbox
 	ParticleEmitter
+in that order
 */
 function Sandbox(attrs){
 	var self = this;
@@ -29,7 +30,7 @@ function Sandbox(attrs){
 	this.emitters = new Array();
 	this.spcVol = 70; //specific volume
 	this.sand.col = defaultTo(Col(224, 165, 75), attrs.sandCol);
-	this.sand.pts = this.getLiquidPts();
+	this.sand.pts = this.getSandPts();
 
 	
 	this.binX = (this.wall[1].x+this.wall[0].x)/2;
@@ -43,9 +44,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 {
 	init: function(){	
 		this.drawListenerName = unique('drawSand' + this.handle, curLevel.updateListeners.listeners);
-		this.cleanUpEmittersListenerName = unique('cleanUpSandEmitters' + this.handle, curLevel.updateListener.listeners);
 		addListener(curLevel, 'update', this.drawListenerName, this.draw, this);
-		addListener(curLevel, 'data', this.cleanUpEmittersListenerName, this.cleanUpEmitters, this);
 		this.wall.moveInit();	
 		return this.displayMass().displayPressure();
 	},
@@ -66,23 +65,15 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		draw.fillPts(this.sand.pts, this.liquid.col, this.drawCanvas);
 		this.drawCanvas.restore();		
 	},
-	cleanUpEmitters: function(){
-		for(var emitterIdx=this.emitters.length-1; emitterIdx>=0; emitterIdx-=1){
-			if(this.emitters[emitterIdx].removed){
-				this.emitters.slice(emitterIdx, 1);
-			}
-		}
-	},
 	getSandPts: function(){
-		var dWidth = this.bin.widthUpper - this.bin.width;
-		this.liquid.height = this.mass*this.spcVol/(this.bin.width + (dWidth)/this.bin.height);
-		var height = this.liquid.height;
 		var pts = new Array(4);
-		var liquidDWidth = dWidth*height/this.bin.height;
-		pts[0] = P(-this.bin.width/2, -this.bin.thickness);
-		pts[1] = P(this.bin.width/2, -this.bin.thickness);
-		pts[2] = P((this.bin.width + liquidDWidth)/2, -height-this.bin.thickness);
-		pts[3] = P((-this.bin.width - liquidDWidth)/2, -height-this.bin.thickness);
+		pts[0] = P(-10, 0);
+		pts[1] = P(-7, -2);
+		pts[2] = P(-3, -6);
+		pts[3] = P(0, -7);
+		ptsRight = pts.deepCopy().splice(0, 1).reverse();
+		mirrorPts(ptsRight, P(0, 0), V(0, -10));
+		pts = pts.concat(ptsRight);
 		return pts;
 	},
 	buttonAddDown: function(){
@@ -113,9 +104,51 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 	makeAddEmitter: function(){
 		var onFinish = {func:this.onFinishAdd, obj:this};
 		var emitterIdx = this.emitters.length-1;
-		addListener(curLevel, 'update', 
-		//You were here.  Need to make a listener that adjusts dist of emitter and then removes when emitter is done
-		//Maybe give the emitter an onRemove func (OH YEAH, DO THAT)
+		var dir = -Math.PI/2;
+		var col = this.sand.col;
+		var centerPos = (this.wall[1].x - this.wall[0].x)/2;
+		var dist = wall[0].y;
+		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners.listeners)
+		var wallPt = this.walls[0];
+		addListener(curLevel, 'update', moveListenerName, 
+			function(){
+				this.emitters[emitterIdx].adjust({dist:wallPt.y});
+			},
+		this);
+		var onRemove = 
+			{func:function(){
+				removeListener(curLevel, 'update', moveListenerName);
+			}, 
+			obj:this};
+		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:100, dist:dist, dir:dir, col:col,
+											onRemove:onRemove, parentList:this.emitters, onFinish:onFinish});
+		
+		return newEmitter;
+	},
+	makeRemoveEmitter: function(){
+		var onGenerate = {func:this.onGenerateRemove, obj:this};
+		var emitterIdx = this.emitters.length-1;
+		var dir = Math.PI/2;
+		var col = this.sand.col;
+		var centerPos = (this.wall[1].x - this.wall[0].x)/2;
+		var dist = wall[0].y;
+		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners.listeners)
+		var wallPt = this.walls[0];
+		addListener(curLevel, 'update', moveListenerName, 
+			function(){
+				this.emitters[emitterIdx].adjust({pos:P(centerPos, wallPt.y), dist:wallPt.y});
+				this.emitters[emitterIdx].adjust({dist:wallPt.y});
+			},
+		this);
+		var onRemove = 
+			{func:function(){
+				removeListener(curLevel, 'update', moveListenerName);
+			}, 
+			obj:this};
+		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:100, dist:dist, dir:dir, col:col,
+											onRemove:onRemove, parentList:this.emitters, onGenerate:onGenerate});
+		
+		return newEmitter;		
 	},
 	onGenerateRemove: function(){
 		this.mass-=this.particleMass;
@@ -145,6 +178,7 @@ function ParticleEmitter(attrs){
 	this.pos = attrs.pos;
 	this.handle = unique('emitter' + defaultTo('', attrs.handle), curLevel.updateListeners.listeners);
 	this.dir = attrs.dir;
+	this.parentList = attrs.parentList;
 	this.width = attrs.width;
 	this.col = attrs.col;
 	this.dist = attrs.dist;
@@ -238,15 +272,6 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 			}	
 		}
 	},
-	/*
-	isFinished: function(particle){
-		var particleV = this.finishPt.VTo(particle.pos);
-		if(particleV.dotProd(this.finishV)<0){
-			return true;
-		}
-		return false;
-	},
-	*/
 	draw: function(){
 		this.drawCanvas.strokeStyle = this.col.hex;
 		for (var particleIdx = 0; particleIdx<this.particles.length; particleIdx++){
@@ -263,6 +288,12 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 		addListener(curLevel, 'update', this.runListenerName, this.trickleOut, this)
 	},
 	remove: function(){
+		if(this.onRemove){
+			this.onRemove.func.apply(this.onRemove.obj);
+		}
+		if(this.parentList){
+			this.parentList.splice(_.indexOf(this.parentList, this), 1);
+		}
 		removeListener(curLevel, 'update', this.runListenerName);
 		removeListener(curLevel, 'cleanUp', this.cleanUpListenerName);
 		this.removed = true;
