@@ -194,11 +194,14 @@ _.extend(Reversibility.prototype,
 		nextPrompt();
 	},
 	block0Start: function(){
+		$('#reset').hide();
+		$('#clearGraphs').hide();
 		var wallHandle = 'container';
 		this.unCompSetup();
 		this.makeGraphsRev();
-		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:33}]})
-		this.dragWeights.wall.displayPExt().displayWork().recordMass().displayMass().displayVol();
+		this.sandBox = new Sandbox();
+		//this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:33}]})
+		//this.dragWeights.wall.displayPExt().displayWork().recordMass().displayMass().displayVol();
 		this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7, alertUnsatisfied:'NO', alertSatisfied:'YES', atSatisfyFunc:{func:function(){store('workInLrg',round(walls[0].work,1))},obj:''}});
 		this.readout.show();
 	},	

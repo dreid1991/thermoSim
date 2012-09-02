@@ -8,6 +8,7 @@ function Sandbox(attrs){
 	var self = this;
 	attrs = defaultTo({}, attrs);
 	this.bin = {};
+	this.sand = {};
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	this.rate = defaultTo(.15, attrs.rate);
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
@@ -18,6 +19,8 @@ function Sandbox(attrs){
 	this.buttonAdd = defaultTo('buttonAddMass', attrs.addButtonId);
 	this.buttonRemove = defaultTo('buttonRemoveMass', attrs.removeButtonId);
 	this.particleMass = .05;
+	this.buttonAddId = 'sandAdd';
+	this.buttonRemoveId = 'sandRemove';
 	this.makeButtons();
 	
 	this.massChunkName = 'sandMass' + defaultTo('', attrs.handle);
@@ -27,13 +30,17 @@ function Sandbox(attrs){
 	this.wallHandler = defaultTo('cPAdiabaticDamped', attrs.compMode) + compAdj;	
 	walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);	
 	
+	this.wallPt = this.wall[0];
+	
 	this.emitters = new Array();
+
+	this.binX = (this.wall[1].x+this.wall[0].x)/2;
+
 	this.spcVol = 70; //specific volume
 	this.sand.col = defaultTo(Col(224, 165, 75), attrs.sandCol);
 	this.sand.pts = this.getSandPts();
+	this.sand.pos = P(this.binX, this.wall[0].y).track({pt:this.wallPt, noTrack:'x'});
 
-	
-	this.binX = (this.wall[1].x+this.wall[0].x)/2;
 	this.pistonPt = this.wall[0].y;
 	
 	this.addCleanUp();
@@ -45,8 +52,12 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 	init: function(){	
 		this.drawListenerName = unique('drawSand' + this.handle, curLevel.updateListeners.listeners);
 		addListener(curLevel, 'update', this.drawListenerName, this.draw, this);
-		this.wall.moveInit();	
-		return this.displayMass().displayPressure();
+		this.wall.moveInit();
+		this.wall.recordMass();
+		this.wall.recordPExt();
+		this.wall.displayMass();
+		this.wall.displayPExt();
+		return this;
 	},
 	makeButtons: function(){
 		addButton(this.buttonAddId, 'Add mass');
@@ -60,9 +71,9 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 	},
 	draw: function(){
 		this.drawCanvas.save();
-		this.drawCanvas.translate(this.binX, this.pistonY());
-		draw.fillPts(this.bin.pts, this.bin.col, this.drawCanvas);
-		draw.fillPts(this.sand.pts, this.liquid.col, this.drawCanvas);
+		this.drawCanvas.translate(this.sand.pos.x, this.sand.pos.y);
+		this.drawCanvas.scale(this.mass*.2, this.mass*.2)
+		draw.fillPts(this.sand.pts, this.sand.col, this.drawCanvas);
 		this.drawCanvas.restore();		
 	},
 	getSandPts: function(){
@@ -96,23 +107,22 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		this.emitters[this.emitters.length-1].stopFlow();
 	},
 	removeMass: function(){
-		this.emitters.push(this.madeRemoveEmitter());
+		this.emitters.push(this.makeRemoveEmitter());
 	},
 	removeMassStop: function(){
 		this.emitters[this.emitters.length-1].stopFlow();
 	},
 	makeAddEmitter: function(){
-		var onFinish = {func:this.onFinishAdd, obj:this};
-		var emitterIdx = this.emitters.length-1;
-		var dir = -Math.PI/2;
+		var onArrive = {func:this.onArriveAdd, obj:this};
+		var emitterIdx = this.emitters.length;
+		var dir = Math.PI/2;
 		var col = this.sand.col;
 		var centerPos = (this.wall[1].x - this.wall[0].x)/2;
-		var dist = wall[0].y;
+		var dist = this.wall[0].y;
 		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners.listeners)
-		var wallPt = this.walls[0];
 		addListener(curLevel, 'update', moveListenerName, 
 			function(){
-				this.emitters[emitterIdx].adjust({dist:wallPt.y});
+				this.emitters[emitterIdx].adjust({dist:this.wallPt.y});
 			},
 		this);
 		var onRemove = 
@@ -121,19 +131,19 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 			}, 
 			obj:this};
 		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:100, dist:dist, dir:dir, col:col,
-											onRemove:onRemove, parentList:this.emitters, onFinish:onFinish});
+											onRemove:onRemove, parentList:this.emitters, onArrive:onArrive});
 		
 		return newEmitter;
 	},
 	makeRemoveEmitter: function(){
 		var onGenerate = {func:this.onGenerateRemove, obj:this};
-		var emitterIdx = this.emitters.length-1;
-		var dir = Math.PI/2;
+		var emitterIdx = this.emitters.length;
+		var dir = -Math.PI/2;
 		var col = this.sand.col;
 		var centerPos = (this.wall[1].x - this.wall[0].x)/2;
-		var dist = wall[0].y;
+		var dist = this.wall[0].y;
 		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners.listeners)
-		var wallPt = this.walls[0];
+		var wallPt = this.wall[0];
 		addListener(curLevel, 'update', moveListenerName, 
 			function(){
 				this.emitters[emitterIdx].adjust({pos:P(centerPos, wallPt.y), dist:wallPt.y});
@@ -154,7 +164,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		this.mass-=this.particleMass;
 		this.wall.setMass(this.massChunkName, this.mass);
 	},
-	onFinishAdd: function(){
+	onArriveAdd: function(){
 		this.mass+=this.particleMass;
 		this.wall.setMass(this.massChunkName, this.mass);	
 	},
@@ -183,7 +193,8 @@ function ParticleEmitter(attrs){
 	this.col = attrs.col;
 	this.dist = attrs.dist;
 	this.onGenerate = attrs.onGenerate;
-	this.onFinish = attrs.onFinish;
+	this.onArrive = attrs.onArrive;
+	this.onRemove = attrs.onRemove;
 	this.rate = defaultTo(Math.round(.1*this.width), attrs.rate);
 	this.speed = defaultTo(5, attrs.speed);
 	this.speedSpread = defaultTo(1, attrs.speedSpread);
@@ -266,8 +277,8 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 			particle.age++;
 			if(particle.age>particle.lifetime){
 				this.particles.splice(particleIdx, 1);
-				if(this.onFinish){
-					this.onFinish.func.apply(this.onFinish.obj);
+				if(this.onArrive){
+					this.onArrive.func.apply(this.onArrive.obj);
 				}
 			}	
 		}
