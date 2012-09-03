@@ -243,9 +243,9 @@ _.extend(Work.prototype,
 								{x:walls[0].data.v, y:walls[0].data.t});		
 		
 		
-		this.heater = new Heater({wallInfo:'container'});
-		//this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15});
-		//this.piston.wall.displayWork().displayPExt();
+		//this.heater = new Heater({wallInfo:'container'});
+		this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15});
+		this.piston.wall.displayWork().displayPExt();
 		this.borderStd();
 		this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:10, alertUnsatisfied:'Compress the system more!'});		
 	},

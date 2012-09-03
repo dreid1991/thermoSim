@@ -8,7 +8,7 @@
 <div class='noSelect wrapper'>
 	<div id='main' class='main noSelect'>
 		<div id='mainHeader' class='header noSelect'>
-			Work
+			
 		</div>
 		<div id='canvasDiv' class='canvasDiv noSelect'>
 			<canvas id='myCanvas'>
@@ -26,16 +26,10 @@
 			</center>
 			
 		</div>
-		<div id='dashRun' class='dashMed noSelect'>
+		<div id='dashRun' class='dashMed noSelect' style='position:relative'>
 			<center>
-				<div>
-					<!div id='sliderPressureHolder' class='niceFont'><!Piston pressure><!br>
-						<!div id='sliderPiston' style='width:300px'><!/div>
-					<!/div>
-					<!br>
-					<button id='reset' class='noSelect'>Reset experiment</button>
-					<button id='clearGraphs' class='noSelect'>Clear graphs</button>
-
+				<div id='buttons'>
+		
 				</div>
 			</center>
 			<center>
@@ -55,12 +49,12 @@
 					</div>
 				</div>
 			</center>
+			<button id='resetExp' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button>
 		</div>
-		<div id='dashCutScene' class='dashMed noSelect'>
-		</div>
+		<div id='dashCutScene' class='dashMed noSelect'></div>
 		<div id='dashOutro' class='dash noSelect ' >
 			<center>
-				<button id='backToSim'>Back to the simulation</button>
+				<button id='toLastStep'>Back to the simulation</button>
 			</center>
 			
 			
@@ -105,7 +99,6 @@
 <script src = '../animText.js'></script>
 <script src = '../Readout.js'></script>
 <script src = '../LevelTools.js'></script>
-
 <script src = 'Work.js'></script>
 <script src = '../base.js'></script>
 <script type = 'text/javascript'>
@@ -113,25 +106,21 @@ var curLevel;
 canvasHeight = 450;
 $(function(){
 	imgPath = 'work';
+	animText = new AnimText(c);
 	myCanvas.height = canvasHeight;
 	curLevel = new Work();
-	animText = new AnimText(c);
-	$('#sliderPressureHolder').hide();
-	$('#clearGraphs').hide();
+
+	curLevel.cutSceneEnd();
+	curLevel.init();
 	$('button').button();
-	$('#longSliderHolder').hide();
+	$('#resetExp').click(function(){curLevel.reset()});
 	$('#toSim').click(function(){nextPrompt()});
-	$('#backToSim').click(function(){prevPrompt()});
+	$('#toLastStep').click(function(){prevPrompt()});
 	$('#previous').click(function(){prevPrompt()});
 	$('#next').click(function(){nextPrompt()});
 	$('#submit').click(function(){submit()});
-	$('#checkAns').click(function(){curLevel.checkAnsTemp()});
 	$('#clearGraphs').click(function(){curLevel.clearGraphs()});
 	$('#reset').click(function(){curLevel.reset()});
-	$('#reset').hide();
-	curLevel.cutSceneEnd();
-	curLevel.init();
-	curLevel.setDefaultPromptVals()
 });
 
 myCanvas.width = $('#main').width();

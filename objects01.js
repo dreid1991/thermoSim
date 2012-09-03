@@ -1608,7 +1608,9 @@ _.extend(Heater.prototype, objectFuncs, {
 	},
 	remove: function(){
 		removeListener(curLevel, 'update', 'drawHeater'+this.handle);
-		walls.removeWall('heater' + this.handle);
+		if(window.walls){
+			walls.removeWall('heater' + this.handle);
+		}
 	}
 }
 )
@@ -1693,7 +1695,7 @@ _.extend(StateListener.prototype, objectFuncs, {
 					if(this.atSatisfyFunc){
 						this.atSatisfyFunc.func.apply(this.atSatisfyFunc.obj);
 					}
-					removeListener(curLevel, 'update', handle);
+					removeListener(curLevel, 'update', this.handle);
 				}
 			},
 		this);

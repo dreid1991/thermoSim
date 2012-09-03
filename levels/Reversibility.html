@@ -27,11 +27,11 @@
 			
 		</div>
 		<div id='dashRun' class='dashShort noSelect' style='position:relative'>
-			<div id='buttons'>
-				<center>
-					
-				</center>
-			</div>
+			<center>
+				<div id='buttons'>
+
+				</div>
+			</center>
 			<center>
 				<div id='sliderHolderSingle'>
 					<div id='sliderHolderCenter' style='width:300px'>
@@ -109,9 +109,9 @@ $(function(){
 	animText = new AnimText(c);
 	myCanvas.height = canvasHeight;
 	curLevel = new Reversibility();
-	//curLevel.setDefaultPromptVals()
-	curLevel.init();
+
 	curLevel.cutSceneEnd();
+	curLevel.init();
 	$('button').button();
 	$('#resetExp').click(function(){curLevel.reset()});
 	$('#toSim').click(function(){nextPrompt()});
