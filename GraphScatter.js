@@ -132,8 +132,8 @@ _.extend(GraphScatter.prototype, GraphBase,
 			var pts = [pt1, pt2, pt3, pt4];
 			draw.fillPtsStroke(pts, col, this.ptStroke, this.graph);
 		},
-		clear: function(){
-			this.clearStd()
+		reset: function(){
+			this.resetStd()
 		},
 	}
 )

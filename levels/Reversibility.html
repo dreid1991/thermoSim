@@ -8,7 +8,7 @@
 <div class='noSelect wrapper'>
 	<div id='main' class='main noSelect'>
 		<div id='mainHeader' class='header noSelect'>
-			Origins of Reversibility
+			
 		</div>
 		<div id='canvasDiv' class='canvasDiv noSelect'>
 			<canvas id='myCanvas'>
@@ -26,11 +26,9 @@
 			</center>
 			
 		</div>
-		<div id='dashRun' class='dashShort noSelect'>
+		<div id='dashRun' class='dashShort noSelect' style='position:relative'>
 			<div id='buttons'>
 				<center>
-					<!button id='reset' class='noSelect'><!Reset experiment><!/button>
-					<!button id='clearGraphs' class='noSelect'><!Clear graphs><!/button>
 					
 				</center>
 			</div>
@@ -51,7 +49,7 @@
 					</div>
 				</div>
 			</center>
-			
+			<button id='resetExp' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button>
 		</div>
 		<div id='dashCutScene' class='dashShort noSelect'></div>
 		<div id='dashOutro' class='dashMed noSelect ' >
@@ -114,9 +112,8 @@ $(function(){
 	//curLevel.setDefaultPromptVals()
 	curLevel.init();
 	curLevel.cutSceneEnd();
-	$('#buttonFill').hide();
-	$('#buttonDrain').hide();
 	$('button').button();
+	$('#resetExp').click(function(){curLevel.reset()});
 	$('#toSim').click(function(){nextPrompt()});
 	$('#toLastStep').click(function(){prevPrompt()});
 	$('#previous').click(function(){prevPrompt()});

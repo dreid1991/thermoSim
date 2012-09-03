@@ -190,12 +190,10 @@ _.extend(Reversibility.prototype,
 
 	init: function(){
 		var self = this;
-
+		$('#mainHeader').text('Origins of Reversibily');
 		nextPrompt();
 	},
 	block0Start: function(){
-		$('#reset').hide();
-		$('#clearGraphs').hide();
 		var wallHandle = 'container';
 		this.unCompSetup();
 		this.makeGraphsRev();

@@ -30,9 +30,9 @@ compressorFuncs = {
 objectFuncs = {
 	addCleanUp: function(){
 		this.cleanUpListenerName = unique(typeof(this) + defaultTo('', this.handle), curLevel.cleanUpListeners),
-		addListener(curLevel, 'cleanUp', this.cleanUplistenerName, function(){
+		addListener(curLevel, 'cleanUp', this.cleanUpListenerName, function(){
 															this.remove();
-															removeListener(curLevel, cleanUp, this.cleanUpListenerName)
+															removeListener(curLevel, 'cleanUp', this.cleanUpListenerName)
 														},
 														this);
 	},
@@ -1684,8 +1684,8 @@ function StateListener(attrs){//like dataList... is:'greaterThan', ... targetVal
 }
 _.extend(StateListener.prototype, objectFuncs, {
 	init: function(){
-		var handle = unique('StateListener' + this.is, curLevel.updateListeners.listeners);
-		addListener(curLevel, 'update', handle,
+		this.handle = unique('StateListener' + this.is, curLevel.updateListeners.listeners);
+		addListener(curLevel, 'update', this.handle,
 			function(){
 				if(this.condition()){
 					this.amSatisfied = true;
@@ -1697,11 +1697,12 @@ _.extend(StateListener.prototype, objectFuncs, {
 				}
 			},
 		this);
-		addListener(curLevel, 'condition', handle,
+		addListener(curLevel, 'condition', this.handle,
 			function(){
 				return {didWin: this.amSatisfied, alert:this.alerts[this.amSatisfied], priority:this.priorities[this.amSatisfied]};
 			},
 		this);
+		this.addCleanUp();
 	},
 	makeConditionFunc: function(){
 		switch(this.is){
@@ -1744,6 +1745,10 @@ _.extend(StateListener.prototype, objectFuncs, {
 		}else{
 			return 'no results from ' + this.condition + 'listener yet';
 		}
+	},
+	remove: function(){
+		removeListener(curLevel, 'condition', this.handle);
+		removeListener(curLevel, 'update', this.handle);
 	},
 }
 )

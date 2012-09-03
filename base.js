@@ -512,22 +512,19 @@ ArrayExtenders = {
 		}
 		return this;
 	},
-	deepCopy: function(startIdx, endIdx){
-		startIdx = defaultTo(0, startIdx);
-		endIdx = Math.min(this.length, defaultTo(this.length, endIdx));
-		var copy = new Array(this.length);
-		for (var idx=startIdx; idx<endIdx; idx++){
-			if(this[idx] instanceof Array){
-				copy[idx] = this[idx].deepCopy();
-			}else{
-				copy[idx] = this[idx];
-			}
-		}
-		return copy;
-
-	},
-	
 }
+function deepCopy(object){
+	var copy = new object.constructor();
+	for (var item in object){
+		if(typeof object[item] == 'object'){
+			copy[item] = deepCopy(object[item]);
+		}else{
+			copy[item] = object[item];
+		}
+	} 
+	return copy;
+}
+
 MathExtenders = {
 	log10: function(val){
 		return Math.log(val)/Math.log(10);	

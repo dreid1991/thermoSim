@@ -17,10 +17,14 @@ GraphBase = {
 		this.characLen = Math.sqrt(Math.pow(this.rectSideLen, 2)/2);		
 	},
 	makeCanvas: function(handle, dims){
+		var self = this;
 		addListener(curLevel, 'reset', 'clearGraph'+this.handle, this.clear, this);
-		var str = "</div><div id = '" + this.handle +"GraphDiv'><canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas></div><div class='graphSpacer noSelect' id='"+this.handle + "GraphSpacer'>"
+		this.buttonId = this.handle + 'reset';
+		var str = "</div><div id = '" + this.handle +"GraphDiv' style = position:relative><canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas><button id='" + this.buttonId + "' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button></div><div class='graphSpacer noSelect' id='"+this.handle + "GraphSpacer'>"
 		var canvasDiv = $(str);
 		$('#graphs').append(canvasDiv);
+		$('#' + this.buttonId).button();
+		$('#' + this.buttonId).click(function(){self.reset()})
 		
 		this.graphHTMLElement = document.getElementById(this.handle+'Graph');
 		this.graph = this.graphHTMLElement.getContext('2d');
@@ -78,13 +82,13 @@ GraphBase = {
 		this.dataSave = {};
 		for (var set in this.data){
 			this.dataSave[set] = {pts:{}, src:{}};
-			this.dataSave[set].pts.x = this.data[set].x.deepCopy();
-			this.dataSave[set].pts.y = this.data[set].y.deepCopy();
+			this.dataSave[set].pts.x = deepCopy(this.data[set].x);
+			this.dataSave[set].pts.y = deepCopy(this.data[set].y);
 			if(this.data[set].xInitDataIdx){
-				this.dataSave[set].src.x = this.data[set].src.x.deepCopy(this.data[set].xInitDataIdx);
+				this.dataSave[set].src.x = deepCopy(this.data[set].src.x).splice(this.data[set].xInitDataIdx, this.data[set].src.x.length);
 			}
 			if(this.data[set].yInitDataIdx){
-				this.dataSave[set].src.y = this.data[set].src.y.deepCopy(this.data[set].yInitDataIdx);
+				this.dataSave[set].src.y = deepCopy(this.data[set].src.y).splice(this.data[set].yInitDataIdx, this.data[set].src.y.length);
 			}
 		}
 		store(saveName, this);
@@ -363,7 +367,7 @@ GraphBase = {
 		}
 		return {min:min, max:max};
 	},
-	clearStd: function(){
+	resetStd: function(){
 		for (var set in this.data){
 			var data = this.data[set];
 			for(var dataBitName in data){

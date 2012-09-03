@@ -340,9 +340,9 @@ LevelTools = {
 		draw.dots();
 		draw.walls(walls, this.wallCol);
 	},
-	clearGraphs: function(){
+	resetGraphs: function(){
 		for (var graphName in this.graphs){
-			this.graphs[graphName].clear();
+			this.graphs[graphName].reset();
 		}
 	},
 	removeGraph: function(graphName){

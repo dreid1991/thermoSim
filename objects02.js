@@ -69,6 +69,10 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		$('#'+this.buttonRemoveId).mousedown(function(){self.buttonRemoveDown()});
 		$('#'+this.buttonRemoveId).mouseup(function(){self.buttonRemoveUp()});
 	},
+	removeButtons: function(){
+		$('#'+this.buttonAddId).remove();
+		$('#'+this.buttonRemoveId).remove();
+	},
 	draw: function(){
 		this.drawCanvas.save();
 		this.drawCanvas.translate(this.sand.pos.x, this.sand.pos.y);
@@ -82,7 +86,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		pts[1] = P(-7, -2);
 		pts[2] = P(-3, -6);
 		pts[3] = P(0, -7);
-		ptsRight = pts.deepCopy().splice(0, 1).reverse();
+		ptsRight = deepCopy(pts).splice(0, pts.length-1).reverse();
 		mirrorPts(ptsRight, P(0, 0), V(0, -10));
 		pts = pts.concat(ptsRight);
 		return pts;
@@ -173,6 +177,8 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 			this.emitters[emitterIdx].remove();
 		}
 		this.emitters = [];
+		this.sand.pos.trackStop();
+		this.removeButtons();
 		removeListener(curLevel, 'update', this.drawListenerName);
 		removeListener(curLevel, 'data', this.cleanUpEmittersListenerName);	
 		this.wall.moveStop();
