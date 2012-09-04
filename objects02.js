@@ -79,6 +79,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		var scalar = Math.sqrt(this.mass*.4);
 		this.drawCanvas.scale(scalar, scalar)
 		draw.fillPts(this.sand.pts, this.sand.col, this.drawCanvas);
+		this.width = scalar * (this.sand.pts[this.sand.pts.length-1].x - this.sand.pts[0].x);
 		this.drawCanvas.restore();		
 	},
 	getSandPts: function(){
@@ -169,15 +170,15 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		
 		var dir = Math.PI/2;
 		var col = this.sand.col;
-		var centerPos = (this.wall[1].x - this.wall[0].x)/2;
+		var centerPos = (this.wall[0].x + this.wall[1].x)/2;
 		var dist = this.wall[0].y;
-		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:100, dist:dist, dir:dir, col:col,
+		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:this.width, dist:dist, dir:dir, col:col,
 											onRemove:onRemove, parentList:this.emitters, onArrive:onArrive});
 		newEmitter.adding = true;
 		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners.listeners)
 		addListener(curLevel, 'update', moveListenerName, 
 			function(){
-				newEmitter.adjust({dist:this.wallPt.y});
+				newEmitter.adjust({dist:this.wallPt.y, width:this.width});
 			},
 		this);
 		var onRemove = 
@@ -193,17 +194,16 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		var emitterIdx = this.emitters.length;
 		var dir = -Math.PI/2;
 		var col = this.sand.col;
-		var centerPos = (this.wall[1].x - this.wall[0].x)/2;
+		var centerPos = (this.wall[0].x + this.wall[1].x)/2;
 		var dist = this.wall[0].y;
-		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:100, dist:dist, dir:dir, col:col,
+		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:this.width, dist:dist, dir:dir, col:col,
 											onRemove:onRemove, parentList:this.emitters, onGenerate:onGenerate});
 		newEmitter.removing = true;
 		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners.listeners)
 		var wallPt = this.wall[0];
 		addListener(curLevel, 'update', moveListenerName, 
 			function(){
-				newEmitter.adjust({pos:P(centerPos, wallPt.y), dist:wallPt.y});
-				newEmitter.adjust({dist:wallPt.y});
+				newEmitter.adjust({pos:P(centerPos, wallPt.y), dist:wallPt.y, width:this.width});
 			},
 		this);
 		var onRemove = 
