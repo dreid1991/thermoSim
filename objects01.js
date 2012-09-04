@@ -29,7 +29,7 @@ compressorFuncs = {
 
 objectFuncs = {
 	addCleanUp: function(){
-		this.cleanUpListenerName = unique(typeof(this) + defaultTo('', this.handle), curLevel.cleanUpListeners),
+		this.cleanUpListenerName = unique(typeof(this) + defaultTo('', this.handle), curLevel.cleanUpListeners.listeners),
 		addListener(curLevel, 'cleanUp', this.cleanUpListenerName, function(){
 															this.remove();
 															removeListener(curLevel, 'cleanUp', this.cleanUpListenerName)

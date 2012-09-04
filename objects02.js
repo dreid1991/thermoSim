@@ -105,6 +105,9 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 	},
 	
 	addMass: function(){
+		if(this.emitters.length==1){
+			console.log('omg');
+		}
 		this.emitters.push(this.makeAddEmitter())
 	},
 	addMassStop: function(){
@@ -119,14 +122,17 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 	makeAddEmitter: function(){
 		var onArrive = {func:this.onArriveAdd, obj:this};
 		var emitterIdx = this.emitters.length;
+		
 		var dir = Math.PI/2;
 		var col = this.sand.col;
 		var centerPos = (this.wall[1].x - this.wall[0].x)/2;
 		var dist = this.wall[0].y;
+		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:100, dist:dist, dir:dir, col:col,
+											onRemove:onRemove, parentList:this.emitters, onArrive:onArrive});
 		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners.listeners)
 		addListener(curLevel, 'update', moveListenerName, 
 			function(){
-				this.emitters[emitterIdx].adjust({dist:this.wallPt.y});
+				newEmitter.adjust({dist:this.wallPt.y});
 			},
 		this);
 		var onRemove = 
@@ -134,8 +140,6 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 				removeListener(curLevel, 'update', moveListenerName);
 			}, 
 			obj:this};
-		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:100, dist:dist, dir:dir, col:col,
-											onRemove:onRemove, parentList:this.emitters, onArrive:onArrive});
 		
 		return newEmitter;
 	},
@@ -146,12 +150,14 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		var col = this.sand.col;
 		var centerPos = (this.wall[1].x - this.wall[0].x)/2;
 		var dist = this.wall[0].y;
+		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:100, dist:dist, dir:dir, col:col,
+											onRemove:onRemove, parentList:this.emitters, onGenerate:onGenerate});
 		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners.listeners)
 		var wallPt = this.wall[0];
 		addListener(curLevel, 'update', moveListenerName, 
 			function(){
-				this.emitters[emitterIdx].adjust({pos:P(centerPos, wallPt.y), dist:wallPt.y});
-				this.emitters[emitterIdx].adjust({dist:wallPt.y});
+				newEmitter.adjust({pos:P(centerPos, wallPt.y), dist:wallPt.y});
+				newEmitter.adjust({dist:wallPt.y});
 			},
 		this);
 		var onRemove = 
@@ -159,8 +165,6 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 				removeListener(curLevel, 'update', moveListenerName);
 			}, 
 			obj:this};
-		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:100, dist:dist, dir:dir, col:col,
-											onRemove:onRemove, parentList:this.emitters, onGenerate:onGenerate});
 		
 		return newEmitter;		
 	},

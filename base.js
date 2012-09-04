@@ -410,7 +410,7 @@ function unique(name, obj){
 		return name;
 	}else{
 		var uniqueId = 1;
-		while(!obj[name+uniqueId]){
+		while(obj[name+uniqueId]){
 			uniqueId++;
 		}
 		return name+uniqueId;
