@@ -76,7 +76,8 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 	draw: function(){
 		this.drawCanvas.save();
 		this.drawCanvas.translate(this.sand.pos.x, this.sand.pos.y);
-		this.drawCanvas.scale(this.mass*.2, this.mass*.2)
+		var scalar = Math.sqrt(this.mass*.4);
+		this.drawCanvas.scale(scalar, scalar)
 		draw.fillPts(this.sand.pts, this.sand.col, this.drawCanvas);
 		this.drawCanvas.restore();		
 	},
@@ -92,22 +93,65 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		return pts;
 	},
 	buttonAddDown: function(){
-		this.addMass();
+		if(this.mass < this.massMax){
+			this.boundUpper();
+			this.addMass();
+		}
 	},
 	buttonAddUp: function(){
-		this.addMassStop();	
+		if(this.mass > this.massMin){
+			this.boundUpperStop();
+			this.addMassStop();	
+		}
 	},
 	buttonRemoveDown: function(){
+		this.boundLower();
 		this.removeMass();
 	},
 	buttonRemoveUp: function(){
+		this.boundLowerStop();
 		this.removeMassStop();
 	},
-	
-	addMass: function(){
-		if(this.emitters.length==1){
-			console.log('omg');
+	boundUpper: function(){
+		var listenerName = this.handle + 'BoundUpper'
+		if(!curLevel.updateListeners.listeners[listenerName]){
+			addListener(curLevel, 'update', listenerName,
+				function(){
+					if(this.mass > this.massMax){
+						this.stopAllEmitters()
+						removeListener(curLevel, 'update', listenerName);
+					}
+				},
+			this)
 		}
+	},
+	boundLower: function(){
+		var listenerName = this.handle + 'BoundLower'
+		if(!curLevel.updateListeners.listeners[listenerName]){
+			addListener(curLevel, 'update', listenerName,
+				function(){
+					if(this.mass < this.massMin){
+						this.stopAllEmitters();
+						removeListener(curLevel, 'update', listenerName);
+					}
+				},
+			this)
+		}	
+	},
+	boundUpperStop: function(){
+		var listenerName = this.handle + 'BoundUpper';
+		removeListener(curLevel, 'update', listenerName);
+	},
+	boundLowerStop: function(){
+		var listenerName = this.handle + 'BoundLower';
+		removeListener(curLevel, 'update', listenerName);	
+	},
+	stopAllEmitters: function(){
+		for(var emitterIdx=0; emitterIdx<this.emitters.length; emitterIdx++){
+			this.emitters[emitterIdx].stopFlow();
+		}
+	},
+	addMass: function(){
 		this.emitters.push(this.makeAddEmitter())
 	},
 	addMassStop: function(){
@@ -129,6 +173,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		var dist = this.wall[0].y;
 		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:100, dist:dist, dir:dir, col:col,
 											onRemove:onRemove, parentList:this.emitters, onArrive:onArrive});
+		newEmitter.adding = true;
 		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners.listeners)
 		addListener(curLevel, 'update', moveListenerName, 
 			function(){
@@ -152,6 +197,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		var dist = this.wall[0].y;
 		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:100, dist:dist, dir:dir, col:col,
 											onRemove:onRemove, parentList:this.emitters, onGenerate:onGenerate});
+		newEmitter.removing = true;
 		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners.listeners)
 		var wallPt = this.wall[0];
 		addListener(curLevel, 'update', moveListenerName, 
