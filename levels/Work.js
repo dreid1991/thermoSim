@@ -140,8 +140,7 @@ _.extend(Work.prototype,
 					]
 				},
 				replace:
-					[{oldStr:'XXX', newStr:'GETtFinal'}
-					//FILL IN
+					[{oldStr:'XXX', newStr:'GETtFinalBlock8'}
 				]
 			},
 			{block:10,
@@ -219,12 +218,13 @@ _.extend(Work.prototype,
 		store('prompts', this.prompts);
 	},
 	init: function(){
+		$('#mainHeader').text('Work');
 		nextPrompt();
 	},
 
 	
 	block3Start: function(){
-		this.playedWithSlider = false;
+
 		var self = this;
 
 		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});
@@ -241,90 +241,34 @@ _.extend(Work.prototype,
 
 		this.graphs.tVSv.addSet('t', 'Sys\nTemp', Col(255,0,0), Col(255,200,200),
 								{x:walls[0].data.v, y:walls[0].data.t});		
-		
-		
-		//this.heater = new Heater({wallInfo:'container'});
 		this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15});
 		this.piston.wall.displayWork().displayPExt();
 		this.borderStd();
 		this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:10, alertUnsatisfied:'Compress the system more!'});		
 	},
 	block4Start: function(){
-
-		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handler:'staticAdiabatic', handles:['container']});
-		walls.setHitMode('container', 'Arrow');
+		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});
+		walls[0].setHitMode('Arrow');
 		this.borderStd();
 		this.compArrow = new CompArrow({mode:'adiabatic', speed:1.5});
 		spcs['spc4'].populate(P(45,235), V(460, 100), 1, 600);
-		this.tempChanged = false;
-		var initTemp = dataHandler.temp();
-		addListener(curLevel, 'data', 'checkTempChanged',
-			function(){
-				var curTemp = dataHandler.temp();
-				if(curTemp!=initTemp){
-					this.tempChanged = true;
-					removeListener(curLevel, 'data', 'checkTempChanged');
-				}
-			},
-		this);
-	},
-	block4Conditions: function(){
-		if(this.tempChanged){
-			return {result:true};
-		}
-		return {result:false, alert:"Try hitting the molecule with the wall while the wall's moving"};	
-	},
-	block4CleanUp: function(){
-		this.tempChanged = undefined;
-		walls['container'].v = 0;
-		walls['container'].removeBorder();
-		this.compArrow.remove();
-		this.compArrow = undefined;
-		walls.setHitMode('container', 'Std');
-		removeListenerByName(curLevel, 'update', 'drawArrow');
-		removeListenerByName(curLevel, 'update', 'animText');
+		this.tempListener = new StateListener({dataList:walls[0].data.t, is:'notEqualTo', targetVal:dataHandler.temp(), alertUnsatisfied:"Try hitting the molecule with the wall while the wall's moving"});
 	},
 	block8Start: function(){
-		$('#reset').show()
-		this.readout.show();
 		wallHandle = 'container';
-		walls = WallHandler([[P(40,31), P(510,31), P(510,350), P(40,350)]], 'staticAdiabatic', [wallHandle], [{yMin:30, yMax:300}], undefined, [15]);
+		walls = WallHandler({pts:[[P(40,31), P(510,31), P(510,350), P(40,350)]], handlers:'staticAdiabatic', handles:[wallHandle], bounds:[{yMin:30, yMax:300}], vols:[15]});
 		this.stops = new Stops({stopPt:{volume:10}});
 		this.borderStd();
 		spcs['spc1'].populate(P(45,35), V(445, 325), 850, 200);
 		spcs['spc3'].populate(P(45,35), V(445, 325), 650, 200);
 		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:wallHandle, compMode:'cPAdiabatic'});
 		this.dragWeights.wall.displayWork().displayMass().displayPExt().displayVol();
-		this.trackTemp();
-		this.trackVolume(0);
-		this.volListener15 = new StateListener({condition:15, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{p:this.data.p, t:this.data.t}});
-		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.03, recordAtSatisfy:{p:this.data.p, t:this.data.t}, atSatisfyFunc:{func:function(){store('tFinal', round(this.data.t[this.data.t.length-1],0))}, obj:this}});
-	},
-	block8Conditions: function(){
-		if(this.volListener10.isSatisfied() && this.volListener15.isSatisfied()){
-			return {result:true};
-		}
-		if(!this.volListener10.isSatisfied()){
-			return {result:false, alert:'Compress the container!'};
-		}
-	},
-	block8CleanUp: function(){
-		this.wallV=0;
-		$('#reset').hide();
-		this.trackTempStop();
-		this.trackVolumeStop();
-		walls['container'].removeBorder();
-		this.readout.hide();
-		this.stops.remove();
-		this.stop = undefined;
-		this.dragWeights.remove();
-		this.dragWeights = undefined;
+		walls
+		this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:10, alertUnsatisfied:'Compress the system!', recordAtSatisfy:{tFinal:walls[0].data.t}});
 	},
 	block12Start: function(){
-		$('#reset').show();
-		this.readout.show();
 		wallHandle = 'container';
-		walls = WallHandler([[P(40,30), P(255,30), P(255,350), P(40,350)], [P(295,30), P(510,30), P(510,350), P(295,350)]], 'staticAdiabatic', ['left', 'right']);
+		walls = WallHandler({pts:[[P(40,30), P(255,30), P(255,350), P(40,350)], [P(295,30), P(510,30), P(510,350), P(295,350)]], handlers:'staticAdiabatic', handles:['left', 'right']});
 		this.borderStd({wallInfo:'left'});
 		this.borderStd({wallInfo:'right'});
 		spcs['spc1'].populate(P(45,35), V(200, 300), 250, 200, 'left', 'left');
@@ -332,59 +276,24 @@ _.extend(Work.prototype,
 		
 		spcs['spc1'].populate(P(300,35), V(200, 300), 250, 400, 'right', 'right');
 		spcs['spc3'].populate(P(300,35), V(200, 300), 150, 400, 'right', 'right');	
-		this.data.tLeft = [];
-		this.data.tRight = [];
-		this.data.vLeft = [];
-		this.data.vRight = [];		
+	
 		this.dragWeightsLeft = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:'left', massInit: 5, compMode:'cPAdiabatic'}).trackMassStop().trackPressure();
 		this.dragWeightsRight = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:'right', massInit: 5, compMode:'cPAdiabatic'}).trackMassStop().trackPressure();
 		this.stopsLeft = new Stops({stopPt:{volume:3.5}, wallInfo:'left'});
 		this.stopsRight = new Stops({stopPt:{volume:3.5}, wallInfo:'right'});		
-		removeListener(curLevel, 'data', 'run');
-		addListener(curLevel, 'data', 'run',
-			function(){
-				this.data.tLeft.push(this.dataHandler.temp({tag:'left'}));
-				this.data.tRight.push(this.dataHandler.temp({tag:'right'}));
-				this.data.vLeft.push(this.dataHandler.volume('left'));
-				this.data.vRight.push(this.dataHandler.volume('right'));
-			},
-		this);
-		addListener(curLevel, 'data', 'updateGraphs',
-			this.updateGraphs,
-		this);
+
 		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
 							{x:{min:0, step:2}, y:{min:150, step:50}});
 		this.graphs.tVSv.addSet('tRight', 'Temp\nRight', Col(255,200,0), Col(255,200,200),
-								{data:this.data, x:'vRight', y:'tRight'});									
+								{x:walls['right'].data.v, y:walls['right'].data.t});									
 		this.graphs.tVSv.addSet('tLeft', 'Temp\nLeft', Col(255,0,0), Col(255,200,200),
-								{data:this.data, x:'vLeft', y:'tLeft'});	
-		
-		this.volListenerLeft = new StateListener({condition:3.5, checkAgainst:this.data.vLeft, tolerance:.05});
-		this.volListenerRight = new StateListener({condition:3.5, checkAgainst:this.data.vRight, tolerance:.05});
-	},
-	block12Conditions: function(){
-		if(this.volListenerLeft.isSatisfied() && this.volListenerRight.isSatisfied()){
-			return {result:true};
-		}
-		return {result:false, alert:'Compress the containers!'};
-	},
-	block12CleanUp: function(){
-		$('#reset').hide();
-		removeListener(curLevel, 'data', 'updateGraphs');
-		removeListener(curLevel, 'data', 'run');
-		addListener(curLevel, 'data', 'run', this.dataRun, this);
-		this.removeAllGraphs();
-		this.stopsLeft.remove();
-		this.stopsRight.remove();
-		this.dragWeightsLeft.remove();
-		this.dragWeightsRight.remove();
-		this.readout.hide();
+								{x:walls['left'].data.v, y:walls['left'].data.t});	
+		this.volListenerLeft = new StateListener({dataList:walls['left'].data.v, is:equalTo, targetVal:3.5, alertUnsatisfied:'Compress the systems!'});
+		this.volListenerRight = new StateListener({dataList:walls['right'].data.v, is:equalTo, targetVal:3.5, alertUnsatified:'Compress the systems!'});
 	},
 	block15Start: function(){
-		$('#reset').show();
-		this.readout.show();
 		wallHandle = 'container';
-		walls = WallHandler([[P(40,30), P(255,30), P(255,350), P(40,350)], [P(295,30), P(510,30), P(510,350), P(295,350)]], 'staticAdiabatic', ['left', 'right']);
+		walls = WallHandler({pts:[[P(40,30), P(255,30), P(255,350), P(40,350)], [P(295,30), P(510,30), P(510,350), P(295,350)]], handlers:'staticAdiabatic', handles:['left', 'right']});
 		this.borderStd({wallInfo:'left'});
 		this.borderStd({wallInfo:'right'});
 		spcs['spc1'].populate(P(45,35), V(200, 300), 250, 200, 'left', 'left');
@@ -392,53 +301,20 @@ _.extend(Work.prototype,
 		
 		spcs['spc1'].populate(P(300,35), V(200, 300), 250, 200, 'right', 'right');
 		spcs['spc3'].populate(P(300,35), V(200, 300), 150, 200, 'right', 'right');	
-		this.data.tLeft = [];
-		this.data.tRight = [];
-		this.data.vLeft = [];
-		this.data.vRight = [];		
 		this.dragWeightsLeft = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:35}], wallInfo:'left', massInit:5, compMode:'cPAdiabatic'}).trackMassStop().trackPressure();
 		this.dragWeightsRight = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:'right', massInit:5, compMode:'cPAdiabatic'}).trackMassStop().trackPressure();
 		this.stopsLeft = new Stops({stopPt:{volume:3.5}, wallInfo:'left'});
 		this.stopsRight = new Stops({stopPt:{volume:3.5}, wallInfo:'right'});		
-		removeListener(curLevel, 'data', 'run');
-		addListener(curLevel, 'data', 'run',
-			function(){
-				this.data.tLeft.push(this.dataHandler.temp({tag:'left'}));
-				this.data.tRight.push(this.dataHandler.temp({tag:'right'}));
-				this.data.vLeft.push(this.dataHandler.volume('left'));
-				this.data.vRight.push(this.dataHandler.volume('right'));
-			},
-		this);
-		addListener(curLevel, 'data', 'updateGraphs',
-			this.updateGraphs,
-		this);
+		
 		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
 							{x:{min:0, step:2}, y:{min:150, step:50}});
 		this.graphs.tVSv.addSet('tRight', 'Temp\nRight', Col(255,200,0), Col(255,200,200),
-								{data:this.data, x:'vRight', y:'tRight'});									
+								{x:walls['right'].data.v, y:walls['right'].data.t});									
 		this.graphs.tVSv.addSet('tLeft', 'Temp\nLeft', Col(255,0,0), Col(255,200,200),
-								{data:this.data, x:'vLeft', y:'tLeft'});	
+								{x:walls['left'].data.v, y:walls['left'].data.t});	
 		
-		this.volListenerLeft = new StateListener({condition:3.5, checkAgainst:this.data.vLeft, tolerance:.02});
-		this.volListenerRight = new StateListener({condition:3.5, checkAgainst:this.data.vRight, tolerance:.02});
-	},
-	block15Conditions: function(){
-		if(this.volListenerLeft.isSatisfied() && this.volListenerRight.isSatisfied()){
-			return {result:true};
-		}
-		return {result:false, alert:'Compress the containers!'};
-	},
-	block15CleanUp: function(){
-		$('#reset').hide();
-		removeListener(curLevel, 'data', 'updateGraphs');
-		removeListener(curLevel, 'data', 'run');
-		addListener(curLevel, 'data', 'run', this.dataRun, this);
-		this.removeAllGraphs();
-		this.stopsLeft.remove();
-		this.stopsRight.remove();
-		this.dragWeightsLeft.remove();
-		this.dragWeightsRight.remove();
-		this.readout.hide();
+		this.volListenerLeft = new StateListener({dataList:walls['left'].data.v, is:'equalTo', targetVal:3.5, alertUnsatisfied:'Compress the systems!'});
+		this.volListenerRight = new StateListener({dataList:walls['right'].data.v, is:'equalTo', targetVal:3.5, alertUnsatified:'Compress the systems!'});
 	},
 }
 )

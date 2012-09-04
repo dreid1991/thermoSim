@@ -61,10 +61,6 @@ WallMethods = {
 			}
 			
 		},
-		setHitMode: function(wallInfo, inputMode){
-			var wallIdx = this.idxByInfo(wallInfo);
-			this[wallIdx].hitMode = inputMode;
-		},
 		doInitHandlers: function(handlers){
 			
 			if (handlers instanceof Array){//NOTE - HANDLERS HAD BETTER BE THE SAME LENGTH AT walls.pts.  I AM ASSUMING IT IS.
@@ -678,6 +674,20 @@ WallMethods = {
 					},
 				this);
 			}		
+		},
+		setHitMode: function(inputMode){
+			if(inputMode == 'Arrow' && this.hitMode != 'Arrow'){
+				addListener(curLevel, 'cleanUp', 'removeArrowAndText',
+					function(){
+						removeListenerByName(curLevel, 'update', 'drawArrow');
+						removeListenerByName(curLevel, 'update', 'animText');
+					},
+				this);
+			} else if (inputMode != 'Arrow' && this.hitMode == 'Arrow'){
+				removeListener(curLevel, 'cleanUp', 'removeArrowAndText');
+			}
+			
+			this.hitMode = inputMode;
 		},
 		setDefaultReadout: function(readout){
 			this.defaultReadout = readout;

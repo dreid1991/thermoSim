@@ -1247,7 +1247,6 @@ DragArrow.prototype = {
 //COMP ARROW
 //////////////////////////////////////////////////////////////////////////
 function CompArrow(attrs){
-	//YOU WERE HERE
 	var wallInfo = defaultTo(0, attrs.wallInfo);
 	var speed = defaultTo(1.5, attrs.speed);
 	var compMode = defaultTo('adiabatic', attrs.compMode);
@@ -1678,7 +1677,7 @@ function StateListener(attrs){//like dataList... is:'greaterThan', ... targetVal
 	
 	this.priorities = {true:defaultTo(0, attrs.prioritySatisfied), false:defaultTo(0, attrs.priorityUnsatisfied)};
 	
-	this.recordAtSatisfy = defaultTo({}, attrs.recordAtSatisfy);
+	this.storeAtSatisfy = defaultTo({}, attrs.storeAtSatisfy);
 	this.atSatisfyFunc = defaultTo(undefined, attrs.atSatisfyFunc);
 	this.amSatisfied = false;
 	this.makeConditionFunc();
@@ -1732,21 +1731,17 @@ _.extend(StateListener.prototype, objectFuncs, {
 		
 	},
 	recordVals: function(){
-		this.results = {}
-		for (var recordName in this.recordAtSatisfy){
-			var sourceList = this.recordAtSatisfy[recordName];
-			this.results[recordName] = sourceList[sourceList.length-1];
+		this.results = {};
+		for (var storeName in this.storeAtSatisfy){
+			var storeAs = storeName + 'Block' + curLevel.blockIdx;
+			var data = this.storeAtSatisfy[storeName];
+			var value = data[data.length-1];
+			store(storeAs, value);
+			this.results[storeAs] = value;
 		}
 	},
 	isSatisfied: function(){
 		return this.amSatisfied;
-	},
-	getResults: function(){
-		if(this.results){
-			return this.results;
-		}else{
-			return 'no results from ' + this.condition + 'listener yet';
-		}
 	},
 	remove: function(){
 		removeListener(curLevel, 'condition', this.handle);
