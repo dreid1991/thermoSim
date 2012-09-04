@@ -29,7 +29,7 @@ compressorFuncs = {
 
 objectFuncs = {
 	addCleanUp: function(){
-		this.cleanUpListenerName = unique(typeof(this) + defaultTo('', this.handle), curLevel.cleanUpListeners.listeners),
+		this.cleanUpListenerName = unique(this.type + defaultTo('', this.handle), curLevel.cleanUpListeners.listeners),
 		addListener(curLevel, 'cleanUp', this.cleanUpListenerName, function(){
 															this.remove();
 															removeListener(curLevel, 'cleanUp', this.cleanUpListenerName)
@@ -99,6 +99,7 @@ objectFuncs = {
 //////////////////////////////////////////////////////////////////////////
 
 function DragWeights(attrs){
+	this.type = 'DragWeights';
 	this.handle = 				unique('dragWeights' + attrs.handle, curLevel);
 	this.tempWeightDefs = 		attrs.weightDefs;
 	this.wallInfo = 			defaultTo(0, attrs.wallInfo);
@@ -466,13 +467,6 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		}
 		alert('BOX IS FULL!  WHY IS THIS HAPPENING?');
 	},
-/*
-	moveWeightsOnPiston: function(){
-		for (var weightIdx=0; weightIdx<this.weightsOnPiston.length; weightIdx++){
-			this.weightsOnPiston[weightIdx].pos.y = this.weightsOnPiston[weightIdx].slot.y();
-		}
-	},
-*/
 	getNumGroups: function(){
 		var count = 0;
 		for (idx in this.weightGroups){
@@ -760,6 +754,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 //Pool
 //////////////////////////////////////////////////////////////////////////
 function Pool(attrs){
+	this.type = 'Pool';
 	var self = this;
 	attrs = defaultTo({}, attrs);
 	this.bin = {};
@@ -1043,6 +1038,7 @@ _.extend(Pool.prototype, objectFuncs, compressorFuncs, {
 //DRAG ARROW
 //////////////////////////////////////////////////////////////////////////
 function DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds){
+	this.type = 'DragArrow';
 	this.pos = pos;
 	this.rotation = rotation;
 	this.posInit = this.pos.copy()
@@ -1247,6 +1243,7 @@ DragArrow.prototype = {
 //COMP ARROW
 //////////////////////////////////////////////////////////////////////////
 function CompArrow(attrs){
+	this.type = 'CompArrow';
 	var wallInfo = defaultTo(0, attrs.wallInfo);
 	var speed = defaultTo(1.5, attrs.speed);
 	var compMode = defaultTo('adiabatic', attrs.compMode);
@@ -1293,6 +1290,7 @@ _.extend(CompArrow.prototype, objectFuncs, {
 //////////////////////////////////////////////////////////////////////////
 
 function Piston(attrs){
+	this.type = 'Piston';
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.pMin = defaultTo(2, attrs.min);
 	this.pMax = defaultTo(15, attrs.max);
@@ -1411,24 +1409,8 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		this.setPressure(ui.value);
 	},
 	setPressure: function(sliderVal){
-	this.p = this.percentToP(sliderVal);
-	this.setMass();
-	/*
-		var pSetPt = this.percentToP(sliderVal);
-		var dp = pSetPt - this.p;
-		addListener(curLevel, 'update', 'piston'+this.handle+'adjP', 
-			function(){
-				this.p = boundedStep(this.p, pSetPt, this.pStep);
-				this.setMass();			
-				if(this.trackingPressure){
-					this.readout.hardUpdate('pressure'+this.wallInfo, this.p);
-				}
-				if(round(this.p,2)==pSetPt){
-					removeListener(curLevel, 'update', 'piston'+this.handle+'adjP');
-				}
-			},
-			this);
-*/
+		this.p = this.percentToP(sliderVal);
+		this.setMass();
 	},
 	pToPercent: function(p){
 		return sliderVal = 100*(p - this.pMin)/(this.pMax-this.pMin);;
@@ -1460,6 +1442,7 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 //HEATER
 //////////////////////////////////////////////////////////////////////////
 function Heater(attrs){
+	this.type = 'Heater';
 	/*
 	dims.dx corresponds to long side w/ wires
 	dims.dy corresponds to short side
@@ -1617,6 +1600,7 @@ _.extend(Heater.prototype, objectFuncs, {
 //STOPS
 //////////////////////////////////////////////////////////////////////////
 function Stops(attrs){
+	this.type = 'Stops';
 	//assumes canvas of c.  I mean, where else would they be?
 	this.stopWidth = 20;
 	this.stopHeight = 5;
@@ -1668,6 +1652,7 @@ _.extend(Stops.prototype, objectFuncs, {
 //STATE LISTENER
 //////////////////////////////////////////////////////////////////////////
 function StateListener(attrs){//like dataList... is:'greaterThan', ... targetVal
+	this.type = 'StateListener';
 	this.dataList = attrs.dataList;
 	this.is = attrs.is
 	this.targetVal = attrs.targetVal;

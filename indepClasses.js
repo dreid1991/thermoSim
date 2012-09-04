@@ -150,7 +150,10 @@ Vector.prototype = {
 			this.dy = -dxOld;		
 		}
 		return this;
-	}
+	},
+	sameAs: function(b){
+		return (this.dx==b.dx && this.dy==b.dy);
+	},
 }
 Color.prototype = {
 	adjust: function(dr, dg, db){
@@ -168,9 +171,9 @@ Color.prototype = {
 		return this;
 	},
 	setHex: function(){
-		var r = Number(Math.round(this.r)).toString(16).toUpperCase();
-		var g = Number(Math.round(this.g)).toString(16).toUpperCase();
-		var b = Number(Math.round(this.b)).toString(16).toUpperCase();
+		var r = Number(Math.round(this.r)).toString(16);
+		var g = Number(Math.round(this.g)).toString(16);
+		var b = Number(Math.round(this.b)).toString(16);
 		if(r.length==1){r = '0'+r;}
 		if(g.length==1){g = '0'+g;}
 		if(b.length==1){b = '0'+b;}
@@ -178,6 +181,20 @@ Color.prototype = {
 	},
 	copy: function(){
 		return Col(this.r, this.g, this.b);
+	},
+	add: function(b){
+		this.r = Math.round(Math.min(255, Math.max(0, this.r+b.r)));
+		this.g = Math.round(Math.min(255, Math.max(0, this.g+b.g)));
+		this.b = Math.round(Math.min(255, Math.max(0, this.b+b.b)));
+		this.setHex();
+		return this;	
+	},
+	addNoBounds: function(b){
+		this.r = Math.round(this.r + b.r);
+		this.g = Math.round(this.g + b.g);
+		this.b = Math.round(this.b + b.b);
+		this.setHex();
+		return this;
 	},
 	mult: function(scalar){
 		this.r = Math.round(Math.min(255, Math.max(0, this.r*scalar)));
@@ -187,8 +204,9 @@ Color.prototype = {
 		return this;
 	},
 	sameAs: function(b){
-		return (this.dx==b.dx && this.dy==b.dy);
+		return this.r == b.r && this.g == b.g && this.b == b.b;
 	},
+
 }
 Point.prototype = {
 	distTo: function(pTo){

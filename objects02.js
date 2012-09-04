@@ -2,9 +2,16 @@
 Contains:
 	Sandbox
 	ParticleEmitter
+	PulseArrow
 in that order
 */
+
+//////////////////////////////////////////////////////////////////////////
+//Sandbox
+//////////////////////////////////////////////////////////////////////////
+
 function Sandbox(attrs){
+	this.type = 'Sandbox';
 	var self = this;
 	attrs = defaultTo({}, attrs);
 	this.bin = {};
@@ -237,10 +244,32 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 
 }
 )
-function testPart(){
-	sillyParticles = new ParticleEmitter({pos:P(300,50), dir:0, width:100, dist:300, col:Col(0,0,255)});
-}
+/*
+//////////////////////////////////////////////////////////////////////////
+//ParticleEmitter
+//////////////////////////////////////////////////////////////////////////
+Requires
+	pos
+	dir
+	width
+	dist
+	col
+Optional
+	parentList
+	handle
+	onGenerate
+	onArrive
+	onRemove
+	rate
+	speed
+	speedSpread
+	accel
+	accelSpread
+	dirSpread
+	drawCanvas
+*/
 function ParticleEmitter(attrs){
+	this.type = 'ParticleEmitter';
 	this.pos = attrs.pos;
 	this.handle = unique('emitter' + defaultTo('', attrs.handle), curLevel.updateListeners.listeners);
 	this.dir = attrs.dir;
@@ -313,10 +342,10 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 		var initSpeed = Math.max(.01, this.speed + this.speedSpread*(Math.random()-.5));
 		var accel = Math.max(0, this.accel + this.accelSpread*(Math.random()-.5));
 		var UV = angleToUV(this.dir + this.dirSpread*(Math.random()-.5));
-		var lifetime = this.getLifetime(initPos, initSpeed, accel, UV);
-		return {pos:initPos, V:UV.copy().mult(initSpeed), accelV:UV.copy().mult(accel), age:0, lifetime:lifetime};
+		var lifespan = this.getlifespan(initPos, initSpeed, accel, UV);
+		return {pos:initPos, V:UV.copy().mult(initSpeed), accelV:UV.copy().mult(accel), age:0, lifespan:lifespan};
 	},
-	getLifetime: function(initPos, initSpeed, accel, UV){
+	getlifespan: function(initPos, initSpeed, accel, UV){
 		var coLinRatio = UV.dotProd(this.UV);
 		var coLinAccel = accel*coLinRatio;
 		var coLinSpeed = initSpeed*coLinRatio;
@@ -331,7 +360,7 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 			particle.pos.movePt(particle.V);
 			particle.V.add(particle.accelV);
 			particle.age++;
-			if(particle.age>particle.lifetime){
+			if(particle.age>particle.lifespan){
 				this.particles.splice(particleIdx, 1);
 				if(this.onArrive){
 					this.onArrive.func.apply(this.onArrive.obj);
@@ -366,5 +395,87 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 		this.removed = true;
 	},
 
+}
+)
+/*
+//////////////////////////////////////////////////////////////////////////
+//PulseArrow
+//////////////////////////////////////////////////////////////////////////
+Requires
+	posInit
+	posFinal || ((dir || UV) && dist)
+	fillInit
+	dimsInit
+	
+Optional
+	posFinal
+	fillFinal
+	dimsFinal
+	strokeInit
+	strokeFinal
+	alphaInit
+	alphaFinal
+*/
+function PulseArrow(attrs){
+	this.type = 'PulseArrow';
+	this.pos = this.pos.copy();
+	if(attrs.posFinal){
+		this.posFinal = this.posFinal;
+		this.UV = this.pos.VTo(this.posFinal).UV();
+		this.dist = this.pos.distTo(this.posFinal);
+	} else if((attrs.dir || attrs.UV) && attrs.dist){
+		if(attrs.dir){
+			this.UV = angleToUV(attrs.dir);
+		}else{
+			this.UV = attrs.UV;
+		}
+		this.posFinal = this.pos.copy().movePt(this.UV.copy().mult(attrs.dist));
+		this.dist = attrs.dist;
+	}
+	this.posFinal = attrs.posFinal;
+	this.dims = attrs.dims
+	this.dimsFinal = defaultTo(this.dims, attrs.dimsFinal);
+	this.fill = attrs.fill.copy();
+	this.fillFinal = defaultTo(this.fill, attrs.fillFinal);
+	this.stroke = defaultTo(this.fill, attrs.stroke);
+	this.strokeFinal = defaultTo(this.fillFinal, attrs.strokeFinal);
+	this.alpha = defaultTo(1, attrs.alpha);
+	this.alphaFinal = defaultTo(this.alpha, attrs.alpha);
+	this.age = 0;
+	this.lifespan = attrs.lifespan/updateInterval;
+	this.getSteps();
+	this.getPts();
+	return this.init();
+}
+_.extend(PulseArrow.prototype, objectFuncs, {
+	getSteps: function(){
+		this.posStep = this.pos.vTo(this.posFinal).mult(1/this.lifespan);
+		
+		var ddx = this.dimsFinal.dx - this.dims.dx;
+		var ddy = this.dimsFinal.dy - this.dims.dy;
+		this.dimsStep = V(ddx, ddy).mult(1/this.lifespan);
+		
+		var drFill = this.fillFinal.r - this.fill.r;
+		var dgFill = this.fillFinal.g - this.fill.g;
+		var dbFill = this.fillFinal.b - this.fill.b;
+		this.fillStep = Col(drFill, dgFill, dbFill).mult(1/this.lifespan);
+		
+		var drStroke = this.strokeFinal.r - this.stroke.r;
+		var dgStroke = this.strokeFinal.g - this.stroke.g;
+		var dbStroke = this.strokeFinal.b - this.stroke.b;
+		this.strokeStep = Col(drStroke, dgStroke, dbStroke).mult(1/this.lifespan);
+		
+		this.alphaStep = (this.alphaFinal - this.alpha)/this.lifespan;
+	},
+	getPts: function(){
+	
+	},
+	init: function(){
+		addListener
+		
+	},
+	run: function(){
+	
+	},
 }
 )
