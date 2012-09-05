@@ -1160,7 +1160,7 @@ WallMethods = {
 		displayQArrows: function(){
 			if (this.recordingQ && !this.displayingQArrows) {
 				this.displayingQArrows = true;
-				addListener(curLevel, 'data', 'displayQArrows' + this.handle, this.populateWithArrows, this);
+				addInterval('displayQArrows' + this.handle, this.populateWithArrows, this, 3000);
 			} else {
 				console.log('Tried to display q arrows for wall ' + this.handle + ' while not recording.  Will not display.');
 			}
@@ -1203,13 +1203,13 @@ WallMethods = {
 		},
 		displayQStop: function(){
 			this.displayingQ = false;
-			removeListener(curLevel, 'update', 'displayQ' + this.handle);
+			removeListener('displayQArrows' + this.handle);
 			this.qReadout.removeEntry('q' + this.handle);
 			return this;
 		},
 		displayQArrowsStop: function(){
 			this.displayingQArrows = false;
-			removeListener(curLevel, 'data', 'displayQArrows' + this.handle);
+			removeInterval(curLevel, 'data', 'displayQArrows' + this.handle);
 			return this;
 		},
 		displayAllStop: function(){

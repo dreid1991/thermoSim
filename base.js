@@ -19,6 +19,7 @@ $(function(){
 	cv = 1.5*R;
 	cp = 2.5*R;
 	compAdj = '32';
+	extraIntervals = {};
 	vConst = 1/10000;
 	//pConst = 16.1423; //for atm
 	pConst = 16.3562; //for bar
@@ -427,8 +428,17 @@ function addListenerOnce(object, typeName, funcName, func, destObj){
 	object[typeName + 'Listeners'].listeners[funcName] = {func:func, obj:destObj};
 	object[typeName + 'Listeners'].listeners[funcName + 'Remove'] = {func:removeFunc, obj:''};
 }
+function addInterval(funcHandle, func, destObj, interval) {
+	extraIntervals[funcHandle] = window.setInterval(function(){func.apply(destObj)}, interval);
+}
 function removeListener(object, typeName, funcName){
 	delete object[typeName + 'Listeners'].listeners[funcName];
+}
+function removeInterval(funcHandle) {
+	if (extraIntervals[funcHandle]) {
+		window.clearInterval(extraIntervals[funcHandle]);
+		extraIntervals[funcHandle] = undefined;
+	}
 }
 function removeSave(object, typeName, funcName){
 	delete object[typeName + 'Listeners'].save[funcName];
