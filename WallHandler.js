@@ -119,7 +119,7 @@ WallMethods = {
 		},
 		setupWall: function(wallIdx){
 			this[wallIdx].wallUVs = this.getWallUV(wallIdx);
-			this[wallIdx].wallPerpUVs= this.getPerpUVs(wallIdx);
+			this[wallIdx].wallPerpUVs= this.getPerpUVs(wallIdx);// perp UVs point in
 			this[wallIdx].wallGrids = this.scatterPts(wallIdx);
 		},
 		scatterPts: function(wallIdx){
@@ -293,12 +293,11 @@ WallMethods = {
 			return perpUVs;
 		},
 		getWallUV: function(wallIdx){
-			var wall = this[wallIdx];
-			var numUVs = wall.length-1
+			var numUVs = this[wallIdx].length-1
 			var wallUVs = new Array(numUVs);
 			for (var ptIdx=0; ptIdx<numUVs; ptIdx++){
-				var ptA = wall[ptIdx];
-				var ptB = wall[ptIdx+1];
+				var ptA = this[wallIdx][ptIdx];
+				var ptB = this[wallIdx][ptIdx+1];
 				wallUVs[ptIdx] = V(ptB.x-ptA.x, ptB.y-ptA.y).UV();
 			}
 			return wallUVs;
@@ -368,13 +367,11 @@ WallMethods = {
 		},
 		didHitStd: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
 			var handler = this[wallIdx + '-' + subWallIdx];
-			//this[handler](dot, wallIdx, subWallIdx, wallUV, perpV, perpUV);
 			handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);		
 		},
 		didHitArrow: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
 			var vo = dot.v.copy();
 			var handler = this[wallIdx + '-' + subWallIdx];
-			//this[handler](dot, wallIdx, subWallIdx, wallUV, perpV, perpUV);
 			handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
 			var pos = P(dot.x, dot.y);
 			var vf = dot.v.copy();
@@ -1157,10 +1154,12 @@ WallMethods = {
 			}
 			return this;
 		},
-		displayQArrows: function(){
+		displayQArrows: function(threshold){
 			if (this.recordingQ && !this.displayingQArrows) {
 				this.displayingQArrows = true;
-				addInterval('displayQArrows' + this.handle, this.populateWithArrows, this, 3000);
+				this.turnLastArrow = turn;
+				this.qArrowThreshold = defaultTo(threshold, .3);
+				addListener(curLevel, 'update', 'checkForDisplayArrows' + this.handle, this.checkDisplayArrows, this);
 			} else {
 				console.log('Tried to display q arrows for wall ' + this.handle + ' while not recording.  Will not display.');
 			}
@@ -1209,7 +1208,7 @@ WallMethods = {
 		},
 		displayQArrowsStop: function(){
 			this.displayingQArrows = false;
-			removeInterval(curLevel, 'data', 'displayQArrows' + this.handle);
+			removeListener(curLevel, 'update', 'checkDisplayArrows' + this.handle);
 			return this;
 		},
 		displayAllStop: function(){
@@ -1223,42 +1222,54 @@ WallMethods = {
 			if(this.displayingQArrows){this.displayQArrowsStop();};
 			return this;
 		},
-		populateWithArrows: function(){
-			var rotations = {'-1':'ccw', '1':'cw'};
+		checkDisplayArrows: function(){
+			var dQ = this.data.q[this.data.q.length-1] - this.data.q[this.turnLastArrow];
+			if (Math.abs(dQ)>this.qArrowThreshold) {
+				this.populateArrows(dQ);
+				this.turnLastArrow = turn;
+			}
+		},
+		populateArrows: function(dQ){
+			var rotations = {'-1':'cw', '1':'ccw'};
 			var dist = 30;
 			var fill = this.parent.qArrowFill;
 			var fillFinal = this.parent.qArrowFillFinal;
 			var stroke = this.parent.qArrowStroke;
-			var UVRot = rotations[getSign(this.q)];
 			var qList = this.data.q;
-			//HEY - 
-			var qLast = qList[qList.length-1] - qList[qList.length-1-Math.round(dataInternal/updateInterval)];
-			var dims = V(200*Math.abs(qLast)+10, 100*Math.abs(qLast)+10);
-			console.log(qLast);
-			//ADD IF qLAST OVER SOME THRESHOLD{
-			var dimsFinal = dims.copy().mult(.8);
-			for (var lineIdx=0; lineIdx<this.length-1; lineIdx++) {
-				if (this[lineIdx].isothermal) {
-					var len = this[lineIdx].distTo(this[lineIdx+1]);
-					var numArrows = Math.round(len/150);
-					var pxStep = len/(numArrows+1);
-					var distAlongLine = pxStep;
-					for (var arrowIdx=0; arrowIdx<numArrows; arrowIdx++){
-						var pos = this[lineIdx].copy().movePt(this.wallUVs[lineIdx].copy().mult(distAlongLine))
-						new PulseArrow({pos:pos, 
-										dist:dist, 
-										UV:this.wallUVs[lineIdx].copy().perp(UVRot), 
-										fill:fill, 
-										fillFinal:fillFinal, 
-										stroke:stroke,
-										dims:dims,
-										dimsFinal:dimsFinal,
-										lifespan:4000,
-									});
-						distAlongLine += pxStep;
-					}	
+			var turnLast = defaultTo(this.turnLastArrow, turnLast);
+			var heatTransSign = getSign(dQ);
+			var UVRot = rotations[heatTransSign];
+			this.turnLastArrow = turn;
+			var dims = V(110*Math.abs(dQ), 170*Math.abs(dQ));//big numbers from adjusting to q per turn so if I change interval, size of arrows doesn't change
+			var dimsFinal = dims.copy();
+			dimsFinal.dx *= 1.4;
+			dimsFinal.dy *= .85;
+			var offset = {'-1':0, '1':-dimsFinal.dx-dist};
+			if (dims.dx>7 || dims.dy>7) {
+				for (var lineIdx=0; lineIdx<this.length-1; lineIdx++) {
+					if (this[lineIdx].isothermal) {
+						var len = this[lineIdx].distTo(this[lineIdx+1]);
+						var numArrows = Math.round(len/150);
+						var pxStep = len/(numArrows+1);
+						var distAlongLine = pxStep;
+						for (var arrowIdx=0; arrowIdx<numArrows; arrowIdx++){
+							var pos = this[lineIdx].copy().movePt(this.wallUVs[lineIdx].copy().mult(distAlongLine)).movePt(this.wallPerpUVs[lineIdx].copy().mult(offset[heatTransSign]));
+							new PulseArrow({pos:pos, 
+											dist:dist, 
+											UV:this.wallUVs[lineIdx].copy().perp(UVRot), 
+											fill:fill, 
+											fillFinal:fillFinal, 
+											stroke:stroke,
+											dims:dims,
+											dimsFinal:dimsFinal,
+											lifespan:3500,
+										});
+							distAlongLine += pxStep;
+						}	
+					}
 				}
-			}		
+			}
+			 
 		},
 		
 	},

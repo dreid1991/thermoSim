@@ -198,6 +198,7 @@ _.extend(Reversibility.prototype,
 		this.unCompSetup();
 		this.makeGraphsRev();
 		this.sandBox = new Sandbox();
+		walls[0].displayQArrows();
 		//this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:33}]})
 		//this.dragWeights.wall.displayPExt().displayWork().recordMass().displayMass().displayVol();
 		this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7, alertUnsatisfied:'NO', alertSatisfied:'YES', atSatisfyFunc:{func:function(){store('workInLrg',round(walls[0].work,1))},obj:''}});

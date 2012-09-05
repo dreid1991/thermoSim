@@ -71,10 +71,10 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		addButton(this.buttonRemoveId, 'Remove mass');
 		var self = this;
 		$('#'+this.buttonAddId).mousedown(function(){self.buttonAddDown()});
-		$('#'+this.buttonAddId).mouseup(function(){self.buttonAddUp()});
+		//$('#'+this.buttonAddId).mouseup(function(){self.buttonAddUp()});
 		
 		$('#'+this.buttonRemoveId).mousedown(function(){self.buttonRemoveDown()});
-		$('#'+this.buttonRemoveId).mouseup(function(){self.buttonRemoveUp()});
+		//$('#'+this.buttonRemoveId).mouseup(function(){self.buttonRemoveUp()});
 	},
 	removeButtons: function(){
 		$('#'+this.buttonAddId).remove();
@@ -104,21 +104,25 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		if(this.mass < this.massMax){
 			this.boundUpper();
 			this.addMass();
+			addListener(curLevel, 'mouseup', 'mouseUpSandbox', this.buttonAddUp, this);
 		}
 	},
 	buttonAddUp: function(){
-		if(this.mass > this.massMin){
-			this.boundUpperStop();
-			this.addMassStop();	
-		}
+		this.boundUpperStop();
+		this.addMassStop();	
+		removeListener(curLevel, 'mouseup', 'mouseUpSandbox');
 	},
 	buttonRemoveDown: function(){
-		this.boundLower();
-		this.removeMass();
+		if(this.mass > this.massMin){
+			this.boundLower();
+			this.removeMass();
+			addListener(curLevel, 'mouseup', 'mouseUpSandbox', this.buttonRemoveUp, this);
+		}
 	},
 	buttonRemoveUp: function(){
 		this.boundLowerStop();
 		this.removeMassStop();
+		removeListener(curLevel, 'mouseup', 'mouseUpSandbox');
 	},
 	boundUpper: function(){
 		var listenerName = this.handle + 'BoundUpper'

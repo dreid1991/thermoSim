@@ -1,15 +1,4 @@
 To do:
-convert from track to record/display
-
-make save/load graphs by block/promptIdx
-
-atm->bar
-
-make sand thing
-
-make graph save grab all the data it can from its data list (not just pts)
-
-make cleanUp listener to be run on block change.  Piston, weights, etc, all have one
-also conditions listeners
-make piston, heater add own slider to like left, mid, right slots.  
-	Have slider template with like text, which one.  Oooh - better yet, add that stuff to makeSlider
+fix check mark
+made change interval thing 
+for add mass, replace button up with mouseup listener because if they mouseup not on button, it doesn't register
