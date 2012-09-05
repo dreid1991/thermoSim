@@ -456,12 +456,12 @@ function PulseArrow(attrs){
 		this.dist = attrs.dist;
 	}
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
-	this.dims = attrs.dims
+	this.dims = attrs.dims.copy();
 	this.dimsFinal = defaultTo(this.dims, attrs.dimsFinal);
 	this.fill = attrs.fill.copy();
 	this.fillUnround = {r:this.fill.r, g:this.fill.g, b:this.fill.b};
 	this.fillFinal = defaultTo(this.fill, attrs.fillFinal);
-	this.stroke = defaultTo(this.fill, attrs.stroke);
+	this.stroke = defaultTo(this.fill, attrs.stroke.copy());
 	this.fade = defaultTo(true, attrs.fade);
 	this.fadeTurns = defaultTo(4, attrs.fadeTurns);
 	//need to keep precision in unround.  Rounding in color class will lose steps < .5/turn
@@ -473,6 +473,11 @@ function PulseArrow(attrs){
 	this.lifespan = Math.round(attrs.lifespan/updateInterval);
 	this.getSteps();
 	this.pts = this.getPts();
+	/*
+	if(this.fade){
+		this.lifespan = Math.max(0, this.lifespan-=this.fadeTurns;
+	}
+	*/
 	this.onFinish = attrs.onFinish;
 	return this.init();
 }

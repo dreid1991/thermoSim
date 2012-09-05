@@ -2,7 +2,7 @@ function WallHandler(attrs){//pts, handlers, handles, bounds, includes, vols, sh
 	var newWall = new Array(attrs.pts.length)
 	_.extend(newWall, WallMethods.main, WallMethods.collideMethods);
 	newWall.assemble(attrs);//pts, handles, bounds, includes, vols, shows, records)
-	
+	newWall.cVIsothermal32 = newWall.cVIsothermal;
 	if(attrs.handles.length!=attrs.pts.length){
 		console.log('NAME YOUR WALLS');
 	}
@@ -1224,38 +1224,39 @@ WallMethods = {
 			return this;
 		},
 		populateWithArrows: function(){
-			var rotations = {'-1':'cw', '1':'ccw'};
+			var rotations = {'-1':'ccw', '1':'cw'};
 			var dist = 30;
 			var fill = this.parent.qArrowFill;
 			var fillFinal = this.parent.qArrowFillFinal;
 			var stroke = this.parent.qArrowStroke;
-			var lenToArrow = 0;
-			var lens = new Array(this.length-1);
 			var UVRot = rotations[getSign(this.q)];
-			var dims = V(10*Math.abs(this.q), 5*Math.abs(this.q));
+			var qList = this.data.q;
+			//HEY - 
+			var qLast = qList[qList.length-1] - qList[qList.length-1-Math.round(dataInternal/updateInterval)];
+			var dims = V(200*Math.abs(qLast)+10, 100*Math.abs(qLast)+10);
+			console.log(qLast);
+			//ADD IF qLAST OVER SOME THRESHOLD{
 			var dimsFinal = dims.copy().mult(.8);
 			for (var lineIdx=0; lineIdx<this.length-1; lineIdx++) {
-				var len = this[lineIdx].distTo(this[lineIdx+1]);
-				lenToArrow += len;
-				lens[lineIdx] = len;
-			}
-			var numArrowsTotal = 1000*this.q/lenToArrow;
-			for (var lineIdx=0; line<this.length-1; lineIdx++) {
-				var numArrows = Math.round(len/lenToArrow);
-				var pxStep = lens[lineIdx]/(numArrows+1)
-				var dist = pxStep;
-				for (var arrowIdx=0; arrowIdx<numArrows; arrowIdx++){
-					var pos = this[lineIdx].copy().movePt(this.wallUVs[lineIdx].copy().mult(dist))
-					new PulseArrow({pos:pos, 
-									dist:dist, 
-									UV:this.wallUVs[lineIdx].copy().perp(UVRot), 
-									fill:fill, 
-									fillFinal:fillFinal, 
-									stroke:stroke,
-									dims:dims,
-									dimsFinal:dimsFinal
-								});
-					dist += pxStep;
+				if (this[lineIdx].isothermal) {
+					var len = this[lineIdx].distTo(this[lineIdx+1]);
+					var numArrows = Math.round(len/150);
+					var pxStep = len/(numArrows+1);
+					var distAlongLine = pxStep;
+					for (var arrowIdx=0; arrowIdx<numArrows; arrowIdx++){
+						var pos = this[lineIdx].copy().movePt(this.wallUVs[lineIdx].copy().mult(distAlongLine))
+						new PulseArrow({pos:pos, 
+										dist:dist, 
+										UV:this.wallUVs[lineIdx].copy().perp(UVRot), 
+										fill:fill, 
+										fillFinal:fillFinal, 
+										stroke:stroke,
+										dims:dims,
+										dimsFinal:dimsFinal,
+										lifespan:4000,
+									});
+						distAlongLine += pxStep;
+					}	
 				}
 			}		
 		},
@@ -1320,7 +1321,7 @@ WallMethods = {
 			var m1 = dot.m;
 			var m2 = wall.mass();
 			
-			if(Math.abs(vo2)>1.0){
+			if(Math.abs(vo2)>1){
 				var vo1Sqr = vo1*vo1;
 				var vo2Sqr = vo2*vo2;
 				
@@ -1394,8 +1395,9 @@ WallMethods = {
 			dot.v.dx*=spdRatio;
 			dot.v.dy*=spdRatio;
 			this[wallIdx].forceInternal += dot.m*(Math.abs(perpV) + Math.abs(outPerpV));
-			this[wallIdx].q += eToAdd/JtoKJ;
+			this[wallIdx].q += eToAdd*JtoKJ;
 		},
+		//cVIsothermal32 defined in init function
 		cVAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 			var v = dot.v;
 			v.dy = -v.dy + 2*walls[wallIdx].v;
