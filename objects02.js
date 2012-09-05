@@ -419,19 +419,36 @@ Optional
 	fadeTurns
 	onFinish {func:, obj:}
 */
+function sillyArrow(){
+	new PulseArrow({pos:P(100, 100), 
+					dist:100, 
+					V:V(300,30), 
+					fill:Col(200,0,0), 
+					fillFinal:Col(0,200,0), 
+					stroke:Col(0,0,200),
+					dims:V(100,50),
+					dimsFinal:V(50,100),
+					lifespan:500,
+				});
+}
 function PulseArrow(attrs){
 	this.type = 'PulseArrow';
 	this.pos = attrs.pos.copy();
-	if(attrs.posFinal){
+	if (attrs.posFinal) {
 		this.posFinal = attrs.posFinal;
 		this.UV = this.pos.VTo(this.posFinal).UV();
 		this.dir = this.UV.angle();
 		this.dist = this.pos.distTo(this.posFinal);
-	} else if((attrs.dir || attrs.UV) && attrs.dist){
+	} else if (attrs.V) {
+		this.posFinal = this.pos.copy().movePt(attrs.V);
+		this.UV = attrs.V.UV();
+		this.dir = this.UV.angle();
+	} else if ((attrs.dir || attrs.UV) && attrs.dist) {
 		if(attrs.dir){
 			this.dir = attrs.dir;
 			this.UV = angleToUV(attrs.dir);
 		}else{// must be UV
+			this.UV = attrs.UV;
 			this.dir = this.UV.angle();
 			this.UV = attrs.UV;
 		}

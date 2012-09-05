@@ -137,15 +137,15 @@ Vector.prototype = {
 	perp: function(dir){
 		var dxOld = this.dx;
 		var dyOld = this.dy;
-		if(dir){
-			if(dir=='cw'){
+		if (dir) {
+			if (dir=='cw') {
 				this.dx = dyOld;
 				this.dy = -dxOld;
-			}else{
+			} else { //dir is 'ccw'
 				this.dx = -dyOld;
 				this.dy = dxOld;
 			}
-		}else{
+		} else{ 
 			this.dx = dyOld;
 			this.dy = -dxOld;		
 		}
