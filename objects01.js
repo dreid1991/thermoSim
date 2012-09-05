@@ -36,6 +36,9 @@ objectFuncs = {
 														},
 														this);
 	},
+	removeCleanUp: function(){
+		removeListener(curLevel, 'cleanUp', this.cleanUpListenerName);
+	},
 	pickSliderPos: function(){
 		var xPos;
 		if(this.wall){

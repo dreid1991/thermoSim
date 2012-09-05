@@ -406,7 +406,7 @@ Requires
 	posFinal || ((dir || UV) && dist)
 	fillInit
 	dimsInit
-	
+	lifespan
 Optional
 	posFinal
 	fillFinal
@@ -415,67 +415,167 @@ Optional
 	strokeFinal
 	alphaInit
 	alphaFinal
+	fade //defaults to true
+	fadeTurns
+	onFinish {func:, obj:}
 */
 function PulseArrow(attrs){
 	this.type = 'PulseArrow';
-	this.pos = this.pos.copy();
+	this.pos = attrs.pos.copy();
 	if(attrs.posFinal){
-		this.posFinal = this.posFinal;
+		this.posFinal = attrs.posFinal;
 		this.UV = this.pos.VTo(this.posFinal).UV();
+		this.dir = this.UV.angle();
 		this.dist = this.pos.distTo(this.posFinal);
 	} else if((attrs.dir || attrs.UV) && attrs.dist){
 		if(attrs.dir){
+			this.dir = attrs.dir;
 			this.UV = angleToUV(attrs.dir);
-		}else{
+		}else{// must be UV
+			this.dir = this.UV.angle();
 			this.UV = attrs.UV;
 		}
 		this.posFinal = this.pos.copy().movePt(this.UV.copy().mult(attrs.dist));
 		this.dist = attrs.dist;
 	}
-	this.posFinal = attrs.posFinal;
+	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	this.dims = attrs.dims
 	this.dimsFinal = defaultTo(this.dims, attrs.dimsFinal);
 	this.fill = attrs.fill.copy();
+	this.fillUnround = {r:this.fill.r, g:this.fill.g, b:this.fill.b};
 	this.fillFinal = defaultTo(this.fill, attrs.fillFinal);
 	this.stroke = defaultTo(this.fill, attrs.stroke);
+	this.fade = defaultTo(true, attrs.fade);
+	this.fadeTurns = defaultTo(4, attrs.fadeTurns);
+	//need to keep precision in unround.  Rounding in color class will lose steps < .5/turn
+	this.strokeUnround = {r:this.stroke.r, g:this.stroke.g, b:this.stroke.b};
 	this.strokeFinal = defaultTo(this.fillFinal, attrs.strokeFinal);
 	this.alpha = defaultTo(1, attrs.alpha);
-	this.alphaFinal = defaultTo(this.alpha, attrs.alpha);
+	this.alphaFinal = defaultTo(this.alpha, attrs.alphaFinal);
 	this.age = 0;
-	this.lifespan = attrs.lifespan/updateInterval;
+	this.lifespan = Math.round(attrs.lifespan/updateInterval);
 	this.getSteps();
-	this.getPts();
+	this.pts = this.getPts();
+	this.onFinish = attrs.onFinish;
 	return this.init();
 }
 _.extend(PulseArrow.prototype, objectFuncs, {
 	getSteps: function(){
-		this.posStep = this.pos.vTo(this.posFinal).mult(1/this.lifespan);
+		var scalar = 1/this.lifespan;
+		this.posStep = this.pos.VTo(this.posFinal).mult(scalar);
 		
 		var ddx = this.dimsFinal.dx - this.dims.dx;
 		var ddy = this.dimsFinal.dy - this.dims.dy;
-		this.dimsStep = V(ddx, ddy).mult(1/this.lifespan);
+		this.dimsStep = V(ddx, ddy).mult(scalar);
 		
 		var drFill = this.fillFinal.r - this.fill.r;
 		var dgFill = this.fillFinal.g - this.fill.g;
 		var dbFill = this.fillFinal.b - this.fill.b;
-		this.fillStep = Col(drFill, dgFill, dbFill).mult(1/this.lifespan);
+		this.fillStep = {r:scalar*drFill, g:scalar*dgFill, b:scalar*dbFill};
 		
 		var drStroke = this.strokeFinal.r - this.stroke.r;
 		var dgStroke = this.strokeFinal.g - this.stroke.g;
 		var dbStroke = this.strokeFinal.b - this.stroke.b;
-		this.strokeStep = Col(drStroke, dgStroke, dbStroke).mult(1/this.lifespan);
+		this.strokeStep = {r:scalar*drStroke, g:scalar*dgStroke, b:scalar*dbStroke};
 		
-		this.alphaStep = (this.alphaFinal - this.alpha)/this.lifespan;
+		this.alphaStep = (this.alphaFinal - this.alpha)*scalar;
 	},
 	getPts: function(){
-	
+		var pts = new Array(3);
+		var dx = this.dims.dx;
+		var dy = this.dims.dy;
+		pts[0] = P(0, .2*dy);
+		pts[1] = P(.7*dx, .2*dy);
+		pts[2] = P(.7*dx, .5*dy);
+		var ptsReverse = deepCopy(pts).reverse();
+		pts.push(P(dx, 0));
+		
+		for (var ptIdx=0; ptIdx<ptsReverse.length; ptIdx++){
+			pts.push(P(ptsReverse[ptIdx].x, -ptsReverse[ptIdx].y));
+		}
+		//rotatePts(pts, P(0,0), this.dir);
+		return pts;		
 	},
 	init: function(){
-		addListener
-		
+		this.updateListenerName = unique(this.type + defaultTo('', this.handle), curLevel.updateListeners.listeners);
+		addListener(curLevel, 'update', this.updateListenerName, this.run, this);
+		this.addCleanUp();
+		return this;
 	},
 	run: function(){
-	
+		this.drawCanvas.save();
+		this.drawCanvas.globalAlpha = this.alpha;
+		this.drawCanvas.translate(this.pos.x, this.pos.y);
+		this.drawCanvas.rotate(this.dir);
+		draw.fillPtsStroke(this.pts, this.fill, this.stroke, this.drawCanvas)
+		this.drawCanvas.restore();
+		this.takeStep();
+		this.age++;
+		if (this.age == this.lifespan) {
+			if (this.onFinish) {
+				this.onFinish.func.apply(this.onFinish.obj);
+			}
+			if (this.fade) {
+				this.alphaStep = -this.alpha/this.fadeTurns;
+				this.remove();
+				this.updateListenerName = unique(this.type + defaultTo('', this.handle) + 'fade', curLevel.updateListeners.listeners);
+				addListener(curLevel, 'update', this.updateListenerName, this.runFade, this);
+				this.addCleanUp();
+			} else {
+				this.remove();
+			}
+		}
+	},
+	runFade: function() {
+		this.drawCanvas.save();
+		this.drawCanvas.globalAlpha = this.alpha;
+		this.drawCanvas.translate(this.pos.x, this.pos.y);
+		this.drawCanvas.rotate(this.dir);
+		draw.fillPtsStroke(this.pts, this.fill, this.stroke, this.drawCanvas)
+		this.drawCanvas.restore();
+		this.takeStepFade();
+		this.age++;
+		if (this.age == this.lifespan+this.fadeTurns) {
+			this.remove();
+		}		
+	},
+	scale: function(){
+		var scalarX = (this.dims.dx + this.dimsStep.dx)/this.dims.dx;
+		var scalarY = (this.dims.dy + this.dimsStep.dy)/this.dims.dy;
+		for (var ptIdx=0; ptIdx<this.pts.length; ptIdx++){
+			this.pts[ptIdx].x*=scalarX;
+			this.pts[ptIdx].y*=scalarY;
+		}
+	},
+	takeStep: function(){
+		this.pos.movePt(this.posStep);
+		this.dims.add(this.dimsStep);
+		this.scale() //can't just scale canvas because that scale stroke as well;
+		this.alpha += this.alphaStep;
+		
+		this.fillUnround.r += this.fillStep.r;
+		this.fillUnround.g += this.fillStep.g;
+		this.fillUnround.b += this.fillStep.b;
+		
+		this.strokeUnround.r += this.strokeStep.r;
+		this.strokeUnround.g += this.strokeStep.g;
+		this.strokeUnround.b += this.strokeStep.b;
+		
+		this.fill.setFromUnround(this.fillUnround);
+		this.stroke.setFromUnround(this.strokeUnround);
+		
+		
+		
+	},
+	takeStepFade: function(){
+		this.pos.movePt(this.posStep);
+		this.dims.add(this.dimsStep);
+		this.scale() //can't just scale canvas because that scale stroke as well;
+		this.alpha += this.alphaStep;
+	},
+	remove: function(){
+		removeListener(curLevel, 'update', this.updateListenerName);
+		this.removeCleanUp();
 	},
 }
 )

@@ -507,8 +507,14 @@ function eraseStore(attrName){
 }
 ArrayExtenders = {
 	pushNumber: function(number){
-		if(!isNaN(number) && number!==undefined){
+		if(!isNaN(number) && number!==undefined) {
 			this.push(number);
+		}
+		return this;
+	},
+	append: function(b){
+		for (var idx=0; idx<b.length; idx++) {
+			this.push(b[idx]);
 		}
 		return this;
 	},

@@ -151,6 +151,9 @@ Vector.prototype = {
 		}
 		return this;
 	},
+	angle: function() {
+		return Math.atan2(this.dy, this.dx);
+	},
 	sameAs: function(b){
 		return (this.dx==b.dx && this.dy==b.dy);
 	},
@@ -169,6 +172,13 @@ Color.prototype = {
 		if(col.b!==undefined){this.b = col.b;};
 		this.setHex();
 		return this;
+	},
+	setFromUnround: function(col) {
+		if(col.r!==undefined){this.r = Math.round(col.r);};
+		if(col.g!==undefined){this.g = Math.round(col.g);};
+		if(col.b!==undefined){this.b = Math.round(col.b);};
+		this.setHex();
+		return this;	
 	},
 	setHex: function(){
 		var r = Number(Math.round(this.r)).toString(16);
