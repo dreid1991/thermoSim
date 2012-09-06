@@ -18,14 +18,14 @@ GraphBase = {
 	},
 	makeCanvas: function(handle, dims){
 		var self = this;
+		this.graphDivHandle = this.handle + 'GraphDiv';
 		addListener(curLevel, 'reset', 'clearGraph'+this.handle, this.clear, this);
 		this.buttonId = this.handle + 'reset';
-		var str = "</div><div id = '" + this.handle +"GraphDiv' style = position:relative><canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas><button id='" + this.buttonId + "' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button></div><div class='graphSpacer noSelect' id='"+this.handle + "GraphSpacer'>"
+		var str = "</div><div id = '" + this.graphDivHandle + "' style = position:relative><canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas><button id='" + this.buttonId + "' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button></div><div class='graphSpacer noSelect' id='"+this.handle + "GraphSpacer'>"
 		var canvasDiv = $(str);
 		$('#graphs').append(canvasDiv);
 		$('#' + this.buttonId).button();
 		$('#' + this.buttonId).click(function(){self.reset()})
-		
 		this.graphHTMLElement = document.getElementById(this.handle+'Graph');
 		this.graph = this.graphHTMLElement.getContext('2d');
 		
@@ -332,7 +332,7 @@ GraphBase = {
 		legendEntry.toggleDims = toggleDims;
 		var self = this;
 		legendEntry.toggle = function(){
-								if($('#graphs').is(':visible') && inRect(togglePos, toggleDims, self.graphHTMLElement)){
+								if($('#graphs').is(':visible') && ptInRect(togglePos, toggleDims, mouseOffsetDiv(self.graphDivHandle))){
 									if(set.show){
 										set.show = false;
 										self.flashers = [];

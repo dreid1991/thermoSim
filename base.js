@@ -223,78 +223,8 @@ drawingTools.prototype = {
 	},
 
 }
-function CheckMark(corner, dims, col, stroke, drawCanvas){
-	var a = corner;
-	var b = dims;
-	var p1 = P(a.x			, a.y+b.dy*.6	);
-	var p2 = P(a.x+b.dx*.4	, a.y+b.dy		);
-	var p3 = P(a.x+b.dx		, a.y			);
-	var p4 = P(a.x+b.dx*.35	, a.y+b.dy*.75	);
-	var pts = [p1, p2, p3, p4];
-	this.pts = pts;
-	this.col = col;
-	this.stroke = stroke;
-	this.drawCanvas = drawCanvas;
-}
-CheckMark.prototype = {
-	draw: function(){
-		draw.fillPtsStroke(this.pts, this.col, this.stroke, this.drawCanvas);
-	},
-}
-function Arrow(handle, pts, col, drawCanvas){
-	this.handle = handle;
-	var rotate = .5;
-	this.pts = {line:pts, arrow: new Array(3)}
-	this.col = col;
-	this.drawCanvas = drawCanvas;
-	var ptLast = this.pts.line[this.pts.line.length-1];
-	var ptNextLast = this.pts.line[this.pts.line.length-2];
-	var dirBack = ptLast.VTo(ptNextLast).UV();
-	var dirSide1 = dirBack.copy().rotate(rotate);
-	var dirSide2 = dirBack.copy().rotate(-rotate);
 
-	this.pts.arrow[0] = ptLast.copy().movePt(dirSide1.mult(10));
-	this.pts.arrow[1] = ptLast;
-	this.pts.arrow[2] = ptLast.copy().movePt(dirSide2.mult(10));
-	return this;
-}	
-Arrow.prototype = {
-	draw: function(){
-		for(var ptName in this.pts){
-			var pts = this.pts[ptName];
-			for(var ptIdx=0; ptIdx<pts.length-1; ptIdx++){
-				var p1 = pts[ptIdx];
-				var p2 = pts[ptIdx+1];
-				draw.line(p1, p2, this.col, this.drawCanvas);
-			}	
-		}
-	},
-	show: function(lifespan){//in ms
-		var turn = 0;
-		addListener(curLevel, 'update', 'drawArrow' + this.handle, this.makeDrawFunc(lifespan), this)
-		return this;
-	},
-	makeDrawFunc: function(lifespan){
-		var turn = 0;
-		var self = this;
-		var drawListener = function(){
-			self.draw();
-		}
-		if(lifespan){
-			drawListener = extend(drawListener, function(){
-				turn++;
-					if(turn==lifespan){
-						removeListener(curLevel, 'update', 'drawArrow' + self.handle);
-					}
-				}
-			)
-		}
-		return drawListener;
-	},
-	hide: function(){
-		removeListener(curLevel, 'update', 'drawArrow' + this.handle);
-	}
-}
+
 
 function gauss(avg, stdev){
 	var numStdev = (Math.random() + Math.random() + Math.random())-1.5;
@@ -835,6 +765,9 @@ globalMousePos = P(0,0);
 function mouseOffset(curCanvas){
 	return P(globalMousePos.x - curCanvas.offsetLeft, globalMousePos.y - curCanvas.offsetTop);
 }
+function mouseOffsetDiv(divId) {
+	return P(globalMousePos.x - $('#'+divId).offset().left, globalMousePos.y - $('#'+divId).offset().top);
+}
 $(document).mousemove(function(e){
 	globalMousePos.x = e.pageX;
 	globalMousePos.y = e.pageY;
@@ -860,9 +793,3 @@ function UNLOCK(){
 		curLevel.prompts[promptIdx].finished=true;
 	}
 }
-
-
-
-
-
-

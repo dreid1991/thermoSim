@@ -1209,6 +1209,7 @@ WallMethods = {
 		displayQArrowsStop: function(){
 			this.displayingQArrows = false;
 			removeListener(curLevel, 'update', 'checkDisplayArrows' + this.handle);
+			removeListenerByName(curLevel, 'update', 'PulseArrow');
 			return this;
 		},
 		displayAllStop: function(){
