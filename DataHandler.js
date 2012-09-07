@@ -40,6 +40,31 @@ DataHandler.prototype = {
 			}
 		}
 	},
+	RMS: function(info) {
+		var count = 0;
+		var sum = 0;
+		if (!info) {
+			for(spcName in spcs){
+				var dots = spcs[spcName];
+				for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
+					sum += dots[dotIdx].v.magSqr();
+					count++;
+				}				
+			}
+		} else {
+			for (var filter in info) {};
+			for(spcName in spcs){
+				var dots = spcs[spcName];
+				for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
+					if (dots[dotIdx][filter] == info[filter]) {
+						sum += dots[dotIdx].v.magSqr();
+						count++;
+					}
+				}				
+			}			
+		}
+		return Math.sqrt(sum/count);
+	},
 	velocities: function(info){
 		info = defaultTo({}, info);
 		var tag = info.tag;

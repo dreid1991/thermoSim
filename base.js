@@ -279,12 +279,24 @@ function removeSpecies(toRem){
 }
 
 
-function changeAllTemp(temp){
-	for(var spc in spcs){
-		var dots = spcs[spc];
-		for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
-			dots[dotIdx].setTemp(temp);
+function changeTemp(info, newTemp){
+	if (!info){
+		for(var spc in spcs){
+			var dots = spcs[spc];
+			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
+				dots[dotIdx].setTemp(temp);
+			}
 		}
+	} else {
+		for (var filter in info) {};
+		for (var spc in spcs) {
+			var dots = spcs[spc];
+			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
+				if (dots[dotIdx][filter] == info[filter]){
+					dots[dotIdx].setTemp(temp);
+				}
+			}
+		}	
 	}
 }
 function changeRMS(info, newRMS){

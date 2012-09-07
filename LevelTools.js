@@ -174,6 +174,9 @@ LevelTools = {
 		if(button.message){
 			func = extend(func, function(){alert(button.message)});
 		}
+		if (button.response) {
+			store('block'+curLevel.blockIdx+'Prompt'+curLevel.promptIdx + 'Response', button.response);
+		}
 		if(button.isCorrect){
 			func = extend(func, nextPrompt);
 		}
@@ -220,10 +223,13 @@ LevelTools = {
 	bindMultChoiceFunc: function(id, option){
 		var checkFunc = function(){
 			if(curLevel.checkConditions()){
-				if(option.message){
+				if (option.message) {
 					alert(option.message);
 				}
-				if(option.isCorrect){
+				if (option.response) {
+					store('block'+curLevel.blockIdx+'Prompt'+curLevel.promptIdx + 'Response', option.response);
+				}
+				if (option.isCorrect) {
 					nextPrompt();
 				}
 			}
@@ -253,6 +259,7 @@ LevelTools = {
 						if(quiz.messageRight){
 							alert(quiz.messageRight);
 						}
+						store('userAnswerBlock'+curLevel.blockIdx+'Prompt'+curLevel.promptIdx, submitted);
 						nextPrompt();
 					}else{
 						if(quiz.messageWrong){
@@ -260,6 +267,7 @@ LevelTools = {
 						}
 					}
 				}else{
+					store('userAnswerBlock'+curLevel.blockIdx+'Prompt'+curLevel.promptIdx, submitted);
 					nextPrompt();
 				}
 			}

@@ -690,3 +690,65 @@ Arrow.prototype = {
 		removeListener(curLevel, 'update', 'drawArrow' + this.handle);
 	}
 }
+
+
+
+//////////////////////////////////////////////////////////////////////////
+//TempChanger
+//////////////////////////////////////////////////////////////////////////
+function TempChanger(attrs) {
+	this.info = attrs.info;
+	this.tempMin = defaultTo(100, attrs.min);
+	this.temp = dataHandler.temp(this.info);
+	this.tempMax = defaultTo(1500, attrs.max);
+	
+	this.addCleanUp();
+	return this.init();
+}
+_.extend(TempChanger.prototype, objectFuncs, {
+	init: function() {
+		if (this.totalDots > 1) {
+			var title = 'System temperature';
+		} else {
+			var title = "Molecule's temperature";
+		}
+		this.sliderId = this.addSlider(title, {value:this.temp}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
+	},
+	parseSlider: function(event, ui) {
+		changeTemp(this.info, ui.value);
+	},
+	remove: function(){
+		$('#'+this.sliderId).remove();
+	},
+}
+)
+
+//////////////////////////////////////////////////////////////////////////
+//RMSChanger
+//////////////////////////////////////////////////////////////////////////
+function RMSChanger(attrs) {
+	this.info = attrs.info;
+	this.RMSMin = defaultTo(1, attrs.min);
+	this.RMS = dataHandler.RMS(this.info);
+	this.RMSMax = defaultTo(15, attrs.max);
+	
+	this.addCleanUp();
+	return this.init();
+}
+_.extend(RMSChanger.prototype, objectFuncs, {
+	init: function() {
+		if (this.totalDots > 1) {
+			var title = "Molecules' RMS";
+		} else {
+			var title = "Molecule's temperature";
+		}
+		this.sliderId = this.addSlider(title, {value:this.RMS}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
+	},
+	parseSlider: function(event, ui) {
+		changeRMS(this.info, ui.value);
+	},
+	remove: function(){
+		$('#'+this.sliderId).remove();
+	},
+}
+)
