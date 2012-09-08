@@ -1,13 +1,6 @@
 function Reversibility(){
 
 	this.setStds();
-	this.data.t = [];
-	this.data.pInt = [];
-	this.data.pExt = [];
-	this.data.v = [];
-	this.data.e = [];
-	var wallHandle = 'container';
-	
 
 	this.readout = new Readout('mainReadout', 15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), this);
 

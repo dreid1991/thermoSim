@@ -1,4 +1,2 @@
 To do:
-fix check mark
-made change interval thing 
-for add mass, replace button up with mouseup listener because if they mouseup not on button, it doesn't register
+in Work: I changed atm to bar without changing any values like mass or whatever.  Reccomend checking values

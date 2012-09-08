@@ -1,9 +1,5 @@
 function Work(){
 	this.setStds();
-	this.data.t = [];
-	this.data.pInt = [];
-	this.data.v = [];
-	this.data.p = [];
 	this.wallSpeed = 1;
 	this.readout = new Readout('mainReadout', 30, myCanvas.width-155, 25, '13pt calibri', Col(255,255,255),this, 'left');
 	this.compMode = 'Isothermal';
@@ -107,7 +103,7 @@ _.extend(Work.prototype,
 			},
 			{block:6,
 				cutScene: true,
-				text:"<p>So we can say that if we hit a molecule with a moving wall, it’ll speed up, but will this idea really lead to the correct temperature change when compressing a system of many molecules?  Let’s do an experiment and find out! </p><p>Let’s compress a system at 200 K from 15 L to 10 L at a constant pressure of 6 atm and see if calculated and simulated results line up.</p><p>One other thing - these collisions are the <i>only</i> way energy is added in these simulations, so if our idea it wrong, the simulation will give the wrong result.</p><p>Now, how much work will we do on this system?</p>",
+				text:"<p>So we can say that if we hit a molecule with a moving wall, it’ll speed up, but will this idea really lead to the correct temperature change when compressing a system of many molecules?  Let’s do an experiment and find out! </p><p>Let’s compress a system at 200 K from 15 L to 10 L at a constant pressure of 6 bar and see if calculated and simulated results line up.</p><p>One other thing - these collisions are the <i>only</i> way energy is added in these simulations, so if our idea it wrong, the simulation will give the wrong result.</p><p>Now, how much work will we do on this system?</p>",
 				quiz:{	
 					type:'text', 
 					text:"Work in in kJ", 
@@ -232,7 +228,7 @@ _.extend(Work.prototype,
 		spcs['spc3'].populate(P(45,35), V(450, 350), 600, 300);
 		
 	
-		this.graphs.pVSv = new GraphScatter('pVSv', 400,275, "Volume (L)", "Pressure (atm)",
+		this.graphs.pVSv = new GraphScatter('pVSv', 400,275, "Volume (L)", "Pressure (bar)",
 							{x:{min:0, step:4}, y:{min:0, step:3}});
 		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
 							{x:{min:0, step:4}, y:{min:250, step:50}});

@@ -1,13 +1,7 @@
 function IdealGasLaw(){
 	dataHandler = new DataHandler();
-	this.setStds();
-	this.data.t = [];
-	this.data.pInt = [];
-	this.data.v = [];
-	this.data.e = [];
 	this.wallSpeed = 1;
 	this.readout = new Readout('mainReadout', 30, myCanvas.width-180, 25, '13pt calibri', Col(255,255,255),this);
-	this.compMode = 'Isothermal';
 	this.prompts=[
 		{block:0},
 		{block:1, title: "Current step", conditions: this.block1Conditions, text:"Alright, let’s figure out what temperature looks like.  Above, we have one molecule, and I submit to you that this molecule has a temperature.  The equation for a molecule’s temperature is as follows: 1.5k<sub>b</sub>T = 0.5mv<sup>2</sup>, where k<sub>b</sub> in the boltzmann constant, T is temperature, m is the molecule’s mass, and v is its speed.  This tells us that temperature is an expression of molecular kinetic energy.  The slider above changes the molecule’s temperature.  If you double the molecule’s temperature, by what factor will its speed increase?  What would a graph of this molecule’s speed with respect to temperature look like?"},
@@ -37,6 +31,83 @@ function IdealGasLaw(){
 _.extend(IdealGasLaw.prototype, 
 		LevelTools, 
 {
+	declarePrompts: function() {
+		this.prompts=[
+			{block:0,
+				cutScene:true,
+				text:"<p>Hey you!</p><p>You know the ideal gas law? This thing?</p>||EQ1CE<p>Any idea why that's actually true?  Want to find out?  Of course you do!</p>",
+			},
+			{block:1, 
+				title:"Currnet step",
+				text: "First, we need to find out what our state variables like temperature and pressure look like on a molecular level.  Let’s start with temperature.  Temperature is proportional to average molecular kinetic energy.  What happens to the molecules’ speed and kinetic energy when you change their temperature with the slider?",
+				quiz:{	
+					type:'buttons',
+					options:
+						[{text:"Increases", isCorrect: true},
+						{text:"Decreases", isCorrect: false, message:"You should play with the slider more or reread the question."}
+					]
+				},
+			},
+			{block:2, 
+				cutScene: true,
+				text:"<p>We can calculate molecules’ temperature with the equation</p>||EQ2CE<p>with <ul><li>k: boltzmann constant <li>t: temperature <li>m: molecule’s mass <li>v molecule’s speed</ul>Alternatively, we can express this in terms of the molecules’ <i>root mean squared</i> speed like this:</p>||EQ3CE<p>so rms is the average of the square of all the velocities square rooted.  The above is for a system of one type of molecule, but rms speed can be used to calculate the temperature of a system with any types of molecules.",
+			},
+			{block:3,
+				cutScene: true,
+				text:"<p>Root mean square is a tricky idea, but it’s important to understanding temperature, so let’s practice.</p><p>If you have molecules moving at 250, 300, 350, 400, and 450 m/s, what is their root mean square speed?</p>",
+				quiz:{	
+					type:'text', 
+					text:"Root mean square in m/s", 
+					answer:357, 
+					messageWrong: "Hey, rms = sqrt((x<sub>1</sub><sup>2</sup> + x<sub>2</sub><sup>2</sup>... + x<sub>n</sub><sup>2</sup>)/n)"
+				},				
+			{block:4,
+				cutScene: true,
+				text:"<p>Okay, now what’s the <i>average</i> of those values?</p><p>  They were 250, 300, 350, 400, and 450 m/s.</p>",
+				quiz:{	
+					type:'text', 
+					text:"Average in m/s", 
+					answer:350, 
+					messageWrong: "That's not right."
+				},
+			},	
+			{block:5,
+				cutScene: true,
+				text:"<p>Okay, from the same values, we have </p><p>&#09;rms: 357 m/s</p><p>&#09;average: 350 m/s</p><p>By the way, root mean square is also called the quadratic mean, if that helps.</p><p>Now which of these would you say best described what root mean square is?</p>",
+				quiz:{	
+					type:'multChoice',
+					options:
+						[{text:"It's an average that weights large numbers more heavily", isCorrect: true},
+						{text:"It’s just like an just like an average", isCorrect: false, message:"But... but the values are different.  How can they be the same if they produce different values?"},
+						{text:"It’s an average that weights large numbers less heavily", isCorrect: "But the rms produced a higher value.  That seems like it's weighting higher values more heavily"}
+					]
+				},
+			},	
+			{block:6,
+				cutScene: true,
+				text:"<p>Right, and we can use that average to calculate temperature through the equation</p>||EQ3CE",
+			},				
+			{block:7,
+				title:"Current step",
+				text:"Okay, now I have a challenge for you: Make these containers have the same temperature by adjusting their molecules’ root mean square speeds.  The containers’ molecules have masses of 2 g/mol and 8 g/mol respectively.  Remember, temperature is proportional to average kinetic energy.",
+				
+			{block:11,
+				cutScene: true,
+				text:"<p>First, we must convince ourselves that work actually <i>is</i> dependent on external pressure</p><p> If we compress a high pressure system and a low pressure system with the same external pressure over the same volume, how should the temperature changes of the two compare?</p>",
+				quiz:{	
+					type:'multChoice',
+					options:
+						[{text:"||EQ9||", isCorrect: false},
+						{text:"||EQ10||", isCorrect: true},
+						{text:"||EQ11||", isCorrect: false},
+						{text:"Can't tell", isCorrect: false}
+
+					]
+				},
+			},
+		]
+		store('prompts', this.prompts);
+	}
 	init: function(){
 		nextPrompt();
 	},
