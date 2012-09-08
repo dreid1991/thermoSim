@@ -79,7 +79,7 @@ _.extend(IdealGasLaw.prototype,
 					options:
 						[{text:"It's an average that weights large numbers more heavily", isCorrect: true},
 						{text:"It’s just like an just like an average", isCorrect: false, message:"But... but the values are different.  How can they be the same if they produce different values?"},
-						{text:"It’s an average that weights large numbers less heavily", isCorrect: "But the rms produced a higher value.  That seems like it's weighting higher values more heavily"}
+						{text:"It’s an average that weights large numbers less heavily", isCorrect:false, message: "But the rms produced a higher value.  That seems like it's weighting higher values more heavily"}
 					]
 				},
 			},	
@@ -90,21 +90,103 @@ _.extend(IdealGasLaw.prototype,
 			{block:7,
 				title:"Current step",
 				text:"Okay, now I have a challenge for you: Make these containers have the same temperature by adjusting their molecules’ root mean square speeds.  The containers’ molecules have masses of 2 g/mol and 8 g/mol respectively.  Remember, temperature is proportional to average kinetic energy.",
-				
-			{block:11,
-				cutScene: true,
-				text:"<p>First, we must convince ourselves that work actually <i>is</i> dependent on external pressure</p><p> If we compress a high pressure system and a low pressure system with the same external pressure over the same volume, how should the temperature changes of the two compare?</p>",
 				quiz:{	
-					type:'multChoice',
+					type:'buttons',
 					options:
-						[{text:"||EQ9||", isCorrect: false},
-						{text:"||EQ10||", isCorrect: true},
-						{text:"||EQ11||", isCorrect: false},
-						{text:"Can't tell", isCorrect: false}
-
+						[{text:"Check answer", isCorrect: true}
 					]
 				},
 			},
+			{block:8,
+				cutScene: true,
+				text:"<p>Excellent, you made it!  Setting the first rms to twice the second gave the two sets of molecules the same <i>average kinetic energy</i> and thus the same temperature.</p><p>So to make sure, which of these best describes temperature?</p>",
+				quiz:{	
+					type:'multChoice',
+					options:
+						[{text:"An expression of molecular speed.  A faster moving set of molecules will always have a higher temperature", isCorrect: false, message:"But what if you have a really heavy molecule moving slowly?  It could still have a bunch of kinetic energy compared to a fast small molecule."},
+						{text:"An expression of molecular momentum.", isCorrect: false, message:"Close, momentum has mass and speed, but not to the powers."},
+						{text:"An expression of molecular kinetic energy, because temperature is really just talking about how energetically molecules are moving, not necessarily which is moving faster or which is more massive", isCorrect: true}
+					]
+				},
+			},
+			{block:9,
+				cutScene: true,
+				text:"<p>Excellent, you made it!  Setting the first rms to twice the second gave the two sets of molecules the same <i>average kinetic energy</i> and thus the same temperature.</p><p>So to make sure, which of these best describes temperature?</p>",
+				quiz:{	
+					type:'multChoice',
+					options:
+						[{text:"An expression of molecular speed.  A faster moving set of molecules will always have a higher temperature", isCorrect: false, message:"But what if you have a really heavy molecule moving slowly?  It could still have a bunch of kinetic energy compared to a fast small molecule."},
+						{text:"An expression of molecular momentum.", isCorrect: false, message:"Close, momentum has mass and speed, but not to the powers."},
+						{text:"An expression of molecular kinetic energy, because temperature is really just talking about how energetically molecules are moving, not necessarily which is moving faster or which is more massive", isCorrect: true}
+					]
+				},
+			},
+			{block:10,
+				title:"Current step",
+				text:"Alright, now on to pressure!<br>A pressure is a force per area. This tells us that gases at non-zero pressure must exert a force on their container.  In the system above, what event causes a force to be exerted on the wall?",
+				quiz:{	
+					type:'text', 
+					text:"Type your explanation here", 
+				},
+			},
+			{block:11,
+				text:"It might be simpler if we look at just one molecule.  Every time the molecule hits the wall, its momentum changes.  If we average that change over some time, we get an average force applied per area, or a pressure.  How would the momentum change of collision and the frequency of collision change with speed, and how might this relate to pressure?  You can use the slider to change the molecule’s temperature to check your ideas.  When you’re done playing here, we can go through the math on the next page.  ",
+				quiz:{	
+					type:'buttons',
+					options:
+						[{text:"Change increases", isCorrect:true},
+						{text:"Change decreases", isCorrect: false, message:"But look at it, when it's going faster, its speed must change more when it bounces off a wall"}
+					]
+				},
+			},	
+			{block:12,
+				cutScene:true,
+				text:"<p>So we have two ideas at play here:</p><p><ul><li>First, the harder your molecules hit the wall, the more force each collision exerts on it.</p><p><li>Second, the faster they're moving, the more often they hit the wall.</ul></p><p>Both of these things are <i>linearly</i> dependant on molecular speed.</p><p>The total force applied to the walls by the molecules is the product of these two, so multiplying, we get that pressure is proportional to mass times speed squared, or to temperature.</p><p>Let's see if we can express that with some math.</p>",
+
+			},				
+			{block:13,
+				cutScene:true,
+				text:"<p>Say we have a molecule of mass m moving as follows:</p>||EQ4CE<p>Starting from||EQ5CE<p>and</p>||EQ6CE<p>We can integrate F=ma over time to get</p>||EQ7CE<p>We know that the change in velocity on collision is 2V<sub>x</sub> because it leaves with the inverse of the velocity it arrived with.  This expresses the first idea.<br>Substituting in F, we get</p>||EQ8CE<p>Continued on next page...</p>",
+			},	
+			{block:14,
+				cutScene:true,
+				text:"||EQ4CE<p>Because we're looking for an average pressure, we average out the momentum change over the whole time between impacts, which is given by</p>||EQ9CE<p>This gives us the second idea.<br>Then we put it all together and get</p>||EQ10CE<p>Now look at that!  Remember that T is proportional to mV<sup>2</sup> as well?  This means that we have just derived that <i>P is directly proportional to T</i> from a simple model of balls bouncing around!  Does this sound familiar to the ideal gas law or what?",
+			},
+			{block:15,
+				title:"Current step",
+				text:"So let’s consider a constant temperature container.  You can use the yellow arrow to change the container volume.  Try halving the volume of this container.  We know from the ideal gas law that if you halve the volume and hold the temperature constant, the pressure will double, right?  Can you explain why this happens in terms of the number of molecular collisions with the wall?",
+			},
+			{block:16,
+				title:"Current step",
+				text:"Now try halving the volume again.  How do the pressure and number of collisions behave this time?",
+				quiz:{	
+					type:'buttons',
+					options:
+						[{text:"Double again", isCorrect:true},
+						{text:"Quadrouple", isCorrect: false, message:"Not really."}
+						{text:"No change", isCorrect: false, message:"Yes there is."}
+					]
+				},
+			},
+			{block:17,
+				cutScene:true,
+				text:"<p>Remember how we looked at the side length of a container, L<sub>x</sub> to find the time between collisions?  If you imagine that L<sub>x</sub> is the vertical dimension of the previous container, every time you halve L<sub>x</sub>, you halve the average time between collisions, doubling the number of wall impacts per time and thus doubling pressure.   From this inverse relationship, might we propose the following:</p>||EQ11CE<p>Similarly, might we say that if we double the number of molecules, we would double the number of collisions per time and so double pressure?  So we get</p>||EQ12CE<p>Would the above relationships be true if temperature were not held constant?  ",
+				quiz:{	
+					type:'multChoice',
+					options:
+						[{text:"No, from the ideal gas law, a temperature will change the molecules’ speeds, changing the pressure.", isCorrect:true},
+						{text:"Yes, changing the temperature will not affect pressure or volume.", isCorrect: false, message:"Try to prove that with the ideal gas law.  I don't think you'll be able to."}
+					]
+				},				
+			},
+			{block:18,
+				cutScene:true,
+				text:"<p>Alright, let’s put it all together!</p><p>From combining impact frequency and speed, we got</p>||EQ13CE<p>By figuring out that if we halve the size, we double the number of collisions, we got</p>||EQ11CE<p>By saying that if we double the number of molecules, we double the number of collisions, we got</p>||EQ12CE<p>Combining, we get</p>||EQ14CE</p>",
+			},
+			{block:19,
+				cutScene:true,
+				text:"<p>If we multiply by the ideal gas constant, R, we can say</p>||EQ15CE<p>or</p>||EQ1CE<p>So we just developed the ideal gas law from a model of molecules being hard spheres that bounce around!  Yay!</p>",
+			}
 		]
 		store('prompts', this.prompts);
 	}
