@@ -2,6 +2,8 @@
 $(function(){
 	_.extend(Array.prototype, ArrayExtenders);
 	_.extend(Math, MathExtenders);
+	//_.extend(String, StringExtenders);
+	String.prototype.killWhiteSpace = StringExtenders.killWhiteSpace;
 	hoverCol = Col(0, 81, 117);
 	turn = 0;
 	$('#canvasDiv').hide();
@@ -488,6 +490,11 @@ MathExtenders = {
 		return Math.log(val)/Math.log(10);	
 	},
 
+}
+StringExtenders = {
+	killWhiteSpace: function() {
+		return this.replace(/\s/g, '');
+	},
 }
 function recordData(handle, list, func, obj, listenerType){
 	var listenerType = defaultTo('record', listenerType)

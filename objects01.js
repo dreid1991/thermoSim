@@ -1716,18 +1716,18 @@ _.extend(StateListener.prototype, objectFuncs, {
 			case 'equalTo':
 				this.condition = function(){
 					if (this.targetVal instanceof Array) {
-						return this.dataList[this.dataList.length-1]==this.targetVal[this.targetVal.length-1];
+						return fracDiff(this.dataList[this.dataList.length-1], this.targetVal[this.targetVal.length-1])<this.tolerance;
 					} else {
-						return this.dataList[this.dataList.length-1]==this.targetVal;
+						return fracDiff(this.dataList[this.dataList.length-1], this.targetVal)<this.tolerance;
 					}
 				}
 				break;
 			case 'notEqualTo':
 				this.condition = function(){
 					if (this.targetVal instanceof Array) {
-						return this.dataList[this.dataList.length-1]!=this.targetVal[this.targetVal.length-1];
+						return fracDiff(this.dataList[this.dataList.length-1], this.targetVal[this.targetVal.length-1]) > this.tolerance;
 					} else {
-						return this.dataList[this.dataList.length-1]!=this.targetVal;
+						return fracDiff(this.dataList[this.dataList.length-1], this.targetVal) > this.tolerance;
 					}
 				}
 				break;

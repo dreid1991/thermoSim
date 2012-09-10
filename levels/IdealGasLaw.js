@@ -33,11 +33,18 @@ _.extend(IdealGasLaw.prototype,
 			},
 			{block:3, 
 				title:"Current step",
-				text:"Just so we're on the same page, which of these two systems has a higher temperature?"
+				text:"Just so we're on the same page, which of these two systems has a higher temperature?",
+				quiz:{	
+					type:'multChoice',
+					options:
+						[{text:"Left", isCorrect: false, message:"Yeah, but temperature is preportional to kinetic energy which is preportional to speed^2"},
+						{text:"Right", isCorrect: true}
+					]
+				},
 			},
 			{block:4,
 				cutScene: true,
-				text:"<p>Root mean square is a tricky idea, but it’s important to understanding temperature, so let’s practice.</p><p>If you have molecules moving at 250, 300, 350, 400, and 450 m/s, what is their root mean square speed?</p>",
+				text:"<p>Right.  Now root mean square is a tricky idea, but it’s important to understanding temperature, so let’s practice.</p><p>If you have molecules moving at 250, 300, 350, 400, and 450 m/s, what is their root mean square speed?</p>",
 				quiz:{	
 					type:'text', 
 					text:"Root mean square in m/s", 
@@ -175,13 +182,14 @@ _.extend(IdealGasLaw.prototype,
 		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});
 		spcs['spc4'].populate(P(45,35), V(450, 350), 300, 300);
 		this.tempChanger1 = new TempChanger({min:100, max:1200});
-		this.stateListener1 = new StateListener({dataList:walls[0].data.t, is:'notEqualTo', targetVal:dataHandler.temp()});
+		this.stateListener1 = new StateListener({dataList:walls[0].data.t, is:'notEqualTo', targetVal:dataHandler.temp(), alertUnsatisfied:"Play with the slider!"});
 		walls[0].displayTemp();
 	},
-	block2Start: function(){
-		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
-			
-		spcs['spc4'].populate(P(45,35), V(450, 350), 400, 200);
+	block3Start: function(){
+		walls = WallHandler({pts:[[P(40,30), P(250,30), P(250,440), P(40,440)], 
+			[P(300,30), P(510,30), P(510,440), P(300,440)]], handlers:'staticAdiabatic', handles:['c1', 'c2']});
+		spcs['spc4'].populate(P(45, 80), V(200, 300), 200, 600);
+		spcs['spc4'].populate(P(305,75), V(200, 300), 200, 100);
 	},
 	block3Start: function(){
 		walls = WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 

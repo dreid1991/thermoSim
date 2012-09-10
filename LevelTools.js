@@ -155,7 +155,7 @@ LevelTools = {
 		buttonHTML += "<br><center><table border='0'><tr>";
 		for (var buttonIdx=0; buttonIdx<buttons.length; buttonIdx++){
 			var button = buttons[buttonIdx];
-			buttonHTML += "<td><button id='" + button.buttonId + "' class='noSelect'>" + button.text + "</button></td>"
+			buttonHTML += "<td><button id='" + defaultTo(button.text.killWhiteSpace(), button.buttonId) + "' class='noSelect'>" + button.text + "</button></td>"
 		}
 		buttonHTML += "</tr></table></center>";
 		$('#'+appendTo).html($('#intText').html() + buttonHTML);
@@ -170,7 +170,7 @@ LevelTools = {
 		}		
 	},
 	attachButtonListener: function(button){
-		var id = button.buttonId;
+		var id = defaultTo(button.text.killWhiteSpace(), button.buttonId);
 		var func = defaultTo(function(){}, button.func);
 		if(button.message){
 			func = extend(func, function(){alert(button.message)});
@@ -183,7 +183,7 @@ LevelTools = {
 		}
 		condFunc = 
 			function(){
-				if(curLevel.checkConditions()){
+				if(curLevel.conditions().didWin){
 					func.apply(curLevel);
 				}
 			}
@@ -223,7 +223,7 @@ LevelTools = {
 	},
 	bindMultChoiceFunc: function(id, option){
 		var checkFunc = function(){
-			if(curLevel.checkConditions()){
+			if(curLevel.conditions().didWin){
 				if (option.message) {
 					alert(option.message);
 				}
@@ -253,7 +253,7 @@ LevelTools = {
 		textBoxHTML += "<textarea id='answerTextArea' rows='3' cols='60' placeholder='"+boxText+"'></textarea>";
 		textBoxHTML += "<table border=0><tr><td width=75%></td><td><button id='textAreaSubmit' class='noSelect'>Submit</button></td></tr></table></p>";
 		var checkFunc = function(){
-			if(curLevel.checkConditions()){
+			if(curLevel.conditions().didWin){
 				if(quiz.answer){
 					var submitted = $('#answerTextArea').val();
 					if(fracDiff(parseFloat(quiz.answer), parseFloat(submitted))<.05){
@@ -277,7 +277,8 @@ LevelTools = {
 		$('button').button();
 		buttonBind('textAreaSubmit', checkFunc);
 	},
-	checkConditions: function(){
+	/*
+	conditions: function(){
 		var prompt = this.prompts[this.promptIdx];
 		var conditions = defaultTo(this['block'+this.blockIdx+'Conditions'], prompt.conditions);
 		if(!conditions){
@@ -292,6 +293,7 @@ LevelTools = {
 		}
 	
 	},
+	*/
 	hideDash: function(){
 		$('#dashIntro').hide();
 		$('#dashRun').hide();

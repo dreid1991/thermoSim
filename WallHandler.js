@@ -1214,7 +1214,7 @@ WallMethods = {
 		},
 		displayAllStop: function(){
 			if(this.displayingVol){this.displayVolStop();};
-			if(this.displayingTemp){this.displayPIntStop();};
+			if(this.displayingPInt){this.displayPIntStop();};
 			if(this.displayingPExt){this.displayPExtStop();};
 			if(this.displayingWork){this.displayWorkStop();};
 			if(this.displayingTemp){this.displayTempStop();};
