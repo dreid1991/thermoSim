@@ -40,6 +40,28 @@ DataHandler.prototype = {
 			}
 		}
 	},
+	count: function(info) {
+		var count = 0;
+		if (!info) {
+			for(spcName in spcs){
+				var dots = spcs[spcName];
+				for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
+					count++;
+				}				
+			}
+		} else {
+			for (var filter in info) {};
+			for(spcName in spcs){
+				var dots = spcs[spcName];
+				for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
+					if (dots[dotIdx][filter] == info[filter]) {
+						count++;
+					}
+				}				
+			}			
+		}
+		return count;	
+	},
 	RMS: function(info) {
 		var count = 0;
 		var sum = 0;

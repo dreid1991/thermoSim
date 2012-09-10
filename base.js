@@ -284,7 +284,7 @@ function changeTemp(info, newTemp){
 		for(var spc in spcs){
 			var dots = spcs[spc];
 			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
-				dots[dotIdx].setTemp(temp);
+				dots[dotIdx].setTemp(newTemp);
 			}
 		}
 	} else {
@@ -293,7 +293,7 @@ function changeTemp(info, newTemp){
 			var dots = spcs[spc];
 			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
 				if (dots[dotIdx][filter] == info[filter]){
-					dots[dotIdx].setTemp(temp);
+					dots[dotIdx].setTemp(newTemp);
 				}
 			}
 		}	

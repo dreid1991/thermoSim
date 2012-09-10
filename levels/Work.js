@@ -1,6 +1,5 @@
 function Work(){
 	this.setStds();
-	this.wallSpeed = 1;
 	this.readout = new Readout('mainReadout', 30, myCanvas.width-155, 25, '13pt calibri', Col(255,255,255),this, 'left');
 	this.compMode = 'Isothermal';
 

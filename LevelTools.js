@@ -8,6 +8,7 @@ LevelTools = {
 		this.bgCol = Col(5, 17, 26);
 		this.wallCol = Col(255,255,255);
 		this.numUpdates = 0;
+		this.wallSpeed = defaultTo(1, this.wallSpeed);
 		this.makeListeners();
 		this.promptIdx = -1;
 		this.blockIdx = -1;

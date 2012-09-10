@@ -1,2 +1,3 @@
 To do:
 in Work: I changed atm to bar without changing any values like mass or whatever.  Reccomend checking values
+should probably make conditions and remove be addable to prompt instead of block of specified

@@ -67,7 +67,7 @@ Readout.prototype = {
 			this.entries.push(entry);
 		}
 		this.positionEntries();
-		
+		this.hide().show();
 	},
 	removeEntry: function(toRemove){
 		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++){
@@ -153,9 +153,11 @@ Readout.prototype = {
 	},
 	show: function(){
 		addListener(curLevel, 'update', 'drawReadout'+this.handle, this.draw, this);
+		return this;
 	},
 	hide: function(){
 		removeListener(curLevel, 'update', 'drawReadout'+this.handle);
+		return this;
 	}
 
 }

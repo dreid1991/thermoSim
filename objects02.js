@@ -701,7 +701,7 @@ function TempChanger(attrs) {
 	this.tempMin = defaultTo(100, attrs.min);
 	this.temp = dataHandler.temp(this.info);
 	this.tempMax = defaultTo(1500, attrs.max);
-	
+	this.totalDots = dataHandler.count(this.info);
 	this.addCleanUp();
 	return this.init();
 }
@@ -712,10 +712,16 @@ _.extend(TempChanger.prototype, objectFuncs, {
 		} else {
 			var title = "Molecule's temperature";
 		}
-		this.sliderId = this.addSlider(title, {value:this.temp}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
+		this.sliderId = this.addSlider(title, {value:this.tempToPercent(this.temp)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
+	},
+	tempToPercent: function(temp) {
+		return 100*(temp-this.tempMin)/(this.tempMax-this.tempMin);
+	},
+	percentToTemp: function(percent) {
+		return (percent*(this.tempMax-this.tempMin)/100+this.tempMin);
 	},
 	parseSlider: function(event, ui) {
-		changeTemp(this.info, ui.value);
+		changeTemp(this.info, this.percentToTemp(ui.value));
 	},
 	remove: function(){
 		$('#'+this.sliderId).remove();

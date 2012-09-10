@@ -1697,22 +1697,38 @@ _.extend(StateListener.prototype, objectFuncs, {
 		switch(this.is){
 			case 'greaterThan':
 				this.condition = function(){
-					return this.dataList[this.dataList.length-1]>this.targetVal;
+					if (this.targetVal instanceof Array) {
+						return this.dataList[this.dataList.length-1]>this.targetVal[this.targetVal.length-1];
+					} else {
+						return this.dataList[this.dataList.length-1]>this.targetVal;
+					}
 				};
 				break;
 			case 'lessThan':
 				this.condition = function(){
-					return this.dataList[this.dataList.length-1]<this.targetVal;
+					if (this.targetVal instanceof Array) {
+						return this.dataList[this.dataList.length-1]<this.targetVal[this.targetVal.length-1];
+					} else {
+						return this.dataList[this.dataList.length-1]<this.targetVal;
+					}
 				};
 				break;
 			case 'equalTo':
 				this.condition = function(){
-					return fracDiff(this.dataList[this.dataList.length-1], this.targetVal)<this.tolerance;
+					if (this.targetVal instanceof Array) {
+						return this.dataList[this.dataList.length-1]==this.targetVal[this.targetVal.length-1];
+					} else {
+						return this.dataList[this.dataList.length-1]==this.targetVal;
+					}
 				}
 				break;
 			case 'notEqualTo':
 				this.condition = function(){
-					return this.dataList[this.dataList.length-1]!=this.targetVal;
+					if (this.targetVal instanceof Array) {
+						return this.dataList[this.dataList.length-1]!=this.targetVal[this.targetVal.length-1];
+					} else {
+						return this.dataList[this.dataList.length-1]!=this.targetVal;
+					}
 				}
 				break;
 		}
