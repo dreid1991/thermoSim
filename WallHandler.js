@@ -1,4 +1,5 @@
 function WallHandler(attrs){//pts, handlers, handles, bounds, includes, vols, shows, records, temps){//records is a verb, like what the wall records.  Defaults to recording q, pint, t, v
+	//a trap!  If you make it isothermal, you must specify a temperature to hold at in temps list
 	var newWall = new Array(attrs.pts.length)
 	_.extend(newWall, WallMethods.main, WallMethods.collideMethods);
 	newWall.assemble(attrs);//pts, handles, bounds, includes, vols, shows, records)
@@ -6,7 +7,6 @@ function WallHandler(attrs){//pts, handlers, handles, bounds, includes, vols, sh
 	if(attrs.handles.length!=attrs.pts.length){
 		console.log('NAME YOUR WALLS');
 	}
-
 	if(attrs.handlers){
 		newWall.doInitHandlers(attrs.handlers);
 	}

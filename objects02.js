@@ -656,8 +656,9 @@ function Arrow(handle, pts, col, lifespan, drawCanvas){
 Arrow.prototype = {
 	draw: function(){
 		var shaft = this.pts.line;
-		draw.line(shaft[0], shaft[1], this.col, this.drawCanvas);
-		
+		for (var ptIdx=0; ptIdx<shaft.length-1; ptIdx++) {
+			draw.line(shaft[ptIdx], shaft[ptIdx+1], this.col, this.drawCanvas);
+		}
 		var arrow = this.pts.arrow;
 		
 		draw.line(arrow[0], arrow[1], this.col, this.drawCanvas);
@@ -711,7 +712,7 @@ _.extend(TempChanger.prototype, objectFuncs, {
 		if (this.totalDots > 1) {
 			var title = 'System temperature';
 		} else {
-			var title = "Molecule's temperature";
+			var title = "Molecule's kinetic energy";//temperature";
 		}
 		this.sliderId = this.addSlider(title, {value:this.valToPercent(this.val)}, [{eventType:'slide', obj:this, func:this.parseSlider}], this.sliderPos);
 	},

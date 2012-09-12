@@ -512,6 +512,8 @@ function addEqs(text){
 	var toHTML = function(eqNum, subStr){
 		if(subStr && subStr =="CE"){
 			return "<p><center><img src = 'img/"+imgPath+"/eq"+eqNum+".gif'</img></center></p>";
+		} else if (subStr && subStr == "BR") {
+			return "<br><center><img src = 'img/"+imgPath+"/eq"+eqNum+".gif'</img></center>";
 		} else {
 			return "<img src = 'img/"+imgPath+"/eq"+eqNum+".gif'</img>";
 		}
@@ -520,10 +522,12 @@ function addEqs(text){
 	while(eqIdx!=-1){
 		for(var charIdx=eqIdx+4; charIdx<text.length; charIdx++){
 			var subStr = text.substring(charIdx, charIdx+2);
-			if(subStr=="||" || subStr=="CE"){
-				break
-			}else if(charIdx+2==text.length){
-				break
+			if (subStr=="||" || subStr=="CE") {
+				break;
+			} else if (subStr=="||" || subStr=="BR") {
+				break;
+			} else if(charIdx+2==text.length) {
+				break;
 			}
 		}
 		var eqNum = text.substring(eqIdx+4, charIdx);

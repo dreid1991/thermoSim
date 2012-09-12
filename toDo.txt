@@ -8,6 +8,9 @@ MAKE RMS BE CONSISTANTLY GOTTEN - currently you have the dot speed function whic
 OR - just calculate px to ms based on the 3/2kt stuff and v->t conversion (tconst I guess)
 
 
+Change equation CE to something that matches well with BR, LIKE /P?
+
+
 in ideal gas eqs: boltzmann constant: K -> K_{b}
 
 
