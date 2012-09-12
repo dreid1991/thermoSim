@@ -137,6 +137,7 @@ _.extend(cvcp.prototype,
 		
 		spcs['spc1'].populate(P(300,200), V(200, 200), 350, 185, 'right', 'right');
 		spcs['spc3'].populate(P(300,200), V(200, 200), 250, 185, 'right', 'right');	
+		
 		this.piston = new Piston({wallInfo:'right', min:2, init:2, max:2, makeSlider:false})
 		this.heaterLeft = new Heater({handle:'heaterLeft', wallInfo:'left'});
 		this.heaterRight = new Heater({handle:'heaterRight', wallInfo:'right'});
