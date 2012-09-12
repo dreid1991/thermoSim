@@ -49,17 +49,20 @@ DataHandler.prototype = {
 					count++;
 				}				
 			}
-		} else {
-			for (var filter in info) {};
+		} else if (info.spcName) {
+			count = spcs[info.spcName].length;
+		} else if (info.tag) {
 			for(spcName in spcs){
 				var dots = spcs[spcName];
 				for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
-					if (dots[dotIdx][filter] == info[filter]) {
+					if (dots[dotIdx] == info.tag) {
 						count++;
 					}
 				}				
-			}			
+			}		
 		}
+	
+		
 		return count;	
 	},
 	RMS: function(info) {
@@ -73,34 +76,62 @@ DataHandler.prototype = {
 					count++;
 				}				
 			}
-		} else {
-			for (var filter in info) {};
+		} else if (info.spcName) {
+			var dots = spcs[info.spcName];
+			for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
+				sum += dots[dotIdx].v.magSqr();
+				count++;
+			}
+		} else if (info.tag) {
 			for(spcName in spcs){
 				var dots = spcs[spcName];
 				for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
-					if (dots[dotIdx][filter] == info[filter]) {
+					if (dots[dotIdx].tag == info.tag) {
 						sum += dots[dotIdx].v.magSqr();
 						count++;
 					}
 				}				
-			}			
+			}		
 		}
-		return Math.sqrt(sum/count);
+		return pxToMS*Math.sqrt(sum/count);
 	},
 	velocities: function(info){
 		info = defaultTo({}, info);
 		var tag = info.tag;
 		var spcToMeasure = info.spcName;
-		var spc = spcs[spcToMeasure];
-		var numDots = spc.length
-		var velocities = new Array(numDots);
-		
-		for (var dotIdx=0; dotIdx<numDots; dotIdx++){
-			var dot = spc[dotIdx];
-			if(!tag || tag==dot.tag){
-				velocities[dotIdx] = dot.speed();
+		if (spcToMeasure) {
+			var spc = spcs[spcToMeasure];
+			var numDots = spc.length
+			var velocities = new Array(numDots);
+			for (var dotIdx=0; dotIdx<numDots; dotIdx++){
+				var dot = spc[dotIdx];
+				if(!tag || tag==dot.tag){
+					velocities[dotIdx] = dot.speed();
+				}
+			}			
+		} else if (tag) {
+			for (var spc in spcs) {
+				var dots = spcs[spc];
+				var velocities = new Array();
+				for (var dotIdx=0; dotIdx<numDots; dotIdx++){
+					if(tag==dots[dotIdx].tag){
+						velocities.push(dot[dotIdx].speed());
+					}
+				}	
 			}
+		} else {
+			var velocitiesAll = [];
+			for (var spc in spcs) {
+				var dots = spcs[spc];
+				var velocities = new Array(dots.length);
+				for (var dotIdx=0; dotIdx<dots.length; dotIdx++){
+					velocities[dotIdx] = dot[dotIdx].speed();		
+				}
+				velocitiesAll = velocitiesAll.concat(velocities);
+			}
+			velocities = velocitiesAll;
 		}
+
 		return velocities;
 	},
 	velocityAvg: function(info){

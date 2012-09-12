@@ -258,7 +258,6 @@ _.extend(Work.prototype,
 		spcs['spc3'].populate(P(45,35), V(445, 325), 650, 200);
 		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:wallHandle, compMode:'cPAdiabatic'});
 		this.dragWeights.wall.displayWork().displayMass().displayPExt().displayVol();
-		walls
 		this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:10, alertUnsatisfied:'Compress the system!', recordAtSatisfy:{tFinal:walls[0].data.t}});
 	},
 	block12Start: function(){

@@ -897,6 +897,7 @@ WallMethods = {
 			} else {
 				console.log('Tried to record RMS of wall ' + this.handle + ' while not recording temp.  Will not record.');
 			}
+			return this;
 		},
 		getRMSMass: function(tag) {
 			if (tag) {
@@ -1189,10 +1190,10 @@ WallMethods = {
 			}
 			return this;
 		},
-		displayRMS: function() {
+		displayRMS: function(readout, label, decPlaces) {
 			if(this.recordingRMS && !this.displayingRMS){
 				this.displayingRMS = true;
-				decPlaces = defaultTo(0, decPlaces);
+				var decPlaces = defaultTo(0, decPlaces);
 				var dataSet = this.data.RMS;
 				label = defaultTo('RMS:', label);
 				this.RMSReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
@@ -1200,10 +1201,10 @@ WallMethods = {
 				if(!validNumber(firstVal)){
 					firstVal = 0;
 				}
-				this.tempReadout.addEntry('RMS' + this.handle, label, 'm/s', firstVal, undefined, decPlaces);
+				this.RMSReadout.addEntry('RMS' + this.handle, label, 'm/s', firstVal, undefined, decPlaces);
 				addListener(curLevel, 'data', 'displayRMS' + this.handle,
 					function(){
-						this.tempReadout.tick('RMS' + this.handle, dataSet[dataSet.length-1]);
+						this.RMSReadout.tick('RMS' + this.handle, dataSet[dataSet.length-1]);
 					},
 				this);	
 			}else{

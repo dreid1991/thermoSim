@@ -701,6 +701,8 @@ function TempChanger(attrs) {
 	this.min = defaultTo(100, attrs.min);
 	this.val = dataHandler.temp(this.info);
 	this.max = defaultTo(1500, attrs.max);
+	this.sliderPos = attrs.sliderPos;
+	this.handle = 'TempChanger' + Math.round(this.min).toString() + Math.round(this.val).toString() + Math.round(this.max).toString() + Math.round(Math.random()*1000);
 	this.totalDots = dataHandler.count(this.info);
 	this.addCleanUp();
 	return this.init();
@@ -712,7 +714,7 @@ _.extend(TempChanger.prototype, objectFuncs, {
 		} else {
 			var title = "Molecule's temperature";
 		}
-		this.sliderId = this.addSlider(title, {value:this.valToPercent(this.val)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
+		this.sliderId = this.addSlider(title, {value:this.valToPercent(this.val)}, [{eventType:'slide', obj:this, func:this.parseSlider}], this.sliderPos);
 	},
 	parseSlider: function(event, ui) {
 		changeTemp(this.info, this.percentToVal(ui.value));
@@ -731,7 +733,9 @@ function RMSChanger(attrs) {
 	this.min = defaultTo(1, attrs.min);
 	this.val = dataHandler.RMS(this.info);
 	this.max = defaultTo(15, attrs.max);
-	
+	this.handle = 'RMSChanger' + Math.round(this.min).toString() + Math.round(this.val).toString() + Math.round(this.max).toString() + Math.round(Math.random()*1000);
+	this.totalDots = dataHandler.count(this.info);
+	this.sliderPos = attrs.sliderPos;
 	this.addCleanUp();
 	return this.init();
 }
@@ -740,9 +744,9 @@ _.extend(RMSChanger.prototype, objectFuncs, {
 		if (this.totalDots > 1) {
 			var title = "Molecules' RMS";
 		} else {
-			var title = "Molecule's temperature";
+			var title = "Molecule's RMS";
 		}
-		this.sliderId = this.addSlider(title, {value:this.valToPercent(this.val)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
+		this.sliderId = this.addSlider(title, {value:this.valToPercent(this.val)}, [{eventType:'slide', obj:this, func:this.parseSlider}], this.sliderPos);
 	},
 	parseSlider: function(event, ui) {
 		changeRMS(this.info, this.percentToVal(ui.value));
