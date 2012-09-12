@@ -8,7 +8,7 @@
 <div class='noSelect wrapper'>
 	<div id='main' class='main noSelect'>
 		<div id='mainHeader' class='header noSelect'>
-			Heat capacities
+			
 		</div>
 		<div id='canvasDiv' class='canvasDiv noSelect'>
 			<canvas id='myCanvas'>
@@ -26,40 +26,35 @@
 			</center>
 			
 		</div>
-		<div id='dashRun' class='dashMed noSelect'>
+		<div id='dashRun' class='dashMed noSelect' style='position:relative'>
 			<center>
-				<div>
-					<div id='sliderPressureHolder' class='niceFont'>Piston pressure<br>
-						<div id='sliderPiston' style='width:300px'></div>
-					</div>
-					<br>
-					<div id='sliderHeaterHolder'>
-						<div id='sliderHeaterLeftHolder' style='float:left' class='niceFont'>
-							<center>Left heater
-								<div id='sliderHeaterLeft' style = 'width:200px'></div>
-							</center>
-						</div>
-						<div id='sliderHeaterRightHolder' style='float:right' class='niceFont'>
-							<center>Right heater
-								<div id='sliderHeaterRight' style = 'width:200px'></div>
-							</center>
-						</div>
-					</div>
-					<button id='buttonFill', class='noSelect'>Fill</button>
-					<button id='buttonDrain', class='noSelect'>Drain</button>
-					
-					<button id='reset' class='noSelect'>Reset experiment</button>
-					<button id='checkAns' class='noSelect'>Check answer</button>
-					<button id='clearGraphs' class='noSelect'>Clear graphs</button>
-
+				<div id='buttons'>
+		
 				</div>
 			</center>
+			<center>
+				<div id='sliderHolderSingle'>
+					<div id='sliderHolderCenter' style='width:300px'>
+					
+					</div>
+				</div>
+			</center>
+			<center>
+				<div id='sliderHolderDouble'>
+					<div id='sliderHolderLeft' style='display:inline-block;width:200px'>
+					</div>
+					<div id='sliderSpacer' style='display:inline-block;width:75px'>
+					</div>
+					<div id='sliderHolderRight' style='display:inline-block;width:200px'>
+					</div>
+				</div>
+			</center>
+			<button id='resetExp' style='position:absolute;right:.5em;bottom:.25em'><img src='img/refresh.gif'></img></button>
 		</div>
-		<div id='dashCutScene' class='dashMed noSelect'>
-		</div>
+		<div id='dashCutScene' class='dashMed noSelect'></div>
 		<div id='dashOutro' class='dash noSelect ' >
 			<center>
-				<button id='backToSim'>Back to the simulation</button>
+				<button id='toLastStep'>Back to the simulation</button>
 			</center>
 			
 			
@@ -104,73 +99,25 @@
 <script src = '../animText.js'></script>
 <script src = '../Readout.js'></script>
 <script src = '../LevelTools.js'></script>
-
 <script src = 'cvcp.js'></script>
 <script src = '../base.js'></script>
 <script type = 'text/javascript'>
 var curLevel;
 canvasHeight = 450;
 $(function(){
-	//HEY - COULD PUT INIT STUFF HERE. 
 	imgPath = 'cvcp';
+	animText = new AnimText(c);
 	myCanvas.height = canvasHeight;
 	curLevel = new cvcp();
-	animText = new AnimText(c);
-	$('#sliderHeaterHolder').show();
-	$('#sliderPressureHolder').hide();
 
-	$('#checkAns').hide();
-	$('#clearGraphs').hide();
-	$('button').button();
-	$('#longSliderHolder').hide();
-	$('#toSim').click(function(){nextPrompt()});
-	$('#backToSim').click(function(){prevPrompt()});
-	$('#previous').click(function(){prevPrompt()});
-	$('#next').click(function(){nextPrompt()});
-	$('#submit').click(function(){submit()});
-	$('#checkAns').click(function(){curLevel.checkAnsTemp()});
-	$('#clearGraphs').click(function(){curLevel.clearGraphs()});
-	$('#reset').click(function(){curLevel.reset()});
-	$('#reset').hide();
 	curLevel.cutSceneEnd();
 	curLevel.init();
-	curLevel.setDefaultPromptVals()
-
-	var slider1 = 'sliderHeaterLeft';
-	makeSlider(
-		slider1, 
-		{
-		},
-		[
-			{eventType:'slidestop', obj:curLevel, func:function(event, ui){
-															$('#sliderHeaterLeft').slider('option', {value:50});
-															ui.value=50;
-															this[slider1 + 'Set'](event, ui)
-														}
-			},
-		],
-		'show',
-		'Temp'
-	);
-	var slider2 = 'sliderHeaterRight';
-	makeSlider(
-		slider2, 
-		{
-		},
-		[
-			{eventType:'slidestop', obj:curLevel, func:function(event, ui){
-															$('#sliderHeaterRight').slider('option', {value:50});
-															ui.value=50;
-															this[slider2 + 'Set'](event, ui)
-														}
-			},
-		],
-		'show',
-		'Temp'
-	);
-	
-
-
+	$('button').button();
+	$('#resetExp').click(function(){curLevel.reset()});
+	$('#toSim').click(function(){nextPrompt()});
+	$('#toLastStep').click(function(){prevPrompt()});
+	$('#previous').click(function(){prevPrompt()});
+	$('#next').click(function(){nextPrompt()});
 });
 
 myCanvas.width = $('#main').width();

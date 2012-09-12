@@ -44,7 +44,7 @@ objectFuncs = {
 		if(this.wall){
 			xPos = (this.wall[0].x + this.wall[1].x)/2;
 		}else if(this.pos && this.dims){
-			xPos = this.pos.x + this.dims.dx;
+			xPos = this.pos.x + this.dims.dx/2;
 		}else if(this.pos){
 			xPos = this.pos.x;
 		}
@@ -1454,7 +1454,9 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		this.wall.moveStop();
 		this.wall.unsetMass('piston' + this.handle);
 		this.hide();
-		this.removeSlider();
+		if (this.sliderId) {
+			this.removeSlider();
+		}
 		this.hideSliderDivs();
 		removeListener(curLevel, 'update', 'moveWalls');
 	}
@@ -1614,7 +1616,7 @@ _.extend(Heater.prototype, objectFuncs, {
 	remove: function(){
 		this.removeSlider();
 		removeListener(curLevel, 'update', 'drawHeater'+this.handle);
-		if(window.walls){
+		if(window.walls && !walls.removed){
 			walls.removeWall('heater' + this.handle);
 		}
 	}

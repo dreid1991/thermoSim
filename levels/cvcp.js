@@ -15,9 +15,9 @@ _.extend(cvcp.prototype,
 	declarePrompts: function(){
 		this.prompts=[
 			{block:0,
-				/*
+				
 				cutScene: true,
-				text:'For an ideal monatomic gas, which of these is correct?  C<sub>V</sub> means heat capacity at constant volume, C<sub>P</sub> means heat capacity at constant pressure.',
+				text:'<p>Hold still, this will only take a minute.</p><p>For an ideal monatomic gas, which of these is correct?  C<sub>V</sub> means heat capacity at constant volume, C<sub>P</sub> means heat capacity at constant pressure.',
 				quiz:{	
 					type:'multChoice', 
 					options:
@@ -28,7 +28,7 @@ _.extend(cvcp.prototype,
 						{text:"||EQ2|| and ||EQ5||", isCorrect: false}
 					]
 				},
-				*/
+				
 			},
 			{block:1,
 				cutScene: true,
@@ -90,7 +90,7 @@ _.extend(cvcp.prototype,
 			},
 			{block:6,
 				cutScene: true,
-				text:"<p>Yes.</p><p>It takes some amount of energy to heat up one mole these molecules one degree kelvin.  That amount is C<sub>V</sub>.  To get the total energy change in a temperature change, we multiply that amount by the change in temperature and the number of moles.  Thus we get<p>||EQ6CE<p>Okay, now what about in the constant pressure case?  Where does the energy go then?</p>",
+				text:"<p>Yes.</p><p>It takes some amount of energy to heat up one mole these molecules one degree kelvin.  That amount is the heat capacity C<sub>V</sub>.  To get the total energy change in a temperature change, we multiply that amount by the change in temperature and the number of moles.  Thus we get<p>||EQ6CE<p>Okay, now what about in the constant pressure case?  Where does the energy go then?</p>",
 				quiz:{
 					type:'multChoice', 
 					options:
@@ -120,25 +120,16 @@ _.extend(cvcp.prototype,
 			}
 		]
 		store('prompts', this.prompts);
-	},
+	}, 
 	init: function(){
+		$('#mainHeader').text('Heat capacities');
 		nextPrompt();
 	},
 	//testing fill
-	block0Start: function(){
-		this.readout.show();
-		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
-		spcs['spc1'].populate(P(300,100), V(200, 200), 350, 185);
-		spcs['spc3'].populate(P(300,100), V(200, 200), 250, 185);	
-		walls[0].trackWorkStart(this.readout);
-		this.pool = new Pool();
-	},
+
 	block2Start: function(){
 		var self = this;
-		this.readout.show();
-		recordDataStart('tLeft', this.dataHandler.tempFunc({tag:'left'}), this);
-		recordDataStart('tRight', this.dataHandler.tempFunc({tag:'right'}), this);
-		walls = WallHandler([[P(40,190), P(255,190), P(255,425), P(40,425)], [P(295,190), P(510,190), P(510,425), P(295,425)]], 'staticAdiabatic', ['left', 'right'], [undefined, {yMin:50, yMax:275}], undefined, [5,5]);
+		walls = WallHandler({pts:[[P(40,190), P(255,190), P(255,425), P(40,425)], [P(295,190), P(510,190), P(510,425), P(295,425)]], handlers:'staticAdiabatic', handles:['left', 'right'], bounds:[undefined, {yMin:50, yMax:275}], vols:[5,5]});
 		this.borderStd({wallInfo:'left', min:50});
 		this.borderStd({wallInfo:'right', min:50});
 		spcs['spc1'].populate(P(45,200), V(200, 200), 350, 185, 'left', 'left');
@@ -146,29 +137,12 @@ _.extend(cvcp.prototype,
 		
 		spcs['spc1'].populate(P(300,200), V(200, 200), 350, 185, 'right', 'right');
 		spcs['spc3'].populate(P(300,200), V(200, 200), 250, 185, 'right', 'right');	
-		this.piston = new Piston({wallInfo:'right', min:2, init:2, max:2}).trackPressureStart();
-		this.heaterLeft = new Heater({handle:'heaterLeft', wallInfo:'left', slider:'sliderHeaterLeft'});
-		this.heaterRight = new Heater({handle:'heaterRight', wallInfo:'right', slider:'sliderHeaterRight'});
+		this.piston = new Piston({wallInfo:'right', min:2, init:2, max:2, makeSlider:false})
+		this.heaterLeft = new Heater({handle:'heaterLeft', wallInfo:'left'});
+		this.heaterRight = new Heater({handle:'heaterRight', wallInfo:'right'});
 		
-		this.trackTempStart('tleft', 'Temp:', this.data.tLeft, 0);
-		//this.trackStart('eLeft', 'Energy in:', function(){return self.heaterLeft.eAdded}, 1, 'kJ');
-		
-		this.trackTempStart('tRight', 'Temp:', this.data.tRight, 0);
-		//this.trackStart('eRight', 'Energy in:', function(){return self.heaterRight.eAdded}, 1, 'kJ');
-	
 	},
-	block2Conditions: function(){
-		return {result:true};
-	},
-	block2CleanUp: function(){
-		this.heaterLeft.remove();
-		this.heaterRight.remove();
-		this.trackTempStop('tLeft');
-		this.trackTempStop('tRight');
-		this.trackStop('eLeft');
-		this.trackStop('eRight');
-		this.piston.remove();
-	},
+
 
 
 }
