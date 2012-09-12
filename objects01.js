@@ -49,7 +49,7 @@ objectFuncs = {
 			xPos = this.pos.x;
 		}
 		if(!xPos){
-			return 'center';
+			return this.checkForMigrateCenter();
 			//ooh - maybe make it check if that div is empty.  If not, move contents of center to left/right
 		}else{
 			var width = $('#main').width();
@@ -58,13 +58,13 @@ objectFuncs = {
 			if(divDest==0){
 				return 'left';
 			}else if(divDest==1){
-				return 'center';
+				return this.checkForMigrateCenter();
 			}
 			else if(divDest==2){
 				return 'right';
 			}
 		}
-		return 'center';
+		return this.checkForMigrateCenter();
 	},
 	addSlider: function(title, attrs, handlers, position){
 		if(!position){
@@ -91,6 +91,19 @@ objectFuncs = {
 		var sliderId = 'slider' + this.handle;
 		this.sliderWrapper = makeSlider(toAppendId, sliderId, title, attrs, handlers);
 		return sliderId;
+	},
+	checkForMigrateCenter: function() {
+		if ($('#sliderHolderCenter').html().killWhiteSpace() != '') {
+			this.migrateCenterSlider();
+			return 'right';
+		} else {
+			return 'center';
+		}
+	},
+	migrateCenterSlider: function() {
+		var centerHTML = $('#sliderHolderCenter').html();
+		$('#sliderHolderCenter').html('');
+		$('#sliderHolderLeft').html(centerHTML);
 	},
 	removeSlider: function() {
 		this.sliderWrapper.html('');

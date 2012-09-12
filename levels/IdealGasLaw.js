@@ -175,92 +175,61 @@ _.extend(IdealGasLaw.prototype,
 		]
 		store('prompts', this.prompts);
 	},
-	init: function(){
+	init: function() {
 		nextPrompt();
 		$('#mainHeader').text('Work');
 	},
-	block1Start: function(){
+	block1Start: function() {
 		this.readout.show();
 		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});
 		spcs['spc4'].populate(P(45,35), V(450, 350), 300, 300);
 		this.tempChanger1 = new TempChanger({min:100, max:1200});
 		this.stateListener1 = new StateListener({dataList:walls[0].data.t, is:'notEqualTo', targetVal:dataHandler.temp(), alertUnsatisfied:"Play with the slider!"});
 		walls[0].displayTemp();
+		this.borderStd({min:this.yMin});
 	},
-	block2Start: function(){
+	block2Start: function() {
 		walls = WallHandler({pts:[[P(40,30), P(250,30), P(250,440), P(40,440)], 
 			[P(300,30), P(510,30), P(510,440), P(300,440)]], handlers:'staticAdiabatic', handles:['c1', 'c2']});
+		this.borderStd({min:this.yMin, wallInfo:0});
+		this.borderStd({min:this.yMin, wallInfo:1});
 		spcs['spc4'].populate(P(45, 80), V(200, 300), 200, 600);
 		spcs['spc4'].populate(P(305,75), V(200, 300), 200, 100);
 	},
-	block8Start: function(){
+	block8Start: function() {
 		walls = WallHandler({pts:[[P(40,30), P(250,30), P(250,440), P(40,440)], 
 			[P(300,30), P(510,30), P(510,440), P(300,440)]], handlers:'staticAdiabatic', handles:['c1', 'c2']});
+		this.borderStd({min:this.yMin, wallInfo:0});
+		this.borderStd({min:this.yMin, wallInfo:1});
 		spcs['spc5'].populate(P(45, 80), V(200, 300), 1, 600, 'c1');
 		spcs['spc6'].populate(P(305,75), V(200, 300), 1, 100, 'c2');
-		this.RMSChanger8Left = new RMSChanger({min:50, max:1000, info:{spcName:'spc5'}, sliderPos:'left'});
-		this.RMSChanger8Right = new RMSChanger({min:50, max:1000, info:{spcName:'spc6'}, sliderPos:'right'});
+		this.RMSChanger8Left = new RMSChanger({min:50, max:1000, info:{spcName:'spc5'}});
+		this.RMSChanger8Right = new RMSChanger({min:50, max:1000, info:{spcName:'spc6'}});
 		walls[0].recordRMS().displayRMS();
 		walls[1].recordRMS().displayRMS();
 		this.tempEqualListener = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:walls[0].data.t, alertUnsatisfied:"Remember temperature is preportional to kinetic energy.  Set the kinetic energies equal"});
 	},
-
-	block9Start: function(){
-		$('#longSliderHolder').show();
-		this.playedWithSlider = new Boolean();
-		this.playedWithSlider = false;
-		walls = WallHandler([[P(50,75), P(75,50), P(475,50), P(500,75), P(500,300), P(475,325), P(75,325), P(50,300)]], 'staticAdiabatic', ['container']);
+	block10Start: function() {
+		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});	
+		this.borderStd({min:this.yMin});
+		spcs['spc1'].populate(P(45,35), V(200, 300), 250, 200);
+		spcs['spc3'].populate(P(45,35), V(200, 300), 150, 200);	
+		walls[0].displayPInt();
+	},
+	block11Start: function() {
+		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});	
 		walls.setHitMode('container', 'Arrow');
-		spcs['spc4'].populate(P(100,100), V(300,200), 1, 700);
-		$('#sliderPressure').show();
+		spcs['spc4'].populate(P(100,100), V(300,200), 1, 600);
+		this.tempChanger11 = new TempChanger({min:100, max:1100});
 		
 	},
-	block9Conditions: function(){
-		return this.block1Conditions();
+	block15Start: function() {
+		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});	
+		this.compArrow15 = new CompArrow({handle:'compyT', compMode:'adiabatic', bounds:{y:{min:30, max:235}}});
 	},
-	block9CleanUp: function(){
-		walls.setHitMode('container', 'Std');
-		this.playedWithSlider = undefined;
-		$('#longSliderHolder').hide();
-		$('#sliderPressure').hide();
-		removeListenerByName(curLevel, 'update', 'drawArrow');
-		removeListenerByName(curLevel, 'update', 'animText');
-		
-	},
-	block10Start: function(){
-		this.cutSceneStart();		
-	},
-	block10aStart:function(){
-		this.cutSceneText("<p>So we have two ideas at play here:</p><p><ul><li>First, the harder your molecules hit the wall, the more force each collision exerts on it.</p>"+
-		"<p><li>Second, the faster they're moving, the more often they hit the wall.</ul></p>"+
-		"<p>Both of these things are <i>linearly</i> dependant on molecular speed.</p>"+
-		"<p>The total force applied to the walls by the molecules is the product of these two, so multiplying, we get that pressure is proportional to mass times speed squared, or to temperature.</p>"+
-		"<p>Let's see if we can express that with some math.</p>"
-		);
-	},
-	block10bStart: function(){
-		this.cutSceneText("Say we have a molecule of mass m moving as follows:"+
-			"<center><img src=img/ideal/pressureSetup.gif></img></center>"+
-			"Starting from"+
-			"<center><img src=img/ideal/pggfa.gif></img> and <img src = img/ideal/fma.gif></center>"+
-			"We can integrate F=ma over time to get"+
-			"<center><img src=img/ideal/momentum.gif></img></center>"+
-			"We know that the change in velocity on collision is 2V<sub>x</sub> because it leaves with the inverse of the velocity it arrived with.  This expresses the first idea.<br>"+
-			"Substituting in F, we get"+
-			"<center><img src=img/ideal/pdelt.gif></center>  <br><p>Continued on next page...</p>"
-			
-			);
-	},
-	block10cStart: function(){
-		this.cutSceneText("<center><img src=img/ideal/pressureSetup.gif></img></center>"+
-		"Because we're looking for an average pressure, we average out the momentum change over the whole time between impacts, which is given by"+
-		"<center><img src=img/ideal/delt.gif></img></center>"+
-		"This gives us the second idea.<br>"+
-		"Then we put it all together and get"+
-		"<center><img src=img/ideal/last.gif></img></center>"+
-		"Now look at that!  Remember that T is proportional to mV<sup>2</sup> as well?  This means that we have just derived that <i>P is directly proportional to T</i> from a simple model of balls bouncing around!  Does this sound familiar to the ideal gas law or what?"
-		
-		);
+	block16Start: function() {
+		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});	
+		this.compArrow15 = new CompArrow({handle:'compyT', compMode:'adiabatic', bounds:{y:{min:30, max:337.5}}});
 	},
 
 	block10CleanUp: function(){
@@ -373,31 +342,7 @@ _.extend(IdealGasLaw.prototype,
 
 		showPrompt(undefined, this.prompts[curLevel.promptIdx]);		
 	},
-/*
-	changeTempSlider: function(event, ui){
-		this.playedWithSlider = true;
-		var temp = ui.value;
-		changeAllTemp(temp);
-		var dot = spcs.spc4[0];
-		this.readout.hardUpdate(temp, 'temp');
-		this.readout.hardUpdate(dot.speed(), 'speed');
-	},
-	changePressureSlider: function(event, ui){
-		this.playedWithSlider = true;
-		var temp = ui.value;
-		changeAllTemp(temp);
-	},
-	changeTempSpcA: function(event, ui){
-		var rms = ui.value;
-		changeRMS({spcName:this.spcA}, rms);
-		this.readout.hardUpdate(rms, 'rmsLeft');
-	},
-	changeTempSpcB: function(event, ui){
-		var rms = ui.value;
-		changeRMS({spcName:this.spcB}, rms);	
-		this.readout.hardUpdate(rms, 'rmsRight');		
-	},
-	*/
+
 
 }
 )

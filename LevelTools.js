@@ -302,7 +302,7 @@ LevelTools = {
 	},
 	borderStd: function(info){
 		info = defaultTo({}, info);
-		var wall = defaultTo('container', info.wallInfo);
+		var wall = defaultTo(0, info.wallInfo);
 		
 		walls[wall].border([1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:info.min}, {}, {}, {y:info.min}]);
 	},
