@@ -570,7 +570,7 @@ function makeSlider(wrapperDivId, sliderDivId, title, attrs, handlers, initVisib
 		div[initVisibility]();
 	}
 	sliderList.push(sliderDivId);
-	return sliderDiv;
+	return wrapperDiv;
 }
 function sliderBind(div, eventType, func, obj){
 	div.bind(eventType, function(event, ui){func.apply(obj, [event, ui])});

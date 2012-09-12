@@ -18,6 +18,7 @@ WallMethods = {
 //////////////////////////////////////////////////////////////////////////	
 	main: {
 		assemble: function(attrs){//pts, handles, bounds, includes, vols, shows, records){
+			this.removed = false;
 			var pts = attrs.pts;
 			var handles = attrs.handles;
 
@@ -259,6 +260,7 @@ WallMethods = {
 				this.removeWall(wallIdx);
 			}
 			//Hey - if I want to remove just one wall when multiple are present, will need to remove wallMove by wall, but I don't think that case will happen
+			this.removed = true;
 			emptyListener(curLevel, 'wallMove');
 		},
 		removeWall: function(wallInfo){

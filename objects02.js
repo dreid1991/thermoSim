@@ -724,7 +724,7 @@ _.extend(TempChanger.prototype, objectFuncs, {
 		changeTemp(this.info, this.percentToTemp(ui.value));
 	},
 	remove: function(){
-		$('#'+this.sliderId).remove();
+		this.removeSlider();
 	},
 }
 )
@@ -754,7 +754,7 @@ _.extend(RMSChanger.prototype, objectFuncs, {
 		changeRMS(this.info, ui.value);
 	},
 	remove: function(){
-		$('#'+this.sliderId).remove();
+		this.removeSlider();
 	},
 }
 )

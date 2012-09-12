@@ -89,8 +89,11 @@ objectFuncs = {
 				break;
 		}
 		var sliderId = 'slider' + this.handle;
-		makeSlider(toAppendId, sliderId, title, attrs, handlers);
+		this.sliderWrapper = makeSlider(toAppendId, sliderId, title, attrs, handlers);
 		return sliderId;
+	},
+	removeSlider: function() {
+		this.sliderWrapper.html('');
 	},
 	hideSliderDivs: function(){
 		$('#sliderHolderSingle').hide();
@@ -1432,9 +1435,7 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		this.wall.moveStop();
 		this.wall.unsetMass('piston' + this.handle);
 		this.hide();
-		if(this.sliderId){
-			$('#'+this.sliderId).remove();
-		}
+		this.removeSlider();
 		this.hideSliderDivs();
 		removeListener(curLevel, 'update', 'moveWalls');
 	}
@@ -1592,6 +1593,7 @@ _.extend(Heater.prototype, objectFuncs, {
 		}
 	},
 	remove: function(){
+		this.removeSlider();
 		removeListener(curLevel, 'update', 'drawHeater'+this.handle);
 		if(window.walls){
 			walls.removeWall('heater' + this.handle);
@@ -1645,7 +1647,9 @@ _.extend(Stops.prototype, objectFuncs, {
 		return this;
 	},
 	remove: function(){
-		walls.setBounds(this.wallInfo, {yMax:this.yMaxSave});
+		if (window.walls && !walls.removed) {
+			walls.setBounds(this.wallInfo, {yMax:this.yMaxSave});
+		}
 		removeListener(curLevel, 'update', 'drawStops' + this.wallInfo);
 		return this;
 	},

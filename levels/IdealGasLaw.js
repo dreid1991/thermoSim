@@ -19,7 +19,7 @@ _.extend(IdealGasLaw.prototype,
 			{block:1, 
 				title:"Currnet step",
 				text: "First, we need to find out what our state variables like temperature and pressure look like on a molecular level.  Let’s start with temperature.  Temperature is proportional to average molecular kinetic energy.  What happens to the molecules’ speed and kinetic energy when you change their temperature with the slider?",
-				quiz:{	
+				quiz:{	0  
 					type:'buttons',
 					options:
 						[{text:"Increases", isCorrect: true},
@@ -191,119 +191,14 @@ _.extend(IdealGasLaw.prototype,
 		spcs['spc4'].populate(P(45, 80), V(200, 300), 200, 600);
 		spcs['spc4'].populate(P(305,75), V(200, 300), 200, 100);
 	},
-	block3Start: function(){
-		walls = WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
-			[P(300,30), P(510,30), P(510,440), P(300,440)]], 'staticAdiabatic', ['c1', 'c2']);
-		;
+	block8Start: function(){
+		walls = WallHandler({pts:[[P(40,30), P(250,30), P(250,440), P(40,440)], 
+			[P(300,30), P(510,30), P(510,440), P(300,440)]], handlers:'staticAdiabatic', handles:['c1', 'c2']});
 		spcs['spc4'].populate(P(45, 80), V(200, 300), 200, 600);
 		spcs['spc4'].populate(P(305,75), V(200, 300), 200, 100);
 		
 	},
-	block4Start: function(){
-		walls = WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
-			[P(300,30), P(510,30), P(510,440), P(300,440)]], 'staticAdiabatic', ['c1', 'c2']);
-		spcs['spc1'].populate(P(45, 80), V(200, 300), 200, 300);
-		spcs['spc5'].populate(P(305,75), V(200, 300), 100, 800);
 
-		this.readout.addEntry('rmsLeft', 'RMS(v) Left:', 'm/s', rms(dataHandler.velocities({spcName:'spc1'})), undefined, 0);
-		
-		this.readout.addEntry('rmsRight', 'RMS(v) Right:', 'm/s', rms(dataHandler.velocities({spcName:'spc5'})), undefined, 0);
-
-		this.readout.show();
-	},
-	block4CleanUp: function(){
-		this.readout.removeAllEntries();
-		this.readout.hide();
-	},
-	block5Start: function(){
-
-		this.spcA = undefined;
-		this.spcB = undefined;
-		this.cutSceneStart("<p>So, we had two comparisons.</p>  <p>In the first, we had identical gases, but the molecules in one chamber moved more quickly.  The container with the fast moving molecules was hotter because its molecules had a higher average kinetic energy. </p>"+
-		"<p>In the second set, we had a container with a light gas and a container with a heavy gas, but they had the same root mean squared speed.  We can calculate the average kinetic energy of the molecules in each container with</p><center><img src=img/ideal/IdealGasRMS.gif></img></center>"+
-		"<p>This shows us that the average kinetic energy of the heavy gas was greater, but we didn’t <i>need</i> to calculate anything to figure that out.  We know that if two objects have the same speed, the heavier one has more kinetic energy.  This intuition applies to molecules too, and we can say just by looking that the heavier molecules had a higher temperature. </p>"+
-		"<p>So higher temperature doesn’t necessarily mean your gas molecules are moving at a higher speed.  It means your gas molecules are moving with <i>more energy</i>.</p>");
-	},
-	block5CleanUp: function(){
-		this.cutSceneEnd();
-	},
-	block6Start: function(){
-		walls = WallHandler([[P(40,30), P(250,30), P(250,440), P(40,440)], 
-			[P(300,30), P(510,30), P(510,440), P(300,440)]], 'staticAdiabatic', ['c1', 'c2']);
-		;
-		var sliderMin = $('#sliderSpeedLeft').slider('option', 'min');
-		var sliderMax = $('#sliderSpeedLeft').slider('option', 'max');
-		this.spcA = 'spc6';
-		this.spcB = 'spc5'
-		var mA = spcs[this.spcA].m;
-		var mB = spcs[this.spcB].m;
-		var tempA = 1;
-		var tempB = 1;
-		while (fracDiff(tempA, tempB)<.1){
-			var rmsInitA = .75*Math.random()*(sliderMax-sliderMin)+sliderMin;
-			var rmsInitB = .75*Math.random()*(sliderMax-sliderMin)+sliderMin;
-			var tempA = VToTemp(mA, rmsInitA/pxToMS);
-			var tempB = VToTemp(mB, rmsInitB/pxToMS);
-		}
-		spcs[this.spcA].populate(P(45, 80), V(200, 300), 200, tempA);
-		spcs[this.spcB].populate(P(305,75), V(200, 300), 100, tempB);
-		
-		$('#sliderSpeedLeft').slider('option', {value:rmsInitA});
-		$('#sliderSpeedRight').slider('option', {value:rmsInitB});
-		$('#sliderSpeedLeftHolder').show();
-		$('#sliderSpeedRightHolder').show();
-		$('#checkAns').show();
-		this.readout.addEntry('rmsLeft', 'RMS(v) Left:', 'm/s', rmsInitA, undefined, 0);
-		this.readout.addEntry('rmsRight', 'RMS(v) Right:', 'm/s', rmsInitB, undefined, 0);
-		this.readout.show();
-	},
-	block6Conditions: function(){
-		var tempA = dataHandler.temp({spcName:this.spcA});
-		var tempB = dataHandler.temp({spcName:this.spcB});
-		if(fracDiff(tempA, tempB)<.05){
-			return {result:true}
-		} else{
-			return {result:false, alert:"Your temperatures aren't within the 5% tolerance of each other"} 
-		}
-	},
-	block6CleanUp: function(){
-		this.readout.removeAllEntries();
-		this.readout.hide();
-		$('#checkAns').hide();
-		$('#sliderSpeedLeftHolder').hide()
-		$('#sliderSpeedRightHolder').hide()
-	},
-
-	block7Start: function(){
-		this.cutSceneStart("<p>I see you made it through unscathed.  That’s good!</p><p>Let’s make sure we did that problem the same way.</p><p>First, you can arbitrarily pick an RMS for one of the containers since the temperatures just have to be equal.  Then we can relate RMS to temperature like this:<br><center><img src=img/ideal/block7a.gif></img></center>Since the temperatures of the two containers were equal, you can set the average kinetic energies equal to each other:<br><center><img src=img/ideal/block7b.gif></img></center><p>Finally, you can solve for the unknown RMS like so:</p><center><img src=img/ideal/block7c.gif></img></center>");
-	},
-	block7CleanUp: function(){
-		this.cutSceneEnd();
-	},
-	block8Start: function(){
-		walls = WallHandler([[P(40,30), P(510,30), P(510,440), P(40,440)]], 'staticAdiabatic', ['container']);
-		;
-		spcs['spc1'].populate(P(45,35), V(450, 350), 600, 300);
-		spcs['spc3'].populate(P(45,35), V(450, 350), 800, 300);
-		this.forceInternal=0;
-		this.numUpdates=0;
-		this.readout.addEntry('pressure', 'Pressure:', 'atm', 0, 0, 1);
-		this.readout.show();
-		var wall = walls[0];
-		this.trackIntPressureStart(wall.handle);
-		var pList = this.data['pInt'+wall.handle];
-		addListener(curLevel, 'data', 'recordPressure', 
-			function(){
-				this.readout.tick(pList[pList.length-1], 'pressure')
-			},
-			this);
-	},
-	block8CleanUp: function(){
-		this.trackIntPressureStop(walls[0].handle);
-		this.readout.removeAllEntries();
-		this.readout.hide();
-		removeListener(curLevel, 'data', 'recordPressure');
-	},
 	block9Start: function(){
 		$('#longSliderHolder').show();
 		this.playedWithSlider = new Boolean();
