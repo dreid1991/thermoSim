@@ -1287,6 +1287,7 @@ WallMethods = {
 			if(this.displayingMass){this.displayMassStop();};
 			if(this.displayingQ){this.displayQStop();};
 			if(this.displayingQArrows){this.displayQArrowsStop();};
+			if(this.displayingRMS){this.displayRMSStop();};
 			return this;
 		},
 		checkDisplayArrows: function(){

@@ -29,7 +29,7 @@ _.extend(IdealGasLaw.prototype,
 			},
 			{block:2, 
 				title:"Current step",
-				text:"Just so we're on the same page, which of these two systems has a higher temperature?",
+				text:"Good, so which of these two systems has a higher temperature?  Or, which system's molecules have a higher average kinetic energy?  It's the same question.",
 				quiz:{	
 					type:'buttons',
 					options:
@@ -41,7 +41,7 @@ _.extend(IdealGasLaw.prototype,
 			},
 			{block:3, 
 				cutScene: true,
-				text:"<p>We can calculate molecules’ temperature with the equation</p>||EQ2CE<p>with <ul><li>k: boltzmann constant <li>t: temperature <li>m: molecule’s mass <li>v molecule’s speed</ul>Alternatively, we can express this in terms of the molecules’ <i>root mean squared</i> speed like this:</p>||EQ3CE<p>so rms is the average of the square of all the velocities square rooted.  The above is for a system of one type of molecule, but rms speed can be used to calculate the temperature of a system with any types of molecules.",
+				text:"<p>Good.  We can calculate molecules’ temperature with the equation</p>||EQ2CE<p>with <ul><li>K<sub>b</sub>: boltzmann constant <li>T: temperature <li>m: molecule’s mass <li>V: molecule’s speed</ul>Alternatively, we can express this in terms of the molecules’ <i>root mean squared</i> speed like this:</p>||EQ3CE<p>so rms is the average of the square of all the velocities square rooted.  The above is for a system of one type of molecule, but rms speed can be used to calculate the temperature of a system with any types of molecules.",
 			},
 
 			{block:4,
@@ -66,7 +66,7 @@ _.extend(IdealGasLaw.prototype,
 			},	
 			{block:6,
 				cutScene: true,
-				text:"<p>Okay, from the same values, we have </p><p>&#09;rms: 357 m/s</p><p>&#09;average: 350 m/s</p><p>By the way, root mean square is also called the quadratic mean, if that helps.</p><p>Now which of these would you say best described what root mean square is?</p>",
+				text:"<p>Okay, from the same values, we have </p><p>&#09;rms: 357 m/s</p><p>&#09;average: 350 m/s</p><p>By the way, root mean square is also called the quadratic mean, if that helps.</p><p>Now which of these would you say best describes what root mean square is?</p>",
 				quiz:{	
 					type:'multChoice',
 					options:
@@ -206,7 +206,7 @@ _.extend(IdealGasLaw.prototype,
 		this.RMSChanger8Left = new RMSChanger({min:50, max:1000, info:{spcName:'spc5'}});
 		this.RMSChanger8Right = new RMSChanger({min:50, max:1000, info:{spcName:'spc6'}});
 		walls[0].recordRMS().displayRMS();
-		walls[1].recordRMS().displayRMS();
+		//walls[1].recordRMS().displayRMS();
 		this.tempEqualListener = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:walls[0].data.t, alertUnsatisfied:"Remember temperature is preportional to kinetic energy.  Set the kinetic energies equal"});
 	},
 	block10Start: function() {
