@@ -140,7 +140,9 @@ _.extend(cvcp.prototype,
 		this.piston = new Piston({wallInfo:'right', min:2, init:2, max:2, makeSlider:false})
 		this.heaterLeft = new Heater({handle:'heaterLeft', wallInfo:'left'});
 		this.heaterRight = new Heater({handle:'heaterRight', wallInfo:'right'});
-		
+		walls[1].setDefaultReadout(this.readout);
+		walls[0].displayTemp().displayQ();
+		walls[1].displayTemp().displayQ();
 	},
 
 

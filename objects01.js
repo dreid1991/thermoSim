@@ -1466,6 +1466,10 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 //////////////////////////////////////////////////////////////////////////
 //HEATER
 //////////////////////////////////////////////////////////////////////////
+/*
+If you give it wallInfo, heater will add its energy flow to wall.q
+Still records its energy flow
+*/
 function Heater(attrs){
 	this.type = 'Heater';
 	/*
@@ -1474,6 +1478,7 @@ function Heater(attrs){
 	*/
 	this.dims = defaultTo(V(100,40), attrs.dims);
 	if(attrs.wallInfo){
+		this.wall = walls[attrs.wallInfo];
 		this.pos = this.centerOnWall(attrs.wallInfo, this.dims);
 	}else{
 		this.pos = attrs.pos;
@@ -1602,7 +1607,12 @@ _.extend(Heater.prototype, objectFuncs, {
 		return this;
 	},
 	setupWalls: function(){
-		walls.addWall({pts:this.wallPts, handler:{func:this.hit, obj:this}, handle:'heater' + this.handle, record:false, show:false});
+		if (this.wall) {
+			var handler = {func:this.hitAddQToWall, obj:this};
+		} else {
+			var handler = {func:this.hit, obj:this};
+		}
+		walls.addWall({pts:this.wallPts, handler:handler, handle:'heater' + this.handle, record:false, show:false});
 	},
 	hit: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){
 		walls.reflect(dot, wallUV, vPerp);
@@ -1610,7 +1620,18 @@ _.extend(Heater.prototype, objectFuncs, {
 			var tempOld = dot.temp();
 			var tempNew = Math.max(tempOld + this.temp, 50);
 			dot.setTemp(tempNew);
-			this.eAdded+=(tempNew-tempOld)*cv/N*JtoKJ;
+			this.eAdded+=(tempNew-tempOld)*cv/(N*JtoKJ);
+		}
+	},
+	hitAddQToWall: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){
+		walls.reflect(dot, wallUV, vPerp);
+		if(this.temp!=0){
+			var tempOld = dot.temp();
+			var tempNew = Math.max(tempOld + this.temp, 50);
+			dot.setTemp(tempNew);
+			var eHit = (tempNew-tempOld)*cv*JtoKJ/N
+			this.eAdded+=eHit;
+			this.wall.q+=eHit;
 		}
 	},
 	remove: function(){
