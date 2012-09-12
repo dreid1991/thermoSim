@@ -19,7 +19,7 @@ _.extend(IdealGasLaw.prototype,
 			{block:1, 
 				title:"Currnet step",
 				text: "First, we need to find out what our state variables like temperature and pressure look like on a molecular level.  Let’s start with temperature.  Temperature is proportional to average molecular kinetic energy.  What happens to the molecules’ speed and kinetic energy when you change their temperature with the slider?",
-				quiz:{	0  
+				quiz:{ 
 					type:'buttons',
 					options:
 						[{text:"Increases", isCorrect: true},
@@ -28,20 +28,22 @@ _.extend(IdealGasLaw.prototype,
 				},
 			},
 			{block:2, 
-				cutScene: true,
-				text:"<p>We can calculate molecules’ temperature with the equation</p>||EQ2CE<p>with <ul><li>k: boltzmann constant <li>t: temperature <li>m: molecule’s mass <li>v molecule’s speed</ul>Alternatively, we can express this in terms of the molecules’ <i>root mean squared</i> speed like this:</p>||EQ3CE<p>so rms is the average of the square of all the velocities square rooted.  The above is for a system of one type of molecule, but rms speed can be used to calculate the temperature of a system with any types of molecules.",
-			},
-			{block:3, 
 				title:"Current step",
 				text:"Just so we're on the same page, which of these two systems has a higher temperature?",
 				quiz:{	
-					type:'multChoice',
+					type:'buttons',
 					options:
-						[{text:"Left", isCorrect: false, message:"Yeah, but temperature is preportional to kinetic energy which is preportional to speed^2"},
-						{text:"Right", isCorrect: true}
+						[{text:"Right", isCorrect: true},
+						{text:"Left", isCorrect: false, message:"Yeah, but temperature is preportional to kinetic energy which is preportional to speed^2"}
+						
 					]
 				},
 			},
+			{block:3, 
+				cutScene: true,
+				text:"<p>We can calculate molecules’ temperature with the equation</p>||EQ2CE<p>with <ul><li>k: boltzmann constant <li>t: temperature <li>m: molecule’s mass <li>v molecule’s speed</ul>Alternatively, we can express this in terms of the molecules’ <i>root mean squared</i> speed like this:</p>||EQ3CE<p>so rms is the average of the square of all the velocities square rooted.  The above is for a system of one type of molecule, but rms speed can be used to calculate the temperature of a system with any types of molecules.",
+			},
+
 			{block:4,
 				cutScene: true,
 				text:"<p>Right.  Now root mean square is a tricky idea, but it’s important to understanding temperature, so let’s practice.</p><p>If you have molecules moving at 250, 300, 350, 400, and 450 m/s, what is their root mean square speed?</p>",
@@ -185,7 +187,7 @@ _.extend(IdealGasLaw.prototype,
 		this.stateListener1 = new StateListener({dataList:walls[0].data.t, is:'notEqualTo', targetVal:dataHandler.temp(), alertUnsatisfied:"Play with the slider!"});
 		walls[0].displayTemp();
 	},
-	block3Start: function(){
+	block2Start: function(){
 		walls = WallHandler({pts:[[P(40,30), P(250,30), P(250,440), P(40,440)], 
 			[P(300,30), P(510,30), P(510,440), P(300,440)]], handlers:'staticAdiabatic', handles:['c1', 'c2']});
 		spcs['spc4'].populate(P(45, 80), V(200, 300), 200, 600);
@@ -196,7 +198,8 @@ _.extend(IdealGasLaw.prototype,
 			[P(300,30), P(510,30), P(510,440), P(300,440)]], handlers:'staticAdiabatic', handles:['c1', 'c2']});
 		spcs['spc4'].populate(P(45, 80), V(200, 300), 200, 600);
 		spcs['spc4'].populate(P(305,75), V(200, 300), 200, 100);
-		
+		this.RMSChanger8Left = new RMSChanger({min:1, max: 
+		this.RMSChanger8Right = 
 	},
 
 	block9Start: function(){

@@ -33,7 +33,9 @@ $(function(){
 	JtoKJ = .001;
 	N = 1000;//Avagadro's number
 	//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
-	pxToMS = 157.9;
+	pxToMS = 157.9; //HEY - THIS SHOULD BE REMOVED AND REPLACED WITH SOLVING FOR V FROM DOT'S TEMPERATURE
+	KB = 1.38*Math.pow(10,-23)
+	ACTUALN = 6.022*Math.pow(10,-23);
 	g = 1.75
 	workConst = .158e-3;//for kJ;
 	updateInterval = 30;
@@ -646,7 +648,15 @@ function showPrompt(prev, prompt){
 
 			emptyListener(curLevel, 'cleanUp');
 			emptyListener(curLevel, 'condition');
-			if(curLevel.inCutScene){
+			
+			addListener(curLevel, 'cleanUp', 'removeArrowAndText',
+				function(){
+					removeListenerByName(curLevel, 'update', 'drawArrow');
+					removeListenerByName(curLevel, 'update', 'animText');
+				},
+			this);
+			
+			if (curLevel.inCutScene) {
 				curLevel.cutSceneEnd();
 			}
 			if(curLevel['block'+block+'Start']){
@@ -730,49 +740,49 @@ function angleToUV(dir){
 }
 function getSign(val){
 	var sign=1;
-	if(val!=0){
+	if (val!=0) {
 		sign = Math.abs(val)/val;
 	}
 	return sign;
 }
-function fracDiff(a, b){
+function fracDiff(a, b) {
 	return Math.abs(a-b)/Math.min(Math.abs(a), Math.abs(b));
 }
-function getLen(pts){
+function getLen(pts) {
 	var len = 0;
 	for (var ptIdx=0; ptIdx<pts.length-1; ptIdx++){
 		len+=pts[ptIdx].distTo(pts[ptIdx+1]);
 	}
 	return len;
 }
-function byAttr(obj, attrVal, attr){
-	if(obj instanceof Array){
+function byAttr(obj, attrVal, attr) {
+	if (obj instanceof Array) {
 		for(var listIdx=0; listIdx<obj.length; listIdx++){
 			if(obj[listIdx][attr]==attrVal){
 				return obj[listIdx];
 			}
 		}
 	}else{
-		for(var name in obj){
+		for (var name in obj) {
 			if (obj[name][attr]==attrVal){
 				return obj[name];
 			}
 		}
 	}
 }
-function inRect(pos, dims, curCanvas){
+function inRect(pos, dims, curCanvas) {
 	var mousePos = mouseOffset(curCanvas);
 	return mousePos.x>=pos.x && mousePos.x<=(pos.x+dims.dx) && mousePos.y>=pos.y && mousePos.y<=(pos.y+dims.dy);
 }
-function ptInRect(pos, dims, pt){
+function ptInRect(pos, dims, pt) {
 	return pt.x>=pos.x && pt.x<=(pos.x+dims.dx) && pt.y>=pos.y && pt.y<=(pos.y+dims.dy);
 }
-function extend(old, add){
+function extend(old, add) {
 	return function(){
 		return add(old());
 	}
 }
-function rms(vals){
+function rms(vals) {
 	var sum=0;
 	for (var valIdx=0; valIdx<vals.length; valIdx++){
 		sum+=vals[valIdx]*vals[valIdx]		
@@ -781,13 +791,13 @@ function rms(vals){
 	return Math.sqrt(sum);
 }
 globalMousePos = P(0,0);
-function mouseOffset(curCanvas){
+function mouseOffset(curCanvas) {
 	return P(globalMousePos.x - curCanvas.offsetLeft, globalMousePos.y - curCanvas.offsetTop);
 }
 function mouseOffsetDiv(divId) {
 	return P(globalMousePos.x - $('#'+divId).offset().left, globalMousePos.y - $('#'+divId).offset().top);
 }
-$(document).mousemove(function(e){
+$(document).mousemove(function(e) {
 	globalMousePos.x = e.pageX;
 	globalMousePos.y = e.pageY;
 	for (var mousemoveListener in curLevel.mousemoveListeners.listeners){
@@ -795,19 +805,19 @@ $(document).mousemove(function(e){
 		listener.func.apply(listener.obj);
 	}	
 })
-$(document).mousedown(function(e){
+$(document).mousedown(function(e) {
 	for (var mousedownListener in curLevel.mousedownListeners.listeners){
 		var listener = curLevel.mousedownListeners.listeners[mousedownListener]
 		listener.func.apply(listener.obj);
 	}		
 })
-$(document).mouseup(function(e){
+$(document).mouseup(function(e) {
 	for (var mouseupListener in curLevel.mouseupListeners.listeners){
 		var listener = curLevel.mouseupListeners.listeners[mouseupListener]
 		listener.func.apply(listener.obj);
 	}	
 })
-function UNLOCK(){
+function UNLOCK() {
 	for (var promptIdx in curLevel.prompts){
 		curLevel.prompts[promptIdx].finished=true;
 	}

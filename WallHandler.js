@@ -181,6 +181,7 @@ WallMethods = {
 			this[wallIdx].data.pInt = new Array();
 			this[wallIdx].data.pExt = new Array();
 			this[wallIdx].data.t = new Array();
+			this[wallIdx].data.RMS = new Array(); // m/s
 			this[wallIdx].data.v = new Array();
 			this[wallIdx].data.m = new Array();
 			this[wallIdx].data.work = new Array(); // kj
@@ -675,17 +676,6 @@ WallMethods = {
 			}		
 		},
 		setHitMode: function(inputMode){
-			if(inputMode == 'Arrow' && this.hitMode != 'Arrow'){
-				addListener(curLevel, 'cleanUp', 'removeArrowAndText',
-					function(){
-						removeListenerByName(curLevel, 'update', 'drawArrow');
-						removeListenerByName(curLevel, 'update', 'animText');
-					},
-				this);
-			} else if (inputMode != 'Arrow' && this.hitMode == 'Arrow'){
-				removeListener(curLevel, 'cleanUp', 'removeArrowAndText');
-			}
-			
 			this.hitMode = inputMode;
 		},
 		setDefaultReadout: function(readout){
@@ -879,9 +869,9 @@ WallMethods = {
 			this.recordVol();
 			this.recordQ();
 		},
-		recordTemp: function(){
+		recordTemp: function() {
 			this.recordingTemp = true;
-			if(this.parent.numWalls>1){
+			if (this.parent.numWalls>1) {
 				var tempFunc = dataHandler.tempFunc({tag:this.handle})
 			}else{
 				var tempFunc = dataHandler.tempFunc();
@@ -889,22 +879,57 @@ WallMethods = {
 			recordData('t' + this.handle, this.data.t, tempFunc, this);
 			return this;
 		},
-		recordPInt: function(){
+		recordRMS: function() {
+			if (this.recordingTemp) {
+				this.recordingRMS = true;
+				//HEY - I AM ASSUMING THAT IF YOU GET RMS, IT IS OF ONE TYPE OF MOLECULE
+				if (this.parent.numWalls>1) {
+					var tag = this.handle;
+				} else {
+					tag = undefined;
+				}			
+				var mass = this.getRMSMass(tag);
+				var RMSFunc = function() {
+					var temp = this.data.t[this.data.t.length-1];
+					return Math.sqrt(3000*KB*temp/(mass*ACTUALN))
+				}
+				recordData('RMS' + this.handle, this.data.RMS, RMSFunc, this);
+			} else {
+				console.log('Tried to record RMS of wall ' + this.handle + ' while not recording temp.  Will not record.');
+			}
+		},
+		getRMSMass: function(tag) {
+			if (tag) {
+				for (var spc in spcs) {
+					var dots = spcs[spc];
+					for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
+						if (tag) {
+							if (dots[dotIdx].tag == tag) {
+								return dots[dotIdx].m;
+							}
+						} else {
+							return dots[dotIdx].m;
+						}
+					}
+				}
+			}
+		},
+		recordPInt: function() {
 			this.recordingPInt = true;
 			recordData('pInt' + this.handle, this.data.pInt, this.pInt, this);
 			return this;
 		},
-		recordPExt: function(){
+		recordPExt: function() {
 			this.recordingPExt = true;
 			recordData('pExt' + this.handle, this.data.pExt, this.pExt, this, 'update');
 			return this;
 		},
-		recordVol: function(){
+		recordVol: function() {
 			this.recordingVol = true;
 			recordData('v' + this.handle, this.data.v, function(){return this.parent.wallVolume(this.handle)}, this, 'update');
 			return this;
 		},
-		recordWork: function(){
+		recordWork: function() {
 			this.recordingWork = true;
 			this.work = 0;
 			var LTOM3LOCAL = LtoM3;
@@ -927,12 +952,12 @@ WallMethods = {
 			recordData('work' + this.handle, this.data.work, function(){return this.data.work[this.data.work.length-1]}, this);
 			return this;
 		},
-		recordMass: function(){
+		recordMass: function() {
 			this.recordingMass = true;
 			recordData('mass' + this.handle, this.data.m, this.mass, this, 'update');		
 			return this;			
 		},
-		recordQ: function(){
+		recordQ: function() {
 			this.recordingQ = true;
 			recordData('q' + this.handle, this.data.q, function(){return this.q}, this, 'update');
 			return this;
@@ -973,6 +998,11 @@ WallMethods = {
 			recordDataStop('q' + this.handle);
 			return this;
 		},
+		recordRMSStop: function() {
+			this.recordingRMS = false;
+			recordDataStop('RMS' + this.handle);
+			return this;
+		},
 		recordAllStop: function(){
 			if(this.recordingTemp){this.recordTempStop();};
 			if(this.recordingPInt){this.recordPIntStop();};
@@ -981,8 +1011,11 @@ WallMethods = {
 			if(this.recordingWork){this.recordWorkStop();};
 			if(this.recordingMass){this.recordMassStop();};
 			if(this.recordingQ){this.recordQStop();};
+			if(this.recordingRMS){this.recordRMSStop();};
 			return this;
 		},	
+		
+
 		//HEY - YOU SHOULD _PROBABLY_ MAKE A FUNCTION THAT DOES THESE DISPLAY THINGS GIVEN SOME INPUTS.  I MEAN, THIS IS A LOT OF NEARLY IDENTICAL CODE
 		displayWork: function(readout, label, decPlaces){
 			if(this.recordingWork && !this.displayingWork){
@@ -1156,6 +1189,29 @@ WallMethods = {
 			}
 			return this;
 		},
+		displayRMS: function() {
+			if(this.recordingRMS && !this.displayingRMS){
+				this.displayingRMS = true;
+				decPlaces = defaultTo(0, decPlaces);
+				var dataSet = this.data.RMS;
+				label = defaultTo('RMS:', label);
+				this.RMSReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
+				var firstVal = dataSet[dataSet.length-1];
+				if(!validNumber(firstVal)){
+					firstVal = 0;
+				}
+				this.tempReadout.addEntry('RMS' + this.handle, label, 'm/s', firstVal, undefined, decPlaces);
+				addListener(curLevel, 'data', 'displayRMS' + this.handle,
+					function(){
+						this.tempReadout.tick('RMS' + this.handle, dataSet[dataSet.length-1]);
+					},
+				this);	
+			}else{
+				console.log('Tried to display RMS of wall ' + this.handle + ' while not recording.  Will not display.');
+			}
+			return this;		
+		
+		},
 		displayQArrows: function(threshold){
 			if (this.recordingQ && !this.displayingQArrows) {
 				this.displayingQArrows = true;
@@ -1208,12 +1264,19 @@ WallMethods = {
 			this.qReadout.removeEntry('q' + this.handle);
 			return this;
 		},
+		displayRMSStop: function(){
+			this.displayingRMS = false;
+			removeListener(curLevel, 'data', 'displayRMS' + this.handle)
+			this.RMSReadout.removeEntry('RMS' + this.handle);
+			return this;
+		},
 		displayQArrowsStop: function(){
 			this.displayingQArrows = false;
 			removeListener(curLevel, 'update', 'checkDisplayArrows' + this.handle);
 			removeListenerByName(curLevel, 'update', 'PulseArrow');
 			return this;
 		},
+
 		displayAllStop: function(){
 			if(this.displayingVol){this.displayVolStop();};
 			if(this.displayingPInt){this.displayPIntStop();};

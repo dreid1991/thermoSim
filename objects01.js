@@ -98,6 +98,12 @@ objectFuncs = {
 	hideSliderDivs: function(){
 		$('#sliderHolderSingle').hide();
 		$('#sliderHolderDouble').hide();
+	},
+	valToPercent: function(val) {
+		return 100*(val-this.min)/(this.max-this.min);
+	},
+	percentToVal: function(percent) {
+		return (percent*(this.max-this.min)/100+this.min);
 	}
 }
 //////////////////////////////////////////////////////////////////////////

@@ -698,9 +698,9 @@ Arrow.prototype = {
 //////////////////////////////////////////////////////////////////////////
 function TempChanger(attrs) {
 	this.info = attrs.info;
-	this.tempMin = defaultTo(100, attrs.min);
-	this.temp = dataHandler.temp(this.info);
-	this.tempMax = defaultTo(1500, attrs.max);
+	this.min = defaultTo(100, attrs.min);
+	this.val = dataHandler.temp(this.info);
+	this.max = defaultTo(1500, attrs.max);
 	this.totalDots = dataHandler.count(this.info);
 	this.addCleanUp();
 	return this.init();
@@ -712,16 +712,10 @@ _.extend(TempChanger.prototype, objectFuncs, {
 		} else {
 			var title = "Molecule's temperature";
 		}
-		this.sliderId = this.addSlider(title, {value:this.tempToPercent(this.temp)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
-	},
-	tempToPercent: function(temp) {
-		return 100*(temp-this.tempMin)/(this.tempMax-this.tempMin);
-	},
-	percentToTemp: function(percent) {
-		return (percent*(this.tempMax-this.tempMin)/100+this.tempMin);
+		this.sliderId = this.addSlider(title, {value:this.valToPercent(this.val)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
 	},
 	parseSlider: function(event, ui) {
-		changeTemp(this.info, this.percentToTemp(ui.value));
+		changeTemp(this.info, this.percentToVal(ui.value));
 	},
 	remove: function(){
 		this.removeSlider();
@@ -734,9 +728,9 @@ _.extend(TempChanger.prototype, objectFuncs, {
 //////////////////////////////////////////////////////////////////////////
 function RMSChanger(attrs) {
 	this.info = attrs.info;
-	this.RMSMin = defaultTo(1, attrs.min);
-	this.RMS = dataHandler.RMS(this.info);
-	this.RMSMax = defaultTo(15, attrs.max);
+	this.min = defaultTo(1, attrs.min);
+	this.val = dataHandler.RMS(this.info);
+	this.max = defaultTo(15, attrs.max);
 	
 	this.addCleanUp();
 	return this.init();
@@ -748,10 +742,10 @@ _.extend(RMSChanger.prototype, objectFuncs, {
 		} else {
 			var title = "Molecule's temperature";
 		}
-		this.sliderId = this.addSlider(title, {value:this.RMS}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
+		this.sliderId = this.addSlider(title, {value:this.valToPercent(this.val)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
 	},
 	parseSlider: function(event, ui) {
-		changeRMS(this.info, ui.value);
+		changeRMS(this.info, this.percentToVal(ui.value));
 	},
 	remove: function(){
 		this.removeSlider();
