@@ -201,13 +201,13 @@ _.extend(IdealGasLaw.prototype,
 			[P(300,30), P(510,30), P(510,440), P(300,440)]], handlers:'staticAdiabatic', handles:['c1', 'c2']});
 		this.borderStd({min:this.yMin, wallInfo:0});
 		this.borderStd({min:this.yMin, wallInfo:1});
-		spcs['spc5'].populate(P(45, 80), V(200, 300), 1, 600, 'c1');
-		spcs['spc6'].populate(P(305,75), V(200, 300), 1, 100, 'c2');
-		this.RMSChanger8Left = new RMSChanger({min:50, max:1000, info:{spcName:'spc5'}});
-		this.RMSChanger8Right = new RMSChanger({min:50, max:1000, info:{spcName:'spc6'}});
+		spcs['spc5'].populate(P(45, 80), V(200, 300), 100, 600, 'c1');
+		spcs['spc6'].populate(P(305,75), V(200, 300), 100, 100, 'c2');
+		this.RMSChanger8Left = new RMSChanger({min:50, max:1000, info:{spcName:'spc5'}, sliderPos:'left'});
+		this.RMSChanger8Right = new RMSChanger({min:50, max:1000, info:{spcName:'spc6'}, sliderPos:'right'});
 		walls[0].recordRMS().displayRMS();
-		//walls[1].recordRMS().displayRMS();
-		this.tempEqualListener = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:walls[0].data.t, alertUnsatisfied:"Remember temperature is preportional to kinetic energy.  Set the kinetic energies equal"});
+		walls[1].recordRMS().displayRMS();
+		this.tempEqualListener = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:walls[1].data.t, checkOn:'conditions', alertUnsatisfied:"Remember temperature is preportional to kinetic energy.  Set the kinetic energies equal"});
 	},
 	block10Start: function() {
 		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});	

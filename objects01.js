@@ -1683,7 +1683,7 @@ function StateListener(attrs){//like dataList... is:'greaterThan', ... targetVal
 	this.is = attrs.is
 	this.targetVal = attrs.targetVal;
 	this.tolerance = defaultTo(.05, attrs.tolerance);
-	
+	this.checkOn = attrs.checkOn;
 	this.alerts = {true:attrs.alertSatisfied, false:attrs.alertUnsatisfied};
 	
 	this.priorities = {true:defaultTo(0, attrs.prioritySatisfied), false:defaultTo(0, attrs.priorityUnsatisfied)};
@@ -1696,6 +1696,23 @@ function StateListener(attrs){//like dataList... is:'greaterThan', ... targetVal
 }
 _.extend(StateListener.prototype, objectFuncs, {
 	init: function(){
+		if (this.checkOn == 'conditions') {
+			this.initCheckOnConditions(); //check if condition is met when curLevel goes to see if its conditions are met
+		} else {
+			this.initCheckOnInterval(); // check if condition is met at update interval, once true, is done and condition is met
+		}
+		this.addCleanUp();
+	},
+	initCheckOnConditions: function() {
+		this.handle = unique('StateListener' + this.is, curLevel.conditionListeners.listeners);
+		addListener(curLevel, 'condition', this.handle,
+			function(){
+				var didWin = this.condition();
+				return {didWin:didWin, alert:this.alerts[didWin], priority:this.priorities[didWin]};
+			},
+		this);		
+	},
+	initCheckOnInterval: function() {
 		this.handle = unique('StateListener' + this.is, curLevel.updateListeners.listeners);
 		addListener(curLevel, 'update', this.handle,
 			function(){
@@ -1709,50 +1726,59 @@ _.extend(StateListener.prototype, objectFuncs, {
 				}
 			},
 		this);
+		
 		addListener(curLevel, 'condition', this.handle,
 			function(){
 				return {didWin: this.amSatisfied, alert:this.alerts[this.amSatisfied], priority:this.priorities[this.amSatisfied]};
 			},
-		this);
-		this.addCleanUp();
+		this);	
 	},
 	makeConditionFunc: function(){
+		//could do a switch within a switch, but meh, kind of busy
 		switch(this.is){
 			case 'greaterThan':
-				this.condition = function(){
-					if (this.targetVal instanceof Array) {
+				if (this.targetVal instanceof Array) {
+					this.condition = function() { 
 						return this.dataList[this.dataList.length-1]>this.targetVal[this.targetVal.length-1];
-					} else {
+					}
+				} else {
+					this.condition = function() {
 						return this.dataList[this.dataList.length-1]>this.targetVal;
 					}
-				};
+				}
 				break;
 			case 'lessThan':
-				this.condition = function(){
-					if (this.targetVal instanceof Array) {
+				if (this.targetVal instanceof Array) {
+					this.condition = function() { 
 						return this.dataList[this.dataList.length-1]<this.targetVal[this.targetVal.length-1];
-					} else {
+					}
+				} else {
+					this.condition = function() {
 						return this.dataList[this.dataList.length-1]<this.targetVal;
 					}
-				};
+				}
 				break;
 			case 'equalTo':
-				this.condition = function(){
-					if (this.targetVal instanceof Array) {
+				if (this.targetVal instanceof Array) {
+					this.condition = function() { 
 						return fracDiff(this.dataList[this.dataList.length-1], this.targetVal[this.targetVal.length-1])<this.tolerance;
-					} else {
+					}
+				} else {
+					this.condition = function() {
 						return fracDiff(this.dataList[this.dataList.length-1], this.targetVal)<this.tolerance;
 					}
 				}
 				break;
 			case 'notEqualTo':
-				this.condition = function(){
-					if (this.targetVal instanceof Array) {
+				if (this.targetVal instanceof Array) {
+					this.condition = function() { 
 						return fracDiff(this.dataList[this.dataList.length-1], this.targetVal[this.targetVal.length-1]) > this.tolerance;
-					} else {
+					}
+				} else {
+					this.condition = function() {
 						return fracDiff(this.dataList[this.dataList.length-1], this.targetVal) > this.tolerance;
 					}
-				}
+				}				
 				break;
 		}
 		
