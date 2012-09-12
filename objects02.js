@@ -635,12 +635,12 @@ CheckMark.prototype = {
 //Arrow
 //////////////////////////////////////////////////////////////////////////
 
-function Arrow(handle, pts, col, drawCanvas){
+function Arrow(handle, pts, col, lifespan, drawCanvas){
 	this.handle = handle;
 	var rotate = .5;
 	this.pts = {line:pts, arrow: new Array(3)}
 	this.col = col;
-	this.drawCanvas = drawCanvas;
+	this.drawCanvas = defaultTo(c, drawCanvas);
 	var ptLast = this.pts.line[this.pts.line.length-1];
 	var ptNextLast = this.pts.line[this.pts.line.length-2];
 	var dirBack = ptLast.VTo(ptNextLast).UV();
@@ -650,19 +650,18 @@ function Arrow(handle, pts, col, drawCanvas){
 	this.pts.arrow[0] = ptLast.copy().movePt(dirSide1.mult(10));
 	this.pts.arrow[1] = ptLast;
 	this.pts.arrow[2] = ptLast.copy().movePt(dirSide2.mult(10));
-	return this;
+	return this.show(lifespan);
 }	
 
 Arrow.prototype = {
 	draw: function(){
-		for(var ptName in this.pts){
-			var pts = this.pts[ptName];
-			for(var ptIdx=0; ptIdx<pts.length-1; ptIdx++){
-				var p1 = pts[ptIdx];
-				var p2 = pts[ptIdx+1];
-				draw.line(p1, p2, this.col, this.drawCanvas);
-			}	
-		}
+		var shaft = this.pts.line;
+		draw.line(shaft[0], shaft[1], this.col, this.drawCanvas);
+		
+		var arrow = this.pts.arrow;
+		
+		draw.line(arrow[0], arrow[1], this.col, this.drawCanvas);
+		draw.line(arrow[1], arrow[2], this.col, this.drawCanvas);
 	},
 	show: function(lifespan){//in ms
 		var turn = 0;

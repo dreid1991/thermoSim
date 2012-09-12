@@ -226,10 +226,14 @@ _.extend(IdealGasLaw.prototype,
 	block15Start: function() {
 		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});	
 		this.compArrow15 = new CompArrow({handle:'compyT', compMode:'adiabatic', bounds:{y:{min:30, max:235}}});
+		this.arrowInit = new Arrow('init', [P(545,30), P(510, 30)], Col(255,255,0));
+		this.arrowHalf = new Arrow('half', [P(545,235), P(510, 235)], Col(0,255,0));
 	},
 	block16Start: function() {
 		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});	
 		this.compArrow15 = new CompArrow({handle:'compyT', compMode:'adiabatic', bounds:{y:{min:30, max:337.5}}});
+		this.arrowInit = new Arrow('init', [P(545,235), P(510, 235)], Col(255,255,0));
+		this.arrowHalf = new Arrow('half', [P(545,337.5), P(510, 337.5)], Col(0,255,0));
 	},
 
 	block10CleanUp: function(){

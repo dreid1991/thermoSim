@@ -623,10 +623,10 @@ WallMethods = {
 			arrowPts[0] = pos.copy().movePt(vo.copy().mult(10).neg());
 			arrowPts[1] = pos.copy();
 			arrowPts[2] = pos.copy().movePt(vf.copy().mult(10));
-			var lifeSpan = 50;
+			var lifespan = 50;
 			var arrowTurn = 0;
 			var handle = 'drawArrow'+round(pos.x,0)+round(pos.y,0);
-			var arrow = new Arrow(handle, arrowPts, Col(255,0,0),c).show(lifeSpan);
+			var arrow = new Arrow(handle, arrowPts, Col(255,0,0), lifespan, c);
 
 
 			var textPos = pos.copy().movePt(vf.mult(15));

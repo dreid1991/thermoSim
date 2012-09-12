@@ -220,6 +220,7 @@ _.extends(HistFun.prototype, WallCollideMethods.prototype,
 		}
 		return {vo:vo, vf:dot.v.copy(), pos:P(dot.x, dot.y)}
 	},
+	//HEY - THIS IS SO OUT OF DATE
 	onWallImpactArrow: function(dot, line, wallUV, perpV){
 		var hitResult = this.onWallImpact(dot, line, wallUV, perpV);
 		var arrowPts = new Array(3);

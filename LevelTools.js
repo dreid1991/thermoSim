@@ -183,8 +183,16 @@ LevelTools = {
 		}
 		condFunc = 
 			function(){
-				if(curLevel.conditions().didWin){
+				var condResults = curLevel.conditions();
+				if (condResults.didWin) {
+					if (condResults.alert) {
+						alert(condResults.alert);
+					}
 					func.apply(curLevel);
+				} else {
+					if (condResults.alert) {
+						alert(condResults.alert);
+					}
 				}
 			}
 		buttonBind(id, condFunc);		
