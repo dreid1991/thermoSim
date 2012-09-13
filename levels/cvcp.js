@@ -64,6 +64,7 @@ _.extend(cvcp.prototype,
 				},
 			},
 			{block:4,
+				cutScene:true,
 				text:"Good, so when we’re heating at constant volume, where does the energy go?",
 				quiz:{	
 					type:'multChoice', 
@@ -103,7 +104,7 @@ _.extend(cvcp.prototype,
 			},
 			{block:7,
 				cutScene: true,
-				text:"So we’re putting energy into <i>two</i> things now!  So we know that </p>||EQ6aCE||<p> is the energy that goes into heating the system.  How could we express the energy that goes into expanding the system again constant pressure?</p>",
+				text:"So we’re putting energy into <i>two</i> things now!  So we know that </p>||EQ6aCE<p> is the energy that goes into heating the system.  How could we express the energy that goes into expanding the system again constant pressure?</p>",
 				quiz:{
 					type:'multChoice', 
 					options:
@@ -116,7 +117,11 @@ _.extend(cvcp.prototype,
 			},
 			{block:8,
 				cutScene: true,
-				text:"And if we put those two things together, we get...</p>||EQ11CE<p>OKAY.  We have our idea.  To heat under constant pressure, we have to expand the system, doing work.  This means that it will take more energy to heat something under constant pressure.   This means that C<sub>P</sub> is greater than C<sub>V</sub>.</p><p>Now watch this:</p><p>From the ideal gas law, we know ||EQ12BR Substituting in, we get ||EQ13BR.  Now we know that a heat capacity is a change in energy per temperate per amout of stuff whose temperature you're changing, so to get heat capacity from energy, we divide by nT.  This gives us ||EQ14CE So there we go!  Heat capacity under constant pressure is greater than heat capacity at constant volume because you need to expand the C<sub>P</sub> container, doing work."
+				text:"And if we put those two things together, we get...</p>||EQ11CE<p>OKAY.  We have our idea.  To heat under constant pressure, we have to expand the system, doing work.  This means that it will take more energy to heat something under constant pressure.   This means that C<sub>P</sub> is greater than C<sub>V</sub>.</p><p>Now watch this:</p><p>From the ideal gas law, we know ||EQ12CE Substituting in, we get ||EQ13CE  "
+			},
+			{block:9,
+				cutScene: true,
+				text: "||EQ13CENow we know that a heat capacity is a change in energy per temperate per amout of stuff whose temperature you're changing, so to get heat capacity from energy, we divide by nT.  This gives us ||EQ14CE So there we go!  Constant pressure heat capacity is R greater than constant volume heat capacity because of the work done when changing volume.</p><p>Neat things to to think about:<ul><li>We showed that C<sub>P</sub> was greater than C<sub>V</sub> for expanding.  Can you show that it is for compressing as well?  Better yet, draw where the energy goes.</li><li>C<sub>P</sub> is the change in enthalpy with temperature.  ",
 			}
 		]
 		store('prompts', this.prompts);
@@ -125,7 +130,6 @@ _.extend(cvcp.prototype,
 		$('#mainHeader').text('Heat capacities');
 		nextPrompt();
 	},
-	//testing fill
 
 	block2Start: function(){
 		var self = this;

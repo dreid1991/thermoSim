@@ -1261,7 +1261,7 @@ WallMethods = {
 		},
 		displayQStop: function(){
 			this.displayingQ = false;
-			removeListener('displayQArrows' + this.handle);
+			removeListener(curLevel, 'data', 'displayQ' + this.handle);
 			this.qReadout.removeEntry('q' + this.handle);
 			return this;
 		},
