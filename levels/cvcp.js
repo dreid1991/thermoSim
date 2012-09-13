@@ -116,7 +116,7 @@ _.extend(cvcp.prototype,
 			},
 			{block:8,
 				cutScene: true,
-				text:"And if we put those two things together, we get...</p>||EQ11CE<p>OKAY.  We have our idea.  To heat under constant pressure, we have to expand the system, doing work.  This means that it will take more energy to heat something under constant pressure.   This means that C<sub>P</sub> is greater than C<sub>V</sub>.</p><p>Now watch this:</p><p>Since the definition of enthalpy is</p>||EQ12CE<p>doesn’t change in energy (above) really mean change in enthalpy?  If we rewrite the equation, we get</p>||EQ13CE<p>Then, from the ideal gas law, we know</p>||EQ14CE<p>"
+				text:"And if we put those two things together, we get...</p>||EQ11CE<p>OKAY.  We have our idea.  To heat under constant pressure, we have to expand the system, doing work.  This means that it will take more energy to heat something under constant pressure.   This means that C<sub>P</sub> is greater than C<sub>V</sub>.</p><p>Now watch this:</p><p>From the ideal gas law, we know ||EQ12BR Substituting in, we get ||EQ13BR.  Now we know that a heat capacity is a change in energy per temperate per amout of stuff whose temperature you're changing, so to get heat capacity from energy, we divide by nT.  This gives us ||EQ14CE So there we go!  Heat capacity under constant pressure is greater than heat capacity at constant volume because you need to expand the C<sub>P</sub> container, doing work."
 			}
 		]
 		store('prompts', this.prompts);
