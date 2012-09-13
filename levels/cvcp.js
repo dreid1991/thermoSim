@@ -121,7 +121,7 @@ _.extend(cvcp.prototype,
 			},
 			{block:9,
 				cutScene: true,
-				text: "||EQ13CENow we know that a heat capacity is a change in energy per temperate per amout of stuff whose temperature you're changing, so to get heat capacity from energy, we divide by nT.  This gives us ||EQ14CE So there we go!  Constant pressure heat capacity is R greater than constant volume heat capacity because of the work done when changing volume.</p><p>Neat things to to think about:<ul><li>We showed that C<sub>P</sub> was greater than C<sub>V</sub> for expanding.  Can you show that it is for compressing as well?  Better yet, draw where the energy goes.</li><li>C<sub>P</sub> is the change in enthalpy with temperature.  ",
+				text: "||EQ13CENow we know that a heat capacity is a change in energy per temperate per amout of stuff whose temperature you're changing, so to get heat capacity from energy, we divide by nT.  This gives us ||EQ14CE So there we go!  Constant pressure heat capacity is R greater than constant volume heat capacity because of the work done when changing volume.</p><p>Neat things to to think about:<ul><li>We showed that C<sub>P</sub> was greater than C<sub>V</sub> for expanding.  Can you show that it is for compressing as well?  Better yet, draw where the energy goes.</li><li>In the previous page's first equation, we really just defined a change in enthalpy.  If a change in enthlpy is a change in internal energy plus some change in work energy, what is enthalpy?  Hint: Replace change with total.",
 			}
 		]
 		store('prompts', this.prompts);
@@ -141,6 +141,10 @@ _.extend(cvcp.prototype,
 		
 		spcs['spc1'].populate(P(300,200), V(200, 200), 350, 185, 'right', 'right');
 		spcs['spc3'].populate(P(300,200), V(200, 200), 250, 185, 'right', 'right');	
+		
+		this.leftChanged = new StateListener({dataList:walls[0].data.t, is:'greaterThan', targetVal:225, alertUnsatisfied:"Heat up the left container more!", priorityUnsatisfied:1, checkOn:'conditions'});
+		this.rightChanged = new StateListener({dataList:walls[1].data.t, is:'greaterThan', targetVal:225, alertUnsatisfied:"Heat up the right container more!", priorityUnsatisfied:1, checkOn:'conditions'});
+		this.tempsEqual = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:walls[1].data.t, alertUnsatisfied:"Set the temperatures equal!", checkOn:'conditions'});
 		
 		this.piston = new Piston({wallInfo:'right', min:2, init:2, max:2, makeSlider:false})
 		this.heaterLeft = new Heater({handle:'heaterLeft', wallInfo:'left'});
