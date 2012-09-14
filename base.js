@@ -357,16 +357,29 @@ function round(val, dec){
 	return Math.round(val*pow)/pow;
 }
 function unique(name, obj){
-	if(!obj[name]){
-		return name;
-	}else{
-		var uniqueId = 1;
-		while(obj[name+uniqueId]){
-			uniqueId++;
+	if (typeof(obj)=="function"){
+		if (!obj(name)) {
+			return name;
+		} else {
+			var uniqueId = 1;
+			while(obj(name+uniqueId)){
+				uniqueId++;
+			}
+			return name+uniqueId;		
 		}
-		return name+uniqueId;
+	} else {
+		if(!obj[name]){
+			return name;
+		} else {
+			var uniqueId = 1;
+			while(obj[name+uniqueId]){
+				uniqueId++;
+			}
+			return name+uniqueId;
+		}
 	}
 }
+
 function addListener(object, typeName, funcName, func, destObj){
 	object[typeName + 'Listeners'].listeners[funcName] = {func:func, obj:destObj};
 }
@@ -732,15 +745,15 @@ function replaceStrings(text, replaceList){
 	return text;
 }
 
-function checkAndFillEmptyGraphDivs() {
+function fillEmptyGraphDivs() {
 	for (var divIdx=0; divIdx<graphHolderDivs.length; divIdx++) {
-		checkAndFillEmptyGraphDiv($('#'+graphHolderDivs[divIdx]));
+		fillEmptyGraphDiv($('#'+graphHolderDivs[divIdx]));
 	}
 }
 
-function checkAndFillEmptyGraphDiv(div) {
-	if ($(div).attr('full')=="false") {
-		
+function fillEmptyGraphDiv(div) {
+	if ($(div).attr('filledWith')=="empty") {
+		new GraphBlank(div);
 	}
 }
 

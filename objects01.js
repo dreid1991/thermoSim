@@ -1811,7 +1811,7 @@ _.extend(StateListener.prototype, objectFuncs, {
 		for (var storeName in this.storeAtSatisfy){
 			var storeAs = storeName + 'Block' + curLevel.blockIdx;
 			var data = this.storeAtSatisfy[storeName];
-			var value = data[data.length-1];
+			var value = round(data[data.length-1], 1);
 			store(storeAs, value);
 			this.results[storeAs] = value;
 		}

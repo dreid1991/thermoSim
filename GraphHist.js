@@ -15,11 +15,8 @@ function GraphHist(handle, width, height, xLabel, yLabel, axisInit, data){
 	this.xEnd = .95;
 	this.yEnd = .05;
 	this.gridSpacing = 40;
-	this.hashMarkLen = 10;
 	this.numBins = 18;
-	var numGridLinesX = Math.ceil(this.dims.dx*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing);
-	var numGridLinesY = Math.ceil(this.dims.dy*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
-	this.numGridLines = {x:numGridLinesX, y:numGridLinesY};
+	this.setNumGridLines();
 	this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1)}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1)}};
 	this.axisRange = {x:{min:0, max:0}, y:{min:0, max:0}};
 	this.data = {};
@@ -29,7 +26,7 @@ function GraphHist(handle, width, height, xLabel, yLabel, axisInit, data){
 	
 	var barCol = Col(255,100,0);
 	this.setStds();
-	var canvasData = this.makeCanvas(this.handle, this.dims);
+	var canvasData = this.makeCanvas(this.dims);
 	this.drawAllBG();
 	this.addSet('only', barCol, data);
 	addListener(curLevel, 'reset', 'clearGraph'+handle, this.clear, this);

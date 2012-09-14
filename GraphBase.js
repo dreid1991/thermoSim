@@ -7,8 +7,9 @@ GraphBase = {
 		return V(dx, dy);
 	},
 	setStds: function(){
+		this.hashMarkLen = 10;
 		this.checkMarkOversize = 3;
-		this.bgCol = curLevel.bgCol
+		this.bgCol = curLevel.bgCol;
 		this.gridCol = Col(72,72,72);
 		this.toggleCol = Col(255,255,255);
 		
@@ -23,15 +24,24 @@ GraphBase = {
 		//characLen, characteristic length, is the radius of the shape being used
 		this.characLen = Math.sqrt(Math.pow(this.rectSideLen, 2)/2);		
 	},
-	makeCanvas: function(handle, dims){
+	setNumGridLines: function() {
+		var numGridLinesX = Math.ceil(this.dims.dx*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing);
+		var numGridLinesY = Math.ceil(this.dims.dy*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
+		this.numGridLines = {x:numGridLinesX, y:numGridLinesY};
+	},
+	makeCanvas: function(dims, parentDiv) {
 		var self = this;
-		this.graphDivHandle = this.handle + 'GraphDiv';
 		addListener(curLevel, 'reset', 'clearGraph'+this.handle, this.clear, this);
 		this.buttonId = this.handle + 'reset';
-		this.parentDiv = this.pickParentDiv();
+		if (!parentDiv){
+			this.parentDiv = this.pickParentDiv();
+		} else {
+			this.parentDiv = parentDiv;
+		}
+		this.parentDiv.html('');
 		this.parentDivId = $(this.parentDiv).attr('id');
 		//var str = "</div><div id = '" + this.graphDivHandle + "' style = position:relative><canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas><button id='" + this.buttonId + "' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button></div><div class='graphSpacer noSelect' id='"+this.handle + "GraphSpacer'>"
-		var str = "<canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas><button id='" + this.buttonId + "' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button></div>";
+		var str = "<canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas><button id='" + this.buttonId + "' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button>";
 		var canvasDiv = $(str);
 		
 		$(this.parentDiv).append(canvasDiv);
@@ -41,12 +51,31 @@ GraphBase = {
 		this.graph = this.graphHTMLElement.getContext('2d');
 		
 	},
+	makeCanvasNoReset: function(dims, parentDiv) {
+		var self = this;
+		addListener(curLevel, 'reset', 'clearGraph'+this.handle, this.clear, this);
+		this.buttonId = this.handle + 'reset';
+		if (!parentDiv){
+			this.parentDiv = this.pickParentDiv();
+		} else {
+			this.parentDiv = parentDiv;
+		}
+		this.parentDiv.html('');
+		this.parentDivId = $(this.parentDiv).attr('id');
+		//var str = "</div><div id = '" + this.graphDivHandle + "' style = position:relative><canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas><button id='" + this.buttonId + "' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button></div><div class='graphSpacer noSelect' id='"+this.handle + "GraphSpacer'>"
+		var str = "<canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas>";
+		var canvasDiv = $(str);
+		
+		$(this.parentDiv).append(canvasDiv);
+		this.graphHTMLElement = document.getElementById(this.handle+'Graph');
+		this.graph = this.graphHTMLElement.getContext('2d');	
+	},
 	pickParentDiv: function() {
 		for (var divIdx=0; divIdx<graphHolderDivs.length; divIdx++) {
 			var div = $('#'+graphHolderDivs[divIdx]);
-			var isFull = $(div).attr('full')
-			if (isFull == 'false') {
-				$(div).attr('full', 'true');
+			var filledWith = $(div).attr('filledWith')
+			if (filledWith == 'empty' || filledWith == 'blank') {
+				$(div).attr('filledWith', 'graph');
 				return div;
 			}
 		}
@@ -59,7 +88,7 @@ GraphBase = {
 		removeListener(curLevel, 'update', 'flash' + this.handle);
 		removeSave(curLevel, 'update', 'flash' + this.handle);
 		$(this.parentDiv).html('');
-		$(this.parentDiv).attr('full', 'false');
+		$(this.parentDiv).attr('filledWith', 'empty');
 		return this;
 	},
 	unfreeze: function(){

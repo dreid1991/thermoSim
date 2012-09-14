@@ -18,11 +18,9 @@ function GraphScatter(handle, width, height, xLabel, yLabel, axisInit){
 	this.xEnd = (this.dims.dx - (this.legendWidth+8))/this.dims.dx;
 	this.yEnd = .05;
 	this.gridSpacing = 40;
-	this.hashMarkLen = 10;
+
 	
-	var numGridLinesX = Math.ceil(this.dims.dx*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing);
-	var numGridLinesY = Math.ceil(this.dims.dy*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
-	this.numGridLines = {x:numGridLinesX, y:numGridLinesY};
+	this.setNumGridLines();
 	this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1)}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1)}};
 	this.axisRange = {x:{min:0, max:0}, y:{min:0, max:0}};
 	this.data = {};
@@ -32,7 +30,7 @@ function GraphScatter(handle, width, height, xLabel, yLabel, axisInit){
 
 
 	this.setStds();
-	this.makeCanvas(this.handle, this.dims);
+	this.makeCanvas(this.dims);
 	this.drawAllBG();
 	
 }

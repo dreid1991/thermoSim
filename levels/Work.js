@@ -220,8 +220,6 @@ _.extend(Work.prototype,
 	
 	block3Start: function(){
 
-		var self = this;
-
 		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});
 		spcs['spc1'].populate(P(45,35), V(460, 350), 800, 300);
 		spcs['spc3'].populate(P(45,35), V(450, 350), 600, 300);
@@ -257,8 +255,9 @@ _.extend(Work.prototype,
 		spcs['spc1'].populate(P(45,35), V(445, 325), 850, 200);
 		spcs['spc3'].populate(P(45,35), V(445, 325), 650, 200);
 		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:wallHandle, compMode:'cPAdiabatic'});
-		this.dragWeights.wall.displayWork().displayMass().displayPExt().displayVol();
-		this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:10, alertUnsatisfied:'Compress the system!', recordAtSatisfy:{tFinal:walls[0].data.t}});
+		walls[0].displayWork().displayTemp().displayPExt().displayVol();
+		this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:10, alertUnsatisfied:'Compress the system!'});
+		this.tempListener = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:363, storeAtSatisfy:{tFinal:walls[0].data.t}, tolerance:.02});
 	},
 	block12Start: function(){
 		wallHandle = 'container';
@@ -271,19 +270,20 @@ _.extend(Work.prototype,
 		spcs['spc1'].populate(P(300,35), V(200, 300), 250, 400, 'right', 'right');
 		spcs['spc3'].populate(P(300,35), V(200, 300), 150, 400, 'right', 'right');	
 	
-		this.dragWeightsLeft = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:'left', massInit: 5, compMode:'cPAdiabatic'}).trackMassStop().trackPressure();
-		this.dragWeightsRight = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:'right', massInit: 5, compMode:'cPAdiabatic'}).trackMassStop().trackPressure();
+		this.dragWeightsLeft = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:'left', massInit: 5, compMode:'cPAdiabatic'});
+		this.dragWeightsRight = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:'right', massInit: 5, compMode:'cPAdiabatic'});
 		this.stopsLeft = new Stops({stopPt:{volume:3.5}, wallInfo:'left'});
 		this.stopsRight = new Stops({stopPt:{volume:3.5}, wallInfo:'right'});		
-
+		walls[0].displayTemp().displayWork();
+		walls[1].displayTemp().displayWork();
 		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
 							{x:{min:0, step:2}, y:{min:150, step:50}});
 		this.graphs.tVSv.addSet('tRight', 'Temp\nRight', Col(255,200,0), Col(255,200,200),
 								{x:walls['right'].data.v, y:walls['right'].data.t});									
 		this.graphs.tVSv.addSet('tLeft', 'Temp\nLeft', Col(255,0,0), Col(255,200,200),
 								{x:walls['left'].data.v, y:walls['left'].data.t});	
-		this.volListenerLeft = new StateListener({dataList:walls['left'].data.v, is:equalTo, targetVal:3.5, alertUnsatisfied:'Compress the systems!'});
-		this.volListenerRight = new StateListener({dataList:walls['right'].data.v, is:equalTo, targetVal:3.5, alertUnsatified:'Compress the systems!'});
+		this.volListenerLeft = new StateListener({dataList:walls['left'].data.v, is:'equalTo', targetVal:3.5, alertUnsatisfied:'Compress the systems!'});
+		this.volListenerRight = new StateListener({dataList:walls['right'].data.v, is:'equalTo', targetVal:3.5, alertUnsatified:'Compress the systems!'});
 	},
 	block15Start: function(){
 		wallHandle = 'container';
@@ -295,11 +295,12 @@ _.extend(Work.prototype,
 		
 		spcs['spc1'].populate(P(300,35), V(200, 300), 250, 200, 'right', 'right');
 		spcs['spc3'].populate(P(300,35), V(200, 300), 150, 200, 'right', 'right');	
-		this.dragWeightsLeft = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:35}], wallInfo:'left', massInit:5, compMode:'cPAdiabatic'}).trackMassStop().trackPressure();
-		this.dragWeightsRight = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:'right', massInit:5, compMode:'cPAdiabatic'}).trackMassStop().trackPressure();
+		this.dragWeightsLeft = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:35}], wallInfo:'left', massInit:5, compMode:'cPAdiabatic'});
+		this.dragWeightsRight = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:75}], wallInfo:'right', massInit:5, compMode:'cPAdiabatic'});
 		this.stopsLeft = new Stops({stopPt:{volume:3.5}, wallInfo:'left'});
 		this.stopsRight = new Stops({stopPt:{volume:3.5}, wallInfo:'right'});		
-		
+		walls[0].displayTemp().displayWork();
+		walls[1].displayTemp().displayWork();		
 		this.graphs.tVSv = new GraphScatter('tVSv', 400, 275,"Volume (L)", "Temperature (K)",
 							{x:{min:0, step:2}, y:{min:150, step:50}});
 		this.graphs.tVSv.addSet('tRight', 'Temp\nRight', Col(255,200,0), Col(255,200,200),
