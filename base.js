@@ -42,6 +42,7 @@ $(function(){
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);
 	multChoiceMaxSnapHeight = 100;
+	graphHolderDivs = ['graph1', 'graph2'];
 	sliderList = [];
 	spcs = {};
 	stored = {};
@@ -85,6 +86,9 @@ function checkIdeality(){
 	
 }
 */
+
+
+
 drawingTools.prototype = {
 
 	clear: function(col){
@@ -689,6 +693,7 @@ function showPrompt(prev, prompt){
 		if(func){
 			func.apply(curLevel);
 		}
+		fillEmptyGraphDivs();
 	}
 
 }
@@ -725,6 +730,18 @@ function replaceStrings(text, replaceList){
 		text = text.replace(oldStr, newStr);
 	}
 	return text;
+}
+
+function checkAndFillEmptyGraphDivs() {
+	for (var divIdx=0; divIdx<graphHolderDivs.length; divIdx++) {
+		checkAndFillEmptyGraphDiv($('#'+graphHolderDivs[divIdx]));
+	}
+}
+
+function checkAndFillEmptyGraphDiv(div) {
+	if ($(div).attr('full')=="false") {
+		
+	}
 }
 
 function rotatePts(pts, center, rotation){

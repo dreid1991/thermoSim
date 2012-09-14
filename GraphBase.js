@@ -1,4 +1,11 @@
 GraphBase = {
+	getGraphDims: function() {
+		var dx = 400;
+		var dyTotal = $('#main').height();
+		dyTotal -= $('#graphSpacer').height();
+		var dy = dyTotal/2;//number of graphs;
+		return V(dx, dy);
+	},
 	setStds: function(){
 		this.checkMarkOversize = 3;
 		this.bgCol = curLevel.bgCol
@@ -21,14 +28,29 @@ GraphBase = {
 		this.graphDivHandle = this.handle + 'GraphDiv';
 		addListener(curLevel, 'reset', 'clearGraph'+this.handle, this.clear, this);
 		this.buttonId = this.handle + 'reset';
-		var str = "</div><div id = '" + this.graphDivHandle + "' style = position:relative><canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas><button id='" + this.buttonId + "' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button></div><div class='graphSpacer noSelect' id='"+this.handle + "GraphSpacer'>"
+		this.parentDiv = this.pickParentDiv();
+		this.parentDivId = $(this.parentDiv).attr('id');
+		//var str = "</div><div id = '" + this.graphDivHandle + "' style = position:relative><canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas><button id='" + this.buttonId + "' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button></div><div class='graphSpacer noSelect' id='"+this.handle + "GraphSpacer'>"
+		var str = "<canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas><button id='" + this.buttonId + "' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button></div>";
 		var canvasDiv = $(str);
-		$('#graphs').append(canvasDiv);
+		
+		$(this.parentDiv).append(canvasDiv);
 		$('#' + this.buttonId).button();
 		$('#' + this.buttonId).click(function(){self.reset()})
 		this.graphHTMLElement = document.getElementById(this.handle+'Graph');
 		this.graph = this.graphHTMLElement.getContext('2d');
 		
+	},
+	pickParentDiv: function() {
+		for (var divIdx=0; divIdx<graphHolderDivs.length; divIdx++) {
+			var div = $('#'+graphHolderDivs[divIdx]);
+			var isFull = $(div).attr('full')
+			if (isFull == 'false') {
+				$(div).attr('full', 'true');
+				return div;
+			}
+		}
+		console.log("Graphs are all full!");
 	},
 	remove: function(){
 		this.freeze();
@@ -36,8 +58,8 @@ GraphBase = {
 		removeSave(curLevel, 'reset', 'clearGraph'+this.handle);
 		removeListener(curLevel, 'update', 'flash' + this.handle);
 		removeSave(curLevel, 'update', 'flash' + this.handle);
-		$('#'+this.handle+'GraphDiv').remove();
-		$('#'+this.handle+'GraphSpacer').remove();
+		$(this.parentDiv).html('');
+		$(this.parentDiv).attr('full', 'false');
 		return this;
 	},
 	unfreeze: function(){
@@ -332,7 +354,7 @@ GraphBase = {
 		legendEntry.toggleDims = toggleDims;
 		var self = this;
 		legendEntry.toggle = function(){
-								if($('#graphs').is(':visible') && ptInRect(togglePos, toggleDims, mouseOffsetDiv(self.graphDivHandle))){
+								if($('#graphs').is(':visible') && ptInRect(togglePos, toggleDims, mouseOffsetDiv(self.parentDivId))){
 									if(set.show){
 										set.show = false;
 										self.flashers = [];

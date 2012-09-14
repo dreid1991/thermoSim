@@ -1,7 +1,8 @@
 function GraphScatter(handle, width, height, xLabel, yLabel, axisInit){
 	this.active = true;
 	this.handle = handle;
-	this.dims = V(width, height);
+	this.dims = this.getGraphDims();
+	//this.dims = V(width, height);
 	this.xLabel = xLabel;
 	this.yLabel = yLabel;
 	this.labelFontSize = 15;

@@ -10,8 +10,9 @@
 	margin-left:570px;
 }
 .graph{
-	padding:20px;
-	padding:20px;
+	/*padding:20px;
+	padding:20px;*/
+	position:relative;
 }
 
 .noSelect{
