@@ -121,7 +121,7 @@ _.extend(cvcp.prototype,
 			},
 			{block:10,
 				cutScene: true,
-				text: "||EQ13CENow we know that a heat capacity is a change in energy per temperate per amout of stuff whose temperature you're changing, so to get heat capacity from energy, we divide by nT.  This gives us ||EQ14CE So there we go!  Constant pressure heat capacity is R greater than constant volume heat capacity because of the work done when changing volume.</p><p>Neat things to to think about:<ul><li>We showed that C<sub>P</sub> was greater than C<sub>V</sub> for heating.  Can you show that it is for cooling as well?  Better yet, draw where the energy goes.</li><li>In the previous page's first equation, we really just defined a change in enthalpy.  If a change in enthlpy is a change in internal energy plus some change in work energy, what is enthalpy?  Hint: Replace change with total.",
+				text: "||EQ13CENow we know that a heat capacity is a change in energy per temperate per amout of stuff whose temperature you're changing, so to get heat capacity from energy, we divide by nT.  This gives us ||EQ14CE So there we go!  Constant pressure heat capacity is R greater than constant volume heat capacity because of the work done when changing volume.</p><p>Neat things to to think about:<ul><li>We showed that C<sub>P</sub> was greater than C<sub>V</sub> for heating.  Can you show that it is for cooling as well?  Better yet, draw where the energy goes.</li><li>In the previous page's first equation, we really just defined a change in enthalpy.  If a change in enthlpy is a change in internal energy plus some work done, what is enthalpy?  Hint: Replace change with total.",
 			}
 		]
 		store('prompts', this.prompts);
