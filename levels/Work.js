@@ -15,20 +15,20 @@ _.extend(Work.prototype,
 		this.prompts=[
 			{block:0,
 				cutScene:true,
-				text:"<p>Good afternoon!</p><p>Today we’re going to try to figure out how work adds energy to a system.  First we’re going to put together the equations that describe doing work on an adiabatic system, </p><p>Which of these equations describes work done on a system?</p>",
+				text:"<p>Today we’re going to investigate how work transfers energy to a system.  First we’re going to develop the equations that describe a process on an adiabatic system. </p><p>Which of these equations describes work done on a system?</p>",
 				quiz:{	
 					type:'multChoice',
 					options:
 						[{text:"||EQ1||", isCorrect: true},
 						{text:"||EQ2||", isCorrect: false, message:'No!  You do no work with constant volume'},
 						{text:"||EQ3||", isCorrect: false, message:"No!"},
-						{text:"||EQ4||", isCorrect: false, message:"It is dependant of change in volume, but T?"}
+						{text:"||EQ4||", isCorrect: false, message:"It is dependant on change in volume, but T?"}
 					]
 				},
 			},
 			{block:1, 
 				cutScene: true,
-				text: "<p>Indeed.  This tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p>||EQ5CE<p>We’re going to be looking at an adiabatic system.  Which is these simplifications is correct?</p>",
+				text: "<p>Indeed.  This tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p>||EQ5CE<p>We’re going to be looking at an adiabatic system.  Which of these relations is correct?</p>",
 				quiz:{	
 					type:'multChoice',
 					options:
@@ -41,7 +41,7 @@ _.extend(Work.prototype,
 			},
 			{block:2, 
 				cutScene: true,
-				text:"<p>Excellent, so as we add energy through work our system heats up since energy is conserved.  We know that temperature is an expression of molecular kinetic energy.  This tells us that as we compress our container, the molecules speed up.</p><p> But why does that happen?  There must be some event in the compression that makes a molecule speed up.  </p><p><p>Shall we investigate?</p>",
+				text:"<p>Excellent, so as we add energy through work our system's temperature rises.  We know that temperature is an expression of molecular kinetic energy.  Since energy is conserved, as we add energy through work, the molecules speed up.</p><p> But why does that happen?  There must be some event in the compression that makes a molecule speed up.  </p><p><p>Shall we investigate?</p>",
 				quiz:{	
 					type:'buttons',
 					options:
@@ -51,11 +51,12 @@ _.extend(Work.prototype,
 			},
 			{block:3,
 				title:"Current step",
-				text:"Alright, let’s do some work (sorry).  Above we have a piston and cylinder setup.  You can change the piston’s pressure with the slider.  If you compress the system, how does the temperature behave?",
+				text:"Alright, let’s do some work (sorry).  Above we have a piston and cylinder assembly undergoing an adiabatic process.  You can change the external pressure with the slider.  If you compress the system, how does the temperature change?",
 				quiz:{	
 					type:'buttons',
 					options:
 						[{buttonId:'inc', text:'Temp Increases', isCorrect:true},
+						{buttonId:'same', text:'Temp stays same', isCorrect:false, message: "But if you're doing work on an adiabatic system and temperature stays the same, is energy conserved?"},
 						{buttonId:'dec', text:'Temp Decreases', isCorrect:false, message: "Do look at the graphs"}
 					]
 				},				
@@ -73,18 +74,20 @@ _.extend(Work.prototype,
 			},
 			{block:3, 
 				title: 'Current step', 
-				text: "Now these molecules undergo perfectly elastic collisions when they hit a wall.  This means that they behave like a bouncy ball would when you throw it against a wall.</p><p>If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving towards the ball, what will the ball do?",
+				//These molecules can be thought of as perfectly elastic bouncy balls.  When the hit a wall...
+				text: "These molecules undergo elastic collisions when they hit a wall.  This means that they behave like a perfectly elastic bouncy ball would when you throw it against a wall.</p><p>If the wall is stationary, the ball bounces back with the same speed.  If the wall is moving towards the ball, what will the ball do?",
 				quiz:{	
 					type:'buttons',
 					options:
 						[{buttonId:'up', text:'Speed up', isCorrect:true},
+						{buttonId:'same', text:'Stay the same', inCorrect:false},
 						{buttonId:'down', text:'Slow down', isCorrect:false}
 					]
 				},
 			},
 			{block:4, 
 				title: 'Current step', 
-				text:"Let’s see if we can relate that idea to work by looking at just one molecule. If you compress the cylinder, at what point does the molecule’s speed change?  How could this relate to a temperature change?"
+				text:"Let’s see if we can relate that idea to work by looking at just one molecule. If you compress the cylinder, at what point does the molecule’s speed change?  How could this relate to a temperature change when there are many molecules?"
 			},
 			{block:5,
 				cutScene: true,
@@ -102,7 +105,7 @@ _.extend(Work.prototype,
 			},
 			{block:6,
 				cutScene: true,
-				text:"<p>So we can say that if we hit a molecule with a moving wall, it’ll speed up, but will this idea really lead to the correct temperature change when compressing a system of many molecules?  Let’s do an experiment and find out! </p><p>Let’s compress a system at 200 K from 15 L to 10 L at a constant pressure of 6 bar and see if calculated and simulated results line up.</p><p>One other thing - these collisions are the <i>only</i> way energy is added in these simulations, so if our idea it wrong, the simulation will give the wrong result.</p><p>Now, how much work will we do on this system?</p>",
+				text:"<p>So we can say that if we hit a molecule with a wall moving towards it3, it’ll speed up, but will this idea really lead to the correct temperature change when compressing a system of many molecules?  Let’s do an experiment and find out! </p><p>Let’s compress a system at 200 K from 15 L to 10 L at a constant pressure of 6 bar and see if calculated and simulated results line up.</p><p>One other thing - these collisions are the <i>only</i> way energy is added in these simulations, so if our idea it wrong, the simulation will give the wrong result.</p><p>Now, how much work will we do on this system?</p>",
 				quiz:{	
 					type:'text', 
 					text:"Work in in kJ", 
