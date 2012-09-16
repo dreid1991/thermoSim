@@ -189,7 +189,7 @@ _.extend(Reversibility.prototype,
 	block0Start: function(){
 		var wallHandle = 'container';
 		this.unCompSetup();
-		//this.makeGraphsRev();
+		this.makeGraphsRev();
 		this.sandBox = new Sandbox();
 		walls[0].displayQArrows();
 		//this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:33}]})

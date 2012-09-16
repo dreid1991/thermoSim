@@ -562,7 +562,7 @@ function showPrompt(prev, prompt){
 		if(func){
 			func.apply(curLevel);
 		}
-		fillEmptyGraphDivs();
+		//fillEmptyGraphDivs();
 	}
 
 }
