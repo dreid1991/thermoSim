@@ -17,34 +17,6 @@ DataHandler.prototype = {
 		return function() {
 			return self.count(info);
 		}
-
-
-		/*
-		if(info && info.tag){//assuming you only send one thing in info
-			return function(){
-				var tag = info.tag;
-				var count = 0;
-				for(var spcName in spcs){
-					var spc = spcs[spcName];
-					for(var dotIdx=0; dotIdx<spc.length; dotIdx++){
-						if(spc[dotIdx].tag==tag){
-							count++;
-						}
-					}
-					
-				}
-				return count;
-			}
-		}else{
-			return function(){
-				var count = 0;
-				for(var spcName in spcs){
-					count += spcs[spcName].length;
-				}
-				return count;
-			}
-		}
-		*/
 	},
 	count: function(info) {
 		return dotManager.get(info).length;

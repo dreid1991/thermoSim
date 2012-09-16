@@ -461,9 +461,7 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		}	
 		this.cleanUp();
 		
-		for (var spcName in spcs){
-			spcs[spcName].depopulate();
-		}		
+		dotManager.clearAll();	
 		this.removeAllGraphs();
 		for (resetListenerName in this.resetListeners.listeners){
 			var func = this.resetListeners.listeners[resetListenerName].func;

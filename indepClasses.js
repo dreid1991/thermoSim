@@ -45,14 +45,11 @@ Species.prototype = {
 		this.dots = dotManager.get({spcName:this.def.spcName});
 	},
 	depopulate: function(tag) {
-		if(tag){
-			for(var dotIdx=this.length-1; dotIdx>=0; dotIdx-=1){
-				if(this[dotIdx].tag == tag){
-					this.splice(dotIdx, 1);
-				}
-			}
-		}else{
-			this.splice(0, this.length);
+		console.trace();
+		if (tag) {
+			dotManager.removeByInfo({name:this.def.spcName, tag:tag});
+		} else {
+			dotManager.removeByInfo({name:this.def.spcName});
 		}
 	},
 }

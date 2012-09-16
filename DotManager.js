@@ -10,7 +10,7 @@ DotManager.prototype = {
 	remove: function(dot) {//can send as list or single dot
 		if (dot instanceof Array) {
 			for (var dotIdx=0; dotIdx<dot.length;dotIdx++) {
-				dot.removeFromParents();
+				dot[dotIdx].removeFromParents();
 			}
 		} else {
 			dot.removeFromParents();
