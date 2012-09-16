@@ -891,7 +891,7 @@ WallMethods = {
 				var mass = this.getRMSMass(tag);
 				var RMSFunc = function() {
 					var temp = this.data.t[this.data.t.length-1];
-					return Math.sqrt(3000*KB*temp/(mass*ACTUALN))
+					return Math.sqrt(3000*KB*temp*ACTUALN/mass)
 				}
 				recordData('RMS' + this.handle, this.data.RMS, RMSFunc, this);
 			} else {

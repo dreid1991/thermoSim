@@ -36,7 +36,7 @@ $(function(){
 	//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
 	pxToMS = 157.9; //HEY - THIS SHOULD BE REMOVED AND REPLACED WITH SOLVING FOR V FROM DOT'S TEMPERATURE
 	KB = 1.38*Math.pow(10,-23)
-	ACTUALN = 6.022*Math.pow(10,-23);
+	ACTUALN = 6.022*Math.pow(10,23);
 	g = 1.75
 	workConst = .158e-3;//for kJ;
 	updateInterval = 30;

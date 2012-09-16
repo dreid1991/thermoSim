@@ -29,19 +29,21 @@ DotManager.prototype = {
 		}
 	},
 	get: function(info) {
-		if (info.spcName && info.tag) {
-			return this.lists[info.spcName + '-' + info.tag];
-		} else if (info.spcName) {
-			return this.lists[info.spcName];
-		} else if (info.tag) {
-			return this.lists[info.tag];
+		if (info) {
+			if (info.spcName && info.tag) {
+				return this.lists[info.spcName + '-' + info.tag];
+			} else if (info.spcName) {
+				return this.lists[info.spcName];
+			} else if (info.tag) {
+				return this.lists[info.tag];
+			}
 		} else {
 			return this.lists.ALLDOTS;
 		}
 	},
 	clearAll: function() {
 		for (var list in this.lists) {
-			this.lists[list].splice(0, this.lists.length);
+			this.lists[list].splice(0, this.lists[list].length);
 		}
 		this.lists = {ALLDOTS:[]};
 	},

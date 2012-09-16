@@ -17,3 +17,5 @@ URISC FINAL REPORT BY SEPT 28th
 
 
 Ooh - when adding a tag, just compile a list of dots with that tag.  There can be like a tagged object and it can contain lists of tagged dots.  Dots also appear in their corresponding spcs element
+
+REVERSIBILITY GRAPHS NOT WORKING - CAN'T GET PARENT HTML
