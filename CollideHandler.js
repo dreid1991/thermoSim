@@ -49,9 +49,9 @@ CollideHandler.prototype = {
 		var grid = this.grid;
 		//defining grid locally speeds up by ~250ms/500runs (1000->750)
 		for (var spcName in this.spcs){
-			var spc = spcs[spcName];
-			for (var dotIdx=spc.length-1; dotIdx>-1; dotIdx-=1){
-				var dot = spc[dotIdx];
+			var dots = spcs[spcName].dots;
+			for (var dotIdx=dots.length-1; dotIdx>-1; dotIdx--) {
+				var dot = dots[dotIdx];
 				var gridX = Math.floor(dot.x/gridSize);
 				var gridY = Math.floor(dot.y/gridSize);
 				var doAdd = true;
@@ -74,8 +74,6 @@ CollideHandler.prototype = {
 				if(doAdd && gridX>=0 && gridY>=0 && gridX<this.numCols && gridY<this.numRows){
 					grid[gridX][gridY].push(dot);
 				}
-				
-				
 			}
 		}
 	},

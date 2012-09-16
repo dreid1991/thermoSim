@@ -311,7 +311,7 @@ WallMethods = {
 			var ySpan = this.ySpan;
 			var spcsLocal = spcs;
 			for (var spcName in spcsLocal){
-				var spc = spcsLocal[spcName];
+				var spc = spcsLocal[spcName].dots;
 				for (var dotIdx=0; dotIdx<spc.length; dotIdx++){
 					var dot = spc[dotIdx];
 					var checkedWalls = [];
@@ -902,7 +902,7 @@ WallMethods = {
 		getRMSMass: function(tag) {
 			if (tag) {
 				for (var spc in spcs) {
-					var dots = spcs[spc];
+					var dots = spcs[spc].dots;
 					for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
 						if (tag) {
 							if (dots[dotIdx].tag == tag) {

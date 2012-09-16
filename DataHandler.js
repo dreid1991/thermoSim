@@ -15,6 +15,13 @@ DataHandler.prototype = {
 		}
 	},
 	countFunc: function(info){
+		var list = dotManager.get(info);
+		if (list) {
+			return list.length;
+		} else {
+			return 0;
+		}
+		/*
 		if(info && info.tag){//assuming you only send one thing in info
 			return function(){
 				var tag = info.tag;
@@ -39,6 +46,7 @@ DataHandler.prototype = {
 				return count;
 			}
 		}
+		*/
 	},
 	count: function(info) {
 		var count = 0;

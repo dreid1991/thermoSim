@@ -1,29 +1,28 @@
 
 
-function Dot(x, y, v, mass, radius, name, idNum, tag, returnTo){
+function Dot(x, y, v, mass, radius, spcName, idNum, tag, returnTo){
 	this.x = x;
 	this.y = y;
 	this.v = v;
 	this.m = mass;
 	this.r = radius;
-	this.name = name;
+	this.spcName = spcName;
 	this.idNum = idNum;
 	this.tag = tag;
 	this.returnTo = returnTo;
 	this.tConst = tConst;
 	this.pxToMS = pxToMS;
+	this.parentLists = [];
 	return this;
 	
 }
 function Species(mass, radius, colors, def){
-	var spc = [];
-	spc.m = mass;
-	spc.r = radius;
-	spc.cols = colors;
-	spc.def = def;
-	spc.idNum = def.idNum
-	_.extend(spc, Species.prototype);
-	return spc;
+	this.m = mass;
+	this.r = radius;
+	this.cols = colors;
+	this.def = def;
+	this.idNum = def.idNum
+	this.dots = [];
 }
 Species.prototype = {
 	populate: function(pos, dims, count, temp, tag, returnTo){
@@ -32,6 +31,7 @@ Species.prototype = {
 		var y = pos.y;
 		var width = dims.dx;
 		var height = dims.dy;
+		var birthList = [];
 		for (var i=0; i<count; i++){
 			var placeX = x + Math.random()*width;
 			var placeY = y + Math.random()*height;
@@ -39,11 +39,12 @@ Species.prototype = {
 			var angle = Math.random()*2*Math.PI;
 			var vx = v * Math.cos(angle);
 			var vy = v * Math.sin(angle);
-			this.push(D(placeX, placeY, V(vx, vy), this.m, this.r, this.def.name, this.def.idNum, tag, returnTo));
-			
-		}		
+			birthList.push(D(placeX, placeY, V(vx, vy), this.m, this.r, this.def.spcName, this.def.idNum, tag, returnTo));
+		}
+		dotManager.add(birthList);
+		this.dots = dotManager.get({spcName:this.def.spcName});
 	},
-	depopulate: function(tag){
+	depopulate: function(tag) {
 		if(tag){
 			for(var dotIdx=this.length-1; dotIdx>=0; dotIdx-=1){
 				if(this[dotIdx].tag == tag){
@@ -72,7 +73,7 @@ function Color(r, g, b){
 	this.setHex();
 	return this;
 }
-function drawingTools(){};
+
 
 function D(x, y, v, mass, radius, name, idNum, tag, returnTo){
 	return new Dot(x, y, v, mass, radius, name, idNum, tag, returnTo);
@@ -336,12 +337,12 @@ Point.prototype = {
 		return (this.x==b.x && this.y==b.y);
 	},
 	track: function(trackData){
-		if(trackData instanceof Point){
+		if (trackData instanceof Point) {
 			pt = trackData;
 			offset = false;
 			noTrackX = false;
 			noTrackY = false;
-		}else{
+		} else {
 			var pt = trackData.pt;
 			var offset = trackData.offset;
 			var noTrack = defaultTo('',trackData.noTrack);
@@ -350,60 +351,61 @@ Point.prototype = {
 		}
 
 		this.trackListenerId = unique(this.x+','+this.y+'tracksWithUniqueId', curLevel.updateListeners.listeners);
-		if(this.trackListenerId.indexOf('NaN')!=-1){
-			console.log('OMGOMG');
+		if (this.trackListenerId.indexOf('NaN')!=-1) {
+			console.log('Trying to track NaN!');
+			console.trace();
 		}
-		if(!noTrackX && !noTrackY){
-			if(!offset){
-				var trackFunc = function(){
+		if (!noTrackX && !noTrackY) {
+			if (!offset) {
+				var trackFunc = function() {
 					this.x = pt.x;
 					this.y = pt.y;
 				}
-			}else if(offset.dx){
-				var trackFunc = function(){
+			} else if (offset.dx) {
+				var trackFunc = function() {
 					this.x = pt.x + offset.dx;
 					this.y = pt.y;
 				}
-			}else if(offset.dy){
+			} else if (offset.dy) {
 				var trackFunc = function(){
 					this.x = pt.x;
 					this.y = pt.y + offset.dy;
 				}
-			}else if(offset.y && offset.dx){
-				var trackFunc = function(){
+			} else if (offset.y && offset.dx) {
+				var trackFunc = function() {
 					this.x = pt.x + offset.dx;
 					this.y = pt.y + offset.dy;
 				}
 			}
-		}else if(noTrackX){
-			if(!offset){
-				var trackFunc = function(){
+		} else if (noTrackX) {
+			if (!offset) {
+				var trackFunc = function() {
 					this.y = pt.y;
 				}
-			}else if(offset.dy){
-				var trackFunc = function(){
+			} else if(offset.dy) {
+				var trackFunc = function() {
 					this.y = pt.y + offset.dy;
 				}
 			}			
-		}else if(noTrackY){
-			if(!offset){
-				var trackFunc = function(){
+		} else if (noTrackY) {
+			if (!offset) {
+				var trackFunc = function() {
 					this.x = pt.x;
 				}
-			}else if(offset.dx){
-				var trackFunc = function(){
+			} else if(offset.dx) {
+				var trackFunc = function() {
 					this.x = pt.x + offset.dx;
 				}
 			}		
 		}
-		if(trackFunc){
+		if (trackFunc) {
 			addListener(curLevel, 'update', this.trackListenerId, trackFunc, this);
-		}else{
+		} else {
 			console.log('tried to track ' + this.trackListenerId + " but input wasn't right");
 		}
 		return this;
 	},
-	trackStop: function(){
+	trackStop: function() {
 		removeListener(curLevel, 'update', this.trackListenerId);
 		this.trackListenerId = undefined;
 		return this;
@@ -411,11 +413,10 @@ Point.prototype = {
 }
 Dot.prototype = {
 	KE: function(){
-		var vSqr = this.v.magSqr();
-		return .5*this.m*vSqr;
+		return .5*this.m*(this.v.dx*this.v.dx + this.v.dy*this.v.dy);
 	},
 	temp: function(){
-		return this.KE()*this.tConst;
+		return .5*this.m*(this.v.dx*this.v.dx + this.v.dy*this.v.dy)*this.tConst;
 	},
 	setTemp: function(newTemp){
 		var curTemp = this.temp();
@@ -427,8 +428,9 @@ Dot.prototype = {
 		return this.v.mag()*this.pxToMS;
 		//return pxToMS*Math.sqrt(this.temp()/(this.m*10));
 	},
-	kill: function(){
-		var dotList = spcs[this.name];
-		dotList.splice(dotList.indexOf(this), 1);
+	removeFromParents: function(){
+		for (var listIdx=0; listIdx<this.parentLists.length; listIdx++) {
+			this.parentLists.splice(this.parentLists[listIdx].indexOf(this), 1);
+		}
 	},
 }

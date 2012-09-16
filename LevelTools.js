@@ -45,7 +45,7 @@ LevelTools = {
 	move: function(){
 		var spcLocal = this.spcs;
 		for (var spcName in spcLocal){
-			var dots = spcLocal[spcName];
+			var dots = spcLocal[spcName].dots;
 			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
 				dots[dotIdx].x += dots[dotIdx].v.dx;
 				dots[dotIdx].y += dots[dotIdx].v.dy;
