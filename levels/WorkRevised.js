@@ -28,7 +28,7 @@ _.extend(Work.prototype,
 			},
 			{block:1, 
 				cutScene: true,
-				text: "<p>Indeed.  This tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p>||EQ5CE<p>We’re going to be looking at an adiabatic system.  Which of these relations is correct?</p>",
+				text: "<p>Indeed.  This tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p>||EQ5CE<p>Since we’re going to be looking at an adiabatic system.  Which of these relations is correct?</p>",
 				quiz:{	
 					type:'multChoice',
 					options:
@@ -250,7 +250,14 @@ _.extend(Work.prototype,
 		$('#mainHeader').text('Work');
 		nextPrompt();
 	},
-
+	block0Start: function() {
+		new AuxPicture('img/work/block0Pic1.JPG');
+		new AuxPicture('img/work/block0Pic2.jpg');
+	},
+	block1Start: function() {
+		new AuxPicture('img/work/block0Pic1.jpg');
+		new AuxPicture('img/work/block0Pic2.jpg');
+	},
 	
 	block3Start: function(){
 

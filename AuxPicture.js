@@ -23,7 +23,7 @@ _.extend(AuxPicture.prototype, AuxFunctions, objectFuncs, {//CONSISTANT PLEASE -
 	remove: function() {
 		$(this.parentDiv).removeAttr('style');
 		this.parentDiv.html('');
-		$(div).attr('filledWith', 'empty');
+		$(this.parentDiv).attr('filledWith', 'empty');
 	}
 
 }
