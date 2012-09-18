@@ -15,7 +15,7 @@ _.extend(Work.prototype,
 		this.prompts=[
 			{block:0,
 				cutScene:true,
-				text:"<p>Today we’re going to investigate how work transfers energy to a system.  First we’re going to develop the equations that describe a process on an adiabatic system. </p><p>Which of these equations describes work done on a system?</p>",
+				text:"Today we’re going to investigate how work transfers energy to a system.  First we’re going to develop the equations that describe a process on an adiabatic system. </p><p>If we compress the system pictured to the right at a constant external pressure, which of these described the work done?</p>",
 				quiz:{	
 					type:'multChoice',
 					options:
@@ -88,7 +88,7 @@ _.extend(Work.prototype,
 			
 			{block:4,
 				cutScene: true,
-				text:"<p>The integral of P<sub>ext</sub> Vs. volume gives work done.</p><p>The system had an initial temperature of 200K and contained 1.8 moles of an ideal monatomic gas.</p><p>What should the final temperature have been?  </p>",
+				text:"<p>The integral of P<sub>ext</sub> dV gives work done.</p><p>The system had an initial temperature of 200K and contained 1.8 moles of an ideal monatomic gas.</p><p>What should the final temperature have been?  </p>",
 				quiz:{
 					type:'text', 
 					text:"Final temperature in kelvin", 
@@ -106,7 +106,7 @@ _.extend(Work.prototype,
 				},					
 			},
 			{block:6,
-				text:"If you'll notice, the T Vs. V graph is linear.  Does that seem correct or did something go wrong? Can you explain your answer using the P vs. V graph?", 
+				text:"If you'll notice, the T Vs. V graph is linear.  Given our P<sub>ext</sub>, does that seem correct or did something go wrong?", 
 				quiz:{
 					type:'text', 
 					text:"Type your answer here."
@@ -132,7 +132,7 @@ _.extend(Work.prototype,
 				},				
 			
 			},
-			*/
+			
 			{block:6,
 				cutScene: true,
 				text:"<p>So we can say that if we hit a molecule with a wall moving towards it3, it’ll speed up, but will this idea really lead to the correct temperature change when compressing a system of many molecules?  Let’s do an experiment and find out! </p><p>Let’s compress a system at 200 K from 15 L to 10 L at a constant pressure of 6 bar and see if calculated and simulated results line up.</p><p>One other thing - these collisions are the <i>only</i> way energy is added in these simulations, so if our idea it wrong, the simulation will give the wrong result.</p><p>Now, how much work will we do on this system?</p>",
@@ -143,6 +143,7 @@ _.extend(Work.prototype,
 					messageWrong: "That's not correct.  Check your units maybe?  Also, the work done on the system is positive since we're compressing."
 				},
 			},
+			*/
 			{block:7,
 				cutScene: true,
 				text:"<p>Yes, and what final temperature should we expect from doing 3.04 kJ of work on the system?  T<sub>o</sub> is 200 K.  The system will contain 1.5 moles and the gas has a heat capacity of 3/2R.</p>",
@@ -278,14 +279,14 @@ _.extend(Work.prototype,
 		this.block3Start();
 		walls[0].displayTemp();
 		this.graphs.tVSv = new GraphScatter('tVSv', 400,275, "Temp (K)", "Pressure (bar)",
-							{x:{min:0, step:3}, y:{min:0, step:100}});
+							{x:{min:0, step:3}, y:{min:0, step:200}});
 		this.graphs.tVSv.addSet('p', 'P Ext.', Col(255,50,50), Col(200,200,255),
 								{x:walls[0].data.v, y:walls[0].data.t});
 	},
 	block6Start: function() {
-		var loadedPVSV = getStore('pVSvblock5prompt5').load();
-		var loadedTVSV = getStore('tVSvblock5Prompt5').load();
-		loadedPVSV.integrate();
+		this.graphs.pVSvLoad = getStore('pVSvblock5prompt5').load();
+		this.graphs.tVSvLoad = getStore('tVSvblock5Prompt5').load();
+		this.graphs.pVSvLoad.integrate();
 		
 	},
 	/*

@@ -1,7 +1,7 @@
 function GraphScatter(handle, width, height, xLabel, yLabel, axisInit){
 	this.active = true;
 	this.handle = handle;
-	this.dims = this.getGraphDims();
+	this.dims = this.getDims();
 	//this.dims = V(width, height);
 	this.xLabel = xLabel;
 	this.yLabel = yLabel;
@@ -34,7 +34,7 @@ function GraphScatter(handle, width, height, xLabel, yLabel, axisInit){
 	this.drawAllBG();
 	
 }
-_.extend(GraphScatter.prototype, GraphBase, 
+_.extend(GraphScatter.prototype, AuxFunctions, GraphBase, 
 	{
 		addSet: function(address, label, pointCol, flashCol, data){
 			var set = {};

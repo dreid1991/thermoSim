@@ -1,11 +1,5 @@
 GraphBase = {
-	getGraphDims: function() {
-		var dx = 400;
-		var dyTotal = $('#main').height();
-		dyTotal -= $('#graphSpacer').height();
-		var dy = dyTotal/2;//number of graphs;
-		return V(dx, dy);
-	},
+
 	setStds: function(){
 		this.hashMarkLen = 10;
 		this.checkMarkOversize = 3;
@@ -34,7 +28,7 @@ GraphBase = {
 		addListener(curLevel, 'reset', 'clearGraph'+this.handle, this.clear, this);
 		this.buttonId = this.handle + 'reset';
 		if (!parentDiv){
-			this.parentDiv = this.pickParentDiv();
+			this.parentDiv = this.pickParentDiv('graph');
 		} else {
 			this.parentDiv = parentDiv;
 		}
@@ -56,7 +50,7 @@ GraphBase = {
 		addListener(curLevel, 'reset', 'clearGraph'+this.handle, this.clear, this);
 		this.buttonId = this.handle + 'reset';
 		if (!parentDiv){
-			this.parentDiv = this.pickParentDiv();
+			this.parentDiv = this.pickParentDiv('graph');
 		} else {
 			this.parentDiv = parentDiv;
 		}
@@ -70,17 +64,7 @@ GraphBase = {
 		this.graphHTMLElement = document.getElementById(this.handle+'Graph');
 		this.graph = this.graphHTMLElement.getContext('2d');	
 	},
-	pickParentDiv: function() {
-		for (var divIdx=0; divIdx<graphHolderDivs.length; divIdx++) {
-			var div = $('#'+graphHolderDivs[divIdx]);
-			var filledWith = $(div).attr('filledWith')
-			if (filledWith == 'empty' || filledWith == 'blank') {
-				$(div).attr('filledWith', 'graph');
-				return div;
-			}
-		}
-		console.log("Graphs are all full!");
-	},
+
 	remove: function(){
 		this.freeze();
 		removeListener(curLevel, 'reset', 'clearGraph'+this.handle);
