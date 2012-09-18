@@ -108,6 +108,7 @@ _.extend(Work.prototype,
 					text:"Type your answer here."
 				},
 			},
+
 			//{block:5,
 			//{block:4, 
 			//	title: 'Current step', 
@@ -139,7 +140,7 @@ _.extend(Work.prototype,
 					messageWrong: "That's not correct.  Check your units maybe?  Also, the work done on the system is positive since we're compressing."
 				},
 			},
-			*/
+			
 			{block:7,
 				cutScene: true,
 				text:"<p>Yes, and what final temperature should we expect from doing 3.04 kJ of work on the system?  T<sub>o</sub> is 200 K.  The system will contain 1.5 moles and the gas has a heat capacity of 3/2R.</p>",
@@ -150,6 +151,11 @@ _.extend(Work.prototype,
 					messageWrong: "That's not correct.  Are you using the right R?"
 				},
 			},			
+			*/
+			{block:7,
+				title:'Current step',
+				text:"Let’s see if we can relate that idea to work by looking at just one molecule. If you compress the cylinder, at what point does the molecule’s speed change?  How could this relate to a temperature change when there are many molecules?",
+			},
 			{block:8,
 				title:'Current step',
 				text:'And... Experiment!'
@@ -291,6 +297,14 @@ _.extend(Work.prototype,
 		this.graphs.tVSvLoad = getStore('tVSvblock5prompt5').load();
 		this.graphs.pVSvLoad.integrate('p');
 		
+	},
+	block7Start: function(){
+		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});
+		walls[0].setHitMode('Arrow');
+		this.borderStd();
+		this.compArrow = new CompArrow({mode:'adiabatic', speed:1.5});
+		spcs['spc4'].populate(P(45,235), V(460, 100), 1, 600);
+		this.tempListener = new StateListener({dataList:walls[0].data.t, is:'notEqualTo', targetVal:dataHandler.temp(), alertUnsatisfied:"Try hitting the molecule with the wall while the wall's moving"});
 	},
 	/*
 	block4Start: function(){
