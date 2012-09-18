@@ -76,7 +76,7 @@ _.extend(Work.prototype,
 			{block:3, 
 				title: 'Current step', 
 				//These molecules can be thought of as perfectly elastic bouncy balls.  When the hit a wall...
-				text: "Alright, let’s do some work.  Above we have our previously pictured system.  Let’s try to estimate a temperature change based on the work done on the system.  Try adding the weight to the piston to compress it.  Once compressed, you can integrate the data on the graph",
+				text: "Alright, let’s do some work.  Above we have our previously pictured system.  Let’s try to estimate a temperature change based on the work done on the system.  Try adding the weight to the piston to compress it.  Once compressed, you can integrate the data on the graph.",
 				quiz:{	
 					type:'buttons',
 					options:
@@ -259,20 +259,20 @@ _.extend(Work.prototype,
 		
 	
 		this.graphs.pVSv = new GraphScatter('pVSv', 400,275, "Volume (L)", "Pressure (bar)",
-							{x:{min:0, step:3}, y:{min:0, step:3}});
+							{x:{min:6, step:2}, y:{min:0, step:3}});
 		this.graphs.pVSv.addSet('p', 'P Ext.', Col(50,50,255), Col(200,200,255),
 								{x:walls[0].data.v, y:walls[0].data.pExt});
 
-		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:213.2}], weightScalar:5, displayText:false, massInit:0, compMode:'cPAdiabaticDamped'});
+		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:213.2}], weightScalar:8, displayText:false, massInit:0, compMode:'cPAdiabaticDamped'});
 		this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, makeSlider:false});
-		walls[0].setDefaultReadout(this.readout);
+		//walls[0].setDefaultReadout(this.readout);
 		walls[0].displayPExt();
 		this.borderStd();
 		this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:10, alertUnsatisfied:'Put the weight on before you try to integrate'});		
 	},
 	block4Start: function() {
-		var loadedGraph = getStore('pVSvblock3prompt3').load();
-		loadedGraph.integrate('p');
+		this.graphs.pVSvLoad = getStore('pVSvblock3prompt3').load();
+		this.graphs.pVSvLoad.integrate('p');
 	},
 	block5Start: function() {
 		this.block3Start();
@@ -287,7 +287,7 @@ _.extend(Work.prototype,
 		var loadedTVSV = getStore('tVSvblock5Prompt5').load();
 		loadedPVSV.integrate();
 		
-	}
+	},
 	/*
 	block4Start: function(){
 		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});
