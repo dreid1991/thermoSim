@@ -138,10 +138,11 @@ function DragWeights(attrs){
 	this.blockCol = 			defaultTo(Col(224, 165, 75), attrs.blockCol);
 	this.binCol = 				defaultTo(Col(150, 150, 150), attrs.binCol);
 	this.massInit = 			defaultTo(25, defaultTo(curLevel.massInit, attrs.massInit));
-	this.binHeight = 			defaultTo(65, attrs.binHeight);
+	this.binHeight = 			defaultTo(45, attrs.binHeight);
 	this.weightDimRatio = 		defaultTo(.5, attrs.weightDimRatio);
 	this.flySpeed =				defaultTo(20, attrs.flySpeed);
-	
+	this.weightScalar = 		defaultTo(70, attrs.weightScalar);//specific volume
+	this.displayText = 			defaultTo(true, attrs.displayText);
 	if(!(this.tempWeightDefs instanceof Array)){
 		//then is a total mass with count
 		var mass = this.tempWeightDefs.mass/this.tempWeightDefs.count;
@@ -156,7 +157,6 @@ function DragWeights(attrs){
 	this.pistonBinWidth = 150;
 	this.pistonBinSpacing = 15;
 	this.blockSpacing = 2;
-	this.weightScalar = 70;//specific volume
 	this.moveSpeed = 20;
 	this.mass = this.massInit;
 	this.massChunkName = 'dragWeights';
@@ -186,6 +186,9 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		//this.dropAllstores();
 		//addListener(curLevel, 'update', 'moveWeightsOnPiston' + this.wallInfo, this.moveWeightsOnPiston, this);
 		walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);
+		if (!this.displayText) {
+			this.draw = this.drawNoText;
+		}
 		addListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo, this.draw, this);
 		addListener(curLevel, 'mousedown', 'weights' + this.wallInfo, this.mousedown, this);
 		addListener(curLevel, 'reset', 'dragWeights' + this.wallInfo, this.reset, this);
@@ -499,10 +502,14 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		}
 		return count;
 	},
-	draw: function(){
+	draw: function() {
 		this.drawWeights();
 		this.drawBins();
-		this.drawBinLabels()
+		this.drawBinLabels();
+	},
+	drawNoText: function() {
+		this.drawWeights();
+		this.drawBins();	
 	},
 	drawWeights: function(){
 		var drawCanvas = c;
@@ -1323,7 +1330,8 @@ function Piston(attrs){
 	this.p = defaultTo(2, attrs.init);
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	this.slant = .07;
-	this.trackingP = false;
+	this.trackingP = false; //Is this used?
+	
 	this.wall = walls[this.wallInfo];
 	this.left = this.wall[0].x;
 	this.width = this.wall[1].x-this.left;

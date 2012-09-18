@@ -136,25 +136,25 @@ GraphBase = {
 			this.dataSave[set].pts.x = deepCopy(this.data[set].x);
 			this.dataSave[set].pts.y = deepCopy(this.data[set].y);
 			if(this.data[set].xInitDataIdx){
-				this.dataSave[set].src.x = deepCopy(this.data[set].src.x).splice(this.data[set].xInitDataIdx, this.data[set].src.x.length);
-			}
+				this.dataSave[set].src.x = deepCopy(this.data[set].src.x);//.splice(this.data[set].xInitDataIdx, this.data[set].src.x.length);
+			}//THIS DEMANDS ATTENTION.  FIX START IDX
 			if(this.data[set].yInitDataIdx){
-				this.dataSave[set].src.y = deepCopy(this.data[set].src.y).splice(this.data[set].yInitDataIdx, this.data[set].src.y.length);
+				this.dataSave[set].src.y = deepCopy(this.data[set].src.y);//.splice(this.data[set].yInitDataIdx, this.data[set].src.y.length);
 			}
 		}
 		store(saveName, this);
 		return saveName;
 	},
 	load: function(){
-		if(!$('#' + this.handle + 'GraphDiv').length){
-			this.makeCanvas(this.handle, this.dims);
-		}
+		//if(!$('#' + this.handle + 'GraphDiv').length){
+			this.makeCanvas(this.dims);
+		//}
 		var toAdd = []
 		for (var set in this.data){
 			this.data[set].x = [];
 			this.data[set].y = [];
-			this.data[set].src.x = this.dataSave[set].src.x.deepCopy();
-			this.data[set].src.y = this.dataSave[set].src.y.deepCopy();
+			this.data[set].src.x = deepCopy(this.dataSave[set].src.x);
+			this.data[set].src.y = deepCopy(this.dataSave[set].src.y);
 						
 			var toAdd = toAdd.concat(this.setsToPts(this.dataSave[set].pts.x, this.dataSave[set].pts.y, set));
 		
