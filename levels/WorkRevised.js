@@ -101,7 +101,8 @@ _.extend(Work.prototype,
 				},					
 			},
 			{block:6,
-				text:"If you'll notice, the T Vs. V graph is linear.  Given our P<sub>ext</sub>, does that seem correct or did something go wrong?", 
+				cutScene:true,
+				text:"If you'll notice, the T vs. V graph is linear.  Given our P<sub>ext</sub>, does that seem correct or did something go wrong?", 
 				quiz:{
 					type:'text', 
 					text:"Type your answer here."
@@ -287,8 +288,8 @@ _.extend(Work.prototype,
 	},
 	block6Start: function() {
 		this.graphs.pVSvLoad = getStore('pVSvblock5prompt5').load();
-		this.graphs.tVSvLoad = getStore('tVSvblock5Prompt5').load();
-		this.graphs.pVSvLoad.integrate();
+		this.graphs.tVSvLoad = getStore('tVSvblock5prompt5').load();
+		this.graphs.pVSvLoad.integrate('p');
 		
 	},
 	/*
