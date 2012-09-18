@@ -15,7 +15,7 @@ _.extend(Work.prototype,
 		this.prompts=[
 			{block:0,
 				cutScene:true,
-				text:"Today we’re going to investigate how work transfers energy to a system.  First we’re going to develop the equations that describe a process on an adiabatic system. </p><p>If we compress the system pictured to the right at a constant external pressure, which of these described the work done?</p>",
+				text:"Today we’re going to investigate how work transfers energy to a system.  First we’re going to develop the equations that describe a process on an adiabatic system. </p><p>If we compress the adiabatic system pictured to the right at a constant external pressure, which of these described the work done?</p>",
 				quiz:{	
 					type:'multChoice',
 					options:
@@ -40,14 +40,9 @@ _.extend(Work.prototype,
 				},
 			},
 			{block:2, 
-				cutScene: true,
-				text:"<p>Excellent, so as we add energy through work our system's temperature rises.  We know that temperature is an expression of molecular kinetic energy.  Since energy is conserved, as we add energy through work, the molecules speed up.</p><p> But why does that happen?  There must be some event in the compression that makes a molecule speed up.  </p><p><p>Shall we investigate?</p>",
-				quiz:{	
-					type:'buttons',
-					options:
-						[{buttonId:'yes', text:'Yes', isCorrect:true}
-					]
-				},
+				cutScene:true,
+				text:"Excellent, so as we add energy through work our system's temperature rises.  We know that temperature is an expression of molecular kinetic energy.  Since energy is conserved, as we add energy through work, the molecules speed up.</p><p> Before we get into why, let’s compress that system.</p>",
+
 			},
 			/*
 			{block:3,
@@ -76,7 +71,7 @@ _.extend(Work.prototype,
 			{block:3, 
 				title: 'Current step', 
 				//These molecules can be thought of as perfectly elastic bouncy balls.  When the hit a wall...
-				text: "Alright, let’s do some work.  Above we have our previously pictured system.  Let’s try to estimate a temperature change based on the work done on the system.  Try adding the weight to the piston to compress it.  Once compressed, you can integrate the data on the graph.",
+				text: "Above we have our previously pictured system.  Let’s try to estimate a temperature change based on the work done on the system.  Try adding the weight to the piston to compress it.  Once compressed, you can integrate the data on the graph.",
 				quiz:{	
 					type:'buttons',
 					options:

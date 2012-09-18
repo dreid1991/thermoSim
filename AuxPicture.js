@@ -15,7 +15,7 @@ _.extend(AuxPicture.prototype, AuxFunctions, objectFuncs, {//CONSISTANT PLEASE -
 		$(this.parentDiv).css("height", this.dims.dy);
 		$(this.parentDiv).css("background-color", this.bgCol.hex);
 		$(this.parentDiv).css("border-radius", 20);
-		$(this.parentDiv).css("padding", 15);
+		$(this.parentDiv).css("padding", 0);
 	},
 	addImage: function(imgPath) {
 		$(this.parentDiv).append('<center><img src=' + imgPath + '></img></center');
