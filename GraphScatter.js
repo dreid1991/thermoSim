@@ -6,7 +6,6 @@ function GraphScatter(attrs) {
 	this.xLabel = attrs.xLabel;
 	this.yLabel = attrs.yLabel;
 	var axisInit = attrs.axesInit;
-	this.trace = defaultTo(false, attrs.trace);
 	this.labelFontSize = 15;
 	this.legendFontSize = 12;
 	this.axisValFontSize = 11;
@@ -29,7 +28,7 @@ function GraphScatter(attrs) {
 	this.legend = {};
 	this.resetRanges();
 	this.stepSize = {x:0, y:0};
-
+	
 
 	this.setStds();
 	this.makeCanvas(this.dims);
@@ -47,10 +46,22 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			set.yInitDataIdx = attrs.data.y.length-1;
 			set.pointCol = attrs.pointCol;
 			set.flashCol = attrs.flashCol;
+			set.trace = defaultTo(false, attrs.trace);
 			set.getLast = this.makePtDataGrabFunc(attrs.data);
 			set.show = true;
 			set.src = attrs.data;
+			
+			
 			this.data[attrs.address] = set;
+			
+			if (set.trace) {
+				set.traceStartX = set.src.x.length; 
+				set.traceStartY = set.src.y.length;
+				set.traceLastX = set.traceStartX;
+				set.traceLastY = set.traceStartY;
+				set.ptDataIdxs = []; //Form of: [{x:xIdx, y:yIdx}...]
+			}
+			
 			this.makeLegendEntry(set, attrs.address);
 			this.drawAllBG();
 		},
@@ -61,11 +72,14 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 		},
 		drawLastData: function(toAdd){
 			for (var addIdx=0; addIdx<toAdd.length; addIdx++){
-				var dataSet = this.data[toAdd[addIdx].address];
-				if(dataSet.show){
-					var xPt = dataSet.x[dataSet.x.length-1]
-					var yPt = dataSet.y[dataSet.y.length-1]
-					var pointCol = dataSet.pointCol
+				var set = this.data[toAdd[addIdx].address];
+				if (set.show) {
+					var xPt = set.x[set.x.length-1]
+					var yPt = set.y[set.y.length-1]
+					var pointCol = set.pointCol
+					if (set.trace) {
+						this.trace(set, set.x.length-1);
+					}
 					this.graphPt(xPt, yPt, pointCol);
 				}
 			}	
@@ -73,11 +87,17 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 		addLast: function(){
 			var toAdd = [];
 			for (var address in this.data){
-				var dataSet = this.data[address];
-				toAdd.push(dataSet.getLast(address));
+				var set = this.data[address];
+				set.ptDataIdxs.push({x:set.src.x.length-1, y:set.src.y.length-1});
+				toAdd.push(set.getLast(address));
 			}
-			if(this.ptsExist(toAdd)){
+			if (this.ptsExist(toAdd)) { 
 				this.addPts(toAdd);
+			} else {
+				for (var address in this.data){
+					var set = this.data[address];
+					set.pop();
+				}
 			}
 		},
 		plotData: function(xVals, yVals, address){
@@ -102,16 +122,20 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 
 
 		graphPts: function(){
-			for (var setName in this.data){
-				var dataSet = this.data[setName];
-					if(dataSet.show){
-						var col = dataSet.pointCol;
-						for (var ptIdx=0; ptIdx<dataSet.x.length; ptIdx++){
-							var xVal = dataSet.x[ptIdx];
-							var yVal = dataSet.y[ptIdx];
-							this.graphPt(xVal, yVal, col);
+			for (var setName in this.data) {
+				var set = this.data[setName];
+				if (set.show) {
+					var col = set.pointCol;
+					for (var ptIdx=0; ptIdx<set.x.length; ptIdx++){
+						var xVal = set.x[ptIdx];
+						var yVal = set.y[ptIdx];
+						this.graphPt(xVal, yVal, col);
+						if (set.trace) {
+							this.trace(set, ptIdx);
+						}
 					}
 				}
+				
 			}
 		},
 		graphPt: function(xVal, yVal, col){

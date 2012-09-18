@@ -270,7 +270,7 @@ _.extend(Work.prototype,
 		this.graphs.pVSv = new GraphScatter({handle:'pVSv', xLabel:"Volume (L)", yLabel:"Pressure (bar)",
 							axesInit:{x:{min:6, step:2}, y:{min:0, step:3}}});
 		this.graphs.pVSv.addSet({address:'p', label:'P Ext.', pointCol:Col(50,50,255), flashCol:Col(200,200,255),
-								data:{x:walls[0].data.v, y:walls[0].data.pExt}});
+								data:{x:walls[0].data.v, y:walls[0].data.pExt}, trace:true});
 
 		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:213.2}], weightScalar:8, displayText:false, massInit:0, compMode:'cPAdiabaticDamped'});
 		this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, makeSlider:false});

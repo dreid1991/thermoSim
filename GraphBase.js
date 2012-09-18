@@ -82,6 +82,41 @@ GraphBase = {
 		this.active = false;
 		return this;
 	},
+	trace: function(set, ptIdx) {
+		if (ptIdx>0) {
+			var ptsToTrace = this.getPtsToTrace(set, ptIdx);
+		}
+	},
+	getPtsToTrace: function(set, ptIdx) {
+		var xDataIdxInit = set.ptDataIdxs[ptIdx-1].x;
+		var xDataIdxFinal = set.ptDataIdxs[ptIdx].x;
+		
+		var yDataIdxInit = set.ptDataIdxs[ptIdx-1].y;
+		var yDataIdxFinal = set.ptDataIdxs[ptIdx].y;
+		
+		if (xDataIdxFinal-xDataIdxInit == yDataIdxFinal-yDataIdxInit) {
+			var numPts = xDataIdxFinal-xDataIdxInit;
+			var tracePts = new Array(numPts);
+			for (var ptIdx=0; ptIdx<numPts; ptIdx++) {
+				tracePts[ptIdx] = this.translateValToCoord(P(set.src.x[xDataIdxInit+ptIdx], set.src.y[yDataIdxInit+ptIdx]));
+			}
+			//this.cutClosePts(tracePts);
+			this.drawTrace(set, tracePts);
+		} else {
+			console.log('Data count mismatch for tracing');
+			console.trace();
+		}
+	},
+	cutClosePts: function(pts) {
+		for (var ptIdx = pts.length-2; ptIdx>0; ptIdx--){
+			if (pts[ptIdx].close(pts[ptIdx+1])) {
+				pts.splice(ptIdx+1, 1);
+			}
+		}
+	},
+	drawTrace: function(set, tracePts) {
+		draw.path(tracePts, set.pointCol, this.graph);
+	},
 	integrate: function(set){
 		this.data[set].integralPts = this.getIntegralPts(set);
 		this.drawIntegral(set);
@@ -109,6 +144,7 @@ GraphBase = {
 		draw.fillPtsAlpha(pts, this.integralCol, this.integralAlpha, this.graph);
 		this.graphPts();
 	},
+
 	save: function(saveName){
 	
 		var saveName = defaultTo('graph'+this.handle, saveName);
@@ -366,7 +402,7 @@ GraphBase = {
 		legendEntry.toggleDims = toggleDims;
 		var self = this;
 		legendEntry.toggle = function(){
-								if($('#graphs').is(':visible') && ptInRect(togglePos, toggleDims, mouseOffsetDiv(self.parentDivId))){
+								if(ptInRect(togglePos, toggleDims, mouseOffsetDiv(self.parentDivId))){
 									if(set.show){
 										set.show = false;
 										self.flashers = [];
@@ -403,12 +439,19 @@ GraphBase = {
 	},
 	resetStd: function(){
 		for (var set in this.data){
-			var data = this.data[set];
-			for(var dataBitName in data){
-				var dataBit = data[dataBitName];
+			var set = this.data[set];
+			for(var dataBitName in set){
+				var dataBit = set[dataBitName];
 				if(dataBit instanceof Array){
-					data[dataBitName]=[];
+					set[dataBitName]=[];
 				}
+			}
+			if (set.trace) {
+				set.traceStartX = set.src.x.length;
+				set.traceStartY = set.src.y.length;
+				set.traceLastX = set.traceStartX;
+				set.traceLastY = set.traceStartY;
+				set.ptDataIdxs = [];
 			}
 		}
 		this.flashers = [];

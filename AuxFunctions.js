@@ -17,6 +17,7 @@ AuxFunctions = {
 			}
 		}
 		console.log("Aux divs are all full!");
+		console.trace();
 	},
 	cleanUpParent: function() {
 		$(this.parentDiv).removeAttr('style');

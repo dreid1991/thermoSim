@@ -330,8 +330,11 @@ Point.prototype = {
 		}
 		return rndPts;
 	},
-	sameAs: function(b){
+	sameAs: function(b) {
 		return (this.x==b.x && this.y==b.y);
+	},
+	close: function(b) {
+		return Math.abs(this.x-b.x)<1 && Math.abs(this.y-b.y)<1;
 	},
 	track: function(trackData){
 		if (trackData instanceof Point) {
