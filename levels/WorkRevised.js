@@ -71,22 +71,21 @@ _.extend(Work.prototype,
 			{block:3, 
 				title: 'Current step', 
 				//These molecules can be thought of as perfectly elastic bouncy balls.  When the hit a wall...
-				text: "Above we have our previously pictured system.  Let’s try to estimate a temperature change based on the work done on the system.  Try adding the weight to the piston to compress it.  Once compressed, you can integrate the data on the graph.",
+				text: "Above we have our previously pictured system.  If you add the weight, how much work do you do on the system?  ",
 				quiz:{	
-					type:'buttons',
-					options:
-						[{buttonId:'integrate', text:'Integrate', isCorrect:true}
-						]
+					type:'textSmall',
+					units:'kJ',
+					text:'',
 					
 				},
 			},
 			
 			{block:4,
 				cutScene: true,
-				text:"<p>The integral of P<sub>ext</sub> dV gives work done.</p><p>The system had an initial temperature of 200K and contained 1.8 moles of an ideal monatomic gas.</p><p>What should the final temperature have been?  </p>",
+				text:"<p>Good.  The system had an initial temperature of 200 K and contained 1.8 moles of an ideal monatomic gas.  From that work of XXX KJ, what final temperature should the system have had?</p>",
 				quiz:{
 					type:'text', 
-					text:"Final temperature in kelvin", 
+					text:"Final temperature in Kelvin", 
 					answer:715,
 					messageWrong: "That's not correct.  Are you using the right R?",
 					tolerance:.1
@@ -268,10 +267,10 @@ _.extend(Work.prototype,
 		spcs['spc3'].populate(P(45,65), V(450, 300), 800, 200);
 		
 	
-		this.graphs.pVSv = new GraphScatter('pVSv', 400,275, "Volume (L)", "Pressure (bar)",
-							{x:{min:6, step:2}, y:{min:0, step:3}});
-		this.graphs.pVSv.addSet('p', 'P Ext.', Col(50,50,255), Col(200,200,255),
-								{x:walls[0].data.v, y:walls[0].data.pExt});
+		this.graphs.pVSv = new GraphScatter({handle:'pVSv', xLabel:"Volume (L)", yLabel:"Pressure (bar)",
+							axesInit:{x:{min:6, step:2}, y:{min:0, step:3}}});
+		this.graphs.pVSv.addSet({address:'p', label:'P Ext.', pointCol:Col(50,50,255), flashCol:Col(200,200,255),
+								data:{x:walls[0].data.v, y:walls[0].data.pExt}});
 
 		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:213.2}], weightScalar:8, displayText:false, massInit:0, compMode:'cPAdiabaticDamped'});
 		this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, makeSlider:false});
@@ -287,10 +286,10 @@ _.extend(Work.prototype,
 	block5Start: function() {
 		this.block3Start();
 		walls[0].displayTemp();
-		this.graphs.tVSv = new GraphScatter('tVSv', 400,275, "Temp (K)", "Pressure (bar)",
-							{x:{min:0, step:3}, y:{min:0, step:200}});
-		this.graphs.tVSv.addSet('p', 'P Ext.', Col(255,50,50), Col(200,200,255),
-								{x:walls[0].data.v, y:walls[0].data.t});
+		this.graphs.tVSv = new GraphScatter({handle:'tVSv', xLabel:"Volume (L)", yLabel:"Temperature (K)",
+							axesInit:{x:{min:0, step:3}, y:{min:0, step:200}}});
+		this.graphs.tVSv.addSet({address:'t', label:'T sys.', pointCol:Col(255,50,50), flashCol:Col(200,200,255),
+								data:{x:walls[0].data.v, y:walls[0].data.t}});
 	},
 	block6Start: function() {
 		this.graphs.pVSvLoad = getStore('pVSvblock5prompt5').load();

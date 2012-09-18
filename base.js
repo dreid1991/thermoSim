@@ -43,7 +43,7 @@ $(function(){
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);
 	multChoiceMaxSnapHeight = 100;
-	graphHolderDivs = ['graph1', 'graph2'];
+	auxHolderDivs = ['aux1', 'aux2'];
 	sliderList = [];
 	spcs = {};
 	stored = {};

@@ -1,10 +1,12 @@
-function GraphScatter(handle, width, height, xLabel, yLabel, axisInit){
+function GraphScatter(attrs) {
 	this.active = true;
-	this.handle = handle;
+	this.handle = attrs.handle;
 	this.dims = this.getDims();
 	//this.dims = V(width, height);
-	this.xLabel = xLabel;
-	this.yLabel = yLabel;
+	this.xLabel = attrs.xLabel;
+	this.yLabel = attrs.yLabel;
+	var axisInit = attrs.axesInit;
+	this.trace = defaultTo(false, attrs.trace);
 	this.labelFontSize = 15;
 	this.legendFontSize = 12;
 	this.axisValFontSize = 11;
@@ -12,13 +14,13 @@ function GraphScatter(handle, width, height, xLabel, yLabel, axisInit){
 	this.legendFont = this.legendFontSize+ 'pt calibri';
 	this.axisValFont = this.axisValFontSize+ 'pt calibri';
 	this.borderSpacing = 70;
-	this.xStart = this.borderSpacing/width;
-	this.yStart = 1-this.borderSpacing/height;
+	this.xStart = this.borderSpacing/this.dims.dx;
+	this.yStart = 1-this.borderSpacing/this.dims.dy;
 	this.legendWidth = 80;
 	this.xEnd = (this.dims.dx - (this.legendWidth+8))/this.dims.dx;
 	this.yEnd = .05;
 	this.gridSpacing = 40;
-
+	
 	
 	this.setNumGridLines();
 	this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1)}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1)}};
@@ -36,20 +38,20 @@ function GraphScatter(handle, width, height, xLabel, yLabel, axisInit){
 }
 _.extend(GraphScatter.prototype, AuxFunctions, GraphBase, 
 	{
-		addSet: function(address, label, pointCol, flashCol, data){
+		addSet: function(attrs){//address, label, pointCol, flashCol, data){
 			var set = {};
-			set.label = label;
+			set.label = attrs.label;
 			set.x = [];
 			set.y = [];
-			set.xInitDataIdx = data.x.length-1;
-			set.yInitDataIdx = data.y.length-1;
-			set.pointCol = pointCol;
-			set.flashCol = flashCol;
-			set.getLast = this.makePtDataGrabFunc(data);
+			set.xInitDataIdx = attrs.data.x.length-1;
+			set.yInitDataIdx = attrs.data.y.length-1;
+			set.pointCol = attrs.pointCol;
+			set.flashCol = attrs.flashCol;
+			set.getLast = this.makePtDataGrabFunc(attrs.data);
 			set.show = true;
-			set.src = data;
-			this.data[address] = set;
-			this.makeLegendEntry(set, address);
+			set.src = attrs.data;
+			this.data[attrs.address] = set;
+			this.makeLegendEntry(set, attrs.address);
 			this.drawAllBG();
 		},
 		drawAllData: function(){

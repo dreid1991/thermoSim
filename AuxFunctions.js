@@ -3,19 +3,24 @@ AuxFunctions = {
 	getDims: function() {
 		var dx = 400;
 		var dyTotal = $('#main').height();
-		dyTotal -= $('#graphSpacer').height();
-		var dy = dyTotal/2;//number of graphs;
+		dyTotal -= $('#auxSpacer').height();
+		var dy = dyTotal/2;//number of aux slots;
 		return V(dx, dy);
 	},
 	pickParentDiv: function(fillWith) {
-		for (var divIdx=0; divIdx<graphHolderDivs.length; divIdx++) {
-			var div = $('#'+graphHolderDivs[divIdx]);
+		for (var divIdx=0; divIdx<auxHolderDivs.length; divIdx++) {
+			var div = $('#'+auxHolderDivs[divIdx]);
 			var filledWith = $(div).attr('filledWith')
-			if (filledWith == 'empty' || filledWith == 'blank') {
+			if (filledWith == '') {
 				$(div).attr('filledWith', fillWith);
 				return div;
 			}
 		}
-		console.log("Graphs are all full!");
+		console.log("Aux divs are all full!");
+	},
+	cleanUpParent: function() {
+		$(this.parentDiv).removeAttr('style');
+		this.parentDiv.html('');
+		$(this.parentDiv).attr('filledWith', '');
 	},
 }

@@ -6,12 +6,12 @@
 	float:left;
 	/*display:inline-block;*/
 }
-.graphs{
+
+.auxSlots{
 	margin-left:570px;
 }
-.graph{
-	/*padding:20px;
-	padding:20px;*/
+
+.aux{
 	position:relative;
 }
 
@@ -110,7 +110,7 @@
 	color:white;
 	padding:10px;
 }
-.graphSpacer{
+.auxSpacer{
 	height:10px;
 }
 .borderedBlock{

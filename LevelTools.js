@@ -95,12 +95,14 @@ LevelTools = {
 		
 	},
 	appendQuiz: function(text, quiz, appendTo){
-		if(quiz.type == 'buttons'){
+		if(quiz.type == 'buttons') {
 			this.appendButtons(text, quiz, appendTo)
-		}else if (quiz.type == 'multChoice'){
+		} else if (quiz.type == 'multChoice') {
 			this.appendMultChoice(text, quiz, appendTo);
-		}else if (quiz.type == 'text'){
-			this.appendTextBox(text, quiz, appendTo);
+		} else if (quiz.type == 'text') {
+			this.appendTextBox(text, quiz, appendTo, 3, 60);
+		} else if (quiz.type == 'textSmall') {
+			this.appendTextBox(text, quiz, appendTo, 1, 6);
 		}
 	},
 	cutSceneText: function(text){
@@ -251,18 +253,21 @@ LevelTools = {
 	},
 	/*
 	type: 'text'
-	can have:			text, messageRight, messageWrong, answer
+	can have:			text, messageRight, messageWrong, answer, units
 	*/
-	appendTextBox: function(text, quiz, appendTo){
+	appendTextBox: function(text, quiz, appendTo, rows, cols, units){
 		var textBoxHTML = '';
 		var boxText = defaultTo('Type your answer here.', quiz.text);
 		textBoxHTML += text;
 		textBoxHTML += '<br>';
-		textBoxHTML += "<textarea id='answerTextArea' rows='3' cols='60' placeholder='"+boxText+"'></textarea>";
+		textBoxHTML += "<textarea id='answerTextArea' rows='" +rows+ "' cols='" +cols+ "' placeholder='"+boxText+"'></textarea>";
+		if (quiz.units) {
+			textBoxHTML += quiz.units;
+		}
 		textBoxHTML += "<table border=0><tr><td width=75%></td><td><button id='textAreaSubmit' class='noSelect'>Submit</button></td></tr></table></p>";
-		var checkFunc = function(){
-			if(curLevel.conditions().didWin){
-				if(quiz.answer){
+		var checkFunc = function() {
+			if (curLevel.conditions().didWin) {
+				if (quiz.answer) {
 					var submitted = $('#answerTextArea').val();
 					if(fracDiff(parseFloat(quiz.answer), parseFloat(submitted))<.05){
 						if(quiz.messageRight){

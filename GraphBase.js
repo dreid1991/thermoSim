@@ -71,8 +71,7 @@ GraphBase = {
 		removeSave(curLevel, 'reset', 'clearGraph'+this.handle);
 		removeListener(curLevel, 'update', 'flash' + this.handle);
 		removeSave(curLevel, 'update', 'flash' + this.handle);
-		$(this.parentDiv).html('');
-		$(this.parentDiv).attr('filledWith', 'empty');
+		this.cleanUpParent();
 		return this;
 	},
 	unfreeze: function(){
