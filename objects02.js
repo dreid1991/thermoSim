@@ -785,13 +785,13 @@ function AccelArrow(attrs) {
 	var drawCanvas = c;
 	var canvasElement = canvas;
 	var listeners = {};
-	if(makeStops){
+	if (makeStops) {
 		this.stops = new Stops({stopPt:{height:bounds.y.max}, wallInfo:this.wallInfo});
 	}
 	var wall = this.wall;
 	var mass = this.mass
 	listeners.onDown = function(){};
-	listeners.onMove = function(){wall.accelTowards(this.pos.y, compMode, massChunkName, mass)};
+	listeners.onMove = function(){wall.freeToPt(this.pos.y, compMode, massChunkName, mass)};
 	listeners.onUp = function(){};
 	this.dragArrow = new DragArrow(pos, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds).show();
 	

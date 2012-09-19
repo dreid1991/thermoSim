@@ -702,7 +702,7 @@ WallMethods = {
 				this);
 			}		
 		},
-		accelTowards: function(dest, compType, massChunkName, mass) {
+		freeToPt: function(dest, compType, massChunkName, mass) {
 			if(compType.indexOf('isothermal')!=-1){
 				var wallMoveMethod = 'cVIsothermal';
 				console.log("cPIsothermal does not exist yet");
@@ -720,7 +720,7 @@ WallMethods = {
 			var dist = dest-y;
 			if (dist!=0) {
 				var sign = getSign(dist);
-				var accel = g*sign;
+				var accel = g;
 				this.parent.setSubWallHandler(this.handle, 0, wallMoveMethod + compAdj);
 				this.setMass(massChunkName, mass);
 				addListener(curLevel, 'wallMove', 'accelTowardsPt' + this.handle,
