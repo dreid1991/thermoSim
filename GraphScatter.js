@@ -88,7 +88,9 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			var toAdd = [];
 			for (var address in this.data){
 				var set = this.data[address];
-				set.ptDataIdxs.push({x:set.src.x.length-1, y:set.src.y.length-1});
+				if (set.trace) {
+					set.ptDataIdxs.push({x:set.src.x.length-1, y:set.src.y.length-1});
+				}
 				toAdd.push(set.getLast(address));
 			}
 			if (this.ptsExist(toAdd)) { 

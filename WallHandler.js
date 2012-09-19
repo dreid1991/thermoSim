@@ -379,7 +379,16 @@ WallMethods = {
 			var pos = P(dot.x, dot.y);
 			var vf = dot.v.copy();
 			var perpVf = -perpUV.dotProd(dot.v);
-			this.drawArrow(pos, vo, vf, perpV, perpVf);  
+			this.drawArrowV(pos, vo, vf, perpV, perpVf);  
+		},
+		didHitArrowSpd: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
+			var vo = dot.v.copy();
+			var handler = this[wallIdx + '-' + subWallIdx];
+			handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
+			var pos = P(dot.x, dot.y);
+			var vf = dot.v.copy();
+			var perpVf = -perpUV.dotProd(dot.v);
+			this.drawArrowSpd(pos, vo, vf, perpV, perpVf);  
 		},
 		haveChecked: function(wall, list){
 			for (var listIdx=0; listIdx<list.length; listIdx++){
@@ -618,7 +627,7 @@ WallMethods = {
 		////////////////////////////////////////////////////////////
 		//EXTRAS
 		////////////////////////////////////////////////////////////
-		drawArrow: function(pos, vo, vf, perpVo, perpVf){
+		drawArrowV: function(pos, vo, vf, perpVo, perpVf){
 			var arrowPts = new Array(3);
 			arrowPts[0] = pos.copy().movePt(vo.copy().mult(10).neg());
 			arrowPts[1] = pos.copy();
@@ -635,7 +644,25 @@ WallMethods = {
 					{pos:textPos.copy().movePt({dy:-20}), col:curLevel.bgCol},
 					{text:'deltaV = '+round(delV,1)+'m/s', time:3000}
 			);
-		},	
+		},
+		drawArrowSpd: function(pos, vo, vf, perpVo, perpVf){
+			var arrowPts = new Array(3);
+			arrowPts[0] = pos.copy().movePt(vo.copy().mult(10).neg());
+			arrowPts[1] = pos.copy();
+			arrowPts[2] = pos.copy().movePt(vf.copy().mult(10));
+			var lifespan = 50;
+			var arrowTurn = 0;
+			var handle = 'drawArrow'+round(pos.x,0)+round(pos.y,0);
+			var arrow = new Arrow(handle, arrowPts, Col(255,0,0), lifespan, c);
+
+
+			var textPos = pos.copy().movePt(vf.mult(15));
+			var V = vf.mag()*pxToMS*.1;//MAYBE SEND DOT.  GET SPEED RIGHT WAY.
+			animText.newAnim({pos:textPos}, 
+					{pos:textPos.copy().movePt({dy:-20}), col:curLevel.bgCol},
+					{text:'Speed = '+round(V,1)+'m/s', time:3000}
+			);
+		},			
 	
 	
 	},

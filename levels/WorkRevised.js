@@ -299,7 +299,7 @@ _.extend(Work.prototype,
 	},
 	block7Start: function(){
 		walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});
-		walls[0].setHitMode('Arrow');
+		walls[0].setHitMode('ArrowSpd');
 		this.borderStd();
 		this.compArrow = new CompArrow({mode:'adiabatic', speed:1.5});
 		spcs['spc4'].populate(P(45,235), V(460, 100), 1, 600);
