@@ -14,6 +14,7 @@ _.extend(Work.prototype,
 	declarePrompts: function(){
 		this.prompts=[
 			{block:0,
+				/*
 				cutScene:true,
 				text:"Today we’re going to investigate how work transfers energy to a system.  First we’re going to develop the equations that describe a process on an adiabatic system. </p><p>If we compress the adiabatic system pictured to the right at a constant external pressure, which of these described the work done?</p>",
 				quiz:{	
@@ -25,6 +26,7 @@ _.extend(Work.prototype,
 						{text:"||EQ4||", isCorrect: false, message:"It is dependant on change in volume, but T?"}
 					]
 				},
+				*/
 			},
 			{block:1, 
 				cutScene: true,
@@ -252,8 +254,14 @@ _.extend(Work.prototype,
 		nextPrompt();
 	},
 	block0Start: function() {
+		walls = WallHandler({pts:[[P(40,60), P(510,60), P(510,380), P(40,380)]], handlers:'staticAdiabatic', handles:['container'], vols:[15]});
+		spcs['spc1'].populate(P(45,65), V(460, 300), 100, 200);
+		spcs['spc3'].populate(P(45,65), V(450, 300), 8, 200);
+		this.accelArrow = new AccelArrow({pressure:2});
+		/*
 		new AuxPicture('img/work/block0Pic1.JPG');
 		new AuxPicture('img/work/block0Pic2.jpg');
+		*/
 	},
 	block1Start: function() {
 		new AuxPicture('img/work/block0Pic1.jpg');

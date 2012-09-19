@@ -117,7 +117,13 @@ objectFuncs = {
 	},
 	percentToVal: function(percent) {
 		return (percent*(this.max-this.min)/100+this.min);
-	}
+	},
+	pressureToMass: function(pressure) {
+		return pressure*(this.wall[1].x-this.wall[0].x)/(pConst*g);
+	},
+	massToPressure: function(mass) {
+		return mass*pConst*g/(this.wall[1].x-this.wall[0].x);
+	},
 }
 //////////////////////////////////////////////////////////////////////////
 //DRAG WEIGHTS
@@ -1324,21 +1330,20 @@ _.extend(CompArrow.prototype, objectFuncs, {
 function Piston(attrs){
 	this.type = 'Piston';
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
-	this.pMin = defaultTo(2, attrs.min);
-	this.pMax = defaultTo(15, attrs.max);
+	this.wall = walls[this.wallInfo];
+	this.min = defaultTo(2, attrs.min);
+	this.max = defaultTo(15, attrs.max);
 	this.makeSlider = defaultTo(true, attrs.makeSlider);
-	this.p = defaultTo(2, attrs.init);
+
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	this.slant = .07;
-	this.trackingP = false; //Is this used?
 	
-	this.wall = walls[this.wallInfo];
 	this.left = this.wall[0].x;
 	this.width = this.wall[1].x-this.left;
 	this.pistonPt = this.wall[0];
+	this.setMass(defaultTo(2, attrs.init));
 
 	this.height = 500;
-	this.setMass();
 	this.draw = this.makeDrawFunc(this.height, this.left, this.width);
 	this.dataSlotFont = '12pt Calibri';
 	this.dataSlotFontCol = Col(255,255,255);
@@ -1357,7 +1362,7 @@ function Piston(attrs){
 	walls.setSubWallHandler(this.wallInfo, 0, 'cPAdiabaticDamped' + compAdj);		
 	this.wall.setDefaultReadout(this.readout);
 	if(this.makeSlider){
-		this.sliderId = this.addSlider('Pressure', {value:this.pToPercent(this.p)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
+		this.sliderId = this.addSlider('Pressure', {value:this.pToPercent(this.val)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
 	}
 	this.addCleanUp();
 	
@@ -1439,20 +1444,14 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		this.readout.hide();
 	},
 	parseSlider: function(event, ui){
-		this.setPressure(ui.value);
+	
+		this.setPressure(this.percentToVal(ui.value));
 	},
-	setPressure: function(sliderVal){
-		this.p = this.percentToP(sliderVal);
-		this.setMass();
+	setPressure: function(pressure){
+		this.setMass(pressure);
 	},
-	pToPercent: function(p){
-		return sliderVal = 100*(p - this.pMin)/(this.pMax-this.pMin);;
-	},
-	percentToP: function(percent){
-		return (this.pMax - this.pMin)*percent/100 + this.pMin;
-	},
-	setMass: function(){
-		this.mass = this.p*this.width/(pConst*g);
+	setMass: function(pressure){
+		this.mass = this.pressureToMass(pressure);
 		this.wall.setMass('piston' + this.handle, this.mass);
 	},
 	setReadoutY: function(){

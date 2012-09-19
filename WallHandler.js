@@ -684,7 +684,7 @@ WallMethods = {
 			}
 			var y = this[0].y
 			var dist = dest-y;
-			if(dist!=0){
+			if (dist!=0) {
 				var sign = getSign(dist);
 				this.v = speed*sign;
 				this.parent.setSubWallHandler(this.handle, 0, wallMoveMethod + compAdj);
@@ -701,6 +701,43 @@ WallMethods = {
 					},
 				this);
 			}		
+		},
+		accelTowards: function(dest, compType, massChunkName, mass) {
+			if(compType.indexOf('isothermal')!=-1){
+				var wallMoveMethod = 'cVIsothermal';
+				console.log("cPIsothermal does not exist yet");
+				console.trace();
+			} else if (compType.indexOf('adiabatic')!=-1){
+				var wallMoveMethod = 'cPAdiabatic';
+			}
+			removeListener(curLevel, 'wallMove', 'accelTowardsPt' + this.handle);
+			var setY = function(curY){
+				this[0].y = curY;
+				this[1].y = curY;
+				this[this.length-1].y = curY;
+			}
+			var y = this[0].y
+			var dist = dest-y;
+			if (dist!=0) {
+				var sign = getSign(dist);
+				var accel = g*sign;
+				this.parent.setSubWallHandler(this.handle, 0, wallMoveMethod + compAdj);
+				this.setMass(massChunkName, mass);
+				addListener(curLevel, 'wallMove', 'accelTowardsPt' + this.handle,
+					function(){
+						var y = this[0].y
+						setY.apply(this, [boundedStep(y, dest, this.v + .5*accel)])
+						this.parent.setupWall(this.handle);
+						this.v += accel;
+						if(round(y,2)==round(dest,2)){
+							this.unsetMass();
+							removeListener(curLevel, 'wallMove', 'accelTowardsPt' + this.handle);
+							this.parent.setSubWallHandler(this.handle, 0, 'staticAdiabatic');
+							this.v = 0;
+						}
+					},
+				this);
+			}			
 		},
 		setHitMode: function(inputMode){
 			this.hitMode = inputMode;

@@ -756,3 +756,57 @@ _.extend(RMSChanger.prototype, objectFuncs, {
 	},
 }
 )
+
+
+function AccelArrow(attrs) {
+
+	this.wallInfo = defaultTo(0, attrs.wallInfo);
+	this.wall = walls[this.wallInfo];
+	if (attrs.pressure) {
+		this.mass = this.pressureToMass(attrs.pressure);
+	} else {
+		this.mass = attrs.mass;
+	}
+	var massChunkName = defaultTo('accelChunk', attrs.massChunkName);
+	this.type = 'CompArrow';
+	var speed = defaultTo(1.5, attrs.speed);
+	var compMode = defaultTo('adiabatic', attrs.compMode);
+	compMode += compAdj;
+	var makeStops = defaultTo(true, attrs.stops);
+	var bounds = defaultTo({y:{min:30, max:350}}, attrs.bounds);
+	var pos = this.wall[1].copy()
+	var rotation = 0;
+	var cols = {};
+	cols.outer = Col(44, 118, 172);
+	cols.onClick = Col(44, 118, 172);
+	cols.inner = curLevel.bgCol.copy();
+	var dims = V(25, 15);
+	var handle = 'volDragger' + defaultTo('', attrs.handle);
+	var drawCanvas = c;
+	var canvasElement = canvas;
+	var listeners = {};
+	if(makeStops){
+		this.stops = new Stops({stopPt:{height:bounds.y.max}, wallInfo:this.wallInfo});
+	}
+	var wall = this.wall;
+	var mass = this.mass
+	listeners.onDown = function(){};
+	listeners.onMove = function(){wall.accelTowards(this.pos.y, compMode, massChunkName, mass)};
+	listeners.onUp = function(){};
+	this.dragArrow = new DragArrow(pos, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds).show();
+	
+	this.addCleanUp();
+	
+	return this;
+}
+
+_.extend(AccelArrow.prototype, objectFuncs, {
+	remove: function() {
+
+		this.dragArrow.remove();
+		if(this.stop){
+			this.stops.remove();
+		}
+	},		
+}
+)
