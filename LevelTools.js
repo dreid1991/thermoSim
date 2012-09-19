@@ -264,7 +264,7 @@ LevelTools = {
 		if (quiz.units) {
 			textBoxHTML += quiz.units;
 		}
-		textBoxHTML += "<table border=0><tr><td width=75%></td><td><button id='textAreaSubmit' class='noSelect'>Submit</button></td></tr></table></p>";
+		textBoxHTML += "<table border=0><tr><td width=75%></td><td><button id='textAreaSubmit' class='noSelect'>Submit</button></td></tr></table>";
 		var checkFunc = function() {
 			if (curLevel.conditions().didWin) {
 				if (quiz.answer) {

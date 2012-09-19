@@ -14,7 +14,7 @@ _.extend(Work.prototype,
 	declarePrompts: function(){
 		this.prompts=[
 			{block:0,
-				/*
+				
 				cutScene:true,
 				text:"Today we’re going to investigate how work transfers energy to a system.  First we’re going to develop the equations that describe a process on an adiabatic system. </p><p>If we compress the adiabatic system pictured to the right at a constant external pressure, which of these described the work done?</p>",
 				quiz:{	
@@ -26,7 +26,7 @@ _.extend(Work.prototype,
 						{text:"||EQ4||", isCorrect: false, message:"It is dependant on change in volume, but T?"}
 					]
 				},
-				*/
+			
 			},
 			{block:1, 
 				cutScene: true,
@@ -86,16 +86,17 @@ _.extend(Work.prototype,
 				cutScene: true,
 				text:"<p>Good.  The system had an initial temperature of 200 K and contained 1.8 moles of an ideal monatomic gas.  From that work of XXX KJ, what final temperature should the system have had?</p>",
 				quiz:{
-					type:'text', 
-					text:"Final temperature in Kelvin", 
+					type:'textSmall', 
+					text:"Tf", 
 					answer:715,
+					units:'K',
 					messageWrong: "That's not correct.  Are you using the right R?",
 					tolerance:.1
 				},				
 			},
 			{block:5,	
 				title:'Current step',
-				text:"Alright, let’s check that answer.  Here’s the same compression, but this time we’re displaying temperature.  How do the results compare?  If there's a discrepency, can you account for it?",
+				text:"Alright, let’s check those answers.  Here’s the same compression, but this time we’re displaying temperature and work done.  How do the results compare?  If there's a discrepency, can you account for it?",
 				quiz:{
 					type:'text', 
 					text:"Type your answer here."
@@ -155,12 +156,22 @@ _.extend(Work.prototype,
 			*/
 			{block:7,
 				title:'Current step',
-				text:"Let’s see if we can relate that idea to work by looking at just one molecule. If you compress the cylinder, at what point does the molecule’s speed change?  How could this relate to a temperature change when there are many molecules?",
+				text:"We know that doing work on our adiabatic system increases its temperature.  This means that the molecules must speed up.  Now these molecules behave like perfectly elastic bouncy balls do when they hit a wall.  Using the movable wall above, can you figure out what event causes the molecule’s speed to change?  Do you think this explains the macroscopic temperature change we saw?",
+				quiz: {
+					type:'text',
+					text:'Type your answer here'
+					
+				},
 			},
+			{block:8,
+				title:'Current step',
+				//text:'
+			/*
 			{block:8,
 				title:'Current step',
 				text:'And... Experiment!'
 			},
+			*/
 			{block:9,
 				cutScene: true,
 				text:"<p>Alright, we got XXX K experimental versus 363 K theoretical.  So our idea was that work increases temperature through molecules' collisions with the moving wall.</p><p>Does our experiment back up the idea?</p>",
@@ -254,14 +265,14 @@ _.extend(Work.prototype,
 		nextPrompt();
 	},
 	block0Start: function() {
-		walls = WallHandler({pts:[[P(40,60), P(510,60), P(510,380), P(40,380)]], handlers:'staticAdiabatic', handles:['container'], vols:[15]});
-		spcs['spc1'].populate(P(45,65), V(460, 300), 100, 200);
-		spcs['spc3'].populate(P(45,65), V(450, 300), 8, 200);
-		this.releaseArrow = new ReleaseArrow({pressure:2});
-		/*
+		//walls = WallHandler({pts:[[P(40,60), P(510,60), P(510,380), P(40,380)]], handlers:'staticAdiabatic', handles:['container'], vols:[15]});
+		//spcs['spc1'].populate(P(45,65), V(460, 300), 100, 200);
+		//spcs['spc3'].populate(P(45,65), V(450, 300), 8, 200);
+		//this.releaseArrow = new ReleaseArrow({pressure:2});
+		
 		new AuxPicture('img/work/block0Pic1.JPG');
 		new AuxPicture('img/work/block0Pic2.jpg');
-		*/
+		
 	},
 	block1Start: function() {
 		new AuxPicture('img/work/block0Pic1.jpg');
@@ -289,20 +300,19 @@ _.extend(Work.prototype,
 	},
 	block4Start: function() {
 		this.graphs.pVSvLoad = getStore('pVSvblock3prompt3').load();
-		this.graphs.pVSvLoad.integrate('p');
 	},
 	block5Start: function() {
 		this.block3Start();
 		walls[0].displayTemp();
+		walls[0].displayWork();
 		this.graphs.tVSv = new GraphScatter({handle:'tVSv', xLabel:"Volume (L)", yLabel:"Temperature (K)",
-							axesInit:{x:{min:0, step:3}, y:{min:0, step:200}}});
+							axesInit:{x:{min:6, step:2}, y:{min:0, step:200}}});
 		this.graphs.tVSv.addSet({address:'t', label:'T sys.', pointCol:Col(255,50,50), flashCol:Col(200,200,255),
 								data:{x:walls[0].data.v, y:walls[0].data.t}});
 	},
 	block6Start: function() {
 		this.graphs.pVSvLoad = getStore('pVSvblock5prompt5').load();
 		this.graphs.tVSvLoad = getStore('tVSvblock5prompt5').load();
-		this.graphs.pVSvLoad.integrate('p');
 		
 	},
 	block7Start: function(){

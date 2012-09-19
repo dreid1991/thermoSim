@@ -5,6 +5,9 @@ Contains:
 	PulseArrow
 	CheckMark
 	Arrow
+	TempChanger
+	RMSChanger
+	ReleaseArrow
 in that order
 */
 
