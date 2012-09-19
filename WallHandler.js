@@ -702,7 +702,7 @@ WallMethods = {
 				this);
 			}		
 		},
-		freeToPt: function(dest, compType, massChunkName, mass) {
+		releaseToPt: function(dest, compType, massChunkName, mass) {
 			if(compType.indexOf('isothermal')!=-1){
 				var wallMoveMethod = 'cVIsothermal';
 				console.log("cPIsothermal does not exist yet");

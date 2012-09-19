@@ -758,7 +758,7 @@ _.extend(RMSChanger.prototype, objectFuncs, {
 )
 
 
-function AccelArrow(attrs) {
+function ReleaseArrow(attrs) {
 
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.wall = walls[this.wallInfo];
@@ -791,7 +791,7 @@ function AccelArrow(attrs) {
 	var wall = this.wall;
 	var mass = this.mass
 	listeners.onDown = function(){};
-	listeners.onMove = function(){wall.freeToPt(this.pos.y, compMode, massChunkName, mass)};
+	listeners.onMove = function(){wall.releaseToPt(this.pos.y, compMode, massChunkName, mass)};
 	listeners.onUp = function(){};
 	this.dragArrow = new DragArrow(pos, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds).show();
 	
@@ -800,7 +800,7 @@ function AccelArrow(attrs) {
 	return this;
 }
 
-_.extend(AccelArrow.prototype, objectFuncs, {
+_.extend(ReleaseArrow.prototype, objectFuncs, {
 	remove: function() {
 
 		this.dragArrow.remove();

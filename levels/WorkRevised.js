@@ -257,7 +257,7 @@ _.extend(Work.prototype,
 		walls = WallHandler({pts:[[P(40,60), P(510,60), P(510,380), P(40,380)]], handlers:'staticAdiabatic', handles:['container'], vols:[15]});
 		spcs['spc1'].populate(P(45,65), V(460, 300), 100, 200);
 		spcs['spc3'].populate(P(45,65), V(450, 300), 8, 200);
-		this.accelArrow = new AccelArrow({pressure:2});
+		this.releaseArrow = new ReleaseArrow({pressure:2});
 		/*
 		new AuxPicture('img/work/block0Pic1.JPG');
 		new AuxPicture('img/work/block0Pic2.jpg');
