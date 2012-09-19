@@ -293,7 +293,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		} else {
 			bin.pos = P(posX - this.pistonBinWidth/2, 0).track({pt:this.pistonPt, noTrack:'x'});
 		}
-		bin.slots = this.getPistonBinSlots(bin.pos.x, weightGroup);
+		bin.slots = this.getPistonBinSlots(bin.pos, weightGroup);
 		bin.visible = false;
 		return bin
 	},
@@ -324,17 +324,14 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		return slots;
 		
 	},
-	stationaryYFunc: function(val){
-		return function(){return val};
-	},
 	//HEY - GENERALIZE THESE TWO
-	getPistonBinSlots: function(x, weightGroup){
+	getPistonBinSlots: function(binPos, weightGroup){
 		var numSlots = weightGroup.weights.length;
 		var dims = weightGroup.dims;
 		var numCols = Math.floor(this.pistonBinWidth/(dims.dx + this.blockSpacing));
 		var usedWidth = numCols*(dims.dx+this.blockSpacing);
 		var unusedWidth = this.pistonBinWidth-usedWidth;
-		startX = x + unusedWidth/2;
+		startX = binPos.x + unusedWidth/2;
 		var numRows = Math.ceil(numSlots/numCols);
 		var slots = [];
 		var yOffset = this.blockSpacing;
@@ -342,7 +339,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 			var row = [];
 			var blockX = startX + this.blockSpacing;
 			for (var colIdx=0; colIdx<numCols; colIdx++){
-				var pos = P(blockX, 0).track({pt:this.pistonPt, offset:{dy:-(yOffset+dims.dy)}, noTrack:'x'});
+				var pos = P(blockX, 0).track({pt:binPos, offset:{dy:-(yOffset+dims.dy)}, noTrack:'x'});
 				var isFull = new Boolean();
 				var isFull = false;
 				row.push(this.newSlot(isFull, pos, weightGroup.name, 'piston', rowIdx, colIdx));

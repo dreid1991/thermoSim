@@ -2,8 +2,6 @@ To do:
 in Work: I changed atm to bar without changing any values like mass or whatever.  Reccomend checking values
 should probably make conditions and remove be addable to prompt instead of block of specified
 
-Make function that takes info (spcName, tags), returns list of dots.  That would get rid of all these lame else ifs
-
 MAKE RMS BE CONSISTANTLY GOTTEN - currently you have the dot speed function which uses pxToMS and the 3/2kT = 1/2mv^2 way.  NOT OKAY
 OR - just calculate px to ms based on the 3/2kt stuff and v->t conversion (tconst I guess)
 
@@ -16,6 +14,9 @@ in ideal gas eqs: boltzmann constant: K -> K_{b}
 URISC FINAL REPORT BY SEPT 28th
 
 
-Ooh - when adding a tag, just compile a list of dots with that tag.  There can be like a tagged object and it can contain lists of tagged dots.  Dots also appear in their corresponding spcs element
+make appendLastAns or something
+	could just manually throw in last answer. w/e
 
-REVERSIBILITY GRAPHS NOT WORKING - CAN'T GET PARENT HTML
+Make graph pts fill in sharp turns with pts
+
+redo block/prompt system to accomidate 
