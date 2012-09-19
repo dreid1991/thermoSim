@@ -130,13 +130,15 @@ objectFuncs = {
 //////////////////////////////////////////////////////////////////////////
 
 function DragWeights(attrs){
+	//Can probably remove energy bar stuff
 	this.type = 'DragWeights';
 	this.handle = 				unique('dragWeights' + attrs.handle, curLevel);
 	this.tempWeightDefs = 		attrs.weightDefs;
 	this.wallInfo = 			defaultTo(0, attrs.wallInfo);
 	this.wall = 				walls[this.wallInfo];
 	this.zeroY = 				defaultTo(this.wall[2].y, attrs.min);
-	this.pistonPt = 			defaultTo(this.wall[0], attrs.pistonPt)
+	this.pistonPt =				defaultTo(this.wall[0], attrs.pistonPt);
+	this.pistonOffset =			defaultTo(undefined, attrs.pistonOffset);
 	this.wallHandler = 			defaultTo('cPAdiabaticDamped', attrs.compMode) + compAdj;
 	this.readout = 				defaultTo(curLevel.readout, attrs.readout);
 	this.binY = 				defaultTo(myCanvas.height-15, attrs.binY);
@@ -151,6 +153,7 @@ function DragWeights(attrs){
 	this.displayText = 			defaultTo(true, attrs.displayText);
 	if(!(this.tempWeightDefs instanceof Array)){
 		//then is a total mass with count
+		//should change so I can have arrays of both types
 		var mass = this.tempWeightDefs.mass/this.tempWeightDefs.count;
 		this.tempWeightDefs = [{name:'onlyWeights', count:this.tempWeightDefs.count, mass:mass}]
 	}
@@ -284,7 +287,12 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	},
 	makePistonBin: function(posX, weightGroup){
 		var bin = {};
-		bin.pos = P(posX - this.pistonBinWidth/2, 0).track({pt:this.pistonPt, noTrack:'x'});
+		if (this.pistonOffset) {
+			var xOffset = this.pistonOffset.dx
+			bin.pos = P(posX - this.pistonBinWidth/2, 0).movePt({dx:xOffset}).track({pt:this.pistonPt, noTrack:'x', offset:{dy:this.pistonOffset.dy}});
+		} else {
+			bin.pos = P(posX - this.pistonBinWidth/2, 0).track({pt:this.pistonPt, noTrack:'x'});
+		}
 		bin.slots = this.getPistonBinSlots(bin.pos.x, weightGroup);
 		bin.visible = false;
 		return bin
@@ -648,7 +656,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		var energyChanged = new Boolean();
 		var selected = this.selected;
 		energyChanged = (selected.cameFrom=='piston' && dest=='store') || (selected.cameFrom=='store' && dest=='piston')
-		if(energyChanged){
+		if (energyChanged) {
 			this.eAdded+=this.eBar.eChange;
 			if(this.trackEnergy){
 				this.readout.tick('eAdd', this.eAdded);
@@ -664,7 +672,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	getDest: function(){
 		var selected = this.selected;
 		var blockHeight = this.weightGroups[selected.name].dims.dy;
-		if(selected.cameFrom=='piston' || selected.pos.y+blockHeight>this.pistonPt.y){
+		if(selected.cameFrom=='piston' || selected.pos.y+blockHeight>this.zeroY){
 			return 'store';
 		}else{
 			return 'piston';

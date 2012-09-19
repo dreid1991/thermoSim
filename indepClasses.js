@@ -371,7 +371,7 @@ Point.prototype = {
 					this.x = pt.x;
 					this.y = pt.y + offset.dy;
 				}
-			} else if (offset.y && offset.dx) {
+			} else if (offset.dy && offset.dx) {
 				var trackFunc = function() {
 					this.x = pt.x + offset.dx;
 					this.y = pt.y + offset.dy;
@@ -382,7 +382,7 @@ Point.prototype = {
 				var trackFunc = function() {
 					this.y = pt.y;
 				}
-			} else if(offset.dy) {
+			} else if (offset.dy) {
 				var trackFunc = function() {
 					this.y = pt.y + offset.dy;
 				}

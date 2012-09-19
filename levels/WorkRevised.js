@@ -166,6 +166,7 @@ _.extend(Work.prototype,
 			{block:8,
 				title:'Current step',
 				//text:'
+			},
 			/*
 			{block:8,
 				title:'Current step',
@@ -291,7 +292,7 @@ _.extend(Work.prototype,
 		this.graphs.pVSv.addSet({address:'p', label:'P Ext.', pointCol:Col(50,50,255), flashCol:Col(200,200,255),
 								data:{x:walls[0].data.v, y:walls[0].data.pExt}, trace:true});
 
-		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:213.2}], weightScalar:8, displayText:false, massInit:0, compMode:'cPAdiabaticDamped'});
+		this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:213.2}], weightScalar:8, displayText:false, massInit:0, compMode:'cPAdiabaticDamped', pistonOffset:V(200,100)});
 		this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, makeSlider:false});
 		//walls[0].setDefaultReadout(this.readout);
 		walls[0].displayPExt();
