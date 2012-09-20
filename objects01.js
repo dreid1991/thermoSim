@@ -131,7 +131,7 @@ objectFuncs = {
 function DragWeights(attrs){
 	//Can probably remove energy bar stuff
 	this.type = 'DragWeights';
-	this.cleanUpWith = 			attrs.cleanUpWith;
+	this.cleanUpWith = 			defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.handle = 				unique('dragWeights' + attrs.handle, curLevel);
 	this.tempWeightDefs = 		attrs.weightDefs;
 	this.wallInfo = 			defaultTo(0, attrs.wallInfo);
@@ -798,7 +798,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 //////////////////////////////////////////////////////////////////////////
 function Pool(attrs){
 	this.type = 'Pool';
-	this.cleanUpWith = attrs.cleanUpWith;
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	var self = this;
 	attrs = defaultTo({}, attrs);
 	this.bin = {};
@@ -1288,7 +1288,7 @@ DragArrow.prototype = {
 //////////////////////////////////////////////////////////////////////////
 function CompArrow(attrs){
 	this.type = 'CompArrow';
-	this.cleanUpWith = attrs.cleanUpWith;
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	var wallInfo = defaultTo(0, attrs.wallInfo);
 	var speed = defaultTo(1.5, attrs.speed);
 	var compMode = defaultTo('adiabatic', attrs.compMode);
@@ -1336,7 +1336,7 @@ _.extend(CompArrow.prototype, objectFuncs, {
 
 function Piston(attrs){
 	this.type = 'Piston';
-	this.cleanUpWith = attrs.cleanUpWith;
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.wall = walls[this.wallInfo];
 	this.min = defaultTo(2, attrs.min);
@@ -1487,7 +1487,7 @@ Still records its energy flow
 */
 function Heater(attrs){
 	this.type = 'Heater';
-	this.cleanUpWith = attrs.cleanUpWith;
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	/*
 	dims.dx corresponds to long side w/ wires
 	dims.dy corresponds to short side
@@ -1664,7 +1664,7 @@ _.extend(Heater.prototype, objectFuncs, {
 //////////////////////////////////////////////////////////////////////////
 function Stops(attrs){
 	this.type = 'Stops';
-	this.cleanUpWith = attrs.cleanUpWith;
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	//assumes canvas of c.  I mean, where else would they be?
 	this.stopWidth = 20;
 	this.stopHeight = 5;
@@ -1719,7 +1719,7 @@ _.extend(Stops.prototype, objectFuncs, {
 //////////////////////////////////////////////////////////////////////////
 function StateListener(attrs){//like dataList... is:'greaterThan', ... targetVal
 	this.type = 'StateListener';
-	this.cleanUpWith = attrs.cleanUpWith;
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.dataList = attrs.dataList;
 	this.is = attrs.is
 	this.targetVal = attrs.targetVal;

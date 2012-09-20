@@ -17,7 +17,7 @@ in that order
 
 function Sandbox(attrs){
 	this.type = 'Sandbox';
-	this.cleanUpWith = attrs.cleanUpWith;
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	var self = this;
 	attrs = defaultTo({}, attrs);
 	this.bin = {};
@@ -280,7 +280,7 @@ Optional
 */
 function ParticleEmitter(attrs){
 	this.type = 'ParticleEmitter';
-	this.cleanUpWith = attrs.cleanUpWith
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.pos = attrs.pos;
 	this.handle = unique('emitter' + defaultTo('', attrs.handle), curLevel.updateListeners.listeners);
 	this.dir = attrs.dir;
@@ -445,7 +445,7 @@ function sillyArrow(){
 }
 function PulseArrow(attrs){
 	this.type = 'PulseArrow';
-	this.cleanUpWith = attrs.cleanUpWith;
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.pos = attrs.pos.copy();
 	if (attrs.posFinal) {
 		this.posFinal = attrs.posFinal;
@@ -705,7 +705,7 @@ Arrow.prototype = {
 //////////////////////////////////////////////////////////////////////////
 function TempChanger(attrs) {
 	this.type = 'tempChanger';
-	this.cleanUpWith = attrs.cleanUpWith;
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.info = attrs.info;
 	this.min = defaultTo(100, attrs.min);
 	this.val = dataHandler.temp(this.info);
@@ -739,7 +739,7 @@ _.extend(TempChanger.prototype, objectFuncs, {
 //////////////////////////////////////////////////////////////////////////
 function RMSChanger(attrs) {
 	this.type = 'RMSChanger';
-	this.cleanUpWith = attrs.cleanUpWith;
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.info = attrs.info;
 	this.min = defaultTo(1, attrs.min);
 	this.val = dataHandler.RMS(this.info);
@@ -771,7 +771,7 @@ _.extend(RMSChanger.prototype, objectFuncs, {
 
 function ReleaseArrow(attrs) {
 	this.type = 'ReleaseArrow';
-	this.cleanUpWith = attrs.cleanUpWith;
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.wall = walls[this.wallInfo];
 	if (attrs.pressure) {

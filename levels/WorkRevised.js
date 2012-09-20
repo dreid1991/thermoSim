@@ -28,9 +28,10 @@ _.extend(Work.prototype,
 					quiz:{	
 						type:'multChoice',
 						options:
-							[{text:"||EQ1||", isCorrect: true},
+							[
 							{text:"||EQ2||", isCorrect: false, message:'No!  You do no work with constant volume'},
 							{text:"||EQ3||", isCorrect: false, message:"No!"},
+							{text:"||EQ1||", isCorrect: true},
 							{text:"||EQ4||", isCorrect: false, message:"It is dependant on change in volume, but T?"}
 						]
 					},
@@ -38,7 +39,7 @@ _.extend(Work.prototype,
 				{
 					setup:undefined,
 					cutScene:true,
-					text: "<p>Indeed.  This tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p>||EQ5CE<p>Since we’re going to be looking at an adiabatic system.  Which of these relations is correct?</p>",
+					text: "||EQ1BR<p>Indeed.  This equation tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p>||EQ5CE<p>Since we’re going to be looking at an adiabatic system.  If we assume constant heat capacity, which of these relations is correct?</p>",
 					quiz:{	
 						type:'multChoice',
 						options:
@@ -54,9 +55,13 @@ _.extend(Work.prototype,
 		{
 			setup: 
 				function() {
-					walls = WallHandler({pts:[[P(40,60), P(510,60), P(510,380), P(40,380)]], handlers:'staticAdiabatic', handles:['container'], vols:[15]});
-					spcs['spc1'].populate(P(45,65), V(460, 300), 1000, 200);
-					spcs['spc3'].populate(P(45,65), V(450, 300), 800, 200);				
+					currentSetupType = 'block';
+					walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});
+					walls[0].setHitMode('ArrowSpd');
+					this.borderStd();
+					this.compArrow = new CompArrow({mode:'adiabatic', speed:1.5});
+					spcs['spc4'].populate(P(45,235), V(460, 100), 1, 600);
+					this.tempListener = new StateListener({dataList:walls[0].data.t, is:'notEqualTo', targetVal:dataHandler.temp(), alertUnsatisfied:"Try hitting the molecule with the wall while the wall's moving"});			
 				
 				},
 			prompts:[
