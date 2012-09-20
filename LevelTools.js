@@ -119,7 +119,7 @@ LevelTools = {
 		$('#dashOutro').hide();
 		$('#dashIntro').hide();
 		$('#dashCutScene').hide();
-		$('#submitDiv').show();
+		$('#nextPrevDiv').show();
 		$('#base').show();
 		$('#canvasDiv').show();
 		$('#display').hide();

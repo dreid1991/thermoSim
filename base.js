@@ -484,17 +484,24 @@ function hideSliders(){
 	}
 }
 function showPrompt(newBlockIdx, newPromptIdx){
+	var newBlock = curLevel.blocks[newBlockIdx];
+	var newPrompt = newBlock.prompts[newPromptIdx];
 	var changedBlock = newBlockIdx!=blockIdx;
-	var oldPrompt = curLevel.blocks[blockIdx].prompts[promptIdx];
-	
+	//Finished must be set in forward, not here.  THIS SHOWS AND DOES NOT ASK QUESTIONS
 	curLevel.promptCleanUp();
+	emptyListener(curLevel, 'promptCleanUp');
+	emptyListener(curLevel, 'promptCondition');
 	if (changedBlock) {
 		curLevel.saveAllGraphs();
 		curLevel.freezeAllGraphs();
 		curLevel.removeAllGraphs();
 		dotManager.clearAll();		
-		emptyListener(curLevel, 'cleanUp');
-		emptyListener(curLevel, 'condition');
+
+		curLevel.blockCleanUp();
+		newBlock.setup.apply(curLevel);
+
+		emptyListener(curLevel, 'blockCleanUp');
+		emptyListener(curLevel, 'blockCondition');
 		
 		addListener(curLevel, 'blockCleanUp', 'removeArrowAndText',
 			function(){
@@ -503,95 +510,24 @@ function showPrompt(newBlockIdx, newPromptIdx){
 			},
 		this);
 	}
+	newPrompt.setup.apply(curLevel)
 	
-	var finishedPrev = new Boolean();
-	var forward = new Boolean();
-	var didWin = new Boolean();
-	if (prev) {
-		var finishedPrev = prev.finished;
+	if(!newPrompt.quiz){
+		$('#nextPrevDiv').show();
+	}
+	if(!newPrompt.cutScene){	
+		if(newPrompt.quiz){
+			var quiz = newPrompt.quiz;
+			$('#nextPrevDiv').hide();
+			$('#prompt').html('');
+			curLevel.appendQuiz(text,newPrompt.quiz, 'prompt')
+		}else{
+			$('#prompt').html(text);
+		}
 	} else{
-		finishedPrev = true;
+		curLevel.cutSceneStart(newPrompt.text, newPrompt.cutScene, newPrompt.quiz)
 	}
-	didWin = true;
-	var indexOfPrev = _.indexOf(curLevel.prompts, prev);
-	var indexOfCur = _.indexOf(curLevel.prompts, prompt);
-	forward = indexOfCur>indexOfPrev;
-	if(prev){
-		var conditions = defaultTo(curLevel.conditions, defaultTo(curLevel['block'+prev.block+'Conditions'], prev.conditions));
-	}
-	if(!finishedPrev && forward && conditions){
-		var condResult = conditions.apply(curLevel);
-		didWin = condResult.didWin;
-		if(condResult.alert){
-			alert(condResult.alert);
-		}
-	}
-	if(didWin || finishedPrev){
-
-
-		if(prev){
-			if(forward){
-				prev.finished = true;
-			}
-			if(prev.cleanUp){
-				prev.cleanUp.apply(curLevel);
-			}
-		}
-		var block = prompt.block
-		var func = prompt.start;
-		if(prompt.replace){
-			prompt.text = replaceStrings(prompt.text, prompt.replace);
-		}
-		var text = prompt.text;
-		
-		if(block!=curLevel.blockIdx){
-			curLevel.saveAllGraphs();
-			curLevel.freezeAllGraphs();
-			curLevel.removeAllGraphs();
-			dotManager.clearAll();
-			curLevel.cleanUp.apply(curLevel);
-
-			emptyListener(curLevel, 'cleanUp');
-			emptyListener(curLevel, 'condition');
-			
-			addListener(curLevel, 'cleanUp', 'removeArrowAndText',
-				function(){
-					removeListenerByName(curLevel, 'update', 'drawArrow');
-					removeListenerByName(curLevel, 'update', 'animText');
-				},
-			this);
-			
-			if (curLevel.inCutScene) {
-				curLevel.cutSceneEnd();
-			}
-			if(curLevel['block'+block+'Start']){
-				curLevel['block'+block+'Start'].apply(curLevel);
-			}
-			curLevel.blockIdx = block;
-		}
-		curLevel.promptIdx = indexOfCur;	
-		if(!prompt.quiz){
-			$('#submitDiv').show();
-		}
-		if(!prompt.cutScene){	
-			if(prompt.quiz){
-				var quiz = prompt.quiz;
-				$('#submitDiv').hide();
-				$('#prompt').html('');
-				curLevel.appendQuiz(text, prompt.quiz, 'prompt')
-			}else{
-				$('#prompt').html(text);
-			}
-		} else{
-			curLevel.cutSceneStart(prompt.text, prompt.cutScene, prompt.quiz)
-		}
-		var title = prompt.title;
-		$('#baseHeader').html(title);
-		if(func){
-			func.apply(curLevel);
-		}
-		//fillEmptyGraphDivs();
-	}
+	$('#baseHeader').html(newPrompt.title);
 
 }
 function toPrompt(newBlockIdx, newPromptIdx){
@@ -604,6 +540,7 @@ function nextPrompt(){
 	var newBlockIdx = blockIdx;
 	var newPromptIdx = promptIdx;
 	var curBlock = curLevel.blocks[blockIdx];
+
 	if (promptIdx+1==curBlock.prompts.length) {
 		if (blockIdx+1 < curLevel.blocks.length) {
 			newBlockIdx++;
@@ -612,8 +549,34 @@ function nextPrompt(){
 	} else {
 		newPromptIdx++;
 	}
-
-	showPrompt(newBlockIdx, newPromptIdx);
+	var changingBlock = blockIdx!=newBlockIdx;
+	var willAdvance = 0;
+	var curFinished = curBlock.prompts[promptIdx].finished;
+	
+	willAdvance = Math.max(willAdvance, curFinished);
+	if (!willAdvance) {
+		var promptResults = curLevel.promptConditions();
+		if (promptResults.didWin) {
+			if (changingBlock) {
+				var blockResults = curLevel.blockConditions();
+				if (blockResults.didWin) {
+					willAdvance = 1;
+				} else {
+					willAdvance = 0;
+					alertValid(blockResults.alert);
+				}
+			} else {
+				willAdvance = 1;
+			}
+		} else {
+			willAdvance = 0;
+			alertValid(promptResults.alert);
+		}
+	}
+	
+	if (willAdvance) {
+		showPrompt(newBlockIdx, newPromptIdx);
+	}
 	
 }
 function prevPrompt(){
@@ -646,6 +609,12 @@ function replaceStrings(text, replaceList){
 		text = text.replace(oldStr, newStr);
 	}
 	return text;
+}
+
+function alertValid(str) {
+	if (str!==undefined && str!='') {
+		alert(str);
+	}
 }
 
 function fillEmptyGraphDivs() {
