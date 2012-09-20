@@ -25,7 +25,6 @@ GraphBase = {
 	},
 	makeCanvas: function(dims, parentDiv) {
 		var self = this;
-		addListener(curLevel, 'reset', 'clearGraph'+this.handle, this.clear, this);
 		this.buttonId = this.handle + 'reset';
 		if (!parentDiv){
 			this.parentDiv = this.pickParentDiv('graph');
@@ -67,8 +66,6 @@ GraphBase = {
 
 	remove: function(){
 		this.freeze();
-		removeListener(curLevel, 'reset', 'clearGraph'+this.handle);
-		removeSave(curLevel, 'reset', 'clearGraph'+this.handle);
 		removeListener(curLevel, 'update', 'flash' + this.handle);
 		removeSave(curLevel, 'update', 'flash' + this.handle);
 		this.cleanUpParent();

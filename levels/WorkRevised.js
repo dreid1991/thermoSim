@@ -43,10 +43,11 @@ _.extend(Work.prototype,
 					quiz:{	
 						type:'multChoice',
 						options:
-							[{text:"||EQ6||", isCorrect: true},
+							[
 							{text:"||EQ7||", isCorrect: false, message:"Why Cp?"},
 							{text:"||EQ8||", isCorrect: false, message:"But it's adiabatic!"},
-							{text:"It cannot be simplified", isCorrect: false, message:"Yes it can.  What is Q equal to?"}
+							{text:"It cannot be simplified", isCorrect: false, message:"Yes it can.  What is Q equal to?"},
+							{text:"||EQ6||", isCorrect: true}
 						]
 					},			
 				}
@@ -62,17 +63,64 @@ _.extend(Work.prototype,
 					this.compArrow = new CompArrow({mode:'adiabatic', speed:1.5});
 					spcs['spc4'].populate(P(45,235), V(460, 100), 1, 600);
 					this.tempListener = new StateListener({dataList:walls[0].data.t, is:'notEqualTo', targetVal:dataHandler.temp(), alertUnsatisfied:"Try hitting the molecule with the wall while the wall's moving"});			
-				
 				},
 			prompts:[
 				{
 					setup:undefined,
-					text:"hello",
+					text:"<center>||EQ6||</center>From the equation above we see that temperature increases as we do work by decreasing volume.  Let's see what's happening from the point of view of a molecule in the system.  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?",
+					quiz:{	
+						type:'text',
+						text:'Type your answer here',
+						//NEED TO STORE ANSWER
+					},
+				}
+			]
+		},
+		{
+			setup:
+				function() {
+					currentSetupType = 'block';
+
+					walls = WallHandler({pts:[[P(40,60), P(510,60), P(510,380), P(40,380)]], handlers:'staticAdiabatic', handles:['container'], vols:[15]});
+					spcs['spc1'].populate(P(45,65), V(460, 300), 1000, 200);
+					spcs['spc3'].populate(P(45,65), V(450, 300), 800, 200);
+					
+				
+					this.graphs.pVSv = new GraphScatter({handle:'pVSv', xLabel:"Volume (L)", yLabel:"Pressure (bar)",
+										axesInit:{x:{min:6, step:2}, y:{min:0, step:3}}});
+					this.graphs.pVSv.addSet({address:'p', label:'P Ext.', pointCol:Col(50,50,255), flashCol:Col(200,200,255),
+											data:{x:walls[0].data.v, y:walls[0].data.pExt}, trace:true});
+
+					this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:213.2}], weightScalar:8, displayText:false, massInit:0, compMode:'cPAdiabaticDamped', pistonOffset:V(130,-41)});
+					this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, makeSlider:false});
+					walls[0].displayPExt();
+					this.borderStd();
+					this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:10, alertUnsatisfied:'Compress the system!'});						
+				},
+			prompts:[
+				{
+					setup:undefined,
+					text:"Above is a piston cylinder assembly that is well insulated.  Place the block on top of the poston and observe the response.  How much work did you do on the system?",
+					quiz:{	
+						type:'textSmall',
+						units:'kJ',
+						text:'',
+						//NEED TO STORE ANSWER
+					},	
+				},
+				{
+					setup:undefined,
+					text:"The system had an initial temperature of 200 K and contained 1.8 moles of an ideal monatomic gas.  You wrote that XXX kJ of work were done.  What final temperature should the system have had?",
+					quiz:{	
+						type:'textSmall',
+						units:'K',
+						text:'',
+						//NEED TO STORE ANSWER
+					},
 				}
 			]
 		}
-
-					
+		
 		]
 	}
 }

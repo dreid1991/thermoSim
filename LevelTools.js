@@ -481,12 +481,12 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		var alerts = {1:undefined, 0:undefined};
 		var priorities = {1:0, 0:0};
 		for (var blockConditionName in this.blockConditionListeners.listeners) {
-			var condition = this.blockConditionListeners.listeners[blockCconditionName]
+			var condition = this.blockConditionListeners.listeners[blockConditionName]
 			winResults = condition.func.apply(condition.obj); //returns didWin, alert, priority (high takes precidence);
 			didWin = Math.min(didWin, winResults.didWin);
 			if (winResults.alert) {
 				var priority = defaultTo(0, winResults.priority);
-				if (priority>priorities[Number(winResults.didWin)]) {
+				if (priority>=priorities[Number(winResults.didWin)]) {
 					alerts[Number(winResults.didWin)] = winResults.alert;
 				}
 			}	
@@ -499,12 +499,12 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		var alerts = {1:undefined, 0:undefined};
 		var priorities = {1:0, 0:0};
 		for (var promptConditionName in this.promptConditionListeners.listeners) {
-			var condition = this.promptConditionListeners.listeners[promptCconditionName]
+			var condition = this.promptConditionListeners.listeners[promptConditionName]
 			winResults = condition.func.apply(condition.obj); //returns didWin, alert, priority (high takes precidence);
 			didWin = Math.min(didWin, winResults.didWin);
 			if (winResults.alert) {
 				var priority = defaultTo(0, winResults.priority);
-				if (priority>priorities[Number(winResults.didWin)]) {
+				if (priority>=priorities[Number(winResults.didWin)]) {
 					alerts[Number(winResults.didWin)] = winResults.alert;
 				}
 			}	

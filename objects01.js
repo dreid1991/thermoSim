@@ -200,7 +200,6 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		}
 		addListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo, this.draw, this);
 		addListener(curLevel, 'mousedown', 'weights' + this.wallInfo, this.mousedown, this);
-		addListener(curLevel, 'reset', 'dragWeights' + this.wallInfo, this.reset, this);
 		this.wall.moveInit();
 		this.dropAllIntoStores('instant');
 		delete this.tempWeightDefs;
@@ -1838,7 +1837,7 @@ _.extend(StateListener.prototype, objectFuncs, {
 		return this.amSatisfied;
 	},
 	remove: function(){
-		removeListener(curLevel, 'condition', this.handle);
+		removeListener(curLevel, this.cleanUpWith + 'Condition', this.handle);
 		removeListener(curLevel, 'update', this.handle);
 	},
 }

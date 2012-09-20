@@ -498,12 +498,13 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 
 		curLevel.blockCleanUp();
 		
+		emptyListener(curLevel, 'blockCleanUp');
+		emptyListener(curLevel, 'blockCondition');
+		
 		if (newBlock.setup) {
 			newBlock.setup.apply(curLevel);
 		}
 
-		emptyListener(curLevel, 'blockCleanUp');
-		emptyListener(curLevel, 'blockCondition');
 		
 		addListener(curLevel, 'blockCleanUp', 'removeArrowAndText',
 			function(){
