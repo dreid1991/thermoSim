@@ -349,6 +349,13 @@ ArrayExtenders = {
 		}
 		return this;
 	},
+	average: function() {
+		var total = 0;
+		for (var idx=0; idx<this.length; idx++) {
+			total+=this[idx];
+		}
+		return total/this.length;
+	}
 }
 function deepCopy(object){
 	var copy = new object.constructor();

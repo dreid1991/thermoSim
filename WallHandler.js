@@ -187,6 +187,7 @@ WallMethods = {
 			this[wallIdx].data.work = new Array(); // kj
 			this[wallIdx].data.q = new Array(); //kj
 			this[wallIdx].q = 0;
+			this[wallIdx].pIntLen = 35;
 			this[wallIdx].eToAdd = 0;
 			this[wallIdx].isothermal = false;
 			this[wallIdx].tSet = tSet;
@@ -788,7 +789,12 @@ WallMethods = {
 			var pInt = this.pConst*this.forceInternal/((turn-this.pLastRecord)*SA);
 			this.forceInternal = 0;
 			this.pLastRecord = turn;
-			return pInt;
+			this.pIntList[this.pIntIdx] = pInt;
+			this.pIntIdx++;
+			if (this.pIntIdx==this.pIntLen) {
+				this.pIntIdx=0;
+			}
+			return this.pIntList.average();
 		},
 		surfArea: function(){
 			var SA=0;
@@ -940,7 +946,7 @@ WallMethods = {
 			}else{
 				var tempFunc = dataHandler.tempFunc();
 			}		
-			recordData('t' + this.handle, this.data.t, tempFunc, this);
+			recordData('t' + this.handle, this.data.t, tempFunc, this, 'update');
 			return this;
 		},
 		recordRMS: function() {
@@ -957,7 +963,7 @@ WallMethods = {
 					var temp = this.data.t[this.data.t.length-1];
 					return Math.sqrt(3000*KB*temp*ACTUALN/mass)
 				}
-				recordData('RMS' + this.handle, this.data.RMS, RMSFunc, this);
+				recordData('RMS' + this.handle, this.data.RMS, RMSFunc, this, 'update');
 			} else {
 				console.log('Tried to record RMS of wall ' + this.handle + ' while not recording temp.  Will not record.');
 			}
@@ -981,7 +987,9 @@ WallMethods = {
 		},
 		recordPInt: function() {
 			this.recordingPInt = true;
-			recordData('pInt' + this.handle, this.data.pInt, this.pInt, this);
+			this.pIntList = new Array();
+			this.pIntIdx = 0;
+			recordData('pInt' + this.handle, this.data.pInt, this.pInt, this, 'update');
 			return this;
 		},
 		recordPExt: function() {
@@ -1117,9 +1125,9 @@ WallMethods = {
 					firstVal = 0;
 				}
 				this.tempReadout.addEntry('temp' + this.handle, label, 'K', firstVal, undefined, decPlaces);
-				addListener(curLevel, 'data', 'displayTemp' + this.handle,
+				addListener(curLevel, 'update', 'displayTemp' + this.handle,
 					function(){
-						this.tempReadout.tick('temp' + this.handle, dataSet[dataSet.length-1]);
+						this.tempReadout.hardUpdate('temp' + this.handle, dataSet[dataSet.length-1]);
 					},
 				this);	
 			}else{
@@ -1139,9 +1147,9 @@ WallMethods = {
 					firstVal = 0;
 				}
 				this.pIntReadout.addEntry('pInt' + this.handle, label, 'bar', firstVal, undefined, decPlaces);
-				addListener(curLevel, 'data', 'displayPInt'+this.handle,
+				addListener(curLevel, 'update', 'displayPInt'+this.handle,
 					function(){
-						this.pIntReadout.tick('pInt' + this.handle, dataSet[dataSet.length-1]);
+						this.pIntReadout.hardUpdate('pInt' + this.handle, dataSet[dataSet.length-1]);
 					},
 				this);
 			}else{

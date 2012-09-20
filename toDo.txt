@@ -17,8 +17,6 @@ URISC FINAL REPORT BY SEPT 28th
 make appendLastAns or something
 	could just manually throw in last answer. w/e
 
-Make graph pts fill in sharp turns with pts
-
 redo block/prompt system 
 	maybe make promptCleanUp as well?
 
