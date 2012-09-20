@@ -336,6 +336,9 @@ Point.prototype = {
 	close: function(b) {
 		return Math.abs(this.x-b.x)<1 && Math.abs(this.y-b.y)<1;
 	},
+	isValid: function() {
+		return this.x!==undefined && !isNaN(this.x) && this.y!==undefined && !isNaN(this.y);
+	},
 	track: function(trackData){
 		if (trackData instanceof Point) {
 			pt = trackData;

@@ -132,8 +132,8 @@ _.extend(GraphHist.prototype, GraphBase,
 				var xLRPt = parseFloat(binName) + this.binWidth;
 				var yLRPt = 0;
 				
-				var ULCoord = this.translateValToCoord(P(xULPt,yULPt));
-				var LRCoord = this.translateValToCoord(P(xLRPt,yLRPt));
+				var ULCoord = this.valToCoord(P(xULPt,yULPt));
+				var LRCoord = this.valToCoord(P(xLRPt,yLRPt));
 				var dims = ULCoord.VTo(LRCoord);
 				
 				draw.fillStrokeRect(ULCoord, dims, barCol, this.bgCol, this.graph);

@@ -98,7 +98,7 @@ GraphBase = {
 			var numPts = xDataIdxFinal-xDataIdxInit;
 			var tracePts = new Array(numPts);
 			for (var ptIdx=0; ptIdx<numPts; ptIdx++) {
-				tracePts[ptIdx] = this.translateValToCoord(P(set.src.x[xDataIdxInit+ptIdx], set.src.y[yDataIdxInit+ptIdx]));
+				tracePts[ptIdx] = this.valToCoord(P(set.src.x[xDataIdxInit+ptIdx], set.src.y[yDataIdxInit+ptIdx]));
 			}
 			//this.cutClosePts(tracePts);
 			this.drawTrace(set, tracePts);
@@ -127,7 +127,7 @@ GraphBase = {
 		var yPts = this.data[set].src.y;
 		var integralPts = new Array(xPts.length);
 		for(var ptIdx=0; ptIdx<xPts.length; ptIdx++){
-			integralPts[ptIdx] = this.translateValToCoord(P(xPts[ptIdx], yPts[ptIdx]));
+			integralPts[ptIdx] = this.valToCoord(P(xPts[ptIdx], yPts[ptIdx]));
 		}
 		//this.makeIntegralBeFunction(integralPts);
 		//HEY - YOU SHOULD *PROBABLY* MAKE A THING THAT MAKES POINTS ABOVE OTHERS REMOVE THE LOWER POINT SO IT LOOKS LIKE WE INTEGRATED A FUNCTION
@@ -286,7 +286,7 @@ GraphBase = {
 			this.drawLastData(toAdd)
 
 		}
-		if(flash){
+		if (flash) {
 			this.flashInit(toAdd);
 		}
 	},
@@ -464,10 +464,10 @@ GraphBase = {
 		this.valRange = {x:{min:Number.MAX_VALUE, max:-Number.MAX_VALUE}, y:{min:Number.MAX_VALUE, max:-Number.MAX_VALUE}};
 	},
 	makePtDataGrabFunc: function(data){
-		return function(address){
+		return function(){
 			var xLast = data.x[data.x.length-1];
 			var yLast = data.y[data.y.length-1];
-			return {x:xLast, y:yLast, address:address};
+			return P(xLast, yLast);
 		}
 	},
 	ptsExist: function(pts){
@@ -484,7 +484,7 @@ GraphBase = {
 			return {address:address, data:data[data.length-1]};
 		}
 	},
-	translateValToCoord: function(val){
+	valToCoord: function(val){
 		var rangeX = this.axisRange.x.max - this.axisRange.x.min;
 		var rangeY = this.axisRange.y.max - this.axisRange.y.min;
 		var x = this.gridSpacing*(this.numGridLines.x-1)*(val.x-this.axisRange.x.min)/rangeX + this.xStart*this.dims.dx;
@@ -498,7 +498,7 @@ GraphBase = {
 			if(this.data[pt.address].show){
 
 
-				var pos = this.translateValToCoord(pt);
+				var pos = this.valToCoord(pt);
 				var x = pos.x;
 				var y = pos.y;
 				var pointCol = this.data[pt.address].pointCol;

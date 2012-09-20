@@ -20,6 +20,7 @@ function GraphScatter(attrs) {
 	this.yEnd = .05;
 	this.gridSpacing = 40;
 	
+	this.addPtThreshold = 5;
 	
 	this.setNumGridLines();
 	this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1)}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1)}};
@@ -59,8 +60,9 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 				set.traceStartY = set.src.y.length;
 				set.traceLastX = set.traceStartX;
 				set.traceLastY = set.traceStartY;
-				set.ptDataIdxs = []; //Form of: [{x:xIdx, y:yIdx}...]
 			}
+			set.ptDataIdxs = []; //Form of: [{x:xIdx, y:yIdx}...]
+			
 			
 			this.makeLegendEntry(set, attrs.address);
 			this.drawAllBG();
@@ -86,21 +88,97 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 		},
 		addLast: function(){
 			var toAdd = [];
+			if (walls[0].mass() > 50) {
+				console.log('omg');
+			}
 			for (var address in this.data){
 				var set = this.data[address];
-				if (set.trace) {
-					set.ptDataIdxs.push({x:set.src.x.length-1, y:set.src.y.length-1});
+				var newPt = set.getLast();
+				newPt.address = address;
+				if (newPt.isValid()) {
+					var newDataIdx = {x:set.src.x.length-1, y:set.src.y.length-1};
+					if (set.x.length>0) {
+						var last = P(set.x[set.x.length-1], set.y[set.y.length-1]);
+						var lastDataIdx = set.ptDataIdxs[set.ptDataIdxs.length-1];
+						var turnPtInfo = this.addPtsAtTurns(newPt, newDataIdx, last, lastDataIdx, set, address);
+						toAdd = toAdd.concat(turnPtInfo.newPts);
+						set.ptDataIdxs = set.ptDataIdxs.concat(turnPtInfo.dataIdxs);
+					}
+					toAdd.push(newPt);
+					set.ptDataIdxs.push(newDataIdx);
 				}
-				toAdd.push(set.getLast(address));
 			}
-			if (this.ptsExist(toAdd)) { 
-				this.addPts(toAdd);
+			this.addPts(toAdd);
+		},
+		addPtsAtTurns: function(a, aDataIdx, b, bDataIdx, set, address){
+			var xDataRange = aDataIdx.x-bDataIdx.x;
+			var yDataRange = aDataIdx.y-bDataIdx.y;
+			if (xDataRange!=yDataRange) {
+				return [];//data points must correspond
+			}
+			var aCoord = this.valToCoord(a);
+			var bCoord = this.valToCoord(b);
+			//Input values aren't translated to pixel coordinates at this point.  
+			//Am making conversion scalars so I don't have to call valToCoord for every point
+			if (aCoord.x!=bCoord.x) {
+				var xScale = Math.abs(aCoord.x-bCoord.x)/Math.abs(a.x-b.x);
 			} else {
-				for (var address in this.data){
-					var set = this.data[address];
-					set.pop();
-				}
+				var xScale = 1;
 			}
+			if (aCoord.y!=bCoord.y) {
+				var yScale = Math.abs(aCoord.y-bCoord.y)/Math.abs(a.y-b.y);
+			} else {
+				yScale = 1;
+			}
+			var src = set.src;
+			var perpUV = a.VTo(b).UV().perp();
+
+			for (var dataIdx=xDataRange-1; dataIdx>1; dataIdx--) {
+				var xIdx = bDataIdx.x + dataIdx;
+				var yIdx = bDataIdx.y + dataIdx;
+				var aToData = V(xScale*(src.x[xIdx]-a.x), yScale*(src.y[yIdx]-a.y));
+				var dist = Math.abs(aToData.dotProd(perpUV));
+				if (dist>this.addPtThreshold) {
+					var ptOverLine = P(src.x[xIdx], src.y[yIdx]);
+					var edgePtInfo = this.getEdgePt({x:xIdx, y:yIdx}, bDataIdx, perpUV, ptOverLine, dist, a, src, xScale, yScale);
+					if (!edgePtInfo) {
+						break;
+					}
+					var edgeDataIdx = edgePtInfo.dataIdx;
+					var edgePt = edgePtInfo.pt;
+					edgePt.address = address;
+					var restOfTurnPts = this.addPtsAtTurns(edgePt, edgeDataIdx, b, bDataIdx, set, address);
+					return {newPts:[edgePt].concat(restOfTurnPts.newPts), dataIdxs:[edgeDataIdx].concat(restOfTurnPts.dataIdxs)};
+				}
+				/*
+				if dist>thresh
+					placeInfo = placeEdgePt();
+					pt = placeInfo.pt;
+					ptDataIdx = placeInfo.ptDataIdx (need x and y)
+					var rest = this.addPtsAtTurns(pt, ptDataIdx, b, bDataIdx, set);
+					var ptsToReturn = rest.pts.push(pt);
+					var ptDataIdxsToReturn = rest.ptDataIdxs.push(ptDataIdx);
+					return {pts:(this.addPtsAtTurns(pt, ptDataIdx, b, bDataIdx, set), ptDataIdxs:
+				*/
+			}
+			return {newPts: [], dataIdxs:[]};
+			
+		},
+		getEdgePt: function(dataIdxsMax, dataIdxsMin, perpUV, lastPt, lastDist, a, src, xScale, yScale) {
+			var dataRange = dataIdxsMax.x - dataIdxsMin.x;
+			for (var dataIdx=dataRange-1; dataIdx>1; dataIdx--) {
+				var xIdx = dataIdxsMin.x+dataIdx;
+				var yIdx = dataIdxsMin.y+dataIdx;
+				var aToData = V(xScale*(src.x[xIdx]-a.x), yScale*(src.y[yIdx]-a.y));
+				var dist = Math.abs(aToData.dotProd(perpUV));
+				if (dist < lastDist) {
+					return {pt:lastPt, dataIdx:{x:xIdx+1, y:yIdx+1}};
+				}
+				lastPt = P(src.x[xIdx], src.y[yIdx]);
+				lastDist = dist;
+				
+			}
+			return undefined;
 		},
 		plotData: function(xVals, yVals, address){
 			if (xVals.length==yVals.length && xVals.length>1){
@@ -141,7 +219,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			}
 		},
 		graphPt: function(xVal, yVal, col){
-			var pt = this.translateValToCoord(P(xVal,yVal));
+			var pt = this.valToCoord(P(xVal,yVal));
 			this.drawPtStd(pt, col);
 		},
 
