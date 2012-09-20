@@ -21,4 +21,6 @@ redo block/prompt system
 	maybe make promptCleanUp as well?
 
 
+Pretty sure Readout's reset listener can be removed.  In fact, the reset listener isn't used by anything
+
 At some point, make graph point data be stored using Point class rather than having .x, .y attribute in set.  Seriously

@@ -10,9 +10,6 @@ LevelTools = {
 		this.numUpdates = 0;
 		this.wallSpeed = defaultTo(1, this.wallSpeed);
 		this.makeListeners();
-		this.promptIdx = -1;
-		this.blockIdx = -1;
-		this.data = {};
 		dataHandler = new DataHandler();
 		this.dataHandler = dataHandler;
 		addListener(this, 'update', 'run', this.updateRun, this);
@@ -59,6 +56,12 @@ LevelTools = {
 		walls.check();
 	},
 	cutSceneStart: function(text, mode, quiz){
+		addListener(curLevel, 'promptCleanUp', 'endCutScene',
+			function() {
+				this.cutSceneEnd()
+			},
+		this);
+		
 		this.inCutScene = true;
 		$('#intText').html('');
 		text = defaultTo('',text);
@@ -381,8 +384,8 @@ LevelTools = {
 	},
 	saveAllGraphs: function(){
 		//OOH - made load graphs by block/prompt idx
-		for(var graphName in this.graphs){
-			var saveName = graphName + 'block' + this.blockIdx + 'prompt' + this.promptIdx;
+		for (var graphName in this.graphs) {
+			var saveName = graphName + 'block' + blockIdx + 'prompt' + promptIdx;
 			this.graphs[graphName].save(saveName);
 		}
 	},
@@ -455,8 +458,10 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		this.resetListeners = {listeners:{}, save:{}};
 		this.initListeners = {listeners:{}, save:{}};	
 		this.recordListeners = {listeners:{}, save:{}};
-		this.conditionListeners = {listeners:{}, save:{}};
-		this.cleanUpListeners = {listeners:{}, save:{}};
+		this.blockConditionListeners = {listeners:{}, save:{}};
+		this.promptConditionListeners = {listeners:{}, save:{}};
+		this.blockCleanUpListeners = {listeners:{}, save:{}};
+		this.promptCleanUpListeners = {listeners:{}, save:{}};
 	},
 	reset: function(){
 		
@@ -481,21 +486,24 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		
 	},
 	setDefaultPromptVals: function(){
-		for (var promptIdx=0; promptIdx<this.prompts.length; promptIdx++){
-			var prompt = this.prompts[promptIdx];
-			prompt.finished = false;
-			prompt.title = defaultTo('', prompt.title);
-			prompt.text = defaultTo('', prompt.text);
+		for (var blockIdxLocal=0; blockIdxLocal<this.blocks.length; blockIdxLocal++){
+			var block = this.blocks[blockIdxLocal];
+			for (var promptIdxLocal=0; promptIdxLocal<block.prompts.length; promptIdxLocal++) {
+				var prompt = block.prompts[promptIdxLocal];
+				prompt.finished = false;
+				prompt.title = defaultTo('', prompt.title);
+				prompt.text = defaultTo('', prompt.text);	
+			}
 		}
 	},
 
-	conditions: function(){
+	blockConditions: function(){
 		//ALERT NOT BUBBLING UP CORRECTLY.  IT GETS TO THIS FUNCTION FROM STATE LISTENERS BUT IS NOT RETURNED
 		var didWin = 1;
 		var alerts = {1:undefined, 0:undefined};
 		var priorities = {1:0, 0:0};
-		for (var conditionName in this.conditionListeners.listeners){
-			var condition = this.conditionListeners.listeners[conditionName]
+		for (var blockConditionName in this.blockConditionListeners.listeners){
+			var condition = this.blockConditionListeners.listeners[blockCconditionName]
 			winResults = condition.func.apply(condition.obj); //returns didWin, alert, priority (high takes precidence);
 			didWin = Math.min(didWin, winResults.didWin);
 			if(winResults.alert){
@@ -507,9 +515,33 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		}	
 		return {didWin:didWin, alert:alerts[didWin]};
 	},
-	cleanUp: function(){
-		for (var cleanUpListener in this.cleanUpListeners.listeners){
-			var listener = this.cleanUpListeners.listeners[cleanUpListener];
+	promptConditions: function(){
+		//ALERT NOT BUBBLING UP CORRECTLY.  IT GETS TO THIS FUNCTION FROM STATE LISTENERS BUT IS NOT RETURNED
+		var didWin = 1;
+		var alerts = {1:undefined, 0:undefined};
+		var priorities = {1:0, 0:0};
+		for (var promptConditionName in this.promptConditionListeners.listeners){
+			var condition = this.promptConditionListeners.listeners[promptCconditionName]
+			winResults = condition.func.apply(condition.obj); //returns didWin, alert, priority (high takes precidence);
+			didWin = Math.min(didWin, winResults.didWin);
+			if(winResults.alert){
+				var priority = defaultTo(0, winResults.priority);
+				if(priority>=priorities[Number(winResults.didWin)]){
+					alerts[Number(winResults.didWin)] = winResults.alert;
+				}
+			}	
+		}	
+		return {didWin:didWin, alert:alerts[didWin]};
+	},
+	blockCleanUp: function(){
+		for (var blockCleanUpListener in this.blockCleanUpListeners.listeners){
+			var listener = this.blockCleanUpListeners.listeners[blockCleanUpListener];
+			listener.func.apply(listener.obj);
+		}
+	},
+	promptCleanUp: function(){
+		for (var promptCleanUpListener in this.promptCleanUpListeners.listeners){
+			var listener = this.promptCleanUpListeners.listeners[promptCleanUpListener];
 			listener.func.apply(listener.obj);
 		}
 	},

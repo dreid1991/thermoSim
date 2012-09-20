@@ -42,8 +42,9 @@ $(function(){
 	updateInterval = 30;
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);
-	multChoiceMaxSnapHeight = 100;
 	auxHolderDivs = ['aux1', 'aux2'];
+	promptIdx = -1;
+	blockIdx = -1;
 	sliderList = [];
 	spcs = {};
 	stored = {};
@@ -482,11 +483,31 @@ function hideSliders(){
 		$('#'+ handle).hide();
 	}
 }
-function showPrompt(prev, prompt){
+function showPrompt(newBlockIdx, newPromptIdx){
+	var changedBlock = newBlockIdx!=blockIdx;
+	var oldPrompt = curLevel.blocks[blockIdx].prompts[promptIdx];
+	
+	curLevel.promptCleanUp();
+	if (changedBlock) {
+		curLevel.saveAllGraphs();
+		curLevel.freezeAllGraphs();
+		curLevel.removeAllGraphs();
+		dotManager.clearAll();		
+		emptyListener(curLevel, 'cleanUp');
+		emptyListener(curLevel, 'condition');
+		
+		addListener(curLevel, 'blockCleanUp', 'removeArrowAndText',
+			function(){
+				removeListenerByName(curLevel, 'update', 'drawArrow');
+				removeListenerByName(curLevel, 'update', 'animText');
+			},
+		this);
+	}
+	
 	var finishedPrev = new Boolean();
 	var forward = new Boolean();
 	var didWin = new Boolean();
-	if(prev){
+	if (prev) {
 		var finishedPrev = prev.finished;
 	} else{
 		finishedPrev = true;
@@ -573,25 +594,44 @@ function showPrompt(prev, prompt){
 	}
 
 }
-function toPrompt(promptIdx){
-	var prev = curLevel.prompts[curLevel.promptIdx];
+function toPrompt(newBlockIdx, newPromptIdx){
+	var prev = curLevel.blocks[newBlockIdx].prompts[newPromptIdx];
 	prev.finished = true;
-	var prompt = curLevel.prompts[promptIdx];
-	showPrompt(prev, prompt);
+	//have thing for determining if moving forwards of backwards, then call corresponding func
+	showPrompt(newBlockIdx, newPromptIdx);
 }
 function nextPrompt(){
-	var prev = curLevel.prompts[curLevel.promptIdx];
-	var promptIdx = Math.min(curLevel.promptIdx+1, curLevel.prompts.length-1);
-	var prompt = curLevel.prompts[promptIdx];
-	showPrompt(prev, prompt);
+	var newBlockIdx = blockIdx;
+	var newPromptIdx = promptIdx;
+	var curBlock = curLevel.blocks[blockIdx];
+	if (promptIdx+1==curBlock.prompts.length) {
+		if (blockIdx+1 < curLevel.blocks.length) {
+			newBlockIdx++;
+			newPromptIdx=0;
+		}
+	} else {
+		newPromptIdx++;
+	}
+
+	showPrompt(newBlockIdx, newPromptIdx);
 	
 }
 function prevPrompt(){
-	var prev = curLevel.prompts[curLevel.promptIdx];
-	var promptIdx = Math.max(0, curLevel.promptIdx-1);;
-	var prompt = curLevel.prompts[promptIdx];
-	showPrompt(prev, prompt);
+	var newBlockIdx = blockIdx;
+	var newPromptIdx = promptIdx;
+	if (promptIdx==0) {
+		if (blockIdx>0) {
+			newBlockIdx--;
+			newPromptIdx=curLevel[newBlockIdx].prompts.length-1;
+		}
+	} else {
+		promptIdx--;
+	}
+	showPrompt(newBlockIdx, newPromptIdx);
 }
+
+
+
 function replaceStrings(text, replaceList){
 	for (var replaceIdx=0; replaceIdx<replaceList.length; replaceIdx++){
 		var replace = replaceList[replaceIdx];
