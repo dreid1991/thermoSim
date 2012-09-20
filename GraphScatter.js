@@ -72,25 +72,25 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			this.drawAxisVals();
 			this.graphPts();
 		},
-		drawLastData: function(toAdd){
-			for (var addIdx=0; addIdx<toAdd.length; addIdx++){
-				var set = this.data[toAdd[addIdx].address];
-				if (set.show) {
-					var xPt = set.x[set.x.length-1]
-					var yPt = set.y[set.y.length-1]
-					var pointCol = set.pointCol
+		drawLastData: function(toDraw){
+			for (var address in toDraw) {
+				var newPtIdxs = toDraw[address];
+				var set = this.data[address]
+				for (var ptIdx=0; ptIdx<newPtIdxs.length; ptIdx++) {
+					var newIdx = newPtIdxs[ptIdx];
+					var xPt = set.x[newIdx];
+					var yPt = set.y[newIdx];
+					var ptCol = set.pointCol;
 					if (set.trace) {
-						this.trace(set, set.x.length-1);
+						this.trace(set, newIdx)
 					}
-					this.graphPt(xPt, yPt, pointCol);
+					this.graphPt(xPt, yPt, ptCol);
 				}
-			}	
+			
+			}
 		},
 		addLast: function(){
 			var toAdd = [];
-			if (walls[0].mass() > 50) {
-				console.log('omg');
-			}
 			for (var address in this.data){
 				var set = this.data[address];
 				var newPt = set.getLast();
@@ -114,7 +114,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			var xDataRange = aDataIdx.x-bDataIdx.x;
 			var yDataRange = aDataIdx.y-bDataIdx.y;
 			if (xDataRange!=yDataRange) {
-				return [];//data points must correspond
+				return {newPts:[], dataIdxs:[]};//data points must correspond
 			}
 			var aCoord = this.valToCoord(a);
 			var bCoord = this.valToCoord(b);
@@ -133,7 +133,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			var src = set.src;
 			var perpUV = a.VTo(b).UV().perp();
 
-			for (var dataIdx=xDataRange-1; dataIdx>1; dataIdx--) {
+			for (var dataIdx=xDataRange-1; dataIdx>0; dataIdx--) {
 				var xIdx = bDataIdx.x + dataIdx;
 				var yIdx = bDataIdx.y + dataIdx;
 				var aToData = V(xScale*(src.x[xIdx]-a.x), yScale*(src.y[yIdx]-a.y));
@@ -166,7 +166,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 		},
 		getEdgePt: function(dataIdxsMax, dataIdxsMin, perpUV, lastPt, lastDist, a, src, xScale, yScale) {
 			var dataRange = dataIdxsMax.x - dataIdxsMin.x;
-			for (var dataIdx=dataRange-1; dataIdx>1; dataIdx--) {
+			for (var dataIdx=dataRange-1; dataIdx>0; dataIdx--) {
 				var xIdx = dataIdxsMin.x+dataIdx;
 				var yIdx = dataIdxsMin.y+dataIdx;
 				var aToData = V(xScale*(src.x[xIdx]-a.x), yScale*(src.y[yIdx]-a.y));

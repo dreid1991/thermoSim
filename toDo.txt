@@ -19,4 +19,8 @@ make appendLastAns or something
 
 Make graph pts fill in sharp turns with pts
 
-redo block/prompt system to accomidate 
+redo block/prompt system 
+	maybe make promptCleanUp as well?
+
+
+At some point, make graph point data be stored using Point class rather than having .x, .y attribute in set.  Seriously

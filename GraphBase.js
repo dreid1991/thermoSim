@@ -96,24 +96,20 @@ GraphBase = {
 		
 		if (xDataIdxFinal-xDataIdxInit == yDataIdxFinal-yDataIdxInit) {
 			var numPts = xDataIdxFinal-xDataIdxInit;
-			var tracePts = new Array(numPts);
-			for (var ptIdx=0; ptIdx<numPts; ptIdx++) {
-				tracePts[ptIdx] = this.valToCoord(P(set.src.x[xDataIdxInit+ptIdx], set.src.y[yDataIdxInit+ptIdx]));
+			var tracePts = [this.valToCoord(P(set.src.x[xDataIdxInit], set.src.y[yDataIdxInit]))];
+			for (var ptIdx=1; ptIdx<numPts+1; ptIdx++) {
+				var pt = this.valToCoord(P(set.src.x[xDataIdxInit+ptIdx], set.src.y[yDataIdxInit+ptIdx]));
+				if (!pt.closeTo(tracePts[tracePts.length-1])) {
+					tracePts.push(pt);
+				}
 			}
-			//this.cutClosePts(tracePts);
 			this.drawTrace(set, tracePts);
 		} else {
 			console.log('Data count mismatch for tracing');
 			console.trace();
 		}
 	},
-	cutClosePts: function(pts) {
-		for (var ptIdx = pts.length-2; ptIdx>0; ptIdx--){
-			if (pts[ptIdx].close(pts[ptIdx+1])) {
-				pts.splice(ptIdx+1, 1);
-			}
-		}
-	},
+
 	drawTrace: function(set, tracePts) {
 		draw.path(tracePts, set.pointCol, this.graph);
 	},
@@ -261,11 +257,16 @@ GraphBase = {
 		flash = defaultTo(true, flash);
 		var val = this.valRange;
 		var oldValRange = {x:{min:val.x.min, max:val.x.max}, y:{min:val.y.min, max:val.y.max}};
+		var toDraw = {};
 		for (var addIdx=0; addIdx<toAdd.length; addIdx++){
 			var address = toAdd[addIdx].address;
 			var x = toAdd[addIdx].x;
 			var y = toAdd[addIdx].y;
 			var dataSet = this.data[address]
+			if (!toDraw[address]) {
+				toDraw[address] = [];
+			}
+			toDraw[address].push(dataSet.x.length);
 			dataSet.x.push(x);
 			dataSet.y.push(y);
 			this.valRange.x.max = Math.max(this.valRange.x.max, x);
@@ -276,14 +277,14 @@ GraphBase = {
 		var old = this.axisRange;
 		var oldAxisRange = {x:{min:old.x.min, max:old.x.max}, y:{min:old.y.min, max:old.y.max}};
 		this.setAxisBounds(oldValRange);
-		if(!this.rangeIsSame(oldAxisRange.x, this.axisRange.x) || !this.rangeIsSame(oldAxisRange.y, this.axisRange.y)){
+		if (!this.rangeIsSame(oldAxisRange.x, this.axisRange.x) || !this.rangeIsSame(oldAxisRange.y, this.axisRange.y)) {
 			mustRedraw = true;
 		}
 		
-		if(mustRedraw){
+		if (mustRedraw) {
 			this.drawAllData();
-		} else{
-			this.drawLastData(toAdd)
+		} else {
+			this.drawLastData(toDraw)
 
 		}
 		if (flash) {
