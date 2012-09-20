@@ -29,49 +29,48 @@ compressorFuncs = {
 
 objectFuncs = {
 	addCleanUp: function(){
-		this.cleanUpListenerName = unique(this.type + defaultTo('', this.handle), curLevel.cleanUpListeners.listeners),
-		addListener(curLevel, 'cleanUp', this.cleanUpListenerName, function(){
+		this.cleanUpListenerName = unique(this.type + defaultTo('', this.handle), curLevel[this.cleanUpWith + 'CleanUpListeners'].listeners),
+		addListener(curLevel, this.cleanUpWith + 'CleanUp', this.cleanUpListenerName, function(){
 															this.remove();
-															removeListener(curLevel, 'cleanUp', this.cleanUpListenerName)
+															removeListener(curLevel, this.cleanUpWith + 'CleanUp', this.cleanUpListenerName)
 														},
 														this);
 	},
 	removeCleanUp: function(){
-		removeListener(curLevel, 'cleanUp', this.cleanUpListenerName);
+		removeListener(curLevel, this.cleanUpWith + 'CleanUp', this.cleanUpListenerName);
 	},
 	pickSliderPos: function(){
 		var xPos;
-		if(this.wall){
+		if (this.wall) {
 			xPos = (this.wall[0].x + this.wall[1].x)/2;
-		}else if(this.pos && this.dims){
+		} else if (this.pos && this.dims) {
 			xPos = this.pos.x + this.dims.dx/2;
-		}else if(this.pos){
+		} else if (this.pos) {
 			xPos = this.pos.x;
 		}
-		if(!xPos){
+		if (!xPos) {
 			return this.checkForMigrateCenter();
 			//ooh - maybe make it check if that div is empty.  If not, move contents of center to left/right
-		}else{
+		} else {
 			var width = $('#main').width();
 			var segmentWidth = width/3;
 			var divDest = Math.floor(xPos/segmentWidth);
-			if(divDest==0){
+			if (divDest==0) {
 				return 'left';
-			}else if(divDest==1){
+			} else if (divDest==1) {
 				return this.checkForMigrateCenter();
-			}
-			else if(divDest==2){
+			} else if(divDest==2) {
 				return 'right';
 			}
 		}
 		return this.checkForMigrateCenter();
 	},
 	addSlider: function(title, attrs, handlers, position){
-		if(!position){
+		if (!position) {
 			position = this.pickSliderPos();
 		}
 		var toAppendId;
-		switch(position){
+		switch (position) {
 			case 'left':
 				toAppendId = 'sliderHolderLeft';
 				$('#sliderHolderSingle').hide();
@@ -132,6 +131,7 @@ objectFuncs = {
 function DragWeights(attrs){
 	//Can probably remove energy bar stuff
 	this.type = 'DragWeights';
+	this.cleanUpWith = 			attrs.cleanUpWith;
 	this.handle = 				unique('dragWeights' + attrs.handle, curLevel);
 	this.tempWeightDefs = 		attrs.weightDefs;
 	this.wallInfo = 			defaultTo(0, attrs.wallInfo);
@@ -798,6 +798,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 //////////////////////////////////////////////////////////////////////////
 function Pool(attrs){
 	this.type = 'Pool';
+	this.cleanUpWith = attrs.cleanUpWith;
 	var self = this;
 	attrs = defaultTo({}, attrs);
 	this.bin = {};
@@ -1287,6 +1288,7 @@ DragArrow.prototype = {
 //////////////////////////////////////////////////////////////////////////
 function CompArrow(attrs){
 	this.type = 'CompArrow';
+	this.cleanUpWith = attrs.cleanUpWith;
 	var wallInfo = defaultTo(0, attrs.wallInfo);
 	var speed = defaultTo(1.5, attrs.speed);
 	var compMode = defaultTo('adiabatic', attrs.compMode);
@@ -1334,6 +1336,7 @@ _.extend(CompArrow.prototype, objectFuncs, {
 
 function Piston(attrs){
 	this.type = 'Piston';
+	this.cleanUpWith = attrs.cleanUpWith;
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.wall = walls[this.wallInfo];
 	this.min = defaultTo(2, attrs.min);
@@ -1484,6 +1487,7 @@ Still records its energy flow
 */
 function Heater(attrs){
 	this.type = 'Heater';
+	this.cleanUpWith = attrs.cleanUpWith;
 	/*
 	dims.dx corresponds to long side w/ wires
 	dims.dy corresponds to short side
@@ -1660,6 +1664,7 @@ _.extend(Heater.prototype, objectFuncs, {
 //////////////////////////////////////////////////////////////////////////
 function Stops(attrs){
 	this.type = 'Stops';
+	this.cleanUpWith = attrs.cleanUpWith;
 	//assumes canvas of c.  I mean, where else would they be?
 	this.stopWidth = 20;
 	this.stopHeight = 5;
@@ -1714,6 +1719,7 @@ _.extend(Stops.prototype, objectFuncs, {
 //////////////////////////////////////////////////////////////////////////
 function StateListener(attrs){//like dataList... is:'greaterThan', ... targetVal
 	this.type = 'StateListener';
+	this.cleanUpWith = attrs.cleanUpWith;
 	this.dataList = attrs.dataList;
 	this.is = attrs.is
 	this.targetVal = attrs.targetVal;
@@ -1739,8 +1745,8 @@ _.extend(StateListener.prototype, objectFuncs, {
 		this.addCleanUp();
 	},
 	initCheckOnConditions: function() {
-		this.handle = unique('StateListener' + this.is, curLevel.conditionListeners.listeners);
-		addListener(curLevel, 'condition', this.handle,
+		this.handle = unique('StateListener' + this.is, curLevel[this.cleanUpWith + 'ConditionListeners'].listeners);
+		addListener(curLevel, this.cleanUpWith + 'Condition', this.handle,
 			function(){
 				var didWin = this.condition();
 				return {didWin:didWin, alert:this.alerts[didWin], priority:this.priorities[didWin]};
@@ -1751,10 +1757,10 @@ _.extend(StateListener.prototype, objectFuncs, {
 		this.handle = unique('StateListener' + this.is, curLevel.updateListeners.listeners);
 		addListener(curLevel, 'update', this.handle,
 			function(){
-				if(this.condition()){
+				if (this.condition()) {
 					this.amSatisfied = true;
 					this.recordVals();
-					if(this.atSatisfyFunc){
+					if (this.atSatisfyFunc) {
 						this.atSatisfyFunc.func.apply(this.atSatisfyFunc.obj);
 					}
 					removeListener(curLevel, 'update', this.handle);
@@ -1762,7 +1768,7 @@ _.extend(StateListener.prototype, objectFuncs, {
 			},
 		this);
 		
-		addListener(curLevel, 'condition', this.handle,
+		addListener(curLevel, this.cleanUpWith + 'Condition', this.handle,
 			function(){
 				return {didWin: this.amSatisfied, alert:this.alerts[this.amSatisfied], priority:this.priorities[this.amSatisfied]};
 			},

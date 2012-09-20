@@ -22,7 +22,7 @@ WallMethods = {
 			var pts = attrs.pts;
 			var handles = attrs.handles;
 
-			addListener(curLevel, 'cleanUp', 'walls', this.remove, this)
+			addListener(curLevel, 'blockCleanUp', 'walls', this.remove, this)
 			
 			this.numWalls = pts.length;
 			this.qArrowFill = Col(200, 0, 0);

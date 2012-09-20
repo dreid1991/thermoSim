@@ -1,6 +1,6 @@
 LevelTools = {
 	setStds: function(){
-		this.declarePrompts();
+		this.declareBlocks();
 		this.addEqs();
 		this.setDefaultPromptVals()
 		this.graphs = {};
@@ -18,21 +18,24 @@ LevelTools = {
 		this.spcs = spcs;
 	},
 	addEqs: function(){
-		for(var promptIdx=0; promptIdx<this.prompts.length; promptIdx++){
-			var prompt = this.prompts[promptIdx];
-			var title = prompt.title;
-			var text = prompt.text;
-			var quiz = prompt.quiz;
-			if(title){prompt.title = addEqs(title);}
-			if(text){prompt.text = addEqs(text);}
-			if(quiz && quiz.options){
-				for(optionIdx=0; optionIdx<quiz.options.length; optionIdx++){
-					var option = quiz.options[optionIdx];
-					for(optionElement in option){
-						var element = option[optionElement];
-						if(typeof(element)=='string'){
-							option[optionElement] = addEqs(element);
-						}						
+		for (var blockIdxLocal=0; blockIdxLocal<this.blocks.length; blockIdxLocal++) {
+			var block = this.blocks[blockIdxLocal];
+			for (var promptIdxLocal=0; promptIdxLocal<block.prompts.length; promptIdxLocal++) {
+				var prompt = block.prompts[promptIdxLocal];
+				var title = prompt.title;
+				var text = prompt.text;
+				var quiz = prompt.quiz;
+				if(title){prompt.title = addEqs(title);}
+				if(text){prompt.text = addEqs(text);}
+				if(quiz && quiz.options){
+					for(optionIdx=0; optionIdx<quiz.options.length; optionIdx++){
+						var option = quiz.options[optionIdx];
+						for(optionElement in option){
+							var element = option[optionElement];
+							if(typeof(element)=='string'){
+								option[optionElement] = addEqs(element);
+							}						
+						}
 					}
 				}
 			}
@@ -181,23 +184,18 @@ LevelTools = {
 			func = extend(func, function(){alert(button.message)});
 		}
 		if (button.response) {
-			store('block'+curLevel.blockIdx+'Prompt'+curLevel.promptIdx + 'Response', button.response);
+			store('block'+blockIdx+'Prompt'+promptIdx + 'Response', button.response);
 		}
 		if(button.isCorrect){
-			func = extend(func, nextPrompt);
+			func = extend(func, function(){nextPrompt(true)});
 		}
 		condFunc = 
 			function(){
-				var condResults = curLevel.conditions();
-				if (condResults.didWin) {
+				if (checkWillAdvance()) {
 					if (condResults.alert) {
 						alert(condResults.alert);
 					}
 					func.apply(curLevel);
-				} else {
-					if (condResults.alert) {
-						alert(condResults.alert);
-					}
 				}
 			}
 		buttonBind(id, condFunc);		
@@ -236,7 +234,7 @@ LevelTools = {
 	},
 	bindMultChoiceFunc: function(id, option){
 		var checkFunc = function(){
-			if(curLevel.conditions().didWin){
+			if(checkWillAdvance()){
 				if (option.message) {
 					alert(option.message);
 				}
@@ -244,7 +242,7 @@ LevelTools = {
 					store('block'+curLevel.blockIdx+'Prompt'+curLevel.promptIdx + 'Response', option.response);
 				}
 				if (option.isCorrect) {
-					nextPrompt();
+					nextPrompt(true);
 				}
 			}
 		}
@@ -269,7 +267,7 @@ LevelTools = {
 		}
 		textBoxHTML += "<table border=0><tr><td width=75%></td><td><button id='textAreaSubmit' class='noSelect'>Submit</button></td></tr></table>";
 		var checkFunc = function() {
-			if (curLevel.conditions().didWin) {
+			if (checkWillAdvance()) {
 				if (quiz.answer) {
 					var submitted = $('#answerTextArea').val();
 					if(fracDiff(parseFloat(quiz.answer), parseFloat(submitted))<.05){
@@ -277,7 +275,7 @@ LevelTools = {
 							alert(quiz.messageRight);
 						}
 						store('userAnswerBlock'+curLevel.blockIdx+'Prompt'+curLevel.promptIdx, submitted);
-						nextPrompt();
+						nextPrompt(true);
 					}else{
 						if(quiz.messageWrong){
 							alert(quiz.messageWrong);
@@ -285,7 +283,7 @@ LevelTools = {
 					}
 				}else{
 					store('userAnswerBlock'+curLevel.blockIdx+'Prompt'+curLevel.promptIdx, submitted);
-					nextPrompt();
+					nextPrompt(true);
 				}
 			}
 		}
@@ -455,7 +453,6 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		this.mousedownListeners = {listeners:{}, save:{}};
 		this.mouseupListeners = {listeners:{}, save:{}};
 		this.mousemoveListeners = {listeners:{}, save:{}};
-		this.resetListeners = {listeners:{}, save:{}};
 		this.initListeners = {listeners:{}, save:{}};	
 		this.recordListeners = {listeners:{}, save:{}};
 		this.blockConditionListeners = {listeners:{}, save:{}};
@@ -464,29 +461,10 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		this.promptCleanUpListeners = {listeners:{}, save:{}};
 	},
 	reset: function(){
-		
-		var curPrompt = this.prompts[this.promptIdx];
-		if(curPrompt.cleanUp){
-			curPrompt.cleanUp();
-		}	
-		this.cleanUp();
-		
-		dotManager.clearAll();	
-		this.removeAllGraphs();
-		for (resetListenerName in this.resetListeners.listeners){
-			var func = this.resetListeners.listeners[resetListenerName].func;
-			var obj = this.resetListeners.listeners[resetListenerName].obj;
-			func.apply(obj);
-		}
-		
-		if(this['block'+this.blockIdx+'Start']){
-			this['block'+this.blockIdx+'Start']()
-		}		
-
-		
+		showPrompt(blockIdx, promptIdx, true);		
 	},
 	setDefaultPromptVals: function(){
-		for (var blockIdxLocal=0; blockIdxLocal<this.blocks.length; blockIdxLocal++){
+		for (var blockIdxLocal=0; blockIdxLocal<this.blocks.length; blockIdxLocal++) {
 			var block = this.blocks[blockIdxLocal];
 			for (var promptIdxLocal=0; promptIdxLocal<block.prompts.length; promptIdxLocal++) {
 				var prompt = block.prompts[promptIdxLocal];
@@ -502,13 +480,13 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		var didWin = 1;
 		var alerts = {1:undefined, 0:undefined};
 		var priorities = {1:0, 0:0};
-		for (var blockConditionName in this.blockConditionListeners.listeners){
+		for (var blockConditionName in this.blockConditionListeners.listeners) {
 			var condition = this.blockConditionListeners.listeners[blockCconditionName]
 			winResults = condition.func.apply(condition.obj); //returns didWin, alert, priority (high takes precidence);
 			didWin = Math.min(didWin, winResults.didWin);
-			if(winResults.alert){
+			if (winResults.alert) {
 				var priority = defaultTo(0, winResults.priority);
-				if(priority>=priorities[Number(winResults.didWin)]){
+				if (priority>priorities[Number(winResults.didWin)]) {
 					alerts[Number(winResults.didWin)] = winResults.alert;
 				}
 			}	
@@ -520,13 +498,13 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		var didWin = 1;
 		var alerts = {1:undefined, 0:undefined};
 		var priorities = {1:0, 0:0};
-		for (var promptConditionName in this.promptConditionListeners.listeners){
+		for (var promptConditionName in this.promptConditionListeners.listeners) {
 			var condition = this.promptConditionListeners.listeners[promptCconditionName]
 			winResults = condition.func.apply(condition.obj); //returns didWin, alert, priority (high takes precidence);
 			didWin = Math.min(didWin, winResults.didWin);
-			if(winResults.alert){
+			if (winResults.alert) {
 				var priority = defaultTo(0, winResults.priority);
-				if(priority>=priorities[Number(winResults.didWin)]){
+				if (priority>priorities[Number(winResults.didWin)]) {
 					alerts[Number(winResults.didWin)] = winResults.alert;
 				}
 			}	
@@ -534,13 +512,13 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		return {didWin:didWin, alert:alerts[didWin]};
 	},
 	blockCleanUp: function(){
-		for (var blockCleanUpListener in this.blockCleanUpListeners.listeners){
+		for (var blockCleanUpListener in this.blockCleanUpListeners.listeners) {
 			var listener = this.blockCleanUpListeners.listeners[blockCleanUpListener];
 			listener.func.apply(listener.obj);
 		}
 	},
 	promptCleanUp: function(){
-		for (var promptCleanUpListener in this.promptCleanUpListeners.listeners){
+		for (var promptCleanUpListener in this.promptCleanUpListeners.listeners) {
 			var listener = this.promptCleanUpListeners.listeners[promptCleanUpListener];
 			listener.func.apply(listener.obj);
 		}

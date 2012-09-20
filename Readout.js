@@ -11,11 +11,6 @@ function Readout(handle, leftBound, rightBound, y, font, fontCol, obj, align){
 	this.width = rightBound - leftBound;
 	this.y = y;
 	this.entries = [];
-	if(obj){
-		addListener(obj, 'reset', 'resetReadout' + this.handle, this.resetAll, this);
-	}else if(curLevel){
-		addListener(curLevel, 'reset', 'resetReadout' + this.handle, this.resetAll, this);
-	}
 }
 Readout.prototype = {
 

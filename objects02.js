@@ -17,6 +17,7 @@ in that order
 
 function Sandbox(attrs){
 	this.type = 'Sandbox';
+	this.cleanUpWith = attrs.cleanUpWith;
 	var self = this;
 	attrs = defaultTo({}, attrs);
 	this.bin = {};
@@ -213,7 +214,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		var centerPos = (this.wall[0].x + this.wall[1].x)/2;
 		var dist = this.wall[0].y;
 		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:this.width, dist:dist, dir:dir, col:col,
-											onRemove:onRemove, parentList:this.emitters, onGenerate:onGenerate});
+											onRemove:onRemove, parentList:this.emitters, onGenerate:onGenerate, cleanUpWith:this.cleanUpWith});
 		newEmitter.removing = true;
 		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners.listeners)
 		var wallPt = this.wall[0];
@@ -279,6 +280,7 @@ Optional
 */
 function ParticleEmitter(attrs){
 	this.type = 'ParticleEmitter';
+	this.cleanUpWith = attrs.cleanUpWith
 	this.pos = attrs.pos;
 	this.handle = unique('emitter' + defaultTo('', attrs.handle), curLevel.updateListeners.listeners);
 	this.dir = attrs.dir;
@@ -438,10 +440,12 @@ function sillyArrow(){
 					dims:V(100,50),
 					dimsFinal:V(50,100),
 					lifespan:500,
+					cleanUpWith:'block',
 				});
 }
 function PulseArrow(attrs){
 	this.type = 'PulseArrow';
+	this.cleanUpWith = attrs.cleanUpWith;
 	this.pos = attrs.pos.copy();
 	if (attrs.posFinal) {
 		this.posFinal = attrs.posFinal;
@@ -700,6 +704,8 @@ Arrow.prototype = {
 //TempChanger
 //////////////////////////////////////////////////////////////////////////
 function TempChanger(attrs) {
+	this.type = 'tempChanger';
+	this.cleanUpWith = attrs.cleanUpWith;
 	this.info = attrs.info;
 	this.min = defaultTo(100, attrs.min);
 	this.val = dataHandler.temp(this.info);
@@ -732,6 +738,8 @@ _.extend(TempChanger.prototype, objectFuncs, {
 //RMSChanger
 //////////////////////////////////////////////////////////////////////////
 function RMSChanger(attrs) {
+	this.type = 'RMSChanger';
+	this.cleanUpWith = attrs.cleanUpWith;
 	this.info = attrs.info;
 	this.min = defaultTo(1, attrs.min);
 	this.val = dataHandler.RMS(this.info);
@@ -762,7 +770,8 @@ _.extend(RMSChanger.prototype, objectFuncs, {
 
 
 function ReleaseArrow(attrs) {
-
+	this.type = 'ReleaseArrow';
+	this.cleanUpWith = attrs.cleanUpWith;
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.wall = walls[this.wallInfo];
 	if (attrs.pressure) {

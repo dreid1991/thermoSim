@@ -44,7 +44,7 @@ $(function(){
 	borderCol = Col(155,155,155);
 	auxHolderDivs = ['aux1', 'aux2'];
 	promptIdx = -1;
-	blockIdx = -1;
+	blockIdx = 0;
 	sliderList = [];
 	spcs = {};
 	stored = {};
@@ -483,22 +483,24 @@ function hideSliders(){
 		$('#'+ handle).hide();
 	}
 }
-function showPrompt(newBlockIdx, newPromptIdx){
+function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 	var newBlock = curLevel.blocks[newBlockIdx];
 	var newPrompt = newBlock.prompts[newPromptIdx];
 	var changedBlock = newBlockIdx!=blockIdx;
-	//Finished must be set in forward, not here.  THIS SHOWS AND DOES NOT ASK QUESTIONS
 	curLevel.promptCleanUp();
 	emptyListener(curLevel, 'promptCleanUp');
 	emptyListener(curLevel, 'promptCondition');
-	if (changedBlock) {
+	if (changedBlock || forceReset) {
 		curLevel.saveAllGraphs();
 		curLevel.freezeAllGraphs();
 		curLevel.removeAllGraphs();
 		dotManager.clearAll();		
 
 		curLevel.blockCleanUp();
-		newBlock.setup.apply(curLevel);
+		
+		if (newBlock.setup) {
+			newBlock.setup.apply(curLevel);
+		}
 
 		emptyListener(curLevel, 'blockCleanUp');
 		emptyListener(curLevel, 'blockCondition');
@@ -510,37 +512,58 @@ function showPrompt(newBlockIdx, newPromptIdx){
 			},
 		this);
 	}
-	newPrompt.setup.apply(curLevel)
-	
-	if(!newPrompt.quiz){
+	if (newPrompt.setup) {
+		newPrompt.setup.apply(curLevel)
+	}
+	if (newPrompt.replace) {
+		newPrompt.text = replaceStrings(prompt.text, prompt.replace);
+	}
+	if (!newPrompt.quiz) {
 		$('#nextPrevDiv').show();
 	}
-	if(!newPrompt.cutScene){	
-		if(newPrompt.quiz){
+	if (!newPrompt.cutScene) {	
+		if (newPrompt.quiz) {
 			var quiz = newPrompt.quiz;
 			$('#nextPrevDiv').hide();
 			$('#prompt').html('');
-			curLevel.appendQuiz(text,newPrompt.quiz, 'prompt')
-		}else{
-			$('#prompt').html(text);
+			curLevel.appendQuiz(newPrompt.text, newPrompt.quiz, 'prompt')
+		} else {
+			$('#prompt').html(newPrompt.text);
 		}
-	} else{
+	} else {
 		curLevel.cutSceneStart(newPrompt.text, newPrompt.cutScene, newPrompt.quiz)
 	}
 	$('#baseHeader').html(newPrompt.title);
 
 }
-function toPrompt(newBlockIdx, newPromptIdx){
-	var prev = curLevel.blocks[newBlockIdx].prompts[newPromptIdx];
-	prev.finished = true;
-	//have thing for determining if moving forwards of backwards, then call corresponding func
-	showPrompt(newBlockIdx, newPromptIdx);
+
+function nextPrompt(forceAdvance){
+	var curBlock = curLevel.blocks[blockIdx];
+	var curPrompt = defaultTo({}, curBlock.prompts[promptIdx]);
+	
+	if (forceAdvance) {
+		var willAdvance = true;
+	} else {
+		var willAdvance = checkWillAdvance();
+	}
+	if (willAdvance) {
+		if (curPrompt) {
+			curPrompt.finished = true;
+		}
+		var nextIdxs = getNextIdxs()
+		showPrompt(nextIdxs.newBlockIdx, nextIdxs.newPromptIdx);
+		blockIdx = nextIdxs.newBlockIdx;
+		promptIdx = nextIdxs.newPromptIdx;
+		return true;
+	}
+	return false;
+	
 }
-function nextPrompt(){
+
+function getNextIdxs() {
 	var newBlockIdx = blockIdx;
 	var newPromptIdx = promptIdx;
 	var curBlock = curLevel.blocks[blockIdx];
-
 	if (promptIdx+1==curBlock.prompts.length) {
 		if (blockIdx+1 < curLevel.blocks.length) {
 			newBlockIdx++;
@@ -549,9 +572,31 @@ function nextPrompt(){
 	} else {
 		newPromptIdx++;
 	}
+	return {newBlockIdx:newBlockIdx, newPromptIdx:newPromptIdx};
+}
+
+function getPrevIdxs() {
+	var newBlockIdx = blockIdx;
+	var newPromptIdx = promptIdx;
+	if (promptIdx==0) {
+		if (blockIdx>0) {
+			newBlockIdx--;
+			newPromptIdx=curLevel.blocks[newBlockIdx].prompts.length-1;
+		}
+	} else {
+		newPromptIdx--;
+	}
+	return {newBlockIdx:newBlockIdx, newPromptIdx:newPromptIdx};
+}
+
+function checkWillAdvance() {
+	var nextIdxs = getNextIdxs();
+	var newBlockIdx = nextIdxs.newBlockIdx;
+	var newPromptIdx = nextIdxs.newPromptIdx;
 	var changingBlock = blockIdx!=newBlockIdx;
 	var willAdvance = 0;
-	var curFinished = curBlock.prompts[promptIdx].finished;
+	var curPrompt = defaultTo({}, curLevel.blocks[blockIdx].prompts[promptIdx]);
+	var curFinished = defaultTo(false, curPrompt.finished);
 	
 	willAdvance = Math.max(willAdvance, curFinished);
 	if (!willAdvance) {
@@ -570,27 +615,16 @@ function nextPrompt(){
 			}
 		} else {
 			willAdvance = 0;
-			alertValid(promptResults.alert);
 		}
 	}
-	
-	if (willAdvance) {
-		showPrompt(newBlockIdx, newPromptIdx);
-	}
-	
+	return willAdvance;
 }
+
 function prevPrompt(){
-	var newBlockIdx = blockIdx;
-	var newPromptIdx = promptIdx;
-	if (promptIdx==0) {
-		if (blockIdx>0) {
-			newBlockIdx--;
-			newPromptIdx=curLevel[newBlockIdx].prompts.length-1;
-		}
-	} else {
-		promptIdx--;
-	}
-	showPrompt(newBlockIdx, newPromptIdx);
+	var prevIdxs = getPrevIdxs();
+	showPrompt(prevIdxs.newBlockIdx, prevIdxs.newPromptIdx);
+	blockIdx = prevIdxs.newBlockIdx;
+	promptIdx = prevIdxs.newPromptIdx;
 }
 
 

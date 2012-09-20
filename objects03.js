@@ -5,6 +5,8 @@ in that order
 */
 
 function Clamps(attrs) {
+	this.type = 'Clamps';
+	this.cleanUpWith = attrs.cleanUpWith;
 	this.clampee = attrs.clampee;
 	this.clamps = attrs.clamps;
 	this.wall = this.clampee.wall;
