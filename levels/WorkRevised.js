@@ -30,13 +30,13 @@ _.extend(Work.prototype,
 				{
 					setup:undefined,
 					cutScene:true,
-					text:"Today we’re going to investigate how work transfers energy to a system.  First we’re going to develop the equations that describe a process on an adiabatic system. </p><p>If we compress the adiabatic system pictured to the right at a constant external pressure, which of these described the work done?</p>",
+					text:"Today we’re going to investigate how work transfers energy to a system.  First we’re going to develop the equations that describe a process on an adiabatic system. </p><p>If we compress the adiabatic system pictured to the right at a constant external pressure from state 1 to state 2, which of these described the work done?</p>",
 					quiz:{	
 						type:'multChoice',
 						options:
 							[
-							{text:"||EQ2||", isCorrect: false, message:"Yeah, but you won't do no work with constant volume in this system"},
-							{text:"||EQ3||", isCorrect: false, message:"Which P should you be using?"},
+							{text:"||EQ2||", isCorrect: false, message:"Which P should you be using?"},
+							{text:"||EQ3||", isCorrect: false, message:"Yeah, but you won't do no work with constant volume in this system."},
 							{text:"||EQ1||", isCorrect: true},
 							{text:"||EQ4||", isCorrect: false, message:"Do your units work out?"}
 						]
@@ -45,15 +45,15 @@ _.extend(Work.prototype,
 				{
 					setup:undefined,
 					cutScene:true,
-					text: "||EQ1BR<p>Indeed.  This equation tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p>||EQ5CE<p>Since we’re going to be looking at an adiabatic system.  If we assume constant heat capacity, which of these relations is correct?</p>",
+					text: "||EQ1BR<p>Indeed.  This equation tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p>||EQ5CE<p>For our adiabatic system, which of the following relations is correct, if we assume constant heat capacity?</p>",
 					quiz:{	
 						type:'multChoice',
 						options:
 							[
-							{text:"||EQ7||", isCorrect: false, message:"Why Cp?"},
 							{text:"||EQ8||", isCorrect: false, message:"But it's adiabatic!"},
-							{text:"It cannot be simplified", isCorrect: false, message:"Yes it can.  What is Q equal to?"},
-							{text:"||EQ6||", isCorrect: true}
+							{text:"||EQ6||", isCorrect: true},
+							{text:"||EQ7||", isCorrect: false, message:"Why Cp?"},
+							{text:"It cannot be simplified", isCorrect: false, message:"Yes it can.  What is Q equal to for an adiabatic system?"}
 						]
 					},			
 				}
@@ -82,7 +82,7 @@ _.extend(Work.prototype,
 				},
 				{
 					setup:undefined,
-					text:"<p>So the molecule's speed up when they collide with the moving wall.  Those collisions add kinetic energy, which means that the temperature increases.</p><p>Now let's do an experiment where we compress the previously pictured (<--maybe change) adiabatic system.",
+					text:"<p>So the molecules speed up when they collide with the moving wall.  Those collisions add kinetic energy, which means that the temperature increases.</p><p>Now let's do an experiment where we compress our adiabatic system.",
 				}
 			]
 		},
