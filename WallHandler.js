@@ -1321,7 +1321,7 @@ WallMethods = {
 		},
 		displayTempStop: function(){
 			this.displayingTemp = false;
-			removeListener(curLevel, 'data', 'displayTemp' + this.handle)
+			removeListener(curLevel, 'update', 'displayTemp' + this.handle)
 			this.tempReadout.removeEntry('temp' + this.handle);
 			return this;
 		},

@@ -13,13 +13,19 @@ _.extend(Work.prototype,
 {
 	init: function(){
 		$('#mainHeader').text('Work');
-		nextPrompt();
+		showPrompt(0, 0, true);
 	},	
 	
 	declareBlocks: function(){
 		this.blocks=[
 		{
-			setup:undefined,
+			setup:
+				function() {
+					currentSetupType = 'block';
+					new AuxPicture('img/work/block0Pic1.jpg');
+					new AuxPicture('img/work/block0Pic2.jpg');
+					
+				},
 			prompts:[
 				{
 					setup:undefined,
@@ -29,10 +35,10 @@ _.extend(Work.prototype,
 						type:'multChoice',
 						options:
 							[
-							{text:"||EQ2||", isCorrect: false, message:'No!  You do no work with constant volume'},
-							{text:"||EQ3||", isCorrect: false, message:"No!"},
+							{text:"||EQ2||", isCorrect: false, message:"Yeah, but you won't do no work with constant volume in this system"},
+							{text:"||EQ3||", isCorrect: false, message:"Which P should you be using?"},
 							{text:"||EQ1||", isCorrect: true},
-							{text:"||EQ4||", isCorrect: false, message:"It is dependant on change in volume, but T?"}
+							{text:"||EQ4||", isCorrect: false, message:"Do your units work out?"}
 						]
 					},
 				},
@@ -59,7 +65,7 @@ _.extend(Work.prototype,
 					currentSetupType = 'block';
 					walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});
 					walls[0].setHitMode('ArrowSpd');
-					this.borderStd();
+					this.borderStd({min:30});
 					this.compArrow = new CompArrow({mode:'adiabatic', speed:1.5});
 					spcs['spc4'].populate(P(45,235), V(460, 100), 1, 600);
 					this.tempListener = new StateListener({dataList:walls[0].data.t, is:'notEqualTo', targetVal:dataHandler.temp(), alertUnsatisfied:"Try hitting the molecule with the wall while the wall's moving"});			
@@ -67,7 +73,7 @@ _.extend(Work.prototype,
 			prompts:[
 				{
 					setup:undefined,
-					text:"<center>||EQ6||</center>From the equation above we see that temperature increases as we do work by decreasing volume.  Let's see what's happening from the point of view of a molecule in the system.  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?",
+					text:"<center>||EQ6||</center>From the equation above we see that temperature increases as we do work by decreasing volume.  Temperature is an expression is molecular kinetic energy, so as the system is compressed, the molecules must speed up.  These ideal gas molecules can be thought of as perfectly elastic bouncy balls (I can add the model bit if anyone really wants, but I kind of like 'thought of' better).  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?",
 					quiz:{	
 						type:'text',
 						text:'Type your answer here',
@@ -76,7 +82,7 @@ _.extend(Work.prototype,
 				},
 				{
 					setup:undefined,
-					text:"So as we add energy through work out system's temperature rises.  We know that temperature is an expression of molecular kinetic energy.  Since energy is conserved, as we add energy through work, the molecules speed up.<br>Now let's do an experiment where we adiabatically compress the system pictures earlier FIX",
+					text:"<p>So the molecule's speed up when they collide with the moving wall.  Those collisions add kinetic energy, which means that the temperature increases.</p><p>Now let's do an experiment where we compress the previously pictured (<--maybe change) adiabatic system.",
 				}
 			]
 		},
@@ -98,7 +104,7 @@ _.extend(Work.prototype,
 					this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:213.2}], weightScalar:8, displayText:false, massInit:0, compMode:'cPAdiabaticDamped', pistonOffset:V(130,-41)});
 					this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, makeSlider:false});
 					walls[0].displayPExt();
-					this.borderStd();
+					this.borderStd({min:30});
 				},
 			prompts:[
 				{
@@ -107,12 +113,11 @@ _.extend(Work.prototype,
 							currentSetupType = 'prompt';
 							this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:10, alertUnsatisfied:'Compress the system!', cleanUpWith:currentSetupType});						
 						},
-					text:"Above is a piston cylinder assembly that is well insulated.  Place the block on top of the poston and observe the response.  How much work did you do on the system?",
+					text:"Above is a well insulated piston cylinder assembly.  Place the block on top of the poston and observe the response.  How much work did you do on the system?",
 					quiz:{	
 						type:'textSmall',
 						units:'kJ',
 						text:'',
-						//NEED TO STORE ANSWER
 					},	
 				},
 				{
@@ -122,8 +127,9 @@ _.extend(Work.prototype,
 						type:'textSmall',
 						units:'K',
 						text:'',
-						//NEED TO STORE ANSWER
 					},
+					replace: 
+						[{oldStr:'XXX', newStr:'GET#userAnswerBlock2Prompt0'}]
 				}
 			]
 		},
@@ -131,7 +137,7 @@ _.extend(Work.prototype,
 			setup:
 				function() {
 					currentSetupType = 'block';
-					this.blocks[2].setup();
+					this.blocks[2].setup.apply(this);
 					walls[0].displayTemp();
 					walls[0].displayWork();
 					this.graphs.tVSv = new GraphScatter({handle:'tVSv', xLabel:"Volume (L)", yLabel:"Temperature (K)",
@@ -141,12 +147,19 @@ _.extend(Work.prototype,
 				},
 			prompts:[
 				{
-					setup:undefined,
-					text:"Previously you answered that the compression did XXX kJ on the system for a final temperature of YYY K.  Here's the same compression, but thime we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
+					setup:
+						function() {
+							this.blocks[2].prompts[0].setup.apply(this);
+						},
+					text:"Previously you answered that the compression did XXXkJ on the system for a final temperature of YYYK.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
 					quiz:{
 						type:'text',
 						text:"Type your answer here",
 					},
+					replace:
+						[{oldStr:'XXX', newStr:'GET#userAnswerBlock2Prompt0'},
+						{oldStr:'YYY', newStr:'GET#userAnswerBlock2Prompt1'}
+						]
 				}
 			
 			]
@@ -155,13 +168,21 @@ _.extend(Work.prototype,
 			setup:
 				function() {
 					currentSetupType = 'block';
-					//load graphs
+					this.graphs.pVSvLoad = getStore('pVSvblock3prompt0').load();
+					this.graphs.tVSvLoad = getStore('tVSvblock3prompt0').load();
 				},
 			prompts:[
 				{
 					setup:undefined,
-					text:"If you'll notice, the T vs. V graph is linear.  
+					cutScene:true,
+					text:"||EQ6CEIf you'll notice, the T vs. V graph is linear.  Using the equation above, find what its slope should should be with 1.8 moles of an ideal monatomic gas.  Do the slopes from the equation and from the graph match?  Given our P<sub>ext</sub>, should the slopes be linear or did something go wrong?",
+					quiz:{
+						type:'text',
+						text:"Type your answer here",
+					},
+				}							
 			]
+		}
 		
 		]
 	}

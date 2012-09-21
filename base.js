@@ -43,7 +43,7 @@ $(function(){
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);
 	auxHolderDivs = ['aux1', 'aux2'];
-	promptIdx = -1;
+	promptIdx = 0;
 	blockIdx = 0;
 	sliderList = [];
 	spcs = {};
@@ -254,7 +254,9 @@ function addInterval(funcHandle, func, destObj, interval) {
 	extraIntervals[funcHandle] = window.setInterval(function(){func.apply(destObj)}, interval);
 }
 function removeListener(object, typeName, funcName){
+	try{
 	delete object[typeName + 'Listeners'].listeners[funcName];
+	}catch(e){console.trace()}
 }
 function removeInterval(funcHandle) {
 	if (extraIntervals[funcHandle]) {
@@ -517,7 +519,7 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 		newPrompt.setup.apply(curLevel)
 	}
 	if (newPrompt.replace) {
-		newPrompt.text = replaceStrings(prompt.text, prompt.replace);
+		newPrompt.text = replaceStrings(newPrompt.text, newPrompt.replace);
 	}
 	if (!newPrompt.quiz) {
 		$('#nextPrevDiv').show();
@@ -616,6 +618,7 @@ function checkWillAdvance() {
 			}
 		} else {
 			willAdvance = 0;
+			alertValid(promptResults.alert);
 		}
 	}
 	return willAdvance;
@@ -636,8 +639,11 @@ function replaceStrings(text, replaceList){
 		var oldStr = replace.oldStr;
 		var newStr = replace.newStr;
 		if(typeof newStr == 'string' && newStr.indexOf('GET')==0){
-			
-			newStr = getStore(newStr.slice(3,newStr.length));
+			if (newStr.indexOf('#')==3) {
+				newStr = parseFloat(getStore(newStr.slice(4,newStr.length)));
+			} else {
+				newStr = getStore(newStr.slice(3,newStr.length));
+			}
 		} else if (typeof newStr == 'function'){
 			newStr = newStr();
 		}

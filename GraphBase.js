@@ -46,7 +46,6 @@ GraphBase = {
 	},
 	makeCanvasNoReset: function(dims, parentDiv) {
 		var self = this;
-		addListener(curLevel, 'reset', 'clearGraph'+this.handle, this.clear, this);
 		this.buttonId = this.handle + 'reset';
 		if (!parentDiv){
 			this.parentDiv = this.pickParentDiv('graph');

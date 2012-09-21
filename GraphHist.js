@@ -29,7 +29,6 @@ function GraphHist(handle, width, height, xLabel, yLabel, axisInit, data){
 	var canvasData = this.makeCanvas(this.dims);
 	this.drawAllBG();
 	this.addSet('only', barCol, data);
-	addListener(curLevel, 'reset', 'clearGraph'+handle, this.clear, this);
 }
 /*
 Good evening:  I am keeping histogram data in data.someName, not just data, even though there is only one for now.

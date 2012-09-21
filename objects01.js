@@ -208,10 +208,8 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	},
 	remove: function(){
 		this.wall.moveStop();
-		//removeListener(curLevel, 'update', 'moveWeightsOnPiston' + this.wallInfo);
 		removeListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo);
 		removeListener(curLevel, 'mousedown', 'weights' + this.wallInfo);
-		removeListener(curLevel, 'reset', 'dragWeights' + this.wallInfo);
 	},
 	getWeightDims: function(weightDefs){
 		var dims = {};

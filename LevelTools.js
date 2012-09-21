@@ -239,7 +239,7 @@ LevelTools = {
 					alert(option.message);
 				}
 				if (option.response) {
-					store('block'+curLevel.blockIdx+'Prompt'+curLevel.promptIdx + 'Response', option.response);
+					store('block'+blockIdx+'Prompt'+promptIdx + 'Response', option.response);
 				}
 				if (option.isCorrect) {
 					nextPrompt(true);
@@ -268,22 +268,27 @@ LevelTools = {
 		textBoxHTML += "<table border=0><tr><td width=75%></td><td><button id='textAreaSubmit' class='noSelect'>Submit</button></td></tr></table>";
 		var checkFunc = function() {
 			if (checkWillAdvance()) {
-				if (quiz.answer) {
-					var submitted = $('#answerTextArea').val();
-					if(fracDiff(parseFloat(quiz.answer), parseFloat(submitted))<.05){
-						if(quiz.messageRight){
-							alert(quiz.messageRight);
+				var submitted = $('#answerTextArea').val();
+				if (submitted != '') {
+					if (quiz.answer) {
+						if(fracDiff(parseFloat(quiz.answer), parseFloat(submitted))<.05){
+							if(quiz.messageRight){
+								alert(quiz.messageRight);
+							}
+							store('userAnswerBlock'+blockIdx+'Prompt'+promptIdx, submitted);
+							nextPrompt(true);
+						}else{
+							if(quiz.messageWrong){
+								alert(quiz.messageWrong);
+							}
 						}
-						store('userAnswerBlock'+curLevel.blockIdx+'Prompt'+curLevel.promptIdx, submitted);
-						nextPrompt(true);
 					}else{
-						if(quiz.messageWrong){
-							alert(quiz.messageWrong);
-						}
+						store('userAnswerBlock'+blockIdx+'Prompt'+promptIdx, submitted);
+						nextPrompt(true);
 					}
-				}else{
-					store('userAnswerBlock'+curLevel.blockIdx+'Prompt'+curLevel.promptIdx, submitted);
-					nextPrompt(true);
+					 
+				} else {
+					alert("You haven't written an answer!");
 				}
 			}
 		}
@@ -291,23 +296,6 @@ LevelTools = {
 		$('button').button();
 		buttonBind('textAreaSubmit', checkFunc);
 	},
-	/*
-	conditions: function(){
-		var prompt = this.prompts[this.promptIdx];
-		var conditions = defaultTo(this['block'+this.blockIdx+'Conditions'], prompt.conditions);
-		if(!conditions){
-			return true;
-		}else{
-			var condResult = conditions.apply(this);
-			
-			if(condResult.alert){
-				alert(condResult.alert);
-			}
-			return condResult.result;
-		}
-	
-	},
-	*/
 	hideDash: function(){
 		$('#dashIntro').hide();
 		$('#dashRun').hide();
