@@ -358,8 +358,16 @@ ArrayExtenders = {
 			total+=this[idx];
 		}
 		return total/this.length;
-	}
+	},
+	switchElements: function(idx1, idx2) {
+		var obj1 = this[idx1];
+		var obj2 = this[idx2];
+		this[idx1] = obj2;
+		this[idx2] = obj1;	
+		return this;
+	},
 }
+
 function deepCopy(object){
 	var copy = new object.constructor();
 	for (var item in object){
@@ -383,6 +391,8 @@ StringExtenders = {
 		return this.replace(/\s/g, '');
 	},
 }
+
+
 function recordData(handle, list, func, obj, listenerType){
 	var listenerType = defaultTo('record', listenerType)
 	store('record' + handle, listenerType);

@@ -164,13 +164,14 @@ WallMethods = {
 			bounds = defaultTo({yMin:30, yMax: 435}, bounds);
 			include = defaultTo(1, include);
 			this[wallIdx] = pts;
+			_.extend(this[wallIdx], WallMethods.wall);	
 			this[wallIdx].handle = handle;
 			this[wallIdx].include = include;
 			this[wallIdx].hitMode = 'Std';
 			this[wallIdx].v = 0;
 			this[wallIdx].bounds = bounds;
 			if(vol){
-				this.setVol(this[wallIdx], vol);
+				this[wallIdx].setVol(vol);
 			}
 			this[wallIdx].show = defaultTo(true, show);
 			this.closeWall(this[wallIdx]);
@@ -196,20 +197,12 @@ WallMethods = {
 			this[wallIdx].pLastRecord = turn;
 			this[wallIdx].parent = this;
 			this[handle] = this[wallIdx];
-			_.extend(this[wallIdx], WallMethods.wall);	
 			record = defaultTo(true, record);
 			if(record){	
 				this[wallIdx].recordDefaults();
 			}
 		},
-		setVol: function(pts, vol){
-			var width = pts[2].distTo(pts[3]);
-			var height = vol/(vConst*width);
-			var extendUV = pts[2].VTo(pts[3]).UV().perp('cw');
-			var setY = pts[2].y - height;
-			pts[0].position({y:setY});
-			pts[1].position({y:setY});
-		},
+
 		addWall: function(attrs){
 			this.numWalls++;
 			var newIdx = this.length;
@@ -671,6 +664,20 @@ WallMethods = {
 //WALL
 //////////////////////////////////////////////////////////////////////////
 	wall: {
+		setVol: function(vol){
+			var setY = this.volToY(vol)
+			this[0].position({y:setY});
+			this[1].position({y:setY});
+		},
+		volToY: function(vol) {
+			var width = this[2].distTo(this[3]);
+			var height = vol/(vConst*width);
+			var extendUV = this[2].VTo(this[3]).UV().perp('cw');
+			return this[2].y - height;
+		},
+
+
+
 		changeSetPt: function(dest, compType, speed){
 			if(compType.indexOf('isothermal')!=-1){
 				var wallMoveMethod = 'cVIsothermal';
@@ -703,43 +710,44 @@ WallMethods = {
 				this);
 			}		
 		},
-		releaseToPt: function(dest, compType, massChunkName, mass) {
-			if(compType.indexOf('isothermal')!=-1){
-				var wallMoveMethod = 'cVIsothermal';
-				console.log("cPIsothermal does not exist yet");
-				console.trace();
-			} else if (compType.indexOf('adiabatic')!=-1){
-				var wallMoveMethod = 'cPAdiabatic';
-			}
-			removeListener(curLevel, 'wallMove', 'accelTowardsPt' + this.handle);
-			var setY = function(curY){
-				this[0].y = curY;
-				this[1].y = curY;
-				this[this.length-1].y = curY;
-			}
-			var y = this[0].y
-			var dist = dest-y;
-			if (dist!=0) {
-				var sign = getSign(dist);
-				var accel = g;
-				this.parent.setSubWallHandler(this.handle, 0, wallMoveMethod + compAdj);
-				this.setMass(massChunkName, mass);
-				addListener(curLevel, 'wallMove', 'accelTowardsPt' + this.handle,
-					function(){
-						var y = this[0].y
-						setY.apply(this, [boundedStep(y, dest, this.v + .5*accel)])
-						this.parent.setupWall(this.handle);
-						this.v += accel;
-						if(round(y,2)==round(dest,2)){
-							this.unsetMass();
-							removeListener(curLevel, 'wallMove', 'accelTowardsPt' + this.handle);
-							this.parent.setSubWallHandler(this.handle, 0, 'staticAdiabatic');
-							this.v = 0;
+		releaseWithBounds: function(lowBound, highBound, funcOnFinish) {
+			removeListener(curLevel, 'wallMove', 'releaseWithBounds' + this.handle);
+			removeListener(curLevel, 'wallMove', 'cP' + this.handle);
+
+			lowBound = defaultTo(0, lowBound)
+			highBound = defaultTo(Number.MAX_VALUE, highBound);
+			var gLocal = g;
+			var bounds = this.bounds;
+			addListener(curLevel, 'wallMove', 'releaseWithBounds' + this.handle,
+				function(){
+					var lastY = this[0].y
+					var nextY;
+					var unboundedY = lastY + this.v + .5*gLocal;
+					var dyWeight = null;
+					if (unboundedY<lowBound || unboundedY>highBound) {
+						removeListener(curLevel, 'wallMove', 'releaseWithBounds' + this.handle);
+						if (unboundedY<lowBound) {
+							funcOnFinish(lowBound);
+						} else {
+							funcOnFinish(highBound);
 						}
-					},
-				this);
-			}			
+					}
+					if(unboundedY>bounds.yMax || unboundedY<bounds.yMin){
+						nextY = this.hitBounds(lastY, gLocal, bounds.yMin, bounds.yMax);
+					}else{
+						nextY = unboundedY;
+						this.v += gLocal;
+
+					}
+					this[0].y = nextY;
+					this[1].y = nextY;
+					this[this.length-1].y = nextY;
+					this.parent.setupWall(this.handle);		
+				},
+			this);
+
 		},
+
 		setHitMode: function(inputMode){
 			this.hitMode = inputMode;
 		},
