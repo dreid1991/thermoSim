@@ -73,6 +73,10 @@ _.extend(Work.prototype,
 						text:'Type your answer here',
 						//NEED TO STORE ANSWER
 					},
+				},
+				{
+					setup:undefined,
+					text:"So as we add energy through work out system's temperature rises.  We know that temperature is an expression of molecular kinetic energy.  Since energy is conserved, as we add energy through work, the molecules speed up.<br>Now let's do an experiment where we adiabatically compress the system pictures earlier FIX",
 				}
 			]
 		},
@@ -95,11 +99,14 @@ _.extend(Work.prototype,
 					this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, makeSlider:false});
 					walls[0].displayPExt();
 					this.borderStd();
-					this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:10, alertUnsatisfied:'Compress the system!'});						
 				},
 			prompts:[
 				{
-					setup:undefined,
+					setup:
+						function() {
+							currentSetupType = 'prompt';
+							this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:10, alertUnsatisfied:'Compress the system!', cleanUpWith:currentSetupType});						
+						},
 					text:"Above is a piston cylinder assembly that is well insulated.  Place the block on top of the poston and observe the response.  How much work did you do on the system?",
 					quiz:{	
 						type:'textSmall',
@@ -119,7 +126,42 @@ _.extend(Work.prototype,
 					},
 				}
 			]
-		}
+		},
+		{
+			setup:
+				function() {
+					currentSetupType = 'block';
+					this.blocks[2].setup();
+					walls[0].displayTemp();
+					walls[0].displayWork();
+					this.graphs.tVSv = new GraphScatter({handle:'tVSv', xLabel:"Volume (L)", yLabel:"Temperature (K)",
+										axesInit:{x:{min:6, step:2}, y:{min:0, step:200}}});
+					this.graphs.tVSv.addSet({address:'t', label:'T sys.', pointCol:Col(255,50,50), flashCol:Col(200,200,255),
+											data:{x:walls[0].data.v, y:walls[0].data.t}});					
+				},
+			prompts:[
+				{
+					setup:undefined,
+					text:"Previously you answered that the compression did XXX kJ on the system for a final temperature of YYY K.  Here's the same compression, but thime we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
+					quiz:{
+						type:'text',
+						text:"Type your answer here",
+					},
+				}
+			
+			]
+		},
+		{
+			setup:
+				function() {
+					currentSetupType = 'block';
+					//load graphs
+				},
+			prompts:[
+				{
+					setup:undefined,
+					text:"If you'll notice, the T vs. V graph is linear.  
+			]
 		
 		]
 	}

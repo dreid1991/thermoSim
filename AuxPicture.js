@@ -1,5 +1,6 @@
 function AuxPicture(imgPath) {
 	this.type = 'AuxPicture';
+	this.cleanUpWith = 'block'//make take attrs, make an option
 	this.dims = this.getDims()
 	this.bgCol = curLevel.bgCol;
 	this.makeDiv()
