@@ -14,9 +14,28 @@ in ideal gas eqs: boltzmann constant: K -> K_{b}
 URISC FINAL REPORT BY SEPT 28th
 
 
+
 make appendLastAns or something
 	could just manually throw in last answer. w/e
 
 Clear up how walls border and extend border 
 
 At some point, make graph point data be stored using Point class rather than having .x, .y attribute in set.  Seriously
+
+---
+make sign is V\Delta Pext negative
+P_sys to just P
+so we have Pext and P instead of Pext and Pint
+Label pictures state 1, state 2
+make fonts in pictures smaller, more Pext out of system to top of piston
+
+do expansion step after compression
+
+give answer box for slope of T vs. V graph
+from the graph, slope 
+from the equation, slope is
+
+add on to end
+Now we'll look at expanding the same system, calculate work
+
+make saveState function 

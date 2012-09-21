@@ -73,7 +73,7 @@ _.extend(Work.prototype,
 			prompts:[
 				{
 					setup:undefined,
-					text:"<center>||EQ6||</center>From the equation above we see that temperature increases as we do work by decreasing volume.  Temperature is an expression is molecular kinetic energy, so as the system is compressed, the molecules must speed up.  These ideal gas molecules can be thought of as perfectly elastic bouncy balls (I can add the model bit if anyone really wants, but I kind of like 'thought of' better).  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?",
+					text:"<center>||EQ6||</center>From the equation above we see that temperature increases as we do work by decreasing volume.  Temperature is an expression is molecular kinetic energy, so as the system is compressed, the molecules must speed up.  These ideal gas molecules can be thought of as perfectly elastic bouncy balls.  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?",
 					quiz:{	
 						type:'text',
 						text:'Type your answer here',
@@ -105,6 +105,8 @@ _.extend(Work.prototype,
 					this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, makeSlider:false});
 					walls[0].displayPExt();
 					this.borderStd({min:30});
+					this.clamps = new Clamps({clampee:this.dragWeights, clamps:[{vol:13}, {vol:10}]});
+					this.clamps.release()
 				},
 			prompts:[
 				{

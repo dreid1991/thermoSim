@@ -524,6 +524,8 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 				removeListenerByName(curLevel, 'update', 'animText');
 			},
 		this);
+		blockIdx = newBlockIdx;
+		promptIdx = newPromptIdx;
 	}
 	if (newPrompt.setup) {
 		newPrompt.setup.apply(curLevel)

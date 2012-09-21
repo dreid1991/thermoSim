@@ -11,6 +11,7 @@ function Clamps(attrs) {
 	this.currentClamper = undefined;
 	this.clamps = attrs.clamps;
 	this.wall = this.clampee.wall;
+	this.wallHandler = this.wall.parent.getSubWallHandler(this.wall.handle, 0);
 	this.init();
 }
 
@@ -31,6 +32,7 @@ _.extend(Clamps.prototype, objectFuncs, {
 			clamp.clamping = false;
 		}
 		this.sortClamps();
+		this.addInitClamp();
 	},
 	sortClamps: function() {
 		//sorting for low y's at beginning of list;
@@ -41,7 +43,6 @@ _.extend(Clamps.prototype, objectFuncs, {
 				}
 			}
 		}
-		this.addInitClamp();
 	},
 	addInitClamp: function() {
 		var initClampY = this.wall[0].y;
@@ -50,19 +51,28 @@ _.extend(Clamps.prototype, objectFuncs, {
 			if (curClampY>initClampY) {
 				this.clamps.splice(clampIdx, 0, {y:initClampY, clamping:true});
 				this.currentClamper = this.clamps[clampIdx];
+				break;
 			}
 		}
 	},
 	release: function() {
+		var highBound = undefined;
+		var lowBound = undefined;
 		this.currentClamper.clamping = false;
 		var currentIdx = this.clamps.indexOf(this.currentClamper);
-		var highBound = this.clamps[currentIdx+1].y;
-		var lowBound = this.clamps[currentIdx-1].y;
+		var highClamp = this.clamps[currentIdx+1];
+		var lowClamp = this.clamps[currentIdx-1];
+		if (highClamp) {
+			highBound = highClamp.y;
+		}
+		if (lowClamp) {
+			lowBound = lowClamp.y;
+		}
 		var self = this;
 		var onArrive = function(y) {
 			self.activateClamp(y);
 		}
-		this.wall.releaseWithBounds(lowBound, highBound, onArrive);
+		this.wall.releaseWithBounds(lowBound, highBound, this.wallHandler, onArrive);
 	},
 	activateClamp: function(arrivedAt) {
 		var currentIdx = this.clamps.indexOf(this.currentClamper);

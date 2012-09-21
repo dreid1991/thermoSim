@@ -102,14 +102,14 @@ WallMethods = {
 		setSubWallHandler: function(wallInfo, subWallIdx, handler){
 			var wallIdx = this.idxByInfo(wallInfo)
 			if(typeof handler == 'string'){
-				this[wallIdx+ '-' + subWallIdx] = {obj:this, func:this[handler]};
+				this[wallIdx + '-' + subWallIdx] = {obj:this, func:this[handler]};
 				if(handler.toLowerCase().indexOf('isothermal')!=-1){
 					this[wallIdx].isothermalInit();
 				} else {
 					this[wallIdx][subWallIdx].isothermal = false;
 				}
 			}else if(typeof handler=='object'){
-				this[wallIdx+ '-' + subWallIdx] = {obj:handler.obj, func: handler.func};
+				this[wallIdx + '-' + subWallIdx] = handler;
 				if(handler.isothermal){
 					this[wallIdx].isothermalInit();
 				} else {
@@ -117,6 +117,10 @@ WallMethods = {
 				}
 			}
 			
+		},
+		getSubWallHandler: function(wallInfo, subWallIdx) {
+			var wallIdx = this.idxByInfo(wallInfo);
+			return this[wallIdx + '-' + subWallIdx];
 		},
 		setupWall: function(wallIdx){
 			this[wallIdx].wallUVs = this.getWallUV(wallIdx);
@@ -710,10 +714,11 @@ WallMethods = {
 				this);
 			}		
 		},
-		releaseWithBounds: function(lowBound, highBound, funcOnFinish) {
+		releaseWithBounds: function(lowBound, highBound, handler, funcOnFinish) {
+			this.moveStop();
 			removeListener(curLevel, 'wallMove', 'releaseWithBounds' + this.handle);
 			removeListener(curLevel, 'wallMove', 'cP' + this.handle);
-
+			this.parent.setSubWallHandler(this.handle, 0, handler);
 			lowBound = defaultTo(0, lowBound)
 			highBound = defaultTo(Number.MAX_VALUE, highBound);
 			var gLocal = g;
@@ -725,7 +730,8 @@ WallMethods = {
 					var unboundedY = lastY + this.v + .5*gLocal;
 					var dyWeight = null;
 					if (unboundedY<lowBound || unboundedY>highBound) {
-						removeListener(curLevel, 'wallMove', 'releaseWithBounds' + this.handle);
+						this.moveStop();
+						this.parent.setSubWallHandler(this.handle, 0, 'staticAdiabatic');
 						if (unboundedY<lowBound) {
 							funcOnFinish(lowBound);
 						} else {
@@ -746,6 +752,63 @@ WallMethods = {
 				},
 			this);
 
+		},
+		moveInit: function(){
+			var gLocal = g;
+			var bounds = this.bounds;
+			addListener(curLevel, 'wallMove', 'cP' + this.handle,
+				function(){
+					var lastY = this[0].y
+					var nextY;
+					var unboundedY = lastY + this.v + .5*gLocal;
+					var dyWeight = null;
+					if(unboundedY>bounds.yMax || unboundedY<bounds.yMin){
+						nextY = this.hitBounds(lastY, gLocal, bounds.yMin, bounds.yMax);
+					}else{
+						nextY = unboundedY;
+						this.v += gLocal;
+
+					}
+					this[0].y = nextY;
+					this[1].y = nextY;
+					this[this.length-1].y = nextY;
+					this.parent.setupWall(this.handle);		
+				},
+			this);
+		},
+		moveStop: function(){
+			this.v = 0;
+			removeListener(curLevel, 'wallMove', 'cP' + this.handle);
+			removeListener(curLevel, 'wallMove', 'releaseWithBounds' + this.handle);
+		},
+		hitBounds: function(lastY, gLocal, yMin, yMax){
+			var tLeft = 1;
+			var unboundedY = lastY + this.v*tLeft + .5*gLocal*tLeft*tLeft;
+			var boundedY = Math.max(yMin, Math.min(yMax, unboundedY));
+			var discr = this.v*this.v + 2*gLocal*(boundedY-lastY);
+			if (boundedY==yMax){
+				
+				var tHit = (-this.v + Math.sqrt(discr))/gLocal;
+
+			}else if (boundedY==yMin){
+				
+				var tHit = (-this.v - Math.sqrt(discr))/gLocal;
+			}
+			this.v+=gLocal*tHit;
+			this.v*=-1;
+			tLeft-=tHit;
+			
+			if(-2*this.v< tLeft*gLocal && this.v<0){
+				var tBounce = Math.abs(2*this.v/gLocal);
+				var numBounces = Math.floor(tLeft/tBounce);
+				tLeft-=numBounces*tBounce;
+			}
+			var nextY = boundedY + this.v*tLeft + .5*gLocal*tLeft*tLeft;
+	 
+			
+			this.v += gLocal*tLeft;
+			
+			return nextY;
 		},
 
 		setHitMode: function(inputMode){
@@ -835,63 +898,7 @@ WallMethods = {
 			}
 			return this;
 		},
-		moveInit: function(){
-			var gLocal = g;
-			var bounds = this.bounds;
-			addListener(curLevel, 'wallMove', 'cP' + this.handle,
-				function(){
-					var lastY = this[0].y
-					var nextY;
-					var unboundedY = lastY + this.v + .5*gLocal;
-					var dyWeight = null;
-					if(unboundedY>bounds.yMax || unboundedY<bounds.yMin){
-						nextY = this.hitBounds(lastY, gLocal, bounds.yMin, bounds.yMax);
-					}else{
-						nextY = unboundedY;
-						this.v += gLocal;
 
-					}
-					this[0].y = nextY;
-					this[1].y = nextY;
-					this[this.length-1].y = nextY;
-					this.parent.setupWall(this.handle);		
-				},
-			this);
-		},
-		moveStop: function(){
-			removeListener(curLevel, 'wallMove', this.handle);
-		},
-		hitBounds: function(lastY, gLocal, yMin, yMax){
-			
-			//possible this should just be for lower bounds
-			var tLeft = 1;
-			var unboundedY = lastY + this.v*tLeft + .5*gLocal*tLeft*tLeft;
-			var boundedY = Math.max(yMin, Math.min(yMax, unboundedY));
-			var discr = this.v*this.v + 2*gLocal*(boundedY-lastY);
-			if (boundedY==yMax){
-				
-				var tHit = (-this.v + Math.sqrt(discr))/gLocal;
-
-			}else if (boundedY==yMin){
-				
-				var tHit = (-this.v - Math.sqrt(discr))/gLocal;
-			}
-			this.v+=gLocal*tHit;
-			this.v*=-1;
-			tLeft-=tHit;
-			
-			if(-2*this.v< tLeft*gLocal && this.v<0){
-				var tBounce = Math.abs(2*this.v/gLocal);
-				var numBounces = Math.floor(tLeft/tBounce);
-				tLeft-=numBounces*tBounce;
-			}
-			var nextY = boundedY + this.v*tLeft + .5*gLocal*tLeft*tLeft;
-	 
-			
-			this.v += gLocal*tLeft;
-			
-			return nextY;
-		},
 	
 		border: function(wallPts, thickness, col, ptAdjusts){
 			this.bordered = true;
