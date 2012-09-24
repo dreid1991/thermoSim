@@ -335,10 +335,11 @@ LevelTools = {
 		//}	
 		//question.correct = false;
 		//question.isAnswered = false;
-		
+		question.label = defaultTo('', question.label);
 		var idText = this.getTextAreaId(questionIdx);
 		var boxText = defaultTo('Type your answer here.', question.text);
 		textBoxHTML += '<br>';
+		textBoxHTML += question.label;
 		textBoxHTML += "<textarea id='"+idText+"' rows='" +rows+ "' cols='" +cols+ "' placeholder='"+boxText+"'></textarea>";
 		if (question.units) {
 			textBoxHTML += question.units;

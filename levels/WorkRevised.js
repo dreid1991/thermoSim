@@ -18,7 +18,7 @@ _.extend(Work.prototype,
 	
 	declareBlocks: function(){
 		this.blocks=[
-		{
+		{//B0
 			setup:
 				function() {
 					currentSetupType = 'block';
@@ -27,7 +27,7 @@ _.extend(Work.prototype,
 					
 				},
 			prompts:[
-				{
+				{//P0
 					setup:undefined,
 					cutScene:true,
 					text:"Today we’re going to investigate how work transfers energy to a system.  First we’re going to develop the equations that describe a process on an adiabatic system. </p><p>If we compress the adiabatic system pictured to the right at a constant external pressure from state 1 to state 2, which of these described the work done?</p>",
@@ -44,7 +44,7 @@ _.extend(Work.prototype,
 						},
 					]
 				},
-				{
+				{//P1
 					setup:undefined,
 					cutScene:true,
 					text: "||EQ1BR<p>Indeed.  This equation tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p>||EQ5CE<p>For our adiabatic system, which of the following relations is correct, if we assume constant heat capacity?</p>",
@@ -63,7 +63,7 @@ _.extend(Work.prototype,
 				}
 			]
 		},
-		{
+		{//B1
 			setup: 
 				function() {
 					currentSetupType = 'block';
@@ -75,7 +75,7 @@ _.extend(Work.prototype,
 							
 				},
 			prompts:[//make comp arrow conditions be on prompt, not block
-				{
+				{//P0
 					setup:
 						function() {
 							currentSetupType = 'prompt';
@@ -89,13 +89,13 @@ _.extend(Work.prototype,
 						}
 					],
 				},
-				{
+				{//P1
 					setup:undefined,
 					text:"<p>So the molecules speed up when they collide with the moving wall.  Those collisions add kinetic energy, which means that the temperature increases.</p><p>Now let's do an experiment where we compress our adiabatic system.",
 				}
 			]
 		},
-		{
+		{//2
 			setup:
 				function() {
 					currentSetupType = 'block';
@@ -118,7 +118,7 @@ _.extend(Work.prototype,
 					//this.clamps.release()
 				},
 			prompts:[
-				{
+				{//P0
 					setup:
 						function() {
 							currentSetupType = 'prompt';
@@ -133,7 +133,7 @@ _.extend(Work.prototype,
 						}
 					],	
 				},
-				{
+				{//P1
 					setup:undefined,
 					text:"The system had an initial temperature of 200 K and contained 1.8 moles of an ideal monatomic gas.  You wrote that XXX kJ of work were done.  What final temperature should the system have had?",
 					quiz:[
@@ -149,7 +149,7 @@ _.extend(Work.prototype,
 				}
 			]
 		},
-		{
+		{//B3
 			setup:
 				function() {
 					currentSetupType = 'block';
@@ -162,7 +162,7 @@ _.extend(Work.prototype,
 											data:{x:walls[0].data.v, y:walls[0].data.t}});					
 				},
 			prompts:[
-				{
+				{//P0
 					setup:
 						function() {
 							this.blocks[2].prompts[0].setup.apply(this);
@@ -178,11 +178,36 @@ _.extend(Work.prototype,
 						[{oldStr:'XXX', newStr:'GET#userAnswerBlock2Prompt0Question0'},
 						{oldStr:'YYY', newStr:'GET#userAnswerBlock2Prompt1Question0'}
 						]
+				},
+				{//P1
+					setup: undefined,
+					cutScene:true,
+					text:"||EQ6CEIf you'll notice, the T vs. V graph is linear.  Using the equation above, find what its slope should should be with 1.8 moles of an ideal monatomic gas.  Do the slopes from the equation and from the graph match?  Given our P<sub>ext</sub>, should the slopes be linear or did something go wrong?",
+					quiz:[
+						{
+							type:'textSmall',
+							label:'Slope from graph:',
+							text:"",
+						},
+						{
+							type:'textSmall',
+							label:'Slope from equation:',
+							text:"",
+						},
+						{
+							type:'text',
+							label:'',
+							text:"Given the Pext, should these slopes be linear?",
+						}
+					],
+				},
+				{//P2
+					setup:undefined,
 				}
 			
 			]
 		},
-		{
+		{//B4
 			setup:
 				function() {
 					currentSetupType = 'block';
@@ -190,14 +215,25 @@ _.extend(Work.prototype,
 					this.graphs.tVSvLoad = getStore('tVSvblock3prompt0').load();
 				},
 			prompts:[
-				{
+				{//P0
 					setup:undefined,
 					cutScene:true,
 					text:"||EQ6CEIf you'll notice, the T vs. V graph is linear.  Using the equation above, find what its slope should should be with 1.8 moles of an ideal monatomic gas.  Do the slopes from the equation and from the graph match?  Given our P<sub>ext</sub>, should the slopes be linear or did something go wrong?",
 					quiz:[
 						{
+							type:'textSmall',
+							label:'Slope from graph:',
+							text:"",
+						},
+						{
+							type:'textSmall',
+							label:'Slope from equation:',
+							text:"",
+						},
+						{
 							type:'text',
-							text:"Type your answer here",
+							label:'',
+							text:"Given the Pext, should these slopes be linear?",
 						}
 					],
 				}							
