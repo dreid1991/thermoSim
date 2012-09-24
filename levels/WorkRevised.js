@@ -31,31 +31,35 @@ _.extend(Work.prototype,
 					setup:undefined,
 					cutScene:true,
 					text:"Today we’re going to investigate how work transfers energy to a system.  First we’re going to develop the equations that describe a process on an adiabatic system. </p><p>If we compress the adiabatic system pictured to the right at a constant external pressure from state 1 to state 2, which of these described the work done?</p>",
-					quiz:{	
-						type:'multChoice',
-						options:
-							[
-							{text:"||EQ2||", isCorrect: false, message:"Which P should you be using?"},
-							{text:"||EQ3||", isCorrect: false, message:"Yeah, but you won't do no work with constant volume in this system."},
-							{text:"||EQ1||", isCorrect: true},
-							{text:"||EQ4||", isCorrect: false, message:"Do your units work out?"}
-						]
-					},
+					quiz:[
+						{	
+							type:'multChoice',
+							options:
+								[
+								{text:"||EQ2||", isCorrect: false, message:"Which P should you be using?"},
+								{text:"||EQ3||", isCorrect: false, message:"Yeah, but you won't do no work with constant volume in this system."},
+								{text:"||EQ1||", isCorrect: true},
+								{text:"||EQ4||", isCorrect: false, message:"Do your units work out?"}
+							]
+						},
+					]
 				},
 				{
 					setup:undefined,
 					cutScene:true,
 					text: "||EQ1BR<p>Indeed.  This equation tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p>||EQ5CE<p>For our adiabatic system, which of the following relations is correct, if we assume constant heat capacity?</p>",
-					quiz:{	
-						type:'multChoice',
-						options:
-							[
-							{text:"||EQ8||", isCorrect: false, message:"But it's adiabatic!"},
-							{text:"||EQ6||", isCorrect: true},
-							{text:"||EQ7||", isCorrect: false, message:"Why Cp?"},
-							{text:"It cannot be simplified", isCorrect: false, message:"Yes it can.  What is Q equal to for an adiabatic system?"}
-						]
-					},			
+					quiz:[
+						{	
+							type:'multChoice',
+							options:
+								[
+								{text:"||EQ8||", isCorrect: false, message:"But it's adiabatic!"},
+								{text:"||EQ6||", isCorrect: true},
+								{text:"||EQ7||", isCorrect: false, message:"Why Cp?"},
+								{text:"It cannot be simplified", isCorrect: false, message:"Yes it can.  What is Q equal to for an adiabatic system?"}
+							]
+						}
+					],				
 				}
 			]
 		},
@@ -70,15 +74,20 @@ _.extend(Work.prototype,
 					spcs['spc4'].populate(P(45,235), V(460, 100), 1, 600);
 					this.tempListener = new StateListener({dataList:walls[0].data.t, is:'notEqualTo', targetVal:dataHandler.temp(), alertUnsatisfied:"Try hitting the molecule with the wall while the wall's moving"});			
 				},
-			prompts:[
+			prompts:[//make comp arrow conditions be on prompt, not block
 				{
 					setup:undefined,
 					text:"<center>||EQ6||</center>From the equation above we see that temperature increases as we do work by decreasing volume.  Temperature is an expression is molecular kinetic energy, so as the system is compressed, the molecules must speed up.  These ideal gas molecules can be thought of as perfectly elastic bouncy balls.  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?",
-					quiz:{	
-						type:'text',
-						text:'Type your answer here',
-						//NEED TO STORE ANSWER
-					},
+					quiz:[
+						{	
+							type:'text',
+							text:'Type your answer here',
+						},
+						{
+							type:'text',
+							text:"I'm subservent",
+						}
+					],
 				},
 				{
 					setup:undefined,
@@ -105,8 +114,8 @@ _.extend(Work.prototype,
 					this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, makeSlider:false});
 					walls[0].displayPExt();
 					this.borderStd({min:30});
-					this.clamps = new Clamps({clampee:this.dragWeights, clamps:[{vol:13}, {vol:10}]});
-					this.clamps.release()
+					//this.clamps = new Clamps({clampee:this.dragWeights, clamps:[{vol:13}, {vol:10}]});
+					//this.clamps.release()
 				},
 			prompts:[
 				{
@@ -116,22 +125,27 @@ _.extend(Work.prototype,
 							this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:10, alertUnsatisfied:'Compress the system!', cleanUpWith:currentSetupType});						
 						},
 					text:"Above is a well insulated piston cylinder assembly.  Place the block on top of the poston and observe the response.  How much work did you do on the system?",
-					quiz:{	
-						type:'textSmall',
-						units:'kJ',
-						text:'',
-					},	
+					quiz:[
+						{	
+							type:'textSmall',
+							units:'kJ',
+							text:'',
+						}
+					],	
 				},
 				{
 					setup:undefined,
 					text:"The system had an initial temperature of 200 K and contained 1.8 moles of an ideal monatomic gas.  You wrote that XXX kJ of work were done.  What final temperature should the system have had?",
-					quiz:{	
-						type:'textSmall',
-						units:'K',
-						text:'',
-					},
+					quiz:[
+						{	
+							type:'textSmall',
+							units:'K',
+							text:'',
+						}
+					],
 					replace: 
-						[{oldStr:'XXX', newStr:'GET#userAnswerBlock2Prompt0'}]
+						[{oldStr:'XXX', newStr:'GET#userAnswerBlock2Prompt0Question0'}]
+					
 				}
 			]
 		},
@@ -154,13 +168,15 @@ _.extend(Work.prototype,
 							this.blocks[2].prompts[0].setup.apply(this);
 						},
 					text:"Previously you answered that the compression did XXXkJ on the system for a final temperature of YYYK.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
-					quiz:{
-						type:'text',
-						text:"Type your answer here",
-					},
+					quiz:[
+						{
+							type:'text',
+							text:"Type your answer here",
+						}
+					],
 					replace:
-						[{oldStr:'XXX', newStr:'GET#userAnswerBlock2Prompt0'},
-						{oldStr:'YYY', newStr:'GET#userAnswerBlock2Prompt1'}
+						[{oldStr:'XXX', newStr:'GET#userAnswerBlock2Prompt0Question0'},
+						{oldStr:'YYY', newStr:'GET#userAnswerBlock2Prompt1Question0'}
 						]
 				}
 			
@@ -178,16 +194,20 @@ _.extend(Work.prototype,
 					setup:undefined,
 					cutScene:true,
 					text:"||EQ6CEIf you'll notice, the T vs. V graph is linear.  Using the equation above, find what its slope should should be with 1.8 moles of an ideal monatomic gas.  Do the slopes from the equation and from the graph match?  Given our P<sub>ext</sub>, should the slopes be linear or did something go wrong?",
-					quiz:{
-						type:'text',
-						text:"Type your answer here",
-					},
+					quiz:[
+						{
+							type:'text',
+							text:"Type your answer here",
+						}
+					],
 				}							
 			]
 		}
 		
 		]
+		
 	}
+
 }
 	
 )

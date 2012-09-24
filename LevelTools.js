@@ -4,6 +4,7 @@ LevelTools = {
 		this.addEqs();
 		this.setDefaultPromptVals()
 		this.graphs = {};
+		this.quiz = [];
 		this.eUnits = 'kJ';
 		this.bgCol = Col(5, 17, 26);
 		this.wallCol = Col(255,255,255);
@@ -27,14 +28,19 @@ LevelTools = {
 				var quiz = prompt.quiz;
 				if(title){prompt.title = addEqs(title);}
 				if(text){prompt.text = addEqs(text);}
-				if(quiz && quiz.options){
-					for(optionIdx=0; optionIdx<quiz.options.length; optionIdx++){
-						var option = quiz.options[optionIdx];
-						for(optionElement in option){
-							var element = option[optionElement];
-							if(typeof(element)=='string'){
-								option[optionElement] = addEqs(element);
-							}						
+				if (quiz) {
+					for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
+						var question = quiz[questionIdx];
+						if (question.options){
+							for (optionIdx=0; optionIdx<question.options.length; optionIdx++) {
+								var option = question.options[optionIdx];
+								for (optionElement in option) {
+									var element = option[optionElement];
+									if (typeof(element)=='string') {
+										option[optionElement] = addEqs(element);
+									}						
+								}
+							}
 						}
 					}
 				}
@@ -58,7 +64,7 @@ LevelTools = {
 	checkWallHits: function(){
 		walls.check();
 	},
-	cutSceneStart: function(text, mode, quiz){
+	cutSceneStart: function(text, mode, quiz) {
 		addListener(curLevel, 'promptCleanUp', 'endCutScene',
 			function() {
 				this.cutSceneEnd()
@@ -71,48 +77,108 @@ LevelTools = {
 		
 		this.pause();
 		$('#dashRun').hide();
-		if(mode===true && !quiz){
+		if (mode===true && !quiz) {
 			$('#dashCutScene').show();
-			$('#intText').html(text);
+			this.cutSceneText.html(text);
 			$('#prompt').html('');
-		}else if(mode=='intro'){
+		} else if (mode=='intro') {
 			$('#dashIntro').show();
 			$('#base').hide();
-			$('#intText').html(text);
-		}else if(mode=='outro'){
+			this.cutSceneText.html(text);
+		} else if (mode=='outro') {
 			$('#dashOutro').show();
 			$('#base').hide();
-			$('#intText').html(text);
-		}else if(quiz){
+			this.cutSceneText.html(text);
+		} else if (quiz) {
 			$('#dashCutScene').show();
 			$('#base').hide();
-			this.appendQuiz(text, quiz, 'intText');
-			
+			this.cutSceneText(text);
+			this.appendQuiz(quiz, 'intText');
 		}
-		/*Hey, so if there's a quiz, I want to just pass the text along to the quiz handlers
-		so if I do quiz stuff not in the cutscene, I want the text handling to be done the same way.
-		Having two things capable of doing that seems weird
-		
-		*/
 		$('#canvasDiv').hide();
 		$('#display').show();
 
-		$('#intText').show();
+		this.cutSceneDivShow();
 		
 	},
-	appendQuiz: function(text, quiz, appendTo){
-		if(quiz.type == 'buttons') {
-			this.appendButtons(text, quiz, appendTo)
-		} else if (quiz.type == 'multChoice') {
-			this.appendMultChoice(text, quiz, appendTo);
-		} else if (quiz.type == 'text') {
-			this.appendTextBox(text, quiz, appendTo, 3, 60);
-		} else if (quiz.type == 'textSmall') {
-			this.appendTextBox(text, quiz, appendTo, 1, 6);
+	appendQuiz: function(quiz, appendTo) {
+		var makeSubmitButton = false;
+		this.quiz = new Array(quiz.length);
+		this.quiz.allAnswered = function() {
+			for (var qIdx=0; qIdx<this.length; qIdx++) {
+				if (!this[qIdx].isAnswered) {
+					return 0;
+				}
+			}
+			return 1;
 		}
+		for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
+			var question = quiz[questionIdx];
+			if (question.type == 'text' || question.type == 'textSmall') {
+				makeSubmitButton = true;
+			}
+			this.appendQuestion(question, appendTo, questionIdx, appendTo);
+		}
+		//Okay, this quiz structure needs work
+		if (makeSubmitButton) {
+			this.makeSubmitButton(appendTo);
+		}
+		$('button').button();
+	},
+	makeSubmitButton: function(appendTo) {
+		var self = this;
+		var onclickSubmit = function() {
+			for (var questionIdx=0; questionIdx<self.quiz.length; questionIdx++) {
+				var question = self.quiz[questionIdx];
+				if (question.type=='text' || question.type=='textSmall') {
+					var id = self.getTextAreaId(questionIdx);
+					var submitted = $('#'+id).val();
+					if (submitted.killWhiteSpace()!='') {
+						store('userAnswerBlock'+blockIdx+'Prompt'+promptIdx+'Question'+questionIdx, submitted);
+						question.answerText(submitted);
+						question.isAnswered = true;
+						if (question.answer) {
+							if (fracDiff(parseFloat(question.answer), parseFloat(submitted))<.05){
+								question.answerIs(true);
+							} else {
+								question.answerIs(false);
+							}
+						} else {
+							question.answerIs(true);
+						}
+					} else {
+						alert("You haven't answered all the questions");
+					}
+				}
+			
+			}
+			//Hey - am not finished making it so you can cleany mix type of questions yet
+			nextPrompt();
+		}
+		var idButton = 'textAreaSubmit';
+		submitHTML = "<table border=0><tr><td width=75%></td><td><button id='" + idButton + "' class='noSelect'>Submit</button></td></tr></table>";
+		$('#'+appendTo).html($('#'+appendTo).html() + submitHTML);
+		buttonBind(idButton, onclickSubmit);
+	},
+	appendQuestion: function(question, appendTo, questionIdx, appendTo){
+		question.answered = false;
+		question.correct = false;
+		if (question.type == 'buttons') {
+			this.appendButtons(question, appendTo, questionIdx);
+		} else if (question.type == 'multChoice') {
+			this.appendMultChoice(question, appendTo, questionIdx);
+		} else if (question.type == 'text') {
+			this.appendTextBox(question, appendTo, 3, 60, question.units, questionIdx);
+		} else if (question.type == 'textSmall') {
+			this.appendTextBox(question, appendTo, 1, 6, question.units, questionIdx);
+		}
+		this.quiz[questionIdx] = question;
+	},
+	cutSceneDivShow: function() {
+		$('#intText').show();
 	},
 	cutSceneText: function(text){
-		$('#intText').html(text);
+		$('#intText').html(text);//is this used?
 	},
 	cutSceneEnd: function(){
 		this.inCutScene = false;
@@ -156,97 +222,100 @@ LevelTools = {
 	options:list of buttons with: 	buttonId, text, isCorrect
 			can have: 				func, message
 	*/
-	appendButtons: function(text, quiz, appendTo){
+	appendButtons: function(question, appendTo, questionIdx){
 		var buttonHTML = '';
-		var buttons = quiz.options;
-		buttonHTML += defaultTo('', text);
+		//Hey - you are setting attrs of the question object.  This will alter the thing the blocks declaration.  I think that is okay, just letting you know
+		question.answerIs = function(correct) {
+			question.correct = correct;
+		}
+		question.isAnswered = false;
+		question.isCorrect = function() {
+			return question.correct;
+		}
+		var buttons = question.options;
 		buttonHTML += "<br><center><table border='0'><tr>";
+		var ids = new Array(buttons.length);
 		for (var buttonIdx=0; buttonIdx<buttons.length; buttonIdx++){
 			var button = buttons[buttonIdx];
-			buttonHTML += "<td><button id='" + defaultTo(button.text.killWhiteSpace(), button.buttonId) + "' class='noSelect'>" + button.text + "</button></td>"
+			ids[buttonIdx] = defaultTo('question' + questionIdx + 'option' + buttonIdx, button.buttonId);
+			buttonHTML += "<td><button id='" + ids[buttonIdx] + "' class='noSelect'>" + button.text + "</button></td>"
 		}
 		buttonHTML += "</tr></table></center>";
 		$('#'+appendTo).html($('#intText').html() + buttonHTML);
-		$('button').button();
-		this.attachButtonListeners(buttons);
+		this.bindButtonListeners(question, buttons, ids);
 	},
-	attachButtonListeners: function(buttons){
+	bindButtonListeners: function(question, buttons, ids){
 		for (var buttonIdx=0; buttonIdx<buttons.length; buttonIdx++){
 			var button = buttons[buttonIdx];
-			this.attachButtonListener(button);
+			this.bindButtonListener(question, button, ids[buttonIdx]);
 
 		}		
 	},
-	attachButtonListener: function(button){
-		var id = defaultTo(button.text.killWhiteSpace(), button.buttonId);
-		var func = defaultTo(function(){}, button.func);
-		if(button.message){
-			func = extend(func, function(){alert(button.message)});
-		}
-		if (button.response) {
-			store('block'+blockIdx+'Prompt'+promptIdx + 'Response', button.response);
-		}
-		if(button.isCorrect){
-			func = extend(func, function(){nextPrompt(true)});
-		}
-		condFunc = 
-			function(){
-				if (checkWillAdvance()) {
-					if (condResults.alert) {
-						alert(condResults.alert);
-					}
-					func.apply(curLevel);
-				}
+	bindButtonListener: function(question, button, id){
+		var onclickFunc = function() {
+			if (button.message) {
+				alert(button.message);
 			}
-		buttonBind(id, condFunc);		
+			if (button.response) {
+				store('block'+blockIdx+'Prompt'+promptIdx + 'Response', button.response);
+			}
+			if (button.func) {
+				button.func();
+			}
+			question.isAnswered = true;
+			question.answerIs(button.isCorrect);
+			nextPrompt();		
+		}
+
+		buttonBind(id, onclickFunc);		
 	},
 	/*
 	type: 'multChoice'
-	list of options wit:	 text, isCorrect
+	list of options with:	 text, isCorrect
 	each option can have:	 message
 	*/
-	appendMultChoice: function(text, quiz, appendTo){
-		var options = quiz.options
+	appendMultChoice: function(question, appendTo, questionIdx){
+		question.answerIs = function(correct) {
+			question.correct = correct;
+		}
+		question.isCorrect = function() {
+			return question.correct;
+		}		
+		var options = question.options
 		var multChoiceHTML = "";
-		multChoiceHTML += defaultTo('', text);
-		multChoiceHTML += "<p></p><table width=100%<tr><td width=10%></td><td>";
-		var idOptionPairs = new Array(options.length);
+		multChoiceHTML += "<br><table width=100%<tr><td width=10%></td><td>";
+		var ids = new Array(options.length);
 		for (var optionIdx=0; optionIdx<options.length; optionIdx++){
 			var option = options[optionIdx];
 			var divId = optionIdx;
-			var uniqueTag = 0
-			//while($('#response ' +divId + 'tag' +uniqueTag)){
-			//	uniqueTag++;
-			//}
-			divId = 'response' + divId + 'tag' + uniqueTag;
-			multChoiceHTML += "<div id='"+divId+"' class='multChoiceBlock'>"+option.text+"</div>";
-			idOptionPairs[optionIdx] = {id:divId, option:option};
+			ids[optionIdx] = 'question' + questionIdx + 'option' + optionIdx;
+			multChoiceHTML += "<div id='"+ids[optionIdx]+"' class='multChoiceBlock'>"+option.text+"</div>";
 		}
 		$('#'+appendTo).html($('#'+appendTo).html() + multChoiceHTML);
-		this.bindMultChoiceFuncs(idOptionPairs);
+		this.bindMultChoiceFuncs(question, options, ids);
 	},
-	bindMultChoiceFuncs: function(idOptionPairs){
-		for (var optionIdx=0; optionIdx<idOptionPairs.length; optionIdx++){
-			var id = idOptionPairs[optionIdx].id;
-			var option = idOptionPairs[optionIdx].option;
-			this.bindMultChoiceFunc(id, option);
+	bindMultChoiceFuncs: function(question, options, ids){
+		for (var optionIdx=0; optionIdx<options.length; optionIdx++) {
+			this.bindMultChoiceFunc(question, options[optionIdx], ids[optionIdx]);
 		}
 	},
-	bindMultChoiceFunc: function(id, option){
-		var checkFunc = function(){
-			if(checkWillAdvance()){
-				if (option.message) {
-					alert(option.message);
-				}
-				if (option.response) {
-					store('block'+blockIdx+'Prompt'+promptIdx + 'Response', option.response);
-				}
-				if (option.isCorrect) {
-					nextPrompt(true);
-				}
+	bindMultChoiceFunc: function(question, option, id){
+		var onclickFunc = function() {
+			if (option.message) {
+				alert(option.message);
 			}
+			if (option.response) {
+				store('block'+blockIdx+'Prompt'+promptIdx + 'Response', option.response);
+			}
+			if (option.func) {
+				option.func();
+			}
+			question.answerIs(option.isCorrect);
+			question.isAnswered = true;
+			//do something to accomidate multiple questions at some point.  Not likely to have multiple now
+			nextPrompt();
 		}
-		$('#'+id).click(checkFunc);
+		$('#'+id).click(onclickFunc);
 		$('#'+id).hover(
 			function(){$(this).css('background-color', hoverCol.hex)}, 
 			function(){$(this).css('background-color', 'transparent')}
@@ -256,45 +325,31 @@ LevelTools = {
 	type: 'text'
 	can have:			text, messageRight, messageWrong, answer, units
 	*/
-	appendTextBox: function(text, quiz, appendTo, rows, cols, units){
+	appendTextBox: function(question, appendTo, rows, cols, units, questionIdx){
 		var textBoxHTML = '';
-		var boxText = defaultTo('Type your answer here.', quiz.text);
-		textBoxHTML += text;
-		textBoxHTML += '<br>';
-		textBoxHTML += "<textarea id='answerTextArea' rows='" +rows+ "' cols='" +cols+ "' placeholder='"+boxText+"'></textarea>";
-		if (quiz.units) {
-			textBoxHTML += quiz.units;
+		question.answerIs = function(correct) {
+			question.correct = correct;
 		}
-		textBoxHTML += "<table border=0><tr><td width=75%></td><td><button id='textAreaSubmit' class='noSelect'>Submit</button></td></tr></table>";
-		var checkFunc = function() {
-			if (checkWillAdvance()) {
-				var submitted = $('#answerTextArea').val();
-				if (submitted != '') {
-					if (quiz.answer) {
-						if(fracDiff(parseFloat(quiz.answer), parseFloat(submitted))<.05){
-							if(quiz.messageRight){
-								alert(quiz.messageRight);
-							}
-							store('userAnswerBlock'+blockIdx+'Prompt'+promptIdx, submitted);
-							nextPrompt(true);
-						}else{
-							if(quiz.messageWrong){
-								alert(quiz.messageWrong);
-							}
-						}
-					}else{
-						store('userAnswerBlock'+blockIdx+'Prompt'+promptIdx, submitted);
-						nextPrompt(true);
-					}
-					 
-				} else {
-					alert("You haven't written an answer!");
-				}
-			}
+		question.answerText = function(text) {
+			question.answerTextSubmitted = text;
+		}
+		question.isCorrect = function() {
+			return question.correct;
+		}	
+		question.correct = false;
+		question.isAnswered = false;
+		
+		var idText = this.getTextAreaId(questionIdx);
+		var boxText = defaultTo('Type your answer here.', question.text);
+		textBoxHTML += '<br>';
+		textBoxHTML += "<textarea id='"+idText+"' rows='" +rows+ "' cols='" +cols+ "' placeholder='"+boxText+"'></textarea>";
+		if (question.units) {
+			textBoxHTML += question.units;
 		}
 		$('#'+appendTo).html($('#'+appendTo).html() + textBoxHTML);
-		$('button').button();
-		buttonBind('textAreaSubmit', checkFunc);
+	},
+	getTextAreaId: function(idx) {
+		return 'textArea' + idx;
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();
@@ -447,6 +502,7 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		this.promptConditionListeners = {listeners:{}, save:{}};
 		this.blockCleanUpListeners = {listeners:{}, save:{}};
 		this.promptCleanUpListeners = {listeners:{}, save:{}};
+		this.quizListeners = {listeners:{}, save:{}};
 	},
 	reset: function(){
 		showPrompt(blockIdx, promptIdx, true);		

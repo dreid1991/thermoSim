@@ -1,6 +1,5 @@
 To do:
 in Work: I changed atm to bar without changing any values like mass or whatever.  Reccomend checking values
-should probably make conditions and remove be addable to prompt instead of block of specified
 
 MAKE RMS BE CONSISTANTLY GOTTEN - currently you have the dot speed function which uses pxToMS and the 3/2kT = 1/2mv^2 way.  NOT OKAY
 OR - just calculate px to ms based on the 3/2kt stuff and v->t conversion (tconst I guess)
@@ -12,11 +11,6 @@ Change equation CE to something that matches well with BR, LIKE /P?
 in ideal gas eqs: boltzmann constant: K -> K_{b}
 
 URISC FINAL REPORT BY SEPT 28th
-
-
-
-make appendLastAns or something
-	could just manually throw in last answer. w/e
 
 Clear up how walls border and extend border 
 
@@ -39,3 +33,11 @@ add on to end
 Now we'll look at expanding the same system, calculate work
 
 make saveState function 
+
+
+For quizes - make make it so once a question is answered correctly, that is stored so you can have multiple multipe choice questions
+make bg stay colored once correct answer selected for question
+
+make rms extend Math
+
+accomidate multiple questions for mult choice, buttons

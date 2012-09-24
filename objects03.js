@@ -37,10 +37,15 @@ _.extend(Clamps.prototype, objectFuncs, {
 	sortClamps: function() {
 		//sorting for low y's at beginning of list;
 		for (var i=0; i<this.clamps.length; i++) {
+			var switched = false;
 			for (var j=0; j<this.clamps.length-1; j++) {
 				if (this.clamps[j].y>this.clamps[j+1].y) {
 					this.clamps.switchElements(j, j+1);
+					switched = true;
 				}
+			}
+			if (!switched) {
+				break;
 			}
 		}
 	},

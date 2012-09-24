@@ -147,36 +147,20 @@ function removeSpecies(toRem){
 
 
 function changeTemp(info, newTemp){
-	if (!info){
-		for(var spc in spcs){
-			var dots = spcs[spc];
-			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
-				dots[dotIdx].setTemp(newTemp);
-			}
-		}
-	} else {
-		for (var filter in info) {};
-		for (var spc in spcs) {
-			var dots = spcs[spc];
-			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
-				if (dots[dotIdx][filter] == info[filter]){
-					dots[dotIdx].setTemp(newTemp);
-				}
-			}
-		}	
+	var dots = dotManager.get(info);
+	for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
+		dots[dotIdx].setTemp(newTemp);
 	}
 }
+
 function changeRMS(info, newRMS){
-	info = defaultTo({}, info);
+	var dots = dotManager.get(info);
 	var spcName = info.spcName;
 	var tag = info.tag;
-	var dots = spcs[spcName];
 	var curRMS = rms(dataHandler.velocities(info));
 	var ratio = newRMS/curRMS;
-	//HEY - MAKE THIS WORK FOR TAG
 	for (var dotIdx=0; dotIdx<dots.length; dotIdx++){
-		var dot = dots[dotIdx];
-		dot.v.mult(ratio);
+		dots[dotIdx].v.mult(ratio);
 	}
 }
 
@@ -189,7 +173,7 @@ function VToTemp(mass, v){
 	return .5*mass*v*v*tConst;
 }
 function returnEscapist(dot){
-	returnTo = defaultTo('0', dot.returnTo);
+	returnTo = defaultTo(0, dot.returnTo);
 	var pt1 = walls[returnTo][0];
 	var pt2 = walls[returnTo][1];
 	var UV = walls[returnTo].wallUVs[0];	
@@ -227,7 +211,7 @@ function unique(name, obj){
 			return name+uniqueId;		
 		}
 	} else {
-		if(!obj[name]){
+		if (!obj[name]) {
 			return name;
 		} else {
 			var uniqueId = 1;
@@ -524,8 +508,6 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 				removeListenerByName(curLevel, 'update', 'animText');
 			},
 		this);
-		blockIdx = newBlockIdx;
-		promptIdx = newPromptIdx;
 	}
 	if (newPrompt.setup) {
 		newPrompt.setup.apply(curLevel)
@@ -536,20 +518,23 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 	if (!newPrompt.quiz) {
 		$('#nextPrevDiv').show();
 	}
-	if (!newPrompt.cutScene) {	
+	curLevel.quiz = [];
+	if (newPrompt.cutScene) {	
+		curLevel.cutSceneStart(newPrompt.text, newPrompt.cutScene, newPrompt.quiz)
+	} else {
 		if (newPrompt.quiz) {
 			var quiz = newPrompt.quiz;
 			$('#nextPrevDiv').hide();
-			$('#prompt').html('');
-			curLevel.appendQuiz(newPrompt.text, newPrompt.quiz, 'prompt')
+			$('#prompt').html(defaultTo('', newPrompt.text));
+			curLevel.appendQuiz(newPrompt.quiz, 'prompt')
 		} else {
 			$('#prompt').html(newPrompt.text);
 		}
-	} else {
-		curLevel.cutSceneStart(newPrompt.text, newPrompt.cutScene, newPrompt.quiz)
 	}
 	$('#baseHeader').html(newPrompt.title);
 
+	blockIdx = newBlockIdx;
+	promptIdx = newPromptIdx;
 }
 
 function nextPrompt(forceAdvance){
@@ -567,8 +552,6 @@ function nextPrompt(forceAdvance){
 		}
 		var nextIdxs = getNextIdxs()
 		showPrompt(nextIdxs.newBlockIdx, nextIdxs.newPromptIdx);
-		blockIdx = nextIdxs.newBlockIdx;
-		promptIdx = nextIdxs.newPromptIdx;
 		return true;
 	}
 	return false;
@@ -608,39 +591,56 @@ function checkWillAdvance() {
 	var nextIdxs = getNextIdxs();
 	var newBlockIdx = nextIdxs.newBlockIdx;
 	var newPromptIdx = nextIdxs.newPromptIdx;
+	var willAdvance = 1;
+	willAdvance = Math.min(willAdvance, checkWillAdvanceConditions(newBlockIdx, newPromptIdx));
+	willAdvance = Math.min(willAdvance, checkWillAdvanceQuiz());
+	return willAdvance;
+}
+
+function checkWillAdvanceConditions(newBlockIdx, newPromptIdx){
+
 	var changingBlock = blockIdx!=newBlockIdx;
-	var willAdvance = 0;
+	var conditionsMet = 0;
 	var curPrompt = defaultTo({}, curLevel.blocks[blockIdx].prompts[promptIdx]);
 	var curFinished = defaultTo(false, curPrompt.finished);
 	
-	willAdvance = Math.max(willAdvance, curFinished);
-	if (!willAdvance) {
+	conditionsMet = Math.max(conditionsMet, curFinished);
+	if (!conditionsMet) {
 		var promptResults = curLevel.promptConditions();
 		if (promptResults.didWin) {
 			if (changingBlock) {
 				var blockResults = curLevel.blockConditions();
 				if (blockResults.didWin) {
-					willAdvance = 1;
+					conditionsMet = 1;
 				} else {
-					willAdvance = 0;
+					conditionsMet = 0;
 					alertValid(blockResults.alert);
 				}
 			} else {
-				willAdvance = 1;
+				conditionsMet = 1;
 			}
 		} else {
-			willAdvance = 0;
+			conditionsMet = 0;
 			alertValid(promptResults.alert);
 		}
 	}
-	return willAdvance;
+	return conditionsMet;
+}
+
+function checkWillAdvanceQuiz(){
+	//isCorrect will alert for wrong answers and maybe for no answer (if text box, I guess)
+	var allCorrect = 1;
+	var quiz = curLevel.quiz;
+	for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
+		var question = quiz[questionIdx];
+		allCorrect = Math.min(allCorrect, question.isCorrect());
+	}
+	return allCorrect;
 }
 
 function prevPrompt(){
 	var prevIdxs = getPrevIdxs();
 	showPrompt(prevIdxs.newBlockIdx, prevIdxs.newPromptIdx);
-	blockIdx = prevIdxs.newBlockIdx;
-	promptIdx = prevIdxs.newPromptIdx;
 }
 
 
