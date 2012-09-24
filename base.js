@@ -593,7 +593,9 @@ function checkWillAdvance() {
 	var newPromptIdx = nextIdxs.newPromptIdx;
 	var willAdvance = 1;
 	willAdvance = Math.min(willAdvance, checkWillAdvanceConditions(newBlockIdx, newPromptIdx));
-	willAdvance = Math.min(willAdvance, checkWillAdvanceQuiz());
+	if (willAdvance) {
+		willAdvance = Math.min(willAdvance, checkWillAdvanceQuiz());
+	}
 	return willAdvance;
 }
 

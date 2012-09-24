@@ -139,15 +139,16 @@ LevelTools = {
 						question.isAnswered = true;
 						if (question.answer) {
 							if (fracDiff(parseFloat(question.answer), parseFloat(submitted))<.05){
-								question.answerIs(true);
+								question.answerIs = true;
 							} else {
-								question.answerIs(false);
+								question.answerIs = false;
 							}
 						} else {
-							question.answerIs(true);
+							question.answerIs = true;
 						}
 					} else {
-						alert("You haven't answered all the questions");
+						question.answerIs false;
+						question.isAnswered = false
 					}
 				}
 			
@@ -225,9 +226,7 @@ LevelTools = {
 	appendButtons: function(question, appendTo, questionIdx){
 		var buttonHTML = '';
 		//Hey - you are setting attrs of the question object.  This will alter the thing the blocks declaration.  I think that is okay, just letting you know
-		question.answerIs = function(correct) {
-			question.correct = correct;
-		}
+		question.answerIs = false;
 		question.isAnswered = false;
 		question.isCorrect = function() {
 			return question.correct;
@@ -263,7 +262,7 @@ LevelTools = {
 				button.func();
 			}
 			question.isAnswered = true;
-			question.answerIs(button.isCorrect);
+			question.answerIs = button.isCorrect;
 			nextPrompt();		
 		}
 
@@ -275,9 +274,7 @@ LevelTools = {
 	each option can have:	 message
 	*/
 	appendMultChoice: function(question, appendTo, questionIdx){
-		question.answerIs = function(correct) {
-			question.correct = correct;
-		}
+		question.answerIs = false;
 		question.isCorrect = function() {
 			return question.correct;
 		}		
@@ -310,7 +307,7 @@ LevelTools = {
 			if (option.func) {
 				option.func();
 			}
-			question.answerIs(option.isCorrect);
+			question.answerIs = option.isCorrect;
 			question.isAnswered = true;
 			//do something to accomidate multiple questions at some point.  Not likely to have multiple now
 			nextPrompt();
@@ -327,9 +324,7 @@ LevelTools = {
 	*/
 	appendTextBox: function(question, appendTo, rows, cols, units, questionIdx){
 		var textBoxHTML = '';
-		question.answerIs = function(correct) {
-			question.correct = correct;
-		}
+		question.answerIs = false;
 		question.answerText = function(text) {
 			question.answerTextSubmitted = text;
 		}
@@ -502,7 +497,6 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		this.promptConditionListeners = {listeners:{}, save:{}};
 		this.blockCleanUpListeners = {listeners:{}, save:{}};
 		this.promptCleanUpListeners = {listeners:{}, save:{}};
-		this.quizListeners = {listeners:{}, save:{}};
 	},
 	reset: function(){
 		showPrompt(blockIdx, promptIdx, true);		

@@ -72,11 +72,15 @@ _.extend(Work.prototype,
 					this.borderStd({min:30});
 					this.compArrow = new CompArrow({mode:'adiabatic', speed:1.5});
 					spcs['spc4'].populate(P(45,235), V(460, 100), 1, 600);
-					this.tempListener = new StateListener({dataList:walls[0].data.t, is:'notEqualTo', targetVal:dataHandler.temp(), alertUnsatisfied:"Try hitting the molecule with the wall while the wall's moving"});			
+							
 				},
 			prompts:[//make comp arrow conditions be on prompt, not block
 				{
-					setup:undefined,
+					setup:
+						function() {
+							currentSetupType = 'prompt';
+							this.tempListener = new StateListener({dataList:walls[0].data.t, is:'notEqualTo', targetVal:dataHandler.temp(), alertUnsatisfied:"Try hitting the molecule with the wall while the wall's moving"});	
+						},
 					text:"<center>||EQ6||</center>From the equation above we see that temperature increases as we do work by decreasing volume.  Temperature is an expression is molecular kinetic energy, so as the system is compressed, the molecules must speed up.  These ideal gas molecules can be thought of as perfectly elastic bouncy balls.  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?",
 					quiz:[
 						{	
