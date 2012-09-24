@@ -139,15 +139,15 @@ LevelTools = {
 						question.isAnswered = true;
 						if (question.answer) {
 							if (fracDiff(parseFloat(question.answer), parseFloat(submitted))<.05){
-								question.answerIs = true;
+								question.correct = true;
 							} else {
-								question.answerIs = false;
+								question.correct = false;
 							}
 						} else {
-							question.answerIs = true;
+							question.correct = true;
 						}
 					} else {
-						question.answerIs false;
+						question.correct = false;
 						question.isAnswered = false
 					}
 				}
@@ -218,6 +218,9 @@ LevelTools = {
 		loadListener(this, 'mouseup');
 		loadListener(this, 'mousemove');
 	},
+	questionIsCorrect: function() {
+		return this.correct;
+	},
 	/*
 	type: 'buttons'
 	options:list of buttons with: 	buttonId, text, isCorrect
@@ -226,11 +229,10 @@ LevelTools = {
 	appendButtons: function(question, appendTo, questionIdx){
 		var buttonHTML = '';
 		//Hey - you are setting attrs of the question object.  This will alter the thing the blocks declaration.  I think that is okay, just letting you know
-		question.answerIs = false;
 		question.isAnswered = false;
-		question.isCorrect = function() {
-			return question.correct;
-		}
+		question.isCorrect = this.questionIsCorrect;//function() {
+			//return question.correct;
+		//}
 		var buttons = question.options;
 		buttonHTML += "<br><center><table border='0'><tr>";
 		var ids = new Array(buttons.length);
@@ -262,7 +264,7 @@ LevelTools = {
 				button.func();
 			}
 			question.isAnswered = true;
-			question.answerIs = button.isCorrect;
+			question.correct = button.isCorrect;
 			nextPrompt();		
 		}
 
@@ -275,9 +277,9 @@ LevelTools = {
 	*/
 	appendMultChoice: function(question, appendTo, questionIdx){
 		question.answerIs = false;
-		question.isCorrect = function() {
-			return question.correct;
-		}		
+		question.isCorrect = this.questionIsCorrect;//function() {
+			//return question.correct;
+		//}		
 		var options = question.options
 		var multChoiceHTML = "";
 		multChoiceHTML += "<br><table width=100%<tr><td width=10%></td><td>";
@@ -307,7 +309,7 @@ LevelTools = {
 			if (option.func) {
 				option.func();
 			}
-			question.answerIs = option.isCorrect;
+			question.correct = option.isCorrect;
 			question.isAnswered = true;
 			//do something to accomidate multiple questions at some point.  Not likely to have multiple now
 			nextPrompt();
@@ -328,11 +330,11 @@ LevelTools = {
 		question.answerText = function(text) {
 			question.answerTextSubmitted = text;
 		}
-		question.isCorrect = function() {
-			return question.correct;
-		}	
-		question.correct = false;
-		question.isAnswered = false;
+		question.isCorrect = this.questionIsCorrect;//function() {
+			//return question.correct;
+		//}	
+		//question.correct = false;
+		//question.isAnswered = false;
 		
 		var idText = this.getTextAreaId(questionIdx);
 		var boxText = defaultTo('Type your answer here.', question.text);

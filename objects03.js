@@ -6,11 +6,14 @@ in that order
 
 function Clamps(attrs) {
 	this.type = 'Clamps';
+	this.draw = defaultTo(false, attrs.draw);
+	this.releaseWith = defaultTo('button', attrs.releaseWit);
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.clampee = attrs.clampee;
 	this.currentClamper = undefined;
 	this.clamps = attrs.clamps;
 	this.wall = this.clampee.wall;
+	this.buttonId = 'clampRelease' + this.wall.handle;
 	this.wallHandler = this.wall.parent.getSubWallHandler(this.wall.handle, 0);
 	this.init();
 }
@@ -20,6 +23,14 @@ _.extend(Clamps.prototype, objectFuncs, {
 		this.addCleanUp();
 		this.wall.moveStop();
 		this.assembleClamps();
+		if (this.releaseWith=='button') {
+			this.makeReleaseButton();
+		} else {
+			this.setupClampClicking(); //Not implemented 
+		}
+		if (this.draw) {
+			this.drawClamps(); //Not implemented
+		}
 		
 	},
 	assembleClamps: function() {
@@ -60,6 +71,14 @@ _.extend(Clamps.prototype, objectFuncs, {
 			}
 		}
 	},
+	makeReleaseButton: function() {
+		var self = this;
+		addButton(this.buttonId, 'Release');
+		buttonBind(this.buttonId, function() {self.release()});
+	},
+	removeReleaseButton: function() {
+		removeButton(this.buttonId);
+	},
 	release: function() {
 		var highBound = undefined;
 		var lowBound = undefined;
@@ -94,6 +113,9 @@ _.extend(Clamps.prototype, objectFuncs, {
 	remove: function() {
 		if (!this.wall.removed) {
 			this.wall.moveInit();
+		}
+		if (this.releaseWith == 'button') {
+			this.removeReleaseButton();
 		}
 	},
 

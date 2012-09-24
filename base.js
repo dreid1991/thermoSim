@@ -468,6 +468,9 @@ function addButton(id, text, divId){
 	button.button();
 	return button;
 }
+function removeButton(id) {
+	$('#'+id).remove();
+}
 function buttonBind(id, func){
 	var button = $('#'+id);
 	button.click(func);
@@ -633,11 +636,21 @@ function checkWillAdvanceQuiz(){
 	//isCorrect will alert for wrong answers and maybe for no answer (if text box, I guess)
 	var allCorrect = 1;
 	var quiz = curLevel.quiz;
-	for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
-		var question = quiz[questionIdx];
-		allCorrect = Math.min(allCorrect, question.isCorrect());
-	}
-	return allCorrect;
+	if (quiz.length>0) {
+		if (!quiz.allAnswered()) {
+			alert("You haven't answered all the questions");
+			return 0;
+		} else {
+			for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
+				var question = quiz[questionIdx];
+				allCorrect = Math.min(allCorrect, question.isCorrect());
+			}
+			return allCorrect;
+		}
+	} else {
+		return allCorrect;
+	}	
+	
 }
 
 function prevPrompt(){

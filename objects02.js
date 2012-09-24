@@ -83,8 +83,8 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		//$('#'+this.buttonRemoveId).mouseup(function(){self.buttonRemoveUp()});
 	},
 	removeButtons: function(){
-		$('#'+this.buttonAddId).remove();
-		$('#'+this.buttonRemoveId).remove();
+		removeButton(this.buttonAddId);
+		removeButton(this.buttonRemoveId);
 	},
 	draw: function(){
 		this.drawCanvas.save();
@@ -240,7 +240,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		this.wall.setMass(this.massChunkName, this.mass);	
 	},
 	remove: function(){
-		for(var emitterIdx=0; emitterIdx<this.emitters.length; emitterIdx++){
+		for (var emitterIdx=0; emitterIdx<this.emitters.length; emitterIdx++) {
 			this.emitters[emitterIdx].remove();
 		}
 		this.emitters = [];

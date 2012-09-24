@@ -86,10 +86,6 @@ _.extend(Work.prototype,
 						{	
 							type:'text',
 							text:'Type your answer here',
-						},
-						{
-							type:'text',
-							text:"I'm subservent",
 						}
 					],
 				},
