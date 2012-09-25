@@ -539,9 +539,7 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 	if (newPrompt.setup) {
 		newPrompt.setup.apply(curLevel)
 	}
-	//if (newPrompt.replace) {
-		newPrompt.text = replaceStrings(newPrompt.text/*, newPrompt.replace*/);
-	//}
+	newPrompt.text = addStored(newPrompt.text/*, newPrompt.replace*/);
 	if (!newPrompt.quiz) {
 		$('#nextPrevDiv').show();
 	}
@@ -579,19 +577,6 @@ function getpromptIdxsToClean(newBlockIdx, newPromptIdx) {
 	} else {
 		return [promptIdx];
 	}
-	/*
-	if ((newPromptIdx==0 && newBlockIdx==blockIdx+1) || (newPromptIdx==promptIdx+1 && newBlockIdx==blockIdx)){
-		return [promptIdx];
-	} else if (newBlockIdx>blockIdx || (blockIdx==newBlockIdx && newPromptIdx>promptIdx)) {
-		var cleanUps = []
-		for (var pIdx=promptIdx; pIdx<curBlock.prompts.length; pIdx++) {
-			cleanUps.push(pIdx);
-		}
-		return cleanUps;
-	} else if (newBlockIdx==blockIdx && newPromptIdx==promptIdx) {
-		return [promptIdx];
-	}
-*/
 }
 
 function nextPrompt(forceAdvance){
@@ -720,7 +705,7 @@ function prevPrompt(){
 
 
 
-function replaceStrings(text, replaceList){
+function addStored(text){
 	var getIdx = text.indexOf('GET');
 	while (getIdx!=-1) {
 		if (text[getIdx+3] == '#') {
@@ -734,23 +719,6 @@ function replaceStrings(text, replaceList){
 		}
 		getIdx = text.indexOf('GET');
 	}
-	/*
-	for (var replaceIdx=0; replaceIdx<replaceList.length; replaceIdx++){
-		var replace = replaceList[replaceIdx];
-		var oldStr = replace.oldStr;
-		var newStr = replace.newStr;
-		if(typeof newStr == 'string' && newStr.indexOf('GET')==0){
-			if (newStr.indexOf('#')==3) {
-				newStr = parseFloat(getStore(newStr.slice(4,newStr.length)));
-			} else {
-				newStr = getStore(newStr.slice(3,newStr.length));
-			}
-		} else if (typeof newStr == 'function'){
-			newStr = newStr();
-		}
-		text = text.replace(oldStr, newStr);
-	}
-	*/
 	return text;
 }
 

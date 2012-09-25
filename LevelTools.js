@@ -135,7 +135,7 @@ LevelTools = {
 					var id = self.getTextAreaId(questionIdx);
 					var submitted = $('#'+id).val();
 					if (submitted.killWhiteSpace()!='') {
-						store('userAnswerBlock'+blockIdx+'Prompt'+promptIdx+'Question'+questionIdx, submitted);
+						store('userAnswerB'+blockIdx+'P'+promptIdx+'Q'+questionIdx, submitted);
 						question.answerText(submitted);
 						question.isAnswered = true;
 						if (question.answer) {
@@ -259,7 +259,7 @@ LevelTools = {
 				alert(button.message);
 			}
 			if (button.response) {
-				store('block'+blockIdx+'Prompt'+promptIdx + 'Response', button.response);
+				store('B'+blockIdx+'P'+promptIdx + 'Response', button.response);
 			}
 			if (button.func) {
 				button.func();
@@ -305,7 +305,7 @@ LevelTools = {
 				alert(option.message);
 			}
 			if (option.response) {
-				store('block'+blockIdx+'Prompt'+promptIdx + 'Response', option.response);
+				store('B'+blockIdx+'P'+promptIdx + 'Response', option.response);
 			}
 			if (option.func) {
 				option.func();
@@ -331,11 +331,7 @@ LevelTools = {
 		question.answerText = function(text) {
 			question.answerTextSubmitted = text;
 		}
-		question.isCorrect = this.questionIsCorrect;//function() {
-			//return question.correct;
-		//}	
-		//question.correct = false;
-		//question.isAnswered = false;
+		question.isCorrect = this.questionIsCorrect;
 		question.label = defaultTo('', question.label);
 		var idText = this.getTextAreaId(questionIdx);
 		var boxText = defaultTo('Type your answer here.', question.text);

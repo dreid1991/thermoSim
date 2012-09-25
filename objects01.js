@@ -1726,7 +1726,7 @@ _.extend(StateListener.prototype, objectFuncs, {
 	recordVals: function(){
 		this.results = {};
 		for (var storeName in this.storeAtSatisfy){
-			var storeAs = storeName + 'Block' + blockIdx + 'Prompt' + promptIdx;
+			var storeAs = storeName + 'B' + blockIdx + 'P' + promptIdx;
 			var data = this.storeAtSatisfy[storeName];
 			var value = round(data[data.length-1], 1);
 			store(storeAs, value);

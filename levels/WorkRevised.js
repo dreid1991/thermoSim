@@ -136,7 +136,7 @@ _.extend(Work.prototype,
 				},
 				{//P1
 					setup:undefined,
-					text:"The system had an initial temperature of 200 K and contained 1.8 moles of an ideal monatomic gas.  You wrote that GET#userAnswerBlock2Prompt0Question0| kJ of work were done.  What final temperature should the system have had?",
+					text:"The system had an initial temperature of 200 K and contained 1.8 moles of an ideal monatomic gas.  You wrote that GET#userAnswerB2P0Q0| kJ of work were done.  What final temperature should the system have had?",
 					quiz:[
 						{	
 							type:'textSmall',
@@ -144,9 +144,6 @@ _.extend(Work.prototype,
 							text:'',
 						}
 					],
-					//replace: 
-					//	[{oldStr:'XXX', newStr:'GET#userAnswerBlock2Prompt0Question0'}]
-					
 				}
 			]
 		},
@@ -169,17 +166,13 @@ _.extend(Work.prototype,
 							currentSetupType = 'prompt0';
 							this.blocks[2].prompts[0].setup.apply(this);
 						},
-					text:"Previously you answered that the compression did GET#userAnswerBlock2Prompt0Question0|kJ on the system for a final temperature of GET#userAnswerBlock2Prompt1Question0|K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
+					text:"Previously you answered that the compression did GET#userAnswerB2P0Q0|kJ on the system for a final temperature of GET#userAnswerB2P1Q0|K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
 					quiz:[
 						{
 							type:'text',
 							text:"Type your answer here",
 						}
 					],
-					//replace:
-					//	[{oldStr:'XXX', newStr:'GET#userAnswerBlock2Prompt0Question0'},
-					//	{oldStr:'YYY', newStr:'GET#userAnswerBlock2Prompt1Question0'}
-					//	]
 				},
 				{//P1
 					setup: undefined,
@@ -232,11 +225,7 @@ _.extend(Work.prototype,
 						this.stops = new Stops({stopPt:{volume:15}});
 						this.volListener14 = new StateListener({dataList:walls[0].data.v, is:'greaterThan', targetVal:14, alertUnsatisfied:'Expand the system!', atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});				
 					},
-					text: "You wrote that the system would do GET#userAnswerBlock3Prompt2Question0| kJ of work for a final temperature of GET#userAnswerBlock3Prompt2Question1|.  Find out of you were right by expanding the system.  Why is the temperature higher after going through the compression and expansion cycle?",
-					//replace:
-					//	[{oldStr:'XXX', newStr:'GET#userAnswerBlock3Prompt2Question0'},
-					//	{oldStr:'YYY', newStr:'GET#userAnswerBlock3Prompt2Question1'}	
-					//],
+					text: "You wrote that the system would do GET#userAnswerB3P2Q0| kJ of work for a final temperature of GET#userAnswerB3P2Q1|.  Find out of you were right by expanding the system.  Why is the temperature higher after going through the compression and expansion cycle?",
 					quiz:[
 						{
 							type:'text',
@@ -322,7 +311,7 @@ _.extend(Work.prototype,
 				},
 				{//P3
 					setup:undefined,
-					text:"When using many molecules, the compressed temperature was 715 K. When we compressed with 1.8 moles, the final temperature was about 715 K.  With one molecule, it was GET#tempBlock4Prompt0| K.  With ten molecules, it was GET#tempBlock4Prompt1| K.  With 50 molecules, it was GET#tempBlock4Prompt2|.  And finally, with 100 molecules it was GET#tempBlock4Prompt3|.  Do you notice a trend in the data?  If so, why might that trend exist?",
+					text:"When using many molecules, the compressed temperature was 715 K.  From the last experiments, we obtained the following data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB4P0|</td></tr><tr><td>10</td><td>GET#tempB4P1|</td></tr><tr><td>50</td><td>GET#tempB4P2|</td></tr><tr><td>100</td><td>GET#tempB4P3|</td></tr></table></p>  Do you notice a trend in the data?  If so, why might that trend exist?",
 					//MAKE LIST, like 1:5k
 									//2:30K OR WHATEVER
 					title:"",
