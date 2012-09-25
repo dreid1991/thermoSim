@@ -204,43 +204,45 @@ _.extend(Work.prototype,
 				},
 				{//P2
 					setup:undefined,
-				}
-			
-			]
-		},
-		{//B4
-			setup:
-				function() {
-					currentSetupType = 'block';
-					this.graphs.pVSvLoad = getStore('pVSvblock3prompt0').load();
-					this.graphs.tVSvLoad = getStore('tVSvblock3prompt0').load();
-				},
-			prompts:[
-				{//P0
-					setup:undefined,
 					cutScene:true,
-					text:"||EQ6CEIf you'll notice, the T vs. V graph is linear.  Using the equation above, find what its slope should should be with 1.8 moles of an ideal monatomic gas.  Do the slopes from the equation and from the graph match?  Given our P<sub>ext</sub>, should the slopes be linear or did something go wrong?",
+					text:"Now we'll look at expanding the same system of 1.8 moles with Pext of 2 bar from 7.5 L to 15 L.  How much work will the system do on its surroundings in this expansion, and what will its final temperature be?",
 					quiz:[
 						{
 							type:'textSmall',
-							label:'Slope from graph:',
+							label:'Work done:',
+							units:"kJ",
 							text:"",
 						},
 						{
 							type:'textSmall',
-							label:'Slope from equation:',
+							label:'Final temperature:',
+							units:"K",
 							text:"",
-						},
+						},					
+					
+					],
+				},
+				{
+					setup: function() {
+						currentSetupType = 'prompt3';
+						walls[0].resetWork();
+						this.stops = new Stops({stopPt:{volume:15}});
+						this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'greaterThan', targetVal:14, alertUnsatisfied:'Expand the system!'});				
+					},
+					text: "You wrote that the system would do XXX kJ of work for a final temperature of YYY.  Find out of you were right by expanding the system.  Why is temperature higher after going through the compression and expansion cycle?",
+					replace:
+						[{oldStr:'XXX', newStr:'GET#userAnswerBlock3Prompt2Question0'},
+						{oldStr:'YYY', newStr:'GET#userAnswerBlock3Prompt2Question1'}	
+					],
+					quiz:[
 						{
 							type:'text',
-							label:'',
-							text:"Given the Pext, should these slopes be linear?",
+							text:"Type your answer here.",
 						}
-					],
-				}							
+					]
+				}
 			]
 		}
-		
 		]
 		
 	}

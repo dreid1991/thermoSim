@@ -1304,7 +1304,7 @@ function CompArrow(attrs){
 	var drawCanvas = c;
 	var canvasElement = canvas;
 	var listeners = {};
-	if(makeStops){
+	if (makeStops) {
 		this.stops = new Stops({stopPt:{height:bounds.y.max}, wallInfo:wallInfo});
 	}
  
@@ -1665,9 +1665,11 @@ function Stops(attrs){
 	//assumes canvas of c.  I mean, where else would they be?
 	this.stopWidth = 20;
 	this.stopHeight = 5;
+	this.boundToSet = undefined;
 	var stopPt = attrs.stopPt;
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
-	this.pts = walls[this.wallInfo];
+	this.wall = walls[this.wallInfo];
+	this.pts = this.wall;
 	
 	if(stopPt.volume){
 		var width = this.pts[0].distTo(this.pts[1]);
@@ -1697,14 +1699,23 @@ _.extend(Stops.prototype, objectFuncs, {
 		}
 	},
 	init: function(){
-		this.yMaxSave = walls[this.wallInfo].bounds.yMax;
-		walls.setBounds(this.wallInfo, {yMax:this.height});
+		if (this.height>this.wall[0]) {
+			this.boundToSet = 'yMax';
+		} else {
+			this.boundToSet = 'yMin'
+		}
+		this.yBoundSave = this.wall.bounds[this.boundToSet];
+		var settingObj = {};
+		settingObj[this.boundToSet] = this.height;
+		walls.setBounds(this.wallInfo, settingObj);
 		addListener(curLevel, 'update', 'drawStops' + this.wallInfo, this.draw, '');
 		return this;
 	},
 	remove: function(){
 		if (window.walls && !walls.removed) {
-			walls.setBounds(this.wallInfo, {yMax:this.yMaxSave});
+			var settingObj = {};
+			settinObj[this.boundToSet] = this.yBoundSave;
+			walls.setBounds(this.wallInfo, settingObj);
 		}
 		removeListener(curLevel, 'update', 'drawStops' + this.wallInfo);
 		return this;
@@ -1836,7 +1847,7 @@ _.extend(StateListener.prototype, objectFuncs, {
 		return this.amSatisfied;
 	},
 	remove: function(){
-		removeListener(curLevel, this.cleanUpWith + 'Condition', this.handle);
+		removeListener(curLevel, this.conditionsOn + 'Condition', this.handle);
 		removeListener(curLevel, 'update', this.handle);
 	},
 }

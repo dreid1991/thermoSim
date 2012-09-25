@@ -1102,8 +1102,14 @@ WallMethods = {
 			if(this.recordingRMS){this.recordRMSStop();};
 			return this;
 		},	
-		
-
+		resetWork: function(){
+			this.work = 0;
+			return this;
+		},
+		resetQ: function(){
+			this.q = 0;
+			return this;
+		},
 		//HEY - YOU SHOULD _PROBABLY_ MAKE A FUNCTION THAT DOES THESE DISPLAY THINGS GIVEN SOME INPUTS.  I MEAN, THIS IS A LOT OF NEARLY IDENTICAL CODE
 		displayWork: function(readout, label, decPlaces){
 			if(this.recordingWork && !this.displayingWork){
@@ -1127,7 +1133,6 @@ WallMethods = {
 			}
 			return this;
 		},
-
 		displayTemp: function(readout, label, decPlaces){
 			if(this.recordingTemp && !this.displayingTemp){
 				this.displayingTemp = true;

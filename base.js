@@ -226,9 +226,9 @@ function unique(name, obj){
 }
 
 function addListener(object, typeName, funcName, func, destObj){
-	try{
+	//try{
 	object[typeName + 'Listeners'].listeners[funcName] = {func:func, obj:destObj};
-	}catch(e){console.trace()}
+	//}catch(e){console.trace()}
 }
 function addListenerOnce(object, typeName, funcName, func, destObj){
 	var removeFunc = function(){
