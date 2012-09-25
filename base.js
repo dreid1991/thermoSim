@@ -486,6 +486,10 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 	var newBlock = curLevel.blocks[newBlockIdx];
 	var newPrompt = newBlock.prompts[newPromptIdx];
 	var changedBlock = newBlockIdx!=blockIdx;
+	var promptCleanUpListeners = getPromptCleanUpListeners(newBlockIdx, newPromptIdx);
+	
+	execListOnObj(promptCleanUpListeners, curLevel);
+	
 	curLevel.promptCleanUp();
 	emptyListener(curLevel, 'promptCleanUp');
 	emptyListener(curLevel, 'promptCondition');
@@ -538,6 +542,21 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 
 	blockIdx = newBlockIdx;
 	promptIdx = newPromptIdx;
+}
+
+function getPromptCleanUpListeners(newBlockIdx, newPromptIdx) {
+	//attn please - this only works for going forwards
+	//would need to make like an 'added by' tag for backwards to work
+	var curBlock = curLevel.block[blockIdx];
+	if ((newPromptIdx==0 && newBlockIdx==blockIdx+1) || (newPromptIdx==promptIdx+1 && newBlockIdx==blockIdx)){
+		return [curLevel['prompt' + promptIdx + 'CleanUpListeners']];
+	} else if (newBlockIdx>blockIdx || (blockIdx==newBlockIdx && newPromptIdx>promptIdx)) {
+		var cleanUps = []
+		for (var pIdx=promptIdx; pIdx<curBlock.prompts.length; pIdx++) {
+			cleanUps.push(curLevel['prompt' + pIdx + 'CleanUpListeners']);
+		}
+		return cleanUps;
+	}
 }
 
 function nextPrompt(forceAdvance){
@@ -630,6 +649,12 @@ function checkWillAdvanceConditions(newBlockIdx, newPromptIdx){
 		}
 	}
 	return conditionsMet;
+}
+
+function execListOnObj(list, obj) {
+	for (var listIdx=0; listIdx<list.length; listIdx++) {
+		list[listIdx].apply(obj);
+	}
 }
 
 function checkWillAdvanceQuiz(){

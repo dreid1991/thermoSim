@@ -10,7 +10,7 @@ LevelTools = {
 		this.wallCol = Col(255,255,255);
 		this.numUpdates = 0;
 		this.wallSpeed = defaultTo(1, this.wallSpeed);
-		this.makeListeners();
+		this.makeListenerHolders();
 		dataHandler = new DataHandler();
 		this.dataHandler = dataHandler;
 		addListener(this, 'update', 'run', this.updateRun, this);
@@ -487,19 +487,29 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		removeListener(curLevel, 'data', 'trackExtentRxn' + handle);
 	},
 	*/
-	makeListeners: function(){
-		this.updateListeners = {listeners:{}, save:{}};
-		this.wallMoveListeners = {listeners:{}, save:{}};
-		this.dataListeners = {listeners:{}, save:{}};
-		this.mousedownListeners = {listeners:{}, save:{}};
-		this.mouseupListeners = {listeners:{}, save:{}};
-		this.mousemoveListeners = {listeners:{}, save:{}};
-		this.initListeners = {listeners:{}, save:{}};	
-		this.recordListeners = {listeners:{}, save:{}};
-		this.blockConditionListeners = {listeners:{}, save:{}};
-		this.promptConditionListeners = {listeners:{}, save:{}};
-		this.blockCleanUpListeners = {listeners:{}, save:{}};
-		this.promptCleanUpListeners = {listeners:{}, save:{}};
+	makeListenerHolders: function(){
+		this.makeListenerHolder('update');
+		this.makeListenerHolder('wallMove');
+		this.makeListenerHolder('data');
+		this.makeListenerHolder('mousedown');
+		this.makeListenerHolder('mouseup');
+		this.makeListenerHolder('mousemove');
+		this.makeListenerHolder('init');
+		this.makeListenerHolder('record');
+		this.makeListenerHolder('blockCondition');
+		this.makeListenerHolder('promptCondition');
+		this.makeListenerHolder('blockCleanUp');
+	},
+	makeListenerHolder: function(name) {
+		this[name + 'Listeners'] = {listeners:{}, save:{}};
+		return this[name + 'Listeners'];
+	},
+	makePromptListenerHolders: function(){
+		var block = this.blocks[blockIdx];
+		this.promptCleanUpListenerHolders = new Array(block.prompts.length);
+		for (var promptIdx=0; promptIdx<block.prompts.length; promptIdx++) {
+			this.promptCleanUpListenerHolders[promptIdx] = this.makeListenerHolder('prompt' + promptIdx + 'CleanUp');
+		}
 	},
 	reset: function(){
 		showPrompt(blockIdx, promptIdx, true);		
