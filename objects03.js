@@ -120,6 +120,7 @@ _.extend(Clamps.prototype, objectFuncs, {
 	remove: function() {
 		if (!this.wall.removed) {
 			this.wall.moveInit();
+			this.wall.parent.setSubWallHandler(walls.indexOf(this.wall), 0, this.wallHandler);
 		}
 		if (this.releaseWith == 'button') {
 			this.removeReleaseButton();

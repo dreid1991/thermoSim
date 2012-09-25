@@ -570,6 +570,16 @@ function getpromptIdxsToClean(newBlockIdx, newPromptIdx) {
 	//attn please - this only works for going forwards
 	//would need to make like an 'added by' tag for backwards to work
 	var curBlock = curLevel.blocks[blockIdx];
+	if (newBlockIdx>blockIdx || (blockIdx==newBlockIdx && newPromptIdx>promptIdx)) {
+		var cleanUps = []
+		for (var pIdx=promptIdx; pIdx<curBlock.prompts.length; pIdx++) {
+			cleanUps.push(pIdx);
+		}
+		return cleanUps;
+	} else {
+		return [promptIdx];
+	}
+	/*
 	if ((newPromptIdx==0 && newBlockIdx==blockIdx+1) || (newPromptIdx==promptIdx+1 && newBlockIdx==blockIdx)){
 		return [promptIdx];
 	} else if (newBlockIdx>blockIdx || (blockIdx==newBlockIdx && newPromptIdx>promptIdx)) {
@@ -581,6 +591,7 @@ function getpromptIdxsToClean(newBlockIdx, newPromptIdx) {
 	} else if (newBlockIdx==blockIdx && newPromptIdx==promptIdx) {
 		return [promptIdx];
 	}
+*/
 }
 
 function nextPrompt(forceAdvance){

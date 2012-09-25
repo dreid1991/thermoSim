@@ -1562,9 +1562,11 @@ function Stops(attrs){
 	}else if (stopPt.height){
 		this.height = stopPt.height;
 	}
-
-	this.draw = this.makeDrawFunc(this.height);
+	this.willDraw = defaultTo(true, attrs.draw);
 	
+	if (this.willDraw) {
+		this.draw = this.makeDrawFunc(this.height);
+	}
 	this.addCleanUp();	
 	
 	return this.init();
@@ -1598,10 +1600,12 @@ _.extend(Stops.prototype, objectFuncs, {
 	remove: function(){
 		if (window.walls && !walls.removed) {
 			var settingObj = {};
-			settinObj[this.boundToSet] = this.yBoundSave;
+			settingObj[this.boundToSet] = this.yBoundSave;
 			walls.setBounds(this.wallInfo, settingObj);
 		}
-		removeListener(curLevel, 'update', 'drawStops' + this.wallInfo);
+		if (this.willDraw) {
+			removeListener(curLevel, 'update', 'drawStops' + this.wallInfo);
+		}
 		return this;
 	},
 }

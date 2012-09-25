@@ -251,7 +251,7 @@ _.extend(Work.prototype,
 				function(){
 					currentSetupType = 'block';
 					walls = WallHandler({pts:[[P(40,60), P(510,60), P(510,380), P(40,380)]], handlers:'staticAdiabatic', handles:['container'], vols:[15]});
-					
+					//this.stops = new Stops(
 					//spcs['spc3'].populate(P(45,65), V(450, 300), 800, 200);
 					//this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:213.2}], weightScalar:8, displayText:false, massInit:0, compMode:'cPAdiabaticDamped', pistonOffset:V(130,-41)});
 					this.piston = new Piston({wallInfo:'container', min:0, init:.01, max:15, makeSlider:false});
@@ -269,7 +269,6 @@ _.extend(Work.prototype,
 							walls[0].reset();
 							this.clamps = new Clamps({clampee:this.piston, clamps:[{vol:7.5}]});
 							spcs['spc1'].populate(P(45,65), V(460, 300), 1, 200);
-							currentSetupType = 'prompt0';
 							this.piston.setPressure(.01);
 						},
 					text:"later",
@@ -283,12 +282,25 @@ _.extend(Work.prototype,
 							walls[0].reset();
 							this.clamps = new Clamps({clampee:this.piston, clamps:[{vol:7.5}]});
 							spcs['spc1'].populate(P(45,65), V(460, 300), 10, 200);
-							currentSetupType = 'prompt0';
 							this.piston.setPressure(.083);		
 						},
 					text:'blop',
 					title:"Current step",
+				},
+				{//P2
+					setup:
+						function(){
+							currentSetupType = 'prompt2';
+							dotManager.clearAll();
+							walls[0].reset();
+							this.clamps = new Clamps({clampee:this.piston, clamps:[{vol:7.5}]});
+							spcs['spc1'].populate(P(45,65), V(460, 300), 50, 200);
+							this.piston.setPressure(.41);
+						},
+					text:"",
+					title:"",
 				}
+						
 					
 			]
 			
