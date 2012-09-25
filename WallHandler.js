@@ -219,15 +219,7 @@ WallMethods = {
 				this[wallIdx].ptsInit = this.copyWallPts(this[wallIdx]);
 			}
 		},
-		restoreWall: function(wallIdx){
-			var init = this[wallIdx].ptsInit;
-			for (var ptIdx=0; ptIdx<init.length; ptIdx++){
-				this[wallIdx][ptIdx] = init[ptIdx].copy();
-			}
-			this[wallIdx].forceInternal = 0;
-			this[wallIdx].v = 0;
-			this.setupWall(wallIdx);
-		},
+
 		copyWallPts: function(wall){
 			var len = wall.length;
 			var copy = new Array(len);
@@ -668,6 +660,16 @@ WallMethods = {
 //WALL
 //////////////////////////////////////////////////////////////////////////
 	wall: {
+		reset: function(){
+			var init = this.ptsInit;
+			for (var ptIdx=0; ptIdx<init.length; ptIdx++){
+				this[ptIdx].x = init[ptIdx].x;
+				this[ptIdx].y = init[ptIdx].y;//Must copy by value to keep point object the same since things follow the points
+			}
+			this.forceInternal = 0;
+			this.v = 0;
+			this.parent.setupWall(this.parent.indexOf(this));
+		},
 		setVol: function(vol){
 			var setY = this.volToY(vol)
 			this[0].position({y:setY});

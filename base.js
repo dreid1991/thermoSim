@@ -494,6 +494,9 @@ function hideSliders(){
 		$('#'+ handle).hide();
 	}
 }
+function S(newBlockIdx, newPromptIdx, forceReset) {
+	showPrompt(newBlockIdx, newPromptIdx, forceReset)
+}
 function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 	var newBlock = curLevel.blocks[newBlockIdx];
 	var newPrompt = newBlock.prompts[newPromptIdx];
@@ -576,7 +579,7 @@ function getpromptIdxsToClean(newBlockIdx, newPromptIdx) {
 		}
 		return cleanUps;
 	} else if (newBlockIdx==blockIdx && newPromptIdx==promptIdx) {
-		return [];
+		return [promptIdx];
 	}
 }
 

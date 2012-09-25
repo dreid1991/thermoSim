@@ -34,6 +34,8 @@ _.extend(Clamps.prototype, objectFuncs, {
 		if (this.draw) {
 			this.drawClamps(); //Not implemented
 		}
+		this.freezeWall();
+
 		
 	},
 	assembleClamps: function() {
@@ -103,7 +105,6 @@ _.extend(Clamps.prototype, objectFuncs, {
 	},
 	activateClamp: function(arrivedAt) {
 		var currentIdx = this.clamps.indexOf(this.currentClamper);
-		alert(arrivedAt);
 		this.currentClamper.clamping = false;
 		if (arrivedAt<this.currentClamper.y) {
 			this.currentClamper = this.clamps[currentIdx-1];
@@ -111,7 +112,10 @@ _.extend(Clamps.prototype, objectFuncs, {
 			this.currentClamper = this.clamps[currentIdx+1];
 		}
 		this.currentClamper.clamping = true;
-		
+		this.freezeWall();	
+	},
+	freezeWall: function() {
+		walls.setSubWallHandler(this.wall.handle, 0, 'staticAdiabatic');	
 	},
 	remove: function() {
 		if (!this.wall.removed) {
