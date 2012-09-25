@@ -2,8 +2,10 @@
 $(function(){
 	_.extend(Array.prototype, ArrayExtenders);
 	_.extend(Math, MathExtenders);
-	//_.extend(String, StringExtenders);
-	String.prototype.killWhiteSpace = StringExtenders.killWhiteSpace;
+	_.extend(String.prototype, StringExtenders);
+	
+	//String.prototype.killWhiteSpace = StringExtenders.killWhiteSpace;
+	
 	hoverCol = Col(0, 81, 117);
 	dotManager = new DotManager();
 	turn = 0;
@@ -224,7 +226,9 @@ function unique(name, obj){
 }
 
 function addListener(object, typeName, funcName, func, destObj){
+	try{
 	object[typeName + 'Listeners'].listeners[funcName] = {func:func, obj:destObj};
+	}catch(e){console.trace()}
 }
 function addListenerOnce(object, typeName, funcName, func, destObj){
 	var removeFunc = function(){
@@ -350,6 +354,11 @@ ArrayExtenders = {
 		this[idx2] = obj1;	
 		return this;
 	},
+	applyFunc: function(func) {
+		for (var idx=0; idx<this.length; idx++) {
+			func(this[idx]);
+		}
+	}
 }
 
 function deepCopy(object){
@@ -374,6 +383,9 @@ StringExtenders = {
 	killWhiteSpace: function() {
 		return this.replace(/\s/g, '');
 	},
+	killNumbers: function() {
+		return this.replace(/[0-9]/g, '');
+	}
 }
 
 
@@ -486,13 +498,18 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 	var newBlock = curLevel.blocks[newBlockIdx];
 	var newPrompt = newBlock.prompts[newPromptIdx];
 	var changedBlock = newBlockIdx!=blockIdx;
-	var promptCleanUpListeners = getPromptCleanUpListeners(newBlockIdx, newPromptIdx);
+	var promptIdxsToClean = getpromptIdxsToClean(newBlockIdx, newPromptIdx);
 	
-	execListOnObj(promptCleanUpListeners, curLevel);
+	promptIdxsToClean.applyFunc(function(idx){
+		curLevel.promptCleanUp(idx);
+	})
 	
-	curLevel.promptCleanUp();
-	emptyListener(curLevel, 'promptCleanUp');
+	
+	//emptyListener(curLevel, 'promptCleanUp');
 	emptyListener(curLevel, 'promptCondition');
+	if (changedBlock) {
+		curLevel.makePromptCleanUpHolders(newBlockIdx);
+	}
 	if (changedBlock || forceReset) {
 		curLevel.saveAllGraphs();
 		curLevel.freezeAllGraphs();
@@ -525,6 +542,8 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 	if (!newPrompt.quiz) {
 		$('#nextPrevDiv').show();
 	}
+	blockIdx = newBlockIdx;
+	promptIdx = newPromptIdx;
 	curLevel.quiz = [];
 	if (newPrompt.cutScene) {	
 		curLevel.cutSceneStart(newPrompt.text, newPrompt.cutScene, newPrompt.quiz)
@@ -540,22 +559,24 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 	}
 	$('#baseHeader').html(newPrompt.title);
 
-	blockIdx = newBlockIdx;
-	promptIdx = newPromptIdx;
+
+
 }
 
-function getPromptCleanUpListeners(newBlockIdx, newPromptIdx) {
+function getpromptIdxsToClean(newBlockIdx, newPromptIdx) {
 	//attn please - this only works for going forwards
 	//would need to make like an 'added by' tag for backwards to work
-	var curBlock = curLevel.block[blockIdx];
+	var curBlock = curLevel.blocks[blockIdx];
 	if ((newPromptIdx==0 && newBlockIdx==blockIdx+1) || (newPromptIdx==promptIdx+1 && newBlockIdx==blockIdx)){
-		return [curLevel['prompt' + promptIdx + 'CleanUpListeners']];
+		return [promptIdx];
 	} else if (newBlockIdx>blockIdx || (blockIdx==newBlockIdx && newPromptIdx>promptIdx)) {
 		var cleanUps = []
 		for (var pIdx=promptIdx; pIdx<curBlock.prompts.length; pIdx++) {
-			cleanUps.push(curLevel['prompt' + pIdx + 'CleanUpListeners']);
+			cleanUps.push(pIdx);
 		}
 		return cleanUps;
+	} else if (newBlockIdx==blockIdx && newPromptIdx==promptIdx) {
+		return [];
 	}
 }
 

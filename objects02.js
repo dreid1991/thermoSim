@@ -477,7 +477,7 @@ function PulseArrow(attrs){
 	this.stroke = defaultTo(this.fill, attrs.stroke.copy());
 	this.fade = defaultTo(true, attrs.fade);
 	this.fadeTurns = defaultTo(4, attrs.fadeTurns);
-	//need to keep precision in unround.  Rounding in color class will lose steps < .5/turn
+	//need to keep precision in unround.  Rounding in color class will lose steps if < .5/turn
 	this.strokeUnround = {r:this.stroke.r, g:this.stroke.g, b:this.stroke.b};
 	this.strokeFinal = defaultTo(this.fillFinal, attrs.strokeFinal);
 	this.alpha = defaultTo(1, attrs.alpha);

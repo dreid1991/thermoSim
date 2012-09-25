@@ -4,6 +4,7 @@ LevelTools = {
 		this.addEqs();
 		this.setDefaultPromptVals()
 		this.graphs = {};
+		this.makePromptCleanUpHolders(0);
 		this.quiz = [];
 		this.eUnits = 'kJ';
 		this.bgCol = Col(5, 17, 26);
@@ -65,7 +66,7 @@ LevelTools = {
 		walls.check();
 	},
 	cutSceneStart: function(text, mode, quiz) {
-		addListener(curLevel, 'promptCleanUp', 'endCutScene',
+		addListener(curLevel, 'prompt' + promptIdx + 'CleanUp', 'endCutScene',
 			function() {
 				this.cutSceneEnd()
 			},
@@ -504,11 +505,11 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		this[name + 'Listeners'] = {listeners:{}, save:{}};
 		return this[name + 'Listeners'];
 	},
-	makePromptListenerHolders: function(){
-		var block = this.blocks[blockIdx];
-		this.promptCleanUpListenerHolders = new Array(block.prompts.length);
+	makePromptCleanUpHolders: function(newBlockIdx){
+		var block = this.blocks[newBlockIdx];
+		this.promptCleanUpHolders = new Array(block.prompts.length);
 		for (var promptIdx=0; promptIdx<block.prompts.length; promptIdx++) {
-			this.promptCleanUpListenerHolders[promptIdx] = this.makeListenerHolder('prompt' + promptIdx + 'CleanUp');
+			this.promptCleanUpHolders[promptIdx] = this.makeListenerHolder('prompt' + promptIdx + 'CleanUp');
 		}
 	},
 	reset: function(){
@@ -531,8 +532,9 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		var didWin = 1;
 		var alerts = {1:undefined, 0:undefined};
 		var priorities = {1:0, 0:0};
-		for (var blockConditionName in this.blockConditionListeners.listeners) {
-			var condition = this.blockConditionListeners.listeners[blockConditionName]
+		var conditions = this.blockConditionListeners.listeners
+		for (var conditionName in conditions) {
+			var condition = conditions[conditionName]
 			winResults = condition.func.apply(condition.obj); //returns didWin, alert, priority (high takes precidence);
 			didWin = Math.min(didWin, winResults.didWin);
 			if (winResults.alert) {
@@ -544,13 +546,13 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		}	
 		return {didWin:didWin, alert:alerts[didWin]};
 	},
-	promptConditions: function(){
-		//ALERT NOT BUBBLING UP CORRECTLY.  IT GETS TO THIS FUNCTION FROM STATE LISTENERS BUT IS NOT RETURNED
+	promptConditions: function(idx){
 		var didWin = 1;
 		var alerts = {1:undefined, 0:undefined};
 		var priorities = {1:0, 0:0};
-		for (var promptConditionName in this.promptConditionListeners.listeners) {
-			var condition = this.promptConditionListeners.listeners[promptConditionName]
+		var conditions = this.promptConditionListeners.listeners;
+		for (var conditionName in conditions) {
+			var condition = conditions[conditionName]
 			winResults = condition.func.apply(condition.obj); //returns didWin, alert, priority (high takes precidence);
 			didWin = Math.min(didWin, winResults.didWin);
 			if (winResults.alert) {
@@ -563,14 +565,16 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		return {didWin:didWin, alert:alerts[didWin]};
 	},
 	blockCleanUp: function(){
-		for (var blockCleanUpListener in this.blockCleanUpListeners.listeners) {
-			var listener = this.blockCleanUpListeners.listeners[blockCleanUpListener];
+		var listeners = this.blockCleanUpListeners.listeners;
+		for (var listenerName in listeners) {
+			var listener = listeners[listenerName];
 			listener.func.apply(listener.obj);
 		}
 	},
-	promptCleanUp: function(){
-		for (var promptCleanUpListener in this.promptCleanUpListeners.listeners) {
-			var listener = this.promptCleanUpListeners.listeners[promptCleanUpListener];
+	promptCleanUp: function(idx){
+		var listeners = this['prompt' + idx + 'CleanUpListeners'].listeners;
+		for (var listenerName in listeners) {
+			var listener = listeners[listenerName];
 			listener.func.apply(listener.obj);
 		}
 	},

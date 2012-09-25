@@ -1717,6 +1717,7 @@ _.extend(Stops.prototype, objectFuncs, {
 function StateListener(attrs){//like dataList... is:'greaterThan', ... targetVal
 	this.type = 'StateListener';
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
+	this.conditionsOn = this.cleanUpWith.killNumbers();
 	this.dataList = attrs.dataList;
 	this.is = attrs.is
 	this.targetVal = attrs.targetVal;
@@ -1742,8 +1743,8 @@ _.extend(StateListener.prototype, objectFuncs, {
 		this.addCleanUp();
 	},
 	initCheckOnConditions: function() {
-		this.handle = unique('StateListener' + this.is, curLevel[this.cleanUpWith + 'ConditionListeners'].listeners);
-		addListener(curLevel, this.cleanUpWith + 'Condition', this.handle,
+		this.handle = unique('StateListener' + this.is, curLevel[this.conditionsOn + 'ConditionListeners'].listeners);
+		addListener(curLevel, this.conditionsOn + 'Condition', this.handle,
 			function(){
 				var didWin = this.condition();
 				return {didWin:didWin, alert:this.alerts[didWin], priority:this.priorities[didWin]};
@@ -1765,7 +1766,7 @@ _.extend(StateListener.prototype, objectFuncs, {
 			},
 		this);
 		
-		addListener(curLevel, this.cleanUpWith + 'Condition', this.handle,
+		addListener(curLevel, this.conditionsOn + 'Condition', this.handle,
 			function(){
 				return {didWin: this.amSatisfied, alert:this.alerts[this.amSatisfied], priority:this.priorities[this.amSatisfied]};
 			},

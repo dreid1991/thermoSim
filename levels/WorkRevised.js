@@ -78,7 +78,7 @@ _.extend(Work.prototype,
 				{//P0
 					setup:
 						function() {
-							currentSetupType = 'prompt';
+							currentSetupType = 'prompt0';
 							this.tempListener = new StateListener({dataList:walls[0].data.t, is:'notEqualTo', targetVal:dataHandler.temp(), alertUnsatisfied:"Try hitting the molecule with the wall while the wall's moving"});	
 						},
 					text:"<center>||EQ6||</center>From the equation above we see that temperature increases as we do work by decreasing volume.  Temperature is an expression is molecular kinetic energy, so as the system is compressed, the molecules must speed up.  These ideal gas molecules can be thought of as perfectly elastic bouncy balls.  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?",
@@ -121,7 +121,7 @@ _.extend(Work.prototype,
 				{//P0
 					setup:
 						function() {
-							currentSetupType = 'prompt';
+							currentSetupType = 'prompt0';
 							this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:10, alertUnsatisfied:'Compress the system!', cleanUpWith:currentSetupType});						
 						},
 					text:"Above is a well insulated piston cylinder assembly.  Place the block on top of the poston and observe the response.  How much work did you do on the system?",
@@ -165,6 +165,7 @@ _.extend(Work.prototype,
 				{//P0
 					setup:
 						function() {
+							currentSetupType = 'prompt0';
 							this.blocks[2].prompts[0].setup.apply(this);
 						},
 					text:"Previously you answered that the compression did XXXkJ on the system for a final temperature of YYYK.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
