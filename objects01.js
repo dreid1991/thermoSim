@@ -142,7 +142,6 @@ function DragWeights(attrs){
 	this.wallHandler = 			defaultTo('cPAdiabaticDamped', attrs.compMode) + compAdj;
 	this.readout = 				defaultTo(curLevel.readout, attrs.readout);
 	this.binY = 				defaultTo(myCanvas.height-15, attrs.binY);
-	this.eBar = 				{x:defaultTo(20, attrs.eBarX), scalar:.7};
 	this.blockCol = 			defaultTo(Col(224, 165, 75), attrs.blockCol);
 	this.binCol = 				defaultTo(Col(150, 150, 150), attrs.binCol);
 	this.massInit = 			defaultTo(25, defaultTo(curLevel.massInit, attrs.massInit));
@@ -159,7 +158,6 @@ function DragWeights(attrs){
 	}
 	
 	
-	this.eBarCol = this.blockCol;
 	this.binSlant = 1.3;
 	this.storeBinWidth = 110;
 	this.storeBinSpacing = 60;
@@ -172,8 +170,8 @@ function DragWeights(attrs){
 	this.eAdded = 0;
 	this.pressure = this.wall.pExt();
 	this.weightsOnPiston = [];
-	this.eBarFont = '12pt Calibri';
-	this.eBarFontCol = Col(255,255,255);
+	this.font = '12pt Calibri';
+	this.fontCol = Col(255,255,255);
 	this.binThickness = 5;
 	var self = this;
 
@@ -199,7 +197,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 			this.draw = this.drawNoText;
 		}
 		addListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo, this.draw, this);
-		addListener(curLevel, 'mousedown', 'weights' + this.wallInfo, this.mousedown, this);
+		this.unfreeze();
 		this.wall.moveInit();
 		this.dropAllIntoStores('instant');
 		delete this.tempWeightDefs;
@@ -550,48 +548,10 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 				var y = bin.y - this.binHeight+10;
 				var mass = this.weightGroups[binName].mass;
 				var text = mass + ' kg each';
-				draw.text(text, P(x, y), this.eBarFont, this.eBarFontCol, 'center', 0, c);
+				draw.text(text, P(x, y), this.font, this.fontCol, 'center', 0, c);
 			}
 		}
 	},
-	drawEBar: function(m, dh){
-		var yBottom = this.zeroY;
-		var yTop = this.zeroY - dh;
-		var corner = P(this.eBar.x - m*this.eBar.scalar/2, yTop);
-		var dims = V(m*this.eBar.scalar, yBottom-yTop);
-		draw.fillRect(corner, dims, this.eBarCol, c);
-	},
-	drawEBarText: function(m, energy){
-		var rounded = round(energy,1)
-		var text = this.eText(rounded)
-		var x = this.eBar.x;
-		var y = this.zeroY - energy/(workConst*g*m);
-		var pos = P(x, y-15);
-		draw.text(text, pos, this.eBarFont, this.eBarFontCol, 'center', 0, c);
-	},
-	eText: function(energy){
-		return energy + ' ' + curLevel.eUnits;
-	},
-
-	shrinkEBar: function(){
-		var assignedWeight = this.selected;
-		var mass = this.weightGroups[assignedWeight.name].mass;
-		var removeTime = 300;
-		var curE = Math.abs(this.eBar.eChange);
-		var ePerTurn = curE*updateInterval/removeTime;
-		addListener(curLevel, 'update', 'shrinkEBar',
-			function(){
-				curE = Math.max(curE-ePerTurn, 0);
-				var height = this.eToHeight(curE, mass);
-				this.drawEBar(mass, height);
-				if(curE==0){
-					removeListener(curLevel, 'update', 'shrinkEBar');
-				}
-			},
-		this);
-	},
-
-
 	putOnPiston: function(weight, slot){
 		this.weightsOnPiston.push(weight);
 		weight.pos.track({pt:slot.pos, noTrack:'x'});
@@ -615,14 +575,6 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		var clicked = this.getClicked();
 		if(clicked){
 			this.pickup(clicked);
-			if(this.trackEnergy){
-				if(this.selected.cameFrom=='store'){
-					this.eBarFromBin();
-				}
-				if(this.selected.cameFrom=='piston'){
-					this.eBarFromPiston();
-				}
-			}
 			if(this.selected.cameFrom=='piston'){
 				this.takeOffPiston(this.selected);
 			}
@@ -649,15 +601,6 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		var dest = this.getDest();
 		var energyChanged = new Boolean();
 		var selected = this.selected;
-		energyChanged = (selected.cameFrom=='piston' && dest=='store') || (selected.cameFrom=='store' && dest=='piston')
-		if (energyChanged) {
-			this.eAdded+=this.eBar.eChange;
-			if(this.trackEnergy){
-				this.readout.tick('eAdd', this.eAdded);
-				this.animText();
-				this.shrinkEBar();
-			}
-		}	
 		this.dropIntoBin(this.selected, dest)
 		delete this.origPos;
 		this.selected = undefined;
@@ -672,52 +615,6 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 			return 'piston';
 		}
 	},
-	eBarFromBin: function(){
-		var eBarType = 'FromBinHolding';
-		addListener(curLevel, 'update', 'eBar' + eBarType,
-			function(){
-				var selected = this.selected;
-				var m = this.weightGroups[selected.name].mass;
-				this.eBar.eChange = this.getSelectedEnergy();
-				var dh = Math.min(this.zeroY - this.pistonPt.y, Math.max(0, this.zeroY - selected.pos.y));
-				this.drawEBar(m, dh);
-				this.drawEBarText(m, this.eBar.eChange);
-				
-			},
-		this);
-		this.addRemoveEBarListener(eBarType)
-	},
-	eBarFromPiston: function(){
-		var eBarType = 'FromPistonHolding';
-		var m = this.weightGroups[this.selected.name].mass;
-		var dh =this.pistonPt.y - this.zeroY;
-		this.eBar.eChange = this.heightToE(dh, m);
-		addListener(curLevel, 'update', 'eBar' + eBarType, 
-			function(){
-				this.drawEBar(m, Math.abs(dh));
-				this.drawEBarText(m, this.eBar.eChange);
-			},
-		this);
-		this.addRemoveEBarListener(eBarType)
-	
-	},
-	addRemoveEBarListener: function(eBarType){
-		addListener(curLevel, 'mouseup', 'removeEBar',
-			function(){
-				removeListener(curLevel, 'update', 'eBar' + eBarType);
-				removeListener(curLevel, 'mouseup', 'removeEBar');
-				;
-			},
-		this);
-	},
-	animText: function(){
-		var destEntry = byAttr(this.readout.entries, 'eAdd', 'name');
-		destPos = destEntry.pos.copy();
-		destPos.x+=40;
-		animText.newAnim({pos:P(this.eBar.x,this.pistonPt.y-15)},
-			{pos:destPos, col:curLevel.bgCol},
-			{text:this.eText(round(this.eBar.eChange,1))})
-	},
 	pickup: function(weight){
 		weight.cameFrom = weight.status;
 		weight.status = 'holding';
@@ -731,14 +628,6 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		delete weight.slot;
 		this.selected = weight;
 		this.selected.origPos = {mouse:mousePos.copy(), weight:weight.pos.copy()};
-	},
-	getSelectedEnergy: function(){
-		var selected = this.selected;
-		var grpName = selected.name;
-		var m = this.weightGroups[grpName].mass;
-		var pos = selected.pos.copy();
-		var dh = Math.min(this.zeroY - this.pistonPt.y, Math.max(0, this.zeroY - selected.pos.y));
-		return this.heightToE(dh, m);		
 	},
 	getClicked: function(){
 		for(var group in this.weightGroups){
@@ -759,12 +648,6 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		}
 		return false
 	},
-	eToHeight: function(e, m){
-		return e/(workConst*m*g);
-	},
-	heightToE: function(dh, m){
-		return workConst*m*g*dh;
-	},
 	mouseOnWeight: function(dims, weightPos){
 		var mousePos = mouseOffset(myCanvas);
 		return mousePos.x>=weightPos.x && mousePos.x<=weightPos.x+dims.dx && mousePos.y<=weightPos.y && mousePos.y>=weightPos.y-dims.dy 
@@ -784,11 +667,12 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	mass: function(){
 		return this.mass;
 	},
-	reset: function(){
-		this.dropAllIntoStores();
-		this.eAdded=0;
-		curLevel.wallV=0;
-	}
+	freeze: function() {
+		removeListener(curLevel, 'mousedown', 'weights' +this.wallInfo);
+	},
+	unfreeze: function() {
+		addListener(curLevel, 'mousedown', 'weights' + this.wallInfo, this.mousedown, this);
+	},
 })
 //////////////////////////////////////////////////////////////////////////
 //Pool

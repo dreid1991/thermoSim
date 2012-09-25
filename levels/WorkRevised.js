@@ -122,6 +122,7 @@ _.extend(Work.prototype,
 					setup:
 						function() {
 							currentSetupType = 'prompt0';
+							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:15, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
 							this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:10, alertUnsatisfied:'Compress the system!', cleanUpWith:currentSetupType});						
 						},
 					text:"Above is a well insulated piston cylinder assembly.  Place the block on top of the poston and observe the response.  How much work did you do on the system?",
@@ -225,9 +226,10 @@ _.extend(Work.prototype,
 				{
 					setup: function() {
 						currentSetupType = 'prompt3';
+						this.dragWeights.unfreeze();
 						walls[0].resetWork();
 						this.stops = new Stops({stopPt:{volume:15}});
-						this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'greaterThan', targetVal:14, alertUnsatisfied:'Expand the system!'});				
+						this.volListener14 = new StateListener({dataList:walls[0].data.v, is:'greaterThan', targetVal:14, alertUnsatisfied:'Expand the system!'});				
 					},
 					text: "You wrote that the system would do XXX kJ of work for a final temperature of YYY.  Find out of you were right by expanding the system.  Why is temperature higher after going through the compression and expansion cycle?",
 					replace:
