@@ -1585,7 +1585,7 @@ _.extend(Stops.prototype, objectFuncs, {
 		}
 	},
 	init: function(){
-		if (this.height>this.wall[0]) {
+		if (this.height>this.wall[0].y) {
 			this.boundToSet = 'yMax';
 		} else {
 			this.boundToSet = 'yMin'
@@ -1594,7 +1594,9 @@ _.extend(Stops.prototype, objectFuncs, {
 		var settingObj = {};
 		settingObj[this.boundToSet] = this.height;
 		walls.setBounds(this.wallInfo, settingObj);
-		addListener(curLevel, 'update', 'drawStops' + this.wallInfo, this.draw, '');
+		if (this.willDraw) {
+			addListener(curLevel, 'update', 'drawStops' + this.wallInfo, this.draw, '');
+		}
 		return this;
 	},
 	remove: function(){
@@ -1724,7 +1726,7 @@ _.extend(StateListener.prototype, objectFuncs, {
 	recordVals: function(){
 		this.results = {};
 		for (var storeName in this.storeAtSatisfy){
-			var storeAs = storeName + 'Block' + curLevel.blockIdx;
+			var storeAs = storeName + 'Block' + blockIdx + 'Prompt' + promptIdx;
 			var data = this.storeAtSatisfy[storeName];
 			var value = round(data[data.length-1], 1);
 			store(storeAs, value);

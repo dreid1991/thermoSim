@@ -539,9 +539,9 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 	if (newPrompt.setup) {
 		newPrompt.setup.apply(curLevel)
 	}
-	if (newPrompt.replace) {
-		newPrompt.text = replaceStrings(newPrompt.text, newPrompt.replace);
-	}
+	//if (newPrompt.replace) {
+		newPrompt.text = replaceStrings(newPrompt.text/*, newPrompt.replace*/);
+	//}
 	if (!newPrompt.quiz) {
 		$('#nextPrevDiv').show();
 	}
@@ -721,6 +721,20 @@ function prevPrompt(){
 
 
 function replaceStrings(text, replaceList){
+	var getIdx = text.indexOf('GET');
+	while (getIdx!=-1) {
+		if (text[getIdx+3] == '#') {
+			var endIdx = text.indexOf("|");
+			var gotten = parseFloat(getStore(text.slice(getIdx+4, endIdx)));
+			text = text.replace(text.slice(getIdx, endIdx+1), gotten);
+		} else {
+			var endIdx = text.indexOf("|");
+			var gotten = parseFloat(getStore(text.slice(getIdx+3, endIdx)));
+			text = text.replace(text.slice(getIdx, endIdx+1), gotten);		
+		}
+		getIdx = text.indexOf('GET');
+	}
+	/*
 	for (var replaceIdx=0; replaceIdx<replaceList.length; replaceIdx++){
 		var replace = replaceList[replaceIdx];
 		var oldStr = replace.oldStr;
@@ -736,6 +750,7 @@ function replaceStrings(text, replaceList){
 		}
 		text = text.replace(oldStr, newStr);
 	}
+	*/
 	return text;
 }
 

@@ -736,13 +736,14 @@ WallMethods = {
 						this.parent.setSubWallHandler(this.handle, 0, 'staticAdiabatic');
 						if (unboundedY<lowBound) {
 							funcOnFinish(lowBound);
+							nextY = lowBound;
 						} else {
 							funcOnFinish(highBound);
+							nextY = highBound;
 						}
-					}
-					if(unboundedY>bounds.yMax || unboundedY<bounds.yMin){
+					} else if(unboundedY>bounds.yMax || unboundedY<bounds.yMin) {
 						nextY = this.hitBounds(lastY, gLocal, bounds.yMin, bounds.yMax);
-					}else{
+					} else {
 						nextY = unboundedY;
 						this.v += gLocal;
 
