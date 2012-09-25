@@ -341,6 +341,9 @@ LevelTools = {
 		var boxText = defaultTo('Type your answer here.', question.text);
 		textBoxHTML += '<br>';
 		textBoxHTML += question.label;
+		if (cols>20) {
+			textBoxHTML += '<br>';
+		}
 		textBoxHTML += "<textarea id='"+idText+"' rows='" +rows+ "' cols='" +cols+ "' placeholder='"+boxText+"'></textarea>";
 		if (question.units) {
 			textBoxHTML += question.units;
