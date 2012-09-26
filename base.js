@@ -279,9 +279,10 @@ function listenerExists(object, typeName, funcName){
 	return object[typeName + 'Listeners'].listeners[funcName]!==undefined;
 }
 function emptyListener(object, typeName){
-	for (var listenerName in object[typeName + 'Listeners'].listeners){
-			delete object[typeName + 'Listeners'].listeners[listenerName];
-	}
+	object[typeName + 'Listeners'].listeners = {};
+}
+function emptySave(object, typeName){
+	object[typeName + 'Listeners'].save = {};
 }
 function getListenerByName(object, typeName, pieceName){
 	for (thisFuncName in object[typeName + 'Listeners'].listeners){
@@ -771,6 +772,14 @@ function getLen(pts) {
 		len+=pts[ptIdx].distTo(pts[ptIdx+1]);
 	}
 	return len;
+}
+function name(str) {
+	if (currentSetupType=='block') {
+		return str + 'B' + blockIdx;
+	} else {
+		return str + 'B' + blockIdx + 'P' + promptIdx;
+	}
+	 
 }
 function byAttr(obj, attrVal, attr) {
 	if (obj instanceof Array) {

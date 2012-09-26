@@ -236,6 +236,16 @@ _.extend(Work.prototype,
 			]
 		},
 		{//B4
+			setup:undefined,
+			prompts:[
+				{
+					setup:undefined,
+					cutScene:true,
+					text:"In the context of this system, the first law says ||EQ6CE and we saw that obeyed in the previous experiments.  Remember how work transfers energy through collisions between molecules and the moving wall?  But does that mechanism always produce the temperature change predicted by the first law?  Let's investigate what effect the number of molecules in the system has on the change in temperature.",
+				}
+			],
+		},
+		{//B5
 			setup: 
 				function(){
 					currentSetupType = 'block';
@@ -263,7 +273,7 @@ _.extend(Work.prototype,
 							this.piston.setPressure(.01);
 							this.listener1 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7.5, tolerance:.01, storeAtSatisfy:{temp:walls[0].data.t}, alertUnsatisfied:"Click the 'Release' button to compress the system"});	
 						},
-					text:"By the way, one molecule in this corresponds to just under a billion trillion real molecules, so this isn't how a system with one molecule with Pext of .01 bar would behave.",
+					text:"Okay, here's a system with one molecule.  Click the release button to let the piston fall.  The pressure has been scaled down so that if the first law is obeyed, the final temperature should be 715 K.  By the way, one molecule in this simulation corresponds to just under a billion trillion real molecules, so this isn't how a system with one molecule under these conditions would behave.",
 					title:"Current step",
 				},
 				{//P1
@@ -277,7 +287,7 @@ _.extend(Work.prototype,
 							this.piston.setPressure(.083);	
 							this.listener1 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7.5, tolerance:.01, storeAtSatisfy:{temp:walls[0].data.t}, alertUnsatisfied:"Click the 'Release' button to compress the system"});								
 						},
-					text:'blop',
+					text:"Now let's try 10 molecules.<br>Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>Many</td><td>715 K</td></tr></table></p> ",
 					title:"Current step",
 				},
 				{//P2
@@ -291,8 +301,8 @@ _.extend(Work.prototype,
 							this.piston.setPressure(.41);
 							this.listener1 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7.5, tolerance:.01, storeAtSatisfy:{temp:walls[0].data.t}, alertUnsatisfied:"Click the 'Release' button to compress the system"});	
 						},
-					text:"",
-					title:"",
+					text:"Here are 50 molecules.  <p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>10</td><td>GET#tempB5P1| K</td></tr><tr><td>Many</td><td>715 K</td></tr></table></p>",
+					title:"Current step",
 				},
 				{//P3
 					setup:
@@ -305,16 +315,20 @@ _.extend(Work.prototype,
 							this.piston.setPressure(.833);
 							this.listener1 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7.5, tolerance:.01, storeAtSatisfy:{temp:walls[0].data.t}, alertUnsatisfied:"Click the 'Release' button to compress the system"});	
 						},
-					text:"",
-					title:"",				
+					text:"And here are 100.  Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>10</td><td>GET#tempB5P1| K</td></tr><tr><td>50</td><td>GET#tempB5P2| K</td></tr><tr><td>Many</td><td>715 K</td></tr></table></p> How is the piston's behavior changing?",
+					title:"Current step",
+					quiz:[
+						{
+							type:'text',
+							text:"Type your answer here.",
+						}
+					]					
 				
 				},
 				{//P3
 					setup:undefined,
-					text:"When using many molecules, the compressed temperature was 715 K.  From the last experiments, we obtained the following data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB4P0|</td></tr><tr><td>10</td><td>GET#tempB4P1|</td></tr><tr><td>50</td><td>GET#tempB4P2|</td></tr><tr><td>100</td><td>GET#tempB4P3|</td></tr></table></p>  Do you notice a trend in the data?  If so, why might that trend exist?",
-					//MAKE LIST, like 1:5k
-									//2:30K OR WHATEVER
-					title:"",
+					text:"Here's all the collected data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>10</td><td>GET#tempB5P1| K</td></tr><tr><td>50</td><td>GET#tempB5P2| K</td></tr><tr><td>100</td><td>GET#tempB5P3| K</td></tr><tr><td>Many</td><td>715 K</td></tr></table></p>  Do you notice a trend?  If so, why might that trend exist?",
+					title:"Current step",
 					cutScene:true,
 					quiz:[
 						{
@@ -353,8 +367,8 @@ _.extend(Work.prototype,
 							this.piston.setPressure(getStore('pExt'));
 							this.listener1 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7.5, tolerance:.01, storeAtSatisfy:{temp:walls[0].data.t}, alertUnsatisfied:"Click the 'Release' button to compress the system"});	
 						},
-					text:"",
-					title:"",
+					text:"Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>10</td><td>GET#tempB5P1| K</td></tr><tr><td>50</td><td>GET#tempB5P2| K</td></tr><tr><td>100</td><td>GET#tempB5P3| K</td></tr><tr><td>Many</td><td>715 K</td></tr></table></p>",
+					title:"Current step",
 				},
 					
 			]

@@ -46,4 +46,9 @@ for srs reset, it may be easiest to just start at the block and have it run thro
 
 make readdress data to change source lists for a set on graphs.  Use this to keep same graphs between prompts/blocks/whatever
 
-in stores, shorted block,prompt,question to B, P, Q
+Need to make nice setup preservation scheme
+	perhaps: instead of remove, just have deactivate listeners, and all block/prompt listeners have block/prompt stuff in name so they aren't overwritten.
+	Wall would be an exception.  Would need to copy reference on walls store object or something.  
+	Would save all listeners active at that prompt when leaving.
+	When going to a prompt, would check if there were saved listeners for it.  That means that user had been there.  
+	Then can have reactivate listener.  Can exec all things in that.  init and reactivate could probably be made to be the same thing.  Could just be activate

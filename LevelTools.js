@@ -80,16 +80,16 @@ LevelTools = {
 		$('#dashRun').hide();
 		if (mode===true && !quiz) {
 			$('#dashCutScene').show();
-			this.cutSceneText.html(text);
+			this.cutSceneText(text);
 			$('#prompt').html('');
 		} else if (mode=='intro') {
 			$('#dashIntro').show();
 			$('#base').hide();
-			this.cutSceneText.html(text);
+			this.cutSceneText(text);
 		} else if (mode=='outro') {
 			$('#dashOutro').show();
 			$('#base').hide();
-			this.cutSceneText.html(text);
+			this.cutSceneText(text);
 		} else if (quiz) {
 			$('#dashCutScene').show();
 			$('#base').hide();
@@ -180,7 +180,7 @@ LevelTools = {
 		$('#intText').show();
 	},
 	cutSceneText: function(text){
-		$('#intText').html(text);//is this used?
+		$('#intText').html(text);
 	},
 	cutSceneEnd: function(){
 		this.inCutScene = false;
@@ -197,7 +197,6 @@ LevelTools = {
 		$('#intText').hide();	
 	},
 	pause: function(){
-
 		saveListener(this, 'update');
 		saveListener(this, 'data');
 		saveListener(this, 'wallMove');
@@ -218,6 +217,12 @@ LevelTools = {
 		loadListener(this, 'mousedown');
 		loadListener(this, 'mouseup');
 		loadListener(this, 'mousemove');
+		emptySave(this, 'update');
+		emptySave(this, 'data');
+		emptySave(this, 'wallMove');
+		emptySave(this, 'mousedown');
+		emptySave(this, 'mouseup');
+		emptySave(this, 'mousemove');
 	},
 	questionIsCorrect: function() {
 		return this.correct;
