@@ -47,7 +47,7 @@ _.extend(Work.prototype,
 				{//P1
 					setup:undefined,
 					cutScene:true,
-					text: "||EQ1BR<p>Indeed.  This equation tells us that work done on a system is equal to how hard you compress a container times how much you compress it.</p><p>Now from the first law, we know</p>||EQ5CE<p>For our adiabatic system, which of the following relations is correct, if we assume constant heat capacity?</p>",
+					text: "||EQ1BR<p>Indeed.  This equation tells us that work done on a system is equal to how hard you compress a container per area times how much you compress it.</p><p>Now from the first law, we know</p>||EQ5CE<p>For our adiabatic system, which of the following relations is correct, if we assume constant heat capacity?</p>",
 					quiz:[
 						{	
 							type:'multChoice',
@@ -136,7 +136,7 @@ _.extend(Work.prototype,
 				},
 				{//P1
 					setup:undefined,
-					text:"The system had an initial temperature of 200 K and contained 1.8 moles of an ideal monatomic gas.  You wrote that GET#userAnswerB2P0Q0| kJ of work were done.  What final temperature should the system have had?",
+					text:"The system had an initial temperature of 200 K and contains 1.8 moles of an ideal monatomic gas.  You wrote that GET#userAnswerB2P0Q0| kJ of work were done.  What final temperature should the system have had?",
 					quiz:[
 						{	
 							type:'textSmall',
@@ -166,7 +166,7 @@ _.extend(Work.prototype,
 							currentSetupType = 'prompt0';
 							this.blocks[2].prompts[0].setup.apply(this);
 						},
-					text:"Previously you answered that the compression did GET#userAnswerB2P0Q0|kJ on the system for a final temperature of GET#userAnswerB2P1Q0|K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
+					text:"Previously you answered that the compression did GET#userAnswerB2P0Q0|kJ on the system bringing it to a final temperature of GET#userAnswerB2P1Q0|K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
 					quiz:[
 						{
 							type:'text',
@@ -225,7 +225,7 @@ _.extend(Work.prototype,
 						this.stops = new Stops({stopPt:{volume:15}});
 						this.volListener14 = new StateListener({dataList:walls[0].data.v, is:'greaterThan', targetVal:14, alertUnsatisfied:'Expand the system!', atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});				
 					},
-					text: "You wrote that the system would do GET#userAnswerB3P2Q0| kJ of work for a final temperature of GET#userAnswerB3P2Q1|.  Find out of you were right by expanding the system.  Why is the temperature higher after going through the compression and expansion cycle?",
+					text: "You wrote that the system would do GET#userAnswerB3P2Q0| kJ of work for a final temperature of GET#userAnswerB3P2Q1| K.  Find out of you were right by expanding the system.  Why is the system temperature higher after going through the compression and expansion cycle?",
 					quiz:[
 						{
 							type:'text',
@@ -241,7 +241,7 @@ _.extend(Work.prototype,
 				{
 					setup:undefined,
 					cutScene:true,
-					text:"In the context of this system, the first law says ||EQ6CE and we saw that obeyed in the previous experiments.  Remember how work transfers energy through collisions between molecules and the moving wall?  But does that mechanism always produce the temperature change predicted by the first law?  Let's investigate what effect the number of molecules in the system has on the change in temperature.",
+					text:"<p>In the context of this system, the first law says</p> ||EQ6CE <p>and we saw that obeyed in the previous experiments.  Remember how work transfers energy through collisions between molecules and the moving wall?</p><p>Do you think that mechanism always produces the temperature change predicted by the first law?  Let's investigate what effect the number of molecules in the system has on the change in temperature.</p><p>Maybe add a response block here, but it seems like people have no basis on which to speculate here</p>",
 				}
 			],
 		},
@@ -273,7 +273,7 @@ _.extend(Work.prototype,
 							this.piston.setPressure(.01);
 							this.listener1 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7.5, tolerance:.01, storeAtSatisfy:{temp:walls[0].data.t}, alertUnsatisfied:"Click the 'Release' button to compress the system"});	
 						},
-					text:"Okay, here's a system with one molecule.  Click the release button to let the piston fall.  The pressure has been scaled down so that if the first law is obeyed, the final temperature should be 715 K.  By the way, one molecule in this simulation corresponds to just under a billion trillion real molecules, so this isn't how a system with one molecule under these conditions would behave.",
+					text:"Okay, here's a system with one molecule.  Click the release button to let the piston fall.  The pressure has been scaled down so that if the first law is obeyed, the final temperature will be 715 K.  By the way, one molecule in this simulation corresponds to just under a billion trillion real molecules, so this isn't how a system with one molecule at this temperature and pressure would behave.",
 					title:"Current step",
 				},
 				{//P1
@@ -301,7 +301,7 @@ _.extend(Work.prototype,
 							this.piston.setPressure(.41);
 							this.listener1 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7.5, tolerance:.01, storeAtSatisfy:{temp:walls[0].data.t}, alertUnsatisfied:"Click the 'Release' button to compress the system"});	
 						},
-					text:"Here are 50 molecules.  <p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>10</td><td>GET#tempB5P1| K</td></tr><tr><td>Many</td><td>715 K</td></tr></table></p>",
+					text:"Here are 50 molecules.<br>Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>10</td><td>GET#tempB5P1| K</td></tr><tr><td>Many</td><td>715 K</td></tr></table></p>",
 					title:"Current step",
 				},
 				{//P3
@@ -315,7 +315,7 @@ _.extend(Work.prototype,
 							this.piston.setPressure(.833);
 							this.listener1 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7.5, tolerance:.01, storeAtSatisfy:{temp:walls[0].data.t}, alertUnsatisfied:"Click the 'Release' button to compress the system"});	
 						},
-					text:"And here are 100.  Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>10</td><td>GET#tempB5P1| K</td></tr><tr><td>50</td><td>GET#tempB5P2| K</td></tr><tr><td>Many</td><td>715 K</td></tr></table></p> How is the piston's behavior changing?",
+					text:"And here are 100.<br>Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>10</td><td>GET#tempB5P1| K</td></tr><tr><td>50</td><td>GET#tempB5P2| K</td></tr><tr><td>Many</td><td>715 K</td></tr></table></p> How does the piston's behavior change as the number of molecules increases?",
 					title:"Current step",
 					quiz:[
 						{
@@ -325,7 +325,7 @@ _.extend(Work.prototype,
 					]					
 				
 				},
-				{//P3
+				{//P4
 					setup:undefined,
 					text:"Here's all the collected data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>10</td><td>GET#tempB5P1| K</td></tr><tr><td>50</td><td>GET#tempB5P2| K</td></tr><tr><td>100</td><td>GET#tempB5P3| K</td></tr><tr><td>Many</td><td>715 K</td></tr></table></p>  Do you notice a trend?  If so, why might that trend exist?",
 					title:"Current step",
@@ -337,7 +337,7 @@ _.extend(Work.prototype,
 						}
 					]
 				},
-				{//P4
+				{//P5
 					setup: undefined,
 					text:"Now you pick how many moles of gas to put in the system.  Try to pick so that the final temperature is closest the what the first law predicts (715 K).",
 					title:"",
@@ -355,7 +355,7 @@ _.extend(Work.prototype,
 						},
 					]
 				},
-				{//P5
+				{//P6
 					setup:
 						function(){
 							currentSetupType = 'prompt5';
@@ -373,6 +373,22 @@ _.extend(Work.prototype,
 					
 			]
 			
+		},
+		{//B6
+			setup:undefined,
+			prompts:[
+				{//P0
+					setup:undefined,
+					cutScene:true,
+					text:"Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>10</td><td>GET#tempB5P1| K</td></tr><tr><td>50</td><td>GET#tempB5P2| K</td></tr><tr><td>100</td><td>GET#tempB5P3| K</td></tr><tr><td>GET#count|</td><td>GET#tempB5P6| K</td></tr><tr><td>Many</td><td>715 K</td></tr></table></p><p>From the data, what conclusions can you draw about when the first law applies, and why?</p>Could add outro, but apart from that, this is the end.",
+					quiz:[
+						{
+							type:'text',
+							text:"Type your answer here.",
+						}
+					]	
+				}
+			]
 		}
 		]
 		
