@@ -168,7 +168,7 @@ function changeRMS(info, newRMS){
 
 function tempToV(mass, temp){
 	//T/tConst = 0.5*m*v^2
-	temp = 2*Math.max(0, temp/tConst*gauss(1,.1));
+	temp = 2*temp/tConst;
 	return Math.sqrt(temp/mass);
 }
 function VToTemp(mass, v){
