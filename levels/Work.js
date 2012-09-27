@@ -95,7 +95,7 @@ _.extend(Work.prototype,
 				}
 			]
 		},
-		{//2
+		{//B2
 			setup:
 				function() {
 					currentSetupType = 'block';
