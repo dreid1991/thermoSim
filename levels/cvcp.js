@@ -78,7 +78,7 @@ _.extend(cvcp.prototype,
 								this.rightTemp250 = new StateListener({dataList:walls[1].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the right container to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
 							},
 						title:"Current step",
-						text:"Okay, here’s a constant volume and a constant pressure container filled with an ideal gas.  Both are adiabatic.  Heat the two containers to 250 K.  How do the energies used compare?",
+						text:"Okay, here’s a constant volume and a constant pressure container.  Both are adiabatic and contain 0.6 moles of an ideal monatomic gas.  Heat the two containers to 250 K.  How do the energies used compare?",
 						quiz:[
 							{	
 							type:'text',
