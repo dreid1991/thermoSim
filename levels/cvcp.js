@@ -62,7 +62,7 @@ _.extend(cvcp.prototype,
 						this.piston = new Piston({wallInfo:'right', min:2, init:2, max:2, makeSlider:false})
 						this.heaterLeft = new Heater({handle:'heaterLeft', wallInfo:'left'});
 						this.heaterRight = new Heater({handle:'heaterRight', wallInfo:'right'});
-						walls[1].displayPExt();
+						
 						walls[1].setDefaultReadout(this.readout);
 						walls[0].displayTemp().displayQ();
 						walls[1].displayTemp().displayQ();
@@ -72,6 +72,8 @@ _.extend(cvcp.prototype,
 						setup: 
 							function(){
 								currentSetupType = 'prompt1';
+								walls[1].setDefaultReadout(this.piston.readout);
+								walls[1].displayPExt();
 								this.leftTemp250 = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the left container to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
 								this.rightTemp250 = new StateListener({dataList:walls[1].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the right container to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
 							},
