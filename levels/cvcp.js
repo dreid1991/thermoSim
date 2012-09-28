@@ -62,7 +62,7 @@ _.extend(cvcp.prototype,
 						this.piston = new Piston({wallInfo:'right', min:2, init:2, max:2, makeSlider:false})
 						this.heaterLeft = new Heater({handle:'heaterLeft', wallInfo:'left'});
 						this.heaterRight = new Heater({handle:'heaterRight', wallInfo:'right'});
-						//walls[1].displayWork();
+						walls[1].displayPExt();
 						walls[1].setDefaultReadout(this.readout);
 						walls[0].displayTemp().displayQ();
 						walls[1].displayTemp().displayQ();
@@ -86,7 +86,7 @@ _.extend(cvcp.prototype,
 					},
 					{
 						setup:undefined,
-						text:"<p>If you'll notice, it took 0.5 kJ to bring to 250K while the constant pressure container took 0.8 kJ.</p>Do you have any theories about why that is?<br>",
+						text:"<p>It took 0.5 kJ to bring to 250K while the constant pressure container took 0.8 kJ.</p>Do you have any theories about why that is?<br>",
 						quiz:[
 							{	
 							type:'text',
@@ -103,11 +103,16 @@ _.extend(cvcp.prototype,
 						this.blocks[1].setup.apply(this);
 						walls[1].setDefaultReadout(this.piston.readout);
 						walls[1].displayWork();
-						this.blocks[1].prompts[0].setup.apply(this);
+						
 					},
 				prompts:[
 					{//P0
-						setup:undefined,
+						setup:
+							function() {
+								this.leftTemp250 = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the left container to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
+								this.rightTemp250 = new StateListener({dataList:walls[1].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the right container to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});							
+							
+							},
 						text:"Try heating the containers to 250 K again.  This time the work done by the constant pressure container is displayed.  Is your theory consistant with the data from this heating?",
 						quiz:[
 							{	
@@ -118,7 +123,7 @@ _.extend(cvcp.prototype,
 					}
 				]
 			},
-			{//B4
+			{//B3
 				setup:undefined,
 				prompts:[
 					{
@@ -135,6 +140,23 @@ _.extend(cvcp.prototype,
 				]
 				
 			},
+			{//B4
+				setup:undefined,
+				prompts:[
+					{
+						setup:undefined,
+						cutScene:true,
+						text:"<p>From that data, we can say</p>||EQ16CE<p>The idea is that in a constant pressure, the energy goes to heating up the molecules <i>and</i> to the surroundings as the system expands.  Note that we changed to work done <i>by</i> the system, not on.</p><p>Substituting in from the first law, we get</p>||EQ11CE<p>From the ideal gas law, we know</p>||EQ12CE<p>Substituting in, we get</p>||EQ13CE<p>Continued on next page.</p>",
+					},
+					{
+						setup:undefined,
+						cutScene:true,
+						text:"||EQ13CE<p>Now a heat capacity is the amount of energy per mole per degree temperature change.  We can express that as follows</p>||EQ17CE<p>If we divide the top equation by nT, we get</p>||EQ14CE<p>There.  We've built up the idea that constant pressure heat capacity is greater that constant volume because of the work done while expanding to maintain constant pressure."
+					}
+					
+				]
+			}
+			/*
 				{//B2
 				setup:undefined,
 				prompts:[
@@ -237,6 +259,7 @@ _.extend(cvcp.prototype,
 					}
 				]
 			}
+		*/
 		]
 	}
 
