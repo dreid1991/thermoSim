@@ -13,7 +13,7 @@ _.extend(cvcp.prototype,
 			LevelTools, 
 {
 	init: function() {
-		$('#mainHeader').text('c<sub>V</sub> vs. c<sub>P</sub');
+		$('#mainHeader').html('c<sub>V</sub> vs. c<sub>P</sub');
 		showPrompt(0, 0, true);
 	},
 	declareBlocks: function(){
@@ -24,7 +24,7 @@ _.extend(cvcp.prototype,
 					{//P0
 						setup:undefined,
 						cutScene:true,
-						text:"<p>It's time to look at heat capacities!</p><p>For an ideal monatomic gas, which of these is correct?  C<sub>V</sub> means heat capacity at constant volume, C<sub>P</sub> means heat capacity at constant pressure.",
+						text:"<p>It's time to look at heat capacities!</p><p>For an ideal monatomic gas, which of these is correct?  c<sub>V</sub> means heat capacity at constant volume, c<sub>P</sub> means heat capacity at constant pressure.",
 						quiz:[
 							{	
 								type:'multChoice', 
@@ -41,14 +41,14 @@ _.extend(cvcp.prototype,
 					{//P1
 						setup:undefined,
 						cutScene:true,
-						text:"Right.  This means that is takes more energy to heat up the same gas at at constant volume than at constant pressure.  Absorbs energy the same way.  The difference comes from the conditions under which the gas is heated, and that's what we're going to investigate.  Shall we?"
+						text:"<p>Right.</p><p>This means that is takes more energy to heat up the same gas at constant pressure than at constant volume.  Let's investigate these processes to find out why this is.</p>"
 					}
 				]
 			},
 			{//B1
 				setup:
 					function() {
-						currentSetupMode = 'block';
+						currentSetupType = 'block';
 						walls = WallHandler({pts:[[P(40,190), P(255,190), P(255,425), P(40,425)], [P(295,190), P(510,190), P(510,425), P(295,425)]], handlers:'staticAdiabatic', handles:['left', 'right'], bounds:[undefined, {yMin:50, yMax:275}], vols:[5,5]});
 						this.borderStd({wallInfo:'left', min:50});
 						this.borderStd({wallInfo:'right', min:50});
@@ -58,22 +58,35 @@ _.extend(cvcp.prototype,
 						spcs['spc1'].populate(P(300,200), V(200, 200), 350, 185, 'right', 'right');
 						spcs['spc3'].populate(P(300,200), V(200, 200), 250, 185, 'right', 'right');	
 						
-						this.leftTemp400 = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:400, alertUnsatisfied:"Bring the left container to 400 K", priorityUnsatisfied:1, checkOn:'conditions'});
-						this.rightTemp400 = new StateListener({dataList:walls[1].data.t, is:'equalTo', targetVal:400, alertUnsatisfied:"Bring the right container to 400 K", priorityUnsatisfied:1, checkOn:'conditions'});
-						
 						
 						this.piston = new Piston({wallInfo:'right', min:2, init:2, max:2, makeSlider:false})
 						this.heaterLeft = new Heater({handle:'heaterLeft', wallInfo:'left'});
 						this.heaterRight = new Heater({handle:'heaterRight', wallInfo:'right'});
+						//walls[1].displayWork();
 						walls[1].setDefaultReadout(this.readout);
 						walls[0].displayTemp().displayQ();
 						walls[1].displayTemp().displayQ();
 					},
 				prompts:[
 					{//P0
-						setup:undefined,
+						setup: 
+							function(){
+								currentSetupType = 'prompt1';
+								this.leftTemp250 = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the left container to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
+								this.rightTemp250 = new StateListener({dataList:walls[1].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the right container to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
+							},
 						title:"Current step",
-						text:"Okay, here’s a constant volume and a constant pressure container.  Both are adiabatic.  Heat the two containers to 400 K.  How do the energies used compare?",
+						text:"Okay, here’s a constant volume and a constant pressure container filled with an ideal gas.  Both are adiabatic.  Heat the two containers to 250 K.  How do the energies used compare?",
+						quiz:[
+							{	
+							type:'text',
+							text:'Type your answer here.',
+							},
+						]
+					},
+					{
+						setup:undefined,
+						text:"<p>If you'll notice, it took 0.5 kJ to bring to 250K while the constant pressure container took 0.8 kJ.</p>Do you have any theories about why that is?<br>",
 						quiz:[
 							{	
 							type:'text',
@@ -85,12 +98,50 @@ _.extend(cvcp.prototype,
 
 			},
 			{//B2
+				setup:
+					function() {
+						this.blocks[1].setup.apply(this);
+						walls[1].setDefaultReadout(this.piston.readout);
+						walls[1].displayWork();
+						this.blocks[1].prompts[0].setup.apply(this);
+					},
+				prompts:[
+					{//P0
+						setup:undefined,
+						text:"Try heating the containers to 250 K again.  This time the work done by the constant pressure container is displayed.  Is your theory consistant with the data from this heating?",
+						quiz:[
+							{	
+							type:'text',
+							text:'Type your answer here.',
+							},
+						]
+					}
+				]
+			},
+			{//B4
+				setup:undefined,
+				prompts:[
+					{
+						setup:undefined,
+						cutScene:true,
+						text:"<p>Here's the data from the previous experiment:</p><p><table style='color:white;' border='1' bordercolor=white><tr><td>Q c<sub>V</sub></td><td>0.5 kJ</td></tr><tr><td>Q c<sub>P</sub></td><td>0.8 kJ</td></tr><tr><td>W (on sys) c<sub>P</sub></td><td>-0.3 kJ</td></tr></table></p><p>From your theory and the data, try to build an equation to that relates the energy added during the constant pressure and constant volume heatings.",
+						quiz:[
+							{	
+							type:'text',
+							text:'Type your equation here.',
+							},
+						]
+					}
+				]
+				
+			},
+				{//B2
 				setup:undefined,
 				prompts:[
 					{//P0
 						setup:undefined,
 						cutScene:true,
-						text:"When we’re heating at constant volume, where does the energy go?",
+						text:"<p>Right, the constant pressure heating took more energy.  To figure out why, we need to think about where the energy added by the heater goes.</p><p>A change in temperature is just a change in the kinetic energy of the molecules.</p><p>In the constant volume heating, where did the energy added by the heater go?</p>",
 						quiz:[
 							{	
 								type:'multChoice', 
@@ -106,7 +157,7 @@ _.extend(cvcp.prototype,
 					{//P1
 						setup:undefined,
 						cutScene:true,
-						text:"Good, and we express this how?"
+						text:"<p>Under constant volume, all of the energy added by the heater was transfered to the molecules, leading to a temperature increase. </p><p> How can we express this thought in an equation?</p>",
 						quiz:[
 							{
 								type:'multChoice', 
@@ -122,7 +173,7 @@ _.extend(cvcp.prototype,
 					{//P2
 						setup:undefined,
 						cutScene:true,
-						text:"<p>Yes.</p><p>It takes some amount of energy to heat up one mole these molecules one degree kelvin.  That amount is the heat capacity c<sub>V</sub>.  To get the total energy change in a temperature change, we multiply that amount by the change in temperature and the number of moles.  Thus we get<p>||EQ6CE<p>Okay, now what about in the constant pressure case?  Where does the energy go then?</p>",
+						text:"<p>Yes.</p><p>It takes some amount of energy to heat up one mole these molecules one degree kelvin.  Under constant volume, that amount is the heat capacity c<sub>V</sub>.  To get the total energy change in a temperature change, we multiply that heat capacity by the change in temperature and the number of moles.  Thus we get<p>||EQ6CE<p>In the constant pressure case, the system was expanding against a constant external pressure.  Where does this tell you that the energy added by the heater goes?",
 						quiz:[
 							{
 								type:'multChoice', 
@@ -138,7 +189,7 @@ _.extend(cvcp.prototype,
 					{//P3
 						setup:undefined,
 						cutScene:true,
-						text:"So we’re putting energy into <i>two</i> places now!  So we know that </p>||EQ6aCE<p> is the energy that goes into heating the system.  How could we express the energy that goes into expanding the system again constant pressure?</p>",
+						text:"So we’re putting energy into <i>two</i> places now!  We put </p>||EQ6aCE<p> into speeding up the molecules.  Which of these expresses the energy expended by expanding against contstant pressure?</p>",
 						quiz:[
 							{
 								type:'multChoice', 
@@ -149,18 +200,20 @@ _.extend(cvcp.prototype,
 									
 								]				
 							},
+							
 						]
-					}
+					},
+
 				]
 			},
 			{//B3
 				setup: function() {
-					curLevel.blocks[1].setup();
-				}
+					this.blocks[1].setup.apply(this);
+				},
 				prompts:[
 					{//P0
 						setup:undefined,
-						text:"Try heating the two systems to 400 K once more.  This time consider how the work done affects the amount of energy used in the heating.",
+						text:"That's right, so under constant pressure, energy goes into speeding up the molecules <i>and</i> into expanding the system, whereas in a constant volume heating, energy only goes into speeding up the molecules.  Try heating the two systems to 250 K once more.  How does work done affect the amount of energy needed to heat the them?",
 						quiz:[
 							{	
 							type:'text',
@@ -175,7 +228,8 @@ _.extend(cvcp.prototype,
 				prompts:[
 					{//P0
 						cutScene:true,
-						text:"<p>So the system heated under constant pressure took more energy per temperature change because the system does work on its surroundings while expanding to maintain constant pressure. </p> <p>If we combine adding energy to the molecules to speed them up and the energy added to the surroundings, we get </p>||EQ11CE<p>With a bit of math, we can relate this to a heat capacity.<p>From the ideal gas law, we know ||EQ12CE Substituting in, we get ||EQ13CE  "
+						text:"<p>Now to express this idea mathematically, we can say</p>||EQ11CE<p>From the ideal gas law, we know</p>||EQ12CE<p>Substituting in, we get</p>||EQ13CE",
+						//text:"<p>So the system heated under constant pressure took more energy per temperature change because the system does work on its surroundings while expanding to maintain constant pressure. </p> <p>If we combine adding energy to the molecules to speed them up and the energy added to the surroundings, we get </p>||EQ11CE<p>With a bit of math, we can relate this to a heat capacity.<p>From the ideal gas law, we know ||EQ12CE Substituting in, we get ||EQ13CE  "
 					},
 					{//P1
 						cutScene:true,
