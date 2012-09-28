@@ -88,7 +88,7 @@ _.extend(cvcp.prototype,
 					},
 					{
 						setup:undefined,
-						text:"<p>It took 0.5 kJ to bring to 250K while the constant pressure container took 0.8 kJ.</p>Do you have any theories about why that is?<br>",
+						text:"<p>It took 0.5 kJ to bring the constant volume container to 250K while the constant pressure container took 0.8 kJ.</p>Do you have any theories about why that is?<br>",
 						quiz:[
 							{	
 							type:'text',
@@ -152,8 +152,8 @@ _.extend(cvcp.prototype,
 					},
 					{
 						setup:undefined,
-						cutScene:true,
-						text:"||EQ13CE<p>Now a heat capacity is the amount of energy per mole per degree temperature change.  We can express that as follows</p>||EQ17CE<p>If we divide the top equation by nT, we get</p>||EQ14CE<p>There.  We've built up the idea that constant pressure heat capacity is greater that constant volume because of the work done while expanding to maintain constant pressure."
+						cutScene:'outro',
+						text:"||EQ13CE<p>Now a heat capacity is the amount of energy per mole per degree temperature change.  We can express that as follows</p>||EQ17CE<p>If we divide the top equation by nT, we get</p>||EQ14CE<p>  So since ||EQ1|| we can say ||EQ4||</p>There.  We've built up the idea that constant pressure heat capacity is greater that constant volume because of the work done while expanding to maintain constant pressure."
 					}
 					
 				]
