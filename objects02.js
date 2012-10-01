@@ -26,11 +26,21 @@ function Sandbox(attrs){
 	this.rate = defaultTo(.15, attrs.rate);
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.wall = walls[this.wallInfo];
-	this.massMax = defaultTo(75, attrs.massMax);
-	this.massMin = defaultTo(10, attrs.massMin);
-	this.mass = defaultTo(10, attrs.massInit);
-	this.buttonAdd = defaultTo('buttonAddMass', attrs.addButtonId);
-	this.buttonRemove = defaultTo('buttonRemoveMass', attrs.removeButtonId);
+	if (attrs.pInit) {
+		this.mass = this.pressureToMass(attrs.pInit);
+	} else {
+		this.mass = defaultTo(10, attrs.massInit);
+	}
+	if (attrs.pMax) {
+		this.massMax = this.pressureToMass(attrs.pMax);
+	} else {
+		this.massMax = defaultTo(75, attrs.massMax);
+	}
+	if (attrs.pMin) {
+		this.pMin = this.pressureToMass(attrs.pMin);
+	} else {
+		this.massMin = defaultTo(10, attrs.massMin);
+	}
 	this.particleMass = .05;
 	this.buttonAddId = 'sandAdd';
 	this.buttonRemoveId = 'sandRemove';

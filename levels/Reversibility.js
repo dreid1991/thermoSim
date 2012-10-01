@@ -21,7 +21,7 @@ _.extend(Reversibility.prototype,
 			prompts:[
 				{//P0
 					setup:undefined,
-					cutScene:true,
+					cutScene:'intro',
 					text:"hello, I'm an intro",
 				}
 			],
@@ -31,22 +31,166 @@ _.extend(Reversibility.prototype,
 				function() {
 					currentSetupType = 'block';
 					this.unCompSetup();
-					//this.makeGraph();
+					this.makeGraph();
 					this.dragWeights = new DragWeights({weightDefs:[{count:1, pressure:3}], displayText:false, pInit:3})
-					walls[0].displayPExt();
+					walls[0].displayPExt().displayWork().displayQ().displayQArrows();
 				},
 			prompts:[
 				{//P0
 					setup:
 						function() {
-							currentSetupType = 'prompt1';
+							currentSetupType = 'prompt0';
+							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:6, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:10, alertUnsatisfied:"Compress the system by dragging the weight up from the bin"});
 						},
 					text:"B1P0",
-					title:"Current step"
+					title:"Current step",
+				},
+				{//P1
+					setup: 
+						function() {
+							currentSetupType = 'prompt1';
+							this.drawWeights.unfreeze();
+							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:3, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, alertUnsatisfied:"Expand the system by dragging the weight off of the piston"});
+						},
+					text:"B1P1",
+					title:"Current step",
+				}
+			]
+		},
+		{//B2
+			setup: 
+				function() {
+					currentSetupType = 'block';
+					this.unCompSetup();
+					this.makeGraph();
+					this.dragWeights = new DragWeights({weightDefs:[{count:4, pressure:3}], displayText:false, pInit:3})
+					walls[0].displayPExt().displayWork().displayQ().displayQArrows();
+				}
+			prompts:[
+				{//P0
+					setup:
+						function() {
+							currentSetupType = 'prompt0';
+							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:6, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:10, alertUnsatisfied:"Compress the system by dragging the weight up from the bin"});
+						},
+					text:"B2P0",
+					title:"Current step",
+				},
+				{//P1
+					setup: 
+						function() {
+							currentSetupType = 'prompt1';
+							this.drawWeights.unfreeze();
+							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:3, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, alertUnsatisfied:"Expand the system by dragging the weight off of the piston"});
+						},
+					text:"B2P1",
+					title:"Current step",
+				}
+			]
+		},
+		{//B3
+			setup: 
+				function() {
+					currentSetupType = 'block';
+					this.unCompSetup();
+					this.makeGraph();
+					this.dragWeights = new DragWeights({weightDefs:[{count:8, pressure:3}], displayText:false, pInit:3})
+					walls[0].displayPExt().displayWork().displayQ().displayQArrows();
+				}
+			prompts:[
+				{//P0
+					setup:
+						function() {
+							currentSetupType = 'prompt0';
+							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:6, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:10, alertUnsatisfied:"Compress the system by dragging the weight up from the bin"});
+						},
+					text:"B3P0",
+					title:"Current step",
+				},
+				{//P1
+					setup: 
+						function() {
+							currentSetupType = 'prompt1';
+							this.drawWeights.unfreeze();
+							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:3, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, alertUnsatisfied:"Expand the system by dragging the weight off of the piston"});
+						},
+					text:"B3P1",
+					title:"Current step",
+				}
+			]
+		},
+		{//B4  Make this be sandbox block
+			setup: 
+				function() {
+					currentSetupType = 'block';
+					this.unCompSetup();
+					this.makeGraph();
+					this.dragWeights = new DragWeights({weightDefs:[{count:8, pressure:3}], displayText:false, pInit:3})
+					walls[0].displayPExt().displayWork().displayQ().displayQArrows();
+				}
+			prompts:[
+				{//P0
+					setup:
+						function() {
+							currentSetupType = 'prompt0';
+							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:6, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:10, alertUnsatisfied:"Compress the system by dragging the weight up from the bin"});
+						},
+					text:"B4P0",
+					title:"Current step",
+				},
+				{//P1
+					setup: 
+						function() {
+							currentSetupType = 'prompt1';
+							this.drawWeights.unfreeze();
+							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:3, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, alertUnsatisfied:"Expand the system by dragging the weight off of the piston"});
+						},
+					text:"B4P1",
+					title:"Current step",
 				}
 			]
 		}
 	],	
+
+	makeGraph: function(){
+		this.graphs.pVSv = new GraphScatter({handle:'pVSv', xLabel:"Volume (L)", yLabel:"Pressure (bar)",
+							axesInit:{x:{min:6, step:2}, y:{min:0, step:3}}});
+		this.graphs.pVSv.addSet({address:'pExt', label:'P Ext.', pointCol:Col(50,50,255), flashCol:Col(200,200,255),
+								data:{x:walls[0].data.v, y:walls[0].data.pExt}, trace:true});		
+		this.graphs.pVSv.addSet({address:'pInt', label:'P Int.', pointCol:Col(50,255,50), flashCol:Col(200,255,200),
+								data:{x:walls[0].data.v, y:walls[0].data.pInt}, trace:true});
+
+	},
+	unCompSetup: function(){
+		walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'cVIsothermal', handles:['container'], bounds:[{yMin:68, yMax:435}], vols:[15], temps:[236]});
+		this.borderStd({min:68});
+		//spcs['spc1'].populate(P(35, 150), V(460, 250), 2, 215.38);
+		spcs['spc1'].populate(P(35, 110), V(460, 250), 814, 236);
+		spcs['spc3'].populate(P(35, 110), V(460, 250), 611, 236);
+	},
+	compSetup: function(){
+		walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'cVIsothermal', handles:['container'], bounds:[{yMin:68, yMax:435}], vols:[10.1]});
+		//add temp to wall
+		this.borderStd({min:68});
+		var maxY = walls[0][0].y;
+		var height = walls[0][3].y-walls[0][0].y;
+		spcs['spc1'].populate(P(35, maxY+10), V(460, height-20), 814, 273);
+		spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 611, 273);
+	},
+
+
+}
+)
+
+
 /*
 
 	block0Start: function(){
@@ -249,32 +393,3 @@ _.extend(Reversibility.prototype,
 	
 	},
 	*/
-	makeGraph: function(){
-		this.graphs.pVSv = new GraphScatter('pVSv', "Volume (L)", "Pressure (bar)",
-							{x:{min:0, step:3}, y:{min:0, step:2}});
-		this.graphs.pVSv.addSet('pInt', 'P Int.', Col(0,0,255), Col(200,200,255),
-								{x:walls[0].data.v, y:walls[0].data.pInt});
-		this.graphs.pVSv.addSet('pExt', 'P Ext.', Col(0,255,0), Col(200,255,200),
-								{x:walls[0].data.v, y:walls[0].data.pExt});
-	},
-	unCompSetup: function(){
-		walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'cVIsothermal', handles:['container'], bounds:[{yMin:68, yMax:435}], vols:[15], temps:[236]});
-		this.borderStd({min:68});
-		//spcs['spc1'].populate(P(35, 150), V(460, 250), 2, 215.38);
-		spcs['spc1'].populate(P(35, 110), V(460, 250), 814, 236);
-		spcs['spc3'].populate(P(35, 110), V(460, 250), 611, 236);
-	},
-	compSetup: function(){
-		walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'cVIsothermal', handles:['container'], bounds:[{yMin:68, yMax:435}], vols:[10.1]});
-		//add temp to wall
-		this.borderStd({min:68});
-		var maxY = walls[0][0].y;
-		var height = walls[0][3].y-walls[0][0].y;
-		spcs['spc1'].populate(P(35, maxY+10), V(460, height-20), 814, 273);
-		spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 611, 273);
-		this.stops = new Stops({stopPt:{volume:10}});		
-	},
-
-
-}
-)
