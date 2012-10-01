@@ -199,6 +199,7 @@ WallMethods = {
 			this[wallIdx].massChunks = {};
 			this[wallIdx].forceInternal = 0;
 			this[wallIdx].pLastRecord = turn;
+			this[wallIdx].mass = 0;
 			this[wallIdx].parent = this;
 			this[handle] = this[wallIdx];
 			record = defaultTo(true, record);
@@ -856,7 +857,7 @@ WallMethods = {
 		},
 		pExt: function(){
 			var SA = this[1].x - this[0].x;
-			return this.pConst*this.mass()*this.g/SA;
+			return this.pConst*this.mass*this.g/SA;
 		},
 		pInt: function(){
 			var SA = this.surfArea();
@@ -880,15 +881,16 @@ WallMethods = {
 			
 			return SA;
 		},
-		mass: function(){
+		updateMass: function() {
 			var totalMass = 0;
 			for (var chunkName in this.massChunks){
 				totalMass+=this.massChunks[chunkName];
 			}
-			return totalMass;
+			this.mass = totalMass;			
 		},
 		setMass: function(chunkName, value){
 			this.massChunks[chunkName] = value;
+			this.updateMass();
 			return this;
 		},
 		unsetMass: function(chunkName){
@@ -899,6 +901,7 @@ WallMethods = {
 			}else{
 				this.massChunks[chunkName] = undefined;
 			}
+			this.updateMass();
 			return this;
 		},
 
@@ -1045,7 +1048,7 @@ WallMethods = {
 		},
 		recordMass: function() {
 			this.recordingMass = true;
-			recordData('mass' + this.handle, this.data.m, this.mass, this, 'update');		
+			recordData('mass' + this.handle, this.data.m, function(){return this.mass}, this, 'update');		
 			return this;			
 		},
 		recordQ: function() {
@@ -1462,7 +1465,7 @@ WallMethods = {
 			var vo1 = dot.v.dy;
 			var vo2 = wall.v;
 			var m1 = dot.m;
-			var m2 = wall.mass();
+			var m2 = wall.mass;
 			
 			if(Math.abs(vo2)>1.0){
 				var vo1Sqr = vo1*vo1;
@@ -1493,7 +1496,7 @@ WallMethods = {
 			var vo1 = dot.v.dy;
 			var vo2 = wall.v;
 			var m1 = dot.m;
-			var m2 = wall.mass();
+			var m2 = wall.mass;
 			
 			if(Math.abs(vo2)>1){
 				var vo1Sqr = vo1*vo1;
@@ -1527,7 +1530,7 @@ WallMethods = {
 			var vo1 = dot.v.dy;
 			var vo2 = wall.v;
 			var m1 = dot.m;
-			var m2 = wall.mass()	
+			var m2 = wall.mass;	
 			var pt = wall[subWallIdx];
 			dot.v.dy = (vo1*(m1-m2)+2*m2*vo2)/(dot.m+m2);
 			wall.v = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
@@ -1541,7 +1544,7 @@ WallMethods = {
 			var vo1 = dot.v.dy;
 			var vo2 = wall.v;
 			var m1 = dot.m;
-			var m2 = wall.mass()	
+			var m2 = wall.mass;
 			var pt = wall[subWallIdx];
 			dot.v.dy = (vo1*(m1-m2)+2*m2*vo2)/(dot.m+m2);
 			wall.v = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
