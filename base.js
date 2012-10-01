@@ -393,7 +393,9 @@ StringExtenders = {
 function recordData(handle, list, func, obj, listenerType){
 	var listenerType = defaultTo('record', listenerType)
 	store('record' + handle, listenerType);
+		try{
 	addListener(curLevel, listenerType, handle, function(){list.pushNumber(func.apply(obj))}, obj);
+	}catch(e){console.trace()};
 }
 function recordDataStop(handle){
 	var listenerType = getStore('record' + handle);
@@ -843,8 +845,3 @@ $(document).mouseup(function(e) {
 		listener.func.apply(listener.obj);
 	}	
 })
-function UNLOCK() {
-	for (var promptIdx in curLevel.prompts){
-		curLevel.prompts[promptIdx].finished=true;
-	}
-}
