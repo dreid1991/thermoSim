@@ -144,19 +144,16 @@ function DragWeights(attrs){
 	this.binY = 				defaultTo(myCanvas.height-15, attrs.binY);
 	this.blockCol = 			defaultTo(Col(224, 165, 75), attrs.blockCol);
 	this.binCol = 				defaultTo(Col(150, 150, 150), attrs.binCol);
-	this.massInit = 			defaultTo(25, defaultTo(curLevel.massInit, attrs.massInit));
+	if (attrs.pInit) {
+		this.massInit = this.pressureToMass(attrs.pInit);
+	} else {
+		this.massInit = 		defaultTo(25, defaultTo(curLevel.massInit, attrs.massInit));
+	}
 	this.binHeight = 			defaultTo(45, attrs.binHeight);
 	this.weightDimRatio = 		defaultTo(.5, attrs.weightDimRatio);
 	this.flySpeed =				defaultTo(20, attrs.flySpeed);
 	this.weightScalar = 		defaultTo(70, attrs.weightScalar);//specific volume
 	this.displayText = 			defaultTo(true, attrs.displayText);
-	if(!(this.tempWeightDefs instanceof Array)){
-		//then is a total mass with count
-		//should change so I can have arrays of both types
-		var mass = this.tempWeightDefs.mass/this.tempWeightDefs.count;
-		this.tempWeightDefs = [{name:'onlyWeights', count:this.tempWeightDefs.count, mass:mass}]
-	}
-	
 	
 	this.binSlant = 1.3;
 	this.storeBinWidth = 110;
@@ -167,8 +164,6 @@ function DragWeights(attrs){
 	this.moveSpeed = 20;
 	this.mass = this.massInit;
 	this.massChunkName = 'dragWeights';
-	this.eAdded = 0;
-	this.pressure = this.wall.pExt();
 	this.weightsOnPiston = [];
 	this.font = '12pt Calibri';
 	this.fontCol = Col(255,255,255);
@@ -191,7 +186,6 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		this.bins['store'] = this.makeStoreBins();
 		this.bins['piston'] = this.makePistonBins();
 		//this.dropAllstores();
-		//addListener(curLevel, 'update', 'moveWeightsOnPiston' + this.wallInfo, this.moveWeightsOnPiston, this);
 		walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);
 		if (!this.displayText) {
 			this.draw = this.drawNoText;
@@ -212,15 +206,24 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	getWeightDims: function(weightDefs){
 		var dims = {};
 		for (var groupIdx=0; groupIdx<weightDefs.length; groupIdx++){
-			var weight = weightDefs[groupIdx];
-			var name = weight.name;
-			var width = Math.sqrt(weight.mass*this.weightScalar/this.weightDimRatio);
+			var weightDef = weightDefs[groupIdx];
+			if (weightDef.pressure) {
+				weightDef.mass = this.pressureToMass(weightDef.pressure);
+			}
+			weightDef.mass/=weightDef.count;
+			var width = Math.sqrt(weightDef.mass*this.weightScalar/this.weightDimRatio);
 			var height = width*this.weightDimRatio;
-			dims[name] = V(width, height);
+			dims[weightDef.name] = V(width, height);
 		}
 		return dims;
 	},
+	nameWeights: function(weightDefs) {
+		for (var weightIdx=0; weightIdx<weightDefs.length; weightIdx++) {
+			weightDefs[weightIdx].name = 'grp' + weightIdx;
+		}
+	},
 	makeWeights: function(weightDefs){
+		this.nameWeights(weightDefs);
 		var weightGroups = {};
 		var weightDims = this.getWeightDims(weightDefs)
 		var weightId = 0;
@@ -519,31 +522,31 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	},
 	drawWeights: function(){
 		var drawCanvas = c;
-		for (var group in this.weightGroups){
+		for (var group in this.weightGroups) {
 			var weightGroup = this.weightGroups[group]
 			var weights = weightGroup.weights;
 			var dims = weightGroup.dims;
-			for (var weightIdx=0; weightIdx<weights.length; weightIdx++){
+			for (var weightIdx=0; weightIdx<weights.length; weightIdx++) {
 				draw.fillRect(weights[weightIdx].pos, dims, this.blockCol, drawCanvas);
 			}
 		}
 	},
 	drawBins: function(){
 		var drawCanvas = c;
-		for (var binType in this.bins){
+		for (var binType in this.bins) {
 			var typeBins = this.bins[binType];
-			for(var binSize in typeBins){
+			for (var binSize in typeBins) {
 				var bin = typeBins[binSize];
-				if(bin.visible){
+				if (bin.visible) {
 					draw.fillPts(bin.pts, this.binCol, drawCanvas);
 				}
 			}
 		}
 	},
 	drawBinLabels: function(){
-		for(var binName in this.bins.store){
+		for (var binName in this.bins.store) {
 			var bin = this.bins.store[binName];
-			if(bin.visible){
+			if (bin.visible) {
 				var x = bin.x + this.storeBinWidth/2
 				var y = bin.y - this.binHeight+10;
 				var mass = this.weightGroups[binName].mass;
@@ -558,24 +561,22 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		weight.status = 'piston';
 		this.mass = this.getPistonMass();
 		this.wall.setMass(this.massChunkName, this.mass);
-		this.pressure = this.wall.pExt();
 	},	
 	takeOffPiston: function(weight){
-		for (var idx=0; idx<this.weightsOnPiston.length; idx++){
-			if(weight==this.weightsOnPiston[idx]){
+		for (var idx=0; idx<this.weightsOnPiston.length; idx++) {
+			if (weight==this.weightsOnPiston[idx]) {
 				this.weightsOnPiston.splice([idx],1);
 			}
 		}
 		weight.pos.trackStop();
 		this.mass = this.getPistonMass();
 		this.wall.setMass(this.massChunkName, this.mass);
-		this.pressure = this.wall.pExt();
 	},
 	mousedown: function(){
 		var clicked = this.getClicked();
-		if(clicked){
+		if (clicked) {
 			this.pickup(clicked);
-			if(this.selected.cameFrom=='piston'){
+			if (this.selected.cameFrom=='piston') {
 				this.takeOffPiston(this.selected);
 			}
 			addListener(curLevel, 'mousemove', 'weights', this.mousemove, this)

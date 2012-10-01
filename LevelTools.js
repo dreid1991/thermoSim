@@ -1,6 +1,5 @@
 LevelTools = {
 	setStds: function(){
-		this.declareBlocks();
 		this.addEqs();
 		this.setDefaultPromptVals()
 		this.graphs = {};

@@ -773,7 +773,7 @@ function getLen(pts) {
 	}
 	return len;
 }
-function name(str) {
+function nameVar(str) {
 	if (currentSetupType=='block') {
 		return str + 'B' + blockIdx;
 	} else {
