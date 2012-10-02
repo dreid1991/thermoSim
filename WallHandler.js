@@ -1200,7 +1200,7 @@ WallMethods = {
 					function(){
 						var curVal = dataSet[dataSet.length-1];
 						if(curVal!=lastVal){
-							this.pExtReadout.tick('pExt' + this.handle, curVal);
+							this.pExtReadout.hardUpdate('pExt' + this.handle, curVal);
 							lastVal = curVal;
 						}
 						
@@ -1250,7 +1250,7 @@ WallMethods = {
 					function(){
 						var curVal = dataSet[dataSet.length-1];
 						if(curVal!=lastVal){
-							this.massReadout.tick('mass' + this.handle, curVal);
+							this.massReadout.hardUpdate('mass' + this.handle, curVal);
 							lastVal = curVal;
 						}
 					},

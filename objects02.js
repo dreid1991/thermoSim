@@ -304,7 +304,7 @@ function ParticleEmitter(attrs){
 	this.rate = defaultTo(Math.round(.1*this.width), attrs.rate);
 	this.speed = defaultTo(5, attrs.speed);
 	this.speedSpread = defaultTo(1, attrs.speedSpread);
-	if(2*this.speedSpread>this.speed){
+	if (2*this.speedSpread>this.speed) {
 		console.log('Uh-oh.  Making particle emitter with handle ' + this.handle + ' with speed spread such that particles will hit ~0 speed');
 	}
 	this.accel = defaultTo(.5, attrs.accel);
@@ -345,15 +345,15 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 	trickleOut: function(){
 		this.updateParticles();
 		this.draw();
-		if(this.particles.length==0){
+		if (this.particles.length==0) {
 			this.remove();
 		}
 	},
 	generateNew: function(){
 		var numNew = Math.round(Math.random()*this.rate);
-		for(var newIdx=0; newIdx<numNew; newIdx++){
+		for (var newIdx=0; newIdx<numNew; newIdx++) {
 			this.particles.push(this.newParticle());
-			if(this.onGenerate){
+			if (this.onGenerate) {
 				this.onGenerate.func.apply(this.onGenerate.obj);
 			}
 		}
@@ -412,7 +412,7 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 			this.parentList.splice(_.indexOf(this.parentList, this), 1);
 		}
 		removeListener(curLevel, 'update', this.runListenerName);
-		removeListener(curLevel, 'cleanUp', this.cleanUpListenerName);
+		removeListener(curLevel, this.cleanUpWith + 'cleanUp', this.cleanUpListenerName);
 		this.removed = true;
 	},
 
