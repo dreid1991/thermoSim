@@ -1169,7 +1169,7 @@ WallMethods = {
 				label = defaultTo('Pint:', label);
 				this.pIntReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
 				var firstVal = dataSet[dataSet.length-1];
-				if(!validNumber(firstVal)){
+				if (!validNumber(firstVal)) {
 					firstVal = 0;
 				}
 				this.pIntReadout.addEntry('pInt' + this.handle, label, 'bar', firstVal, undefined, decPlaces);
@@ -1200,7 +1200,7 @@ WallMethods = {
 					function(){
 						var curVal = dataSet[dataSet.length-1];
 						if(curVal!=lastVal){
-							this.pExtReadout.hardUpdate('pExt' + this.handle, curVal);
+							this.pExtReadout.tick('pExt' + this.handle, curVal);
 							lastVal = curVal;
 						}
 						

@@ -387,14 +387,28 @@ LevelTools = {
 
 		this.numUpdates = 0;
 	},
+	delayGraphs: function() {
+		addListener(curLevel, 'data', 'run', function() {
+			this.dataRunNoGraphs();
+			addListener(curLevel, 'data', 'run', this.dataRun, this);
+		},
+		this);
+	},
+	dataRunNoGraphs: function() {
+		for (var datum in this.recordListeners.listeners){
+			var recordInfo = this.recordListeners.listeners[datum];
+			recordInfo.func.apply(recordInfo.obj);
+			//this.data[datum].pushNumber(recordInfo.func.apply(recordInfo.obj));
+		}			
+	},
 	dataRun: function(){
 		for (var datum in this.recordListeners.listeners){
 			var recordInfo = this.recordListeners.listeners[datum];
 			recordInfo.func.apply(recordInfo.obj);
 			//this.data[datum].pushNumber(recordInfo.func.apply(recordInfo.obj));
 		}	
-		for(var graphName in this.graphs){
-			if(this.graphs[graphName].active){
+		for (var graphName in this.graphs) {
+			if (this.graphs[graphName].active) {
 				this.graphs[graphName].addLast();
 			}
 		}

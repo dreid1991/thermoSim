@@ -23,7 +23,7 @@ function Sandbox(attrs){
 	this.bin = {};
 	this.sand = {};
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
-	this.rate = defaultTo(.15, attrs.rate);
+	this.rate = defaultTo(.05, attrs.rate);
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.wall = walls[this.wallInfo];
 	if (attrs.pInit) {
@@ -78,8 +78,6 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		this.wall.moveInit();
 		this.wall.recordMass();
 		this.wall.recordPExt();
-		this.wall.displayMass();
-		this.wall.displayPExt();
 		return this;
 	},
 	makeButtons: function(){
@@ -412,7 +410,7 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 			this.parentList.splice(_.indexOf(this.parentList, this), 1);
 		}
 		removeListener(curLevel, 'update', this.runListenerName);
-		removeListener(curLevel, this.cleanUpWith + 'cleanUp', this.cleanUpListenerName);
+		removeListener(curLevel, this.cleanUpWith + 'CleanUp', this.cleanUpListenerName);
 		this.removed = true;
 	},
 

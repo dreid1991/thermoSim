@@ -125,7 +125,8 @@ _.extend(Reversibility.prototype,
 				},
 				{//P2
 					setup: undefined,
-					text:"Last time when putting on slowly, did GET#workB1P0 kJ of work.  This time when putting on quickly, did GET#B2P0 kJ work.  Ask why?",
+					cutScene:true,
+					text:"Last time when putting on slowly, did GET#workB1P0| kJ of work.  This time when putting on quickly, did GET#B3P0| kJ work.  Ask why?",
 					quiz:[
 						{
 							type:'text',

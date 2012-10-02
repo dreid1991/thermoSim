@@ -242,9 +242,7 @@ function addInterval(funcHandle, func, destObj, interval) {
 	extraIntervals[funcHandle] = window.setInterval(function(){func.apply(destObj)}, interval);
 }
 function removeListener(object, typeName, funcName){
-	try{
 	delete object[typeName + 'Listeners'].listeners[funcName];
-	}catch(e){console.trace()}
 }
 function removeInterval(funcHandle) {
 	if (extraIntervals[funcHandle]) {
@@ -538,6 +536,7 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 				removeListenerByName(curLevel, 'update', 'animText');
 			},
 		this);
+		curLevel.delayGraphs();
 	}
 	if (newPrompt.setup) {
 		newPrompt.setup.apply(curLevel)
