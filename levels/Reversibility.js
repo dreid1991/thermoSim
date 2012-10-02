@@ -41,9 +41,9 @@ _.extend(Reversibility.prototype,
 						function() {
 							currentSetupType = 'prompt0';
 							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:4, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
-							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.5, alertUnsatisfied:"Compress the system by dragging the weight up from the bin"});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.7, alertUnsatisfied:"Compress the system by dragging the weight up from the bin", storeAtSatisfy:{work:walls[0].data.work}});
 						},
-					text:"Put on once reached equilibrium with first",
+					text:"Put block on",
 					title:"Current step",
 				},
 				{//P1
@@ -54,7 +54,7 @@ _.extend(Reversibility.prototype,
 							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:2, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
 							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, alertUnsatisfied:"Expand the system by dragging the weight off of the piston"});
 						},
-					text:"Take off once reached equilibrium",
+					text:"Take block off",
 					title:"Current step",
 				}
 			]
@@ -74,9 +74,9 @@ _.extend(Reversibility.prototype,
 						function() {
 							currentSetupType = 'prompt0';
 							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:4, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
-							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.5, alertUnsatisfied:"Compress the system by dragging the weight up from the bin"});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.7, alertUnsatisfied:"Compress the system by dragging the weight up from the bin"});
 						},
-					text:"Put on as quickly as you can",
+					text:"Put blocks on when at equilibrium",
 					title:"Current step",
 				},
 				{//P1
@@ -87,12 +87,9 @@ _.extend(Reversibility.prototype,
 							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:2, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
 							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, alertUnsatisfied:"Expand the system by dragging the weight off of the piston"});
 						},
-					text:"take off as quickly as you can",
+					text:"Take block off when at equilibrium",
 					title:"Current step",
 				}
-				{//P2
-					setup: undefined,
-					text:"Last time when putting on slowly, did GET#
 			]
 		},
 		{//B3
@@ -110,9 +107,9 @@ _.extend(Reversibility.prototype,
 						function() {
 							currentSetupType = 'prompt0';
 							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:4, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
-							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.5, alertUnsatisfied:"Compress the system by dragging the weight up from the bin"});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.7, alertUnsatisfied:"Compress the system by dragging the weight up from the bin", storeAtSatisfy:{work:walls[0].data.work}});
 						},
-					text:"B3P0",
+					text:"Put on as quickly as you can",
 					title:"Current step",
 				},
 				{//P1
@@ -123,11 +120,22 @@ _.extend(Reversibility.prototype,
 							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:2, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
 							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, alertUnsatisfied:"Expand the system by dragging the weight off of the piston"});
 						},
-					text:"B3P1",
+					text:"take off as quickly as you can",
 					title:"Current step",
+				},
+				{//P2
+					setup: undefined,
+					text:"Last time when putting on slowly, did GET#workB1P0 kJ of work.  This time when putting on quickly, did GET#B2P0 kJ work.  Ask why?",
+					quiz:[
+						{
+							type:'text',
+							text:"Type your answer here.",
+						}
+					]
 				}
 			]
 		},
+
 		{//B4
 			setup: 
 				function() {
@@ -143,7 +151,7 @@ _.extend(Reversibility.prototype,
 						function() {
 							currentSetupType = 'prompt0';
 							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:4, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
-							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.5, alertUnsatisfied:"Compress the system by dragging the weight up from the bin"});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.7, alertUnsatisfied:"Compress the system by dragging the weight up from the bin"});
 						},
 					text:"B4P0",
 					title:"Current step",
@@ -175,7 +183,7 @@ _.extend(Reversibility.prototype,
 					setup:
 						function() {
 							currentSetupType = 'prompt0';
-							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.5, alertUnsatisfied:"Compress the system by dragging the weight up from the bin"});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.7, alertUnsatisfied:"Compress the system by dragging the weight up from the bin"});
 						},
 					text:"B5P0",
 					title:"Current step",
@@ -206,8 +214,8 @@ _.extend(Reversibility.prototype,
 		walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'cVIsothermal', handles:['container'], bounds:[{yMin:68, yMax:435}], vols:[15], temps:[240.7]});
 		this.borderStd({min:40});
 		//spcs['spc1'].populate(P(35, 150), V(460, 250), 2, 215.38);
-		spcs['spc1'].populate(P(40, 100), V(470, 310), 750, 240.7);
-		spcs['spc3'].populate(P(40, 100), V(470, 310), 750, 240.7);
+		spcs['spc1'].populate(P(42, 100), V(468, 310), 750, 240.7);
+		spcs['spc3'].populate(P(42, 100), V(468, 310), 750, 240.7);
 	},
 	compSetup: function(){
 		walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'cVIsothermal', handles:['container'], bounds:[{yMin:68, yMax:435}], vols:[10.1]});

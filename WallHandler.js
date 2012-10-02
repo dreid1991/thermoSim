@@ -1314,7 +1314,7 @@ WallMethods = {
 		displayQArrows: function(threshold){
 			if (this.recordingQ && !this.displayingQArrows) {
 				this.displayingQArrows = true;
-				this.turnLastArrow = turn;
+				this.idxLastArrow = Math.max(0, this.data.q.length-1);
 				this.qArrowThreshold = defaultTo(threshold, .3);
 				addListener(curLevel, 'update', 'checkForDisplayArrows' + this.handle, this.checkDisplayArrows, this);
 			} else {
@@ -1389,10 +1389,10 @@ WallMethods = {
 			return this;
 		},
 		checkDisplayArrows: function(){
-			var dQ = this.data.q[this.data.q.length-1] - this.data.q[this.turnLastArrow];
+			var dQ = this.data.q[this.data.q.length-1] - this.data.q[this.idxLastArrow];
 			if (Math.abs(dQ)>this.qArrowThreshold) {
 				this.populateArrows(dQ);
-				this.turnLastArrow = turn;
+				this.idxLastArrow = turn;
 			}
 		},
 		populateArrows: function(dQ){
@@ -1402,10 +1402,9 @@ WallMethods = {
 			var fillFinal = this.parent.qArrowFillFinal;
 			var stroke = this.parent.qArrowStroke;
 			var qList = this.data.q;
-			var turnLast = defaultTo(this.turnLastArrow, turnLast);
 			var heatTransSign = getSign(dQ);
 			var UVRot = rotations[heatTransSign];
-			this.turnLastArrow = turn;
+			this.idxLastArrow = this.data.q.length-1;
 			var dims = V(110*Math.abs(dQ), 170*Math.abs(dQ));//big numbers from adjusting to q per turn so if I change interval, size of arrows doesn't change
 			var dimsFinal = dims.copy();
 			dimsFinal.dx *= 1.4;
