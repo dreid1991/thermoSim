@@ -41,7 +41,9 @@ _.extend(Reversibility.prototype,
 						function() {
 							currentSetupType = 'prompt0';
 							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:4, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
-							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.7, alertUnsatisfied:"Compress the system by dragging the weight up from the bin", storeAtSatisfy:{work:walls[0].data.work}});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.8, 
+							alertUnsatisfied:"Compress the system by dragging the weight up from the bin", 
+							storeAtSatisfy:{work:walls[0].data.work}});
 						},
 					text:"Put block on",
 					title:"Current step",
@@ -52,7 +54,9 @@ _.extend(Reversibility.prototype,
 							currentSetupType = 'prompt1';
 							this.dragWeights.unfreeze();
 							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:2, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
-							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, alertUnsatisfied:"Expand the system by dragging the weight off of the piston"});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15,
+							alertUnsatisfied:"Expand the system by dragging the weight off of the piston",
+							storeAtSatisfy:{work:walls[0].data.work}});
 						},
 					text:"Take block off",
 					title:"Current step",
@@ -74,7 +78,9 @@ _.extend(Reversibility.prototype,
 						function() {
 							currentSetupType = 'prompt0';
 							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:4, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
-							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.7, alertUnsatisfied:"Compress the system by dragging the weight up from the bin"});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.8,
+							alertUnsatisfied:"Compress the system by dragging the weight up from the bin",
+							storeAtSatisfy:{work:walls[0].data.work}});
 						},
 					text:"Put blocks on when at equilibrium",
 					title:"Current step",
@@ -85,7 +91,9 @@ _.extend(Reversibility.prototype,
 							currentSetupType = 'prompt1';
 							this.dragWeights.unfreeze();
 							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:2, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
-							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, alertUnsatisfied:"Expand the system by dragging the weight off of the piston"});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, 
+							alertUnsatisfied:"Expand the system by dragging the weight off of the piston",
+							storeAtSatisfy:{work:walls[0].data.work}});
 						},
 					text:"Take block off when at equilibrium",
 					title:"Current step",
@@ -107,7 +115,9 @@ _.extend(Reversibility.prototype,
 						function() {
 							currentSetupType = 'prompt0';
 							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:4, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
-							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.7, alertUnsatisfied:"Compress the system by dragging the weight up from the bin", storeAtSatisfy:{work:walls[0].data.work}});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.8, 
+								alertUnsatisfied:"Compress the system by dragging the weight up from the bin", 
+								storeAtSatisfy:{work:walls[0].data.work}});
 						},
 					text:"Put on as quickly as you can",
 					title:"Current step",
@@ -118,7 +128,9 @@ _.extend(Reversibility.prototype,
 							currentSetupType = 'prompt1';
 							this.dragWeights.unfreeze();
 							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:2, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
-							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, alertUnsatisfied:"Expand the system by dragging the weight off of the piston"});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, 
+								alertUnsatisfied:"Expand the system by dragging the weight off of the piston",
+								storeAtSatisfy:{work:walls[0].data.work}});
 						},
 					text:"take off as quickly as you can",
 					title:"Current step",
@@ -126,7 +138,7 @@ _.extend(Reversibility.prototype,
 				{//P2
 					setup: undefined,
 					cutScene:true,
-					text:"Last time when putting on slowly, did GET#workB1P0| kJ of work.  This time when putting on quickly, did GET#B3P0| kJ work.  Ask why?",
+					text:"Last time when putting on slowly, did GET#workB1P0| kJ of work.  This time when putting on quickly, did GET#workB3P0| kJ work.  Ask why?",
 					quiz:[
 						{
 							type:'text',
@@ -152,9 +164,11 @@ _.extend(Reversibility.prototype,
 						function() {
 							currentSetupType = 'prompt0';
 							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:4, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
-							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.7, alertUnsatisfied:"Compress the system by dragging the weight up from the bin"});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.8, 
+							alertUnsatisfied:"Compress the system by dragging the weight up from the bin",
+							storeAtSatisfy:{work:walls[0].data.work}});
 						},
-					text:"B4P0",
+					text:"Put on",
 					title:"Current step",
 				},
 				{//P1
@@ -163,9 +177,11 @@ _.extend(Reversibility.prototype,
 							currentSetupType = 'prompt1';
 							this.dragWeights.unfreeze();
 							this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:2, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
-							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, alertUnsatisfied:"Expand the system by dragging the weight off of the piston"});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, 
+							alertUnsatisfied:"Expand the system by dragging the weight off of the piston",
+							storeAtSatisfy:{work:walls[0].data.work}});
 						},
-					text:"B4P1",
+					text:"Take off",
 					title:"Current step",
 				}
 			]
@@ -184,7 +200,9 @@ _.extend(Reversibility.prototype,
 					setup:
 						function() {
 							currentSetupType = 'prompt0';
-							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.7, alertUnsatisfied:"Compress the system by dragging the weight up from the bin"});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.8, 
+							alertUnsatisfied:"Compress the system by dragging the weight up from the bin",
+							storeAtSatisfy:{work:walls[0].data.work}});
 						},
 					text:"B5P0",
 					title:"Current step",
@@ -193,9 +211,11 @@ _.extend(Reversibility.prototype,
 					setup: 
 						function() {
 							currentSetupType = 'prompt1';
-							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, alertUnsatisfied:"Expand the system by dragging the weight off of the piston"});
+							this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15, 
+							alertUnsatisfied:"Expand the system by dragging the weight off of the piston",
+							storeAtSatisfy:{work:walls[0].data.work}});
 						},
-					text:"B5P1",
+					text:"B5P1 - last",
 					title:"Current step",
 				}
 			]
@@ -232,206 +252,3 @@ _.extend(Reversibility.prototype,
 }
 )
 
-
-/*
-
-	block0Start: function(){
-		var wallHandle = 'container';
-		this.unCompSetup();
-		this.makeGraphsRev();
-		this.sandBox = new Sandbox();
-		walls[0].displayQArrows();
-		//this.dragWeights = new DragWeights({weightDefs:[{name:'lrg', count:1, mass:33}]})
-		//this.dragWeights.wall.displayPExt().displayWork().recordMass().displayMass().displayVol();
-		this.volListener10 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7, alertUnsatisfied:'NO', alertSatisfied:'YES', atSatisfyFunc:{func:function(){store('workInLrg',round(walls[0].work,1))},obj:''}});
-		this.readout.show();
-	},	
-
-	block2Start: function(){
-		this.makeGraphsRev();
-		var numBlocks = getStore('numBlocks');
-		this.unCompSetup();
-		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:numBlocks}}).trackPressure().trackWork();
-		this.trackVolume(0);
-		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.02, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInMed', round(walls[0].work,1))},obj:''}});
-	},
-	block2Conditions: function(){
-		if(this.volListener10.isSatisfied()){
-			return {result:true};
-		}else{
-			return {result:false, alert:'Compress thy system!'};
-		}
-	},
-	block2CleanUp: function(){
-		this.trackVolumeStop();
-		this.removeAllGraphs();
-		this.dragWeights.remove();
-		this.dragWeights = undefined;
-		//walls[0].trackWorkStop();
-	},
-	block5Start: function(){
-		this.makeGraphsRev();
-		this.unCompSetup();
-		this.trackVolume(0);		
-		this.pool = new Pool({massMax:100, massMin:10}).trackWork().trackMass().trackPressure();
-		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.02, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workInSml', round(walls[0].work,1))},obj:''}});
-		$('#reset').hide();
-		$('#clearGraphs').hide();
-		$('#buttonFill').show();
-		$('#buttonDrain').show();
-	},
-	block5Conditions: function(){
-		if(this.volListener10.isSatisfied()){
-			return {result:true};
-		}else{
-			return {result:false, alert:'Compress thy system!'};
-		}
-	},
-	block5CleanUp: function(){
-		$('#reset').show();
-		$('#clearGraphs').show();
-		$('#buttonFill').hide();
-		$('#buttonDrain').hide();
-		this.trackVolumeStop();
-		this.removeAllGraphs();
-		this.pool.remove();
-		this.pool = undefined;
-		this.stops.remove();
-		
-	},
-	block7CleanUp: function(){
-		this.removeAllGraphs();
-	},
-	block8Start: function(){
-		this.makeGraphsRev();
-		this.compSetup();
-		this.trackVolume(0);
-		this.volListener16 = new StateListener({condition:16, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workOutLrg', Math.abs(round(walls[0].work,1)))},obj:''}});
-		walls[0].trackWork(this.readout);
-		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:1}}).dropAllIntoPistons('instant').trackPressure();
-	},
-	block8Conditions: function(){
-		if(this.volListener16.isSatisfied){
-			return{result:true};
-		}else{
-			return{result:false, alert:"Expand the system!"}
-		}
-	},
-	block8CleanUp: function(){
-		walls[0].trackWorkStop();
-		this.trackVolumeStop();
-		this.dragWeights.remove();
-	},
-	block9CleanUp: function(){
-		this.removeAllGraphs();
-	},
-	block10Start: function(){
-		this.compSetup();
-		this.pool = new Pool({massInit:60});
-		//this.dragWeights = new DragWeights({weightDefs:{mass:90, count:12}}).trackPressure().dropAllIntoPistons('instant');
-		this.makeGraphsRev();
-		this.volListener16 = new StateListener({condition:16, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:function(){store('workOutSml', Math.abs(round(walls[0].work,1)))},obj:''}});
-		walls[0].trackWork(this.readout);
-		this.trackVolume(0);
-		$('#reset').hide();
-		$('#clearGraphs').hide();
-		$('#buttonFill').show();
-		$('#buttonDrain').show();
-	},
-	block10CleanUp: function(){
-		$('#reset').show();
-		$('#clearGraphs').show();
-		$('#buttonFill').hide();
-		$('#buttonDrain').hide();
-		this.trackVolumeStop();
-		walls[0].trackWorkStop();
-		this.removeAllGraphs();
-		this.pool.remove();
-	},
-	block13Start: function(){
-		this.unCompSetup();
-		this.makeGraphsRev();
-
-		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.02, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:
-				function(){
-					var compWork = walls[0].work;
-					store('cycleLrgCompWork', round(compWork,1));
-					this.volListener16 = new StateListener({condition:16, checkAgainst:this.data.v, tolerance:.02, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:
-					function(){
-						store('cycleLrgUnCompWork', round(compWork - walls[0].work,1));
-					},obj:this}
-					}
-					);
-				},
-				obj:this}
-			}
-			
-		);
-		this.dragWeights = new DragWeights({weightDefs:{mass:90, count:1}}).trackPressure().trackWork();		
-		this.trackVolume(0);
-	},
-	block13Conditions: function(){
-		if(this.volListener10.isSatisfied() && this.volListener16.isSatisfied()){
-			return {result:true};
-		}else if(!this.volListener10.isSatisfied()){
-			return {result:false, alert:"You haven't compressed it all the way yet!"};
-		}else{
-			return {result:false, alert:"Finish the cycle!"};
-		}
-	},
-	block13CleanUp: function(){
-		this.removeAllGraphs();
-		this.dragWeights.remove();
-		this.trackVolumeStop();
-	},
-	block14Start: function(){
-		$('#reset').hide();
-		$('#clearGraphs').hide();
-		$('#buttonFill').show();
-		$('#buttonDrain').show();
-		this.unCompSetup();
-		this.makeGraphsRev();
-		this.volListener10 = new StateListener({condition:10, checkAgainst:this.data.v, tolerance:.05, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:
-			function(){
-				var compWork = walls[0].work;
-				store('cycleSmlCompWork', round(compWork, 1));
-				this.volListener16 = new StateListener({condition:16, checkAgainst:this.data.v, tolerance:.02, recordAtSatisfy:{v:this.data.v}, atSatisfyFunc:{func:
-				function(){
-					store('cycleSmlUnCompWork', round(compWork - walls[0].work, 1));
-				},obj:this}
-				}
-				);
-			},
-			obj:this}
-		});
-		this.trackVolume(0);
-		this.pool = new Pool().trackPressure().trackMass().trackWork();
-	},
-	block14Conditions: function(){
-		if(this.volListener10.isSatisfied() && this.volListener16.isSatisfied()){
-			return {result:true};
-		}else if(!this.volListener10.isSatisfied()){
-			return {result:false, alert:"You haven't compressed it all the way yet!"};
-		}else{
-			return {result:false, alert:"Finish the cycle!"};
-		}
-	},
-	block14CleanUp: function(){
-		$('#reset').show();
-		$('#clearGraphs').show();
-		$('#buttonFill').hide();
-		$('#buttonDrain').hide();
-		this.removeAllGraphs();
-		this.trackVolumeStop();
-		walls[0].trackWorkStop();
-		this.pool.remove();
-		this.prompts[15].quiz.answer = 100*getStore('cycleSmlUnCompWork')/getStore('cycleSmlCompWork');
-	},
-
-	blockNStart: function(){
-	
-	},
-	blockNCleanUp: function(){
-	
-	},
-	*/

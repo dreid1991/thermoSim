@@ -23,7 +23,6 @@ function Sandbox(attrs){
 	this.bin = {};
 	this.sand = {};
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
-	this.rate = defaultTo(.05, attrs.rate);
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.wall = walls[this.wallInfo];
 	if (attrs.pInit) {
@@ -37,11 +36,11 @@ function Sandbox(attrs){
 		this.massMax = defaultTo(75, attrs.massMax);
 	}
 	if (attrs.pMin) {
-		this.pMin = this.pressureToMass(attrs.pMin);
+		this.massMin = this.pressureToMass(attrs.pMin);
 	} else {
 		this.massMin = defaultTo(10, attrs.massMin);
 	}
-	this.particleMass = .05;
+	this.particleMass = defaultTo(.01, attrs.partMass);
 	this.buttonAddId = 'sandAdd';
 	this.buttonRemoveId = 'sandRemove';
 	this.makeButtons();
@@ -140,10 +139,10 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 	},
 	boundUpper: function(){
 		var listenerName = this.handle + 'BoundUpper'
-		if(!curLevel.updateListeners.listeners[listenerName]){
+		if (!curLevel.updateListeners.listeners[listenerName]) {
 			addListener(curLevel, 'update', listenerName,
 				function(){
-					if(this.mass > this.massMax){
+					if (this.mass > this.massMax) {
 						this.stopAllEmitters()
 						removeListener(curLevel, 'update', listenerName);
 					}
