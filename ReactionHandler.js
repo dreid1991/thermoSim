@@ -16,9 +16,9 @@ ReactionHandler = {
 		var idStr = low + '-' + high;
 		this.rxns[idStr].push({hRxn:hRxn, activE:activE, prods:prods});
 		if (this.rxns[idStr].length==1) {
-			this.setHandler(aName, bName, {func:this.setupReactSinglePair(this.rxns[idStr]), this});
+			this.setHandler(aName, bName, {func:this.setupReactSinglePair(this.rxns[idStr]), obj:this});
 		} else {
-			this.setHandler(aName, bName, {func:this.setupReactMultPairs(this.rxns[idStr]), this});
+			this.setHandler(aName, bName, {func:this.setupReactMultPairs(this.rxns[idStr]), obj:this});
 		}	
 	},
 	//format prods as [{name:'spc1', count:#}]
@@ -67,7 +67,7 @@ ReactionHandler = {
 		
 		return function(a, b, UVAB, perpAB, perpBA) {
 			var hitTemp = this.hitTemp(a, b, perpAB, perpBA);
-			var probs new Array(pairs.length);
+			var probs = new Array(pairs.length);
 			var sumProbs = 0;
 			for (var pairIdx=0; pairIdx<pairs.length; pairIdx++) {
 				probs[pairIdx] = this.probFunc(hitTemp, pairs[pairIdx].activE);

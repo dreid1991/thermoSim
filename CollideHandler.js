@@ -4,11 +4,11 @@ function CollideHandler(){
 	this.tConst = tConst;
 	this.cp = cp;
 	this.cv = cv;
-	this.setDefaultHandler({func:this.impactStd, obj:this});
 	this.rxns = {};
+	this.setDefaultHandler({func:this.impactStd, obj:this});
 	console.log("Made supercollider");
 }
-_extend(CollideHandler.prototype, ReactionHandler, {
+_.extend(CollideHandler.prototype, ReactionHandler, {
 	setDefaultHandler: function(handler){
 		var numSpcs = this.getNumSpcs();
 		for (var i=0; i<numSpcs; i++){
