@@ -4,15 +4,17 @@ function CollideHandler(){
 	this.tConst = tConst;
 	this.cp = cp;
 	this.cv = cv;
-	this.reactions = this.setupBlankReactions();
+	this.setDefaultHandler({func:this.impactStd, obj:this});
+	this.rxns = {};
 	console.log("Made supercollider");
 }
-CollideHandler.prototype = {
+_extend(CollideHandler.prototype, ReactionHandler, {
 	setDefaultHandler: function(handler){
 		var numSpcs = this.getNumSpcs();
 		for (var i=0; i<numSpcs; i++){
 			for (var j=i; j<numSpcs; j++){
 				this[i + '-' + j] = handler; //has func and obj
+				this.rxns[i + '-' + j] = [];
 			}
 		}
 	
@@ -23,16 +25,6 @@ CollideHandler.prototype = {
 		var min = Math.min(idA, idB);
 		var max = Math.max(idA, idB);
 		this.handlers[min + '-' + max] = handler;
-	},
-	setupBlankReactions: function(){
-		var reactions = {};
-		var numSpcs = this.getNumSpcs();
-		for (var i=0; i<numSpcs; i++){
-			for (var j=i; j<numSpcs; j++){
-				reactions[i + '-' + j] = []; 
-			}
-		}
-		return reactions;
 	},
 	getNumSpcs: function(){
 		var numSpcs = 0;
@@ -61,17 +53,19 @@ CollideHandler.prototype = {
 							var neighbor = grid[x][y][neighborIdx];
 							var dx = dot.x-neighbor.x;
 							var dy = dot.y-neighbor.y;
-							if(dx*dx+dy*dy<=(dot.r+neighbor.r)*(dot.r+neighbor.r)){
+							if (dx*dx+dy*dy<=(dot.r+neighbor.r)*(dot.r+neighbor.r)) {
 								var handler = this[Math.min(dot.idNum, neighbor.idNum) + '-' + Math.max(dot.idNum, neighbor.idNum)];
 								var UVAB = V(neighbor.x-dot.x, neighbor.y-dot.y).UV();
-								if(!handler.func.apply(handler.obj, [dot, neighbor, UVAB, dot.v.dotProd(UVAB), neighbor.v.dotProd(UVAB), x, y])){
-									doAdd = false;;
+								//YO YO - TRY INLINING ALL  OF THESE FUNCTIONS (THE VECTOR MATH) AND SEE IF IT MAKES IT FASTER.  
+								if (!handler.func.apply(handler.obj, [dot, neighbor, UVAB, dot.v.dotProd(UVAB), neighbor.v.dotProd(UVAB)])) {
+									doAdd = false;
+									grid[x][y].splice(neighborIdx, 1);
 								}
 							}
 						}
 					}
 				}
-				if(doAdd && gridX>=0 && gridY>=0 && gridX<this.numCols && gridY<this.numRows){
+				if (doAdd && gridX>=0 && gridY>=0 && gridX<this.numCols && gridY<this.numRows) {
 					grid[gridX][gridY].push(dot);
 				}
 			}
@@ -87,6 +81,7 @@ CollideHandler.prototype = {
 		this.breakUp(a, b, UVAB);
 		return true;
 	},
+	//HEY - TEST INLINING breakUp in impactStd - I mean, of course it's icky, but it's faster and who looks or works here anyway?
 	breakUp: function(a, b, UVAB){
 		var sumR = a.r+b.r;
 		var aXNew = b.x - UVAB.dx*sumR;
@@ -109,9 +104,9 @@ CollideHandler.prototype = {
 		var numCols = this.numCols;
 		var numRows = this.numRows;
 		var grid = new Array(numCols)
-		for (var colIdx=0; colIdx<numCols; colIdx++){
+		for (var colIdx=0; colIdx<numCols; colIdx++) {
 			var col = new Array(numRows)
-			for (var rowIdx=0; rowIdx<numRows;rowIdx++){
+			for (var rowIdx=0; rowIdx<numRows;rowIdx++) {
 				col[rowIdx] = [];
 			}
 			grid[colIdx] = col;
@@ -126,207 +121,5 @@ CollideHandler.prototype = {
 		}
 		return maxR;	
 	},
-	checkReact: function(a, b, UVAB, perpAB, perpBA, bX, bY){
-		var idA = a.idNum;
-		var idB = b.idNum;
-		var min = Math.min(idA, idB);
-		var max = Math.max(idA, idB);		
-		var rxns = this.reactions[min + '-' + max];
-		var idxToReact = this.pickRxn(a, b, perpAB, perpBA, rxns);
-		if(idxToReact!=-1){
-			return !this.react(a, b, bX, bY, rxns[idxToReact]);
-		} else{
-			this.impactStd(a, b, UVAB, perpAB, perpBA);
-		}
-
-	},
-	pickRxn: function(a, b, perpAB, perpBA, rxns){
-		//HEY - THIS WILL NOT WORK.  YOU ARE NORMALIZING TO THE MAX DELTAH RXN.  THAT MEANS THAT THE MAX WILL NEVER HAPPEN.  
-		//ALSO WHAT IF DELTAHRXN IS 0?
-		/*
-		var collideEnergy = this.collideEnergy(a, b, perpAB, perpBA)
-		var maxDeltaHRxn = -Number.MAX_VALUE;
-		var totalDeltaH = 0;
-		var normalizedDeltaH = new Array(rxns.length);
-		var aboveActiveE = new Array(rxns.length);
-		var probMap = new Array(rxns.length);
-		for (var rxnIdx=0; rxnIdx<rxns.length; rxnIdx++){
-			var rxn = rxns[rxnIdx];
-			if(collideEnergy>rxn.activationE){
-				maxDeltaHRxn = Math.max(rxn.deltaH, maxDeltaHRxn);
-				totalDeltaH+=rxn.deltaH;
-				aboveActiveE[rxnIdx] = true;
-			}else{
-				aboveActiveE[rxnIdx] = false;
-			}
-		}
-		totalDeltaH-=rxns.length*maxDeltaHRxn;
-		totalDeltaH*=-1;
-		var curProbVal = 0;
-		for (var rxnIdx=0; rxnIdx<rxns.length; rxnIdx++){
-			normalizedDeltaH[rxnIdx] = -(rxns[rxnIdx].deltaH - maxDeltaH);
-		}
-		if(totalDeltaH!=0){
-			rndVal = Math.random()*totalDeltaH;
-			var sumDeltaH = 0;
-			for	(var rxnIdx=0; rxnIdx<rxns.length; rxnIdx++){
-				sumDeltaH += normalizedDeltaH[rxnIdx]*aboveActiveE[rxnIdx];
-				if(sumDeltaH>=rndVal){
-					return rxnIdx;
-				}
-			}
-		}else{
-			return -1;
-		}
-		*/
-		return Math.floor(Math.random()*rxns.length);
-		
-	},
-	react: function(a, b, bX, bY, rxn){
-		
-		if(rxn.reactants[a.name]){
-			a.kill();
-			var killedA = true;
-		} else {
-			var killedA = false;
-		}
-		//HEY - a.name and b.name can reference the same thing.  Need to add a tag to reaction saying 1 or 2 reactants involved.
-		if(rxn.reactants[b.name]){
-			b.kill();
-			var bGridSquare = this.grid[bX][bY];
-			bGridSquare.splice(bGridSquare.indexOf(b), 1);			
-			var killedB = true;
-		}else{
-			var killedB = false;
-		}
-
-		var added = [];
-		var avgX = (a.x + b.x)/2;
-		var avgY = (a.y + b.y)/2;
-		for (var prodIdx=0; prodIdx<rxn.products.length; prodIdx++){
-			var product = rxn.products[prodIdx];
-			var spc = this.spcs[product.spc];
-			var def = this.defs[product.spc];
-			for (var countIdx=0; countIdx<product.count; countIdx++){
-				var dir = Math.random()*2*Math.PI;
-				var v = V(Math.cos(dir), Math.sin(dir));
-				var newDot = D(avgX + 2*v.dx, avgY + 2*v.dy, v, def.m, def.r, def.name, spc.idNum, product.tag, product.returnTo);
-				spc.push(newDot);
-				added.push(newDot);
-			}
-		}
-		var tF = (a.temp()*killedA + b.temp()*killedB - rxn.deltaH/this.cV)/added.length;
-		for(var addedIdx=0; addedIdx<added.length; addedIdx++){
-			var dot = added[addedIdx];
-			dot.setTemp(tF);
-		}
-		return killedA;
-	},
-	addReaction: function(spcAName, spcBName, activationE, deltaH, products, track){
-		//deltaHRxn *= .8;
-		//NOT converting from Cp of 5/2R to 4/2R to make the temp change in this be what it should be, I think
-		//deltaHRxn converted to joules
-		if(deltaH.toString().toLowerCase().indexOf('kj')!=-1){
-			deltaH = parseFloat(deltaH);
-			deltaH*=1000;
-		}
-		deltaH = parseFloat(deltaH);
-		
-		var spcA = defaultTo({}, this.spcs[spcAName]);
-		var spcB = defaultTo({}, this.spcs[spcBName]);
-		this.includeSpcs(spcAName, spcBName, products);
-		var idA = spcA.idNum;
-		var idB = spcB.idNum;
-		this.checkMassConserve(spcA, spcB, products);
-		var rxnName = this.nameRxn(spcAName, spcBName, products);
-		if(track){
-			this.addTracking(spcAName, spcBName, products, rxnName);
-		}
-		var rxn = {reactants:{}, products:products, deltaH:deltaH, activationE:activationE};
-		if(spcAName){
-			rxn.reactants[spcAName] = true;
-		}
-		if(spcBName){
-			rxn.reactants[spcBName] = true;
-		}
-		this.appendRxn(spcAName, spcBName, idA, idB, rxn);
-	},
-	includeSpcs: function(a, b, prods){
-		var nameList = new Array(prods.length + 2);
-		nameList[0] = a;
-		nameList[1] = b;
-		for (var prodIdx=0; prodIdx<prods.length; prodIdx++){
-			nameList[prodIdx+2] = prods[prodIdx].spc;
-		}
-		addSpecies(nameList);
-	},
-	nameRxn: function(a, b, prods){
-		var rxnName = '';
-		if(a){rxnName+=a;}	
-		if(b){rxnName+=b;}
-		rxnName+='to';
-		for(var prodIdx=0; prodIdx<prods.length; prodIdx++){
-			var prod = prods[prodIdx];
-			rxnName += prod.count + prod.spc;
-		}
-		return rxnName;
-	},
-	addTracking: function(a, b, prods, rxnName){
-		var trackList = new Array(prods.length+2);
-		trackList[0] = {spc:a, coeff:-1};
-		trackList[1] = {spc:b, coeff:-1};
-		
-		for(var prodIdx=0; prodIdx<prods.length; prodIdx++){
-			var prod = prods[prodIdx];
-			trackList[prodIdx+2] = {spc:prod.spc, coeff:prod.count};
-		}
-		curLevel.trackExtentRxnStart(rxnName, trackList);
-	},
-	appendRxn: function(spcAName, spcBName, idA, idB, rxn){
-		if(spcAName && spcBName){
-			var min = Math.min(idA, idB);
-			var max = Math.max(idA, idB);
-			this.reactions[min + '-' + max].push(rxn);
-			this[min + '-' + max] = {func:this.checkReact, obj:this};
-		} else {
-			var fixed = defaultTo(idA, idB);
-			var numSpcs = this.getNumSpcs();
-			for (var spcIdx=0; spcIdx<numSpcs; spcIdx++){
-				var min = Math.min(fixed, spcIdx);
-				var max = Math.max(fixed, spcIdx);
-				this.reactions[min + '-' + max].push(rxn);
-				this[min + '-' + max] = {func:this.checkReact, obj:this};
-			}
-		}
-	},
-	removeReaction: function(spcAName, spcBName){
-		var spcA = spcs[spcAName];
-		var spcB = spcs[spcBName];
-		var idA = spcA.idNum;
-		var idB = spcB.idNum;
-		var min = Math.min(idA, idB);
-		var max = Math.max(idA, idB);
-		var handler = this[min + '-' + max];
-		removeListener(curLevel, 'data', 'trackExtentRxn' + handler.rxnName);
-		handler = {func:this.impactStd, obj:this};
-		return this;
-	},
-	removeAllReactions: function(){
-		removeListenerByName(curLevel, 'data', 'trackExtentRxn');
-		this.setDefaultHandler({func:this.impactStd, obj:this});
-	},
-	collideEnergy: function(a, b, perpAB, perpBA){
-		return .5*(perpAB*perpAB*a.m + perpBA*perpBA*b.m)*this.tConst;
-		//in temperature (kelvin)
-	},
-	checkMassConserve: function(a, b, products){
-		var massIn = a.m + b.m;
-		var massOut = 0;
-		for (var prodIdx=0; prodIdx<products.length; prodIdx++){
-			massOut += spcs[products[prodIdx].spc].m*products[prodIdx].count;
-		}
-		if(massIn!=massOut){
-			console.log('YOUR ATTENTION PLEASE: MASS IS NOT CONSERVED IN THE REACTION BETWEEN ' + a.name + ' AND ' + b.name);
-		}
-	},
 }
+)

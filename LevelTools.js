@@ -15,7 +15,7 @@ LevelTools = {
 		this.dataHandler = dataHandler;
 		addListener(this, 'update', 'run', this.updateRun, this);
 		addListener(this, 'data', 'run', this.dataRun, this);
-		collide.setDefaultHandler({func:collide.impactStd, obj:collide})
+		
 		this.spcs = spcs;
 	},
 	addEqs: function(){
