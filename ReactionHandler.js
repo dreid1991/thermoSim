@@ -14,15 +14,17 @@ ReactionHandler = {
 		var low = Math.min(idA, idB);
 		var high = Math.max(idA, idB);
 		var idStr = low + '-' + high;
-		this.rxns[idStr].push({hRxn:hRxn, activE:activE, prods:prods});
+		this.rxns[idStr].push({hRxn:hRxn, activE:activE, prods:this.flattenProds(prods)});
 		if (this.rxns[idStr].length==1) {
 			this.setHandler(aName, bName, {func:this.setupReactSinglePair(this.rxns[idStr]), obj:this});
 		} else {
 			this.setHandler(aName, bName, {func:this.setupReactMultPairs(this.rxns[idStr]), obj:this});
 		}	
 	},
-	//format prods as [{name:'spc1', count:#}]
-	//activE in temperature
+	//Input prods as {name:count, ...}
+	//for a rxn, if any returnTos/tags are set, will not inherit from a parent
+	//if are tags specified, prods ->[{name:'...', returnTo:'...', tag:'...'}//one entry for each prod
+	//else -> ['myName'...] one entry for each prod
 	addRxnDecomp: function(aName, hRxn, activE, prods) {
 		var idA = speciesDefs[aName].idNum;
 		for (var spcDefName in speciesDefs) {
@@ -36,6 +38,36 @@ ReactionHandler = {
 			this.addRxnPair(aName, spcDefName, hRxn, activE, pairProds);
 			
 		}
+	},
+	flattenProds: function(prods) {
+		var flatProds = [];
+		var hasTags = this.checkHasTags(prods);
+		if (hasTags) {
+			for (var prodIdx=0; prodIdx<prods.length; prodIdx++) {
+				var prod = prods[prodIdx];
+				for (var countIdx=0; countIdx<prod.count; countIdx++) {
+					flatProds.push({name:prod.name, returnTo:prod.returnTo, tag:prod.tag});
+				}
+			}
+		} else {
+			for (var prodIdx=0; prodIdx<prods.length; prodIdx++) {
+				var prod = prods[prodIdx];
+				for (var countIdx=0; countIdx<prod.count; countIdx++) {
+					flatProds.push(prod.name);
+				}
+			}
+		}
+		return flatProds;
+	},
+	checkHasTags: function(prods) {
+		var hasTags = false;
+		for (var prodIdx=0; prodIdx<prods.length; prodIdx++) {
+			var prod = prods[prodIdx];
+			if (prod.returnTo || prod.tag) {
+				return true;
+			}
+		}
+		return false;
 	},
 	removeAllReactions: function(){
 		removeListenerByName(curLevel, 'data', 'trackExtentRxn');
@@ -53,41 +85,55 @@ ReactionHandler = {
 		var activE = pairs[0].activE;
 		var hRxn = pairs[0].hRxn;
 		var prods = pairs[0].prods;
-		return function(a, b, UVAB, perpAB, perpBA) {
-			var hitTemp = this.hitTemp(a, b, perpAB, perpBA);
-			if (Math.random()>this.probFunc(hitTemp, activE)) {
-				this.react(a, b, hRxn, prods)
-				return false;
-			}
-			return this.impactStd(a, b, UVAB, perpAB, perpBA);
-		
-		};
+		if (pairs[0].prods instanceof Object) {
+			return function(a, b, UVAB, perpAB, perpBA) {
+				var hitTemp = this.hitTemp(a, b, perpAB, perpBA);
+				if (Math.random()>this.probFunc(hitTemp, activE)) {
+					this.reactTagsSpecified(a, b, hRxn, prods)
+					return false;
+				}
+				return this.impactStd(a, b, UVAB, perpAB, perpBA);
+			
+			};			
+		} else {
+			return function(a, b, UVAB, perpAB, perpBA) {
+				var hitTemp = this.hitTemp(a, b, perpAB, perpBA);
+				if (Math.random()>this.probFunc(hitTemp, activE)) {
+					this.reactInheritTags(a, b, hRxn, prods)
+					return false;
+				}
+				return this.impactStd(a, b, UVAB, perpAB, perpBA);
+			
+			};
+		}
 	},
 	setupReactMultPairs: function(pairs) {
-		
-		return function(a, b, UVAB, perpAB, perpBA) {
-			var hitTemp = this.hitTemp(a, b, perpAB, perpBA);
-			var probs = new Array(pairs.length);
-			var sumProbs = 0;
-			for (var pairIdx=0; pairIdx<pairs.length; pairIdx++) {
-				probs[pairIdx] = this.probFunc(hitTemp, pairs[pairIdx].activE);
-				sumProbs += probs[pairIdx];
-			}
-			if (sumProbs>1) {
-				var corrFac = 1/sumProbs;
-				for (var probIdx=0; probIdx<probs.length; probIdx++) {
-					probs[probIdx]*=corrFac;
+		if (pairs[0] instanceof Object) {
+			return function(a, b, UVAB, perpAB, perpBA) {
+				var hitTemp = this.hitTemp(a, b, perpAB, perpBA);
+				var probs = new Array(pairs.length);
+				var sumProbs = 0;
+				for (var pairIdx=0; pairIdx<pairs.length; pairIdx++) {
+					probs[pairIdx] = this.probFunc(hitTemp, pairs[pairIdx].activE);
+					sumProbs += probs[pairIdx];
 				}
-			}
-			var rxnIdx = this.pickRxnIdx(probs);
-			if (rxnIdx===false) {
-				return this.impactStd(a, b, UVAB, perpAB, perpBA);
-			} else {
-				this.react(a, b, pairs[rxnIdx].hRxn, pairs[rxnIdx].prods);
-				return false;
-			}
-		};
+				if (sumProbs>1) {
+					var correctionFac = 1/sumProbs;
+					for (var probIdx=0; probIdx<probs.length; probIdx++) {
+						probs[probIdx]*=correctionFac;
+					}
+				}
+				var rxnIdx = this.pickRxnIdx(probs);
+				if (rxnIdx===false) {
+					return this.impactStd(a, b, UVAB, perpAB, perpBA);
+				} else {
+					this.reactTagsSpecified(a, b, pairs[rxnIdx].hRxn, pairs[rxnIdx].prods);
+					return false;
+				}
+			};
+		}
 	},
+	
 	pickRxnIdx: function(probs) {
 		var rnd = Math.random();
 		var sum = 0;
@@ -99,8 +145,27 @@ ReactionHandler = {
 		}
 		return false;
 	},
-	react: function(a, b, hRxn, prods) {
-	
+	reactTagsSpecified: function(a, b, hRxn, prods) {
+		var ePerProd = (a.temp() + b.temp() - hRxn)/prods.length; //neg hRxn means energy released
+		
+		a.kill();
+		b.kill();
+		for (var prodIdx=0; prodIdx<prods.length; prodIdx++) {
+			
+		}
+		return false;
+		
+	},
+	reactInheritTags: function(a, b, hRxn, prods) {
+		var ePerProd = (a.temp() + b.temp() - hRxn)/prods.length; //neg hRxn means energy released
+		
+		a.kill();
+		b.kill();
+		for (var prodIdx=0; prodIdx<prods.length; prodIdx++) {
+			
+		}
+		return false;
+		
 	},
 	checkMassConserve: function(a, b, products){
 		var massIn = a.m + b.m;

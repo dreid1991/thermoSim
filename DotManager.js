@@ -10,10 +10,10 @@ DotManager.prototype = {
 	remove: function(dot) {//can send as list or single dot
 		if (dot instanceof Array) {
 			for (var dotIdx=0; dotIdx<dot.length;dotIdx++) {
-				dot[dotIdx].removeFromParents();
+				dot[dotIdx].kill();
 			}
 		} else {
-			dot.removeFromParents();
+			dot.kill();
 		}
 	},
 	removeByInfo: function(info) {
@@ -66,7 +66,7 @@ DotManager.prototype = {
 	removeByNameAndTagFunc: function(list, info) {
 		for (var dotIdx=list.length-1; dotIdx>-1; dotIdx--) {
 			if (list[dotIdx].spcName==info.spcName && list[dotIdx].tag==info.tag) {
-				list[dotIdx].removeFromParents();
+				list[dotIdx].kill();
 			}
 		}
 	},	
@@ -74,7 +74,7 @@ DotManager.prototype = {
 		for (var dotIdx=list.length-1; dotIdx>-1; dotIdx--) {
 			if (list[dotIdx].spcName==info.spcName) {
 				list.splice(dotIdx, 1);
-				list[dotIdx].removeFromParents();	
+				list[dotIdx].kill();	
 			}
 		}
 	},	
@@ -82,7 +82,7 @@ DotManager.prototype = {
 		for (var dotIdx=list.length-1; dotIdx>-1; dotIdx--) {
 			if (list[dotIdx].tag==info.tag) {
 				list.splice(dotIdx, 1);
-				list[dotIdx].removeFromParents();
+				list[dotIdx].kill();
 			}
 		}
 	},	

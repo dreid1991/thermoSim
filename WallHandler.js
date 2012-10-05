@@ -1024,26 +1024,37 @@ WallMethods = {
 			return this;
 		},
 		recordWork: function() {
-			this.recordingWork = true;
-			this.work = 0;
-			var LTOM3LOCAL = LtoM3;
-			var PCONSTLOCAL = pConst;
-			var PUNITTOPALOCAL = PUNITTOPA;
-			var VCONSTLOCAL = vConst;
-			var JTOKJLOCAL = JtoKJ;
-			var trackPt = this[0];
-			var width = this[1].x-this[0].x;
-			var heightLast = trackPt.y;
-			addListener(curLevel, 'update', 'recordWork'+this.handle,
-				function(){
-					var dV = LTOM3LOCAL*VCONSTLOCAL*width*(heightLast-trackPt.y)
-					var p = this.pExt()*PUNITTOPALOCAL;
-					this.work -= JTOKJLOCAL*p*dV;
-					heightLast = trackPt.y;
-					this.data.work.push(this.work);
-				},
-			this);
-			recordData('work' + this.handle, this.data.work, function(){return this.data.work[this.data.work.length-1]}, this);
+			if (!this.recordingWork) {
+				this.recordingWork = true;
+				this.work = 0;
+				var LTOM3LOCAL = LtoM3;
+				var PCONSTLOCAL = pConst;
+				var PUNITTOPALOCAL = PUNITTOPA;
+				var VCONSTLOCAL = vConst;
+				var JTOKJLOCAL = JtoKJ;
+				var trackPt = this[0];
+				var width = this[1].x-this[0].x;
+				var heightLast = trackPt.y;
+				//Attention - at some point, employ some trickyness to first add a listener for first turn that records zero, then add real listener that uses func below. 
+				//this will work after first turn since volume is _always_ recorded before work (vol is added as default to wall, work is added later by objects)
+				addListenerOnce(curLevel, 'update', 'recordWorkFirst' + this.handle,
+					function() {
+						this.work = 0;
+						//this.data.work.push(0);
+						addListener(curLevel, 'update', 'recordWork'+this.handle,
+							function(){
+								var len = this.data.v.length;
+								var dV = LTOM3LOCAL*(this.data.v[len-1] - this.data.v[len-2])
+								var p = this.pExt()*PUNITTOPALOCAL;
+								this.work -= JTOKJLOCAL*p*dV;
+								heightLast = trackPt.y;
+								//this.data.work.push(this.work);
+							},
+						this);
+					},
+				this);
+				recordData('work' + this.handle, this.data.work, function(){return this.work}, this, 'update');
+			}
 			return this;
 		},
 		recordMass: function() {

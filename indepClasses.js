@@ -431,7 +431,7 @@ Dot.prototype = {
 		return this.v.mag()*this.pxToMS;
 		//return pxToMS*Math.sqrt(this.temp()/(this.m*10));
 	},
-	removeFromParents: function(){
+	kill: function(){
 		for (var listIdx=0; listIdx<this.parentLists.length; listIdx++) {
 			this.parentLists.splice(this.parentLists[listIdx].indexOf(this), 1);
 		}

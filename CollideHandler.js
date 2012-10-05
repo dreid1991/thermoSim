@@ -6,6 +6,7 @@ function CollideHandler(){
 	this.cv = cv;
 	this.rxns = {};
 	this.setDefaultHandler({func:this.impactStd, obj:this});
+	this.dotManager = dotManager;
 	console.log("Made supercollider");
 }
 _.extend(CollideHandler.prototype, ReactionHandler, {
@@ -39,10 +40,15 @@ _.extend(CollideHandler.prototype, ReactionHandler, {
 		var ySpan = this.ySpan;
 		this.grid = this.makeGrid();
 		var grid = this.grid;
+		var spcLens = {};
+		for (var spcName in this.spcs) {
+			spcLens[spcName] = this.spcs[spcName].dots.length;
+		};
+		//predetermining lengths to prevent rxn prods from reacting again on same turn.  Could make things slow
 		//defining grid locally speeds up by ~250ms/500runs (1000->750)
 		for (var spcName in this.spcs){
 			var dots = spcs[spcName].dots;
-			for (var dotIdx=dots.length-1; dotIdx>-1; dotIdx--) {
+			for (var dotIdx=spcLens[spcName]-1; dotIdx>=0; dotIdx--) {
 				var dot = dots[dotIdx];
 				var gridX = Math.floor(dot.x/gridSize);
 				var gridY = Math.floor(dot.y/gridSize);
