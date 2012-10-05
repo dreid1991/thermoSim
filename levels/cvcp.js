@@ -40,7 +40,7 @@ _.extend(cvcp.prototype,
 				{//P1
 					setup:undefined,
 					cutScene:true,
-					text:"<p>Right.</p><p>So an ideal gas has a higher heat capacity under constant pressure than under constant volume.  We're going to investigate these processes to figure out why that is.</p><p>First, what does it mean in terms of energy required to heat a given system that c<sub>P</sub> is greater than c<sub>v</sub>?</p>"
+					text:"<p>Right.</p><p>So an ideal gas has a higher heat capacity under constant pressure than under constant volume.  We're going to investigate these processes to figure out why that is.</p><p>First, what does it mean in terms of energy required to heat a given system that c<sub>P</sub> is greater than c<sub>v</sub>?</p>",
 					quiz:[
 						{	
 						type:'text',
@@ -166,10 +166,13 @@ _.extend(cvcp.prototype,
 		{//B3
 			setup:undefined,
 			prompts:[
-				setup:undefined,
-				cutScene:true,
-				text:"<p>End of simulation.</p>"
+				{
+					setup:undefined,
+					cutScene:true,
+					text:"<p>End of simulation.</p>",
+				}
 			]
+		}
 
 	]
 	
