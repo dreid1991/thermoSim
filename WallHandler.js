@@ -1139,27 +1139,42 @@ WallMethods = {
 			}
 			return this;
 		},
-		displayTemp: function(readout, label, decPlaces){
-			if(this.recordingTemp && !this.displayingTemp){
+		displayTemp: function(readout, label, decPlaces, smooth){
+			if (this.recordingTemp && !this.displayingTemp) {
 				this.displayingTemp = true;
 				decPlaces = defaultTo(0, decPlaces);
 				var dataSet = this.data.t;
 				label = defaultTo('Temp:', label);
 				this.tempReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
 				var firstVal = dataSet[dataSet.length-1];
-				if(!validNumber(firstVal)){
+				if (!validNumber(firstVal)) {
 					firstVal = 0;
 				}
 				this.tempReadout.addEntry('temp' + this.handle, label, 'K', firstVal, undefined, decPlaces);
-				addListener(curLevel, 'update', 'displayTemp' + this.handle,
-					function(){
-						this.tempReadout.hardUpdate('temp' + this.handle, dataSet[dataSet.length-1]);
-					},
-				this);	
+				if (!smooth) {
+					addListener(curLevel, 'update', 'displayTemp' + this.handle,
+						function() {
+							this.tempReadout.hardUpdate('temp' + this.handle, dataSet[dataSet.length-1]);
+						},
+					this);	
+				} else {
+					addListener(curLevel, 'update', 'displayTemp' + this.handle,
+						function() {
+							var sum = 0;
+							for (var tempIdx=dataSet.length-5; tempIdx<dataSet.length; tempIdx++) {
+								sum += dataSet[tempIdx];
+							}
+							this.tempReadout.hardUpdate('temp' + this.handle, sum*=.2);
+						},
+					this);
+				}
 			}else{
 				console.log('Tried to display temp of wall ' + this.handle + ' while not recording.  Will not display.');
 			}
 			return this;
+		},
+		displayTempSmooth: function(readout, label, decPlaces) {
+			return this.displayTemp(readout, label, decPlaces, true);
 		},
 		displayPInt: function(readout, label, decPlaces){
 			if(this.recordingPInt && !this.displayingPInt){
