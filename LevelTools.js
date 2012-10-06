@@ -4,7 +4,6 @@ LevelTools = {
 		this.setDefaultPromptVals()
 		this.graphs = {};
 		this.makePromptCleanUpHolders(0);
-		this.quiz = [];
 		this.eUnits = 'kJ';
 		this.bgCol = Col(5, 17, 26);
 		this.wallCol = Col(255,255,255);

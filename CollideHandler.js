@@ -2,6 +2,7 @@ function CollideHandler(){
 	this.spcs = spcs;
 	this.defs = speciesDefs;
 	this.tConst = tConst;
+	this.rndUVs = this.generateRandomUVs();
 	this.cp = cp;
 	this.cv = cv;
 	this.rxns = {};
@@ -126,6 +127,14 @@ _.extend(CollideHandler.prototype, ReactionHandler, {
 			maxR = Math.max(maxR, spc.r);
 		}
 		return maxR;	
+	},
+	generateRandomUVs: function() {
+		var UVs = new Array(20);
+		for (var idx=0; idx<20; idx++) {
+			var angle = Math.random()*2*Math.PI;
+			UVs[idx] = V(Math.cos(angle), Math.sin(angle));
+		}
+		return UVs;
 	},
 }
 )
