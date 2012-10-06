@@ -8,14 +8,16 @@
 <div class='noSelect wrapper'>
 	<div id='main' class='main noSelect'>
 		<div id='mainHeader' class='header noSelect'>
-			Reactions
+			
 		</div>
-		<div id='canvasDiv' class='canvasDiv noSelect'>
-			<canvas id='myCanvas'>
-			</canvas>
+		<div id='canvasWrapper'>
+			<div id='canvasDiv' class='canvasDiv noSelect'>
+				<canvas id='myCanvas'>
+				</canvas>
+			</div>
 		</div>
-		<div id='display' class='display noSelect'>
-				<div id='intText' class='displayText noSelect'>
+		<div id='display' class='displayLong noSelect'>
+			<div id='intText' class='displayText noSelect'>
 			</div>
 		</div>
 
@@ -26,29 +28,48 @@
 			</center>
 			
 		</div>
-		<div id='dashRun' class='dashMed noSelect'>
+		<div id='dashRun' class='dashShort noSelect' style='position:relative'>
 			<center>
-				<div>
-					<button id='reset' class='noSelect'>Reset experiment</button>
-					<button id='checkAns' class='noSelect'>Check answer</button>
-					<button id='clearGraphs' class='noSelect'>Clear graphs</button>
+				<div id='buttons'>
 
 				</div>
 			</center>
-		</div>
-		<div id='dashCutScene' class='dashMed noSelect'>
-		</div>
-		<div id='dashOutro' class='dash noSelect ' >
 			<center>
-				<button id='backToSim'>Back to the simulation</button>
+				<div id='sliderHolderSingle'>
+					<div id='sliderHolderCenter' style='width:300px'>
+					
+					</div>
+				</div>
+			</center>
+			<center>
+				<div id='sliderHolderDouble'>
+					<div id='sliderHolderLeft' style='display:inline-block;width:200px'>
+					</div>
+					<div id='sliderSpacer' style='width:100px'>
+					</div>
+					<div id='sliderHolderRight' style='width:200px'>
+					</div>
+				</div>
+			</center>
+			<button id='resetExp' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button>
+		</div>
+		<div id='dashCutScene' class='dashShort noSelect'></div>
+		<div id='dashOutro' class='dashMed noSelect ' >
+			<center>
+				<button id='toLastStep'>Back to the simulation</button>
 			</center>
 			
 			
 		</div>
 		
-
 	</div>
-	<div id='graphs' class='graphs noSelect'>
+	<div id='auxSlots' class='auxSlots noSelect'>
+		<div id='aux1' class='aux' filledWith=''>
+		</div>
+		<div id='auxSpacer' class='auxSpacer'>
+		</div>
+		<div id='aux2' class='aux' filledWith=''>
+		</div>
 	</div>
 </div>
 <br>
@@ -73,100 +94,43 @@
 	<div id='baseDash' class='bottomRound noSelect'></div>
 </div>
 <script src = '../indepClasses.js'></script>
+<script src = '../DrawingTools.js'></script>
+<script src = '../DotManager.js'></script>
+<script src = '../AuxFunctions.js'></script>
 <script src = '../GraphBase.js'></script>
 <script src = '../GraphScatter.js'></script>
 <script src = '../GraphHist.js'></script>
+<script src = '../GraphBlank.js'></script>
 <script src = '../SpeciesDefs.js'></script>
+<script src = '../ReactionHandler.js'></script>
 <script src = '../CollideHandler.js'></script>
 <script src = '../DataHandler.js'></script>
 <script src = '../WallHandler.js'></script>
 <script src = '../objects01.js'></script>
 <script src = '../objects02.js'></script>
+<script src = '../AuxPicture.js'></script>
 <script src = '../animText.js'></script>
 <script src = '../Readout.js'></script>
-<script src = '../WorkTracker.js'></script>
 <script src = '../LevelTools.js'></script>
-
 <script src = 'Reactions.js'></script>
 <script src = '../base.js'></script>
 <script type = 'text/javascript'>
 var curLevel;
-canvasHeight = 450;
+canvasHeight = 500;
 $(function(){
-	//HEY - COULD PUT INIT STUFF HERE. 
+	imgPath = 'rev';
+	animText = new AnimText(c);
 	myCanvas.height = canvasHeight;
 	curLevel = new Reactions();
-	animText = new AnimText(c);
-	$('#sliderHeaterHolder').hide();
-	$('#sliderPressureHolder').hide();
 
-	$('#checkAns').hide();
-	$('#clearGraphs').hide();
+	curLevel.cutSceneEnd();
+	curLevel.init();
 	$('button').button();
-	$('#longSliderHolder').hide();
+	$('#resetExp').click(function(){curLevel.reset()});
 	$('#toSim').click(function(){nextPrompt()});
-	$('#backToSim').click(function(){prevPrompt()});
+	$('#toLastStep').click(function(){prevPrompt()});
 	$('#previous').click(function(){prevPrompt()});
 	$('#next').click(function(){nextPrompt()});
-	$('#submit').click(function(){submit()});
-	$('#checkAns').click(function(){curLevel.checkAnsTemp()});
-	$('#clearGraphs').click(function(){curLevel.clearGraphs()});
-	$('#reset').click(function(){curLevel.reset()});
-	$('#reset').hide();
-	curLevel.init();
-	curLevel.setDefaultPromptVals();
-	makeSlider(
-		"sliderPressure", 
-		{
-			min:2, 
-			max:15, 
-			value:2, 
-		},
-		[
-			{eventType:'slide', obj:curLevel, func:curLevel.changePressure},
-		],
-		'show'
-	);
-	makeSlider(
-		"sliderHeaterLeft", 
-		{
-			min:-20, 
-			max:20, 
-			value:0, 
-		},
-		[
-			{eventType:'slidestop', obj:curLevel, func:function(event, ui){
-															$('#sliderHeaterLeft').slider('option', {value:0});
-															ui.value=0;
-															this.heatLeft(event, ui)
-														}
-			},
-			{eventType:'slide', obj:curLevel, func:curLevel.heatLeft}, 
-			
-		],
-		'show'
-	);
-	makeSlider(
-		"sliderHeaterRight", 
-		{
-			min:-20, 
-			max:20, 
-			value:0, 
-		},
-		[
-			{eventType:'slidestop', obj:curLevel, func:function(event, ui){
-															$('#sliderHeaterRight').slider('option', {value:0});
-															ui.value=0;
-															this.heatRight(event, ui)
-														}
-			},
-			{eventType:'slide', obj:curLevel, func:curLevel.heatRight}, 
-			
-		],
-		'show'
-	);
-
-
 });
 
 myCanvas.width = $('#main').width();

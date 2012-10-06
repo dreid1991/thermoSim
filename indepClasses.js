@@ -433,7 +433,7 @@ Dot.prototype = {
 	},
 	kill: function(){
 		for (var listIdx=0; listIdx<this.parentLists.length; listIdx++) {
-			this.parentLists.splice(this.parentLists[listIdx].indexOf(this), 1);
+			this.parentLists[listIdx].splice(this.parentLists[listIdx].indexOf(this), 1);
 		}
 	},
 }

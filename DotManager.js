@@ -135,6 +135,7 @@ DotManager.prototype = {
 			return this.lists[spcName];
 		} else {
 			this.lists[spcName] = [];
+			spcs[spcName].dots = this.lists[spcName]; // Hey - this is sloppy.  Do like a 'sync with spcs' function
 			return this.lists[spcName];
 		}
 	},

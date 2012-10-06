@@ -26,7 +26,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, {
 		var idB = speciesDefs[bName].idNum;
 		var min = Math.min(idA, idB);
 		var max = Math.max(idA, idB);
-		this.handlers[min + '-' + max] = handler;
+		this[min + '-' + max] = handler;
 	},
 	getNumSpcs: function(){
 		var numSpcs = 0;

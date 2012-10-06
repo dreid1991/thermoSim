@@ -241,8 +241,7 @@ _.extend(Reversibility.prototype,
 		spcs['spc3'].populate(P(42, 100), V(468, 310), 750, 240.7);
 	},
 	compSetup: function(){
-		walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'cVIsothermal', handles:['container'], bounds:[{yMin:68, yMax:435}], vols:[10.1]});
-		//add temp to wall
+		walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'cVIsothermal', handles:['container'], bounds:[{yMin:68, yMax:435}], vols:[10.1], temps:[240.7]});
 		this.borderStd({min:68});
 		var maxY = walls[0][0].y;
 		var height = walls[0][3].y-walls[0][0].y;

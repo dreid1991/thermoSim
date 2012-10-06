@@ -1,5 +1,5 @@
 ReactionHandler = {
-	addRxn: function(aName, bName, hRxn, activE, prods) {
+	addReaction: function(aName, bName, hRxn, activE, prods) {
 		if (bName) {
 			this.addRxnPair(aName, bName, hRxn, activE, prods);
 		} else {
@@ -7,14 +7,19 @@ ReactionHandler = {
 		}
 
 	},
+	//make a removeReaction function
+	removeAllReactions: function(){
+		this.setDefaultHandler({func:this.impactStd, obj:this});
+	},
+	//end public
 	//maybe automatically adding reverse should reverse activE be specified
 	addRxnPair: function(aName, bName, hRxn, activE, prods) {
-		var idA = speciesDefs[aName].idNum;
-		var idB = speciesDefs[bName].idNum;
+		var idA = this.defs[aName].idNum;
+		var idB = this.defs[bName].idNum;
 		var low = Math.min(idA, idB);
 		var high = Math.max(idA, idB);
 		var idStr = low + '-' + high;
-		this.rxns[idStr].push({hRxn:hRxn, activE:activE, prods:this.reformatProds(prods))});
+		this.rxns[idStr].push({hRxn:hRxn, activE:activE, prods:this.reformatProds(prods), prodCount:this.countProds(prods)});
 		if (this.rxns[idStr].length==1) {
 			this.setHandler(aName, bName, {func:this.setupReactSinglePair(this.rxns[idStr]), obj:this});
 		} else {
@@ -26,6 +31,14 @@ ReactionHandler = {
 		for (var name in prods) {
 			reformat.push({name:name, count:prods[name]});
 		}
+		return reformat;
+	},
+	countProds: function(prods) {
+		var count = 0;
+		for (var prod in prods) {
+			count+=prods[prod];
+		}
+		return count;
 	},
 	//Input prods as {name:count, ...}
 	//reformatting since looping through array is faster than looping through obj
@@ -44,9 +57,6 @@ ReactionHandler = {
 			
 		}
 	},
-	removeAllReactions: function(){
-		this.setDefaultHandler({func:this.impactStd, obj:this});
-	},
 	hitTemp: function(a, b, perpAB, perpBA){
 		return .5*(perpAB*perpAB*a.m + perpBA*perpBA*b.m)*this.tConst;
 		//in temperature
@@ -59,10 +69,11 @@ ReactionHandler = {
 		var activE = pairs[0].activE;
 		var hRxn = pairs[0].hRxn;
 		var prods = pairs[0].prods;
+		var prodCount = pairs[0].prodCount;
 		return function(a, b, UVAB, perpAB, perpBA) {
 			var hitTemp = this.hitTemp(a, b, perpAB, perpBA);
 			if (Math.random()>this.probFunc(hitTemp, activE)) {
-				this.react(a, b, hRxn, prods)
+				this.react(a, b, hRxn, prods, prodCount)
 				return false;
 			}
 			return this.impactStd(a, b, UVAB, perpAB, perpBA);
@@ -89,7 +100,7 @@ ReactionHandler = {
 			if (rxnIdx===false) {
 				return this.impactStd(a, b, UVAB, perpAB, perpBA);
 			} else {
-				this.react(a, b, pairs[rxnIdx].hRxn, pairs[rxnIdx].prods);
+				this.react(a, b, pairs[rxnIdx].hRxn, pairs[rxnIdx].prods, pairs[rxnIdx].prodCount);
 				return false;
 			}
 		};
@@ -107,18 +118,18 @@ ReactionHandler = {
 		}
 		return false;
 	},
-	react: function(a, b, hRxn, prods) {
-		var prodTemp = (a.temp() + b.temp() - hRxn)/prods.length; //hey - should make hRxn be in j or kj and convert at some point
+	react: function(a, b, hRxn, prods, prodCount) {
+		var prodTemp = (a.temp() + b.temp() - hRxn)/prodCount; //hey - should make hRxn be in j or kj and convert at some point
 		a.kill();
 		b.kill();
 		var x = .5*(a.x + b.x);
 		var y = .5*(a.y + b.y);
 		for (var prodIdx=0; prodIdx<prods.length; prodIdx++) {
 			var name = prods[prodIdx].name;
-			var newDots = newArray(prods[prodIdx].count);
-			for (var countIdx=0; countIdx<prods[prodIdx].count) {
+			var newDots = new Array(prods[prodIdx].count);
+			for (var countIdx=0; countIdx<prods[prodIdx].count; countIdx++) {
 				var UV = this.rndUVs[Math.floor(Math.random()*20)];
-				newDots[countIdx] = D(x+UV.dx*3, y+UV.dy*3, UV.copy(), this.defs[name].r, name, this.defs[name].idNum, a.tag, a.returnTo); 
+				newDots[countIdx] = D(x+UV.dx*3, y+UV.dy*3, UV.copy(), this.defs[name].m, this.defs[name].r, name, this.defs[name].idNum, a.tag, a.returnTo); 
 				newDots[countIdx].setTemp(prodTemp);
 			}
 			this.dotManager.add(newDots);
