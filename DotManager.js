@@ -1,7 +1,7 @@
 function DotManager() {
 	this.lists = {ALLDOTS:[]};
 }
-//Yo yo, make spcs[w/e].populate add lists here and then spc references this list.  THIS IS THE MOTHERLIST
+
 DotManager.prototype = {
 //start public funcs
 	add: function(dot) {//can send as list or single dot

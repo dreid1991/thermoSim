@@ -25,7 +25,7 @@ _.extend(Reactions.prototype,
 					var maxY = walls[0][0].y;
 					var height = walls[0][3].y-walls[0][0].y;
 					spcs['spc1'].populate(P(35, maxY+10), V(460, height-20), 100, 273);
-					spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 1, 273);
+					spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 100, 273);
 				},
 			prompts:[
 				{//P0
