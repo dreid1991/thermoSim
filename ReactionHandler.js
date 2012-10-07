@@ -58,7 +58,8 @@ ReactionHandler = {
 		}
 	},
 	hitTemp: function(a, b, perpAB, perpBA){
-		return .5*(perpAB*perpAB*a.m + perpBA*perpBA*b.m)*this.tConst;
+		return .5*(Math.abs(perpAB)*perpAB*a.m + Math.abs(perpBA)*perpBA*b.m)*this.tConst;
+		//abs will handle dots moving away from other dot
 		//in temperature
 	},
 	probFunc: function(hitTemp, activE) {
@@ -71,7 +72,7 @@ ReactionHandler = {
 		var prods = pairs[0].prods;
 		var prodCount = pairs[0].prodCount;
 		return function(a, b, UVAB, perpAB, perpBA) {
-			var hitTemp = this.hitTemp(a, b, perpAB, perpBA);
+			var hitTemp = this.hitTemp(a, b, perpAB, -perpBA);
 			if (Math.random()>this.probFunc(hitTemp, activE)) {
 				this.react(a, b, hRxn, prods, prodCount)
 				return false;

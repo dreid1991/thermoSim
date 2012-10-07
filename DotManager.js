@@ -16,6 +16,10 @@ DotManager.prototype = {
 			dot.kill();
 		}
 	},
+	addSpcs: function(name) {
+		this.lists[name] = [];
+		return this.lists[name];
+	},
 	removeByInfo: function(info) {
 		if (info.spcName && info.tag) {
 			this.execAllCombos(this.removeByNameAndTagFunc, info);
@@ -45,7 +49,6 @@ DotManager.prototype = {
 		for (var list in this.lists) {
 			this.lists[list].splice(0, this.lists[list].length);
 		}
-		this.lists = {ALLDOTS:[]};
 	},
 	
 //end public funcs
@@ -134,9 +137,8 @@ DotManager.prototype = {
 		if (this.lists[spcName]) {
 			return this.lists[spcName];
 		} else {
-			this.lists[spcName] = [];
-			spcs[spcName].dots = this.lists[spcName]; // Hey - this is sloppy.  Do like a 'sync with spcs' function
-			return this.lists[spcName];
+			console.log('Tried to get bad spcName ' + spcName);
+			console.trace();
 		}
 	},
 	getByTag: function(tag) {

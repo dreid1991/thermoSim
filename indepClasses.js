@@ -22,11 +22,10 @@ function Species(mass, radius, colors, def){
 	this.cols = colors;
 	this.def = def;
 	this.idNum = def.idNum
-	this.dots = [];
+	this.dots = dotManager.addSpcs(def.spcName);
 }
 Species.prototype = {
 	populate: function(pos, dims, count, temp, tag, returnTo){
-		var vStdev = .1;
 		var x = pos.x;
 		var y = pos.y;
 		var width = dims.dx;
@@ -42,7 +41,7 @@ Species.prototype = {
 			birthList.push(D(placeX, placeY, V(vx, vy), this.m, this.r, this.def.spcName, this.def.idNum, tag, returnTo));
 		}
 		dotManager.add(birthList);
-		this.dots = dotManager.get({spcName:this.def.spcName});
+		//dots gets set in dotManager
 	},
 	depopulate: function(tag) {
 		console.trace();

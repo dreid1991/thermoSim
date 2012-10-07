@@ -114,24 +114,24 @@ function boundedStep(cur, setPt, step){
 }
 function addSpecies(toAdd){
 	var didAdd = false;
-	if (String(toAdd)===toAdd){
-		if(!spcs[toAdd] && toAdd){
+	if (String(toAdd)===toAdd) {
+		if (!spcs[toAdd] && toAdd) {
 			var def = speciesDefs[toAdd];
 			spcs[toAdd] = new Species(def.m, def.r, def.cols, def);
 			didAdd = true;
 		}
 		
-	} else if (toAdd instanceof Array){
+	} else if (toAdd instanceof Array) {
 		for (var toAddIdx=0; toAddIdx<toAdd.length; toAddIdx++){
 			var name = toAdd[toAddIdx];
-			if(!spcs[name] && name){
+			if (!spcs[name] && name) {
 				var def = speciesDefs[name];
 				spcs[name] = new Species(def.m, def.r, def.cols, def);
 				didAdd = true;
 			}
 		}
 	}
-	if(didAdd){
+	if (didAdd) {
 		collide.setup();
 	}
 }
@@ -241,15 +241,16 @@ function addListenerOnce(object, typeName, funcName, func, destObj){
 function addInterval(funcHandle, func, destObj, interval) {
 	extraIntervals[funcHandle] = window.setInterval(function(){func.apply(destObj)}, interval);
 }
-function removeListener(object, typeName, funcName){
-	delete object[typeName + 'Listeners'].listeners[funcName];
-}
 function removeInterval(funcHandle) {
 	if (extraIntervals[funcHandle]) {
 		window.clearInterval(extraIntervals[funcHandle]);
 		extraIntervals[funcHandle] = undefined;
 	}
 }
+function removeListener(object, typeName, funcName){
+	delete object[typeName + 'Listeners'].listeners[funcName];
+}
+
 function removeSave(object, typeName, funcName){
 	delete object[typeName + 'Listeners'].save[funcName];
 }
