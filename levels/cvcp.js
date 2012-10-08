@@ -29,10 +29,10 @@ _.extend(cvcp.prototype,
 							type:'multChoice', 
 							options:
 								[
-								{text:"||EQ1|| and ||EQ3||", isCorrect: false},
-								{text:"||EQ2|| and ||EQ3||", isCorrect: false},
+								{text:"||EQ1|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
+								{text:"||EQ2|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
 								{text:"||EQ1|| and ||EQ4||", isCorrect: true},
-								{text:"||EQ2|| and ||EQ5||", isCorrect: false}
+								{text:"||EQ2|| and ||EQ5||", isCorrect: false, message:"That's not correct"}
 							]
 						}
 					],
@@ -79,8 +79,8 @@ _.extend(cvcp.prototype,
 							currentSetupType = 'prompt1';
 							walls[1].setDefaultReadout(this.piston.readout);
 							walls[1].displayPExt();
-							this.leftTemp250 = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the left container to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
-							this.rightTemp250 = new StateListener({dataList:walls[1].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the right container to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
+							this.leftTemp250 = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
+							this.rightTemp250 = new StateListener({dataList:walls[1].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
 						},
 					title:"Current step",
 					text:"Okay, here’s a constant volume and a constant pressure container.  Both are adiabatic and contain 0.6 moles of an ideal monatomic gas.  Heat the two containers to 250 K.  How do the energies used compare?",
@@ -148,8 +148,8 @@ _.extend(cvcp.prototype,
 				{//P0
 					setup:
 						function() {
-							this.leftTemp250 = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the left container to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
-							this.rightTemp250 = new StateListener({dataList:walls[1].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the right container to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});							
+							this.leftTemp250 = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
+							this.rightTemp250 = new StateListener({dataList:walls[1].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});							
 
 						},
 					text:"Try heating the containers to 250 K again.  This time the work done by the constant pressure container is displayed.  Is your theory consistant with the data from this heating?",
