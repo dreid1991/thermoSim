@@ -61,7 +61,7 @@ function Sandbox(attrs){
 	this.spcVol = 70; //specific volume
 	this.sand.col = defaultTo(Col(224, 165, 75), attrs.sandCol);
 	this.sand.pts = this.getSandPts();
-	this.sand.pos = P(this.binX, this.wall[0].y).track({pt:this.wallPt, noTrack:'x'});
+	this.sand.pos = P(this.binX, this.wall[0].y).track({pt:this.wallPt, noTrack:'x', cleanUpWith:this.cleanUpWith});
 
 	this.pistonPt = this.wall[0].y;
 	

@@ -402,8 +402,10 @@ Point.prototype = {
 		}
 		if (trackFunc) {
 			addListener(curLevel, 'update', this.trackListenerId, trackFunc, this);
+			addListener(curLevel, defaultTo(currentSetupType, trackData.cleanUpWith) + 'CleanUp', this.trackListenerId, this.trackStop, this);
 		} else {
 			console.log('tried to track ' + this.trackListenerId + " but input wasn't right");
+			console.trace();
 		}
 		return this;
 	},

@@ -287,9 +287,9 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		var bin = {};
 		if (this.pistonOffset) {
 			var xOffset = this.pistonOffset.dx
-			bin.pos = P(posX - this.pistonBinWidth/2, 0).movePt({dx:xOffset}).track({pt:this.pistonPt, noTrack:'x', offset:{dy:this.pistonOffset.dy}});
+			bin.pos = P(posX - this.pistonBinWidth/2, 0).movePt({dx:xOffset}).track({pt:this.pistonPt, noTrack:'x', offset:{dy:this.pistonOffset.dy}, cleanUpWith:this.cleanUpWith});
 		} else {
-			bin.pos = P(posX - this.pistonBinWidth/2, 0).track({pt:this.pistonPt, noTrack:'x'});
+			bin.pos = P(posX - this.pistonBinWidth/2, 0).track({pt:this.pistonPt, noTrack:'x', cleanUpWith:this.cleanUpWith});
 		}
 		bin.slots = this.getPistonBinSlots(bin.pos, weightGroup);
 		bin.visible = false;
@@ -337,7 +337,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 			var row = [];
 			var blockX = startX + this.blockSpacing;
 			for (var colIdx=0; colIdx<numCols; colIdx++){
-				var pos = P(blockX, 0).track({pt:binPos, offset:{dy:-(yOffset+dims.dy)}, noTrack:'x'});
+				var pos = P(blockX, 0).track({pt:binPos, offset:{dy:-(yOffset+dims.dy)}, noTrack:'x', cleanUpWith:this.cleanUpWith});
 				var isFull = new Boolean();
 				var isFull = false;
 				row.push(this.newSlot(isFull, pos, weightGroup.name, 'piston', rowIdx, colIdx));
@@ -557,7 +557,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	},
 	putOnPiston: function(weight, slot){
 		this.weightsOnPiston.push(weight);
-		weight.pos.track({pt:slot.pos, noTrack:'x'});
+		weight.pos.track({pt:slot.pos, noTrack:'x', cleanUpWith:this.cleanUpWith});
 		weight.status = 'piston';
 		this.mass = this.getPistonMass();
 		this.wall.setMass(this.massChunkName, this.mass);

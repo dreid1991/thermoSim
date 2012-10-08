@@ -11,7 +11,7 @@ _.extend(Reactions.prototype,
 			LevelTools, 
 {
 	init: function(){
-		$('#mainHeader').html('c<sub>v</sub> vs. c<sub>P</sub');
+		$('#mainHeader').html('THE REACTOR');
 		showPrompt(0, 0, true);
 
 	},

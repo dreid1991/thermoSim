@@ -43,6 +43,7 @@ make rms extend Math
 accomidate multiple questions for mult choice, buttons
 
 for srs reset, it may be easiest to just start at the block and have it run through all prompts up to current one.  It's icky, but it's that or tracking down what exactly needs to be added
+well, or have an 'addedBy' attr
 
 make readdress data to change source lists for a set on graphs.  Use this to keep same graphs between prompts/blocks/whatever
 
