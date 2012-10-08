@@ -402,7 +402,8 @@ Point.prototype = {
 		}
 		if (trackFunc) {
 			addListener(curLevel, 'update', this.trackListenerId, trackFunc, this);
-			addListener(curLevel, defaultTo(currentSetupType, trackData.cleanUpWith) + 'CleanUp', this.trackListenerId, this.trackStop, this);
+			this.cleanUpWith = defaultTo(currentSetupType, trackData.cleanUpWith)
+			addListener(curLevel, this.cleanUpWith + 'CleanUp', this.trackListenerId, this.trackStop, this);
 		} else {
 			console.log('tried to track ' + this.trackListenerId + " but input wasn't right");
 			console.trace();
@@ -411,7 +412,9 @@ Point.prototype = {
 	},
 	trackStop: function() {
 		removeListener(curLevel, 'update', this.trackListenerId);
+		removeListener(curLevel, this.cleanUpWith + 'CleanUp', this.trackListenerId);
 		this.trackListenerId = undefined;
+		this.cleanUpWith = undefined;
 		return this;
 	}
 }
