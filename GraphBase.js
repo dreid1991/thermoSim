@@ -254,7 +254,7 @@ GraphBase = {
 		var val = this.valRange;
 		var oldValRange = {x:{min:val.x.min, max:val.x.max}, y:{min:val.y.min, max:val.y.max}};
 		var toDraw = {};
-		for (var addIdx=0; addIdx<toAdd.length; addIdx++){
+		for (var addIdx=0; addIdx<toAdd.length; addIdx++) {
 			var address = toAdd[addIdx].address;
 			var x = toAdd[addIdx].x;
 			var y = toAdd[addIdx].y;
@@ -262,7 +262,9 @@ GraphBase = {
 			if (!toDraw[address]) {
 				toDraw[address] = [];
 			}
-			toDraw[address].push(dataSet.x.length);
+			if (dataSet.show) {
+				toDraw[address].push(dataSet.x.length);
+			}
 			dataSet.x.push(x);
 			dataSet.y.push(y);
 			this.valRange.x.max = Math.max(this.valRange.x.max, x);
@@ -280,11 +282,11 @@ GraphBase = {
 		if (mustRedraw) {
 			this.drawAllData();
 		} else {
-			this.drawLastData(toDraw)
+			this.drawLastData(toDraw);
 
 		}
 		if (flash) {
-			this.flashInit(toAdd);
+			this.flashInit(toDraw);
 		}
 	},
 	rangeIsSame: function(a, b){
@@ -380,7 +382,7 @@ GraphBase = {
 		var entry = this.legend[entryName];
 		draw.fillStrokeRect(entry.togglePos, entry.toggleDims, this.gridCol, this.toggleCol, this.graph);
 		var dataSet = this.data[entryName];
-		if(dataSet.show){
+		if (dataSet.show) {
 			this.legend[entryName]['check'].draw();
 		}
 	},
@@ -399,14 +401,14 @@ GraphBase = {
 		legendEntry.toggleDims = toggleDims;
 		var self = this;
 		legendEntry.toggle = function(){
-								if(ptInRect(togglePos, toggleDims, mouseOffsetDiv(self.parentDivId))){
-									if(set.show){
+								if (ptInRect(togglePos, toggleDims, mouseOffsetDiv(self.parentDivId))) {
+									if (set.show) {
 										set.show = false;
 										self.flashers = [];
 										removeListener(curLevel, 'update', 'flash'+self.handle);
 										self.drawAllBG();
 										self.drawAllData();
-									}else{
+									} else {
 										set.show = true;
 										self.flashers = [];
 										removeListener(curLevel, 'update', 'flash'+self.handle);
@@ -488,11 +490,52 @@ GraphBase = {
 		var y = this.dims.dy - (this.gridSpacing*(this.numGridLines.y-1)*(val.y-this.axisRange.y.min)/rangeY + (1-this.yStart)*this.dims.dy);
 		return P(x,y);
 	},
-	flashInit: function(pts){
+	flashInit: function(toDraw){
+			/*
+			for (var address in toDraw) {
+				var newPtIdxs = toDraw[address];
+				var set = this.data[address]
+				for (var ptIdx=0; ptIdx<newPtIdxs.length; ptIdx++) {
+					var newIdx = newPtIdxs[ptIdx];
+					var xPt = set.x[newIdx];
+					var yPt = set.y[newIdx];
+					var ptCol = set.pointCol;
+					if (set.trace) {
+						this.trace(set, newIdx)
+					}
+					this.graphPt(xPt, yPt, ptCol);
+				}
+			
+			}
+			*/
+		this.flashers = [];
+		for (var address in toDraw) {
+			var newPtIdxs = toDraw[address];
+			var set = this.data[address];
+			for (var ptIdx=0; ptIdx<newPtIdxs.length; ptIdx++) {
+				var newIdx = newPtIdxs[ptIdx];
+				var val = P(set.x[newIdx], set.y[newIdx]);
+				var pos = this.valToCoord(val);
+				var xPt = pos.x;
+				var yPt = pos.y;
+				var pointCol = set.pointCol;
+				var flashCol = set.flashCol;
+				var curCol = Col(flashCol.r, flashCol.g, flashCol.b);
+				var imagePos = P(xPt - this.characLen*this.flashMult-1, yPt - this.characLen*this.flashMult-1);
+				var len = this.characLen*2*this.flashMult+2;
+				var curCharacLen = this.characLen*this.flashMult;
+				var imageData = this.graph.getImageData(imagePos.x, imagePos.y, len, len);
+				this.flashers.push({pos:pos, pointCol:pointCol, flashCol:flashCol, curCol:curCol, curCharacLen:curCharacLen, imagePos:imagePos, imageData:imageData});
+			}
+			if (this.flashers.length>0) {
+				addListener(curLevel, 'update', 'flash'+this.handle, this.flashRun, this);
+			}
+		}
+		/*
 		this.flashers = [];
 		for (var flashIdx=0; flashIdx<pts.length; flashIdx++){
 			var pt = pts[flashIdx];
-			if(this.data[pt.address].show){
+			//if(this.data[pt.address].show){
 
 
 				var pos = this.valToCoord(pt);
@@ -506,11 +549,12 @@ GraphBase = {
 				var curCharacLen = this.characLen*this.flashMult;
 				var imageData = this.graph.getImageData(imagePos.x, imagePos.y, len, len);
 				this.flashers.push({pos:pos, pointCol:pointCol, flashCol:flashCol, curCol:curCol, curCharacLen:curCharacLen, imagePos:imagePos, imageData:imageData});
-			}
+			//}
 		}
 		if(this.flashers.length>0){
 			addListener(curLevel, 'update', 'flash'+this.handle, this.flashRun, this);
 		}
+		*/
 	},
 	flashRun: function(){
 		this.eraseFlashers();

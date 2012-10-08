@@ -108,6 +108,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 					set.ptDataIdxs.push(newDataIdx);
 				}
 			}
+
 			this.addPts(toAdd);
 		},
 		addPtsAtTurns: function(a, aDataIdx, b, bDataIdx, set, address){
