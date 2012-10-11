@@ -49,13 +49,28 @@ ReactionHandler = {
 			var spcDef = speciesDefs[spcDefName];
 			var idB = spcDef.idNum;
 			if (idA==idB) {
-				var pairProds = deepCopy(prods).concat(deepCopy(prods));
+				var pairProds = this.doubleProds(deepCopy(prods));
 				this.addRxnPair(aName, aName, 2*hRxn, 2*activE, pairProds);
 			} //so if it hits itself, both can decompose with twice deltaHRxn and activation energy, or just one can through reaction below
-			var pairProds = deepCopy(prods).push({name:spcDefName, count:1});
+			var pairProds = this.plusOne(deepCopy(prods), aName);
+			
 			this.addRxnPair(aName, spcDefName, hRxn, activE, pairProds);
 			
 		}
+	},
+	doubleProds: function(prods) {
+		for (var prod in prods) {
+			prods[prod]*=2;
+		}
+		return prods;
+	},
+	plusOne: function(prods, spc) {
+		if (prods[spc] === undefined) {
+			prods[spc] = 1;
+		} else {
+			prods[spc]++;
+		}
+		return prods;
 	},
 	hitTemp: function(a, b, perpAB, perpBA){
 		return .5*(Math.abs(perpAB)*perpAB*a.m + Math.abs(perpBA)*perpBA*b.m)*this.tConst;
