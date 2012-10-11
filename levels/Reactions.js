@@ -19,14 +19,15 @@ _.extend(Reactions.prototype,
 		{//B1
 			setup:
 				function() {
-					walls = WallHandler({pts:[[P(490,300), P(510,300), P(510,410), P(490,410)]], handlers:'staticAdiabatic', handles:['container'], bounds:[{yMin:68, yMax:435}]});
+					//walls = WallHandler({pts:[[P(490,300), P(510,300), P(510,410), P(490,410)]], handlers:'staticAdiabatic', handles:['container'], bounds:[{yMin:68, yMax:435}]});
+					walls = WallHandler({pts:[[P(200,300), P(510,300), P(510,410), P(200,410)]], handlers:'staticAdiabatic', handles:['container'], bounds:[{yMin:68, yMax:435}]});
 					//add temp to wall
 					this.borderStd({min:68});
 					var maxY = walls[0][0].y;
 					var height = walls[0][3].y-walls[0][0].y;
-					//spcs['spc1'].populate(P(300, 310), V(100, height-20), 50, 273);
-					//spcs['spc3'].populate(P(300, 310), V(100, height-20), 50, 273);
-					spcs['spc4'].populate(P(495, 310), V(5, height-20), 3, 273);
+					spcs['spc1'].populate(P(300, 310), V(100, height-20), 50, 273);
+					spcs['spc3'].populate(P(300, 310), V(100, height-20), 50, 273);
+					//spcs['spc4'].populate(P(495, 310), V(5, height-20), 3, 273);
 				},
 			prompts:[
 				{//P0
