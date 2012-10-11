@@ -48,11 +48,8 @@ _.extend(CollideHandler.prototype, ReactionHandler, {
 		//defining grid locally speeds up by ~250ms/500runs (1000->750)
 		for (var spcName in this.spcs){
 			var dots = this.spcs[spcName].dots;
-			for (var dotIdx=/*Math.min(spcLens[spcName], */dots.length-1/*)*/; dotIdx>=0; dotIdx--) {
+			for (var dotIdx=spcLens[spcName]-1; dotIdx>=0; dotIdx--) {
 				var dot = dots[dotIdx];
-				if (!dot) {
-					console.log('omg');
-				}
 				var gridX = Math.floor(dot.x/gridSize);
 				var gridY = Math.floor(dot.y/gridSize);
 				var doAdd = true;
@@ -72,8 +69,6 @@ _.extend(CollideHandler.prototype, ReactionHandler, {
 										doAdd = false;
 										grid[x][y].splice(neighborIdx, 1);
 										break loop1;
-										//from here, must break to...
-										//perhaps a while loop? like while (!killed && x<=Math.min(gridX+1, xSpan))
 									}
 								}
 							}

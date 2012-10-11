@@ -136,17 +136,17 @@ WallMethods = {
 			for (var wallIdx=0; wallIdx<wall.scatter.length; wallIdx++){
 				var UV = UVs[wallIdx];
 				var dist = wall[wallIdx].distTo(wall[wallIdx+1]);
-				var numScatters = Math.ceil(dist/gridDim)
+				var numScatters = Math.ceil(dist/gridDim);
 				var wallScatters = new Array(numScatters);
 				var ptInit = wall[wallIdx];
 				var gridXLast = -1;
 				var gridYLast = -1;
-				for (var ptIdx=0; ptIdx<numScatters; ptIdx++){
+				for (var ptIdx=0; ptIdx<numScatters; ptIdx++) {
 					var newX = ptInit.x + UV.dx*gridDim*ptIdx;
 					var newY = ptInit.y + UV.dy*gridDim*ptIdx;
 					var gridX = Math.floor(newX/gridDim);
 					var gridY = Math.floor(newY/gridDim);
-					if(gridX!=gridXLast || gridY!=gridYLast){
+					if (gridX!=gridXLast || gridY!=gridYLast) {
 						grid[gridX][gridY].push(wallIdx);
 					}
 				}
@@ -154,10 +154,10 @@ WallMethods = {
 			return grid;
 		},
 		makeBlankGrid: function(){
-			var wallGrid = new Array(this.numCols);
-			for (var x=0; x<this.numCols; x++){ 
-				var column = new Array(this.numRows);
-				for (var y=0; y<this.numRows; y++){
+			var wallGrid = new Array(this.numCols+1);
+			for (var x=0; x<this.numCols+1; x++){ 
+				var column = new Array(this.numRows+1);
+				for (var y=0; y<this.numRows+1; y++){
 					column[y] = [];
 				}
 				wallGrid[x] = (column);
@@ -318,14 +318,15 @@ WallMethods = {
 								
 								for (var wallIdx=0; wallIdx<this.length; wallIdx++){
 									var gridSquare = this[wallIdx].wallGrids[x][y];
+
 									for (var lineIdx=0; lineIdx<gridSquare.length; lineIdx++){
 										var line = gridSquare[lineIdx];
 										if (!this.haveChecked([wallIdx, line], checkedWalls)){
+											//add if hit, break out of this dot's loops
 											this.checkWallHit(dot, [wallIdx, line]);
 											checkedWalls.push([wallIdx, line]);
 										}
 									}
-								
 								}
 							}
 						}
@@ -1523,7 +1524,7 @@ WallMethods = {
 			var m1 = dot.m;
 			var m2 = wall.mass;
 			
-			if(Math.abs(vo2)>1){
+			if (Math.abs(vo2)>1) {
 				var vo1Sqr = vo1*vo1;
 				var vo2Sqr = vo2*vo2;
 				
@@ -1537,7 +1538,7 @@ WallMethods = {
 				dot.v.dy = (-b + Math.pow(b*b - 4*a*c,.5))/(2*a);
 				dot.y = dot.y+dot.r;
 				wall.v = (m1*vo1 + m2*vo2 - m1*dot.v.dy)/(m2*scalar);
-			}else{
+			} else {
 				var pt = walls[wallIdx][subWallIdx];
 				dot.v.dy = (vo1*(m1-m2)+2*m2*vo2)/(dot.m+m2);
 				wall.v = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
