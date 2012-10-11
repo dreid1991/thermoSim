@@ -58,20 +58,7 @@ LevelTools = {
 		}
 	},
 	checkDotHits: function(){
-		if(started){
-		var then = Date.now();
-	}	
-	//stuff to time goes here
-
 		collide.check();
-		if(started&&counted<500){
-		counted++;
-		total+=Date.now()-then;
-	}else if (counted==500){
-		console.log(total);
-		counted=0;
-		total=0;
-	}
 	},
 	checkWallHits: function(){
 		walls.check();
@@ -427,7 +414,7 @@ LevelTools = {
 	},
 	updateRun: function(){
 		this.move();
-		this.checkDotHits(); 
+		this.checkDotHits();
 		this.checkWallHits();
 		this.drawRun();
 	},

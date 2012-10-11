@@ -54,7 +54,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, {
 				var gridY = Math.floor(dot.y/gridSize);
 				var doAdd = true;
 				//hey - define x & y mins so I don't have to call each time?
-				loop1:
+				gridLoop:
 					for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){
 						for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, ySpan); y++){
 							for (var neighborIdx=grid[x][y].length-1; neighborIdx>-1; neighborIdx-=1){
@@ -68,16 +68,25 @@ _.extend(CollideHandler.prototype, ReactionHandler, {
 									if (!handler.func.apply(handler.obj, [dot, neighbor, UVAB, dot.v.dotProd(UVAB), neighbor.v.dotProd(UVAB)])) {
 										doAdd = false;
 										grid[x][y].splice(neighborIdx, 1);
-										break loop1;
+										break gridLoop;
 									}
 								}
 							}
 						}
 					}
-				//here!
+				if (gridX>=0 && gridY>=0 && gridX<this.numCols && gridY<this.numRows) {
+					if (doAdd) {
+						grid[gridX][gridY].push(dot);
+					}
+				} else {
+					returnEscapist(dot);
+					console.log("ball out of bounds");		
+				}
+				/*
 				if (doAdd && gridX>=0 && gridY>=0 && gridX<this.numCols && gridY<this.numRows) {
 					grid[gridX][gridY].push(dot);
 				}
+				*/
 			}
 		}
 	},

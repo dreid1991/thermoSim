@@ -54,10 +54,6 @@ $(function(){
 	collide = new CollideHandler();
 	setInterval('curLevel.update()', updateInterval);
 	setInterval('curLevel.updateData()', dataInterval);
-	addRxns = function (){collide.addReaction('spc4', 'spc4', 0, 100, {spc1:1}); collide.addReaction('spc1', undefined, 0, 200, {spc4:2})};
-	started = false;
-	counted = 0;
-	total = 0;
 
 	/*Timing stuff
 	started = false;
