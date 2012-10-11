@@ -2,7 +2,6 @@ function CollideHandler(){
 	this.spcs = spcs;
 	this.defs = speciesDefs;
 	this.tConst = tConst;
-	this.rndUVs = this.generateRandomUVs();
 	this.cp = cp;
 	this.cv = cv;
 	this.rxns = {};
@@ -48,30 +47,39 @@ _.extend(CollideHandler.prototype, ReactionHandler, {
 		//predetermining lengths to prevent rxn prods from reacting again on same turn.  Could make things slow
 		//defining grid locally speeds up by ~250ms/500runs (1000->750)
 		for (var spcName in this.spcs){
-			var dots = spcs[spcName].dots;
-			for (var dotIdx=spcLens[spcName]-1; dotIdx>=0; dotIdx--) {
+			var dots = this.spcs[spcName].dots;
+			for (var dotIdx=/*Math.min(spcLens[spcName], */dots.length-1/*)*/; dotIdx>=0; dotIdx--) {
 				var dot = dots[dotIdx];
+				if (!dot) {
+					console.log('omg');
+				}
 				var gridX = Math.floor(dot.x/gridSize);
 				var gridY = Math.floor(dot.y/gridSize);
 				var doAdd = true;
-				for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){
-					for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, ySpan); y++){
-						for (var neighborIdx=grid[x][y].length-1; neighborIdx>-1; neighborIdx-=1){
-							var neighbor = grid[x][y][neighborIdx];
-							var dx = dot.x-neighbor.x;
-							var dy = dot.y-neighbor.y;
-							if (dx*dx+dy*dy<=(dot.r+neighbor.r)*(dot.r+neighbor.r)) {
-								var handler = this[Math.min(dot.idNum, neighbor.idNum) + '-' + Math.max(dot.idNum, neighbor.idNum)];
-								var UVAB = V(neighbor.x-dot.x, neighbor.y-dot.y).UV();
-								//YO YO - TRY INLINING ALL  OF THESE FUNCTIONS (THE VECTOR MATH) AND SEE IF IT MAKES IT FASTER.  
-								if (!handler.func.apply(handler.obj, [dot, neighbor, UVAB, dot.v.dotProd(UVAB), neighbor.v.dotProd(UVAB)])) {
-									doAdd = false;
-									grid[x][y].splice(neighborIdx, 1);
+				//hey - define x & y mins so I don't have to call each time?
+				loop1:
+					for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){
+						for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, ySpan); y++){
+							for (var neighborIdx=grid[x][y].length-1; neighborIdx>-1; neighborIdx-=1){
+								var neighbor = grid[x][y][neighborIdx];
+								var dx = dot.x-neighbor.x;
+								var dy = dot.y-neighbor.y;
+								if (dx*dx+dy*dy<=(dot.r+neighbor.r)*(dot.r+neighbor.r)) {
+									var handler = this[Math.min(dot.idNum, neighbor.idNum) + '-' + Math.max(dot.idNum, neighbor.idNum)];
+									var UVAB = V(neighbor.x-dot.x, neighbor.y-dot.y).UV();
+									//YO YO - TRY INLINING ALL  OF THESE FUNCTIONS (THE VECTOR MATH) AND SEE IF IT MAKES IT FASTER.  
+									if (!handler.func.apply(handler.obj, [dot, neighbor, UVAB, dot.v.dotProd(UVAB), neighbor.v.dotProd(UVAB)])) {
+										doAdd = false;
+										grid[x][y].splice(neighborIdx, 1);
+										break loop1;
+										//from here, must break to...
+										//perhaps a while loop? like while (!killed && x<=Math.min(gridX+1, xSpan))
+									}
 								}
 							}
 						}
 					}
-				}
+				//here!
 				if (doAdd && gridX>=0 && gridY>=0 && gridX<this.numCols && gridY<this.numRows) {
 					grid[gridX][gridY].push(dot);
 				}
@@ -127,14 +135,6 @@ _.extend(CollideHandler.prototype, ReactionHandler, {
 			maxR = Math.max(maxR, spc.r);
 		}
 		return maxR;	
-	},
-	generateRandomUVs: function() {
-		var UVs = new Array(20);
-		for (var idx=0; idx<20; idx++) {
-			var angle = Math.random()*2*Math.PI;
-			UVs[idx] = V(Math.cos(angle), Math.sin(angle));
-		}
-		return UVs;
 	},
 }
 )

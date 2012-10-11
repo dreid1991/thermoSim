@@ -45,14 +45,17 @@ ReactionHandler = {
 	//internally formatted as [{name:'...', count:#}..]
 	addRxnDecomp: function(aName, hRxn, activE, prods) {
 		var idA = speciesDefs[aName].idNum;
+	
+
+		var pairProdsDouble = this.doubleProds(deepCopy(prods));
+		this.addRxnPair(aName, aName, 2*hRxn, 2*activE, pairProdsDouble);
+		//so if it hits itself, both can decompose with twice deltaHRxn and activation energy, or just one can through reaction below
+
 		for (var spcDefName in speciesDefs) {
 			var spcDef = speciesDefs[spcDefName];
 			var idB = spcDef.idNum;
-			if (idA==idB) {
-				var pairProds = this.doubleProds(deepCopy(prods));
-				this.addRxnPair(aName, aName, 2*hRxn, 2*activE, pairProds);
-			} //so if it hits itself, both can decompose with twice deltaHRxn and activation energy, or just one can through reaction below
-			var pairProds = this.plusOne(deepCopy(prods), aName);
+
+			var pairProds = this.plusOne(deepCopy(prods), spcDefName);
 			
 			this.addRxnPair(aName, spcDefName, hRxn, activE, pairProds);
 			
@@ -99,7 +102,7 @@ ReactionHandler = {
 	},
 	setupReactMultPairs: function(pairs) {
 		return function(a, b, UVAB, perpAB, perpBA) {
-			var hitTemp = this.hitTemp(a, b, perpAB, perpBA);
+			var hitTemp = this.hitTemp(a, b, perpAB, -perpBA);
 			var probs = new Array(pairs.length);
 			var sumProbs = 0;
 			for (var pairIdx=0; pairIdx<pairs.length; pairIdx++) {
@@ -144,8 +147,9 @@ ReactionHandler = {
 			var name = prods[prodIdx].name;
 			var newDots = new Array(prods[prodIdx].count);
 			for (var countIdx=0; countIdx<prods[prodIdx].count; countIdx++) {
-				var UV = this.rndUVs[Math.floor(Math.random()*20)];
-				newDots[countIdx] = D(x+UV.dx*3, y+UV.dy*3, UV.copy(), this.defs[name].m, this.defs[name].r, name, this.defs[name].idNum, a.tag, a.returnTo); 
+				var angle = Math.random()*2*Math.PI;
+				var UV = V(Math.sin(angle), Math.cos(angle))
+				newDots[countIdx] = D(x+UV.dx*3, y+UV.dy*3, UV, this.defs[name].m, this.defs[name].r, name, this.defs[name].idNum, a.tag, a.returnTo); 
 				newDots[countIdx].setTemp(prodTemp);
 			}
 			this.dotManager.add(newDots);
