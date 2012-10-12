@@ -52,6 +52,7 @@ $(function(){
 	stored = {};
 	draw = new DrawingTools();
 	collide = new CollideHandler();
+	attractor = new Attractor();
 	setInterval('curLevel.update()', updateInterval);
 	setInterval('curLevel.updateData()', dataInterval);
 
@@ -325,6 +326,21 @@ function eraseStore(attrName){
 	}else{
 		stored = {};
 	}
+}
+gridder = {
+	makeGrid: function(){
+		var numCols = this.numCols;
+		var numRows = this.numRows;
+		var grid = new Array(numCols)
+		for (var colIdx=0; colIdx<numCols; colIdx++) {
+			var col = new Array(numRows)
+			for (var rowIdx=0; rowIdx<numRows;rowIdx++) {
+				col[rowIdx] = [];
+			}
+			grid[colIdx] = col;
+		}
+		return grid;
+	},	
 }
 ArrayExtenders = {
 	pushNumber: function(number){

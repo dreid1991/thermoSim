@@ -139,8 +139,7 @@ ReactionHandler = {
 	},
 	react: function(a, b, hRxn, prods, prodCount) {
 		var prodTemp = (a.temp() + b.temp() - hRxn)/prodCount; //hey - should make hRxn be in j or kj and convert at some point
-		a.kill();
-		b.kill();
+		this.dotManager.remove([a, b]);
 		var x = .5*(a.x + b.x);
 		var y = .5*(a.y + b.y);
 		for (var prodIdx=0; prodIdx<prods.length; prodIdx++) {

@@ -13,6 +13,7 @@ function Dot(x, y, v, mass, radius, spcName, idNum, tag, returnTo){
 	this.tConst = tConst;
 	this.pxToMS = pxToMS;
 	this.parentLists = [];
+	this.attractMoveIdx = Number();
 	return this;
 	
 }

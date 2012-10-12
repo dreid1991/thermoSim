@@ -9,7 +9,7 @@ function CollideHandler(){
 	this.dotManager = dotManager;
 	console.log("Made supercollider");
 }
-_.extend(CollideHandler.prototype, ReactionHandler, {
+_.extend(CollideHandler.prototype, ReactionHandler, gridder, {
 	setDefaultHandler: function(handler){
 		var numSpcs = this.getNumSpcs();
 		for (var i=0; i<numSpcs; i++){
@@ -119,19 +119,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, {
 		this.xSpan = Math.floor(myCanvas.width/this.gridSize);
 		this.ySpan = Math.floor(myCanvas.height/this.gridSize);
 	},
-	makeGrid: function(){
-		var numCols = this.numCols;
-		var numRows = this.numRows;
-		var grid = new Array(numCols)
-		for (var colIdx=0; colIdx<numCols; colIdx++) {
-			var col = new Array(numRows)
-			for (var rowIdx=0; rowIdx<numRows;rowIdx++) {
-				col[rowIdx] = [];
-			}
-			grid[colIdx] = col;
-		}
-		return grid;
-	},
+
 	getMaxR: function(){
 		var maxR = 0;
 		for (var spcName in spcs){

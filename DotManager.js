@@ -1,18 +1,26 @@
 function DotManager() {
 	this.lists = {ALLDOTS:[]};
+	this.count = 0;
 }
 
 DotManager.prototype = {
 //start public funcs
 	add: function(dot) {//can send as list or single dot
+		if (dot instanceof Array) {
+			this.count += dot.length;
+		} else {
+			this.count ++;
+		}
 		this.execAllCombos(this.addFunc, dot);
 	},
 	remove: function(dot) {//can send as list or single dot
 		if (dot instanceof Array) {
+			this.count -= dot.length;
 			for (var dotIdx=0; dotIdx<dot.length;dotIdx++) {
 				dot[dotIdx].kill();
 			}
 		} else {
+			this.count --;
 			dot.kill();
 		}
 	},

@@ -308,15 +308,7 @@ WallMethods = {
 					var checkedWalls = [];
 					var gridX = Math.floor(dot.x/gridDim);
 					var gridY = Math.floor(dot.y/gridDim);
-					/*
-					if (gridX>xSpan || gridX<0 || gridY>ySpan || gridY<0) {
-						returnEscapist(dot);
-						console.log("ball out of bounds");				
-					}
-				
-					else{
-					escapist checking is now done only in collide.  Collide happens before checking wall hits
-					*/
+					//HEY - DO TESTING TO FIGURE OUT IF SHOULD DEFINED Math.min(gridspot...) OR CALCULATE EACH TIME
 					for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){
 						for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, ySpan); y++){
 							
@@ -334,7 +326,6 @@ WallMethods = {
 							}
 						}
 					}
-					//}
 				}
 			}
 		},

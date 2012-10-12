@@ -19,7 +19,7 @@ _.extend(Reactions.prototype,
 		{//B1
 			setup:
 				function() {
-					walls = WallHandler({pts:[[P(100,260), P(410,300), P(410,410), P(150,410)]], handlers:'staticAdiabatic', handles:['container'], bounds:[{yMin:68, yMax:435}]});
+					walls = WallHandler({pts:[[P(100,260), P(150,100), P(100,75), P(300,40), P(180, 100), P(250, 350), P(410,300), P(410,410), P(150,410)]], handlers:'staticAdiabatic', handles:['container'], bounds:[{yMin:68, yMax:435}]});
 					//walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'staticAdiabatic', handles:['container'], bounds:[{yMin:68, yMax:435}]});
 			
 					//this.borderStd({min:68});
