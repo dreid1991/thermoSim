@@ -114,7 +114,7 @@
 <script src = '../animText.js'></script>
 <script src = '../Readout.js'></script>
 <script src = '../LevelTools.js'></script>
-<script src = 'Reactions.js'></script>
+<script src = 'Attractions.js'></script>
 <script src = '../base.js'></script>
 <script type = 'text/javascript'>
 var curLevel;
@@ -123,9 +123,10 @@ $(function(){
 	imgPath = 'rev';
 	animText = new AnimText(c);
 	myCanvas.height = canvasHeight;
-	curLevel = new Reactions();
+	curLevel = new Attractions();
 
 	curLevel.cutSceneEnd();
+	attractor.setup();
 	curLevel.init();
 	$('button').button();
 	$('#resetExp').click(function(){curLevel.reset()});

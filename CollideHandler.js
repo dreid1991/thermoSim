@@ -9,7 +9,7 @@ function CollideHandler(){
 	this.dotManager = dotManager;
 	console.log("Made supercollider");
 }
-_.extend(CollideHandler.prototype, ReactionHandler, gridder, {
+_.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 	setDefaultHandler: function(handler){
 		var numSpcs = this.getNumSpcs();
 		for (var i=0; i<numSpcs; i++){
@@ -65,7 +65,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, gridder, {
 									var handler = this[Math.min(dot.idNum, neighbor.idNum) + '-' + Math.max(dot.idNum, neighbor.idNum)];
 									var UVAB = V(neighbor.x-dot.x, neighbor.y-dot.y).UV();
 									//YO YO - TRY INLINING ALL  OF THESE FUNCTIONS (THE VECTOR MATH) AND SEE IF IT MAKES IT FASTER.  
-									if (!handler.func.apply(handler.obj, [dot, neighbor, UVAB, dot.v.dotProd(UVAB), neighbor.v.dotProd(UVAB)])) {
+									if (handler.func.apply(handler.obj, [dot, neighbor, UVAB, dot.v.dotProd(UVAB), neighbor.v.dotProd(UVAB)])===false) {
 										doAdd = false;
 										grid[x][y].splice(neighborIdx, 1);
 										break gridLoop;

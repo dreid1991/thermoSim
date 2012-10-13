@@ -317,7 +317,7 @@ WallMethods = {
 
 								for (var lineIdx=0; lineIdx<gridSquare.length; lineIdx++){
 									var line = gridSquare[lineIdx];
-									if (!this.haveChecked([wallIdx, line], checkedWalls)){
+									if (this.haveChecked([wallIdx, line], checkedWalls)===false){
 										//add if hit, break out of this dot's loops
 										this.checkWallHit(dot, [wallIdx, line]);
 										checkedWalls.push([wallIdx, line]);
@@ -378,7 +378,7 @@ WallMethods = {
 		},
 		haveChecked: function(wall, list){
 			for (var listIdx=0; listIdx<list.length; listIdx++){
-				if(list[listIdx][0]==wall[0] && list[listIdx][1]==wall[1]){
+				if (list[listIdx][0]==wall[0] && list[listIdx][1]==wall[1]) {
 					return true;
 				}
 			}

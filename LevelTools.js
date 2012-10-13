@@ -12,8 +12,7 @@ LevelTools = {
 		this.makeListenerHolders();
 		dataHandler = new DataHandler();
 		this.dataHandler = dataHandler;
-		this.updateRun = this.updateRunNoAttrac;
-		addListener(this, 'update', 'run', this.updateRun, this);
+		this.setUpdateRunListener(this.updateRunNoAttract)
 		addListener(this, 'data', 'run', this.dataRun, this);
 		
 		this.spcs = spcs;
@@ -413,13 +412,22 @@ LevelTools = {
 			}
 		}
 	},
-	updateRunNoAttrac: function(){
+	setUpdateRunListener: function(func) {
+		addListener(this, 'update', 'run', func, this);
+	},
+	attract: function() {
+		this.setUpdateRunListener(this.updateRunAttract);
+	},
+	attractStop: function() {
+		this.setUpdateRunListener(this.updateRunNoAttract);
+	},
+	updateRunNoAttract: function(){
 		this.move();
 		this.checkDotHits();
 		this.checkWallHits();
 		this.drawRun();
 	},
-	updateRunAttrac: function(){
+	updateRunAttract: function(){
 		this.move();
 		//ooh - should I put it before or after all the hits?  
 		//will try before to start with
