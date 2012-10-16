@@ -20,7 +20,7 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 			var dots = spcs[spcName].dots;
 			for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
 				var dot = dots[dotIdx];
-				dot.attractMoveIdx = moveIdx;
+				dot.tempLast = dot.temp();
 				var gridX = Math.floor(dot.x/gridSize);
 				var gridY = Math.floor(dot.y/gridSize);
 				for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){
@@ -30,12 +30,11 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 							var dx = (dot.x-neighbor.x)
 							var dy = (dot.y-neighbor.y)
 							var dist = Math.max(Math.sqrt(dx*dx+dy*dy) - dot.r - neighbor.r, 1)  //will blow up if dist==0.  UNLIKELY
-							
 							var f = 1/(dist*dist*dist)//add int constant
-							dist *= pxToE
-							var pe = k/(2*dot.pxToE*dot.pxToE*dist*dist) //MAKE A K
-							dot.eLast += pe; //(k)/((n-1)(R^(n-1)))
-							neighbor.eLast += pe;							
+							dist *= pxToE;
+							var pe = 1/(2*dist*dist) //MAKE A K
+							dot.peCur += pe; //(k)/((n-1)(R^(n-1)))
+							neighbor.peCur += pe;							
 							var UV = V(dx, dy).UV(); //neighbor to dot
 							
 							var dVDot = UV.copy().mult(-f/dot.m);
@@ -50,13 +49,14 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 			}
 		
 		}
+		this.adjustE();
 	},
 	adjustE: function() {
 		for (var spcName in spcs) {
 			var dots = spcs[spcName].dots;
 			for (var dotIdx=0; dotIdx<dots.length;dotIdx++) {
 				var dot = dots[dotIdx];
-				dot.v.mult(Math.sqrt(dot.eCur/dot.eLast));
+				dot.setTemp(dot.tempLast + dot.peCur - dot.peLast);
 				dot.eLast = dot.eCur;
 				dot.eCur = 0;
 			}
@@ -72,7 +72,7 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 			var dots = spcs[spcName].dots;
 			for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
 				var dot = dots[dotIdx];
-				this.addKeToE(dot);
+				dot.tempLast = dot.temp();
 				var gridX = Math.floor(dot.x/gridSize);
 				var gridY = Math.floor(dot.y/gridSize);
 				for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){
@@ -83,8 +83,8 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 							var dy = (dot.y-neighbor.y)
 							var dist = pxToE * Math.max(Math.sqrt(dx*dx+dy*dy) - dot.r - neighbor.r, 1)  //will blow up if dist==0.  UNLIKELY
 							var pe = k/(2*dist*dist)
-							dot.eLast += pe; //(k)/((n-1)(R^(n-1)))
-							neighbor.eLast += pe;
+							dot.peLast += pe; //(k)/((n-1)(R^(n-1)))
+							neighbor.peLast += pe;
 							
 						}
 					}
@@ -93,9 +93,6 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 			}
 		
 		}		
-	},
-	addKeToE: function(dot) {
-		dot.eLast += dot.temp();
 	},
 }
 )

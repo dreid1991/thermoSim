@@ -416,6 +416,7 @@ LevelTools = {
 		addListener(this, 'update', 'run', func, this);
 	},
 	attract: function() {
+		attractor.assignELastAll();
 		this.setUpdateRunListener(this.updateRunAttract);
 	},
 	attractStop: function() {

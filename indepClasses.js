@@ -13,8 +13,10 @@ function Dot(x, y, v, mass, radius, spcName, idNum, tag, returnTo){
 	this.tConst = tConst;
 	this.pxToE = pxToE;
 	this.parentLists = [];
-	this.eLast = Number();
-	this.eCur = Number();
+	this.peLast = Number();
+	this.tempLast = Number();
+	this.peCur = Number();
+	
 	return this;
 	
 }
@@ -421,16 +423,29 @@ Point.prototype = {
 	}
 }
 Dot.prototype = {
-	KE: function(){
+	KE: function() {
 		return .5*this.m*(this.v.dx*this.v.dx + this.v.dy*this.v.dy);
 	},
-	temp: function(){
+	temp: function() {
 		return .5*this.m*(this.v.dx*this.v.dx + this.v.dy*this.v.dy)*this.tConst;
 	},
-	setTemp: function(newTemp){
+	setTemp: function(newTemp) {
 		var curTemp = this.temp();
-		var scalar = Math.sqrt(newTemp/curTemp);
-		this.v.mult(scalar);
+		//if (curTemp!=0) {
+			this.v.mult(Math.sqrt(newTemp/curTemp));
+		/*  SHOULD ZERO-TEMP CASE BECOME A THING...   BUT AT CURRENT I DON'T THINK IT IS
+		} else {
+			var v = Math.sqrt(2*newTemp/(this.tConst*this.m));
+			var dir = Math.random()*2*Math.PI;
+			this.v.dx = Math.cos(dir)*v;
+			this.v.dy = Math.sin(dir)*v;
+		}
+		*/
+		return this;
+	},
+	changeTemp: function(delta) {
+		var curTemp = this.temp();
+		this.v.mult(Math.sqrt((curTemp+delta)/curTemp));
 		return this;
 	},
 	speed: function(){
