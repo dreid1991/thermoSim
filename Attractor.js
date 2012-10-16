@@ -29,17 +29,22 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 							var neighbor = grid[x][y][neighborIdx];
 							var dx = (dot.x-neighbor.x)
 							var dy = (dot.y-neighbor.y)
-							var dist = Math.max(Math.sqrt(dx*dx+dy*dy) - dot.r - neighbor.r, 1)  //will blow up if dist==0.  UNLIKELY
-							var f = 1/(dist*dist*dist)//add int constant
-							dist *= pxToE;
-							var pe = 500/(2*dist*dist) //MAKE A K
+							//var dist = Math.max(Math.sqrt(dx*dx+dy*dy) - dot.r - neighbor.r, 1)  //will blow up if dist==0.  UNLIKELY
+							var dist = Math.sqrt(dx*dx+dy*dy) - dot.r - neighbor.r;
+							if (dist>1) {
+								var f = 1/(dist*dist)//add int constant
+								var UV = V(dx, dy).UV(); //neighbor to dot
+								var dVDot = UV.copy().mult(-f/dot.m);
+								var dVNeigh = UV.mult(f/neighbor.m);
+								dot.v.add(dVDot);
+								neighbor.v.add(dVNeigh);
+							}
+							
+							dist = pxToE * Math.max(dist, 1);
+							var pe = 500/(dist) //MAKE A K
 							dot.peCur += pe; //(k)/((n-1)(R^(n-1)))
 							neighbor.peCur += pe;							
-							var UV = V(dx, dy).UV(); //neighbor to dot
-							var dVDot = UV.copy().mult(-f/dot.m);
-							var dVNeigh = UV.mult(f/neighbor.m);
-							dot.v.add(dVDot);
-							neighbor.v.add(dVNeigh);
+
 						
 						}
 					}
@@ -55,8 +60,12 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 			var dots = spcs[spcName].dots;
 			for (var dotIdx=0; dotIdx<dots.length;dotIdx++) {
 				var dot = dots[dotIdx];
-				dot.setTemp(Math.max(dot.tempLast + dot.peCur - dot.peLast,1));
-				//attn please.  Shouldn't have to set max here.  Not sure why, but temp to set is sometimes <0
+				var newTemp = dot.tempLast + dot.peCur - dot.peLast;
+				if (newTemp<0) {
+					dot.v.mult(-1);
+					newTemp*=-1;
+				}
+				dot.setTemp(newTemp);
 				dot.peLast = dot.peCur;
 				dot.peCur = 0;
 			}
@@ -82,7 +91,7 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 							var dx = (dot.x-neighbor.x)
 							var dy = (dot.y-neighbor.y)
 							var dist = pxToE * Math.max(Math.sqrt(dx*dx+dy*dy) - dot.r - neighbor.r, 1)  //will blow up if dist==0.  UNLIKELY
-							var pe = k/(2*dist*dist)
+							var pe = k/(dist)
 							dot.peLast += pe; //(k)/((n-1)(R^(n-1)))
 							neighbor.peLast += pe;
 							
