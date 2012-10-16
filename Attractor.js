@@ -32,11 +32,10 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 							var dist = Math.max(Math.sqrt(dx*dx+dy*dy) - dot.r - neighbor.r, 1)  //will blow up if dist==0.  UNLIKELY
 							var f = 1/(dist*dist*dist)//add int constant
 							dist *= pxToE;
-							var pe = 1/(2*dist*dist) //MAKE A K
+							var pe = 500/(2*dist*dist) //MAKE A K
 							dot.peCur += pe; //(k)/((n-1)(R^(n-1)))
 							neighbor.peCur += pe;							
 							var UV = V(dx, dy).UV(); //neighbor to dot
-							
 							var dVDot = UV.copy().mult(-f/dot.m);
 							var dVNeigh = UV.mult(f/neighbor.m);
 							dot.v.add(dVDot);
@@ -56,14 +55,15 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 			var dots = spcs[spcName].dots;
 			for (var dotIdx=0; dotIdx<dots.length;dotIdx++) {
 				var dot = dots[dotIdx];
-				dot.setTemp(dot.tempLast + dot.peCur - dot.peLast);
-				dot.eLast = dot.eCur;
-				dot.eCur = 0;
+				dot.setTemp(Math.max(dot.tempLast + dot.peCur - dot.peLast,1));
+				//attn please.  Shouldn't have to set max here.  Not sure why, but temp to set is sometimes <0
+				dot.peLast = dot.peCur;
+				dot.peCur = 0;
 			}
 		}
 	},
 	assignELastAll: function() {
-		var k = 1;
+		var k = 500;
 		var grid = this.makeGrid();
 		var gridSize = this.gridSize;
 		var xSpan = this.xSpan;

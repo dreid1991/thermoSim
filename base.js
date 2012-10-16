@@ -94,13 +94,13 @@ function checkIdeality(){
 function HOLDSTILL() {
 	spcs.spc1.dots[0].v.dx=0;
 	spcs.spc1.dots[0].v.dy=.01;
-	spcs.spc3.dots[0].v.dx=0;
-	spcs.spc3.dots[0].v.dy=.01;
+	spcs.spc1.dots[1].v.dx=0;
+	spcs.spc1.dots[1].v.dy=.01;
 	
 	spcs.spc1.dots[0].x=300;
 	spcs.spc1.dots[0].y=300;
-	spcs.spc3.dots[0].x=315;
-	spcs.spc3.dots[0].y=300;
+	spcs.spc1.dots[1].x=315;
+	spcs.spc1.dots[1].y=300;
 }
 
 

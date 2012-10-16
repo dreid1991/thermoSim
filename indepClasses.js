@@ -158,6 +158,9 @@ Vector.prototype = {
 	sameAs: function(b){
 		return (this.dx==b.dx && this.dy==b.dy);
 	},
+	isValid: function() {
+		return this.dx!==undefined && !isNaN(this.dx) && this.dy!==undefined && !isNaN(this.dy);
+	}
 }
 Color.prototype = {
 	adjust: function(dr, dg, db){
