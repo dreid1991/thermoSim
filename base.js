@@ -36,7 +36,7 @@ $(function(){
 	JtoKJ = .001;
 	N = 1000;//Avagadro's number
 	//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
-	pxToMS = 157.9; //HEY - THIS SHOULD BE REMOVED AND REPLACED WITH SOLVING FOR V FROM DOT'S TEMPERATURE
+	pxToE = Math.sqrt(tConst); //gotten for a dot... T = 1/2*m*(v*pxToE)^2.  For energy conservation in attraction. 
 	KB = 1.38*Math.pow(10,-23)
 	ACTUALN = 6.022*Math.pow(10,23);
 	g = 1.75

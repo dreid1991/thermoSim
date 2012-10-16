@@ -26,7 +26,7 @@ _.extend(Attractions.prototype,
 					var maxY = walls[0][0].y;
 					var height = walls[0][3].y-walls[0][0].y;
 					
-					spcs['spc1'].populate(P(300, 310), V(100, height-20), 1, 273);
+					//spcs['spc1'].populate(P(300, 310), V(100, height-20), 1, 273);
 					spcs['spc3'].populate(P(300, 310), V(100, height-20), 1, 273);
 					//spcs['spc4'].populate(P(495, 310), V(5, height-20), 3, 273);
 				},

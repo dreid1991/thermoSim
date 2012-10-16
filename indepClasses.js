@@ -11,9 +11,10 @@ function Dot(x, y, v, mass, radius, spcName, idNum, tag, returnTo){
 	this.tag = tag;
 	this.returnTo = returnTo;
 	this.tConst = tConst;
-	this.pxToMS = pxToMS;
+	this.pxToE = pxToE;
 	this.parentLists = [];
-	this.attractMoveIdx = Number();
+	this.eLast = Number();
+	this.eCur = Number();
 	return this;
 	
 }
