@@ -509,7 +509,6 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 	}
 	blockIdx = newBlockIdx;
 	promptIdx = newPromptIdx;
-	curLevel.quiz = [];
 	if (newPrompt.cutScene) {	
 		curLevel.cutSceneStart(newPrompt.text, newPrompt.cutScene, newPrompt.quiz)
 	} else {

@@ -116,7 +116,7 @@ LevelTools = {
 			if (question.type == 'text' || question.type == 'textSmall') {
 				makeSubmitButton = true;
 			}
-			this.appendQuestion(question, appendTo, questionIdx, appendTo);
+			this.appendQuestion(question, appendTo, questionIdx);
 		}
 		//Okay, this quiz structure needs work
 		if (makeSubmitButton) {
@@ -160,7 +160,7 @@ LevelTools = {
 		$('#'+appendTo).html($('#'+appendTo).html() + submitHTML);
 		buttonBind(idButton, onclickSubmit);
 	},
-	appendQuestion: function(question, appendTo, questionIdx, appendTo){
+	appendQuestion: function(question, appendTo, questionIdx){
 		question.answered = false;
 		question.correct = false;
 		if (question.type == 'buttons') {
@@ -246,7 +246,7 @@ LevelTools = {
 			buttonHTML += "<td><button id='" + ids[buttonIdx] + "' class='noSelect'>" + button.text + "</button></td>"
 		}
 		buttonHTML += "</tr></table></center>";
-		$('#'+appendTo).html($('#intText').html() + buttonHTML);
+		$('#'+appendTo).html($('#' + appendTo).html() + buttonHTML);
 		this.bindButtonListeners(question, buttons, ids);
 	},
 	bindButtonListeners: function(question, buttons, ids){
