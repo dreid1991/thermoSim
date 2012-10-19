@@ -1,6 +1,6 @@
 function IdealGasLaw(){
 	this.setStds();
-	this.readout = new Readout('mainReadout', 30, myCanvas.width-180, 25, '13pt calibri', Col(255,255,255),this);
+	this.readout = new Readout('mainReadout', 30, myCanvas.width-180, 25, '13pt calibri', Col(255,255,255), 'left');
 	addSpecies(['spc1', 'spc3', 'spc4', 'spc5', 'spc6']);
 	this.yMin = 30;
 	this.yMax = 350;

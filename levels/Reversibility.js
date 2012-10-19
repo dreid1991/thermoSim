@@ -2,7 +2,7 @@ function Reversibility(){
 
 	this.setStds();
 
-	this.readout = new Readout('mainReadout', 15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), this);
+	this.readout = new Readout('mainReadout', 15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), 'left');
 
 	addSpecies(['spc1', 'spc3']);
 	this.massInit = 33;

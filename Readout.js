@@ -1,12 +1,9 @@
-function Readout(handle, leftBound, rightBound, y, font, fontCol, obj, align){
+function Readout(handle, leftBound, rightBound, y, font, fontCol, align){
 	this.handle = handle;
-	this.align = 'left';
-	if(align){
-		this.align = align;
-	}
+	this.align = defaultTo('left', align);
 	this.drawCanvas = c;
-	this.font = font;
-	this.fontCol = fontCol;
+	this.font = defaultTo('13pt calibri', font);
+	this.fontCol = defaultTo(Col(255, 255, 255), fontCol);
 	this.leftBound = leftBound;
 	this.width = rightBound - leftBound;
 	this.y = y;

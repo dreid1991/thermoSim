@@ -2,7 +2,7 @@
 Contains:
 	Sandbox
 	ParticleEmitter
-	PulseArrow
+	ArrowFly
 	CheckMark
 	Arrow
 	TempChanger
@@ -320,7 +320,7 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 		return this;
 	},
 	adjust: function(attrs){
-		for(var attr in attrs){
+		for (var attr in attrs) {
 			this[attr] = attrs[attr];
 		}
 		this.makeBounds();
@@ -417,7 +417,7 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 )
 /*
 //////////////////////////////////////////////////////////////////////////
-//PulseArrow
+//ArrowFly
 //////////////////////////////////////////////////////////////////////////
 Requires
 	posInit
@@ -437,21 +437,9 @@ Optional
 	fadeTurns
 	onFinish {func:, obj:}
 */
-function sillyArrow(){
-	new PulseArrow({pos:P(100, 100), 
-					dist:100, 
-					V:V(300,30), 
-					fill:Col(200,0,0), 
-					fillFinal:Col(0,200,0), 
-					stroke:Col(0,0,200),
-					dims:V(100,50),
-					dimsFinal:V(50,100),
-					lifespan:500,
-					cleanUpWith:'block',
-				});
-}
-function PulseArrow(attrs){
-	this.type = 'PulseArrow';
+
+function ArrowFly(attrs){
+	this.type = 'ArrowFly';
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.pos = attrs.pos.copy();
 	if (attrs.posFinal) {
@@ -464,10 +452,10 @@ function PulseArrow(attrs){
 		this.UV = attrs.V.UV();
 		this.dir = this.UV.angle();
 	} else if ((attrs.dir || attrs.UV) && attrs.dist) {
-		if(attrs.dir){
+		if (attrs.dir) {
 			this.dir = attrs.dir;
 			this.UV = angleToUV(attrs.dir);
-		}else{// must be UV
+		} else {// must be UV
 			this.UV = attrs.UV;
 			this.dir = this.UV.angle();
 			this.UV = attrs.UV;
@@ -475,24 +463,24 @@ function PulseArrow(attrs){
 		this.posFinal = this.pos.copy().movePt(this.UV.copy().mult(attrs.dist));
 		this.dist = attrs.dist;
 	}
-	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
-	this.dims = attrs.dims.copy();
-	this.dimsFinal = defaultTo(this.dims, attrs.dimsFinal);
-	this.fill = attrs.fill.copy();
-	this.fillUnround = {r:this.fill.r, g:this.fill.g, b:this.fill.b};
-	this.fillFinal = defaultTo(this.fill, attrs.fillFinal);
-	this.stroke = defaultTo(this.fill, attrs.stroke.copy());
-	this.fade = defaultTo(true, attrs.fade);
-	this.fadeTurns = defaultTo(4, attrs.fadeTurns);
+	this.drawCanvas = 			defaultTo(c, attrs.drawCanvas);
+	this.dims = 				attrs.dims.copy();
+	this.dimsFinal = 			defaultTo(this.dims, attrs.dimsFinal);
+	this.fill = 				attrs.fill.copy();
+	this.fillUnround = 			{r:this.fill.r, g:this.fill.g, b:this.fill.b};
+	this.fillFinal = 			defaultTo(this.fill, attrs.fillFinal);
+	this.stroke = 				defaultTo(this.fill, attrs.stroke.copy());
+	this.fade = 				defaultTo(true, attrs.fade);
+	this.fadeTurns = 			defaultTo(4, attrs.fadeTurns);
 	//need to keep precision in unround.  Rounding in color class will lose steps if < .5/turn
-	this.strokeUnround = {r:this.stroke.r, g:this.stroke.g, b:this.stroke.b};
-	this.strokeFinal = defaultTo(this.fillFinal, attrs.strokeFinal);
-	this.alpha = defaultTo(1, attrs.alpha);
-	this.alphaFinal = defaultTo(this.alpha, attrs.alphaFinal);
-	this.age = 0;
-	this.lifespan = Math.round(attrs.lifespan/updateInterval);
+	this.strokeUnround = 		{r:this.stroke.r, g:this.stroke.g, b:this.stroke.b};
+	this.strokeFinal = 			defaultTo(this.fillFinal, attrs.strokeFinal);
+	this.alpha = 				defaultTo(1, attrs.alpha);
+	this.alphaFinal = 			defaultTo(this.alpha, attrs.alphaFinal);
+	this.age = 					0;
+	this.lifespan = 			Math.round(attrs.lifespan/updateInterval);
 	this.getSteps();
-	this.pts = this.getPts();
+	this.pts = 					this.getPts();
 	/*
 	if(this.fade){
 		this.lifespan = Math.max(0, this.lifespan-=this.fadeTurns;
@@ -501,7 +489,7 @@ function PulseArrow(attrs){
 	this.onFinish = attrs.onFinish;
 	return this.init();
 }
-_.extend(PulseArrow.prototype, objectFuncs, {
+_.extend(ArrowFly.prototype, objectFuncs, toInherit.ArrowFuncs, {
 	getSteps: function(){
 		var scalar = 1/this.lifespan;
 		this.posStep = this.pos.VTo(this.posFinal).mult(scalar);
@@ -522,22 +510,7 @@ _.extend(PulseArrow.prototype, objectFuncs, {
 		
 		this.alphaStep = (this.alphaFinal - this.alpha)*scalar;
 	},
-	getPts: function(){
-		var pts = new Array(3);
-		var dx = this.dims.dx;
-		var dy = this.dims.dy;
-		pts[0] = P(0, .2*dy);
-		pts[1] = P(.7*dx, .2*dy);
-		pts[2] = P(.7*dx, .5*dy);
-		var ptsReverse = deepCopy(pts).reverse();
-		pts.push(P(dx, 0));
-		
-		for (var ptIdx=0; ptIdx<ptsReverse.length; ptIdx++){
-			pts.push(P(ptsReverse[ptIdx].x, -ptsReverse[ptIdx].y));
-		}
-		//rotatePts(pts, P(0,0), this.dir);
-		return pts;		
-	},
+
 	init: function(){
 		this.updateListenerName = unique(this.type + defaultTo('', this.handle), curLevel.updateListeners.listeners);
 		addListener(curLevel, 'update', this.updateListenerName, this.run, this);
@@ -646,10 +619,10 @@ CheckMark.prototype = {
 }
 
 //////////////////////////////////////////////////////////////////////////
-//Arrow
+//ArrowLine
 //////////////////////////////////////////////////////////////////////////
 
-function Arrow(handle, pts, col, lifespan, drawCanvas){
+function ArrowLine(handle, pts, col, lifespan, drawCanvas){
 	this.handle = handle;
 	var rotate = .5;
 	this.pts = {line:pts, arrow: new Array(3)}
@@ -667,7 +640,7 @@ function Arrow(handle, pts, col, lifespan, drawCanvas){
 	return this.show(lifespan);
 }	
 
-Arrow.prototype = {
+ArrowLine.prototype = {
 	draw: function(){
 		var shaft = this.pts.line;
 		for (var ptIdx=0; ptIdx<shaft.length-1; ptIdx++) {

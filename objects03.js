@@ -10,7 +10,7 @@ in that order
 function Clamps(attrs) {
 	this.type = 'Clamps';
 	this.draw = defaultTo(false, attrs.draw);
-	this.releaseWith = defaultTo('button', attrs.releaseWit);
+	this.releaseWith = defaultTo('button', attrs.releaseWith);
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.clampee = attrs.clampee;
 	this.currentClamper = undefined;
@@ -128,4 +128,117 @@ _.extend(Clamps.prototype, objectFuncs, {
 	},
 
 } 
+)
+function sillyArrow(){
+	new ArrowFly({pos:P(100, 100), 
+					dist:100, 
+					V:V(300,30), 
+					fill:Col(200,0,0), 
+					fillFinal:Col(0,200,0), 
+					stroke:Col(0,0,200),
+					dims:V(100,50),
+					dimsFinal:V(50,100),
+					lifespan:5000,
+					cleanUpWith:'block',
+				});
+}
+
+function sillierArrow() {
+	return new ArrowStatic({pos:P(100, 100),
+					dims:V(100,50),
+					angle:Math.PI,
+					fill:Col(150, 0, 0),
+					stroke:Col(0, 255, 255),
+					label:'LOL',
+					});
+					
+}
+
+function ArrowStatic(attrs) {
+	this.type = 'ArrowStatic';
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
+	this.pos = attrs.pos.copy();
+	this.dims = attrs.dims.copy();
+	this.pts = this.getPts();
+	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
+	if (attrs.label) {
+			this.label = attrs.label;
+		} else {
+			this.label = false;
+	}
+	if (attrs.angle) {
+			this.angle = attrs.angle;
+		} else if (attrs.UV) {
+			this.angle = UVToAngle(attrs.UV);
+	}
+	this.setTextOffset();
+	this.fill = attrs.fill.copy();
+	this.textCol = defaultTo(Col(255,255,255), attrs.textCol);
+	this.stroke = defaultTo(attrs.stroke, Col(0,0,0));
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
+	return this.init();
+}
+_.extend(ArrowStatic.prototype, objectFuncs, toInherit.ArrowFuncs, {
+	init: function() {
+		this.updateListenerName = unique(this.type + defaultTo('', this.handle), curLevel.updateListeners.listeners);
+		if (this.label) {
+				addListener(curLevel, 'update', this.updateListenerName, this.runLabel, this);
+			} else {
+				addListener(curLevel, 'update', this.updateListenerName, this.runNoLabel, this);
+		}
+		this.addCleanUp();
+		return this;		
+	},
+	runLabel: function() {
+		this.drawCanvas.save();
+		this.drawCanvas.translate(this.pos.x, this.pos.y);
+		this.drawCanvas.rotate(this.angle);
+		draw.fillPtsStroke(this.pts, this.fill, this.stroke, this.drawCanvas);
+		this.drawCanvas.translate(this.textOffset.dx, this.textOffset.dy);
+		this.drawCanvas.rotate(-this.angle);
+		draw.text(this.label, P(0,0), '13pt calibri', this.textCol, 'center', 0, this.drawCanvas);
+		this.drawCanvas.restore();
+	},
+	runNoLabel: function() {
+		this.drawCanvas.save();
+		this.drawCanvas.translate(this.pos.x, this.pos.y);
+		this.drawCanvas.rotate(this.angle);
+		draw.fillPtsStroke(this.pts, this.fill, this.stroke, this.drawCanvas);
+		this.drawCanvas.restore();
+	},
+	setTextOffset: function() {
+		this.textOffset = V(15, Math.cos(this.angle)*5);
+	},
+	move: function(v) {
+		this.pos.movePt(v);
+		return this;
+	},
+	scale: function(v) {
+		this.dims.multVec(v);
+		this.pts = this.getPts();
+		return this;
+	},
+	size: function(v) {
+		this.dims = v.copy();
+		this.pts = this.getPts();
+		return this;
+	},
+	rotate: function(angle) {
+		this.angle+=angle;
+		this.setTextOffset();
+		return this;
+	},
+	setFill: function(fill) {
+		this.fill = fill.copy();
+	},
+	setStroke: function(stroke) {
+		this.stroke = stroke.copy();
+	},
+	remove: function() {
+		removeListener(curLevel, 'update', this.updateListenerName);
+		this.removeCleanUp();
+	},
+	
+
+}
 )

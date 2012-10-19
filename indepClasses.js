@@ -120,8 +120,14 @@ Vector.prototype = {
 		this.dy*=scalar;
 		return this;
 	},
+	multVec: function(b) {
+		this.dx*=b.dx;
+		this.dy*=b.dy;
+		return this;
+	},
 	setMag: function(mag){
-		this.mult(mag/this.mag())
+		this.mult(mag/this.mag());
+		return this;
 	},
 	adjust: function(ddx, ddy){
 		this.dx+=ddx;
@@ -171,9 +177,9 @@ Color.prototype = {
 		return this;
 	},
 	set: function(col){
-		if(col.r!==undefined){this.r = col.r;};
-		if(col.g!==undefined){this.g = col.g;};
-		if(col.b!==undefined){this.b = col.b;};
+		if (col.r!==undefined) {this.r = col.r;};
+		if (col.g!==undefined) {this.g = col.g;};
+		if (col.b!==undefined) {this.b = col.b;};
 		this.setHex();
 		return this;
 	},
@@ -188,9 +194,9 @@ Color.prototype = {
 		var r = Number(Math.round(this.r)).toString(16);
 		var g = Number(Math.round(this.g)).toString(16);
 		var b = Number(Math.round(this.b)).toString(16);
-		if(r.length==1){r = '0'+r;}
-		if(g.length==1){g = '0'+g;}
-		if(b.length==1){b = '0'+b;}
+		if (r.length==1) {r = '0'+r;}
+		if (g.length==1) {g = '0'+g;}
+		if (b.length==1) {b = '0'+b;}
 		this.hex = r+g+b;
 	},
 	copy: function(){
@@ -296,9 +302,9 @@ Point.prototype = {
 		var ptVec = around.VTo(this);
 		var perpVec = UV.perp('cw');
 		var mag = ptVec.dotProd(perpVec);
-		if(mag<0){
+		if (mag<0) {
 			this.movePt(perpVec.mult(Math.abs(2*mag)));
-		}else if(mag>0){
+		} else if (mag>0) {
 			this.movePt(perpVec.neg().mult(2*mag));
 		}
 		return this;
@@ -306,12 +312,12 @@ Point.prototype = {
 	},
 	rect: function(dims, dir){
 		var pts = new Array(4);
-		if(dir=='ccw'){
+		if (dir=='ccw') {
 			pts[0] = this.copy();
 			pts[1] = this.copy().movePt({dy:dims.dy});
 			pts[2] = this.copy().movePt(dims);
 			pts[3] = this.copy().movePt({dx:dims.dx});
-		}else{
+		} else {
 			pts[0] = this.copy();
 			pts[1] = this.copy().movePt({dx:dims.dx});			
 			pts[2] = this.copy().movePt(dims);
@@ -436,7 +442,7 @@ Dot.prototype = {
 		var curTemp = this.temp();
 		//if (curTemp!=0) {
 			this.v.mult(Math.sqrt(newTemp/curTemp));
-		/*  SHOULD ZERO-TEMP CASE BECOME A THING...   BUT AT CURRENT I DON'T THINK IT IS
+		/*  SHOULD ZERO-TEMP CASE BECOME A THING, USE BELOW,  BUT AT CURRENT I DON'T THINK IT MUST
 		} else {
 			var v = Math.sqrt(2*newTemp/(this.tConst*this.m));
 			var dir = Math.random()*2*Math.PI;
@@ -446,7 +452,7 @@ Dot.prototype = {
 		*/
 		return this;
 	},
-	changeTemp: function(delta) {
+	adjTemp: function(delta) {
 		var curTemp = this.temp();
 		this.v.mult(Math.sqrt((curTemp+delta)/curTemp));
 		return this;

@@ -1,7 +1,7 @@
 function cvcp(){
 	this.setStds();
 	this.wallSpeed = 1;
-	this.readout = new Readout('mainReadout', 30, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255),this, 'left');
+	this.readout = new Readout('mainReadout', 30, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), 'left');
 	this.compMode = 'Isothermal';//is this used?
 
 	

@@ -1,7 +1,7 @@
 function Attractions(){
 	this.setStds();
 	this.wallSpeed = 1;
-	this.readout = new Readout('mainReadout', 30, myCanvas.width-125, 25, '13pt calibri', Col(255,255,255),this, 'left');
+	this.readout = new Readout('mainReadout', 30, myCanvas.width-125, 25, '13pt calibri', Col(255,255,255), 'left');
 	this.compMode = 'Isothermal';
 	addSpecies(['spc1', 'spc3', 'spc4']);
 	this.yMin = 30;

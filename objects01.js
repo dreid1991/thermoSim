@@ -103,7 +103,7 @@ objectFuncs = {
 		var centerHTML = $('#sliderHolderCenter').html();
 		$('#sliderHolderCenter').html('');
 		$('#sliderHolderLeft').html(centerHTML);
-	},
+	},//DOESN'T WORK  MUST MIGRATE ALL BOUND FUNCTIONS AS WELL, I THINK
 	removeSlider: function() {
 		this.sliderWrapper.html('');
 	},
@@ -1243,7 +1243,7 @@ function Piston(attrs){
 	var readoutY = this.pistonBottom.pos.y-2+this.pistonPt.y;
 	var readoutFont = '12pt calibri';
 	var readoutFontCol = Col(255, 255, 255);
-	this.readout = new Readout('pistonReadout', readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, undefined, 'center');
+	this.readout = new Readout('pistonReadout', readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, 'center');
 	this.wall.moveInit();
 	
 	this.wall.recordPExt();

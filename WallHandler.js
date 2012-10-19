@@ -621,7 +621,7 @@ WallMethods = {
 			var lifespan = 50;
 			var arrowTurn = 0;
 			var handle = 'drawArrow'+round(pos.x,0)+round(pos.y,0);
-			var arrow = new Arrow(handle, arrowPts, Col(255,0,0), lifespan, c);
+			var arrow = new ArrowLine(handle, arrowPts, Col(255,0,0), lifespan, c);
 
 
 			var textPos = pos.copy().movePt(vf.mult(15));
@@ -639,7 +639,7 @@ WallMethods = {
 			var lifespan = 50;
 			var arrowTurn = 0;
 			var handle = 'drawArrow'+round(pos.x,0)+round(pos.y,0);
-			var arrow = new Arrow(handle, arrowPts, Col(255,0,0), lifespan, c);
+			var arrow = new ArrowLine(handle, arrowPts, Col(255,0,0), lifespan, c);
 
 
 			var textPos = pos.copy().movePt(vf.mult(15));
@@ -1393,7 +1393,7 @@ WallMethods = {
 		displayQArrowsStop: function(){
 			this.displayingQArrows = false;
 			removeListener(curLevel, 'update', 'checkDisplayArrows' + this.handle);
-			removeListenerByName(curLevel, 'update', 'PulseArrow');
+			removeListenerByName(curLevel, 'update', 'ArrowFly');
 			return this;
 		},
 
@@ -1440,7 +1440,7 @@ WallMethods = {
 						var distAlongLine = pxStep;
 						for (var arrowIdx=0; arrowIdx<numArrows; arrowIdx++){
 							var pos = this[lineIdx].copy().movePt(this.wallUVs[lineIdx].copy().mult(distAlongLine)).movePt(this.wallPerpUVs[lineIdx].copy().mult(offset[heatTransSign]));
-							new PulseArrow({pos:pos, 
+							new ArrowFly({pos:pos, 
 											dist:dist, 
 											UV:this.wallUVs[lineIdx].copy().perp(UVRot), 
 											fill:fill, 

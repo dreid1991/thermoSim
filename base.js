@@ -715,8 +715,11 @@ function mirrorPts(pts, center, line){
 	}
 	return pts;
 }
-function angleToUV(dir){
+function angleToUV(dir) {
 	return V(Math.cos(dir), Math.sin(dir));
+}
+function UVToAngle(UV) {
+	return Math.atan2(UV.dy, UV.dx);
 }
 function getSign(val){
 	var sign=1;

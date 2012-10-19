@@ -60,5 +60,23 @@ toInherit = {
 		killNumbers: function() {
 			return this.replace(/[0-9]/g, '');
 		}
+	},
+	ArrowFuncs: {
+		getPts: function(){
+			var pts = new Array(3);
+			var dx = this.dims.dx;
+			var dy = this.dims.dy;
+			pts[0] = P(0, .2*dy);
+			pts[1] = P(.7*dx, .2*dy);
+			pts[2] = P(.7*dx, .5*dy);
+			var ptsReverse = deepCopy(pts).reverse();
+			pts.push(P(dx, 0));
+			
+			for (var ptIdx=0; ptIdx<ptsReverse.length; ptIdx++){
+				pts.push(P(ptsReverse[ptIdx].x, -ptsReverse[ptIdx].y));
+			}
+			//rotatePts(pts, P(0,0), this.dir);
+			return pts;		
+		},
 	}
 }
