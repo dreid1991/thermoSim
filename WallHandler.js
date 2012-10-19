@@ -1332,14 +1332,25 @@ WallMethods = {
 			return this;		
 		
 		},
-		displayQArrows: function(threshold){
-			if (this.recordingQ && !this.displayingQArrows) {
-				this.displayingQArrows = true;
+		displayQArrowsRate: function(threshold){
+			if (this.recordingQ && !this.displayingQArrowsRate && !this.displayingQArrowsAmmt) {
+				this.displayingQArrowsRate = true;
 				this.idxLastArrow = Math.max(0, this.data.q.length-1);
 				this.qArrowThreshold = defaultTo(threshold, .3);
 				addListener(curLevel, 'update', 'checkForDisplayArrows' + this.handle, this.checkDisplayArrows, this);
 			} else {
-				console.log('Tried to display q arrows for wall ' + this.handle + ' while not recording.  Will not display.');
+				console.log('Tried to display q arrowsRate for wall ' + this.handle + ' while not recording or already displaying.  Will not display.');
+				console.trace();
+			}
+		},
+		displayQArrowsAmmt: function(maxE) {
+			if (this.recordingQ && !this.displayingQArrowsRate && !this.displayingQArrowsAmmt) {
+				this.displayingQArrowsAmmt = true;
+				this.qArrowsAmmtInit(maxE);
+			} else {
+				console.log('Tried to display q arrowsAmmt for wall ' + this.handle + ' while not recording or already displaying.  Will not display.');
+				console.trace();	
+				
 			}
 		},
 		displayVolStop: function(){
@@ -1384,16 +1395,19 @@ WallMethods = {
 			this.qReadout.removeEntry('q' + this.handle);
 			return this;
 		},
+		displayQArrowsRateStop: function(){
+			this.displayingQArrowsRate = false;
+			removeListener(curLevel, 'update', 'checkDisplayArrows' + this.handle);
+			removeListenerByName(curLevel, 'update', 'ArrowFly');
+			return this;
+		},
+		displayQArrowAmmtStop: function() {
+			//LALALA PUT STUFF HERE
+		},
 		displayRMSStop: function(){
 			this.displayingRMS = false;
 			removeListener(curLevel, 'data', 'displayRMS' + this.handle)
 			this.RMSReadout.removeEntry('RMS' + this.handle);
-			return this;
-		},
-		displayQArrowsStop: function(){
-			this.displayingQArrows = false;
-			removeListener(curLevel, 'update', 'checkDisplayArrows' + this.handle);
-			removeListenerByName(curLevel, 'update', 'ArrowFly');
 			return this;
 		},
 
@@ -1405,9 +1419,43 @@ WallMethods = {
 			if(this.displayingTemp){this.displayTempStop();};
 			if(this.displayingMass){this.displayMassStop();};
 			if(this.displayingQ){this.displayQStop();};
-			if(this.displayingQArrows){this.displayQArrowsStop();};
+			if(this.displayingQArrowsRate){this.displayQArrowsRateStop();};
+			if(this.displayingQArrowAmmt){this.displayQArrowAmmtStop();};
 			if(this.displayingRMS){this.displayRMSStop();};
 			return this;
+		},
+		qArrowsAmmtInit: function(eMax) {
+			var lengthMin = 10;
+			var lenthMax = 70;
+			var widthMin = 30
+			var widthMax = 60;
+			var dLenth = lenthMax - lengthMin;
+			var dWidth = widthMax - widthMin;
+			var col = Col(175, 0, 0);
+			var width = 40;
+			var fracFromEdge = .25;
+			var startingDims = V(30, 10);
+			var UV = pos2.VTo(pos1).perp('ccw').UV();
+			var pos1 = this[3].copy().fracMoveTo(this[2], fracFromEdge);
+			var pos2 = this[3].copy()/fracMoveTo(this[2], 1-fracFromEdge);
+			var arrow1 = new ArrowStatic({pos:pos1, dims:startingDims, stroke: Col(0,0,0), label:'Q', UV:UV});
+			var arrow2 = new ArrowStatic({pos:pos2, dims:startingDims, stroke: Col(0,0,0), label:'Q', UV:UV});
+			this.qArrowsAmmt = [arrow1, arrow2];
+			addListener(curLevel, 'update', this.handle + 'drawQAmmtArrows', 
+				function() {
+					
+				},
+			this);
+		},
+		flipAmmtArrow: function(arrow) {
+			arrow.move(arrow.dims.copy().rotate(arrow.angle));
+			arrow.rotate(Math.PI);
+		},
+		setAmmtArrowDims: function(arrow, lMin, lMax, wMin, wMax, e, eMax) {
+			var percent = Math.abs(e)/eMax);
+			var l = lMin + (lMax-lMin)*percent;
+			var w = wMin + (wMax-wMin)*percent;
+			arrow.size(V(l, w));
 		},
 		checkDisplayArrows: function(){
 			var dQ = this.data.q[this.data.q.length-1] - this.data.q[this.idxLastArrow];
