@@ -1343,10 +1343,10 @@ WallMethods = {
 				console.trace();
 			}
 		},
-		displayQArrowsAmmt: function(maxE) {
+		displayQArrowsAmmt: function(qMax) {
 			if (this.recordingQ && !this.displayingQArrowsRate && !this.displayingQArrowsAmmt) {
 				this.displayingQArrowsAmmt = true;
-				this.qArrowsAmmtInit(maxE);
+				this.qArrowsAmmtInit(defaultTo(3, qMax));
 			} else {
 				console.log('Tried to display q arrowsAmmt for wall ' + this.handle + ' while not recording or already displaying.  Will not display.');
 				console.trace();	
@@ -1402,7 +1402,8 @@ WallMethods = {
 			return this;
 		},
 		displayQArrowAmmtStop: function() {
-			//LALALA PUT STUFF HERE
+			this.displayingQArrowsAmmt = false;
+			removeListener(curLevel, 'update', this.handle + 'drawQAmmtArrows');
 		},
 		displayRMSStop: function(){
 			this.displayingRMS = false;
@@ -1424,38 +1425,69 @@ WallMethods = {
 			if(this.displayingRMS){this.displayRMSStop();};
 			return this;
 		},
-		qArrowsAmmtInit: function(eMax) {
+		qArrowsAmmtInit: function(qMax) {
 			var lengthMin = 10;
-			var lenthMax = 70;
+			var lengthMax = 70;
 			var widthMin = 30
 			var widthMax = 60;
-			var dLenth = lenthMax - lengthMin;
-			var dWidth = widthMax - widthMin;
 			var col = Col(175, 0, 0);
 			var width = 40;
 			var fracFromEdge = .25;
 			var startingDims = V(30, 10);
-			var UV = pos2.VTo(pos1).perp('ccw').UV();
 			var pos1 = this[3].copy().fracMoveTo(this[2], fracFromEdge);
-			var pos2 = this[3].copy()/fracMoveTo(this[2], 1-fracFromEdge);
-			var arrow1 = new ArrowStatic({pos:pos1, dims:startingDims, stroke: Col(0,0,0), label:'Q', UV:UV});
-			var arrow2 = new ArrowStatic({pos:pos2, dims:startingDims, stroke: Col(0,0,0), label:'Q', UV:UV});
+			var pos2 = this[3].copy().fracMoveTo(this[2], 1-fracFromEdge);
+			var UV = pos2.VTo(pos1).perp('cw').UV();
+			pos1.movePt(UV.copy().mult(5));
+			pos2.movePt(UV.copy().mult(5));
+			var arrow1 = new ArrowStatic({pos:pos1, dims:startingDims, fill: Col(175,0,0), stroke: Col(0,0,0), label:'Q', UV:UV});
+			var arrow2 = new ArrowStatic({pos:pos2, dims:startingDims, fill: Col(175,0,0), stroke: Col(0,0,0), label:'Q', UV:UV});
+			if (this.q==0) {
+				var sign = 0;
+			} else {
+				var sign = getSign(this.q);
+			}
+			if (this.q==0) {
+				qLast = -.01;
+			} else {
+				qLast = this.q;
+			}
+			var curE = this;
+			var redrawThreshold = qMax/(lengthMax-lengthMin);
 			this.qArrowsAmmt = [arrow1, arrow2];
+			this.setAmmtArrowDims(this.qArrowsAmmt, lengthMin, lengthMax, widthMin, widthMax, this.q, qMax);
 			addListener(curLevel, 'update', this.handle + 'drawQAmmtArrows', 
 				function() {
-					
+					if (Math.abs(this.q - qLast) > redrawThreshold) {
+						this.setAmmtArrowDims(this.qArrowsAmmt, lengthMin, lengthMax, widthMin, widthMax, this.q, qMax);
+						if (getSign(this.q) != getSign(qLast)) {
+							this.flipAmmtArrows(this.qArrowsAmmt);
+						}
+						qLast = this.q;
+					}
 				},
 			this);
 		},
-		flipAmmtArrow: function(arrow) {
-			arrow.move(arrow.dims.copy().rotate(arrow.angle));
-			arrow.rotate(Math.PI);
+		flipAmmtArrows: function(arrows) {
+			for (var arrowIdx=0; arrowIdx<arrows.length; arrowIdx++) {
+				var arrow = arrows[arrowIdx];
+				var UV = angleToUV(arrow.getAngle()).mult(1);
+				arrow.move(UV.mult(arrow.dims.dx));
+				//arrow.move(arrow.dims.copy().rotate(arrow.angle));
+				arrow.rotate(Math.PI);
+			}
 		},
-		setAmmtArrowDims: function(arrow, lMin, lMax, wMin, wMax, e, eMax) {
-			var percent = Math.abs(e)/eMax);
-			var l = lMin + (lMax-lMin)*percent;
-			var w = wMin + (wMax-wMin)*percent;
-			arrow.size(V(l, w));
+		setAmmtArrowDims: function(arrows, lMin, lMax, wMin, wMax, q, qMax) {
+			for (var arrowIdx=0; arrowIdx<arrows.length; arrowIdx++) {
+				var arrow = arrows[arrowIdx];
+				var dimso = arrow.getDims();
+				var percent = Math.abs(this.q)/qMax;
+				var l = lMin + (lMax-lMin)*percent;
+				var w = wMin + (wMax-wMin)*percent;
+				arrow.size(V(l, w));
+				if (q>0) {
+					arrow.move(V(0, l-dimso.dx));
+				}
+			}
 		},
 		checkDisplayArrows: function(){
 			var dQ = this.data.q[this.data.q.length-1] - this.data.q[this.idxLastArrow];

@@ -37,12 +37,12 @@ _.extend(Reversibility.prototype,
 			setup:
 				function() {
 					currentSetupType = 'block';
-					this.unCompSetup();
+					this.compSetup();
 					this.makeGraph();
-					this.dragWeights = new DragWeights({weightDefs:[{count:1, pressure:2}], weightScalar:70, displayText:false, massInit:0, compMode:'cPAdiabaticDamped', pistonOffset:V(130,-41)});
+					this.dragWeights = new DragWeights({weightDefs:[{count:10, pressure:2}], weightScalar:70, displayText:false, massInit:0, compMode:'cPAdiabaticDamped', pistonOffset:V(130,-41)});
 					this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, makeSlider:false});
 					//this.dragWeights = new DragWeights({weightDefs:[{count:1, pressure:2}], displayText:false, pInit:2})
-					walls[0].displayPExt().displayQ().displayQArrows();
+					walls[0].displayPExt().displayQ().displayQArrowsAmmt();
 				},
 			prompts:[
 				{//P0
@@ -128,7 +128,7 @@ _.extend(Reversibility.prototype,
 					this.dragWeights = new DragWeights({weightDefs:[{count:2, pressure:2}], weightScalar:70, displayText:false, massInit:0, compMode:'cPAdiabaticDamped', pistonOffset:V(130,-41)});
 					this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, makeSlider:false});
 					//this.dragWeights = new DragWeights({weightDefs:[{count:2, pressure:2}], displayText:false, pInit:2})
-					walls[0].displayPExt().displayWork().displayQ().displayQArrows();
+					walls[0].displayPExt().displayWork().displayQ().displayQArrowsAmmt();
 				},
 			prompts:[
 				{//P0
@@ -213,7 +213,7 @@ _.extend(Reversibility.prototype,
 					this.unCompSetup();
 					this.makeGraph();
 					this.dragWeights = new DragWeights({weightDefs:[{count:2, pressure:2}], displayText:false, pInit:2})
-					walls[0].displayPExt().displayWork().displayQ().displayQArrows();
+					walls[0].displayPExt().displayWork().displayQ().displayQArrowsAmmt();
 				},
 			prompts:[
 				{//P0
@@ -264,7 +264,7 @@ _.extend(Reversibility.prototype,
 					this.unCompSetup();
 					this.makeGraph();
 					this.dragWeights = new DragWeights({weightDefs:[{count:8, pressure:2}], displayText:false, pInit:2})
-					walls[0].displayPExt().displayWork().displayQ().displayQArrows();
+					walls[0].displayPExt().displayWork().displayQ().displayQArrowsAmmt();
 				},
 			prompts:[
 				{//P0
@@ -301,7 +301,7 @@ _.extend(Reversibility.prototype,
 					this.unCompSetup();
 					this.makeGraph();
 					this.sandbox = new Sandbox({pMin:2, pInit:2, pMax:4});
-					walls[0].displayPExt().displayWork().displayQ().displayQArrows();
+					walls[0].displayPExt().displayWork().displayQ().displayQArrowsAmmt();
 				},
 			prompts:[
 				{//P0
@@ -351,8 +351,8 @@ _.extend(Reversibility.prototype,
 		this.borderStd({min:68});
 		var maxY = walls[0][0].y;
 		var height = walls[0][3].y-walls[0][0].y;
-		spcs['spc1'].populate(P(35, maxY+10), V(460, height-20), 814, 273);
-		spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 611, 273);
+		spcs['spc1'].populate(P(35, maxY+10), V(460, height-20), 814, 240.7);
+		spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 611, 240.7);
 	},
 
 

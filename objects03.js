@@ -207,7 +207,10 @@ _.extend(ArrowStatic.prototype, objectFuncs, toInherit.ArrowFuncs, {
 		this.drawCanvas.restore();
 	},
 	setTextOffset: function() {
-		this.textOffset = V(15, Math.cos(this.angle)*5);
+		this.textOffset = V(8, Math.cos(this.angle)*5);
+	},
+	getDims: function() {
+		return this.dims;
 	},
 	move: function(v) {
 		this.pos.movePt(v);
@@ -227,6 +230,9 @@ _.extend(ArrowStatic.prototype, objectFuncs, toInherit.ArrowFuncs, {
 		this.angle+=angle;
 		this.setTextOffset();
 		return this;
+	},
+	getAngle: function() {
+		return this.angle;
 	},
 	setFill: function(fill) {
 		this.fill = fill.copy();
