@@ -1426,10 +1426,10 @@ WallMethods = {
 			return this;
 		},
 		qArrowsAmmtInit: function(qMax) {
-			var lengthMin = 10;
-			var lengthMax = 70;
-			var widthMin = 30
-			var widthMax = 60;
+			var lengthMin = 15;
+			var lengthMax = 90;
+			var widthMin = 70
+			var widthMax = 100;
 			var col = Col(175, 0, 0);
 			var width = 40;
 			var fracFromEdge = .25;

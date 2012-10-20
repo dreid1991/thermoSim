@@ -39,7 +39,7 @@ _.extend(Reversibility.prototype,
 					currentSetupType = 'block';
 					this.compSetup();
 					this.makeGraph();
-					this.dragWeights = new DragWeights({weightDefs:[{count:10, pressure:2}], weightScalar:70, displayText:false, massInit:0, compMode:'cPAdiabaticDamped', pistonOffset:V(130,-41)});
+					this.dragWeights = new DragWeights({weightDefs:[{count:1, pressure:2}], weightScalar:70, displayText:false, massInit:0, compMode:'cPAdiabaticDamped', pistonOffset:V(130,-41)});
 					this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, makeSlider:false});
 					//this.dragWeights = new DragWeights({weightDefs:[{count:1, pressure:2}], displayText:false, pInit:2})
 					walls[0].displayPExt().displayQ().displayQArrowsAmmt();
