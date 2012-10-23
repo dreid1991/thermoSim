@@ -1401,9 +1401,12 @@ WallMethods = {
 			removeListenerByName(curLevel, 'update', 'ArrowFly');
 			return this;
 		},
-		displayQArrowAmmtStop: function() {
+		displayQArrowsAmmtStop: function() {
 			this.displayingQArrowsAmmt = false;
-			removeListener(curLevel, 'update', this.handle + 'drawQAmmtArrows');
+			for (var arrowIdx=0; arrowIdx<this.qArrowsAmmt.length; arrowIdx++) {
+				this.qArrowsAmmt[arrowIdx].remove();
+			}
+			removeListener(curLevel, 'update', this.handle + 'updateQAmmtArrows');
 		},
 		displayRMSStop: function(){
 			this.displayingRMS = false;
@@ -1421,11 +1424,19 @@ WallMethods = {
 			if(this.displayingMass){this.displayMassStop();};
 			if(this.displayingQ){this.displayQStop();};
 			if(this.displayingQArrowsRate){this.displayQArrowsRateStop();};
-			if(this.displayingQArrowAmmt){this.displayQArrowAmmtStop();};
+			if(this.displayingQArrowAmmt){this.displayQArrowsAmmtStop();};
 			if(this.displayingRMS){this.displayRMSStop();};
 			return this;
 		},
+		resetQ: function() {
+			this.q = 0;
+			if (this.displayingQArrowsAmmt) {
+				this.displayQArrowsAmmtStop();
+				this.displayQArrowsAmmt(this.qArrowAmmtMax);
+			}
+		},
 		qArrowsAmmtInit: function(qMax) {
+			this.qArrowAmmtMax = qMax;
 			var lengthMin = 15;
 			var lengthMax = 90;
 			var widthMin = 70
@@ -1441,26 +1452,28 @@ WallMethods = {
 			pos2.movePt(UV.copy().mult(5));
 			var arrow1 = new ArrowStatic({pos:pos1, dims:startingDims, fill: Col(175,0,0), stroke: Col(0,0,0), label:'Q', UV:UV});
 			var arrow2 = new ArrowStatic({pos:pos2, dims:startingDims, fill: Col(175,0,0), stroke: Col(0,0,0), label:'Q', UV:UV});
-			if (this.q==0) {
-				var sign = 0;
-			} else {
-				var sign = getSign(this.q);
-			}
-			if (this.q==0) {
-				qLast = -.01;
-			} else {
-				qLast = this.q;
-			}
-			var curE = this;
+
 			var redrawThreshold = qMax/(lengthMax-lengthMin);
 			this.qArrowsAmmt = [arrow1, arrow2];
+			var dirLast = 'out';
+			qLast = this.q;
 			this.setAmmtArrowDims(this.qArrowsAmmt, lengthMin, lengthMax, widthMin, widthMax, this.q, qMax);
-			addListener(curLevel, 'update', this.handle + 'drawQAmmtArrows', 
+			if (this.q>=0) {
+				dirLast = 'in';
+				this.flipAmmtArrows(this.qArrowsAmmt);
+			}
+			addListener(curLevel, 'update', this.handle + 'updateQAmmtArrows', 
 				function() {
 					if (Math.abs(this.q - qLast) > redrawThreshold) {
+						if (this.q<0) {
+							dir = 'out';
+						} else {
+							dir = 'in';
+						}
 						this.setAmmtArrowDims(this.qArrowsAmmt, lengthMin, lengthMax, widthMin, widthMax, this.q, qMax);
-						if (getSign(this.q) != getSign(qLast)) {
+						if (dirLast != dir) {
 							this.flipAmmtArrows(this.qArrowsAmmt);
+							dirLast = dir;
 						}
 						qLast = this.q;
 					}
@@ -1471,8 +1484,7 @@ WallMethods = {
 			for (var arrowIdx=0; arrowIdx<arrows.length; arrowIdx++) {
 				var arrow = arrows[arrowIdx];
 				var UV = angleToUV(arrow.getAngle()).mult(1);
-				arrow.move(UV.mult(arrow.dims.dx));
-				//arrow.move(arrow.dims.copy().rotate(arrow.angle));
+				arrow.move(UV.mult(arrow.getDims().dx));
 				arrow.rotate(Math.PI);
 			}
 		},

@@ -31,6 +31,7 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 							var dy = (dot.y-neighbor.y)
 							//var dist = Math.max(Math.sqrt(dx*dx+dy*dy) - dot.r - neighbor.r, 1)  //will blow up if dist==0.  UNLIKELY
 							var dist = Math.sqrt(dx*dx+dy*dy) - dot.r - neighbor.r;
+							//hey - use this dist (but without subtracting off radiuses) to get the UV
 							if (dist>1) {
 								var f = 1/(dist*dist)//add int constant
 								var UV = V(dx, dy).UV(); //neighbor to dot
