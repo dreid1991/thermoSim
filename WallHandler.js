@@ -1435,12 +1435,15 @@ WallMethods = {
 				this.displayQArrowsAmmt(this.qArrowAmmtMax);
 			}
 		},
+		resetWork: function() {
+			this.work = 0;
+		},
 		qArrowsAmmtInit: function(qMax) {
 			this.qArrowAmmtMax = qMax;
 			var lengthMin = 15;
-			var lengthMax = 90;
+			var lengthMax = 80;
 			var widthMin = 70
-			var widthMax = 100;
+			var widthMax = 90;
 			var col = Col(175, 0, 0);
 			var width = 40;
 			var fracFromEdge = .25;

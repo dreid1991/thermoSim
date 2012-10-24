@@ -37,7 +37,7 @@ _.extend(Reversibility.prototype,
 			setup:
 				function() {
 					currentSetupType = 'block';
-					this.compSetup();
+					this.unCompSetup();
 					this.makeGraph();
 					this.dragWeights = new DragWeights({weightDefs:[{count:1, pressure:2}], weightScalar:70, displayText:false, massInit:0, compMode:'cPAdiabaticDamped', pistonOffset:V(130,-41)});
 					this.piston = new Piston({wallInfo:'container', init:2, min:2, max:15, makeSlider:false});
@@ -49,6 +49,7 @@ _.extend(Reversibility.prototype,
 					setup:
 						function() {
 							currentSetupType = 'prompt0';
+							this.listener = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7.5, tolerance:.04, storeAtSatisfy:{work:walls[0].data.work}, alertUnsatisfied:"Click and drag the block onto the piston."});	
 							//this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:4, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
 							//this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.8, 
 							//alertUnsatisfied:"Compress the system by dragging the weight up from the bin", 
@@ -74,7 +75,7 @@ _.extend(Reversibility.prototype,
 							//alertUnsatisfied:"Expand the system by dragging the weight off of the piston",
 							//storeAtSatisfy:{work:walls[0].data.work}});
 						},
-					text:"You calculated XXX kJ for the isothermal compression process.  How does that compare to the value heat?  Explain.",
+					text:"You calculated GET_userAnswerB1P0Q0| kJ for the isothermal compression process.  How does that compare to the value of heat?  Explain.",
 					title:"Current step",
 					quiz:[
 						{	
@@ -83,17 +84,20 @@ _.extend(Reversibility.prototype,
 						}
 					],	
 				},
-				{//P1
+				{//P2
 					setup: 
 						function() {
 							currentSetupType = 'prompt2';
+							walls[0].resetQ();
+							walls[0].resetWork();
+							this.listener = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:15, tolerance:.04, storeAtSatisfy:{work:walls[0].data.work}, alertUnsatisfied:"Click and drag the block off of the piston."});	
 							//this.dragWeights.unfreeze();
 							//this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:2, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
 							//this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:15,
 							//alertUnsatisfied:"Expand the system by dragging the weight off of the piston",
 							//storeAtSatisfy:{work:walls[0].data.work}});
 						},
-					text:"Now remove the block and let the piston isothermally expand.  For the compression process, you estimated that it 'cost'DOUBLE QUOTES you 3 kJ of work.  Estimate how much work you 'got back' from the expansion.",
+					text:'Now remove the block and let the piston isothermally expand.  For the compression process, you estimated that it "cost" you GET_userAnswerB1P0Q0| kJ of work.  Estimate how much work you "got back" from the expansion.',
 					title:"Current step",
 					quiz:[
 						{	
@@ -103,7 +107,7 @@ _.extend(Reversibility.prototype,
 						}
 					],	
 				},
-				{//P1
+				{//P3
 					setup: 
 						function() {
 							currentSetupType = 'prompt3';
@@ -113,7 +117,7 @@ _.extend(Reversibility.prototype,
 							//alertUnsatisfied:"Expand the system by dragging the weight off of the piston",
 							//storeAtSatisfy:{work:walls[0].data.work}});
 						},
-					text:"<p>Indeed, so it 'cost' you X more kJ to compress the system than you 'got back' when expanding it.</p>",
+					text:"<p>Indeed, so it 'cost' you EVAL_round(GET_workB1P0| + GET_workB1P2|,1)| more kJ to compress the system than you 'got back' when expanding it.</p>",
 					title:"Current step",
 	
 				},				

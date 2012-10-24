@@ -135,7 +135,7 @@ _.extend(Work.prototype,
 				},
 				{//P1
 					setup:undefined,
-					text:"The system had an initial temperature of 200 K and contains 1.8 moles of an ideal monatomic gas.  You wrote that GET#userAnswerB2P0Q0| kJ of work were done.  What final temperature should the system have had?",
+					text:"The system had an initial temperature of 200 K and contains 1.8 moles of an ideal monatomic gas.  You wrote that GET#_userAnswerB2P0Q0| kJ of work were done.  What final temperature should the system have had?",
 					quiz:[
 						{	
 							type:'textSmall',
@@ -165,7 +165,7 @@ _.extend(Work.prototype,
 							currentSetupType = 'prompt0';
 							this.blocks[2].prompts[0].setup.apply(this);
 						},
-					text:"Previously you answered that the compression did GET#userAnswerB2P0Q0|kJ on the system bringing it to a final temperature of GET#userAnswerB2P1Q0|K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
+					text:"Previously you answered that the compression did GET#_userAnswerB2P0Q0|kJ on the system bringing it to a final temperature of GET#_userAnswerB2P1Q0|K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
 					quiz:[
 						{
 							type:'text',
@@ -224,7 +224,7 @@ _.extend(Work.prototype,
 						this.stops = new Stops({stopPt:{volume:15}});
 						this.volListener14 = new StateListener({dataList:walls[0].data.v, is:'greaterThan', targetVal:14, alertUnsatisfied:'Expand the system!', atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});				
 					},
-					text: "You wrote that the system would do GET#userAnswerB3P2Q0| kJ of work for a final temperature of GET#userAnswerB3P2Q1| K.  Find out of you were right by expanding the system.  Why is the system temperature higher after going through the compression and expansion cycle?",
+					text: "You wrote that the system would do GET#_userAnswerB3P2Q0| kJ of work for a final temperature of GET#_userAnswerB3P2Q1| K.  Find out of you were right by expanding the system.  Why is the system temperature higher after going through the compression and expansion cycle?",
 					quiz:[
 						{
 							type:'text',
@@ -286,7 +286,7 @@ _.extend(Work.prototype,
 							this.piston.setPressure(.083);	
 							this.listener1 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7.5, tolerance:.01, storeAtSatisfy:{temp:walls[0].data.t}, alertUnsatisfied:"Click the 'Release' button to compress the system"});								
 						},
-					text:"Now let's try 10 molecules.<br>Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>Many</td><td>701 K</td></tr></table></p> ",
+					text:"Now let's try 10 molecules.<br>Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#_tempB5P0| K</td></tr><tr><td>Many</td><td>701 K</td></tr></table></p> ",
 					title:"Current step",
 				},
 				{//P2
@@ -300,7 +300,7 @@ _.extend(Work.prototype,
 							this.piston.setPressure(.41);
 							this.listener1 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7.5, tolerance:.01, storeAtSatisfy:{temp:walls[0].data.t}, alertUnsatisfied:"Click the 'Release' button to compress the system"});	
 						},
-					text:"Here are 50 molecules.<br>Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>10</td><td>GET#tempB5P1| K</td></tr><tr><td>Many</td><td>701 K</td></tr></table></p>",
+					text:"Here are 50 molecules.<br>Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#_tempB5P0| K</td></tr><tr><td>10</td><td>GET#_tempB5P1| K</td></tr><tr><td>Many</td><td>701 K</td></tr></table></p>",
 					title:"Current step",
 				},
 				{//P3
@@ -314,7 +314,7 @@ _.extend(Work.prototype,
 							this.piston.setPressure(.833);
 							this.listener1 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7.5, tolerance:.01, storeAtSatisfy:{temp:walls[0].data.t}, alertUnsatisfied:"Click the 'Release' button to compress the system"});	
 						},
-					text:"And here are 100.<br>Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>10</td><td>GET#tempB5P1| K</td></tr><tr><td>50</td><td>GET#tempB5P2| K</td></tr><tr><td>Many</td><td>701 K</td></tr></table></p> How does the piston's behavior change as the number of molecules increases?",
+					text:"And here are 100.<br>Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#_tempB5P0| K</td></tr><tr><td>10</td><td>GET#_tempB5P1| K</td></tr><tr><td>50</td><td>GET#_tempB5P2| K</td></tr><tr><td>Many</td><td>701 K</td></tr></table></p> How does the piston's behavior change as the number of molecules increases?",
 					title:"Current step",
 					quiz:[
 						{
@@ -326,7 +326,7 @@ _.extend(Work.prototype,
 				},
 				{//P4
 					setup:undefined,
-					text:"Here's all the collected data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>10</td><td>GET#tempB5P1| K</td></tr><tr><td>50</td><td>GET#tempB5P2| K</td></tr><tr><td>100</td><td>GET#tempB5P3| K</td></tr><tr><td>Many</td><td>701 K</td></tr></table></p>  Do you notice a trend?  If so, why might that trend exist?",
+					text:"Here's all the collected data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#_tempB5P0| K</td></tr><tr><td>10</td><td>GET#_tempB5P1| K</td></tr><tr><td>50</td><td>GET#_tempB5P2| K</td></tr><tr><td>100</td><td>GET#_tempB5P3| K</td></tr><tr><td>Many</td><td>701 K</td></tr></table></p>  Do you notice a trend?  If so, why might that trend exist?",
 					title:"Current step",
 					cutScene:true,
 					quiz:[
@@ -366,7 +366,7 @@ _.extend(Work.prototype,
 							this.piston.setPressure(getStore('pExt'));
 							this.listener1 = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7.5, tolerance:.01, storeAtSatisfy:{temp:walls[0].data.t}, alertUnsatisfied:"Click the 'Release' button to compress the system"});	
 						},
-					text:"Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>10</td><td>GET#tempB5P1| K</td></tr><tr><td>50</td><td>GET#tempB5P2| K</td></tr><tr><td>100</td><td>GET#tempB5P3| K</td></tr><tr><td>Many</td><td>701 K</td></tr></table></p>",
+					text:"Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#_tempB5P0| K</td></tr><tr><td>10</td><td>GET#_tempB5P1| K</td></tr><tr><td>50</td><td>GET#tempB5P2| K</td></tr><tr><td>100</td><td>GET#_tempB5P3| K</td></tr><tr><td>Many</td><td>701 K</td></tr></table></p>",
 					title:"Current step",
 				},
 					
@@ -379,7 +379,7 @@ _.extend(Work.prototype,
 				{//P0
 					setup:undefined,
 					cutScene:true,
-					text:"Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#tempB5P0| K</td></tr><tr><td>10</td><td>GET#tempB5P1| K</td></tr><tr><td>50</td><td>GET#tempB5P2| K</td></tr><tr><td>100</td><td>GET#tempB5P3| K</td></tr><tr><td>GET#count|</td><td>GET#tempB5P6| K</td></tr><tr><td>Many</td><td>701 K</td></tr></table></p><p>From the data, what conclusions can you draw about when the first law applies, and why?</p>Could add outro, but apart from that, this is the end.",
+					text:"Previous data:<p><table style='color:white;' border='1' bordercolor=white><tr><td># molecules</td><td>T<sub>f</sub><tr><td>1</td><td>GET#_tempB5P0| K</td></tr><tr><td>10</td><td>GET#_tempB5P1| K</td></tr><tr><td>50</td><td>GET#_tempB5P2| K</td></tr><tr><td>100</td><td>GET#_tempB5P3| K</td></tr><tr><td>GET#_count|</td><td>GET#tempB5P6| K</td></tr><tr><td>Many</td><td>701 K</td></tr></table></p><p>From the data, what conclusions can you draw about when the first law applies, and why?</p>Could add outro, but apart from that, this is the end.",
 					quiz:[
 						{
 							type:'text',

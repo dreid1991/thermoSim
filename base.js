@@ -503,7 +503,7 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 	if (newPrompt.setup) {
 		newPrompt.setup.apply(curLevel)
 	}
-	newPrompt.text = addStored(newPrompt.text/*, newPrompt.replace*/);
+	newPrompt.text = evalText(addStored(newPrompt.text));
 	if (!newPrompt.quiz) {
 		$('#nextPrevDiv').show();
 	}
@@ -668,19 +668,39 @@ function prevPrompt(){
 
 
 
-function addStored(text){
-	var getIdx = text.indexOf('GET');
+function addStored(text) {
+	var getIdx = text.indexOf('GET_');
 	while (getIdx!=-1) {
 		if (text[getIdx+3] == '#') {
 			var endIdx = text.indexOf("|");
-			var gotten = parseFloat(getStore(text.slice(getIdx+4, endIdx)));
+			var gotten = parseFloat(getStore(text.slice(getIdx+5, endIdx)));
 			text = text.replace(text.slice(getIdx, endIdx+1), gotten);
 		} else {
 			var endIdx = text.indexOf("|");
-			var gotten = parseFloat(getStore(text.slice(getIdx+3, endIdx)));
+			if (endIdx==-1) {
+				console.log('YOUR GETS IN TEXT BLOCKS ARE MESSED UP.  MUST END WITH |');
+				break;
+			}
+			var gotten = parseFloat(getStore(text.slice(getIdx+4, endIdx)));
 			text = text.replace(text.slice(getIdx, endIdx+1), gotten);		
 		}
 		getIdx = text.indexOf('GET');
+	}
+	return text;
+}
+
+function evalText(text) {
+	var evalIdx = text.indexOf('EVAL_');
+	while (evalIdx!=-1) {
+		var endIdx = text.indexOf("|");
+		if (endIdx==-1) {
+			console.log('YOUR EVALS IN TEXT BLOCKS ARE MESSED UP.  MUST END WITH |');
+			break;
+		}
+		var evaled = eval(text.slice(evalIdx+5, endIdx));
+		text = text.replace(text.slice(evalIdx, endIdx+1), evaled);		
+		evalIdx = text.indexOf('EVAL_');	
+	
 	}
 	return text;
 }
