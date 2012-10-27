@@ -12,6 +12,7 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 		this.dotManager = dotManager;
 	},
 	attract: function() {
+		var k = 500;
 		var grid = this.makeGrid();
 		var gridSize = this.gridSize;
 		var xSpan = this.xSpan;
@@ -30,19 +31,25 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 							var dx = (dot.x-neighbor.x)
 							var dy = (dot.y-neighbor.y)
 							//var dist = Math.max(Math.sqrt(dx*dx+dy*dy) - dot.r - neighbor.r, 1)  //will blow up if dist==0.  UNLIKELY
-							var dist = Math.sqrt(dx*dx+dy*dy) - dot.r - neighbor.r;
-							//hey - use this dist (but without subtracting off radiuses) to get the UV
-							if (dist>1) {
-								var f = 1/(dist*dist)//add int constant
-								var UV = V(dx, dy).UV(); //neighbor to dot
+							var dist = Math.sqrt(dx*dx+dy*dy);
+							//hey - all this funny business with the dist and UV is so I can get the dist and UV with but one square root
+							if (dist>1+neighbor.r+dot.r) {
+								var UV = V(dx, dy);
+								UV.dx/=dist;
+								UV.dy/=dist;
+								dist-=dot.r+neighbor.r;
+								dist*=pxToE;
+								var f = k/(dist*dist);
+								//var UV = V(dx, dy).UV(); //neighbor to dot
+								var sign = getSign(dot.v.dx);
 								var dVDot = UV.copy().mult(-f/dot.m);
 								var dVNeigh = UV.mult(f/neighbor.m);
 								dot.v.add(dVDot);
 								neighbor.v.add(dVNeigh);
 							}
 							
-							dist = pxToE * Math.max(dist, 1);
-							var pe = 500/(dist) //MAKE A K
+							dist = Math.max(dist, pxToE);
+							var pe = k/(dist) 
 							dot.peCur += pe; //(k)/((n-1)(R^(n-1)))
 							neighbor.peCur += pe;							
 

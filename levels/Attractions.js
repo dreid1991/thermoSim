@@ -26,10 +26,23 @@ _.extend(Attractions.prototype,
 					var maxY = walls[0][0].y;
 					var height = walls[0][3].y-walls[0][0].y;
 					
-					spcs['spc1'].populate(P(300, 310), V(100, height-20), 100, 100);
-					//spcs['spc3'].populate(P(300, 310), V(100, height-20), 1, 273);
+					//spcs['spc1'].populate(P(300, 310), V(100, height-20), 100, 100);
+					//spcs['spc3'].populate(P(300, 310), V(100, height-20), 2, 273);
 					//HOLDSTILL();
-					//spcs['spc4'].populate(P(495, 310), V(5, height-20), 3, 273);
+					spcs['spc1'].populate(P(495, 310), V(5, height-20), 2, 273);
+					HOLDSTILL();
+					
+					addListenerOnce(curLevel, 'update', 'lala', function() {
+						spcs.spc1.dots[0].v.dy=0;
+						spcs.spc1.dots[0].v.dx=.1;
+						spcs.spc1.dots[1].v.dy=0;
+						spcs.spc1.dots[1].v.dx=-.1;
+						this.attract();
+						keo = spcs.spc1.dots[0].temp() + spcs.spc1.dots[1].temp();
+						peo = spcs.spc1.dots[0].peLast + spcs.spc1.dots[1].peLast;
+
+					}, this)
+					
 				},
 			prompts:[
 				{//P0

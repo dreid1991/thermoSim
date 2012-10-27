@@ -57,12 +57,6 @@ LevelTools = {
 			}
 		}
 	},
-	checkDotHits: function(){
-		collide.check();
-	},
-	checkWallHits: function(){
-		walls.check();
-	},
 	cutSceneStart: function(text, mode, quiz) {
 		addListener(curLevel, 'prompt' + promptIdx + 'CleanUp', 'endCutScene',
 			function() {
@@ -424,17 +418,18 @@ LevelTools = {
 	},
 	updateRunNoAttract: function(){
 		this.move();
-		this.checkDotHits();
-		this.checkWallHits();
+		collide.check();
+		walls.check();
 		this.drawRun();
 	},
 	updateRunAttract: function(){
 		this.move();
+		attractor.attract();
+		foo();
 		//ooh - should I put it before or after all the hits?  
 		//will try before to start with
-		attractor.attract();
-		this.checkDotHits();
-		this.checkWallHits();
+		collide.check();
+		walls.check();
 		this.drawRun();
 	},
 	drawRun: function(){

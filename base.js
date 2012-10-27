@@ -32,7 +32,7 @@ $(function(){
 	LtoM3 = .001;
 	ATMtoPA = 101325;
 	BARTOPA = 100000;
-	PUNITTOPA = BARTOPA;
+	PUNITTOPA = BARTOPA; //current pressure unit to pascals
 	JtoKJ = .001;
 	N = 1000;//Avagadro's number
 	//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
@@ -41,7 +41,7 @@ $(function(){
 	ACTUALN = 6.022*Math.pow(10,23);
 	g = 1.75
 	workConst = .158e-3;//for kJ;
-	updateInterval = 30;
+	updateInterval = 100;//30;
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);
 	auxHolderDivs = ['aux1', 'aux2'];
@@ -53,8 +53,8 @@ $(function(){
 	draw = new DrawingTools();
 	collide = new CollideHandler();
 	attractor = new Attractor();
-	setInterval('curLevel.update()', updateInterval);
-	setInterval('curLevel.updateData()', dataInterval);
+	turnUpdater = setInterval('curLevel.update()', updateInterval);
+	dataUpdater = setInterval('curLevel.updateData()', dataInterval);
 
 	/*Timing stuff
 	started = false;
@@ -90,12 +90,27 @@ function checkIdeality(){
 	
 }
 */
+function foo() {
+	console.log('START TURN READOUT');
+	var total = spcs.spc1.dots[0].temp() + spcs.spc1.dots[1].temp();
+	var shouldBe = keo + spcs.spc1.dots[0].peLast + spcs.spc1.dots[1].peLast - peo;
+	var difference = shouldBe-total;
+	
+	console.log('total ke+ ' + total);
+	console.log('should be ' + shouldBe);
+	console.log('difference ' + difference);
+	if (Math.abs(difference) > 1e-7) {
+		console.log('omg');
+	}
+	console.log('END TURN READOUT');
+}
+
 
 function HOLDSTILL() {
 	spcs.spc1.dots[0].v.dx=0;
-	spcs.spc1.dots[0].v.dy=.01;
+	spcs.spc1.dots[0].v.dy=1;
 	spcs.spc1.dots[1].v.dx=0;
-	spcs.spc1.dots[1].v.dy=.01;
+	spcs.spc1.dots[1].v.dy=1;
 	
 	spcs.spc1.dots[0].x=300;
 	spcs.spc1.dots[0].y=300;
