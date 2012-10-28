@@ -92,8 +92,10 @@ function checkIdeality(){
 */
 function foo() {
 	console.log('START TURN READOUT');
-	var total = spcs.spc1.dots[0].temp() + spcs.spc1.dots[1].temp();
-	var shouldBe = keo + spcs.spc1.dots[0].peLast + spcs.spc1.dots[1].peLast - peo;
+	var dot1 = spcs.spc1.dots[0];
+	var dot2 = spcs.spc1.dots[1];
+	var total = dot1.temp() + dot2.temp();
+	var shouldBe = keo + dot1.peLast + dot2.peLast + dot1.eDebt + dot2.eDebt - peo;
 	var difference = shouldBe-total;
 	
 	console.log('total ke+ ' + total);

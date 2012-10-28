@@ -13,10 +13,10 @@ function Dot(x, y, v, mass, radius, spcName, idNum, tag, returnTo){
 	this.tConst = tConst;
 	this.pxToE = pxToE;
 	this.parentLists = [];
-	this.peLast = Number();
-	this.tempLast = Number();
-	this.peCur = Number();
-	
+	this.peLast = 0;
+	this.tempLast = 0;
+	this.peCur = 0;
+	this.eDebt = 0;
 	return this;
 	
 }

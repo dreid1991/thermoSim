@@ -70,14 +70,29 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 				var dot = dots[dotIdx];
 				var newTemp = dot.tempLast + dot.peCur - dot.peLast;
 				if (newTemp<0) {
-					dot.v.mult(-1);
+					//dot.v.mult(-1);
 					newTemp*=-1;
-				}
+					this.exactDebtInit(dot, newTemp);
+				} 
 				dot.setTemp(newTemp);
 				dot.peLast = dot.peCur;
 				dot.peCur = 0;
 			}
 		}
+	},
+	exactDebtInit: function(dot, newTemp) {
+		dot.eDebt = newTemp*2;
+		var listenerName = 'exactDebt' + dot.idNum + dot.x + dot.y;
+		addListener(curLevel, 'update', listenerName, function() {
+			var temp = this.temp();
+			var ammtToExact = Math.max(0, Math.min(temp-.01, Math.min(.1*newTemp, this.eDebt)));
+			this.eDebt-=ammtToExact;
+			this.setTemp(temp-ammtToExact);
+			if (this.eDebt<=0) {
+				this.eDebt = 0;
+				removeListener(curLevel, 'update', listenerName);
+			}
+		}, dot);	
 	},
 	assignELastAll: function() {
 		var k = 500;
