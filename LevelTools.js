@@ -425,7 +425,7 @@ LevelTools = {
 	updateRunAttract: function(){
 		this.move();
 		attractor.attract();
-		foo();
+		//foo();
 		//ooh - should I put it before or after all the hits?  
 		//will try before to start with
 		collide.check();

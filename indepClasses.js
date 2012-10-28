@@ -17,6 +17,7 @@ function Dot(x, y, v, mass, radius, spcName, idNum, tag, returnTo){
 	this.tempLast = 0;
 	this.peCur = 0;
 	this.eDebt = 0;
+	this.eDebtListenerName = undefined;
 	return this;
 	
 }

@@ -82,15 +82,19 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 	},
 	exactDebtInit: function(dot, newTemp) {
 		dot.eDebt = newTemp*2;
-		var listenerName = 'exactDebt' + dot.idNum + dot.x + dot.y;
-		addListener(curLevel, 'update', listenerName, function() {
+		if (dot.eDebtListenerName) {
+			removeListener(curLevel, 'update', dot.eDebtListenerName);
+		}
+		dot.eDebtlistenerName = 'exactDebt' + dot.idNum + dot.x + dot.y;
+		addListener(curLevel, 'update', dot.eDebtlistenerName, function() {
 			var temp = this.temp();
 			var ammtToExact = Math.max(0, Math.min(temp-.01, Math.min(.1*newTemp, this.eDebt)));
 			this.eDebt-=ammtToExact;
 			this.setTemp(temp-ammtToExact);
 			if (this.eDebt<=0) {
 				this.eDebt = 0;
-				removeListener(curLevel, 'update', listenerName);
+				this.eDebtListenerName = undefined;
+				removeListener(curLevel, 'update', dot.eDebtlistenerName);
 			}
 		}, dot);	
 	},

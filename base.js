@@ -41,7 +41,7 @@ $(function(){
 	ACTUALN = 6.022*Math.pow(10,23);
 	g = 1.75
 	workConst = .158e-3;//for kJ;
-	updateInterval = 100;//30;
+	updateInterval = 30;
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);
 	auxHolderDivs = ['aux1', 'aux2'];
@@ -90,21 +90,22 @@ function checkIdeality(){
 	
 }
 */
+/*
 function foo() {
-	console.log('START TURN READOUT');
+	//console.log('START TURN READOUT');
 	var dot1 = spcs.spc1.dots[0];
 	var dot2 = spcs.spc1.dots[1];
 	var total = dot1.temp() + dot2.temp();
 	var shouldBe = keo + dot1.peLast + dot2.peLast + dot1.eDebt + dot2.eDebt - peo;
 	var difference = shouldBe-total;
 	
-	console.log('total ke+ ' + total);
-	console.log('should be ' + shouldBe);
+	//console.log('total ke+ ' + total);
+	//console.log('should be ' + shouldBe);
 	console.log('difference ' + difference);
 	if (Math.abs(difference) > 1e-7) {
 		console.log('omg');
 	}
-	console.log('END TURN READOUT');
+	//console.log('END TURN READOUT');
 }
 
 
@@ -119,7 +120,7 @@ function HOLDSTILL() {
 	spcs.spc1.dots[1].x=315;
 	spcs.spc1.dots[1].y=300;
 }
-
+*/
 
 
 function gauss(avg, stdev){
