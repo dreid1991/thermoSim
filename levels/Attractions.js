@@ -29,21 +29,23 @@ _.extend(Attractions.prototype,
 					//spcs['spc1'].populate(P(300, 310), V(100, height-20), 100, 100);
 					//spcs['spc3'].populate(P(300, 310), V(100, height-20), 2, 273);
 					//HOLDSTILL();
-					spcs['spc1'].populate(P(110, 270), V(100, 100), 20, 273);
-					this.attract();
-					//HOLDSTILL();
-					/*
+					spcs['spc1'].populate(P(110, 270), V(100, 100), 2, 273);
+					//this.attract();
+					HOLDSTILL();
+					
 					addListenerOnce(curLevel, 'update', 'lala', function() {
 						spcs.spc1.dots[0].v.dy=1;
 						spcs.spc1.dots[0].v.dx=.1;
 						spcs.spc1.dots[1].v.dy=1;
 						spcs.spc1.dots[1].v.dx=-.1;
+						spcs.spc1.dots[2].v.dy=1;
+						spcs.spc1.dots[2].v.dx=-.1;
 						this.attract();
-						keo = spcs.spc1.dots[0].temp() + spcs.spc1.dots[1].temp();
-						peo = spcs.spc1.dots[0].peLast + spcs.spc1.dots[1].peLast;
+						keo = spcs.spc1.dots[0].temp() + spcs.spc1.dots[1].temp() + spcs.spc1.dots[2].temp();
+						peo = spcs.spc1.dots[0].peLast + spcs.spc1.dots[1].peLast + spcs.spc1.dots[2].peLast;
 
 					}, this)
-					*/
+					
 				},
 			prompts:[
 				{//P0

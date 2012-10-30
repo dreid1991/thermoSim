@@ -41,7 +41,7 @@ $(function(){
 	ACTUALN = 6.022*Math.pow(10,23);
 	g = 1.75
 	workConst = .158e-3;//for kJ;
-	updateInterval = 30;
+	updateInterval = 150;//30;
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);
 	auxHolderDivs = ['aux1', 'aux2'];
@@ -90,13 +90,14 @@ function checkIdeality(){
 	
 }
 */
-/*
+
 function foo() {
 	//console.log('START TURN READOUT');
 	var dot1 = spcs.spc1.dots[0];
 	var dot2 = spcs.spc1.dots[1];
-	var total = dot1.temp() + dot2.temp();
-	var shouldBe = keo + dot1.peLast + dot2.peLast + dot1.eDebt + dot2.eDebt - peo;
+	var dot3 = spcs.spc1.dots[2];
+	var total = dot1.temp() + dot2.temp(0) + dot3.temp();
+	var shouldBe = keo + dot1.peLast + dot2.peLast + dot3.peLast + dot1.eDebt + dot2.eDebt + dot3.eDebt - peo;
 	var difference = shouldBe-total;
 	
 	//console.log('total ke+ ' + total);
@@ -114,13 +115,17 @@ function HOLDSTILL() {
 	spcs.spc1.dots[0].v.dy=1;
 	spcs.spc1.dots[1].v.dx=0;
 	spcs.spc1.dots[1].v.dy=1;
+	spcs.spc1.dots[2].v.dx=0;
+	spcs.spc1.dots[2].v.dy=1;
 	
 	spcs.spc1.dots[0].x=300;
 	spcs.spc1.dots[0].y=300;
 	spcs.spc1.dots[1].x=315;
 	spcs.spc1.dots[1].y=300;
+	spcs.spc1.dots[2].x=330;
+	spcs.spc1.dots[2].y=300;
 }
-*/
+
 
 
 function gauss(avg, stdev){
