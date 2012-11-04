@@ -74,7 +74,8 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 				if (newTemp<0) {
 					//dot.v.mult(-1);
 					this.eDebt+=(10 - newTemp);
-					newTemp=10;//Change this to like -.1 and eDebt to 1.1
+					newTemp=10;
+					console.log('adding debt');
 				} 
 				dot.setTemp(newTemp);
 				dot.peLast = dot.peCur;
@@ -87,6 +88,7 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 	},
 	exactDebt: function() {
 		//yo yo, combine this with adjust E.
+		console.log('exacting debt');
 		var minTemp = .3*dataHandler.avgTemp();
 		for (var spcName in spcs) {
 			var dots = spcs[spcName].dots;
@@ -96,6 +98,7 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 				if (dotTemp>minTemp) {
 					var deltaTemp = Math.min(Math.min(dotTemp-minTemp, 5), this.eDebt);
 					this.eDebt-=deltaTemp;
+					console.log('from ' + dotTemp + ' to ' + (dotTemp-deltaTemp));
 					dot.setTemp(dotTemp - deltaTemp);
 					if (this.eDebt<=0) {
 						return;
