@@ -30,9 +30,6 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 				for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){
 					for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, ySpan); y++){
 						for (var neighborIdx=grid[x][y].length-1; neighborIdx>-1; neighborIdx-=1){
-							if (turn==17) {
-								console.log('boo');
-							}
 							var neighbor = grid[x][y][neighborIdx];
 							var dx = (dot.x-neighbor.x)
 							var dy = (dot.y-neighbor.y)
@@ -44,15 +41,12 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 							dist*=pxToE;
 							var exp = Math.exp(-this.k2*dist);
 							var f = -this.k1*dist*exp*(2-this.k2*dist);
-							//var UV = V(dx, dy).UV(); //neighbor to dot
 							var dVDot = UV.copy().mult(-f/dot.m);
 							var dVNeigh = UV.mult(f/neighbor.m);
 							dot.v.add(dVDot);
 							neighbor.v.add(dVNeigh);
-						
-							
 							var pe = this.k1*exp*dist*dist;
-							dot.peCur += pe; //(k)/((n-1)(R^(n-1)))
+							dot.peCur += pe;
 							neighbor.peCur += pe;							
 
 						
@@ -72,10 +66,8 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 				var dot = dots[dotIdx];
 				var newTemp = dot.tempLast + dot.peCur - dot.peLast;
 				if (newTemp<0) {
-					//dot.v.mult(-1);
 					this.eDebt+=(10 - newTemp);
 					newTemp=10;
-					console.log('adding debt');
 				} 
 				dot.setTemp(newTemp);
 				dot.peLast = dot.peCur;
@@ -88,7 +80,7 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 	},
 	exactDebt: function() {
 		//yo yo, combine this with adjust E.
-		console.log('exacting debt');
+		//console.log('exacting debt');
 		var minTemp = .3*dataHandler.avgTemp();
 		for (var spcName in spcs) {
 			var dots = spcs[spcName].dots;
@@ -98,7 +90,7 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 				if (dotTemp>minTemp) {
 					var deltaTemp = Math.min(Math.min(dotTemp-minTemp, 5), this.eDebt);
 					this.eDebt-=deltaTemp;
-					console.log('from ' + dotTemp + ' to ' + (dotTemp-deltaTemp));
+					//console.log('from ' + dotTemp + ' to ' + (dotTemp-deltaTemp));
 					dot.setTemp(dotTemp - deltaTemp);
 					if (this.eDebt<=0) {
 						return;

@@ -41,7 +41,7 @@ $(function(){
 	ACTUALN = 6.022*Math.pow(10,23);
 	g = 1.75
 	workConst = .158e-3;//for kJ;
-	updateInterval = 500;//30;
+	updateInterval = 30;//500;
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);
 	auxHolderDivs = ['aux1', 'aux2'];
@@ -102,9 +102,10 @@ function foo() {
 	
 	//console.log('total ke+ ' + total);
 	//console.log('should be ' + shouldBe);
-	console.log('difference ' + difference);
+	//console.log('difference ' + difference);
 	if (Math.abs(difference) > 1e-7) {
 		console.log('omg');
+		console.log(difference);
 	}
 	//console.log('END TURN READOUT');
 }
