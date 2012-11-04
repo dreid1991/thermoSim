@@ -91,6 +91,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 		}
 	},
 	impactStd: function(a, b, UVAB, perpAB, perpBA){
+		console.log('BANG!');
 		var perpABRes = (perpAB*(a.m-b.m)+2*b.m*perpBA)/(a.m+b.m);
 		var perpBARes = (perpBA*(b.m-a.m)+2*a.m*perpAB)/(a.m+b.m);
 		a.v.dx += UVAB.dx*(perpABRes-perpAB);

@@ -35,14 +35,16 @@ _.extend(Attractions.prototype,
 					
 					addListenerOnce(curLevel, 'update', 'lala', function() {
 						spcs.spc1.dots[0].v.dy=1;
-						spcs.spc1.dots[0].v.dx=.1;
-						spcs.spc1.dots[1].v.dy=1;
-						spcs.spc1.dots[1].v.dx=-.1;
-						spcs.spc1.dots[2].v.dy=1;
-						spcs.spc1.dots[2].v.dx=-.1;
+						spcs.spc1.dots[0].v.dx=0;
+						spcs.spc1.dots[1].v.dy=2;
+						spcs.spc1.dots[1].v.dx=0;
+						a = spcs.spc1.dots[0];
+						b = spcs.spc1.dots[1];
+						//spcs.spc1.dots[2].v.dy=1;
+						//spcs.spc1.dots[2].v.dx=0;
 						this.attract();
-						keo = spcs.spc1.dots[0].temp() + spcs.spc1.dots[1].temp() + spcs.spc1.dots[2].temp();
-						peo = spcs.spc1.dots[0].peLast + spcs.spc1.dots[1].peLast + spcs.spc1.dots[2].peLast;
+						keo = spcs.spc1.dots[0].temp() + spcs.spc1.dots[1].temp()// + spcs.spc1.dots[2].temp();
+						peo = spcs.spc1.dots[0].peLast + spcs.spc1.dots[1].peLast// + spcs.spc1.dots[2].peLast;
 
 					}, this)
 					

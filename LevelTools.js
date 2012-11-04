@@ -423,6 +423,9 @@ LevelTools = {
 		this.drawRun();
 	},
 	updateRunAttract: function(){
+		if (turn==8) {
+			console.log('5!');
+		}
 		this.move();
 		attractor.attract();
 		foo();
