@@ -39,7 +39,8 @@ $(function(){
 	pxToE = Math.sqrt(tConst); //gotten for a dot... T = 1/2*m*(v*pxToE)^2.  For energy conservation in attraction. 
 	KB = 1.38*Math.pow(10,-23)
 	ACTUALN = 6.022*Math.pow(10,23);
-	g = 1.75
+	g = 1.75;
+	gInternal = .01;
 	workConst = .158e-3;//for kJ;
 	updateInterval = 30;//500;
 	dataInterval = 1250;

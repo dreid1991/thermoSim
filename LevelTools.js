@@ -409,11 +409,30 @@ LevelTools = {
 	setUpdateRunListener: function(func) {
 		addListener(this, 'update', 'run', func, this);
 	},
-	attract: function() {
+	gravity: function(cleanUpWith) {
+		//YO YO - MAKE IT CLEAN UP
+		//Problem with hitting wall, slowly loses energy.  Would need to do something similar to wall hitting its bounds
+		addListener(curLevel, 'update', 'gravity', function() {
+			for (var spcName in spcs) {
+				var dots = spcs[spcName].dots;
+				for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
+					dots[dotIdx].v.dy+=gInternal;
+					dots[dotIdx].y+=.5*gInternal;
+				}
+			}
+		
+		}, '');
+	},
+	gravityStop: function() {
+		removeListener(curLevel, 'update', 'gravity');
+	},
+	attract: function(cleanUpWith) {
+		//YO YO - MAKE IT CLEAN UP
 		attractor.assignELastAll();
 		this.setUpdateRunListener(this.updateRunAttract);
 	},
 	attractStop: function() {
+		attractor.zeroAllEnergies();
 		this.setUpdateRunListener(this.updateRunNoAttract);
 	},
 	updateRunNoAttract: function(){

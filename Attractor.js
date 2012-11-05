@@ -99,29 +99,16 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 			}
 		}
 	},
-	/*
-	exactDebtInit: function(dot, newTemp) {
-		dot.eDebt = dot.eDebt + newTemp*2;
-		var eDebtInit = dot.eDebt;
-		console.log('Starting e debt');
-		if (dot.eDebtListenerName) {
-			removeListener(curLevel, 'update', dot.eDebtListenerName);
-		}
-		dot.eDebtListenerName = 'exactDebt' + dot.idNum + dot.x + dot.y;
-		addListener(curLevel, 'update', dot.eDebtListenerName, function() {
-			var temp = this.temp();
-			var ammtToExact = Math.max(0, Math.min(temp-.01, Math.min(.01*eDebtInit, this.eDebt)));
-			this.eDebt-=ammtToExact;
-			this.setTemp(temp-ammtToExact);
-			if (this.eDebt<=0) {
-				this.eDebt = 0;
-				this.eDebtListenerName = undefined;
-				removeListener(curLevel, 'update', dot.eDebtlistenerName);
+	zeroAllEnergies: function() {
+		for (var spcName in spcs) {
+			var dots = spcs[spcName].dots;
+			for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
+				dots[dotIdx].peLast = 0;
+				dots[dotIdx].keLast = 0;
+				dots[dotIdx].tempLast = 0;
 			}
-		}, dot);	
-	
+		}
 	},
-	*/
 	assignELastAll: function() {
 		var grid = this.makeGrid();
 		var gridSize = this.gridSize;
