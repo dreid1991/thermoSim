@@ -45,6 +45,7 @@ $(function(){
 	updateInterval = 30;//500;
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);
+	pxToMS = 19.33821;
 	auxHolderDivs = ['aux1', 'aux2'];
 	promptIdx = 0;
 	blockIdx = 0;
