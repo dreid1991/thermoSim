@@ -16,6 +16,9 @@ function Dot(x, y, v, mass, radius, spcName, idNum, tag, returnTo){
 	this.peLast = 0;
 	this.tempLast = 0;
 	this.peCur = 0;
+	var speciesDef = speceiesDefs[spcName];
+	this.attractStrs = speciesDef.attractStrs;
+	this.attractRad = speciesDef.attractRad;
 	return this;
 	
 }
