@@ -97,14 +97,14 @@ function foo() {
 	//console.log('START TURN READOUT');
 	var dot1 = spcs.spc1.dots[0];
 	var dot2 = spcs.spc1.dots[1];
-	var dot3 = spcs.spc1.dots[2];
-	var total = dot1.temp() + dot2.temp() + dot3.temp();
-	var shouldBe = keo + dot1.peLast + dot2.peLast + dot3.peLast + attractor.eDebt  - peo;
+	//var dot3 = spcs.spc1.dots[2];
+	var total = dot1.temp() + dot2.temp();// + dot3.temp();
+	var shouldBe = keo + dot1.peLast + dot2.peLast +/* dot3.peLast + */attractor.eDebt  - peo;
 	var difference = shouldBe-total;
 	
-	//console.log('total ke+ ' + total);
-	//console.log('should be ' + shouldBe);
-	//console.log('difference ' + difference);
+	console.log('total ke+ ' + total);
+	console.log('should be ' + shouldBe);
+	console.log('difference ' + difference);
 	if (Math.abs(difference) > 1e-7) {
 		console.log('omg');
 		console.log(difference);
@@ -118,15 +118,15 @@ function HOLDSTILL() {
 	spcs.spc1.dots[0].v.dy=1;
 	spcs.spc1.dots[1].v.dx=0;
 	spcs.spc1.dots[1].v.dy=1;
-	spcs.spc1.dots[2].v.dx=0;
-	spcs.spc1.dots[2].v.dy=1;
+	//spcs.spc1.dots[2].v.dx=0;
+	//spcs.spc1.dots[2].v.dy=1;
 	
 	spcs.spc1.dots[0].x=300;
 	spcs.spc1.dots[0].y=300;
 	spcs.spc1.dots[1].x=310;
 	spcs.spc1.dots[1].y=300;
-	spcs.spc1.dots[2].x=330;
-	spcs.spc1.dots[2].y=300;
+	//spcs.spc1.dots[2].x=330;
+	//spcs.spc1.dots[2].y=300;
 }
 
 

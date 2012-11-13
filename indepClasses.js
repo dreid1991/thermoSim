@@ -1,5 +1,3 @@
-
-
 function Dot(x, y, v, mass, radius, spcName, idNum, tag, returnTo){
 	this.x = x;
 	this.y = y;
@@ -16,7 +14,8 @@ function Dot(x, y, v, mass, radius, spcName, idNum, tag, returnTo){
 	this.peLast = 0;
 	this.tempLast = 0;
 	this.peCur = 0;
-	var speciesDef = speceiesDefs[spcName];
+	var speciesDef = speciesDefs[spcName];
+	this.attractStr = speciesDef.attractStr;
 	this.attractStrs = speciesDef.attractStrs;
 	this.attractRad = speciesDef.attractRad;
 	return this;
