@@ -443,11 +443,11 @@ LevelTools = {
 	},
 	updateRunAttract: function(){
 		this.move();
+		collide.check();
 		attractor.attract();
 		//foo();
 		//ooh - should I put it before or after all the hits?  
 		//will try before to start with
-		collide.check();
 		walls.check();
 		this.drawRun();
 	},
