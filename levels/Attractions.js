@@ -29,7 +29,7 @@ _.extend(Attractions.prototype,
 					//spcs['spc1'].populate(P(300, 310), V(100, height-20), 100, 100);
 					//spcs['spc3'].populate(P(300, 310), V(100, height-20), 2, 273);
 					//HOLDSTILL();
-					spcs['spc1'].populate(P(110, 270), V(200, 100), 200, 100);
+					spcs['spc1'].populate(P(110, 270), V(200, 100), 100, 20);
 					//spcs['spc3'].populate(P(110, 270), V(200, 100), 200, 20);
 					//spcs['spc6'].populate(P(110, 270), V(200, 100), 50, 20);
 					this.attract();

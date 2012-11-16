@@ -12,7 +12,9 @@ LevelTools = {
 		this.makeListenerHolders();
 		dataHandler = new DataHandler();
 		this.dataHandler = dataHandler;
-		this.setUpdateRunListener(this.updateRunNoAttract)
+		this.attracting = false;
+		this.gravitying = false;
+		this.setUpdateRunListener()
 		addListener(this, 'data', 'run', this.dataRun, this);
 		
 		this.spcs = spcs;
@@ -406,53 +408,83 @@ LevelTools = {
 			}
 		}
 	},
-	setUpdateRunListener: function(func) {
-		addListener(this, 'update', 'run', func, this);
+	setUpdateRunListener: function() {
+		if (this.attracting && this.gravitying) {
+			addListener(this, 'update', 'run', this.updateRunAttractAndGravity, this);
+		} else if (this.attracting) {
+			addListener(this, 'update', 'run', this.updateRunAttract, this);
+		} else if (this.gravitying) {
+			addListener(this, 'update', 'run', this.updateRunGravity, this);
+		} else { 
+			addListener(this, 'update', 'run', this.updateRunBasic, this);
+		}
 	},
 	gravity: function(cleanUpWith) {
+		this.gravitying = true;
 		cleanUpWith = defaultTo('block', cleanUpWith);
 		//YO YO - MAKE IT CLEAN UP
 		//Problem with hitting wall, slowly loses energy.  Would need to do something similar to wall hitting its bounds
-		addListener(curLevel, 'update', 'gravity', function() {
-			for (var spcName in spcs) {
-				var dots = spcs[spcName].dots;
-				for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
-					dots[dotIdx].v.dy+=gInternal;
-					dots[dotIdx].y+=.5*gInternal;
-				}
-			}
-		
-		}, '');
-		addListener(curLevel, cleanUpWith + 'CleanUp', 'attractStop', this.attractStop, this);
+		for (var wallIdx=0; wallIdx<walls.length; wallIdx++) {
+			walls[wallIdx].setHitMode('Gravity');
+		}
+		this.setUpdateRunListener();
+
+		addListener(curLevel, cleanUpWith + 'CleanUp', 'gravityStop', this.gravityStop, this);
 	},
 	gravityStop: function() {
-		removeListener(curLevel, 'update', 'gravity');
+		this.gravitying = false;
+		this.setUpdateRunListener();
+
+
+	},
+	doGravity: function() {
+		for (var spcName in spcs) {
+			var dots = spcs[spcName].dots;
+			for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
+				dots[dotIdx].v.dy+=gInternal;
+				dots[dotIdx].y+=.5*gInternal;
+			}
+		}
 	},
 	attract: function(cleanUpWith) {
+		this.attracting = true;
 		cleanUpWith = defaultTo('block', cleanUpWith);
 		attractor.assignELastAll();
-		this.setUpdateRunListener(this.updateRunAttract);
+		this.setUpdateRunListener();
 		addListener(curLevel, cleanUpWith + 'CleanUp', 'attractStop', this.attractStop, this);
 	},
 	attractStop: function() {
+		this.attracting = false;
 		attractor.zeroAllEnergies();
-		this.setUpdateRunListener(this.updateRunNoAttract);
+		this.setUpdateRunListener();
 	},
-	updateRunNoAttract: function(){
+	updateRunBasic: function() {
 		this.move();
 		collide.check();
 		walls.check();
 		this.drawRun();
 	},
-	updateRunAttract: function(){
+	updateRunGravity: function() {
+		this.move();
+		collide.check();
+		this.doGravity();
+		walls.check();
+		this.drawRun();	
+	},
+	updateRunAttract: function() {
 		this.move();
 		collide.check();
 		attractor.attract();
-		//foo();
-		//ooh - should I put it before or after all the hits?  
-		//will try before to start with
 		walls.check();
 		this.drawRun();
+	},
+	updateRunAttractAndGravity: function() {
+		this.move();
+		collide.check();
+		attractor.attract();
+		this.doGravity();
+		walls.check();
+		this.drawRun();		
 	},
 	drawRun: function(){
 		draw.clear(this.bgCol);

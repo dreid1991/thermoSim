@@ -383,15 +383,23 @@ WallMethods = {
 			var handler = this[wallIdx + '-' + subWallIdx];
 			if (wallUV.dx!=0) {
 				var yo = dot.y;
-
+				var dyo = dot.v.dy;
 			}
 			handler.func.apply(handler.obj, [dot, wallIdx, subWallIdx, wallUV, perpV, perpUV])
 			if (wallUV.dx!=0) {
-				var y = dot.y;
-				if (this[wallIdx].wallPerpUVs[subWallIdx].dy>0) {
-					//is top wall
-				} else {
-					//is bottom wall
+				//v^2 = vo^2 + 2ax;
+				var discrim = dot.v.dy*dot.v.dy + 2*gInternal * (dot.y-yo);
+				if (discrim>=0) { 
+					if (dot.v.dy>0) {
+						dot.v.dy = Math.sqrt(discrim);
+					} else {
+						dot.v.dy = -Math.sqrt(discrim);
+					}		
+				} else { 
+					//should not have gotten as far up as reflection over wall moved it     so dyFinal>0/
+					//so basically I'm setting a new velocity (1e-7)and solving for the approptiate y
+					dot.v.dy = -1.e-7;
+					dot.y = (dot.v.dy*dot.v.dy - dyo*dyo)/(2*gInternal) + yo;
 				}
 			}
 			
