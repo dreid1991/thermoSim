@@ -19,7 +19,7 @@ _.extend(Attractions.prototype,
 		{//B1
 			setup:
 				function() {
-					walls = WallHandler({pts:[[P(100,260), P(410,260), P(410,410), P(100,410)]], handlers:'staticAdiabatic', handles:['container'], bounds:[{yMin:68, yMax:435}]});
+					walls = WallHandler({pts:[[P(100,60), P(410,60), P(410,410), P(100,410)]], handlers:'staticAdiabatic', handles:['container'], bounds:[{yMin:68, yMax:435}]});
 					//walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'staticAdiabatic', handles:['container'], bounds:[{yMin:68, yMax:435}]});
 			
 					//this.borderStd({min:68});
@@ -29,7 +29,7 @@ _.extend(Attractions.prototype,
 					//spcs['spc1'].populate(P(300, 310), V(100, height-20), 100, 100);
 					//spcs['spc3'].populate(P(300, 310), V(100, height-20), 2, 273);
 					//HOLDSTILL();
-					spcs['spc1'].populate(P(110, 270), V(200, 100), 200, 20);
+					spcs['spc1'].populate(P(110, 270), V(200, 100), 200, 100);
 					//spcs['spc3'].populate(P(110, 270), V(200, 100), 200, 20);
 					//spcs['spc6'].populate(P(110, 270), V(200, 100), 50, 20);
 					this.attract();

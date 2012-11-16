@@ -410,6 +410,7 @@ LevelTools = {
 		addListener(this, 'update', 'run', func, this);
 	},
 	gravity: function(cleanUpWith) {
+		cleanUpWith = defaultTo('block', cleanUpWith);
 		//YO YO - MAKE IT CLEAN UP
 		//Problem with hitting wall, slowly loses energy.  Would need to do something similar to wall hitting its bounds
 		addListener(curLevel, 'update', 'gravity', function() {
@@ -422,14 +423,16 @@ LevelTools = {
 			}
 		
 		}, '');
+		addListener(curLevel, cleanUpWith + 'CleanUp', 'attractStop', this.attractStop, this);
 	},
 	gravityStop: function() {
 		removeListener(curLevel, 'update', 'gravity');
 	},
 	attract: function(cleanUpWith) {
-		//YO YO - MAKE IT CLEAN UP
+		cleanUpWith = defaultTo('block', cleanUpWith);
 		attractor.assignELastAll();
 		this.setUpdateRunListener(this.updateRunAttract);
+		addListener(curLevel, cleanUpWith + 'CleanUp', 'attractStop', this.attractStop, this);
 	},
 	attractStop: function() {
 		attractor.zeroAllEnergies();

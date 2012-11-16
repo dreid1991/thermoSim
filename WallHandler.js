@@ -282,7 +282,7 @@ WallMethods = {
 			var perpUVs = new Array(wallUVSet.length);
 			for (var wallUVIdx=0; wallUVIdx<wallUVSet.length; wallUVIdx++){
 				var wallUV = wallUVSet[wallUVIdx];
-				perpUVs[wallUVIdx] = V(-wallUV.dy, wallUV.dx);
+				perpUVs[wallUVIdx] = V(-wallUV.dy, wallUV.dx);//rotating clockwise 
 			}
 			return perpUVs;
 		},
@@ -354,29 +354,53 @@ WallMethods = {
 			var dotVecB = V(dot.x-wallPtB.x, dot.y-wallPtB.y);
 			return (dotVecA.dotProd(wallUV)>=0 && dotVecB.dotProd(reverseWallUV)>=0)
 		},
-		didHitStd: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
+		////////////////////////////////////////////////////////////
+		//WALL HIT HANDLER WRAPPERS
+		////////////////////////////////////////////////////////////		
+		didHitStd: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV) {
 			var handler = this[wallIdx + '-' + subWallIdx];
-			handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);		
+			handler.func.apply(handler.obj, [dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);		
 		},
-		didHitArrow: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
+		didHitArrow: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV) {
 			var vo = dot.v.copy();
 			var handler = this[wallIdx + '-' + subWallIdx];
-			handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
+			handler.func.apply(handler.obj, [dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
 			var pos = P(dot.x, dot.y);
 			var vf = dot.v.copy();
 			var perpVf = -perpUV.dotProd(dot.v);
 			this.drawArrowV(pos, vo, vf, perpV, perpVf);  
 		},
-		didHitArrowSpd: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
+		didHitArrowSpd: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV) {
 			var vo = dot.v.copy();
 			var handler = this[wallIdx + '-' + subWallIdx];
-			handler.func.apply(handler.obj,[dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
+			handler.func.apply(handler.obj, [dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
 			var pos = P(dot.x, dot.y);
 			var vf = dot.v.copy();
 			var perpVf = -perpUV.dotProd(dot.v);
 			this.drawArrowSpd(pos, vo, vf, perpV, perpVf);  
 		},
-		haveChecked: function(wall, list){
+		didHitGravity: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV) {
+			var handler = this[wallIdx + '-' + subWallIdx];
+			if (wallUV.dx!=0) {
+				var yo = dot.y;
+
+			}
+			handler.func.apply(handler.obj, [dot, wallIdx, subWallIdx, wallUV, perpV, perpUV])
+			if (wallUV.dx!=0) {
+				var y = dot.y;
+				if (this[wallIdx].wallPerpUVs[subWallIdx].dy>0) {
+					//is top wall
+				} else {
+					//is bottom wall
+				}
+			}
+			
+			
+		},
+		////////////////////////////////////////////////////////////
+		//END
+		////////////////////////////////////////////////////////////
+		haveChecked: function(wall, list) {
 			for (var listIdx=0; listIdx<list.length; listIdx++){
 				if (list[listIdx][0]==wall[0] && list[listIdx][1]==wall[1]) {
 					return true;
@@ -674,6 +698,7 @@ WallMethods = {
 		volToY: function(vol) {
 			var width = this[2].distTo(this[3]);
 			var height = vol/(vConst*width);
+			//WHAT IS THIS?
 			var extendUV = this[2].VTo(this[3]).UV().perp('cw');
 			return this[2].y - height;
 		},
@@ -1581,13 +1606,15 @@ WallMethods = {
 			var vo2 = wall.v;
 			var m1 = dot.m;
 			var m2 = wall.mass;
+			var absWallV = Math.abs(vo2);
 			
-			if(Math.abs(vo2)>1.0){
+			if (absWallV > 1) {
 				var vo1Sqr = vo1*vo1;
 				var vo2Sqr = vo2*vo2;
-				
-				var scalar = Math.pow(Math.abs(vo2)+.1, .2);
-				var scalarSqr = scalar*scalar
+				//var scalar = Math.pow(Math.abs(vo2)+.1, .2);
+				var scalar = .0017*absWallV*absWallV*absWallV - .0281*absWallV*absWallV + .205*absWallV + .8466;
+				//polynomial fit to above function for fasterness.
+				var scalarSqr = scalar*scalar;
 				
 				var a = m1*(1 + m1/(scalarSqr*m2));
 				var b = -2*m1*(vo1*m1/(m2) + vo2)/scalarSqr;
@@ -1612,19 +1639,21 @@ WallMethods = {
 			var vo2 = wall.v;
 			var m1 = dot.m;
 			var m2 = wall.mass;
+			var absWallV = Math.abs(vo2);
 			
-			if (Math.abs(vo2)>1) {
+			if (absWallV > 1) {
 				var vo1Sqr = vo1*vo1;
 				var vo2Sqr = vo2*vo2;
-				
-				var scalar = Math.pow(Math.abs(vo2)+.1, .2);
-				var scalarSqr = scalar*scalar
+				//var scalar = Math.pow(Math.abs(vo2)+.1, .2);
+				var scalar = .0017*absWallV*absWallV*absWallV - .0281*absWallV*absWallV + .205*absWallV + .8466;
+				//polynomial fit to above function for fasterness.
+				var scalarSqr = scalar*scalar;
 				
 				var a = m1*(1 + m1/(scalarSqr*m2));
 				var b = -2*m1*(vo1*m1/(m2) + vo2)/scalarSqr;
 				var c = (m1*(m1*vo1Sqr/m2 + 2*vo2*vo1) + m2*vo2Sqr)/scalarSqr - m1*vo1Sqr - m2*vo2Sqr;
 				
-				dot.v.dy = (-b + Math.pow(b*b - 4*a*c,.5))/(2*a);
+				dot.v.dy = (-b + Math.sqrt(b*b - 4*a*c))/(2*a);
 				dot.y = dot.y+dot.r;
 				wall.v = (m1*vo1 + m2*vo2 - m1*dot.v.dy)/(m2*scalar);
 			} else {
