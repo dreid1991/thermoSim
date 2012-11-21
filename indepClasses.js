@@ -114,7 +114,7 @@ Vector.prototype = {
 		return this.dx*this.dx + this.dy*this.dy;
 	},
 	copy: function(){
-		return V(this.dx, this.dy);
+		return new Vector(this.dx, this.dy);
 	},
 	mult: function(scalar){
 		this.dx*=scalar; 
@@ -201,7 +201,7 @@ Color.prototype = {
 		this.hex = r+g+b;
 	},
 	copy: function(){
-		return Col(this.r, this.g, this.b);
+		return new Color(this.r, this.g, this.b);
 	},
 	add: function(b){
 		this.r = Math.round(Math.min(255, Math.max(0, this.r+b.r)));
@@ -258,7 +258,7 @@ Point.prototype = {
 		return .5*width*height;
 	},
 	copy: function(){
-		return P(this.x, this.y);
+		return new Point(this.x, this.y);
 	},
 	movePt: function(v){
 		if(v.dx!==undefined){
