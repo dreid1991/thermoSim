@@ -91,7 +91,7 @@ function Col(r, g, b){
 
 Vector.prototype = {
 	UV: function(){
-		var mag = this.mag();
+		var mag = Math.sqrt(this.dx*this.dx + this.dy*this.dy);
 		return V(this.dx/mag, this.dy/mag);
 	},
 	mag: function(){
