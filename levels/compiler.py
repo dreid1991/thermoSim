@@ -37,10 +37,10 @@ for line in src:
 		dest.write('<script>\n')
 		writeFile(fileName)
 		dest.write('</script>\n')
-	elif '<link type' in line:
-		fileName = getFileName(line)
-		dest.write('<style media="screen" type="text/css">\n')
-		writeFile(fileName)
-		dest.write('</style>\n')
+	#elif '<link type' in line:
+	#	fileName = getFileName(line)
+	#	dest.write('<style media="screen" type="text/css">\n')
+	#	writeFile(fileName)
+	#	dest.write('</style>\n')
 	else:
 		dest.write(line)
