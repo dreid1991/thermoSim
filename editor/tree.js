@@ -1,7 +1,7 @@
 function Tree(paper, pos) {
 	this.paper = paper;
 	this.pos = pos; //upper left corner of first section
-	this.buttonDims = V(130, 30);
+	this.buttonDims = V(150, 30);
 	this.innerRectDims = V(30, this.buttonDims.dy);
 	this.circleOffset = V(80, 0);
 	this.circleRad = 15;
@@ -35,7 +35,8 @@ function Tree(paper, pos) {
 	this.defineClickFuncs();
 	this.defineBGRectDragFuncs();
 	this.definePlacerRectFuncs();
-	this.placerButton = this.makePlacerButton();
+	this.placerButtonBG = this.makePlacerButton(false);
+	this.placerButton = this.makePlacerButton(true);
 	this.bgRect = this.makeBGRect();
 	this.clickedButton = undefined;
 	this.sections = [];
@@ -46,22 +47,22 @@ Tree.prototype = {
 		var pos = posOnPaper(mousePos, this.paper);
 		var sectionIdx = this.getNewSectionIdx(pos);
 		if (!section) {
-		/*should make it send rectangle corner positions*/
-			section = new TreeSection(this, pos/*GET A POINT FOR THE UPPER LEFT CORNER, NOT FOR MOUSEPOS*/, this.sectionDragFuncs,  this.promptDragFuncs, this.clickFuncs);
+			var label = '';
+			section = new TreeSection(this, pos, this.sectionDragFuncs,  this.promptDragFuncs, this.clickFuncs, label);
 		}
 		this.sections.splice(sectionIdx, 0, section);
-		//for (var idx=sectionIdx+1; idx<this.sections.length; idx++) {
-		//	this.sections[idx].idx++;
-		//}
+		this.setDefaultLabels();
 		this.moveAllToPositions('fly');
 	},
 	addPrompt: function(mousePos, prompt) {
 		var pos = posOnPaper(mousePos, this.paper);
 		var sectionIdx = this.getNewPromptSectionIdx(pos);
 		this.sections[sectionIdx].addPrompt(pos, prompt);
+		this.setDefaultLabels();
 		this.moveAllToPositions('fly');
 	},
 	toObjectMode: function() {
+		this.placerButtonBG.hide();
 		this.placerButton.hide();
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
 			var section = this.sections[sectionIdx];
@@ -73,6 +74,7 @@ Tree.prototype = {
 		}
 	},
 	toTreeMode: function() {
+		this.placerButtonBG.show();
 		this.placerButton.show();
 		this.unclickButton();
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
@@ -86,6 +88,19 @@ Tree.prototype = {
 		}
 		
 		this.moveAllToPositions('fly');
+	},
+	setDefaultLabels: function() {
+		var sectionLabel, label;
+		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
+			sectionLabel = 'Section ' + (sectionIdx+1);
+			this.sections[sectionIdx].updateLabel(sectionLabel, true);
+			var prompts = this.sections[sectionIdx].prompts;
+			for (var promptIdx=0; promptIdx<prompts.length; promptIdx++) {
+				label = sectionLabel + ' prompt ' + (promptIdx+1);
+				prompts[promptIdx].updateLabel(label, true);
+			}
+		
+		}
 	},
 	removeSection: function(sectionIdx) {
 		if (this.sections[sectionIdx]) {
@@ -179,9 +194,13 @@ Tree.prototype = {
 			return undefined;
 		}
 	},
-	makePlacerButton: function() {
+	makePlacerButton: function(draggable) {
+		var dragFuncs;
 		var pos = this.placerButtonPos;
-		var placer = new TreeSection(this, pos, this.placerRectDragFuncs, undefined, undefined, undefined, true);
+		if (draggable) {
+			dragFuncs = this.placerRectDragFuncs;
+		}
+		var placer = new TreeSection(this, pos, dragFuncs, undefined, undefined, 'New Block', true);
 		return placer;
 	},
 	makeBGRect: function() {
@@ -538,7 +557,7 @@ Tree.prototype = {
 
 }
 
-function TreeSection(tree, posInit, sectionDragFuncs, promptDragFuncs, clickFuncs, isPlacer) {
+function TreeSection(tree, posInit, sectionDragFuncs, promptDragFuncs, clickFuncs, labelText, isPlacer) {
 	this.tree = tree;
 	this.prompts = [];
 	this.pos = posInit.copy();
@@ -549,7 +568,7 @@ function TreeSection(tree, posInit, sectionDragFuncs, promptDragFuncs, clickFunc
 	this.promptDragFuncs = promptDragFuncs;
 	this.clickFuncs = clickFuncs;
 	this.isPlacer = isPlacer;
-	this.button = new TreeButton(this.tree, this, this.pos, this.sectionDragFuncs, this.clickFuncs, isPlacer);
+	this.button = new TreeButton(this.tree, this, this.pos, this.sectionDragFuncs, this.clickFuncs, labelText, isPlacer);
  
 }
 
@@ -572,6 +591,9 @@ TreeSection.prototype = {
 		for (var promptIdx=0; promptIdx<this.prompts.length; promptIdx++) {
 			this.prompts[promptIdx].show();
 		}
+	},
+	updateLabel: function(labelText, settingToDefault) {
+		this.button.updateLabel(labelText, settingToDefault);
 	},
 	toFront: function() {
 		this.button.toFront();
@@ -639,6 +661,9 @@ TreePrompt.prototype = {
 	setSection: function(section) {
 		this.section = section;
 	},
+	updateLabel: function(labelText, settingToDefault) {
+		this.button.updateLabel(labelText, settingToDefault);
+	},
 	hide: function() {
 		this.button.hide();
 	},
@@ -668,12 +693,13 @@ function TreeButton(tree, parent, posInit, dragFuncs, clickFuncs, labelText, isP
 	this.mousePos = P(0,0);
 	this.sectionYs = [];
 	this.parent = parent;
-	this.labelText = defaultTo(labelText, '');
-	this.updateLabel(this.labelText);
+	this.labelText = undefined;
 	this.isPlacerButton = defaultTo(isPlacerButton, false);
 	this.rect = this.makeRect();
 	this.innerRect = this.makeInnerRect();
 	this.arrows = this.makeArrows();
+	this.updateLabel(labelText);
+	this.haveUpdatedLabel = false;
 	this.arrowAngle = 0;//sorry about right/left, 0/180 use.  right -> 0, left -> 180.  Tossing angle around is nice for getting position without a bunch of ifs
 }
 
@@ -687,6 +713,7 @@ TreeButton.prototype = {
 	hide: function() {
 		this.rect.hide();
 		this.innerRect.hide();
+		this.label.hide();
 		for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
 			this.arrows[arrowIdx].hide();
 		}
@@ -695,8 +722,9 @@ TreeButton.prototype = {
 		this.rect.show().toFront();
 		this.innerRect.show().toFront();
 		for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
-			this.arrows[arrowIdx].show().toFront();;
-		}		
+			this.arrows[arrowIdx].show().toFront();
+		}
+		this.label.show().toFront();
 	},
 	toObjectMode: function() {
 		this.mode = 'object';
@@ -784,37 +812,44 @@ TreeButton.prototype = {
 		return arrows;
 		
 	},
-	updateLabel: function(labelText) {
+	updateLabel: function(labelText, settingToDefault) {
 		//Yo yo, I am not strictly using this.labelText because I want that to be the untruncated text
-		this.labelText = labelText;
-		var pos = this.labelPos();
-		if (this.label) {
-			this.label.remove();
+		if (settingToDefault && this.haveUpdatedLabel) {
+			return;
+		} else if (!settingToDefault) {
+			this.haveUpdatedLabel = true;
 		}
-		var maxWidth = this.tree.buttonDims.dx - this.tree.labelIndent - this.tree.innerRectDims.dx - 10;
-		var tempText = '';
-		var label = this.tree.paper.text(0, 0, tempText).attr({'text-anchor': 'start', 'font-size': this.tree.labelTextSize});
-		var tooWide = false;
-		for (var letterIdx=0; letterIdx<labelText.length; letterIdx++) {
-			tempText = tempText + labelText[letterIdx];
-			label.attr({'text': tempText});
-			
-			if (label.getBBox().width > maxWidth && letterIdx != labelText.length-1) {
-				tooWide = true;
-				break;
+		if (labelText != this.labelText) {
+			this.labelText = labelText;
+			var pos = this.labelPos();
+			if (this.label) {
+				this.label.remove();
 			}
+			var maxWidth = this.tree.buttonDims.dx - this.tree.labelIndent - this.tree.innerRectDims.dx - 10;
+			var tempText = '';
+			var label = this.tree.paper.text(0, 0, tempText).attr({'text-anchor': 'start', 'font-size': this.tree.labelTextSize});
+			var tooWide = false;
+			for (var letterIdx=0; letterIdx<labelText.length; letterIdx++) {
+				tempText = tempText + labelText[letterIdx];
+				label.attr({'text': tempText});
+				
+				if (label.getBBox().width > maxWidth && letterIdx != labelText.length-1) {
+					tooWide = true;
+					break;
+				}
+			}
+			if (tooWide) {
+				label.attr({'text': tempText + '...'});
+			}
+			label.transform('t' + pos.x + ',' + pos.y);
+			this.assignHover(label, 'rect', this.tree.rectColHover, this.tree.rectCol);
+			if (this.dragFuncs) {
+				label.drag(this.dragFuncs.tree.onMove, this.dragFuncs.tree.onStart, this.dragFuncs.tree.onEnd);
+			}
+			label.parent = this;
+			label.type = 'label';
+			this.label = label;
 		}
-		if (tooWide) {
-			label.attr({'text': tempText + '...'});
-		}
-		label.transform('t' + pos.x + ',' + pos.y);
-		this.assignHover(label, 'rect', this.tree.rectColHover, this.tree.rectCol);
-		if (this.dragFuncs) {
-			label.drag(this.dragFuncs.tree.onMove, this.dragFuncs.tree.onStart, this.dragFuncs.tree.onEnd);
-		}
-		label.parent = this;
-		label.type = 'label';
-		this.label = label;
 	},
 	assignHover: function(raphaelShape, toChange, hoverOnCol, hoverOffCol) {
 		if (this.isPlacerButton) {
