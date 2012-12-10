@@ -230,25 +230,29 @@ Color.prototype = {
 
 }
 Point.prototype = {
-	distTo: function(pTo){
+	distTo: function(pTo) {
 		var dx = this.x-pTo.x;
 		var dy = this.y-pTo.y;
 		return Math.sqrt(dx*dx + dy*dy);
 	},
-	VTo: function(b){
+	VTo: function(b) {
 		return V(b.x-this.x, b.y-this.y);
 	},
-	fracVTo: function(b, frac){
+	fracVTo: function(b, frac) {
 		return this.VTo(b).mult(frac);
 	},
 	fracMoveTo: function(b, frac){
 		this.movePt(this.fracVTo(b, frac));
 		return this;
 	},
-	avg: function(b){
+	set: function(b) {
+		this.x = b.x;
+		this.y = b.y;
+	},
+	avg: function(b) {
 		return P((this.x+b.x)/2, (this.y+b.y)/2);
 	},
-	area: function(a, b){
+	area: function(a, b) {
 		var baseV = V(a.x-this.x, a.y-this.y);
 		var baseUV = baseV.UV();
 		var width = baseV.mag();
@@ -257,10 +261,10 @@ Point.prototype = {
 		var height = Math.abs(basePerp.dotProd(sideVec));
 		return .5*width*height;
 	},
-	copy: function(){
+	copy: function() {
 		return new Point(this.x, this.y);
 	},
-	movePt: function(v){
+	movePt: function(v) {
 		if(v.dx!==undefined){
 			this.x+=v.dx;
 		}
