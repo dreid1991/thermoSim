@@ -411,50 +411,66 @@ Tree.prototype = {
 		}
 	},
 	placerRectDragStart: function() {
-		this.parent.tree.clickedButton = this;
-		var buttonDims = this.parent.tree.buttonDims;
-		var outline = this.parent.tree.paper.rect(0, 0, buttonDims.dx, buttonDims.dy);//making outline be a section attribute
-		outline.attr({'stroke-dasharray': '-'});
-		outline.transform('t' + this._.dx + ',' + this._.dy);
-		this.parent.outline = outline;
+		var tree = this.parent.tree;
+		tree.clickedButton = this;
+		this.parent.outline = tree.makeOutline.apply(tree, [P(this._.dx, this._.dy)]);
 		this.parent.outlinePos = P(this._.dx, this._.dy);
-		this.parent.mousePos = posOnPaper(globalMousePos, this.parent.tree.paper);
+		this.parent.mousePos = posOnPaper(globalMousePos, tree.paper);
 		this.parent.displaced = undefined;
+		this.parent.inColumn = tree.inButtonColumn(this.parent.pos);
 	},
 	placerRectDragMove: function() {
-		var outlinePos;
-		var oldOutlinePos = this.parent.outlinePos;
-		var outline = this.parent.outline;
+		var outlinePos, oldOutlinePos;
 		var tree = this.parent.tree;
 		var buttonPos = this.parent.parent.pos;
+		var inColLast = this.parent.inColumn;
+		var inCol = tree.inButtonColumn(buttonPos);
+		if (this.parent.outlinePos) {
+			oldOutlinePos = this.parent.outlinePos.copy();
+		} 
+		var outline = this.parent.outline;
 		var curMousePos = posOnPaper(globalMousePos, this.parent.tree.paper);
 		var dPos = this.parent.mousePos.VTo(curMousePos);
 		this.parent.mousePos.set(curMousePos);
 		this.parent.parent.move(dPos);
-		if (tree.inButtonColumn(buttonPos)) {
+		if (inCol) {
 			var toDisplace = tree.getIdxsToDisplace(buttonPos);
 			if (!objectsEqual(toDisplace, this.parent.displaced)) {
-
 				this.parent.tree.returnDisplaced(this.parent.displaced);
 				this.parent.tree.displace(toDisplace);
 				this.parent.displaced = toDisplace;
 			}
-			outlinePos = tree.getOutlinePos(buttonPos, toDisplace);
-			console.log(outlinePos);
-			if (!outlinePos) {
-				console.log('no position');
-				outline.transform('t' + buttonPos.x + ',' + buttonPos.y);
-			} else if (!oldOutlinePos || !outlinePos.sameAs(oldOutlinePos)) {
-				console.log('Trying to animate');
-				outline.animate({transform:'t' + outlinePos.x + ',' + outlinePos.y}, 250, 'ease-in-out').toFront();
-				this.parent.outlinePos.set(outlinePos);
-				
-			}
+
 		} else if (this.parent.displaced) {
-			//maybe fade out outline
 			this.parent.tree.returnDisplaced(this.parent.displaced);
 			this.parent.displaced = undefined;
 		}
+		this.parent.inColumn = inCol;
+		if (inCol) {
+			outlinePos = tree.getOutlinePos(buttonPos, toDisplace);
+			if (!oldOutlinePos || !outlinePos.sameAs(oldOutlinePos)) {
+				console.log('animating!');
+				outline.animate({transform:'t' + outlinePos.x + ',' + outlinePos.y}, 250, 'ease-in-out').toFront();
+				this.parent.outlinePos = outlinePos.copy();
+				
+			}			
+		} else if (inColLast) {
+			console.log('fading!');
+			this.parent.outlinePos = undefined;
+			console.log(this.parent.outlinePos);
+			this.parent.tree.fadeOut(outline);
+			this.parent.outline = tree.makeOutline.apply(tree, [buttonPos]);			
+		} else {
+			outline.transform('t' + buttonPos.x + ',' + buttonPos.y);
+		}
+	},
+	makeOutline: function(pos) {
+		//call in context of tree
+		var buttonDims = this.buttonDims;
+		var outline = this.paper.rect(0, 0, buttonDims.dx, buttonDims.dy);//making outline be a section attribute
+		outline.attr({'stroke-dasharray': '-'});
+		outline.transform('t' + pos.x + ',' + pos.y);
+		return outline;
 	},
 	getOutlinePos: function(pos, displaced) {
 		var treePos = this.pos;
@@ -519,11 +535,15 @@ Tree.prototype = {
 
 		}
 		this.parent.outlinePos = P(0, 0);
-		this.parent.outline.animate({opacity:0}, 250, undefined, function(){this.remove()});
+		this.parent.tree.fadeOut(this.parent.outline);
 		this.parent.outline = undefined;
 		this.parent.displaced = undefined;
 		this.parent.mousePos = P(0, 0);
 		this.parent.parent.move(this.parent.tree.placerButtonPos, 'snap');
+	},
+	fadeOut: function(obj, time) {
+		time = defaultTo(time, 250);
+		obj.animate({opacity:0}, time, undefined, function(){this.remove()});
 	},
 	displace: function(toDisplace) {
 		for (var dir in toDisplace) {
