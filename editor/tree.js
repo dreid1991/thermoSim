@@ -413,15 +413,18 @@ Tree.prototype = {
 	placerRectDragStart: function() {
 		this.parent.tree.clickedButton = this;
 		var buttonDims = this.parent.tree.buttonDims;
-		this.parent.outline = this.parent.tree.paper.rect(0, 0, buttonDims.dx, buttonDims.dy);//making outline be a section attribute
-		this.parent.outline.attr({'stroke-dasharray': '-'});
-		this.parent.outline.transform('t' + this._.dx + ',' + this._.dy);
-		//this.parent.outlinePos = P(this._.dx, this._.dy);
+		var outline = this.parent.tree.paper.rect(0, 0, buttonDims.dx, buttonDims.dy);//making outline be a section attribute
+		outline.attr({'stroke-dasharray': '-'});
+		outline.transform('t' + this._.dx + ',' + this._.dy);
+		this.parent.outline = outline;
+		this.parent.outlinePos = P(this._.dx, this._.dy);
 		this.parent.mousePos = posOnPaper(globalMousePos, this.parent.tree.paper);
 		this.parent.displaced = undefined;
 	},
 	placerRectDragMove: function() {
-		var upPos, downPos, outlinePos;
+		var outlinePos;
+		var oldOutlinePos = this.parent.outlinePos;
+		var outline = this.parent.outline;
 		var tree = this.parent.tree;
 		var buttonPos = this.parent.parent.pos;
 		var curMousePos = posOnPaper(globalMousePos, this.parent.tree.paper);
@@ -431,89 +434,70 @@ Tree.prototype = {
 		if (tree.inButtonColumn(buttonPos)) {
 			var toDisplace = tree.getIdxsToDisplace(buttonPos);
 			if (!objectsEqual(toDisplace, this.parent.displaced)) {
-				console.log(toDisplace);
 
 				this.parent.tree.returnDisplaced(this.parent.displaced);
 				this.parent.tree.displace(toDisplace);
 				this.parent.displaced = toDisplace;
+			}
+			outlinePos = tree.getOutlinePos(buttonPos, toDisplace);
+			console.log(outlinePos);
+			if (!outlinePos) {
+				console.log('no position');
+				outline.transform('t' + buttonPos.x + ',' + buttonPos.y);
+			} else if (!oldOutlinePos || !outlinePos.sameAs(oldOutlinePos)) {
+				console.log('Trying to animate');
+				outline.animate({transform:'t' + outlinePos.x + ',' + outlinePos.y}, 250, 'ease-in-out').toFront();
+				this.parent.outlinePos.set(outlinePos);
+				
 			}
 		} else if (this.parent.displaced) {
 			//maybe fade out outline
 			this.parent.tree.returnDisplaced(this.parent.displaced);
 			this.parent.displaced = undefined;
 		}
-		/*
-		if (toDisplace) {
-			if (toDisplace.up) {
-				if (toDisplace.up.promptIdx == -1) {
-					upPos = tree.getButtonPos(tree.sections[toDisplace.up.sectionIdx].button)
-				} else {
-					upPos = tree.getButtonPos(tree.sections[toDisplace.up.sectionIdx].prompts[toDisplace.up.promptIdx]);
-				}
-			} 
-			if (toDisplace.down) {
-				if (toDisplace.down.promptIdx == -1) {
-					downPos = tree.getButtonPos(tree.sections[toDisplace.down.sectionIdx].button)
-				} else {
-					downPos = tree.getButtonPos(tree.sections[toDisplace.down.sectionIdx].prompts[toDisplace.down.promptIdx]);
-				}
-			}
-			if (upPos && downPos) {
-				outlinePos = upPos.avg(downPos);
-			} else if (upPos) {
-				outlinePos = upPos.copy().movePt(V(0, tree.totalButtonHeight));
-			} else if (downPos) {
-				outlinePos = downPos.copy().movePt(V(0, -tree.totalButtonHeight));
-			}
-			if (tree.inSectionColumn(buttonPos)) {
-				outlinePos.x = tree.pos.x;
-			} else {
-				outlinePos.x = tree.pos.x + tree.promptIndent;
-			}
-			this.parent.outline.animate({transform: 't' + outlinePos.x + ',' + outlinePos.y}, 250, 'ease-in-out');
-		}
-		*/
 	},
-	/*
-	getNearestButtonPos: function(pos) {
-		var y = this.pos.y;
-		var inSectionColumn = this.inSectionColumn(pos);
+	getOutlinePos: function(pos, displaced) {
+		var treePos = this.pos;
 		var totalHeight = this.totalHeight();
-		if (!this.inButtonColumn(pos)) {
-			return pos.copy();
-		} else if (y > pos.y) {
-			return this.pos.copy();
-		} else if (this.pos.y + totalHeight < pos.y && this.pos.y + totalHeight < pos.y + this.nearestButtonYTol) {//yo yo, make consistant with adding
-			return this.pos.copy().movePt(V(0, totalHeight));
-		} else if (this.pos.y + totalHeight < pos.y + this.nearestButtonYTol) {
-			return pos.copy();
-		} else {
-			for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
-				if (pos.y >= y && pos.y < y + this.totalButtonHeight) {
-					if (inSectionColumn) {
-						return P(this.pos.x, y);
-					} else {
-						return P(this.pos.x + this.promptIndent, y);
-					}
+		var indent = this.promptIndent;
+		var buttonHeight = this.buttonDims.dy//or this.totalButtonHeight;
+		var adjustment = buttonHeight/2;
+		if (displaced) {
+			if (!displaced.up) {//must be section above first section
+				return treePos.copy().movePt(V(0, -adjustment));
+			} else if (!displaced.down) {
+				var yAdj = totalHeight - adjustment;
+				if (this.inSectionColumn(pos)) {
+					return treePos.copy().movePt(V(0, yAdj));
+				} else {
+					return treePos.copy().movePt(V(indent, yAdj));
 				}
-				y += this.totalButtonHeight;
-				var prompts = this.sections[sectionIdx].prompts;
-				for (var promptIdx=0; promptIdx<prompts.length; promptIdx++) {
-					if (pos.y >= y && pos.y < y + this.totalButtonHeight) {
-						if (promptIdx == prompts.length-1 && inSectionColumn) {
-							return P(this.pos.x, y);
-						}
-						return P(this.pos.x + this.promptIndent, y)
-					}
-					y += this.totalButtonHeight;
+			} else {
+				var posUp = this.buttonPosFromIdxs(displaced.up);
+				var posDown = this.buttonPosFromIdxs(displaced.down);
+				var y = (posUp.y + posDown.y)/2;
+				if (displaced.down.promptIdx == -1 && this.inSectionColumn(pos)) { //then can be section
+					var x = treePos.x;
+				} else {
+					var x = treePos.x + indent;
 				}
+				return P(x, y);
 			}
-			return P(this.pos.x, y);
-		
+		} else if (pos.y >= treePos.y + totalHeight) {
+			return P(treePos.x, treePos.y + totalHeight);
+		} else {
+			return false;
 		}
-	},	
-	
-	*/
+	},
+	buttonPosFromIdxs: function(idxs) { //idxs being sectionIdx, promptIdx, with promptIdx = -1 if it's for the section
+		var button;
+		if (idxs.promptIdx == -1) {
+			button = this.sections[idxs.sectionIdx].button;
+		} else {
+			button = this.sections[idxs.sectionIdx].prompts[idxs.promptIdx].button;
+		}
+		return this.getButtonPos(button);
+	},
 	placerRectDragEnd: function() {
 		var buttonPos = this.parent.parent.pos;
 		
