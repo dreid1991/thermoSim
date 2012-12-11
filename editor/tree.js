@@ -777,6 +777,21 @@ function objectsEqualInDirection(a, b) {
 	}
 	return true;
 }
+function arrayDifference(a, b) {
+	var asNotInB = [];
+	var bsNotInA = [];
+	for (var aIdx=0; aIdx<a.length; aIdx++) {
+		if (b.indexOf(a[aIdx]) == -1) {
+			asNotInB.push(a[aIdx]);
+		}
+	}
+	for (var bIdx=0; bIdx<b.length; bIdx++) {
+		if (a.indexOf(b[bIdx]) == -1) {
+			bsNotInA.push(b[bIdx]);
+		}
+	}
+	return {asNotInB:asNotInB, bsNotInA:bsNotInA};
+}
 function posOnPaper(mousePos, paper) {
 	return P(mousePos.x-paper._left, mousePos.y-paper._top);
 }
