@@ -5,7 +5,7 @@
 <script src='../js/jquery-1.7.2.min.js'></script>
 <script src='tree.js'></script>
 <style>
-	#canvas {
+	#treeDiv {
 		height:620px; 
 		width:300px; 
 		border:1px solid #333; 	
@@ -13,7 +13,7 @@
 	}
 </style>
 
-<div id='canvas' class='canvas'>
+<div id='treeDiv' class='treeDiv'>
 
 </div>
 
@@ -24,8 +24,8 @@ $(document).mousemove(function(e) {
 	globalMousePos.x = e.pageX;
 	globalMousePos.y = e.pageY;
 })
-var paper = Raphael('canvas', 420, 400);
-var tree = new Tree(paper, P(50, 50));
+var paper = Raphael('treeDiv', $('#treeDiv').width(), $('#treeDiv').height());
+var tree = new Tree(paper, P(15, 15));
 tree.addSection(P(0,0));
 tree.addSection(P(0,0));
 tree.addPrompt(P(0,0));

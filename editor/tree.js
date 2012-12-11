@@ -1,6 +1,7 @@
 function Tree(paper, pos) {
 	this.paper = paper;
 	this.pos = pos; //upper left corner of first section
+	this.posO = this.pos.copy();
 	this.buttonDims = V(150, 30);
 	this.innerRectDims = V(30, this.buttonDims.dy);
 	this.circleOffset = V(80, 0);
@@ -9,6 +10,7 @@ function Tree(paper, pos) {
 	this.displaceDist = 9;
 	this.totalButtonHeight = this.buttonDims.dy + this.buttonSpacing;
 	this.buttonPosObjectModeSelected = P(10, 10);
+	this.nearestButtonYTol = 50;
 	this.labelIndent = 3;
 	this.labelTextSize = 13;
 	this.promptIndent = 30;
@@ -20,6 +22,7 @@ function Tree(paper, pos) {
 	this.arrowOffset = 5;
 	this.numArrows = 2;
 	this.snapDist = 5;
+	this.edgePadding = 10;
 	this.placerBlockTolerance = 10; //how close placer block has to be before stuff starts moving out of the way
 	this.bgCol = Col(255, 255, 255);
 	this.rectCol = Col(0, 164, 255);//'#64a0c1';
@@ -29,12 +32,14 @@ function Tree(paper, pos) {
 	this.arrowCol = Col(255, 255, 255);
 	//this.circleCol = Col(59, 68, 73);//Col(120, 180, 213);
 	//this.circleColHover = Col(110, 170, 203);
-	this.placerButtonPos = P(200, 300);
+	this.placerButtonPos = P(this.paper.width - this.buttonDims.dx - this.edgePadding, this.paper.height - this.buttonDims.dy - this.edgePadding);
 	this.defineSectionDragFuncs();
 	this.definePromptDragFuncs();
 	this.defineClickFuncs();
 	this.defineBGRectDragFuncs();
 	this.definePlacerRectFuncs();
+	//this.bottomRect = this.makeBottomRect();
+	//this.trashRect = this.makeTrashRect();
 	this.placerButtonBG = this.makePlacerButton(false);
 	this.placerButton = this.makePlacerButton(true);
 	this.bgRect = this.makeBGRect();
@@ -46,10 +51,9 @@ Tree.prototype = {
 	addSection: function(mousePos, section) {
 		var pos = posOnPaper(mousePos, this.paper);
 		var sectionIdx = this.getNewSectionIdx(pos);
-		if (!section) {
-			var label = '';
-			section = new TreeSection(this, pos, this.sectionDragFuncs,  this.promptDragFuncs, this.clickFuncs, label);
-		}
+		var label = '';
+		var section = new TreeSection(this, pos, this.sectionDragFuncs,  this.promptDragFuncs, this.clickFuncs, label);
+		
 		this.sections.splice(sectionIdx, 0, section);
 		this.setDefaultLabels();
 		this.moveAllToPositions('fly');
@@ -276,19 +280,22 @@ Tree.prototype = {
 		
 	},
 	sectionDragEndTreeMode: function() {
+		var tree = this.parent.tree;
+		//dawg, I need to define tree because if this is a label and we updateLabel it changes the label object and parent gets nulled.  Also .attr({text... isn't working right after I make it.  Dunno why.
 		var didClickFunc = false;
 		if (!this.parent.released && this.parent.clickFuncs) {
 			didClickFunc = true;
 			this.parent.clickFuncs[this.type][this.parent.mode].apply(this.parent);
 		}
-		this.parent.tree.clickedButton = undefined;
+		tree.clickedButton = undefined;
 		this.parent.sectionIdx = undefined;
 		this.parent.released = false;
 		this.parent.posO = P(0, 0);
 		this.parent.mousePos = P(0, 0);
 		this.parent.sectionYs = [];
+		tree.setDefaultLabels();
 		if (!didClickFunc) {
-			this.parent.tree.moveAllToPositions('fly');
+			tree.moveAllToPositions('fly');
 		}
 	},
 	defineSectionDragFuncs: function() {
@@ -345,21 +352,23 @@ Tree.prototype = {
 		}
 	},
 	promptDragEndTreeMode: function() {
+		var tree = this.parent.tree;
 		var didClickFunc = false;
 		if (!this.parent.released && this.parent.clickFuncs) {
 			didClickFunc = true;
 			this.parent.clickFuncs[this.type][this.parent.mode].apply(this.parent);
 		}//might want to save these variables for use in the click function
 		//also, if we're doing the click function, it means we didn't move any blocks, so we don't have to rearrange
-		this.parent.tree.clickedButton = undefined;
+		tree.clickedButton = undefined;
 		this.parent.promptIdx = undefined;
 		this.parent.released = false;
 		this.parent.mousePos = P(0, 0);
 		this.parent.sectionYs = undefined;
 		this.parent.sectionTop = undefined;
 		this.parent.sectionBottom = undefined;	
+		tree.setDefaultLabels();
 		if (!didClickFunc) {
-			this.parent.tree.moveAllToPositions('fly');
+			tree.moveAllToPositions('fly');
 		}
 	},
 	definePromptDragFuncs: function() {
@@ -384,8 +393,8 @@ Tree.prototype = {
 		var curMousePos = posOnPaper(globalMousePos, this.parent.paper);
 		var dPos = this.mousePos.VTo(curMousePos);
 		this.mousePos.set(curMousePos);
-		var maxY = 50;
-		var minY = this.parent.paper.height - this.totalHeight;
+		var maxY = this.parent.posO.y;
+		var minY = this.parent.paper.height - this.totalHeight - 2*this.parent.buttonDims.dy;
 		this.parent.pos.y = Math.min(maxY, Math.max(minY, this.parent.pos.y + dPos.dy));
 		this.parent.moveAllToPositions('snap');
 		
@@ -403,29 +412,111 @@ Tree.prototype = {
 	},
 	placerRectDragStart: function() {
 		this.parent.tree.clickedButton = this;
+		var buttonDims = this.parent.tree.buttonDims;
+		this.parent.outline = this.parent.tree.paper.rect(0, 0, buttonDims.dx, buttonDims.dy);//making outline be a section attribute
+		this.parent.outline.attr({'stroke-dasharray': '-'});
+		this.parent.outline.transform('t' + this._.dx + ',' + this._.dy);
+		//this.parent.outlinePos = P(this._.dx, this._.dy);
 		this.parent.mousePos = posOnPaper(globalMousePos, this.parent.tree.paper);
 		this.parent.displaced = undefined;
 	},
 	placerRectDragMove: function() {
+		var upPos, downPos, outlinePos;
+		var tree = this.parent.tree;
 		var buttonPos = this.parent.parent.pos;
 		var curMousePos = posOnPaper(globalMousePos, this.parent.tree.paper);
 		var dPos = this.parent.mousePos.VTo(curMousePos);
 		this.parent.mousePos.set(curMousePos);
 		this.parent.parent.move(dPos);
-		if (this.parent.tree.inButtonColumn(buttonPos)) {
-			var toDisplace = this.parent.tree.getIdxsToDisplace(buttonPos);
+		if (tree.inButtonColumn(buttonPos)) {
+			var toDisplace = tree.getIdxsToDisplace(buttonPos);
 			if (!objectsEqual(toDisplace, this.parent.displaced)) {
+				console.log(toDisplace);
+
 				this.parent.tree.returnDisplaced(this.parent.displaced);
 				this.parent.tree.displace(toDisplace);
 				this.parent.displaced = toDisplace;
 			}
 		} else if (this.parent.displaced) {
+			//maybe fade out outline
 			this.parent.tree.returnDisplaced(this.parent.displaced);
 			this.parent.displaced = undefined;
 		}
+		/*
+		if (toDisplace) {
+			if (toDisplace.up) {
+				if (toDisplace.up.promptIdx == -1) {
+					upPos = tree.getButtonPos(tree.sections[toDisplace.up.sectionIdx].button)
+				} else {
+					upPos = tree.getButtonPos(tree.sections[toDisplace.up.sectionIdx].prompts[toDisplace.up.promptIdx]);
+				}
+			} 
+			if (toDisplace.down) {
+				if (toDisplace.down.promptIdx == -1) {
+					downPos = tree.getButtonPos(tree.sections[toDisplace.down.sectionIdx].button)
+				} else {
+					downPos = tree.getButtonPos(tree.sections[toDisplace.down.sectionIdx].prompts[toDisplace.down.promptIdx]);
+				}
+			}
+			if (upPos && downPos) {
+				outlinePos = upPos.avg(downPos);
+			} else if (upPos) {
+				outlinePos = upPos.copy().movePt(V(0, tree.totalButtonHeight));
+			} else if (downPos) {
+				outlinePos = downPos.copy().movePt(V(0, -tree.totalButtonHeight));
+			}
+			if (tree.inSectionColumn(buttonPos)) {
+				outlinePos.x = tree.pos.x;
+			} else {
+				outlinePos.x = tree.pos.x + tree.promptIndent;
+			}
+			this.parent.outline.animate({transform: 't' + outlinePos.x + ',' + outlinePos.y}, 250, 'ease-in-out');
+		}
+		*/
 	},
+	/*
+	getNearestButtonPos: function(pos) {
+		var y = this.pos.y;
+		var inSectionColumn = this.inSectionColumn(pos);
+		var totalHeight = this.totalHeight();
+		if (!this.inButtonColumn(pos)) {
+			return pos.copy();
+		} else if (y > pos.y) {
+			return this.pos.copy();
+		} else if (this.pos.y + totalHeight < pos.y && this.pos.y + totalHeight < pos.y + this.nearestButtonYTol) {//yo yo, make consistant with adding
+			return this.pos.copy().movePt(V(0, totalHeight));
+		} else if (this.pos.y + totalHeight < pos.y + this.nearestButtonYTol) {
+			return pos.copy();
+		} else {
+			for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
+				if (pos.y >= y && pos.y < y + this.totalButtonHeight) {
+					if (inSectionColumn) {
+						return P(this.pos.x, y);
+					} else {
+						return P(this.pos.x + this.promptIndent, y);
+					}
+				}
+				y += this.totalButtonHeight;
+				var prompts = this.sections[sectionIdx].prompts;
+				for (var promptIdx=0; promptIdx<prompts.length; promptIdx++) {
+					if (pos.y >= y && pos.y < y + this.totalButtonHeight) {
+						if (promptIdx == prompts.length-1 && inSectionColumn) {
+							return P(this.pos.x, y);
+						}
+						return P(this.pos.x + this.promptIndent, y)
+					}
+					y += this.totalButtonHeight;
+				}
+			}
+			return P(this.pos.x, y);
+		
+		}
+	},	
+	
+	*/
 	placerRectDragEnd: function() {
 		var buttonPos = this.parent.parent.pos;
+		
 		this.parent.tree.clickedButton = undefined;
 		if (this.parent.tree.inButtonColumn(buttonPos)) {
 			if (this.parent.displaced) {
@@ -443,6 +534,9 @@ Tree.prototype = {
 			}
 
 		}
+		this.parent.outlinePos = P(0, 0);
+		this.parent.outline.animate({opacity:0}, 250, undefined, function(){this.remove()});
+		this.parent.outline = undefined;
 		this.parent.displaced = undefined;
 		this.parent.mousePos = P(0, 0);
 		this.parent.parent.move(this.parent.tree.placerButtonPos, 'snap');
