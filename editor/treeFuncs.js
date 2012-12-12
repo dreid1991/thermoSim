@@ -348,6 +348,7 @@ PlacerRectFuncs = {
 				}
 			}
 		}		
+		this.staticsToFront();
 	},
 	getIdxsToDisplace: function(pos) {//with pos being an upper corner of the button
 		var up, down;

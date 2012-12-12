@@ -41,14 +41,14 @@ function Tree(paper, pos) {
 	this.defineClickFuncs();
 	this.defineBGRectDragFuncs();
 	this.definePlacerRectFuncs();
-	this.base = this.makeBase();
+	this.baseRect = this.makeBaseRect();
 	this.placerButtonBG = this.makePlacerButton(false);
 	this.placerButton = this.makePlacerButton(true);
 	this.bgRect = this.makeBGRect();
 	this.clickedButton = undefined;
 	this.receptacles = [this.makeTrash(this.trashPos)]
 	this.sections = [];
-	this.topButtons = [];
+	this.topButtons = []; //for fading buttons and such.  Is placed on top after statics
 }
 
 _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs, TrashFuncs, ReceptacleFuncs,  {
@@ -70,9 +70,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.moveAllToPositions('fly');
 	},
 	toObjectMode: function() {
-		this.placerButtonBG.hide();
-		this.placerButton.hide();
-		this.hideReceptacles();
+		this.hideBase()
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
 			var section = this.sections[sectionIdx];
 			section.button.toObjectMode();
@@ -83,7 +81,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		}
 	},
 	staticsToFront: function() {
-		this.base.toFront();
+		this.baseRect.toFront();
 		this.placerButtonBG.toFront();
 		this.placerButton.toFront();
 		for (var receptIdx=0; receptIdx<this.receptacles.length; receptIdx++) {
@@ -102,10 +100,20 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 			this.topButtons.splice(idx, 1);
 		}
 	},
-	toTreeMode: function() {
+	hideBase: function() {
+		this.baseRect.hide();
+		this.placerButtonBG.hide();
+		this.placerButton.hide();
+		this.hideReceptacles();	
+	},
+	showBase: function() {
+		this.baseRect.show();
 		this.placerButtonBG.show();
 		this.placerButton.show();
 		this.showReceptacles();
+	},
+	toTreeMode: function() {
+		this.showBase();
 		this.unclickButton();
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
 			var section = this.sections[sectionIdx];
@@ -144,11 +152,11 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 			this.receptacles[receptIdx].hide();
 		}
 	},
-	makeBase: function() {
-		var base = this.paper.rect(0, this.paper.height - this.baseDims.dy, this.baseDims.dx, this.baseDims.dy).attr({
+	makeBaseRect: function() {
+		var baseRect = this.paper.rect(0, this.paper.height - this.baseDims.dy, this.baseDims.dx, this.baseDims.dy).attr({
 			fill: this.baseCol.hex
 		})
-		return base;
+		return baseRect;
 	},
 	removeSection: function(sectionIdx) {
 		if (sectionIdx instanceof TreeSection) {
