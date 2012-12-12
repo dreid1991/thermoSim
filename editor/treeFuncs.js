@@ -3,7 +3,7 @@ SectionFuncs = {
 		this.parent.posO = posOnPaper(globalMousePos, this.parent.tree.paper);
 		this.parent.released = false;
 		this.parent.tree.clickedButton = this.parent;
-		this.parent.tree.activateReceptacles.apply(this.parent.tree, [this.parent.parent])
+		this.parent.tree.activateReceptacles.apply(this.parent.tree, [this.parent])
 		this.parent.sectionIdx = this.parent.tree.getSectionIdx(this.parent.parent);
 		this.parent.mousePos = posOnPaper(globalMousePos, this.parent.tree.paper);
 		this.parent.sectionYs = this.parent.tree.getSectionYs();
@@ -13,6 +13,7 @@ SectionFuncs = {
 		var dPos = this.parent.mousePos.VTo(mousePos);
 		var distFromOSqr = this.parent.posO.VTo(mousePos).magSqr();
 		if (distFromOSqr > this.parent.tree.snapDist*this.parent.tree.snapDist || this.parent.released) {
+			this.parent.tree.checkReceptacles(this.parent);
 			this.parent.released = true;
 			var sections = this.parent.tree.sections;
 			var curSectionIdx = this.parent.sectionIdx;
@@ -53,16 +54,18 @@ SectionFuncs = {
 		var tree = this.parent.tree;
 		//dawg, I need to define tree because if this is a label and we updateLabel it changes the label object and parent gets nulled.  Also .attr({text... isn't working right after I make it.  Dunno why.
 		var didClickFunc = false;
-		if (!this.parent.released && this.parent.clickFuncs) {
-			didClickFunc = true;
-			this.parent.clickFuncs[this.type][this.parent.mode].apply(this.parent);
+		if (this.parent.tree.onReleaseReceptacle.apply(this.parent.tree, [this.parent])) {
+			if (!this.parent.released && this.parent.clickFuncs) {
+				didClickFunc = true;
+				this.parent.clickFuncs[this.type][this.parent.mode].apply(this.parent);
+			}
+			this.parent.sectionIdx = undefined;
+			this.parent.released = false;
+			this.parent.posO = P(0, 0);
+			this.parent.mousePos = P(0, 0);
+			this.parent.sectionYs = [];
 		}
 		tree.clickedButton = undefined;
-		this.parent.sectionIdx = undefined;
-		this.parent.released = false;
-		this.parent.posO = P(0, 0);
-		this.parent.mousePos = P(0, 0);
-		this.parent.sectionYs = [];
 		tree.setDefaultLabels();
 		if (!didClickFunc) {
 			tree.moveAllToPositions('fly');
@@ -91,6 +94,7 @@ PromptFuncs = {
 		this.parent.posO = posOnPaper(globalMousePos, this.parent.tree.paper);
 		this.parent.released = false;
 		this.parent.tree.clickedButton = this.parent;
+		this.parent.tree.activateReceptacles.apply(this.parent.tree, [this.parent])
 		this.parent.promptIdx = this.parent.parent.section.getPromptIdx(this.parent.parent);
 		this.parent.mousePos = posOnPaper(globalMousePos, this.parent.tree.paper);
 		this.parent.sectionYs = this.parent.tree.getSectionYs();
@@ -102,6 +106,7 @@ PromptFuncs = {
 		var dPos = V(mousePos.x - this.parent.mousePos.x, mousePos.y- this.parent.mousePos.y);
 		var distFromOSqr = this.parent.posO.VTo(mousePos).magSqr();
 		if (distFromOSqr > this.parent.tree.snapDist*this.parent.tree.snapDist || this.parent.released) {
+			this.parent.tree.checkReceptacles(this.parent);
 			this.parent.released = true;
 			this.parent.mousePos.set(mousePos);
 			this.parent.parent.move(dPos);
@@ -127,18 +132,20 @@ PromptFuncs = {
 	promptDragEndTreeMode: function() {
 		var tree = this.parent.tree;
 		var didClickFunc = false;
-		if (!this.parent.released && this.parent.clickFuncs) {
-			didClickFunc = true;
-			this.parent.clickFuncs[this.type][this.parent.mode].apply(this.parent);
-		}//might want to save these variables for use in the click function
-		//also, if we're doing the click function, it means we didn't move any blocks, so we don't have to rearrange
+		if (this.parent.tree.onReleaseReceptacle.apply(this.parent.tree, [this.parent])) {
+			if (!this.parent.released && this.parent.clickFuncs) {
+				didClickFunc = true;
+				this.parent.clickFuncs[this.type][this.parent.mode].apply(this.parent);
+			}//might want to save these variables for use in the click function
+			//also, if we're doing the click function, it means we didn't move any blocks, so we don't have to rearrange
+			this.parent.promptIdx = undefined;
+			this.parent.released = false;
+			this.parent.mousePos = P(0, 0);
+			this.parent.sectionYs = undefined;
+			this.parent.sectionTop = undefined;
+			this.parent.sectionBottom = undefined;	
+		}
 		tree.clickedButton = undefined;
-		this.parent.promptIdx = undefined;
-		this.parent.released = false;
-		this.parent.mousePos = P(0, 0);
-		this.parent.sectionYs = undefined;
-		this.parent.sectionTop = undefined;
-		this.parent.sectionBottom = undefined;	
 		tree.setDefaultLabels();
 		if (!didClickFunc) {
 			tree.moveAllToPositions('fly');
@@ -411,33 +418,61 @@ PlacerRectFuncs = {
 
 TrashFuncs = {
 	trashOnHoverIn: function() {
-		this.attr({fill:undefined});
+		this.rect.attr({fill:this.tree.rectColHover.hex});
 	},
 	trashOnHoverOut: function() {
-		this.attr({fill:this.tree.rectColHover.hex})
+		this.rect.attr({fill:this.tree.bgCol.hex})
 	},
-	trashOnDropInto: function(obj) {
-		obj.remove();
+	trashOnDropInto: function(button) {
+		button.tree.fadeOutUnknown(button.parent);
+		return false;
 	}
 }
 
-ReceptacleFuncs = { //obj will be the a button.  Something with pos, parent has totalHeight, totalWidth, 
+ReceptacleFuncs = { //button has pos, parent has totalHeight, totalWidth, 
 					//called in context of tree
 	activateReceptacles: function(button) {
-		obj.hoveringOver = [];
-		obj.storedDims = V(button.parent.totalWidth(), button.parent.totalHeight());
-		this.checkReceptacles(obj);
+		button.hoveringOver = [];
+		button.storedDims = V(button.parent.totalWidth(), button.parent.totalHeight());
+		this.checkReceptacles(button);
 	},
-	checkReceptacles: function(obj) {
-		for (var receptacleIdx=0; receptacleIdx<this.receptacles.length; receptacleIdx++) {
-			
+	checkReceptacles: function(button) {
+		var newHoveringOver = this.getReceptaclesTouched(button);
+		var difference = arrayDifference(button.hoveringOver, newHoveringOver);
+		var toUnhover = difference.asNotInB;
+		var toHover = difference.bsNotInA;
+		button.hoveringOver = newHoveringOver;
+		for (var unhoverIdx=0; unhoverIdx<toUnhover.length; unhoverIdx++) {
+			toUnhover[unhoverIdx].onHoverOut();
+		}
+		for (var hoverIdx=0; hoverIdx<toHover.length; hoverIdx++) {
+			toHover[hoverIdx].onHoverIn();
 		}
 	},
-	getReceptaclesTouched: function(obj) {
+	getReceptaclesTouched: function(button) {
+		var receptsTouched = [];
+		for (var receptacleIdx=0; receptacleIdx<this.receptacles.length; receptacleIdx++) {
+			var recept = this.receptacles[receptacleIdx];
+			if (rectsOverlap({pos: recept.pos, dims: recept.dims}, {pos: button.pos, dims: button.storedDims})) {
+				receptsTouched.push(recept);
+			}
+		}
+		return receptsTouched;
+	},
+	onReleaseReceptacle: function(obj) {
 		
+		this.deactivateReceptacles(obj);
+		if (obj.hoveringOver.length>0) {
+			return obj.hoveringOver[obj.hoveringOver.length-1].onDropInto(obj);
+		}
+		obj.hoveringOver = undefined;
+		return true;
 	},
 	deactivateReceptacles: function(obj) {
-	
+		obj.storedDims = undefined;
+		for (var unhoverIdx=0; unhoverIdx<obj.hoveringOver.length; unhoverIdx++) {
+			obj.hoveringOver[unhoverIdx].onHoverOut();
+		}
 	},
 
 }

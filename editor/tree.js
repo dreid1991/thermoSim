@@ -9,6 +9,7 @@ function Tree(paper, pos) {
 	this.buttonSpacing = 10;
 	this.displaceDist = 9;
 	this.totalButtonHeight = this.buttonDims.dy + this.buttonSpacing;
+	this.baseDims = V(this.paper.width, 60);
 	this.buttonPosObjectModeSelected = P(10, 10);
 	this.nearestButtonYTol = 50;
 	this.labelIndent = 3;
@@ -25,6 +26,7 @@ function Tree(paper, pos) {
 	this.edgePadding = 10;
 	this.placerBlockTolerance = 10; //how close placer block has to be before stuff starts moving out of the way
 	this.bgCol = Col(255, 255, 255);
+	this.baseCol = Col(168, 168, 168);//do a gradient, yo
 	this.rectCol = Col(0, 164, 255);//'#64a0c1';
 	this.rectColHover = Col(0, 144, 224);//'#5c93b2';
 	//this.rectColSelect = Col(82, 108, 122);//'#526c7a';
@@ -33,23 +35,23 @@ function Tree(paper, pos) {
 	//this.circleCol = Col(59, 68, 73);//Col(120, 180, 213);
 	//this.circleColHover = Col(110, 170, 203);
 	this.placerButtonPos = P(this.paper.width - this.buttonDims.dx - this.edgePadding, this.paper.height - this.buttonDims.dy - this.edgePadding);
-	this.trashPos = this.placerButtonPos.movePt(V(-160, 0));
+	this.trashPos = this.placerButtonPos.copy().movePt(V(-160, 0));
 	this.defineSectionDragFuncs();
 	this.definePromptDragFuncs();
 	this.defineClickFuncs();
 	this.defineBGRectDragFuncs();
 	this.definePlacerRectFuncs();
-	//this.bottomRect = this.makeBottomRect();
-	//this.trashRect = this.makeTrashRect();
+	this.base = this.makeBase();
 	this.placerButtonBG = this.makePlacerButton(false);
 	this.placerButton = this.makePlacerButton(true);
 	this.bgRect = this.makeBGRect();
 	this.clickedButton = undefined;
 	this.receptacles = [this.makeTrash(this.trashPos)]
 	this.sections = [];
+	this.topButtons = [];
 }
 
-_.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs, TrashFuncs, ReceptacleFuncs  {
+_.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs, TrashFuncs, ReceptacleFuncs,  {
 	addSection: function(mousePos, section) {
 		var pos = posOnPaper(mousePos, this.paper);
 		var sectionIdx = this.getNewSectionIdx(pos);
@@ -70,6 +72,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 	toObjectMode: function() {
 		this.placerButtonBG.hide();
 		this.placerButton.hide();
+		this.hideReceptacles();
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
 			var section = this.sections[sectionIdx];
 			section.button.toObjectMode();
@@ -83,10 +86,26 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.base.toFront();
 		this.placerButtonBG.toFront();
 		this.placerButton.toFront();
+		for (var receptIdx=0; receptIdx<this.receptacles.length; receptIdx++) {
+			this.receptacles[receptIdx].toFront();
+		}
+		for (var topButtonIdx=0; topButtonIdx<this.topButtons.length; topButtonIdx++) {
+			this.topButtons[topButtonIdx].toFront();
+		}
+	},
+	addTopButton: function(button) {
+		this.topButtons.push(button);
+	},
+	removeTopButton: function(button) {
+		var idx = this.topButtons.indexOf(button);
+		if (idx!=-1) {
+			this.topButtons.splice(idx, 1);
+		}
 	},
 	toTreeMode: function() {
 		this.placerButtonBG.show();
 		this.placerButton.show();
+		this.showReceptacles();
 		this.unclickButton();
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
 			var section = this.sections[sectionIdx];
@@ -113,7 +132,28 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		
 		}
 	},
+	//for these two remove functions, can send idxs or just the object you want to remove.  Type-safe my foot
+	//all removing is done through these two.
+	showReceptacles: function() {
+		for (var receptIdx=0; receptIdx<this.receptacles.length; receptIdx++) {
+			this.receptacles[receptIdx].show();
+		}
+	},
+	hideReceptacles: function() {
+		for (var receptIdx=0; receptIdx<this.receptacles.length; receptIdx++) {
+			this.receptacles[receptIdx].hide();
+		}
+	},
+	makeBase: function() {
+		var base = this.paper.rect(0, this.paper.height - this.baseDims.dy, this.baseDims.dx, this.baseDims.dy).attr({
+			fill: this.baseCol.hex
+		})
+		return base;
+	},
 	removeSection: function(sectionIdx) {
+		if (sectionIdx instanceof TreeSection) {
+			sectionIdx = this.sections.indexOf(sectionIdx);
+		}
 		if (this.sections[sectionIdx]) {
 			this.sections[sectionIdx].remove();
 			this.sections.splice(sectionIdx, 1);
@@ -122,10 +162,67 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 			console.log('tried to remove section idx ' + sectionIdx + '.  Does not exist.');
 			console.trace();
 		}
+	
 	},
 	removePrompt: function(sectionIdx, promptIdx) {
+		if (sectionIdx instanceof TreePrompt) {
+			var prompt = sectionIdx;
+			for (var sectionIdx=0; sectionIdx<this.section.length; sectionIdx++) {
+				promptIdx = this.sections[sectionIdx].prompts.indexOf(prompt);
+				if (promptIdx != -1) {
+					break;
+				}
+			}
+		}
 		this.sections[sectionIdx].removePrompt(promptIdx);
 		this.moveAllToPositions('fly');
+	},
+	removeUnknown: function(button) {
+		if (button instanceof TreeSection) {
+			this.removeSection(button);
+		} else if (button instanceof TreePrompt) {
+			this.removePrompt(button);
+		} else {
+			console.log('Tried to remove a MYSTERIOUS OBJECT!');
+			console.trace();
+		}
+	},
+	fadeOutSection: function(sectionIdx) {
+		if (sectionIdx instanceof TreeSection) {
+			sectionIdx = this.sections.indexOf(sectionIdx);
+		}
+		if (this.sections[sectionIdx]) {
+			this.sections[sectionIdx].fadeOut();
+			this.sections.splice(sectionIdx, 1);
+			this.moveAllToPositions('fly');
+		} else {
+			console.log('tried to remove section idx ' + sectionIdx + '.  Does not exist.');
+			console.trace();
+		}
+	
+	},
+	fadeOutPrompt: function(sectionIdx, promptIdx) {
+		if (sectionIdx instanceof TreePrompt) {
+			var prompt = sectionIdx;
+			for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
+				promptIdx = this.sections[sectionIdx].prompts.indexOf(prompt);
+				if (promptIdx != -1) {
+					break;
+				}
+			}
+		}
+		this.sections[sectionIdx].fadeOutPrompt(promptIdx);
+		this.moveAllToPositions('fly');
+	},
+	fadeOutUnknown: function(button) {
+		if (button instanceof TreeSection) {
+			this.fadeOutSection(button);
+		} else if (button instanceof TreePrompt) {
+			this.fadeOutPrompt(button);
+		} else {
+			console.log('Tried to fade out a MYSTERIOUS OBJECT!');
+			console.trace();
+		}	
 	},
 	unclickButton: function() {
 		this.clickedButton = undefined;
@@ -237,20 +334,20 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		return ys;
 	},
 	makeTrash: function() {
-		return new Recaptacle(this, this.trashPos, 'Trash', this.trashOnHoverIn, this.trashOnHoverOut, this.trashOnDropInto);
+		return new Receptacle(this, this.trashPos, this.buttonDims, 'Trash', this.trashOnHoverIn, this.trashOnHoverOut, this.trashOnDropInto);
 	},
 	moveAllToPositions: function(moveStyle) {
 		var x = this.pos.x;
 		var y = this.pos.y;
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
 			var section = this.sections[sectionIdx];
-			if (section.button != this.clickedButton) {
+			if (section.button != this.clickedButton && !section.button.inUse) {
 				section.button.move(P(x, y), moveStyle);
 				section.pos.set(P(x,y));
 				y += this.totalButtonHeight;
 				for (var promptIdx=0; promptIdx<section.prompts.length; promptIdx++) {
 					var prompt = section.prompts[promptIdx];
-					if (prompt.button != this.clickedButton) {
+					if (prompt.button != this.clickedButton || !prompt.button.inUse) {
 						prompt.button.move(P(x+this.promptIndent, y), moveStyle);
 					}
 					y += this.totalButtonHeight;
@@ -262,6 +359,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		if (this.clickedButton) {
 			this.clickedButton.groupToFront();
 		}
+		this.staticsToFront();
 	},
 
 })
@@ -311,12 +409,13 @@ TreeSection.prototype = {
 		}
 	},
 	move: function(moveOrder) {
-		if (moveOrder instanceof Vector) {
-			this.pos.movePt(moveOrder);
-		} else {
-			this.pos.set(moveOrder);
+		if (this.button.move(moveOrder)) {
+			if (moveOrder instanceof Vector) {
+				this.pos.movePt(moveOrder);
+			} else {
+				this.pos.set(moveOrder);
+			}
 		}
-		this.button.move(moveOrder);
 		for (var promptIdx=0; promptIdx<this.prompts.length; promptIdx++) {
 			this.prompts[promptIdx].move(moveOrder);
 		}
@@ -331,6 +430,16 @@ TreeSection.prototype = {
 		}		
 		return this.prompts.length;
 	},
+	fadeOut: function() {
+		this.button.fadeOut();
+		for (var promptIdx=0; promptIdx<this.prompts.length; promptIdx++) {
+			this.prompts[promptIdx].fadeOut();
+		}
+	},
+	fadeOutPrompt: function(promptIdx) {
+		this.prompts[promptIdx].fadeOut();
+		this.prompts.splice(promptIdx, 1);
+	},
 	getPromptIdx: function(prompt) {
 		return this.prompts.indexOf(prompt);
 	},
@@ -344,7 +453,6 @@ TreeSection.prototype = {
 	removePrompt: function(promptIdx) {
 		if (this.prompts[promptIdx]) {
 			this.prompts[promptIdx].remove();
-			this.prompts.splice(promptIdx, 1);
 		} else {
 			console.log('tried to remove prompt idx ' + promptIdx + ' from some section, which is not helpful at all.  It does not exist.');
 			console.trace();
@@ -369,6 +477,9 @@ function TreePrompt(tree, section, posInit, dragFuncs, clickFuncs) {
 TreePrompt.prototype = {
 	getSection: function() {
 		return this.section;
+	},
+	fadeOut: function() {
+		this.button.fadeOut();
 	},
 	setSection: function(section) {
 		this.section = section;
@@ -418,6 +529,7 @@ function TreeButton(tree, parent, posInit, dragFuncs, clickFuncs, labelText, isP
 	this.arrows = this.makeArrows();
 	this.updateLabel(labelText);
 	this.haveUpdatedLabel = false;
+	this.inUse = false;
 	this.arrowAngle = 0;//sorry about right/left, 0/180 use.  right -> 0, left -> 180.  Tossing angle around is nice for getting position without a bunch of ifs
 }
 
@@ -435,6 +547,9 @@ TreeButton.prototype = {
 		for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
 			this.arrows[arrowIdx].hide();
 		}
+	},
+	setUse: function(use) {
+		this.inUse = use;
 	},
 	show: function() {
 		this.rect.show().toFront();
@@ -578,7 +693,8 @@ TreeButton.prototype = {
 					this.parent[toChange].attr({fill:hoverOnCol.hex});
 				},
 				function() {
-					this.parent[toChange].attr({fill:hoverOffCol.hex});
+					try{this.parent[toChange].attr({fill:hoverOffCol.hex});
+					} catch(e) {console.log('Hovering out of removed shape')};
 				}
 			)
 		}
@@ -609,15 +725,20 @@ TreeButton.prototype = {
 		this.parent = parent;
 	},
 	move: function(moveOrder, type, time) {
-		if (moveOrder instanceof Vector) {
-			var pos = P(this.pos.x + moveOrder.dx, this.pos.y + moveOrder.dy);
-		} else { //is point
-			var pos = moveOrder;
-		}
-		if (type == 'fly') {
-			this.flyToPos(pos, time);
+		if (!this.inUse) {
+			if (moveOrder instanceof Vector) {
+				var pos = P(this.pos.x + moveOrder.dx, this.pos.y + moveOrder.dy);
+			} else { //is point
+				var pos = moveOrder;
+			}
+			if (type == 'fly') {
+				this.flyToPos(pos, time);
+			} else {
+				this.snapToPos(pos);
+			}
+			return true;
 		} else {
-			this.snapToPos(pos);
+			return false;
 		}
 	},
 	groupToFront: function() {
@@ -626,6 +747,7 @@ TreeButton.prototype = {
 	toFront: function() {
 		this.rect.toFront();
 		this.innerRect.toFront();
+		this.label.toFront();
 		for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
 			this.arrows[arrowIdx].toFront();
 		}
@@ -694,6 +816,24 @@ TreeButton.prototype = {
 		pts.push(P(width-thickness, height/2));
 		return makePath(pts, true);
 	},
+	fadeOut: function() {
+		this.tree.addTopButton(this);
+		this.setUse(false);
+		this.fadeObj(this.rect);
+		this.fadeObj(this.innerRect);
+		this.fadeObj(this.label);
+
+		for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
+			this.fadeObj(this.arrows[arrowIdx]);
+		}		
+		
+	},
+	fadeObj: function(obj, time) {
+		time = defaultTo(time, 250);
+		obj.drag(undefined, undefined, undefined);
+		obj.hover(undefined, undefined);
+		obj.animate({opacity:0}, time, undefined, function() {this.parent.tree.removeTopButton(this.parent); this.remove();});
+	},
 	remove: function() {
 		this.rect.remove();
 		this.innerRect.remove();
@@ -704,27 +844,43 @@ TreeButton.prototype = {
 	},
 }
 
-function Receptacle(tree, pos, labelText, onHoverIn, onHoverOut, onDropInto) {
+function Receptacle(tree, pos, dims, labelText, onHoverIn, onHoverOut, onDropInto) {//yo yo, need to send dims
 	this.tree = tree;
 	this.pos = pos;
 	this.labelText = labelText;
+	this.dims = dims;
 	this.rect = this.makeRect();
-	this.onHoverIn = onHoverOut;
+	this.label = this.makeLabel();
+	this.onHoverIn = onHoverIn;
+	this.onHoverOut = onHoverOut;
 	this.onDropInto = onDropInto;
 }
 
 Receptacle.prototype = {
 	makeRect: function() {
-		var rect = this.tree.paper.rect(0, 0, this.tree.buttonDims.dx, this.tree.buttonDims.dy, this.tree.rectRounding);	
+		var rect = this.tree.paper.rect(0, 0, this.dims.dx, this.dims.dy, this.tree.rectRounding);	
 		translateObj(rect, this.pos);
 		rect.attr({
+			fill: this.tree.bgCol.hex,
 			stroke: this.tree.rectCol.hex,
 		})
 		return rect;
 	},
+	toFront: function() {
+		this.rect.toFront();
+		this.label.toFront();
+	},
+	show: function() {
+		this.rect.show();
+		this.label.show();
+	},
+	hide: function() {
+		this.rect.hide();
+		this.label.hide();
+	},
 	makeLabel: function() {
 		var pos = P(this.pos.x + this.tree.buttonDims.dx/2, this.pos.y + this.tree.buttonDims.dy/2);
-		var label = this.tree.paper.trect(0, 0, this.labelText).attr({'text-anchor': 'start', 'font-size': this.tree.labelTextSize});
+		var label = this.tree.paper.text(0, 0, this.labelText).attr({'font-size': this.tree.labelTextSize});
 		translateObj(label, pos);
 		return label;
 	},
