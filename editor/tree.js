@@ -2,20 +2,17 @@ function Tree(paper, pos) {
 	this.paper = paper;
 	this.pos = pos; //upper left corner of first section
 	this.posO = this.pos.copy();
-	this.buttonDims = V(150, 30);
+	this.buttonDims = config.buttonDimsLarge;
 	this.innerRectDims = V(30, this.buttonDims.dy);
-	this.circleOffset = V(80, 0);
-	this.circleRad = 15;
 	this.buttonSpacing = 10;
 	this.displaceDist = 9;
 	this.totalButtonHeight = this.buttonDims.dy + this.buttonSpacing;
 	this.baseDims = V(this.paper.width, 60);
 	this.buttonPosObjectModeSelected = P(10, 10);
-	this.nearestButtonYTol = 50;
 	this.labelIndent = 3;
-	this.labelTextSize = 13;
+	this.labelTextSize = config.textSizeMed;
 	this.promptIndent = 30;
-	this.rectRounding = 3;
+	this.rectRounding = config.buttonRounding;
 	this.innerRectWidth = 25;
 	this.arrowDims = V(17, 26);
 	this.arrowThickness = 4;
@@ -23,12 +20,12 @@ function Tree(paper, pos) {
 	this.arrowOffset = 5;
 	this.numArrows = 2;
 	this.snapDist = 5;
-	this.edgePadding = 10;
+	this.edgePadding = 10;//dist placer rect is from edge
 	this.placerBlockTolerance = 10; //how close placer block has to be before stuff starts moving out of the way
 	this.bgCol = Col(255, 255, 255);
-	this.baseCol = Col(168, 168, 168);//do a gradient, yo
-	this.rectCol = Col(0, 164, 255);//'#64a0c1';
-	this.rectColHover = Col(0, 144, 224);//'#5c93b2';
+	this.baseCol = Col(255, 255, 255);//do a gradient, yo
+	this.rectCol = config.buttonFillCol;
+	this.rectColHover = config.buttonFillColHover;//'#5c93b2';
 	//this.rectColSelect = Col(82, 108, 122);//'#526c7a';
 	//this.rectColStroke = Col(59, 68, 73);//'#3b4449';
 	this.arrowCol = Col(255, 255, 255);
@@ -518,6 +515,27 @@ TreePrompt.prototype = {
 	}
 }
 
+
+var assignHover = {
+	assignHover: function(raphaelShape, toChange, hoverOnCol, hoverOffCol) {
+		if (this.isPlacerButton) {
+			raphaelShape.hover(this.hoverOnChangeAll, this.hoverOffChangeAll);
+		} else {
+			raphaelShape.hover(
+				function() {
+					this.parent[toChange].attr({fill:hoverOnCol.hex});
+				},
+				function() {
+					try{this.parent[toChange].attr({fill:hoverOffCol.hex});
+					} catch(e) {console.log('Hovering out of removed shape')};
+				}
+			)
+		}
+	},
+
+}
+
+
 function TreeButton(tree, parent, posInit, dragFuncs, clickFuncs, labelText, isPlacerButton) {
 	this.tree = tree;
 	this.mode = 'tree';
@@ -541,7 +559,7 @@ function TreeButton(tree, parent, posInit, dragFuncs, clickFuncs, labelText, isP
 	this.arrowAngle = 0;//sorry about right/left, 0/180 use.  right -> 0, left -> 180.  Tossing angle around is nice for getting position without a bunch of ifs
 }
 
-TreeButton.prototype = {
+_.extend(TreeButton.prototype, assignHover, {
 	toTreeMode: function() {
 		this.mode = 'tree';
 		if (this.arrowAngle = 180) {
@@ -692,21 +710,7 @@ TreeButton.prototype = {
 			this.label = label;
 		}
 	},
-	assignHover: function(raphaelShape, toChange, hoverOnCol, hoverOffCol) {
-		if (this.isPlacerButton) {
-			raphaelShape.hover(this.hoverOnChangeAll, this.hoverOffChangeAll);
-		} else {
-			raphaelShape.hover(
-				function() {
-					this.parent[toChange].attr({fill:hoverOnCol.hex});
-				},
-				function() {
-					try{this.parent[toChange].attr({fill:hoverOffCol.hex});
-					} catch(e) {console.log('Hovering out of removed shape')};
-				}
-			)
-		}
-	},
+
 	hoverOnChangeAll: function() {
 		this.parent.innerRect.attr({fill:this.parent.tree.rectColHover.hex});
 		this.parent.rect.attr({fill:this.parent.tree.rectColHover.hex})
@@ -850,7 +854,7 @@ TreeButton.prototype = {
 			this.arrows[arrowIdx].remove();
 		}
 	},
-}
+});
 
 function Receptacle(tree, pos, dims, labelText, onHoverIn, onHoverOut, onDropInto) {//yo yo, need to send dims
 	this.tree = tree;
@@ -894,6 +898,7 @@ Receptacle.prototype = {
 	},
 
 }
+
 function translateObj(obj, pos) {
 	return obj.transform('t' + pos.x + ',' + pos.y);
 }
@@ -922,6 +927,12 @@ function rectsOverlap(a, b) {//{pos:, dims:}
 	return (((a.pos.x <= b.pos.x && a.pos.x + a.dims.dx >= b.pos.x) || (b.pos.x <= a.pos.x && b.pos.x + b.dims.dx >= a.pos.x)) &&
 		    ((a.pos.y <= b.pos.y && a.pos.y + a.dims.dy >= b.pos.y) || (b.pos.y <= a.pos.y && b.pos.y + b.dims.dy >= a.pos.y)));
 	
+}
+function scaleDims(fit, fitsInTo, paddingFrac) {
+	paddingFrac = defaultTo(paddingFrac, 0);
+	fit = fit.copy();
+	var ratio = Math.min(fitsInTo.dx/fit.dx, fitsInTo.dy/fit.dy) * (1-paddingFrac);
+	return fit.mult(ratio);
 }
 function objectsEqualInDirection(a, b) {
 	for (var alet in a) {
