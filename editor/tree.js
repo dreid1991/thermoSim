@@ -29,6 +29,7 @@ function Tree(paper, pos) {
 	//this.rectColSelect = Col(82, 108, 122);//'#526c7a';
 	//this.rectColStroke = Col(59, 68, 73);//'#3b4449';
 	this.arrowCol = Col(255, 255, 255);
+	this.mode = 'tree';
 	//this.circleCol = Col(59, 68, 73);//Col(120, 180, 213);
 	//this.circleColHover = Col(110, 170, 203);
 	this.placerButtonPos = P(this.paper.width - this.buttonDims.dx - this.edgePadding, this.paper.height - this.buttonDims.dy - this.edgePadding);
@@ -46,7 +47,15 @@ function Tree(paper, pos) {
 	this.receptacles = [this.makeTrash(this.trashPos)]
 	this.sections = [];
 	this.topButtons = []; //for fading buttons and such.  Is placed on top after statics
+	data.add('tSections', []);
+	data.add('tMode', 'tree');
 }
+
+/*
+For tree, need to store:
+	sections: ['s1', 's4', 's2'...]
+	mode: - maybe not?  Actually, maybe so
+*/
 
 _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs, TrashFuncs, ReceptacleFuncs,  {
 	addSection: function(mousePos, section) {
@@ -57,7 +66,16 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		
 		this.sections.splice(sectionIdx, 0, section);
 		this.setDefaultLabels();
+		var sectionIds = this.getSectionIds();
+		data.change('tSections', sectionIds);
 		this.moveAllToPositions('fly');
+	},
+	getSectionIds: function() {
+		var ids = [];
+		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
+			ids.push(this.sections[sectionIdx].getId());
+		}
+		return ids;
 	},
 	addPrompt: function(mousePos, prompt) {
 		var pos = posOnPaper(mousePos, this.paper);
@@ -67,6 +85,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.moveAllToPositions('fly');
 	},
 	toObjectMode: function() {
+		this.mode = 'object';
 		this.hideBase()
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
 			var section = this.sections[sectionIdx];
@@ -110,6 +129,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.showReceptacles();
 	},
 	toTreeMode: function() {
+		this.mode = 'tree';
 		this.showBase();
 		this.unclickButton();
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
@@ -370,6 +390,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 })
 
 function TreeSection(tree, posInit, sectionDragFuncs, promptDragFuncs, clickFuncs, labelText, isPlacer) {
+	this.id = data.getSectionId();
 	this.tree = tree;
 	this.prompts = [];
 	this.pos = posInit.copy();
@@ -379,18 +400,54 @@ function TreeSection(tree, posInit, sectionDragFuncs, promptDragFuncs, clickFunc
 	this.sectionDragFuncs = sectionDragFuncs;
 	this.promptDragFuncs = promptDragFuncs;
 	this.clickFuncs = clickFuncs;
+	this.labelText = labelText;
 	this.isPlacer = isPlacer;
-	this.button = new TreeButton(this.tree, this, this.pos, this.sectionDragFuncs, this.clickFuncs, labelText, isPlacer);
+	this.button = new TreeButton(this.tree, this, this.pos, this.sectionDragFuncs, this.clickFuncs, this.labelText, isPlacer);
+	this.register();
  
 }
+/*
+For section, need to store: 
+	list of prompts: ['p1', 'p3', ...]
+	sectionDragFuncs
+	promptDragFuncs
+	clickFuncs
+	isPlacer
+	labelText - if button.haveUpdatedLabel, store, else undefined
 
+	
+	Yo yo, should do some kind of what meta-data each thing has for generalized getting.  Or maybe not since getting will only be done in one place and arguments are given in order, so I'll need to specify at some point anyway...
+*/
 TreeSection.prototype = {
 	addPrompt: function(cornerPos, prompt) {
 		var newIdx = this.getNewPromptIdx(cornerPos);
 		if (!prompt) {
-			prompt = new TreePrompt(this.tree, this, cornerPos, this.promptDragFuncs, this.clickFuncs)
+			prompt = new TreePrompt(this.tree, this, cornerPos, this.promptDragFuncs, this.clickFuncs, '')
 		}
 		this.prompts.splice(newIdx, 0, prompt);
+		var promptIds = this.getPromptIds();
+		data.change(this.id + 'Prompts', promptIds);
+	},
+	register: function() {
+		data.add(this.id + 'Prompts', []);
+		data.add(this.id + 'SectionDragFuncs', this.sectionDragFuncs);
+		data.add(this.id + 'PromptDragFuncs', this.promptDragFuncs);
+		data.add(this.id + 'ClickFuncs', this.clickFuncs);
+		if (this.button.haveUpdatedLabel) {
+			data.add(this.id + 'LabelText', this.labelText);
+		} else {
+			data.add(this.id + 'LabelText', undefined);
+		}
+	},
+	getPromptIds: function() {
+		var ids = [];
+		for (var promptIdx=0; promptIdx<this.prompts.length; promptIdx++) {
+			ids.push(this.prompts[promptIdx].getId());
+		}
+		return ids;
+	},
+	getId: function() {
+		return this.id;
 	},
 	hide: function() {
 		this.button.hide();
@@ -405,6 +462,7 @@ TreeSection.prototype = {
 		}
 	},
 	updateLabel: function(labelText, settingToDefault) {
+		this.labelText = labelText;
 		this.button.updateLabel(labelText, settingToDefault);
 	},
 	toFront: function() {
@@ -471,17 +529,36 @@ TreeSection.prototype = {
 	}
 }
 
-function TreePrompt(tree, section, posInit, dragFuncs, clickFuncs) {
+/*
+For prompt, need to store:
+	labelText - if button.haveChangedLabel, store, else undefined
+	
+*/
+
+function TreePrompt(tree, section, posInit, dragFuncs, clickFuncs, labelText) {
 	this.tree = tree;
+	this.id = data.getPromptId();
 	this.section = section;
 	this.dragFuncs = dragFuncs;
 	this.clickFuncs = clickFuncs;
+	this.labelText = labelText;
 	this.button = new TreeButton(this.tree, this, posInit, this.dragFuncs, this.clickFuncs);
+	this.register();
 }
 
 TreePrompt.prototype = {
 	getSection: function() {
 		return this.section;
+	},
+	getId: function() {
+		return this.id;
+	},
+	register: function() {
+		if (this.button.haveUpdatedLabel) {
+			data.add(this.id + 'LabelText', this.labelText);
+		} else {
+			data.add(this.id + 'LabelText', undefined);
+		}
 	},
 	fadeOut: function() {
 		this.button.fadeOut();
