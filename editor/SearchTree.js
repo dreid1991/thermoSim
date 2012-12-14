@@ -97,16 +97,26 @@ SearchTree.prototype = {
 		}
 	},
 	rotateRight: function(root) {
-		newRoot = root.left;
-		root.left = root.left.right;
+		root = root.copy();
+		var newRoot = root.left.copy();
+		if (root.left.right) {
+			root.left = root.left.right.copy();
+		} else {
+			root.left = undefined;
+		}
 		newRoot.right = root;
 		this.assignHeightFromChildren(root);
 		this.assignHeightFromChildren(newRoot);
 		return newRoot;
 	},
 	rotateLeft: function(root) {
-		var newRoot = root.right;
-		root.right = root.right.left;
+		root = root.copy();
+		var newRoot = root.right.copy();
+		if (root.right.left) {
+			root.right = root.right.left.copy();
+		} else {
+			root.right = undefined;
+		}
 		newRoot.left = root;
 		this.assignHeightFromChildren(root);
 		this.assignHeightFromChildren(newRoot);
@@ -168,6 +178,16 @@ function Node(key, value) {
 	this.right = undefined;
 	this.height = 0;
 	
+}
+
+Node.prototype = {
+	copy: function() {
+		var newNode = new Node(this.key, this.value);
+		newNode.left = this.left;
+		newNode.right = this.right;
+		newNode.height = this.height;
+		return newNode;
+	}
 }
 
 
