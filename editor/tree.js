@@ -352,7 +352,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 				y += this.totalButtonHeight;
 				for (var promptIdx=0; promptIdx<section.prompts.length; promptIdx++) {
 					var prompt = section.prompts[promptIdx];
-					if (prompt.button != this.clickedButton || !prompt.button.inUse) {
+					if (prompt.button != this.clickedButton && !prompt.button.inUse) {
 						prompt.button.move(P(x+this.promptIndent, y), moveStyle);
 					}
 					y += this.totalButtonHeight;
