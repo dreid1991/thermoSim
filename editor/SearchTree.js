@@ -99,11 +99,7 @@ SearchTree.prototype = {
 	rotateRight: function(root) {
 		root = root.copy();
 		var newRoot = root.left.copy();
-		if (root.left.right) {
-			root.left = root.left.right.copy();
-		} else {
-			root.left = undefined;
-		}
+		root.left = root.left.right;
 		newRoot.right = root;
 		this.assignHeightFromChildren(root);
 		this.assignHeightFromChildren(newRoot);
@@ -112,11 +108,7 @@ SearchTree.prototype = {
 	rotateLeft: function(root) {
 		root = root.copy();
 		var newRoot = root.right.copy();
-		if (root.right.left) {
-			root.right = root.right.left.copy();
-		} else {
-			root.right = undefined;
-		}
+		root.right = root.right.left;
 		newRoot.left = root;
 		this.assignHeightFromChildren(root);
 		this.assignHeightFromChildren(newRoot);
