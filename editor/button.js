@@ -94,12 +94,15 @@ _.extend(Button.prototype, assignHover, {
 	show: function() {
 		this.action('show');
 	},
+	toFront: function() {
+		this.action('toFront');
+	},
 	action: function(actionType) {
 		this.rect[actionType]();
 		if (this.label) {
 			this.label[actionType]();
 		}
-		if (this.img) {
+		if (this.image) {
 			this.image[actionType]();
 		}
 	}

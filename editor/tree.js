@@ -105,11 +105,14 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 	},
 	staticsToFront: function() {
 		this.panels.bottom.toFront();
+		this.panels.top.toFront();
 		this.placerButtonBG.toFront();
 		this.placerButton.toFront();
 		for (var receptIdx=0; receptIdx<this.receptacles.length; receptIdx++) {
 			this.receptacles[receptIdx].toFront();
 		}
+		this.dirButtons.redo.toFront();
+		this.dirButtons.undo.toFront();
 		//for (var buttonIdx
 		for (var topButtonIdx=0; topButtonIdx<this.topButtons.length; topButtonIdx++) {
 			this.topButtons[topButtonIdx].toFront();
@@ -874,16 +877,18 @@ _.extend(TreeButton.prototype, assignHover, {
 			if (this.label) {
 				this.label.remove();
 			}
-			var maxWidth = this.tree.buttonDims.dx - this.tree.labelIndent - this.tree.innerRectDims.dx - 10;
+			var maxWidth = this.tree.buttonDims.dx - this.tree.labelIndent - this.tree.innerRectDims.dx - 5;
 			var tempText = '';
 			var label = this.tree.paper.text(0, 0, tempText).attr({'text-anchor': 'start', 'font-size': this.tree.labelTextSize});
 			var tooWide = false;
-			for (var letterIdx=0; letterIdx<labelText.length; letterIdx++) {
-				tempText = tempText + labelText[letterIdx];
+			
+			for (var letterIdx=labelText.length; letterIdx>=0; letterIdx--) {
+				tempText = labelText.slice(0, letterIdx);
 				label.attr({'text': tempText});
 				
-				if (label.getBBox().width > maxWidth && letterIdx != labelText.length-1) {
+				if (label.getBBox().width > maxWidth) {
 					tooWide = true;
+				} else {
 					break;
 				}
 			}
@@ -983,7 +988,7 @@ _.extend(TreeButton.prototype, assignHover, {
 			for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
 				var arrowPos = this.arrowPos(arrowIdx);
 				this.arrows[arrowIdx].animate({transform:'t' + arrowPos.x + ',' + arrowPos.y + 'r' + this.arrowAngle + ',0,0'}, time, 'ease-in-out').toFront();
-				//this.arrows[arrowIdx].toFront();
+				this.arrows[arrowIdx].toFront();
 			}
 		}
 	},
