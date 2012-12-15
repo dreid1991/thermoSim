@@ -1,14 +1,17 @@
-function Tree(paper, pos) {
+function Tree(paper/*, pos*/) {
 	this.paper = paper;
-	this.pos = pos; //upper left corner of first section
+	this.someImage = new Image();
+	this.someImage.src = 'undo.GIF';
+	this.panelDimsTop = V(this.paper.width, 40);
+	this.panelDimsBottom = V(this.paper.width, 50);
+	this.pos = P(15, 10 + this.panelDimsTop.dy); //upper left corner of first section
 	this.posO = this.pos.copy();
 	this.buttonDims = config.buttonDimsLarge;
 	this.innerRectDims = V(30, this.buttonDims.dy);
 	this.buttonSpacing = 10;
 	this.displaceDist = 9;
 	this.totalButtonHeight = this.buttonDims.dy + this.buttonSpacing;
-	this.baseDims = V(this.paper.width, 60);
-	this.buttonPosObjectModeSelected = P(10, 10);
+	this.buttonPosObjectModeSelected = P(10, (this.panelDimsTop.dy-this.buttonDims.dy)/2);
 	this.labelIndent = 3;
 	this.labelTextSize = config.textSizeMed;
 	this.promptIndent = 30;
@@ -23,7 +26,7 @@ function Tree(paper, pos) {
 	this.edgePadding = 10;//dist placer rect is from edge
 	this.placerBlockTolerance = 10; //how close placer block has to be before stuff starts moving out of the way
 	this.bgCol = Col(255, 255, 255);
-	this.baseCol = Col(255, 255, 255);//do a gradient, yo
+	this.panelCol = Col(255, 255, 255);//do a gradient, yo
 	this.rectCol = config.buttonFillCol;
 	this.rectColHover = config.buttonFillColHover;//'#5c93b2';
 	//this.rectColSelect = Col(82, 108, 122);//'#526c7a';
@@ -39,13 +42,15 @@ function Tree(paper, pos) {
 	this.defineClickFuncs();
 	this.defineBGRectDragFuncs();
 	this.definePlacerRectFuncs();
-	this.baseRect = this.makeBaseRect();
+	this.panels = this.makePanels();
 	this.placerButtonBG = this.makePlacerButton(false);
 	this.placerButton = this.makePlacerButton(true);
 	this.bgRect = this.makeBGRect();
 	this.editingButton = undefined; //the one getting working on while in object mode
 	this.clickedButton = undefined;
-	this.receptacles = [this.makeTrash(this.trashPos)]
+	this.receptacles = [this.makeTrash(this.trashPos)];
+	this.dirButtonDims = config.buttonDimsSmall;
+	this.dirButtons = this.makeDirButtons();
 	this.sections = [];
 	this.topButtons = []; //for fading buttons and such.  Is placed on top after statics
 	data.add('tSections', []);
@@ -86,8 +91,9 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.moveAllToPositions('fly');
 	},
 	toObjectMode: function() {
+		this.bgRect.hide();
 		this.mode = 'object';
-		this.hideBase()
+		this.hideBottomPanel()
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
 			var section = this.sections[sectionIdx];
 			section.button.toObjectMode();
@@ -98,12 +104,13 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		}
 	},
 	staticsToFront: function() {
-		this.baseRect.toFront();
+		this.panels.bottom.toFront();
 		this.placerButtonBG.toFront();
 		this.placerButton.toFront();
 		for (var receptIdx=0; receptIdx<this.receptacles.length; receptIdx++) {
 			this.receptacles[receptIdx].toFront();
 		}
+		//for (var buttonIdx
 		for (var topButtonIdx=0; topButtonIdx<this.topButtons.length; topButtonIdx++) {
 			this.topButtons[topButtonIdx].toFront();
 		}
@@ -117,21 +124,27 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 			this.topButtons.splice(idx, 1);
 		}
 	},
-	hideBase: function() {
-		this.baseRect.hide();
+	hideBottomPanel: function() {
+		this.panels.bottom.hide();
+		//this.baseRects[1].hide()
 		this.placerButtonBG.hide();
 		this.placerButton.hide();
 		this.hideReceptacles();	
 	},
-	showBase: function() {
-		this.baseRect.show();
+	showBottomPanel: function() {
+		this.panels.bottom.show();
+		//this.baseRects[1].show();
+		//for (var buttonIdx=0; buttonIdx<this.buttons.length; buttonIdx++) {
+		//	this.buttons[buttonIdx].sohw();
+		//}
 		this.placerButtonBG.show();
 		this.placerButton.show();
 		this.showReceptacles();
 	},
 	toTreeMode: function() {
+		this.bgRect.show();
 		this.mode = 'tree';
-		this.showBase();
+		this.showBottomPanel();
 		this.editingButton = undefined;
 		this.unclickButton();
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
@@ -167,6 +180,8 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.setDefaultLabels();
 		if (this.mode == 'object' && this.editingButton == undefined) { //then uh oh, the one we were working on was removed!
 			this.toTreeMode();
+		} else if (this.editingButton) {
+			this.editingButton.toObjectMode();
 		}
 	},
 	renderSections: function(renderData, sectionIds, editingId, pos) {
@@ -179,10 +194,12 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 			var labelText = renderData.get(sectionId + 'LabelText');
 			var displayPos = pos;
 			if (sectionId == editingId) {
-				this.editingButton = section.button;
 				displayPos = this.buttonPosObjectModeSelected;
 			}
 			var section = new TreeSection(this, displayPos, sectionDragFuncs, promptDragFuncs, clickFuncs, '', false, sectionId);
+			if (sectionId == editingId) {
+				this.editingButton = section.button;
+			}
 			if (labelText) {
 				section.updateLabel(labelText);
 			}
@@ -210,6 +227,13 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		
 		}
 	},
+	makeDirButtons: function() { 
+		var pos = P(this.paper.width - this.buttonSpacing - this.dirButtonDims.dx, (this.panelDimsTop.dy - this.dirButtonDims.dy)/2);
+		var redo = new Button(this.paper, pos, this.dirButtonDims, undefined, function(){data.redo()}, 'imgRedo');
+		pos.movePt(V(-(this.dirButtonDims.dx + this.buttonSpacing), 0));
+		var undo = new Button(this.paper, pos, this.dirButtonDims, undefined, function(){data.undo()}, 'imgUndo');
+		return {undo: undo, redo: redo};
+	},
 	//for these two remove functions, can send idxs or just the object you want to remove.  Type-safe my foot
 	//all removing is done through these two.
 	showReceptacles: function() {
@@ -222,11 +246,14 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 			this.receptacles[receptIdx].hide();
 		}
 	},
-	makeBaseRect: function() {
-		var baseRect = this.paper.rect(0, this.paper.height - this.baseDims.dy, this.baseDims.dx, this.baseDims.dy).attr({
-			fill: this.baseCol.hex
+	makePanels: function() {
+		var bottom = this.paper.rect(0, this.paper.height - this.panelDimsBottom.dy, this.panelDimsBottom.dx, this.panelDimsBottom.dy).attr({
+			fill: this.panelCol.hex
 		})
-		return baseRect;
+		var top = this.paper.rect(0, 0, this.panelDimsTop.dx, this.panelDimsTop.dy).attr({
+			fill: this.panelCol.hex
+		})
+		return {bottom:bottom, top:top}
 	},
 	removeSection: function(sectionIdx) {
 		if (sectionIdx instanceof TreeSection) {
@@ -492,10 +519,12 @@ TreeSection.prototype = {
 			var labelText = renderData.get(id + 'LabelText');
 			var displayPos = pos.copy().movePt(V(this.tree.promptIndent, 0));
 			if (id == editingId) {
-				this.tree.editingButton = this.prompts[this.prompts.length-1];
 				displayPos = this.tree.buttonPosObjectModeSelected;
 			}			
 			this.prompts.push(new TreePrompt(this.tree, this, displayPos, this.promptDragFuncs, this.clickFuncs, '', id));
+			if (id==editingId) {
+				this.tree.editingButton = this.prompts[this.prompts.length-1];
+			}
 			if (labelText) {
 				this.prompts[this.prompts.length-1].updateLabel(labelText);
 			}
@@ -746,7 +775,8 @@ _.extend(TreeButton.prototype, assignHover, {
 	},
 	toObjectMode: function() {
 		this.mode = 'object';
-		if (this == this.tree.clickedButton) {
+		if (this == this.tree.clickedButton || this == this.tree.editingButton) {
+			this.tree.editingButton = this;
 			this.pointArrows('left');
 			this.tree.editingButton = this;
 			this.flyToPos(this.tree.buttonPosObjectModeSelected, 200);

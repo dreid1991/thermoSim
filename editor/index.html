@@ -10,6 +10,11 @@
 <script src='DataManager.js'></script>
 <script src='tree.js'></script>
 <script src='button.js'></script>
+<div style='display: none'>
+<img src='undo.GIF' id='imgUndo'></img>
+<img src='redo.GIF' id='imgRedo'></img>
+<!Attention:  Images you plan to use in raphael should go here so their dimensions can be loaded.>
+</div>
 <style>
 	#treeDiv {
 		height:620px; 
@@ -30,13 +35,15 @@ $(document).mousemove(function(e) {
 	globalMousePos.x = e.pageX;
 	globalMousePos.y = e.pageY;
 })
-var paper = Raphael('treeDiv', $('#treeDiv').width(), $('#treeDiv').height());
-var data = new DataManager(tree);
-var tree = new Tree(paper, P(15, 15));
-tree.addSection(P(0,0));
-tree.addSection(P(0,0));
-tree.addPrompt(P(0,0));
-tree.addPrompt(P(0,0))
+window.onload = function() {
+	paper = Raphael('treeDiv', $('#treeDiv').width(), $('#treeDiv').height());
+	data = new DataManager();
+	tree = new Tree(paper, P(15, 15));
+	tree.addSection(P(0,0));
+	tree.addSection(P(0,0));
+	tree.addPrompt(P(0,0));
+	tree.addPrompt(P(0,0))
+}
 
 </script>
 

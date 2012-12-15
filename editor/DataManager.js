@@ -1,5 +1,4 @@
-function DataManager(tree) {
-	this.tree = tree;
+function DataManager() {
 	this.curIdx = 0;
 	this.sectionNum = 0;
 	this.promptNum = 0;

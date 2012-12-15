@@ -1,4 +1,4 @@
-function Button (paper, pos, size, labelText, onClick, imgSrc, fillCol, fillColHover,  rounding) {
+function Button (paper, pos, size, labelText, onClick, imgId, fillCol, fillColHover,  rounding) {
 //Yo yo, button states are constant, no need to make attrs.  That is only for things that can get changed and you may need to edit/undo
 	this.paper = paper;
 	this.pos = pos.copy();
@@ -8,6 +8,8 @@ function Button (paper, pos, size, labelText, onClick, imgSrc, fillCol, fillColH
 		this.dims = config.buttonDimsMedium;
 	} else if (size == 'small') {
 		this.dims = config.buttonDimsSmall;
+	} else if (size instanceof Vector) {
+		this.dims = size.copy();
 	} else {
 		console.log('Bad button dims sent to ' + labelText);
 		console.trace();
@@ -22,9 +24,9 @@ function Button (paper, pos, size, labelText, onClick, imgSrc, fillCol, fillColH
 		this.labelText = labelText;
 		this.label = this.makeLabel();
 	}
-	if (imgSrc) {
+	if (imgId) {
 		this.imagePadding = config.imagePadding;
-		this.imgSrc = imgSrc;
+		this.imgId = imgId;
 		this.image = this.makeImage();
 	}
 }
@@ -52,12 +54,13 @@ _.extend(Button.prototype, assignHover, {
 		
 	},
 	makeImage: function() {
-		var img = new Image();
-		img.src = this.imgSrc;
-		var dims = V(img.width, img.height);
+		var imgDiv = $('#' + this.imgId)[0];
+		var height = imgDiv.height;
+		var width = imgDiv.width;
+		var dims = V(width, height);
 		dims = scaleDims(dims, this.dims, this.imagePadding);
 		var pos = this.pos.copy().movePt(this.dims.copy().mult(.5)).movePt(dims.copy().mult(-.5));
-		var raphaelImg = this.paper.image(this.imgSrc, pos.x, pos.y, dims.dx, dims.dy);
+		var raphaelImg = this.paper.image(imgDiv.src, pos.x, pos.y, dims.dx, dims.dy);
 		raphaelImg.parent = this;
 		this.assignHover(raphaelImg, 'rect', this.fillColHover, this.fillCol);
 		raphaelImg.click(this.onClick);
