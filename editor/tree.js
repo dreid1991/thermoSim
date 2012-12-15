@@ -43,6 +43,7 @@ function Tree(paper, pos) {
 	this.placerButtonBG = this.makePlacerButton(false);
 	this.placerButton = this.makePlacerButton(true);
 	this.bgRect = this.makeBGRect();
+	this.editingButton = undefined; //the one getting working on while in object mode
 	this.clickedButton = undefined;
 	this.receptacles = [this.makeTrash(this.trashPos)]
 	this.sections = [];
@@ -131,6 +132,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 	toTreeMode: function() {
 		this.mode = 'tree';
 		this.showBase();
+		this.editingButton = undefined;
 		this.unclickButton();
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
 			var section = this.sections[sectionIdx];
@@ -143,6 +145,57 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		}
 		
 		this.moveAllToPositions('fly');
+	},
+	render: function(renderData) {
+		var x, y;
+		y = this.pos.y;
+		if (this.mode == 'tree') {
+			x = this.pos.x;
+		} else if (this.mode == 'object') {
+			x = -this.buttonDims.dx - 50;
+		}
+		var pos = P(x, y);
+		this.removeSections();
+		var sectionIds = renderData.get('tSections');
+		if (this.editingButton) {
+			var editingId = this.editingButton.parent.getId();
+		}
+		this.editingButton = undefined;
+
+		this.renderSections(renderData, sectionIds, editingId, pos);
+		
+		this.setDefaultLabels();
+		if (this.mode == 'object' && this.editingButton == undefined) { //then uh oh, the one we were working on was removed!
+			this.toTreeMode();
+		}
+	},
+	renderSections: function(renderData, sectionIds, editingId, pos) {
+		for (var sectionIdx=0; sectionIdx<sectionIds.length; sectionIdx++) {
+			var sectionId = sectionIds[sectionIdx];
+			var promptIds = renderData.get(sectionId + 'Prompts');
+			var sectionDragFuncs = renderData.get(sectionId + 'SectionDragFuncs');
+			var promptDragFuncs = renderData.get(sectionId + 'PromptDragFuncs');
+			var clickFuncs = renderData.get(sectionId + 'ClickFuncs');
+			var labelText = renderData.get(sectionId + 'LabelText');
+			var displayPos = pos;
+			if (sectionId == editingId) {
+				this.editingButton = section.button;
+				displayPos = this.buttonPosObjectModeSelected;
+			}
+			var section = new TreeSection(this, displayPos, sectionDragFuncs, promptDragFuncs, clickFuncs, '', false, true);
+			if (labelText) {
+				section.updateLabel(labelText);
+			}
+			pos.y += this.totalButtonHeight;
+			section.renderPrompts(renderData, promptIds, editingId, pos)
+			this.sections.push(section);
+		}	
+	},
+	removeSections: function() {
+		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
+			this.sections[sectionIdx].remove();
+		}
+		this.sections = [];
 	},
 	setDefaultLabels: function() {
 		var sectionLabel, label;
@@ -389,7 +442,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 
 })
 
-function TreeSection(tree, posInit, sectionDragFuncs, promptDragFuncs, clickFuncs, labelText, isPlacer) {
+function TreeSection(tree, posInit, sectionDragFuncs, promptDragFuncs, clickFuncs, labelText, isPlacer, isLoading) {
 	this.id = data.getSectionId();
 	this.tree = tree;
 	this.prompts = [];
@@ -403,7 +456,9 @@ function TreeSection(tree, posInit, sectionDragFuncs, promptDragFuncs, clickFunc
 	this.labelText = labelText;
 	this.isPlacer = isPlacer;
 	this.button = new TreeButton(this.tree, this, this.pos, this.sectionDragFuncs, this.clickFuncs, this.labelText, isPlacer);
-	this.register();
+	if (!isLoading) {
+		this.register();
+	}
  
 }
 /*
@@ -427,6 +482,27 @@ TreeSection.prototype = {
 		this.prompts.splice(newIdx, 0, prompt);
 		var promptIds = this.getPromptIds();
 		data.change(this.id + 'Prompts', promptIds);
+	},
+	renderPrompts: function(renderData, promptIds, editingId, pos) {
+		//rendering will always be done on a empty section.  No need to remove prompts first
+		for (var promptIdx=0; promptIdx<promptIds.length; promptIdx++) {
+			var id = promptIds[promptIdx];
+			var labelText = renderData.get(id + 'LabelText');
+			var displayPos = pos.copy().movePt(V(this.tree.promptIndent, 0));
+			if (id == editingId) {
+				this.tree.editingButton = this.prompts[this.prompts.length-1];
+				displayPos = this.tree.buttonPosObjectModeSelected;
+			}			
+			this.prompts.push(new TreePrompt(this.tree, this, displayPos, this.promptDragFuncs, this.clickFuncs, '', true));
+			if (labelText) {
+				this.prompts[this.prompts.length-1].updateLabel(labelText);
+			}
+			
+			pos.y += this.tree.totalButtonHeight;
+			
+			
+			
+		}
 	},
 	register: function() {
 		data.add(this.id + 'Prompts', []);
@@ -535,7 +611,7 @@ For prompt, need to store:
 	
 */
 
-function TreePrompt(tree, section, posInit, dragFuncs, clickFuncs, labelText) {
+function TreePrompt(tree, section, posInit, dragFuncs, clickFuncs, labelText, isLoading) {
 	this.tree = tree;
 	this.id = data.getPromptId();
 	this.section = section;
@@ -543,7 +619,9 @@ function TreePrompt(tree, section, posInit, dragFuncs, clickFuncs, labelText) {
 	this.clickFuncs = clickFuncs;
 	this.labelText = labelText;
 	this.button = new TreeButton(this.tree, this, posInit, this.dragFuncs, this.clickFuncs);
-	this.register();
+	if (!isLoading) {
+		this.register();
+	}
 }
 
 TreePrompt.prototype = {
@@ -630,8 +708,8 @@ function TreeButton(tree, parent, posInit, dragFuncs, clickFuncs, labelText, isP
 	this.rect = this.makeRect();
 	this.innerRect = this.makeInnerRect();
 	this.arrows = this.makeArrows();
-	this.updateLabel(labelText);
 	this.haveUpdatedLabel = false;
+	this.updateLabel(labelText, true);
 	this.inUse = false;
 	this.arrowAngle = 0;//sorry about right/left, 0/180 use.  right -> 0, left -> 180.  Tossing angle around is nice for getting position without a bunch of ifs
 }
@@ -666,6 +744,7 @@ _.extend(TreeButton.prototype, assignHover, {
 		this.mode = 'object';
 		if (this == this.tree.clickedButton) {
 			this.pointArrows('left');
+			this.tree.editingButton = this;
 			this.flyToPos(this.tree.buttonPosObjectModeSelected, 200);
 			//this.flyToPos(P(0, 75));
 		} else {

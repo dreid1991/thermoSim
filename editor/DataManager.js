@@ -9,7 +9,7 @@ function DataManager(tree) {
 
 DataManager.prototype = {
 	add: function(key, value) {
-		this.hist[this.hist.length-1].add(key, value);
+		this.hist[this.curIdx].add(key, value);
 	},
 	change: function(key, value) {
 		if (this.curIdx != this.hist.length-1) {
@@ -22,13 +22,15 @@ DataManager.prototype = {
 	redo: function() {
 		var newIdx = Math.min(this.hist.length-1, this.curIdx+1);
 		if (newIdx != this.curIdx) {
-			//render
+			tree.render(this.hist[newIdx]);
+			this.curIdx = newIdx;
 		}
 	},
 	undo: function() {
 		var newIdx = Math.max(0, this.curIdx-1);
 		if (newIdx != this.curIdx) {
-			//render
+			tree.render(this.hist[newIdx]);
+			this.curIdx = newIdx;
 		}
 	},
 	getSectionId: function() {
