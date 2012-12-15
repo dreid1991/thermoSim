@@ -183,10 +183,12 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.setDefaultLabels();
 		if (this.mode == 'object' && this.editingButton == undefined) { //then uh oh, the one we were working on was removed!
 			this.toTreeMode();
-		} else if (this.editingButton) {
-			this.editingButton.toObjectMode();
-		}
+		} 
 		this.staticsToFront();
+		if (this.editingButton) {
+			this.editingButton.toObjectMode();
+			this.editingButton.toFront();
+		}		
 	},
 	renderSections: function(renderData, newSectionIds, editingId, pos, oldSectionIds, toRemove) {
 		var oldSections = this.sections;
@@ -196,6 +198,9 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 			var sectionId = newSectionIds[idIdx];
 			var idxInOld = oldSectionIds.indexOf(sectionId);
 			var displayPos = pos;
+			if (sectionId == editingId) {
+				displayPos = this.buttonPosObjectModeSelected;
+			}
 			var labelText = renderData.get(sectionId + 'LabelText'); //undefined if at default
 			if (sectionId == editingId) {
 				displayPos = this.buttonPosObjectModeSelected;
@@ -213,12 +218,40 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 			if (labelText) {
 				newSection.updateLabel(labelText);
 			}
+			if (sectionId == editingId) {
+				this.editingButton = newSection.button;
+			}
 			var newPromptIds = renderData.get(sectionId + 'Prompts');
 			pos.y += this.totalButtonHeight;
 			newSection.renderPrompts(renderData, newPromptIds, editingId, pos, toRemove);
 			newSections.push(newSection);
 		}
 		this.sections = newSections;
+		/*
+		WILL STILL NEED TO CLEAN UP UNUSED SECTIONS AND PROMPTS
+		for (var sectionIdx=0; sectionIdx<sectionIds.length; sectionIdx++) {
+			var sectionId = sectionIds[sectionIdx];
+			var promptIds = renderData.get(sectionId + 'Prompts');
+			var sectionDragFuncs = renderData.get(sectionId + 'SectionDragFuncs');
+			var promptDragFuncs = renderData.get(sectionId + 'PromptDragFuncs');
+			var clickFuncs = renderData.get(sectionId + 'ClickFuncs');
+			var labelText = renderData.get(sectionId + 'LabelText');
+			var displayPos = pos;
+			if (sectionId == editingId) {
+				displayPos = this.buttonPosObjectModeSelected;
+			}
+			var section = new TreeSection(this, displayPos, sectionDragFuncs, promptDragFuncs, clickFuncs, '', false, sectionId);
+			if (sectionId == editingId) {
+				this.editingButton = section.button;
+			}
+			if (labelText) {
+				section.updateLabel(labelText);
+			}
+			pos.y += this.totalButtonHeight;
+			section.renderPrompts(renderData, promptIds, editingId, pos)
+			this.sections.push(section);
+		}	
+		*/
 	},
 	makeToRemove: function() {
 		var toRemove = {};
@@ -544,14 +577,16 @@ TreeSection.prototype = {
 		data.change(this.id + 'Prompts', promptIds);
 	},
 	renderPrompts: function(renderData, newPromptIds, editingId, pos, toRemove) {
-		//rendering will always be done on a empty section.  No need to remove prompts first
 		var oldPrompts = this.prompts;
 		var newPrompts = [];
 		var oldPromptIds = this.getPromptIds();
 		for (var idIdx=0; idIdx<newPromptIds.length; idIdx++) {
 			var promptId = newPromptIds[idIdx];
 			var idxInOld = oldPromptIds.indexOf(promptId);
-			var displayPos = pos.copy().movePt(V(this.tree.promptIndent, 0));;
+			var displayPos = pos.copy().movePt(V(this.tree.promptIndent, 0));
+			if (promptId == editingId) {
+				displayPos = this.buttonPosObjectModeSelected;
+			}
 			var labelText = renderData.get(promptId + 'LabelText'); //undefined if at default
 			if (promptId == editingId) {
 				displayPos = this.tree.buttonPosObjectModeSelected;
@@ -562,6 +597,9 @@ TreeSection.prototype = {
 				newPrompt.move(displayPos, 'snap');
 			} else {
 				var newPrompt = new TreePrompt(this.tree, this, displayPos, this.promptDragFuncs, this.clickFuncs, '', promptId);
+			}
+			if (promptId == editingId) {
+				this.tree.editingButton = newPrompt.button;
 			}
 			if (labelText) {
 				newPrompt.updateLabel(labelText);
