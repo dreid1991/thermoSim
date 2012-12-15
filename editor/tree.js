@@ -182,7 +182,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 				this.editingButton = section.button;
 				displayPos = this.buttonPosObjectModeSelected;
 			}
-			var section = new TreeSection(this, displayPos, sectionDragFuncs, promptDragFuncs, clickFuncs, '', false, true);
+			var section = new TreeSection(this, displayPos, sectionDragFuncs, promptDragFuncs, clickFuncs, '', false, sectionId);
 			if (labelText) {
 				section.updateLabel(labelText);
 			}
@@ -442,8 +442,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 
 })
 
-function TreeSection(tree, posInit, sectionDragFuncs, promptDragFuncs, clickFuncs, labelText, isPlacer, isLoading) {
-	this.id = data.getSectionId();
+function TreeSection(tree, posInit, sectionDragFuncs, promptDragFuncs, clickFuncs, labelText, isPlacer, inheritedId) {
 	this.tree = tree;
 	this.prompts = [];
 	this.pos = posInit.copy();
@@ -456,8 +455,11 @@ function TreeSection(tree, posInit, sectionDragFuncs, promptDragFuncs, clickFunc
 	this.labelText = labelText;
 	this.isPlacer = isPlacer;
 	this.button = new TreeButton(this.tree, this, this.pos, this.sectionDragFuncs, this.clickFuncs, this.labelText, isPlacer);
-	if (!isLoading) {
+	if (inheritedId === undefined) {
+		this.id = data.getSectionId();
 		this.register();
+	} else {
+		this.id = inheritedId;
 	}
  
 }
@@ -493,7 +495,7 @@ TreeSection.prototype = {
 				this.tree.editingButton = this.prompts[this.prompts.length-1];
 				displayPos = this.tree.buttonPosObjectModeSelected;
 			}			
-			this.prompts.push(new TreePrompt(this.tree, this, displayPos, this.promptDragFuncs, this.clickFuncs, '', true));
+			this.prompts.push(new TreePrompt(this.tree, this, displayPos, this.promptDragFuncs, this.clickFuncs, '', id));
 			if (labelText) {
 				this.prompts[this.prompts.length-1].updateLabel(labelText);
 			}
@@ -611,16 +613,18 @@ For prompt, need to store:
 	
 */
 
-function TreePrompt(tree, section, posInit, dragFuncs, clickFuncs, labelText, isLoading) {
+function TreePrompt(tree, section, posInit, dragFuncs, clickFuncs, labelText, inheritedId) {
 	this.tree = tree;
-	this.id = data.getPromptId();
 	this.section = section;
 	this.dragFuncs = dragFuncs;
 	this.clickFuncs = clickFuncs;
 	this.labelText = labelText;
 	this.button = new TreeButton(this.tree, this, posInit, this.dragFuncs, this.clickFuncs);
-	if (!isLoading) {
+	if (inheritedId === undefined) {
+		this.id = data.getPromptId();
 		this.register();
+	} else {
+		this.id = inheritedId;
 	}
 }
 

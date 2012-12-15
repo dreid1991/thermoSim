@@ -1,5 +1,6 @@
 SectionFuncs = {
 	sectionDragStartTreeMode: function() {
+		this.parent.sectionIds = this.parent.tree.getSectionIds();
 		this.parent.posO = posOnPaper(globalMousePos, this.parent.tree.paper);
 		this.parent.released = false;
 		this.parent.tree.clickedButton = this.parent;
@@ -52,6 +53,7 @@ SectionFuncs = {
 	},
 	sectionDragEndTreeMode: function() {
 		var tree = this.parent.tree;
+		var oldSectionIds = this.parent.sectionIds;
 		//dawg, I need to define tree because if this is a label and we updateLabel it changes the label object and parent gets nulled.  Also .attr({text... isn't working right after I make it.  Dunno why.
 		var didClickFunc = false;
 		if (this.parent.tree.onReleaseReceptacle.apply(this.parent.tree, [this.parent])) {
@@ -69,6 +71,10 @@ SectionFuncs = {
 		tree.setDefaultLabels();
 		if (!didClickFunc) {
 			tree.moveAllToPositions('fly');
+		}
+		var newSectionIds = tree.getSectionIds();
+		if (!objectsEqual(oldSectionIds, newSectionIds)) {
+			data.change('tSections', newSectionIds);
 		}
 	},
 	defineSectionDragFuncs: function() {
@@ -91,6 +97,8 @@ SectionFuncs = {
 
 PromptFuncs = {
 	promptDragStartTreeMode: function() {
+	//CHECK IF promptIds GETS SET
+		this.parent.promptIds = this.parent.parent.section.getPromptIds();
 		this.parent.posO = posOnPaper(globalMousePos, this.parent.tree.paper);
 		this.parent.released = false;
 		this.parent.tree.clickedButton = this.parent;
@@ -130,7 +138,10 @@ PromptFuncs = {
 		}
 	},
 	promptDragEndTreeMode: function() {
+		var section = this.parent.parent.section;
+		var sectionId = section.id;
 		var tree = this.parent.tree;
+		var oldPromptIds = this.parent.promptIds;
 		var didClickFunc = false;
 		if (this.parent.tree.onReleaseReceptacle.apply(this.parent.tree, [this.parent])) {
 			if (!this.parent.released && this.parent.clickFuncs) {
@@ -149,6 +160,10 @@ PromptFuncs = {
 		tree.setDefaultLabels();
 		if (!didClickFunc) {
 			tree.moveAllToPositions('fly');
+		}
+		var newPromptIds = section.getPromptIds();
+		if (!objectsEqual(oldPromptIds, newPromptIds)) {
+			data.change(sectionId + 'Prompts', newPromptIds);
 		}
 	},
 	definePromptDragFuncs: function() {

@@ -13,7 +13,7 @@ DataManager.prototype = {
 	},
 	change: function(key, value) {
 		if (this.curIdx != this.hist.length-1) {
-			this.hist = this.hist.slice(0, this.curIdx);
+			this.hist = this.hist.slice(0, this.curIdx+1);
 		}
 		this.hist.push(this.hist[this.hist.length-1].withChange(key, value));
 		this.curIdx++;
