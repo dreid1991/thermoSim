@@ -26,7 +26,7 @@ function Tree(paper/*, pos*/) {
 	this.edgePadding = 10;//dist placer rect is from edge
 	this.placerBlockTolerance = 10; //how close placer block has to be before stuff starts moving out of the way
 	this.bgCol = Col(255, 255, 255);
-	this.panelCol = Col(255, 255, 255);//do a gradient, yo
+	this.panelCol = Col(230, 230, 230);//do a gradient, yo
 	this.rectCol = config.buttonFillCol;
 	this.rectColHover = config.buttonFillColHover;//'#5c93b2';
 	//this.rectColSelect = Col(82, 108, 122);//'#526c7a';
@@ -162,7 +162,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		
 		this.moveAllToPositions('fly');
 	},
-	render: function(renderData) {
+	load: function(renderData) {
 		var x, y;
 		y = this.pos.y;
 		if (this.mode == 'tree') {
@@ -178,7 +178,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.editingButton = undefined;
 		var oldSectionIds = this.getSectionIds();
 		var toRemove = this.makeToRemove(oldSectionIds);
-		this.renderSections(renderData, sectionIds, editingId, pos, oldSectionIds, toRemove);
+		this.loadSections(renderData, sectionIds, editingId, pos, oldSectionIds, toRemove);
 		this.removeUnused(toRemove);
 		this.setDefaultLabels();
 		if (this.mode == 'object' && this.editingButton == undefined) { //then uh oh, the one we were working on was removed!
@@ -190,7 +190,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 			this.editingButton.toFront();
 		}		
 	},
-	renderSections: function(renderData, newSectionIds, editingId, pos, oldSectionIds, toRemove) {
+	loadSections: function(renderData, newSectionIds, editingId, pos, oldSectionIds, toRemove) {
 		var oldSections = this.sections;
 		var newSections = [];
 		
@@ -216,14 +216,14 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 				var newSection = new TreeSection(this, displayPos, sectionDragFuncs, promptDragFuncs, clickFuncs, '', false, sectionId)				
 			}
 			if (labelText) {
-				newSection.updateLabel(labelText);
+				newSection.updateLabel(labelText, false, true);
 			}
 			if (sectionId == editingId) {
 				this.editingButton = newSection.button;
 			}
 			var newPromptIds = renderData.get(sectionId + 'Prompts');
 			pos.y += this.totalButtonHeight;
-			newSection.renderPrompts(renderData, newPromptIds, editingId, pos, toRemove);
+			newSection.loadPrompts(renderData, newPromptIds, editingId, pos, toRemove);
 			newSections.push(newSection);
 		}
 		this.sections = newSections;
@@ -576,7 +576,7 @@ TreeSection.prototype = {
 		var promptIds = this.getPromptIds();
 		data.change(this.id + 'Prompts', promptIds);
 	},
-	renderPrompts: function(renderData, newPromptIds, editingId, pos, toRemove) {
+	loadPrompts: function(renderData, newPromptIds, editingId, pos, toRemove) {
 		var oldPrompts = this.prompts;
 		var newPrompts = [];
 		var oldPromptIds = this.getPromptIds();
@@ -602,7 +602,7 @@ TreeSection.prototype = {
 				this.tree.editingButton = newPrompt.button;
 			}
 			if (labelText) {
-				newPrompt.updateLabel(labelText);
+				newPrompt.updateLabel(labelText, false, true);
 			}
 			pos.y += this.tree.totalButtonHeight;
 			newPrompts.push(newPrompt);
@@ -642,9 +642,9 @@ TreeSection.prototype = {
 			this.prompts[promptIdx].show();
 		}
 	},
-	updateLabel: function(labelText, settingToDefault) {
+	updateLabel: function(labelText, settingToDefault, isLoading) {
 		this.labelText = labelText;
-		this.button.updateLabel(labelText, settingToDefault);
+		this.button.updateLabel(labelText, settingToDefault, isLoading);
 	},
 	toFront: function() {
 		this.button.toFront();
@@ -660,9 +660,9 @@ TreeSection.prototype = {
 				this.pos.set(moveOrder);
 			}
 		}
-		//for (var promptIdx=0; promptIdx<this.prompts.length; promptIdx++) {
-		//	this.prompts[promptIdx].move(moveOrder, type, time);
-		//}
+		for (var promptIdx=0; promptIdx<this.prompts.length; promptIdx++) {
+			this.prompts[promptIdx].move(moveOrder, type, time);
+		}
 	},
 	getNewPromptIdx: function(releasePos) {
 		var y = this.pos.y + this.tree.totalButtonHeight;
@@ -751,8 +751,8 @@ TreePrompt.prototype = {
 	setSection: function(section) {
 		this.section = section;
 	},
-	updateLabel: function(labelText, settingToDefault) {
-		this.button.updateLabel(labelText, settingToDefault);
+	updateLabel: function(labelText, settingToDefault, isLoading) {
+		this.button.updateLabel(labelText, settingToDefault, isLoading);
 	},
 	totalHeight: function() {
 		return this.tree.totalButtonHeight;
@@ -935,11 +935,11 @@ _.extend(TreeButton.prototype, assignHover, {
 		return arrows;
 		
 	},
-	updateLabel: function(labelText, settingToDefault) {
+	updateLabel: function(labelText, settingToDefault, isLoading) {
 		//Yo yo, I am not strictly using this.labelText because I want that to be the untruncated text
 		if (settingToDefault && this.haveUpdatedLabel) {
 			return;
-		} else if ((labelText != this.labelText && !settingToDefault) || (!settingToDefault && !this.haveUpdateLabel)) {
+		} else if (!isLoading && ((labelText != this.labelText && !settingToDefault) || (!settingToDefault && !this.haveUpdateLabel))) {
 			data.change(this.parent.id + 'LabelText', labelText);
 			this.haveUpdatedLabel = true;
 		} else if (!settingToDefault) {
@@ -1142,7 +1142,7 @@ Receptacle.prototype = {
 		var rect = this.tree.paper.rect(0, 0, this.dims.dx, this.dims.dy, this.tree.rectRounding);	
 		translateObj(rect, this.pos);
 		rect.attr({
-			fill: this.tree.bgCol.hex,
+			fill: this.tree.panelCol.hex,
 			stroke: this.tree.rectCol.hex,
 		})
 		return rect;

@@ -21,14 +21,14 @@ DataManager.prototype = {
 	redo: function() {
 		var newIdx = Math.min(this.hist.length-1, this.curIdx+1);
 		if (newIdx != this.curIdx) {
-			tree.render(this.hist[newIdx]);
+			tree.load(this.hist[newIdx]);
 			this.curIdx = newIdx;
 		}
 	},
 	undo: function() {
 		var newIdx = Math.max(0, this.curIdx-1);
 		if (newIdx != this.curIdx) {
-			tree.render(this.hist[newIdx]);
+			tree.load(this.hist[newIdx]);
 			this.curIdx = newIdx;
 		}
 	},
