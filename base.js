@@ -48,7 +48,7 @@ $(function(){
 	pxToMS = 19.33821;
 	auxHolderDivs = ['aux1', 'aux2'];
 	promptIdx = 0;
-	blockIdx = 0;
+	sectionIdx = 0;
 	sliderList = [];
 	spcs = {};
 	stored = {};
@@ -483,14 +483,14 @@ function hideSliders(){
 		$('#'+ handle).hide();
 	}
 }
-function S(newBlockIdx, newPromptIdx, forceReset) {
-	showPrompt(newBlockIdx, newPromptIdx, forceReset)
+function S(newSectionIdx, newPromptIdx, forceReset) {
+	showPrompt(newSectionIdx, newPromptIdx, forceReset)
 }
-function showPrompt(newBlockIdx, newPromptIdx, forceReset){
-	var newBlock = curLevel.blocks[newBlockIdx];
-	var newPrompt = newBlock.prompts[newPromptIdx];
-	var changedBlock = newBlockIdx!=blockIdx;
-	var promptIdxsToClean = getpromptIdxsToClean(newBlockIdx, newPromptIdx);
+function showPrompt(newSectionIdx, newPromptIdx, forceReset){
+	var newSection = curLevel.sections[newSectionIdx];
+	var newPrompt = newSection.prompts[newPromptIdx];
+	var changedSection = newSectionIdx!=sectionIdx;
+	var promptIdxsToClean = getpromptIdxsToClean(newSectionIdx, newPromptIdx);
 	
 	promptIdxsToClean.applyFunc(function(idx){
 		curLevel.promptCleanUp(idx);
@@ -499,26 +499,26 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 	
 	//emptyListener(curLevel, 'promptCleanUp');
 	emptyListener(curLevel, 'promptCondition');
-	if (changedBlock) {
-		curLevel.makePromptCleanUpHolders(newBlockIdx);
+	if (changedSection) {
+		curLevel.makePromptCleanUpHolders(newSectionIdx);
 	}
-	if (changedBlock || forceReset) {
+	if (changedSection || forceReset) {
 		curLevel.saveAllGraphs();
 		curLevel.freezeAllGraphs();
 		curLevel.removeAllGraphs();
 		dotManager.clearAll();		
 
-		curLevel.blockCleanUp();
+		curLevel.sectionCleanUp();
 		
-		emptyListener(curLevel, 'blockCleanUp');
-		emptyListener(curLevel, 'blockCondition');
+		emptyListener(curLevel, 'sectionCleanUp');
+		emptyListener(curLevel, 'sectionCondition');
 		
-		if (newBlock.setup) {
-			newBlock.setup.apply(curLevel);
+		if (newSection.setup) {
+			newSection.setup.apply(curLevel);
 		}
 
 		
-		addListener(curLevel, 'blockCleanUp', 'removeArrowAndText',
+		addListener(curLevel, 'sectionCleanUp', 'removeArrowAndText',
 			function(){
 				removeListenerByName(curLevel, 'update', 'drawArrow');
 				removeListenerByName(curLevel, 'update', 'animText');
@@ -533,7 +533,7 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 	if (!newPrompt.quiz) {
 		$('#nextPrevDiv').show();
 	}
-	blockIdx = newBlockIdx;
+	sectionIdx = newSectionIdx;
 	promptIdx = newPromptIdx;
 	if (newPrompt.cutScene) {	
 		curLevel.cutSceneStart(newPrompt.text, newPrompt.cutScene, newPrompt.quiz)
@@ -553,13 +553,13 @@ function showPrompt(newBlockIdx, newPromptIdx, forceReset){
 
 }
 
-function getpromptIdxsToClean(newBlockIdx, newPromptIdx) {
+function getpromptIdxsToClean(newSectionIdx, newPromptIdx) {
 	//attn please - this only works for going forwards
 	//would need to make like an 'added by' tag for backwards to work
-	var curBlock = curLevel.blocks[blockIdx];
-	if (newBlockIdx>blockIdx || (blockIdx==newBlockIdx && newPromptIdx>promptIdx)) {
+	var curSection = curLevel.sections[sectionIdx];
+	if (newSectionIdx>sectionIdx || (sectionIdx==newSectionIdx && newPromptIdx>promptIdx)) {
 		var cleanUps = []
-		for (var pIdx=promptIdx; pIdx<curBlock.prompts.length; pIdx++) {
+		for (var pIdx=promptIdx; pIdx<curSection.prompts.length; pIdx++) {
 			cleanUps.push(pIdx);
 		}
 		return cleanUps;
@@ -569,8 +569,8 @@ function getpromptIdxsToClean(newBlockIdx, newPromptIdx) {
 }
 
 function nextPrompt(forceAdvance){
-	var curBlock = curLevel.blocks[blockIdx];
-	var curPrompt = defaultTo({}, curBlock.prompts[promptIdx]);
+	var curSection = curLevel.sections[sectionIdx];
+	var curPrompt = defaultTo({}, curSection.prompts[promptIdx]);
 	
 	if (forceAdvance) {
 		var willAdvance = true;
@@ -582,7 +582,7 @@ function nextPrompt(forceAdvance){
 			curPrompt.finished = true;
 		}
 		var nextIdxs = getNextIdxs()
-		showPrompt(nextIdxs.newBlockIdx, nextIdxs.newPromptIdx);
+		showPrompt(nextIdxs.newSectionIdx, nextIdxs.newPromptIdx);
 		return true;
 	}
 	return false;
@@ -590,64 +590,64 @@ function nextPrompt(forceAdvance){
 }
 
 function getNextIdxs() {
-	var newBlockIdx = blockIdx;
+	var newSectionIdx = sectionIdx;
 	var newPromptIdx = promptIdx;
-	var curBlock = curLevel.blocks[blockIdx];
-	if (promptIdx+1==curBlock.prompts.length) {
-		if (blockIdx+1 < curLevel.blocks.length) {
-			newBlockIdx++;
+	var curSection = curLevel.sections[sectionIdx];
+	if (promptIdx+1==curSection.prompts.length) {
+		if (sectionIdx+1 < curLevel.sections.length) {
+			newSectionIdx++;
 			newPromptIdx=0;
 		}
 	} else {
 		newPromptIdx++;
 	}
-	return {newBlockIdx:newBlockIdx, newPromptIdx:newPromptIdx};
+	return {newSectionIdx:newSectionIdx, newPromptIdx:newPromptIdx};
 }
 
 function getPrevIdxs() {
-	var newBlockIdx = blockIdx;
+	var newSectionIdx = sectionIdx;
 	var newPromptIdx = promptIdx;
 	if (promptIdx==0) {
-		if (blockIdx>0) {
-			newBlockIdx--;
-			newPromptIdx=curLevel.blocks[newBlockIdx].prompts.length-1;
+		if (sectionIdx>0) {
+			newSectionIdx--;
+			newPromptIdx=curLevel.sections[newSectionIdx].prompts.length-1;
 		}
 	} else {
 		newPromptIdx--;
 	}
-	return {newBlockIdx:newBlockIdx, newPromptIdx:newPromptIdx};
+	return {newSectionIdx:newSectionIdx, newPromptIdx:newPromptIdx};
 }
 
 function checkWillAdvance() {
 	var nextIdxs = getNextIdxs();
-	var newBlockIdx = nextIdxs.newBlockIdx;
+	var newSectionIdx = nextIdxs.newSectionIdx;
 	var newPromptIdx = nextIdxs.newPromptIdx;
 	var willAdvance = 1;
-	willAdvance = Math.min(willAdvance, checkWillAdvanceConditions(newBlockIdx, newPromptIdx));
+	willAdvance = Math.min(willAdvance, checkWillAdvanceConditions(newSectionIdx, newPromptIdx));
 	if (willAdvance) {
 		willAdvance = Math.min(willAdvance, checkWillAdvanceQuiz());
 	}
 	return willAdvance;
 }
 
-function checkWillAdvanceConditions(newBlockIdx, newPromptIdx){
+function checkWillAdvanceConditions(newSectionIdx, newPromptIdx){
 
-	var changingBlock = blockIdx!=newBlockIdx;
+	var changingSection = sectionIdx!=newSectionIdx;
 	var conditionsMet = 0;
-	var curPrompt = defaultTo({}, curLevel.blocks[blockIdx].prompts[promptIdx]);
+	var curPrompt = defaultTo({}, curLevel.sections[sectionIdx].prompts[promptIdx]);
 	var curFinished = defaultTo(false, curPrompt.finished);
 	
 	conditionsMet = Math.max(conditionsMet, curFinished);
 	if (!conditionsMet) {
 		var promptResults = curLevel.promptConditions();
 		if (promptResults.didWin) {
-			if (changingBlock) {
-				var blockResults = curLevel.blockConditions();
-				if (blockResults.didWin) {
+			if (changingSection) {
+				var sectionResults = curLevel.sectionConditions();
+				if (sectionResults.didWin) {
 					conditionsMet = 1;
 				} else {
 					conditionsMet = 0;
-					alertValid(blockResults.alert);
+					alertValid(sectionResults.alert);
 				}
 			} else {
 				conditionsMet = 1;
@@ -689,7 +689,7 @@ function checkWillAdvanceQuiz(){
 
 function prevPrompt(){
 	var prevIdxs = getPrevIdxs();
-	showPrompt(prevIdxs.newBlockIdx, prevIdxs.newPromptIdx);
+	showPrompt(prevIdxs.newSectionIdx, prevIdxs.newPromptIdx);
 }
 
 
@@ -785,10 +785,10 @@ function getLen(pts) {
 	return len;
 }
 function nameVar(str) {
-	if (currentSetupType=='block') {
-		return str + 'B' + blockIdx;
+	if (currentSetupType=='section') {
+		return str + 'S' + sectionIdx;
 	} else {
-		return str + 'B' + blockIdx + 'P' + promptIdx;
+		return str + 'S' + sectionIdx + 'P' + promptIdx;
 	}
 	 
 }

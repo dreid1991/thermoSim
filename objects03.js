@@ -139,7 +139,7 @@ function sillyArrow(){
 					dims:V(100,50),
 					dimsFinal:V(50,100),
 					lifespan:5000,
-					cleanUpWith:'block',
+					cleanUpWith:'section',
 				});
 }
 

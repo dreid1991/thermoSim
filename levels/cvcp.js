@@ -16,7 +16,7 @@ _.extend(cvcp.prototype,
 		$('#mainHeader').html('c<sub>v</sub> vs. c<sub>P</sub');
 		showPrompt(0, 0, true);
 	},
-	blocks: [
+	sections: [
 		{//B0
 			setup:undefined,
 			prompts:[
@@ -53,7 +53,7 @@ _.extend(cvcp.prototype,
 		{//B1
 			setup:
 				function() {
-					currentSetupType = 'block';
+					currentSetupType = 'section';
 					walls = WallHandler({pts:[[P(40,190), P(255,190), P(255,425), P(40,425)], [P(295,190), P(510,190), P(510,425), P(295,425)]], handlers:'staticAdiabatic', handles:['left', 'right'], bounds:[undefined, {yMin:50, yMax:275}], vols:[5,5]});
 					this.borderStd({wallInfo:'left', min:50});
 					this.borderStd({wallInfo:'right', min:50});
@@ -139,7 +139,7 @@ _.extend(cvcp.prototype,
 		{//B2
 			setup:
 				function() {
-					this.blocks[1].setup.apply(this);
+					this.sections[1].setup.apply(this);
 					walls[1].setDefaultReadout(this.piston.readout);
 					walls[1].displayWork();
 

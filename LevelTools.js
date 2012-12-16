@@ -20,10 +20,10 @@ LevelTools = {
 		this.spcs = spcs;
 	},
 	addEqs: function(){
-		for (var blockIdxLocal=0; blockIdxLocal<this.blocks.length; blockIdxLocal++) {
-			var block = this.blocks[blockIdxLocal];
-			for (var promptIdxLocal=0; promptIdxLocal<block.prompts.length; promptIdxLocal++) {
-				var prompt = block.prompts[promptIdxLocal];
+		for (var sectionIdxLocal=0; sectionIdxLocal<this.sections.length; sectionIdxLocal++) {
+			var section = this.sections[sectionIdxLocal];
+			for (var promptIdxLocal=0; promptIdxLocal<section.prompts.length; promptIdxLocal++) {
+				var prompt = section.prompts[promptIdxLocal];
 				var title = prompt.title;
 				var text = prompt.text;
 				var quiz = prompt.quiz;
@@ -129,7 +129,7 @@ LevelTools = {
 					var id = self.getTextAreaId(questionIdx);
 					var submitted = $('#'+id).val();
 					if (submitted.killWhiteSpace()!='') {
-						store('userAnswerB'+blockIdx+'P'+promptIdx+'Q'+questionIdx, submitted);
+						store('userAnswerB'+sectionIdx+'P'+promptIdx+'Q'+questionIdx, submitted);
 						question.answerText(submitted);
 						question.isAnswered = true;
 						if (question.answer) {
@@ -228,7 +228,7 @@ LevelTools = {
 	*/
 	appendButtons: function(question, appendTo, questionIdx){
 		var buttonHTML = '';
-		//Hey - you are setting attrs of the question object.  This will alter the thing the blocks declaration.  I think that is okay, just letting you know
+		//Hey - you are setting attrs of the question object.  This will alter the thing the sections declaration.  I think that is okay, just letting you know
 		question.isAnswered = false;
 		question.isCorrect = this.questionIsCorrect;//function() {
 			//return question.correct;
@@ -258,7 +258,7 @@ LevelTools = {
 				alert(button.message);
 			}
 			if (button.response) {
-				store('B'+blockIdx+'P'+promptIdx + 'Response', button.response);
+				store('B'+sectionIdx+'P'+promptIdx + 'Response', button.response);
 			}
 			if (button.func) {
 				button.func();
@@ -304,7 +304,7 @@ LevelTools = {
 				alert(option.message);
 			}
 			if (option.response) {
-				store('B'+blockIdx+'P'+promptIdx + 'Response', option.response);
+				store('B'+sectionIdx+'P'+promptIdx + 'Response', option.response);
 			}
 			if (option.func) {
 				option.func();
@@ -421,7 +421,7 @@ LevelTools = {
 	},
 	gravity: function(cleanUpWith) {
 		this.gravitying = true;
-		cleanUpWith = defaultTo('block', cleanUpWith);
+		cleanUpWith = defaultTo('section', cleanUpWith);
 		//YO YO - MAKE IT CLEAN UP
 		//Problem with hitting wall, slowly loses energy.  Would need to do something similar to wall hitting its bounds
 		for (var wallIdx=0; wallIdx<walls.length; wallIdx++) {
@@ -448,7 +448,7 @@ LevelTools = {
 	},
 	attract: function(cleanUpWith) {
 		this.attracting = true;
-		cleanUpWith = defaultTo('block', cleanUpWith);
+		cleanUpWith = defaultTo('section', cleanUpWith);
 		attractor.assignELastAll();
 		this.setUpdateRunListener();
 		addListener(curLevel, cleanUpWith + 'CleanUp', 'attractStop', this.attractStop, this);
@@ -507,9 +507,9 @@ LevelTools = {
 		}	
 	},
 	saveAllGraphs: function(){
-		//OOH - made load graphs by block/prompt idx
+		//OOH - made load graphs by section/prompt idx
 		for (var graphName in this.graphs) {
-			var saveName = graphName + 'block' + blockIdx + 'prompt' + promptIdx;
+			var saveName = graphName + 'section' + sectionIdx + 'prompt' + promptIdx;
 			this.graphs[graphName].save(saveName);
 		}
 	},
@@ -581,29 +581,29 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		this.makeListenerHolder('mousemove');
 		this.makeListenerHolder('init');
 		this.makeListenerHolder('record');
-		this.makeListenerHolder('blockCondition');
+		this.makeListenerHolder('sectionCondition');
 		this.makeListenerHolder('promptCondition');
-		this.makeListenerHolder('blockCleanUp');
+		this.makeListenerHolder('sectionCleanUp');
 	},
 	makeListenerHolder: function(name) {
 		this[name + 'Listeners'] = {listeners:{}, save:{}};
 		return this[name + 'Listeners'];
 	},
-	makePromptCleanUpHolders: function(newBlockIdx){
-		var block = this.blocks[newBlockIdx];
-		this.promptCleanUpHolders = new Array(block.prompts.length);
-		for (var promptIdx=0; promptIdx<block.prompts.length; promptIdx++) {
+	makePromptCleanUpHolders: function(newSectionIdx){
+		var section = this.sections[newSectionIdx];
+		this.promptCleanUpHolders = new Array(section.prompts.length);
+		for (var promptIdx=0; promptIdx<section.prompts.length; promptIdx++) {
 			this.promptCleanUpHolders[promptIdx] = this.makeListenerHolder('prompt' + promptIdx + 'CleanUp');
 		}
 	},
 	reset: function(){
-		showPrompt(blockIdx, promptIdx, true);		
+		showPrompt(sectionIdx, promptIdx, true);		
 	},
 	setDefaultPromptVals: function(){
-		for (var blockIdxLocal=0; blockIdxLocal<this.blocks.length; blockIdxLocal++) {
-			var block = this.blocks[blockIdxLocal];
-			for (var promptIdxLocal=0; promptIdxLocal<block.prompts.length; promptIdxLocal++) {
-				var prompt = block.prompts[promptIdxLocal];
+		for (var sectionIdxLocal=0; sectionIdxLocal<this.sections.length; sectionIdxLocal++) {
+			var section = this.sections[sectionIdxLocal];
+			for (var promptIdxLocal=0; promptIdxLocal<section.prompts.length; promptIdxLocal++) {
+				var prompt = section.prompts[promptIdxLocal];
 				prompt.finished = false;
 				prompt.title = defaultTo('', prompt.title);
 				prompt.text = defaultTo('', prompt.text);	
@@ -611,12 +611,12 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		}
 	},
 
-	blockConditions: function(){
+	sectionConditions: function(){
 		//ALERT NOT BUBBLING UP CORRECTLY.  IT GETS TO THIS FUNCTION FROM STATE LISTENERS BUT IS NOT RETURNED
 		var didWin = 1;
 		var alerts = {1:undefined, 0:undefined};
 		var priorities = {1:0, 0:0};
-		var conditions = this.blockConditionListeners.listeners
+		var conditions = this.sectionConditionListeners.listeners
 		for (var conditionName in conditions) {
 			var condition = conditions[conditionName]
 			winResults = condition.func.apply(condition.obj); //returns didWin, alert, priority (high takes precidence);
@@ -648,8 +648,8 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		}	
 		return {didWin:didWin, alert:alerts[didWin]};
 	},
-	blockCleanUp: function(){
-		var listeners = this.blockCleanUpListeners.listeners;
+	sectionCleanUp: function(){
+		var listeners = this.sectionCleanUpListeners.listeners;
 		for (var listenerName in listeners) {
 			var listener = listeners[listenerName];
 			listener.func.apply(listener.obj);
