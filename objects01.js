@@ -1676,54 +1676,28 @@ _.extend(StateListener.prototype, objectFuncs, {
 		this);	
 	},
 	makeConditionFunc: function(){
-		//could do a switch within a switch, but meh, kind of busy
-		switch(this.is){
-			case 'greaterThan':
-				if (this.targetVal instanceof Array) {
-					this.condition = function() { 
-						return this.dataList[this.dataList.length-1]>this.targetVal[this.targetVal.length-1];
-					}
-				} else {
-					this.condition = function() {
-						return this.dataList[this.dataList.length-1]>this.targetVal;
-					}
-				}
-				break;
-			case 'lessThan':
-				if (this.targetVal instanceof Array) {
-					this.condition = function() { 
-						return this.dataList[this.dataList.length-1]<this.targetVal[this.targetVal.length-1];
-					}
-				} else {
-					this.condition = function() {
-						return this.dataList[this.dataList.length-1]<this.targetVal;
-					}
-				}
-				break;
-			case 'equalTo':
-				if (this.targetVal instanceof Array) {
-					this.condition = function() { 
-						return fracDiff(this.dataList[this.dataList.length-1], this.targetVal[this.targetVal.length-1])<this.tolerance;
-					}
-				} else {
-					this.condition = function() {
-						return fracDiff(this.dataList[this.dataList.length-1], this.targetVal)<this.tolerance;
-					}
-				}
-				break;
-			case 'notEqualTo':
-				if (this.targetVal instanceof Array) {
-					this.condition = function() { 
-						return fracDiff(this.dataList[this.dataList.length-1], this.targetVal[this.targetVal.length-1]) > this.tolerance;
-					}
-				} else {
-					this.condition = function() {
-						return fracDiff(this.dataList[this.dataList.length-1], this.targetVal) > this.tolerance;
-					}
-				}				
-				break;
-		}
+		if (this.targetVal instanceof Array) {
+			this.condition = function() {
+				return this[this.is](this.dataList[this.dataList.length-1], this.targetVal[this.targetVal.length-1]);
+			}
+		} else {
+			this.condition = function() {
+				return this[this.is](this.dataList[this.dataList.length-1], this.targetVal);
+			}
 		
+		}		
+	},
+	lessThan: function(val1, val2) {
+		return val1<val2;
+	},
+	greaterThan: function(val1, val2) {
+		return val1>val2;
+	},
+	equalTo: function(val1, val2) {
+		return fracDiff(val1, val2) < this.tolerance;
+	},
+	notEqualTo: function(val1, val2) {
+		return fracDiff(val1, val2) > this.tolerance;
 	},
 	recordVals: function(){
 		this.results = {};

@@ -57,18 +57,18 @@ _.extend(cvcp.prototype,
 				type: 'section',
 				walls: {pts:[[P(40,190), P(255,190), P(255,425), P(40,425)], [P(295,190), P(510,190), P(510,425), P(295,425)]], handlers:'staticAdiabatic', handles:['left', 'right'], bounds:[undefined, {yMin:50, yMax:275}], vols:[5,5]},
 				//borders should be option in wall
-				spcs: [	{type: 'spc1', pos: P(45,200), dims: V(200, 200), count: 350, temp:150, returnTo: 'left', tag: 'right'},
+				dots: [	{type: 'spc1', pos: P(45,200), dims: V(200, 200), count: 350, temp:150, returnTo: 'left', tag: 'right'},
 						{type: 'spc3', pos: P(45,200), dims: V(200, 200), count: 250, temp:150, returnTo: 'left', tag: 'right'},
 						{type: 'spc1', pos: P(45,200), dims: V(200, 200), count: 350, temp:150, returnTo: 'left', tag: 'right'},
 						{type: 'spc3', pos: P(45,200), dims: V(200, 200), count: 350, temp:150, returnTo: 'left', tag: 'right'}
 				],
 				objs: [
-					{type: 'piston', handle: 'RightPiston', wallInfo: 'right', min:2, init:2, max:2, makeSlider:false},
-					{type: 'heater', handle: 'heaterLeft', wallInfo: 'left'},
-					{type: 'heater', handle: 'heaterRight', wallInfo: 'right'}
+					{type: 'piston', attrs: {handle: 'RightPiston', wallInfo: 'right', min:2, init:2, max:2, makeSlider:false}},
+					{type: 'heater', attrs: {handle: 'heaterLeft', wallInfo: 'left'}},
+					{type: 'heater', attrs: {handle: 'heaterRight', wallInfo: 'right'}}
 				],
-				display: [
-					{wallHandle: 'left', 'tempSmooth', 'mainReadout'}
+				readoutEntries: [
+					{wallHandle: 'left', data:'tempSmooth', readout:'mainReadout'}
 					//WHICH WALL, WHAT THING, WHERE
 					
 				],
