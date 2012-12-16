@@ -1,15 +1,23 @@
 function WallHandler(attrs){//pts, handlers, handles, bounds, includes, vols, shows, records, temps){//records is a verb, like what the wall records.  Defaults to recording q, pint, t, v
 	//a trap!  If you make it isothermal, you must specify a temperature to hold at in temps list
-	var newWall = new Array(attrs.pts.length)
+	if (attrs) {
+		var newWall = new Array(attrs.pts.length);
+	} else {
+		var newWall = new Array();
+	}
 	_.extend(newWall, WallMethods.main, WallMethods.collideMethods);
-	newWall.assemble(attrs);//pts, handles, bounds, includes, vols, shows, records)
+	addListener(curLevel, 'sectionCleanUp', 'walls', newWall.remove, newWall)
 	newWall.cVIsothermal32 = newWall.cVIsothermal;
-	if(attrs.handles.length!=attrs.pts.length){
-		console.log('NAME YOUR WALLS');
+	if (attrs) {//Yo yo, you can just do new WallHander() and then add walls
+		newWall.assemble(attrs);//pts, handles, bounds, includes, vols, shows, records)
+		if (attrs.handles.length!=attrs.pts.length) {
+			console.log('NAME YOUR WALLS');
+		}
+		if (attrs.handlers) {
+			newWall.doInitHandlers(attrs.handlers);
+		}
 	}
-	if(attrs.handlers){
-		newWall.doInitHandlers(attrs.handlers);
-	}
+	newWall.setup();
 	return newWall;
 };
 WallMethods = {
@@ -22,8 +30,7 @@ WallMethods = {
 			var pts = attrs.pts;
 			var handles = attrs.handles;
 
-			addListener(curLevel, 'sectionCleanUp', 'walls', this.remove, this)
-			
+						
 			this.numWalls = pts.length;
 			this.qArrowFill = Col(200, 0, 0);
 			this.qArrowFillFinal = Col(100, 0, 0);
@@ -38,7 +45,7 @@ WallMethods = {
 				this.setWallVals(wallIdx, pts[wallIdx], handles[wallIdx], bounds[wallIdx], includes[wallIdx], vols[wallIdx], shows[wallIdx], records[wallIdx], tSets[wallIdx]);
 
 			}
-			this.setup();
+			
 
 		},
 		setDefaultReadout: function(readout){
@@ -990,11 +997,11 @@ WallMethods = {
 		},
 		recordTemp: function() {
 			this.recordingTemp = true;
-			if (this.parent.numWalls>1) {
+			//if (this.parent.numWalls>1) {
 				var tempFunc = dataHandler.tempFunc({tag:this.handle})
-			}else{
-				var tempFunc = dataHandler.tempFunc();
-			}		
+			//}else{
+			//	var tempFunc = dataHandler.tempFunc();
+			//}		
 			recordData('t' + this.handle, this.data.t, tempFunc, this, 'update');
 			return this;
 		},
@@ -1413,7 +1420,7 @@ WallMethods = {
 			return this;
 		},
 		displayPExtStop: function(){
-			this.displayingPInt = false;
+			this.displayingPExt = false;
 			removeListener(curLevel, 'update', 'displayPExt'+this.handle);
 			this.pExtReadout.removeEntry('pExt' + this.handle);
 			return this;

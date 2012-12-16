@@ -81,7 +81,10 @@ _.extend(cvcp.prototype,
 			setup:
 				function() {
 					currentSetupType = 'section';
-					walls = WallHandler({pts:[[P(40,190), P(255,190), P(255,425), P(40,425)], [P(295,190), P(510,190), P(510,425), P(295,425)]], handlers:'staticAdiabatic', handles:['left', 'right'], bounds:[undefined, {yMin:50, yMax:275}], vols:[5,5]});
+					//walls = WallHandler({pts:[[P(40,190), P(255,190), P(255,425), P(40,425)], [P(295,190), P(510,190), P(510,425), P(295,425)]], handlers:'staticAdiabatic', handles:['left', 'right'], bounds:[undefined, {yMin:50, yMax:275}], vols:[5,5]});
+					walls = WallHandler();
+					walls.addWall({pts:[P(40,190), P(255,190), P(255,425), P(40,425)], handler:'staticAdiabatic', handle:'left', bounds:undefined, vol:5});
+					walls.addWall({pts:[P(295,190), P(510,190), P(510,425), P(295,425)], handler:'staticAdiabatic', handle:'right', bounds:{yMin:50, yMax:275}, vol:5});
 					this.borderStd({wallInfo:'left', min:50});
 					this.borderStd({wallInfo:'right', min:50});
 					spcs['spc1'].populate(P(45,200), V(200, 200), 350, 185, 'left', 'left');
