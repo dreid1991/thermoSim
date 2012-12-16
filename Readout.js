@@ -8,10 +8,11 @@ function Readout(handle, leftBound, rightBound, y, font, fontCol, align){
 	this.width = rightBound - leftBound;
 	this.y = y;
 	this.entries = [];
+	curLevel.readouts[handle] = this; //global readouts 
 }
 Readout.prototype = {
 
-	draw: function(){
+	draw: function() {
 		this.drawCanvas.save();
 		this.drawCanvas.translate(this.leftBound, this.y);
 		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++){
@@ -23,12 +24,12 @@ Readout.prototype = {
 		}
 		this.drawCanvas.restore();
 	},
-	hardUpdate: function(name, setPt){
+	hardUpdate: function(name, setPt) {
 		var entry = byAttr(this.entries, name, 'name');
 		var decPlaces = entry.decPlaces;
 		entry.val = round(setPt, decPlaces);
 	},
-	tick: function(name, setPt){
+	tick: function(name, setPt) {
 		var entry = byAttr(this.entries, name, 'name');
 		if(isNaN(entry.val)){
 			entry.val = setPt;
@@ -42,7 +43,7 @@ Readout.prototype = {
 			
 		}
 	},
-	makeTickFunc: function(entry, step, setPt){
+	makeTickFunc: function(entry, step, setPt) {
 		return function(){
 			entry.val = boundedStep(entry.val, setPt, step);
 			var decPlaces = entry.decPlaces
@@ -51,19 +52,19 @@ Readout.prototype = {
 			}
 		}
 	},
-	addEntry: function(name, text, units, initVal, idx, decPlaces){
+	addEntry: function(name, text, units, initVal, idx, decPlaces) {
 		var entry = {name:name, text:text, units:units, val: initVal, initVal:initVal, decPlaces:decPlaces};
-		if(idx){
+		if (idx) {
 			this.entries.splice(idx, 0, entry);
-		}else{
+		} else {
 			this.entries.push(entry);
 		}
 		this.positionEntries();
 		this.hide().show();
 	},
-	removeEntry: function(toRemove){
-		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++){
-			if(this.entries[entryIdx].name==toRemove){
+	removeEntry: function(toRemove) {
+		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++) {
+			if (this.entries[entryIdx].name==toRemove) {
 				this.entries.splice(entryIdx,1);
 				this.positionEntries();
 				return this;
@@ -71,27 +72,27 @@ Readout.prototype = {
 		}
 		console.log('Tried to remove entry that does not exist: ' + toRemove);
 	},
-	entryExists: function(entryName){
-		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++){
-			if(this.entries[entryIdx].name==entryName){
+	entryExists: function(entryName) {
+		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++) {
+			if (this.entries[entryIdx].name==entryName) {
 				return true;
 			}
 		}
 		return false;		
 	},
-	removeAllEntries: function(){
+	removeAllEntries: function() {
 		this.entries = [];
 	},
-	positionEntries: function(){
+	positionEntries: function() {
 		var numEntries = this.entries.length;
 		var spacing;
-		if(numEntries>1){
+		if (numEntries>1) {
 			spacing = Math.floor(this.width/(numEntries-1));
-		} else{
+		} else {
 			spacing=this.width;
 		}
 
-		if(this.align=='center'){
+		if (this.align=='center') {
 			spacing = this.width/(numEntries+1);
 			var center = this.leftBound + this.width/2;
 			var spaceNum = numEntries-1;
@@ -102,7 +103,7 @@ Readout.prototype = {
 				var y = 0;
 				entry.pos = P(x,y);
 			}
-		}else if(this.align=='left'){
+		} else if(this.align=='left') {
 			for (var entryIdx=0; entryIdx<numEntries; entryIdx++){
 				var entry = this.entries[entryIdx];
 				var x = spacing*entryIdx
@@ -144,10 +145,12 @@ Readout.prototype = {
 		}
 	},
 	show: function(){
+		curLevel.readouts[this.handle] = this;
 		addListener(curLevel, 'update', 'drawReadout'+this.handle, this.draw, this);
 		return this;
 	},
 	hide: function(){
+		delete curLevel.readouts[this.handle];
 		removeListener(curLevel, 'update', 'drawReadout'+this.handle);
 		return this;
 	}

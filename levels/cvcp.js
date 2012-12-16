@@ -1,7 +1,7 @@
 function cvcp(){
 	this.setStds();
 	this.wallSpeed = 1;
-	this.readout = new Readout('mainReadout', 30, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), 'left');
+	this.readouts = {};
 	this.compMode = 'Isothermal';//is this used?
 
 	
@@ -15,6 +15,7 @@ _.extend(cvcp.prototype,
 	init: function() {
 		$('#mainHeader').html('c<sub>v</sub> vs. c<sub>P</sub');
 		showPrompt(0, 0, true);
+		this.readout = new Readout('mainReadout', 30, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), 'left');
 	},
 	sections: [
 		{//B0
@@ -51,6 +52,32 @@ _.extend(cvcp.prototype,
 			]
 		},
 		{//B1
+			/*
+			setup: {
+				type: 'section',
+				walls: {pts:[[P(40,190), P(255,190), P(255,425), P(40,425)], [P(295,190), P(510,190), P(510,425), P(295,425)]], handlers:'staticAdiabatic', handles:['left', 'right'], bounds:[undefined, {yMin:50, yMax:275}], vols:[5,5]},
+				//borders should be option in wall
+				spcs: [	{type: 'spc1', pos: P(45,200), dims: V(200, 200), count: 350, temp:150, returnTo: 'left', tag: 'right'},
+						{type: 'spc3', pos: P(45,200), dims: V(200, 200), count: 250, temp:150, returnTo: 'left', tag: 'right'},
+						{type: 'spc1', pos: P(45,200), dims: V(200, 200), count: 350, temp:150, returnTo: 'left', tag: 'right'},
+						{type: 'spc3', pos: P(45,200), dims: V(200, 200), count: 350, temp:150, returnTo: 'left', tag: 'right'}
+				],
+				objs: [
+					{type: 'piston', handle: 'RightPiston', wallInfo: 'right', min:2, init:2, max:2, makeSlider:false},
+					{type: 'heater', handle: 'heaterLeft', wallInfo: 'left'},
+					{type: 'heater', handle: 'heaterRight', wallInfo: 'right'}
+				],
+				display: [
+					{wallHandle: 'left', 'tempSmooth', 'mainReadout'}
+					//WHICH WALL, WHAT THING, WHERE
+					
+				],
+				listeners: [
+					{dataList:walls[0].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'},
+					{dataList:walls[1].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'}
+				]
+			}
+		*/
 			setup:
 				function() {
 					currentSetupType = 'section';
@@ -63,22 +90,39 @@ _.extend(cvcp.prototype,
 					spcs['spc1'].populate(P(300,200), V(200, 200), 350, 185, 'right', 'right');
 					spcs['spc3'].populate(P(300,200), V(200, 200), 250, 185, 'right', 'right');	
 
-
-					this.piston = new Piston({wallInfo:'right', min:2, init:2, max:2, makeSlider:false})
+					this.piston = new Piston({handle: 'RightPiston', wallInfo:'right', min:2, init:2, max:2, makeSlider:false})
 					this.heaterLeft = new Heater({handle:'heaterLeft', wallInfo:'left'});
 					this.heaterRight = new Heater({handle:'heaterRight', wallInfo:'right'});
-
-					walls[1].setDefaultReadout(this.readout);
-					walls[0].displayTempSmooth().displayQ();
-					walls[1].displayTempSmooth().displayQ();
+					
+					walls[0].displayTempSmooth('mainReadout')//.displayQ('mainReadout');
+					walls[1].displayTempSmooth('mainReadout')//.displayQ('mainReadout');
 				},
 			prompts:[
 				{//P0
 					setup: 
 						function(){
+							currentSetupType = 'prompt0';
+							//walls[1].setDefaultReadout(this.piston.readout);
+							walls[1].displayPExt('pistonReadoutRightPiston');
+							walls[0].displayQ('mainReadout');
+							this.leftTemp250 = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
+							this.rightTemp250 = new StateListener({dataList:walls[1].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
+						},
+					title:"Current step",
+					text:"Okay, here’s a constant volume and a constant pressure container.  Both are adiabatic and contain 0.6 moles of an ideal monatomic gas.  Heat the two containers to 250 K.  How do the energies used compare?",
+					quiz:[
+						{	
+						type:'text',
+						text:'Type your answer here.',
+						},
+					]
+				},
+				{//P0
+					setup: 
+						function(){
 							currentSetupType = 'prompt1';
-							walls[1].setDefaultReadout(this.piston.readout);
-							walls[1].displayPExt();
+							//walls[1].setDefaultReadout(this.piston.readout);
+							//walls[1].displayPExt('pistonReadoutRightPiston');
 							this.leftTemp250 = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
 							this.rightTemp250 = new StateListener({dataList:walls[1].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
 						},
@@ -140,8 +184,8 @@ _.extend(cvcp.prototype,
 			setup:
 				function() {
 					this.sections[1].setup.apply(this);
-					walls[1].setDefaultReadout(this.piston.readout);
-					walls[1].displayWork();
+					//walls[1].setDefaultReadout(this.piston.readout);
+					walls[1].displayWork('mainReadout');
 
 				},
 			prompts:[

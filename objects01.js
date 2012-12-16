@@ -1218,6 +1218,7 @@ _.extend(CompArrow.prototype, objectFuncs, {
 
 function Piston(attrs){
 	this.type = 'Piston';
+	this.handle = attrs.handle;
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.wall = walls[this.wallInfo];
@@ -1243,14 +1244,14 @@ function Piston(attrs){
 	var readoutY = this.pistonBottom.pos.y-2+this.pistonPt.y;
 	var readoutFont = '12pt calibri';
 	var readoutFontCol = Col(255, 255, 255);
-	this.readout = new Readout('pistonReadout', readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, 'center');
+	this.readout = new Readout('pistonReadout' + this.handle, readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, 'center');
 	this.wall.moveInit();
 	
 	this.wall.recordPExt();
 	this.wall.recordWork();
 	
 	walls.setSubWallHandler(this.wallInfo, 0, 'cPAdiabaticDamped' + compAdj);		
-	this.wall.setDefaultReadout(this.readout);
+	//this.wall.setDefaultReadout(this.readout);
 	if(this.makeSlider){
 		this.sliderId = this.addSlider('Pressure', {value:this.pToPercent(this.val)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
 	}

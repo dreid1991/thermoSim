@@ -1156,13 +1156,13 @@ WallMethods = {
 			return this;
 		},
 		//HEY - YOU SHOULD _PROBABLY_ MAKE A FUNCTION THAT DOES THESE DISPLAY THINGS GIVEN SOME INPUTS.  I MEAN, THIS IS A LOT OF NEARLY IDENTICAL CODE
-		displayWork: function(readout, label, decPlaces){
+		displayWork: function(readoutHandle, label, decPlaces){
 			if(this.recordingWork && !this.displayingWork){
 				this.displayingWork = true;
 				decPlaces = defaultTo(1, decPlaces);
 				var dataSet = this.data.work;
 				label = defaultTo('Work:', label);
-				this.workReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
+				this.workReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
 				var firstVal = dataSet[dataSet.length-1];
 				if(!validNumber(firstVal)){
 					firstVal = 0;
@@ -1173,18 +1173,19 @@ WallMethods = {
 						this.workReadout.hardUpdate('work' + this.handle, dataSet[dataSet.length-1]);
 					},
 				this);	
-			}else{
+				this.addCleanUpIfPrompt('displayWork', this.displayWorkStop);
+			} else {
 				console.log('Tried to display work of wall ' + this.handle + ' while not recording.  Will not display.');
 			}
 			return this;
 		},
-		displayTemp: function(readout, label, decPlaces, smooth){
+		displayTemp: function(readoutHandle, label, decPlaces, smooth){
 			if (this.recordingTemp && !this.displayingTemp) {
 				this.displayingTemp = true;
 				decPlaces = defaultTo(0, decPlaces);
 				var dataSet = this.data.t;
 				label = defaultTo('Temp:', label);
-				this.tempReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
+				this.tempReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
 				var firstVal = dataSet[dataSet.length-1];
 				if (!validNumber(firstVal)) {
 					firstVal = 0;
@@ -1207,21 +1208,22 @@ WallMethods = {
 						},
 					this);
 				}
+				this.addCleanUpIfPrompt('displayTemp', this.displayTempStop);
 			}else{
 				console.log('Tried to display temp of wall ' + this.handle + ' while not recording.  Will not display.');
 			}
 			return this;
 		},
-		displayTempSmooth: function(readout, label, decPlaces) {
-			return this.displayTemp(readout, label, decPlaces, true);
+		displayTempSmooth: function(readoutHandle, label, decPlaces) {
+			return this.displayTemp(readoutHandle, label, decPlaces, true);
 		},
-		displayPInt: function(readout, label, decPlaces){
+		displayPInt: function(readoutHandle, label, decPlaces){
 			if(this.recordingPInt && !this.displayingPInt){
 				this.displayingPInt = true;
 				decPlaces = defaultTo(1, decPlaces);
 				var dataSet = this.data.pInt;
 				label = defaultTo('Pint:', label);
-				this.pIntReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
+				this.pIntReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
 				var firstVal = dataSet[dataSet.length-1];
 				if (!validNumber(firstVal)) {
 					firstVal = 0;
@@ -1232,18 +1234,19 @@ WallMethods = {
 						this.pIntReadout.hardUpdate('pInt' + this.handle, dataSet[dataSet.length-1]);
 					},
 				this);
+				this.addCleanUpIfPrompt('displayPInt', this.displayPIntStop);
 			}else{
 				console.log('Tried to display pInt of wall ' + this.handle + ' while not recording.  Will not display.');
 			}
 			return this;
 		},
-		displayPExt: function(readout, label, decPlaces){
+		displayPExt: function(readoutHandle, label, decPlaces){
 			if(this.recordingPExt && !this.displayingPExt){
 				this.displayingPExt = true;
 				decPlaces = defaultTo(1, decPlaces);
 				var dataSet = this.data.pExt;
 				label = defaultTo('Pext:', label);
-				this.pExtReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
+				this.pExtReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
 				var firstVal = dataSet[dataSet.length-1];
 				if(!validNumber(firstVal)){
 					firstVal = 0;
@@ -1260,18 +1263,19 @@ WallMethods = {
 						
 					},
 				this);
+				this.addCleanUpIfPrompt('displayPExt', this.displayPExtStop);
 			}else{//OR ALREADY DISPLAYING - MAKE ERROR MESSAGES FOR TRYING TO DISPLAY WHILE ALREADY DISPLAYING
 				console.log('Tried to display pExt of wall ' + this.handle + ' while not recording.  Will not display.');
 			}
 			return this;
 		},
-		displayVol: function(readout, label, decPlaces){
+		displayVol: function(readoutHandle, label, decPlaces){
 			if(this.recordingVol && !this.displayingVol){
 				this.displayingVol = true;
 				decPlaces = defaultTo(1, decPlaces);
 				var dataSet = this.data.v;
 				label = defaultTo('Volume:', label);
-				this.volReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
+				this.volReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
 				var firstVal = dataSet[dataSet.length-1];
 				if(!validNumber(firstVal)){
 					firstVal = 0;
@@ -1282,18 +1286,19 @@ WallMethods = {
 						this.volReadout.hardUpdate('vol' + this.handle, dataSet[dataSet.length-1]);
 					},
 				this);
+				this.addCleanUpIfPrompt('displayVol', this.displayVolStop);
 			}else{
 				console.log('Tried to display volume of wall ' + this.handle + ' while not recording.  Will not display.');			
 			}
 			return this;
 		},
-		displayMass: function(readout, label, decPlaces){
+		displayMass: function(readoutHandle, label, decPlaces){
 			if(this.recordingMass && !this.displayingMass){
 				this.displayingMass = true;
 				decPlaces = defaultTo(0, decPlaces);
 				var dataSet = this.data.m;
 				label = defaultTo('Mass:', label);
-				this.massReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
+				this.massReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
 				var firstVal = dataSet[dataSet.length-1];
 				if(!validNumber(firstVal)){
 					firstVal = 0;
@@ -1309,18 +1314,19 @@ WallMethods = {
 						}
 					},
 				this);
+				this.addCleanUpIfPrompt('displayMass', this.displayMassStop);
 			}else{
 				console.log('Tried to display mass of wall ' + this.handle + ' while not recording.  Will not display.');			
 			}
 			return this;			
 		},
-		displayQ: function(readout, label, decPlaces){
-			if(this.recordingQ && !this.displayingQ){
+		displayQ: function(readoutHandle, label, decPlaces){
+			if (this.recordingQ && !this.displayingQ) {
 				this.displayingQ = true;
 				decPlaces = defaultTo(1, decPlaces);
 				var dataSet = this.data.q;
 				label = defaultTo('Q:', label);
-				this.qReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
+				this.qReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
 				var firstVal = dataSet[dataSet.length-1];
 				if(!validNumber(firstVal)){
 					firstVal = 0;
@@ -1337,18 +1343,20 @@ WallMethods = {
 						
 					},
 				this);
+				this.addCleanUpIfPrompt('displayQ', this.displayQStop);
+
 			}else{
 				console.log('Tried to display q of wall ' + this.handle + ' while not recording.  Will not display.');
 			}
 			return this;
 		},
-		displayRMS: function(readout, label, decPlaces) {
+		displayRMS: function(readoutHandle, label, decPlaces) {
 			if(this.recordingRMS && !this.displayingRMS){
 				this.displayingRMS = true;
 				var decPlaces = defaultTo(0, decPlaces);
 				var dataSet = this.data.RMS;
 				label = defaultTo('RMS:', label);
-				this.RMSReadout = defaultTo(curLevel.readout, defaultTo(this.parent.defaultReadout, this.defaultReadout));
+				this.RMSReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
 				var firstVal = dataSet[dataSet.length-1];
 				if(!validNumber(firstVal)){
 					firstVal = 0;
@@ -1359,6 +1367,7 @@ WallMethods = {
 						this.RMSReadout.tick('RMS' + this.handle, dataSet[dataSet.length-1]);
 					},
 				this);	
+				this.addCleanUpIfPrompt('displayRMS', this.displayRMSStop);
 			}else{
 				console.log('Tried to display RMS of wall ' + this.handle + ' while not recording.  Will not display.');
 			}
@@ -1385,6 +1394,11 @@ WallMethods = {
 				console.trace();	
 				
 			}
+		},
+		addCleanUpIfPrompt: function(displayType, func) {
+			if (currentSetupType.indexOf('prompt') != -1) {
+				addListener(curLevel, currentSetupType + 'CleanUp', displayType + this.handle, func, this);
+			}			
 		},
 		displayVolStop: function(){
 			this.displayingVol = false;
