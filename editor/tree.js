@@ -277,9 +277,9 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 	},
 	makeDirButtons: function() { 
 		var pos = P(this.buttonSpacing, this.buttonSpacing);
-		var redo = new Button(this.paper, pos, this.dirButtonDims, undefined, function(){data.redo()}, 'imgRedo');
-		pos.movePt(V((this.dirButtonDims.dx + this.buttonSpacing), 0));
 		var undo = new Button(this.paper, pos, this.dirButtonDims, undefined, function(){data.undo()}, 'imgUndo');
+		pos.movePt(V((this.dirButtonDims.dx + this.buttonSpacing), 0));
+		var redo = new Button(this.paper, pos, this.dirButtonDims, undefined, function(){data.redo()}, 'imgRedo');
 		return {undo: undo, redo: redo};
 	},
 	//for these two remove functions, can send idxs or just the object you want to remove.  Type-safe my foot
@@ -804,6 +804,8 @@ function ArrowButton(tree, parent, posInit, dragFuncs, clickFuncs, labelText, is
 	this.inUse = false;
 	if (!this.dragFuncs) { // click is taken care of in drag funcs. 
 		this.assignClickFuncs() 
+	} else {
+		this.assignDragFuncs();
 	}
 	/*
 		click funcs formatted as 
@@ -822,13 +824,38 @@ function ArrowButton(tree, parent, posInit, dragFuncs, clickFuncs, labelText, is
 }
 
 _.extend(ArrowButton.prototype, assignHover, {
-	toTreeMode: function() {
+	//What I really should do is let you send a toTreeMode and toObjectMoe function.  Then the button would be mode flexible without sloppy things
+	toTreeMode: function(move) {
 		this.mode = 'tree';
 		if (!this.dragFuncs) {
 			this.assignClickFuncs();
+		} else {
+			this.assignDragFuncs();
 		}
 		if (this.arrowAngle = Math.PI) {
 			this.pointArrows('right')
+		}
+	
+	},
+	toObjectMode: function(move) {
+		
+		this.mode = 'object';
+		if (!this.dragFuncs) {
+			this.assignClickFuncs();
+		} else {
+			this.assignDragFuncs();
+		}
+		if (move !== false) {
+			if (this == this.tree.clickedButton || this == this.tree.editingButton) {
+				this.tree.editingButton = this;
+				this.pointArrows('left');
+				this.tree.editingButton = this;
+				this.flyToPos(this.tree.buttonPosObjectModeSelected, 200);
+				//this.flyToPos(P(0, 75));
+			} else {
+				//this.flyToPos(P(0, 75));
+				this.flyToPos(P(-this.tree.buttonDims.dx-50, this.pos.y), 150);
+			}
 		}
 	},
 	hide: function() {
@@ -850,28 +877,36 @@ _.extend(ArrowButton.prototype, assignHover, {
 		}
 		this.label.show().toFront();
 	},
-	toObjectMode: function() {
-		this.mode = 'object';
-		if (!this.dragFuncs) {
-			this.assignClickFuncs();
-		}
-		if (this == this.tree.clickedButton || this == this.tree.editingButton) {
-			this.tree.editingButton = this;
-			this.pointArrows('left');
-			this.tree.editingButton = this;
-			this.flyToPos(this.tree.buttonPosObjectModeSelected, 200);
-			//this.flyToPos(P(0, 75));
-		} else {
-			//this.flyToPos(P(0, 75));
-			this.flyToPos(P(-this.tree.buttonDims.dx-50, this.pos.y), 150);
-		}
-	},
 	assignClickFuncs: function() {
 		if (this.clickFuncs) {
+			this.rect.unclick();
 			this.rect.click(this.clickFuncs[this.mode]['rect']);
+			this.innerRect.unclick();
 			this.innerRect.click(this.clickFuncs[this.mode]['arrows']);
+			if (this.label) {
+				this.label.unclick()
+				this.label.click(this.clickFuncs[this.mode]['rect']);
+			}
 			for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
+				this.arrows[arrowIdx].unclick();
 				this.arrows[arrowIdx].click(this.clickFuncs[this.mode]['arrows']);
+			}
+		}
+	},
+	assignDragFuncs: function() {
+		if (this.dragFuncs) {
+			this.rect.undrag();
+			this.rect.drag(this.dragFuncs[this.mode].onMove, this.dragFuncs[this.mode].onStart, this.dragFuncs[this.mode].onEnd);
+			this.innerRect.undrag();
+			this.innerRect.drag(this.dragFuncs[this.mode].onMove, this.dragFuncs[this.mode].onStart, this.dragFuncs[this.mode].onEnd);
+			if (this.label) {
+				this.label.undrag();
+				this.label.drag(this.dragFuncs[this.mode].onMove, this.dragFuncs[this.mode].onStart, this.dragFuncs[this.mode].onEnd);
+			}
+			for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
+				this.arrows[arrowIdx].undrag();
+				this.arrows[arrowIdx].drag(this.dragFuncs[this.mode].onMove, this.dragFuncs[this.mode].onStart, this.dragFuncs[this.mode].onEnd);
+			
 			}
 		}
 	},
@@ -897,7 +932,7 @@ _.extend(ArrowButton.prototype, assignHover, {
 			//'stroke-linejoin': 'round',
 		});
 		if (this.dragFuncs) {
-			rect.drag(this.dragFuncs.tree.onMove, this.dragFuncs.tree.onStart, this.dragFuncs.tree.onEnd);
+			//rect.drag(this.dragFuncs.tree.onMove, this.dragFuncs.tree.onStart, this.dragFuncs.tree.onEnd);
 		}
 		this.assignHover(rect, 'rect', this.tree.rectColHover, this.tree.rectCol)
 
@@ -915,7 +950,7 @@ _.extend(ArrowButton.prototype, assignHover, {
 			
 		});
 		if (this.dragFuncs) {
-			rect.drag(this.dragFuncs.tree.onMove, this.dragFuncs.tree.onStart, this.dragFuncs.tree.onEnd);
+			//rect.drag(this.dragFuncs.tree.onMove, this.dragFuncs.tree.onStart, this.dragFuncs.tree.onEnd);
 		}
 		this.assignHover(rect, 'innerRect', this.tree.rectColHover, this.tree.rectCol);
 
@@ -941,7 +976,7 @@ _.extend(ArrowButton.prototype, assignHover, {
 			this.assignHover(arrow, 'innerRect', this.tree.rectColHover, this.tree.rectCol);
 
 			if (this.dragFuncs) {
-				arrow.drag(this.dragFuncs.tree.onMove, this.dragFuncs.tree.onStart, this.dragFuncs.tree.onEnd);
+				//arrow.drag(this.dragFuncs.tree.onMove, this.dragFuncs.tree.onStart, this.dragFuncs.tree.onEnd);
 			}
 			arrow.parent = this;
 			arrow.type = 'arrows';
@@ -987,7 +1022,7 @@ _.extend(ArrowButton.prototype, assignHover, {
 			translateObj(label, pos);
 			this.assignHover(label, 'rect', this.tree.rectColHover, this.tree.rectCol);
 			if (this.dragFuncs) {
-				label.drag(this.dragFuncs.tree.onMove, this.dragFuncs.tree.onStart, this.dragFuncs.tree.onEnd);
+				label.drag(this.dragFuncs[this.mode].onMove, this.dragFuncs[this.mode].onStart, this.dragFuncs[this.mode].onEnd);
 			}
 			label.parent = this;
 			label.type = 'label';

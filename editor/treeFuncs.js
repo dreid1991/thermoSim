@@ -85,9 +85,9 @@ SectionFuncs = {
 				onEnd: this.sectionDragEndTreeMode
 			},
 			object: {
-				onStart: undefined,
-				onMove: undefined,
-				onEnd: undefined
+				onStart: this.sectionDragStartTreeMode,
+				onMove: this.sectionDragMoveTreeMode,
+				onEnd: this.sectionDragEndTreeMode
 			}
 		}
 		
@@ -174,9 +174,9 @@ PromptFuncs = {
 				onEnd: this.promptDragEndTreeMode	
 			},
 			object: {
-				onStart: undefined,
-				onMove: undefined,
-				onEnd: undefined
+				onStart: this.promptDragStartTreeMode,
+				onMove: this.promptDragMoveTreeMode,
+				onEnd: this.promptDragEndTreeMode	
 			}
 		}
 	}
@@ -449,6 +449,8 @@ ReceptacleFuncs = { //button has pos, parent has totalHeight, totalWidth,
 					//called in context of tree
 	activateReceptacles: function(button) {
 		button.hoveringOver = [];
+		console.log('activating');
+		console.log(button.parent);
 		button.storedDims = V(button.parent.totalWidth(), button.parent.totalHeight());
 		this.checkReceptacles(button);
 	},
@@ -475,19 +477,21 @@ ReceptacleFuncs = { //button has pos, parent has totalHeight, totalWidth,
 		}
 		return receptsTouched;
 	},
-	onReleaseReceptacle: function(obj) {
+	onReleaseReceptacle: function(button) {
 		
-		this.deactivateReceptacles(obj);
-		if (obj.hoveringOver.length>0) {
-			return obj.hoveringOver[obj.hoveringOver.length-1].onDropInto(obj);
+		this.deactivateReceptacles(button);
+		if (button.hoveringOver.length>0) {
+			return button.hoveringOver[button.hoveringOver.length-1].onDropInto(button);
 		}
-		obj.hoveringOver = undefined;
+		button.hoveringOver = undefined;
 		return true;
 	},
-	deactivateReceptacles: function(obj) {
-		obj.storedDims = undefined;
-		for (var unhoverIdx=0; unhoverIdx<obj.hoveringOver.length; unhoverIdx++) {
-			obj.hoveringOver[unhoverIdx].onHoverOut();
+	deactivateReceptacles: function(button) {
+		button.storedDims = undefined;
+		console.log('deactivating');
+		console.log(button.parent);
+		for (var unhoverIdx=0; unhoverIdx<button.hoveringOver.length; unhoverIdx++) {
+			button.hoveringOver[unhoverIdx].onHoverOut();
 		}
 	},
 

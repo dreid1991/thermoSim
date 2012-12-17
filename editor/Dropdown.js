@@ -1,4 +1,5 @@
 function Dropdown(tree, pos, dims, text, fillCol, hoverCol) {
+	this.expanded = false;
 	this.tree = tree;
 	this.pos = pos.copy();
 	this.dims = dims.copy();
@@ -6,6 +7,8 @@ function Dropdown(tree, pos, dims, text, fillCol, hoverCol) {
 	this.hoverCol = hoverCol.copy();
 	this.defineClickFuncs();
 	this.button = new ArrowButton(this.tree, this, this.pos, undefined, this.clickFuncs, this.text, false);
+	this.button.toObjectMode(false);
+	this.button.pointArrows('down');
 	this.items = [];
 }
 
@@ -14,15 +17,19 @@ Dropdown.prototype = {
 		this.clickFuncs = {
 			object: {
 				rect: function(){},
-				arrows: function(){}
+				arrows: this.clickArrows
 			},
 			tree: {
-				rect: function(){},
-				arrows: function(){}
+				rect: function(){console.log('Dropdown is in tree mode!')},
+				arrows: function(){console.log('Dropdown is in tree mode!')}
 			}
 		}
 	},
-	clickFunc: function() {
-		
+	clickArrows: function() {
+		if (this.expanded) {
+			this.contract();
+		} else {
+			this.expand();
+		}
 	},
 }
