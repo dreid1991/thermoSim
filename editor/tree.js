@@ -462,13 +462,13 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 
 	defineClickFuncs: function() {
 		this.clickFuncs = {
-			rect: {
-				tree: this.onClickRectTreeMode,
-				object: this.onClickRectObjectMode
+			tree: {
+				rect: this.onClickRectTreeMode,
+				arrows: this.onClickArrowsTreeMode
 			},
-			arrows: {
-				tree: this.onClickArrowsTreeMode,
-				object: this.onClickArrowsObjectMode
+			object: {
+				rect: this.onClickRectObjectMode,
+				arrows: this.onClickArrowsObjectMode
 			}
 		}
 	},
@@ -835,7 +835,7 @@ _.extend(ArrowButton.prototype, assignHover, {
 	//What I really should do is let you send a toTreeMode and toObjectMoe function.  Then the button would be mode flexible without sloppy things
 	toTreeMode: function(move) {
 		this.mode = 'tree';
-		if (!this.dragFuncs) {
+		if (!this.dragFuncs || !this.dragFuncs[this.mode]) {
 			this.assignClickFuncs();
 		} else {
 			this.assignDragFuncs();
@@ -848,7 +848,7 @@ _.extend(ArrowButton.prototype, assignHover, {
 	toObjectMode: function(move) {
 		
 		this.mode = 'object';
-		if (!this.dragFuncs) {
+		if (!this.dragFuncs || !this.dragFuncs[this.mode]) {
 			this.assignClickFuncs();
 		} else {
 			this.assignDragFuncs();

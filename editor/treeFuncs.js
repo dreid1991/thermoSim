@@ -59,7 +59,7 @@ SectionFuncs = {
 		if (this.parent.tree.onReleaseReceptacle.apply(this.parent.tree, [this.parent])) {
 			if (!this.parent.released && this.parent.clickFuncs) {
 				didClickFunc = true;
-				this.parent.clickFuncs[this.type][this.parent.mode].apply(this.parent);
+				this.parent.clickFuncs[this.parent.mode][this.type].apply(this.parent);
 			}
 			this.parent.sectionIdx = undefined;
 			this.parent.released = false;
@@ -84,11 +84,7 @@ SectionFuncs = {
 				onMove: this.sectionDragMoveTreeMode,
 				onEnd: this.sectionDragEndTreeMode
 			},
-			object: {
-				onStart: this.sectionDragStartTreeMode,
-				onMove: this.sectionDragMoveTreeMode,
-				onEnd: this.sectionDragEndTreeMode
-			}
+			object: undefined
 		}
 		
 	}
@@ -146,7 +142,7 @@ PromptFuncs = {
 		if (this.parent.tree.onReleaseReceptacle.apply(this.parent.tree, [this.parent])) {
 			if (!this.parent.released && this.parent.clickFuncs) {
 				didClickFunc = true;
-				this.parent.clickFuncs[this.type][this.parent.mode].apply(this.parent);
+				this.parent.clickFuncs[this.parent.mode][this.type].apply(this.parent);
 			}//might want to save these variables for use in the click function
 			//also, if we're doing the click function, it means we didn't move any blocks, so we don't have to rearrange
 			this.parent.promptIdx = undefined;
@@ -173,11 +169,7 @@ PromptFuncs = {
 				onMove: this.promptDragMoveTreeMode,
 				onEnd: this.promptDragEndTreeMode	
 			},
-			object: {
-				onStart: this.promptDragStartTreeMode,
-				onMove: this.promptDragMoveTreeMode,
-				onEnd: this.promptDragEndTreeMode	
-			}
+			object: undefined
 		}
 	}
 
