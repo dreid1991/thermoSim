@@ -107,6 +107,7 @@
 <script src = '../Attractor.js'></script>
 <script src = '../DataHandler.js'></script>
 <script src = '../WallHandler.js'></script>
+<script src = '../Renderer.js'></script>
 <script src = '../objects01.js'></script>
 <script src = '../objects02.js'></script>
 <script src = '../AuxPicture.js'></script>
@@ -122,7 +123,7 @@ $(function(){
 	imgPath = 'cvcp';
 	animText = new AnimText(c);
 	myCanvas.height = canvasHeight;
-	//renderer = new Renderer();
+	renderer = new Renderer();
 	curLevel = new cvcp();
 
 	curLevel.cutSceneEnd();

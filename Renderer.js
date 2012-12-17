@@ -4,10 +4,16 @@ function Renderer() {
 
 Renderer.prototype = {
 	render: function(scene) {
-		currentSetupType = scene.type + window[scene.type + 'Idx'];
-		
+		if (scene.type.indexOf('section') != -1) {
+			currentSetupType = scene.type;
+		} else {
+			currentSetupType = scene.type + window[scene.type + 'Idx'];
+		}
+		if (!curLevel[currentSetupType + 'CleanUp'] && scene.type == 'prompt') {
+			curLevel.makeListenerHolder('prompt' + promptIdx + 'CleanUp');
+		}
 		this.renderDots(scene.dots);
-		this.renderWall(scene.walls);
+		this.renderWalls(scene.walls, scene);
 		this.renderObjs(scene.objs);
 		this.addReadoutEntries(scene.readoutEntries);
 		this.addListeners(scene.listeners);
@@ -28,31 +34,38 @@ Renderer.prototype = {
 			}
 		}	
 	},
-	renderWalls: function(walls) {
-		var newWalls = defaultTo([], scene.walls);
+	renderWalls: function(newWalls, scene) {
+		var newWalls = defaultTo([], newWalls);
 		if (scene.type == 'section') {
 			walls = new WallHandler();
 		}
 		for (var wallIdx=0; wallIdx<newWalls.length; wallIdx++) {
 			var newWall = newWalls[wallIdx];
-			walls.addWall({pts: newWall.pts, handler: newWall.handler, handle: newWall.handle, bound: newWall.bounds, vol: newWall.vol});
+			walls.addWall(newWall);
 		}	
 	},
 	renderObjs: function(objs) {
-		var newObjs = defaultTo([], scene.objs);
+		objs = defaultTo([], objs);
 		for (var objIdx=0; objIdx<objs.length; objIdx++) {
 			var obj = objs[objIdx];
-			curLevel[obj.type + obj.handle] = new (window[obj.type](obj.attrs));
+			var objFunc = window[obj.type]
+			curLevel[obj.type + obj.handle] = new objFunc(obj.attrs);
 		}
 	},
 	addReadoutEntries: function(entries) {
+		entries = defaultTo([], entries);
 		for (var entryIdx=0; entryIdx<entries.length; entryIdx++) {
 			var entry = entries[entryIdx];
 			walls[entry.wallHandle]['display' + entry.data](entry.readout);
 		}
 	},
-	addListener: function(listeners) {
-		
+	addListeners: function(listeners) {
+		listener = defaultTo([], listeners);
+		for (var listenerIdx=0; listenerIdx<listeners.length; listenerIdx++) {
+			var listener = listeners[listenerIdx];
+			new StateListener(listener); 
+			//I don't think state listeners are ever referenced through curLevel., so I don't have to name them as keys in curLevel
+		}
 	},
 
 }
