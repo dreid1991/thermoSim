@@ -449,8 +449,6 @@ ReceptacleFuncs = { //button has pos, parent has totalHeight, totalWidth,
 					//called in context of tree
 	activateReceptacles: function(button) {
 		button.hoveringOver = [];
-		console.log('activating');
-		console.log(button.parent);
 		button.storedDims = V(button.parent.totalWidth(), button.parent.totalHeight());
 		this.checkReceptacles(button);
 	},
@@ -488,8 +486,6 @@ ReceptacleFuncs = { //button has pos, parent has totalHeight, totalWidth,
 	},
 	deactivateReceptacles: function(button) {
 		button.storedDims = undefined;
-		console.log('deactivating');
-		console.log(button.parent);
 		for (var unhoverIdx=0; unhoverIdx<button.hoveringOver.length; unhoverIdx++) {
 			button.hoveringOver[unhoverIdx].onHoverOut();
 		}

@@ -1,5 +1,6 @@
 config = {
 	buttonRounding: 3,
+	labelIndent: 3,
 	buttonFillCol: Col(0, 164, 255),//'#64a0c1';
 	buttonFillColHover: Col(0, 144, 224),
 	textSizeMed: 13,

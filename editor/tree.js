@@ -3,6 +3,7 @@ function Tree(paper/*, pos*/) {
 	this.someImage = new Image();
 	this.someImage.src = 'undo.GIF';
 	this.buttonDims = config.buttonDimsLarge;
+	this.toPosTime = 250;
 	this.innerRectDims = V(30, this.buttonDims.dy);
 	this.buttonSpacing = 7;
 	this.displaceDist = 9;
@@ -14,7 +15,7 @@ function Tree(paper/*, pos*/) {
 	this.totalButtonHeight = this.buttonDims.dy + this.buttonSpacing;
 	this.buttonPosObjectModeSelected = P(this.buttonSpacing, this.panelDimsTop.dy-this.totalButtonHeight);
 	this.objSelectorPos = P(this.panelDimsTop.dx - this.buttonSpacing - this.buttonDims.dx, this.panelDimsTop.dy-this.totalButtonHeight)
-	this.labelIndent = 3;
+	this.labelIndent = config.labelIndent;
 	this.labelTextSize = config.textSizeMed;
 	this.promptIndent = 30;
 	this.rectRounding = config.buttonRounding;
@@ -34,7 +35,6 @@ function Tree(paper/*, pos*/) {
 	this.rectColHover = config.buttonFillColHover;//'#5c93b2';
 	//this.rectColSelect = Col(82, 108, 122);//'#526c7a';
 	//this.rectColStroke = Col(59, 68, 73);//'#3b4449';
-	this.objSelector = new Dropdown(this, this.objSelectorPos, this.buttonDims, 'New object', this.rectCol, this.rectColHover);
 	this.populateObjSelector();
 	this.mode = 'tree';
 	//this.circleCol = Col(59, 68, 73);//Col(120, 180, 213);
@@ -49,6 +49,8 @@ function Tree(paper/*, pos*/) {
 	this.panels = this.makePanels();
 	this.placerButtonBG = this.makePlacerButton(false);
 	this.placerButton = this.makePlacerButton(true);
+	this.objSelector = new Dropdown(this.paper, this, this.objSelectorPos, this.buttonDims, 'New object', this.rectCol, this.rectColHover);
+	this.objSelector.hide();
 	this.bgRect = this.makeBGRect();
 	this.editingButton = undefined; //the one getting working on while in object mode
 	this.clickedButton = undefined;
@@ -94,10 +96,34 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.setDefaultLabels();
 		this.moveAllToPositions('fly');
 	},
+	toTreeMode: function() {
+		this.bgRect.show();
+		this.objSelector.hide();
+		this.mode = 'tree';
+		this.showBottomPanel();
+		this.editingButton = undefined;
+		this.topButtons.push(this.clickedButton);
+		this.unclickButton();
+		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
+			var section = this.sections[sectionIdx];
+			section.button.toTreeMode();
+			var prompts = section.prompts;
+			for (var promptIdx=0; promptIdx<prompts.length; promptIdx++) {
+				prompts[promptIdx].button.toTreeMode();
+			}
+		//to object mode moves each button.  to tree mode gets moved by the moveAllToPositions function.  This is an acceptable inconsistancy because the buttons don't individually know where to go in to tree mode
+		}
+		
+		this.moveAllToPositions('fly');
+		window.setTimeout(function() {
+			tree.topButtons = [];
+		}, this.toPosTime);
+	},
 	toObjectMode: function() {
 		this.bgRect.hide();
 		this.mode = 'object';
-		this.hideBottomPanel()
+		this.hideBottomPanel();
+		this.objSelector.show();
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
 			var section = this.sections[sectionIdx];
 			section.button.toObjectMode();
@@ -117,7 +143,6 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		}
 		this.dirButtons.redo.toFront();
 		this.dirButtons.undo.toFront();
-		//for (var buttonIdx
 		for (var topButtonIdx=0; topButtonIdx<this.topButtons.length; topButtonIdx++) {
 			this.topButtons[topButtonIdx].toFront();
 		}
@@ -147,24 +172,6 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.placerButtonBG.show();
 		this.placerButton.show();
 		this.showReceptacles();
-	},
-	toTreeMode: function() {
-		this.bgRect.show();
-		this.mode = 'tree';
-		this.showBottomPanel();
-		this.editingButton = undefined;
-		this.unclickButton();
-		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
-			var section = this.sections[sectionIdx];
-			section.button.toTreeMode();
-			var prompts = section.prompts;
-			for (var promptIdx=0; promptIdx<prompts.length; promptIdx++) {
-				prompts[promptIdx].button.toTreeMode();
-			}
-		//to object mode moves each button.  to tree mode gets moved by the moveAllToPositions function.  This is an acceptable inconsistancy because the buttons don't individually know where to go in to tree mode
-		}
-		
-		this.moveAllToPositions('fly');
 	},
 	load: function(renderData) {
 		var x, y;
@@ -495,13 +502,13 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
 			var section = this.sections[sectionIdx];
 			if (section.button != this.clickedButton && !section.button.inUse) {
-				section.button.move(P(x, y), moveStyle);
+				section.button.move(P(x, y), moveStyle, this.toPosTime);
 				section.pos.set(P(x,y));
 				y += this.totalButtonHeight;
 				for (var promptIdx=0; promptIdx<section.prompts.length; promptIdx++) {
 					var prompt = section.prompts[promptIdx];
 					if (prompt.button != this.clickedButton && !prompt.button.inUse) {
-						prompt.button.move(P(x+this.promptIndent, y), moveStyle);
+						prompt.button.move(P(x+this.promptIndent, y), moveStyle, this.toPosTime);
 					}
 					y += this.totalButtonHeight;
 				}
@@ -513,6 +520,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 			this.clickedButton.groupToFront();
 		}
 		this.staticsToFront();
+
 	},
 
 })
@@ -861,7 +869,9 @@ _.extend(ArrowButton.prototype, assignHover, {
 	hide: function() {
 		this.rect.hide();
 		this.innerRect.hide();
-		this.label.hide();
+		if (this.label) {
+			this.label.hide();
+		}
 		for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
 			this.arrows[arrowIdx].hide();
 		}
@@ -872,10 +882,12 @@ _.extend(ArrowButton.prototype, assignHover, {
 	show: function() {
 		this.rect.show().toFront();
 		this.innerRect.show().toFront();
+		if (this.label) {
+			this.label.show().toFront();
+		}
 		for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
 			this.arrows[arrowIdx].show().toFront();
 		}
-		this.label.show().toFront();
 	},
 	assignClickFuncs: function() {
 		if (this.clickFuncs) {
