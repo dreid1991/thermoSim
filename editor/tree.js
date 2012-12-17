@@ -2,16 +2,18 @@ function Tree(paper/*, pos*/) {
 	this.paper = paper;
 	this.someImage = new Image();
 	this.someImage.src = 'undo.GIF';
-	this.panelDimsTop = V(this.paper.width, 40);
+	this.buttonDims = config.buttonDimsLarge;
+	this.innerRectDims = V(30, this.buttonDims.dy);
+	this.buttonSpacing = 7;
+	this.displaceDist = 9;
+	this.degToRad = 360/(2*Math.PI);
+	this.panelDimsTop = V(this.paper.width, 2*this.buttonDims.dy+3*this.buttonSpacing);
 	this.panelDimsBottom = V(this.paper.width, 50);
 	this.pos = P(15, 10 + this.panelDimsTop.dy); //upper left corner of first section
 	this.posO = this.pos.copy();
-	this.buttonDims = config.buttonDimsLarge;
-	this.innerRectDims = V(30, this.buttonDims.dy);
-	this.buttonSpacing = 10;
-	this.displaceDist = 9;
 	this.totalButtonHeight = this.buttonDims.dy + this.buttonSpacing;
-	this.buttonPosObjectModeSelected = P(10, (this.panelDimsTop.dy-this.buttonDims.dy)/2);
+	this.buttonPosObjectModeSelected = P(this.buttonSpacing, this.panelDimsTop.dy-this.totalButtonHeight);
+	this.objSelectorPos = P(this.panelDimsTop.dx - this.buttonSpacing - this.buttonDims.dx, this.panelDimsTop.dy-this.totalButtonHeight)
 	this.labelIndent = 3;
 	this.labelTextSize = config.textSizeMed;
 	this.promptIndent = 30;
@@ -27,11 +29,13 @@ function Tree(paper/*, pos*/) {
 	this.placerBlockTolerance = 10; //how close placer block has to be before stuff starts moving out of the way
 	this.bgCol = Col(255, 255, 255);
 	this.panelCol = Col(230, 230, 230);//do a gradient, yo
+	this.arrowCol = Col(255, 255, 255);
 	this.rectCol = config.buttonFillCol;
 	this.rectColHover = config.buttonFillColHover;//'#5c93b2';
 	//this.rectColSelect = Col(82, 108, 122);//'#526c7a';
 	//this.rectColStroke = Col(59, 68, 73);//'#3b4449';
-	this.arrowCol = Col(255, 255, 255);
+	this.objSelector = new Dropdown(this, this.objSelectorPos, this.buttonDims, 'New object', this.rectCol, this.rectColHover);
+	this.populateObjSelector();
 	this.mode = 'tree';
 	//this.circleCol = Col(59, 68, 73);//Col(120, 180, 213);
 	//this.circleColHover = Col(110, 170, 203);
@@ -227,31 +231,8 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 			newSections.push(newSection);
 		}
 		this.sections = newSections;
-		/*
-		WILL STILL NEED TO CLEAN UP UNUSED SECTIONS AND PROMPTS
-		for (var sectionIdx=0; sectionIdx<sectionIds.length; sectionIdx++) {
-			var sectionId = sectionIds[sectionIdx];
-			var promptIds = renderData.get(sectionId + 'Prompts');
-			var sectionDragFuncs = renderData.get(sectionId + 'SectionDragFuncs');
-			var promptDragFuncs = renderData.get(sectionId + 'PromptDragFuncs');
-			var clickFuncs = renderData.get(sectionId + 'ClickFuncs');
-			var labelText = renderData.get(sectionId + 'LabelText');
-			var displayPos = pos;
-			if (sectionId == editingId) {
-				displayPos = this.buttonPosObjectModeSelected;
-			}
-			var section = new TreeSection(this, displayPos, sectionDragFuncs, promptDragFuncs, clickFuncs, '', false, sectionId);
-			if (sectionId == editingId) {
-				this.editingButton = section.button;
-			}
-			if (labelText) {
-				section.updateLabel(labelText);
-			}
-			pos.y += this.totalButtonHeight;
-			section.renderPrompts(renderData, promptIds, editingId, pos)
-			this.sections.push(section);
-		}	
-		*/
+		
+
 	},
 	makeToRemove: function() {
 		var toRemove = {};
@@ -263,6 +244,9 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 			}
 		}
 		return toRemove;
+	},
+	populateObjSelector: function() {
+	
 	},
 	removeUnused: function(toRemove) {
 		for (var id in toRemove) {
@@ -292,9 +276,9 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		}
 	},
 	makeDirButtons: function() { 
-		var pos = P(this.paper.width - this.buttonSpacing - this.dirButtonDims.dx, (this.panelDimsTop.dy - this.dirButtonDims.dy)/2);
+		var pos = P(this.buttonSpacing, this.buttonSpacing);
 		var redo = new Button(this.paper, pos, this.dirButtonDims, undefined, function(){data.redo()}, 'imgRedo');
-		pos.movePt(V(-(this.dirButtonDims.dx + this.buttonSpacing), 0));
+		pos.movePt(V((this.dirButtonDims.dx + this.buttonSpacing), 0));
 		var undo = new Button(this.paper, pos, this.dirButtonDims, undefined, function(){data.undo()}, 'imgUndo');
 		return {undo: undo, redo: redo};
 	},
@@ -545,7 +529,7 @@ function TreeSection(tree, posInit, sectionDragFuncs, promptDragFuncs, clickFunc
 	this.clickFuncs = clickFuncs;
 	this.labelText = labelText;
 	this.isPlacer = isPlacer;
-	this.button = new TreeButton(this.tree, this, this.pos, this.sectionDragFuncs, this.clickFuncs, this.labelText, isPlacer);
+	this.button = new ArrowButton(this.tree, this, this.pos, this.sectionDragFuncs, this.clickFuncs, this.labelText, isPlacer);
 	if (inheritedId === undefined) {
 		this.id = data.getSectionId();
 		this.register();
@@ -722,7 +706,7 @@ function TreePrompt(tree, section, posInit, dragFuncs, clickFuncs, labelText, in
 	this.dragFuncs = dragFuncs;
 	this.clickFuncs = clickFuncs;
 	this.labelText = labelText;
-	this.button = new TreeButton(this.tree, this, posInit, this.dragFuncs, this.clickFuncs);
+	this.button = new ArrowButton(this.tree, this, posInit, this.dragFuncs, this.clickFuncs);
 	if (inheritedId === undefined) {
 		this.id = data.getPromptId();
 		this.register();
@@ -798,7 +782,7 @@ var assignHover = {
 }
 
 
-function TreeButton(tree, parent, posInit, dragFuncs, clickFuncs, labelText, isPlacerButton) {
+function ArrowButton(tree, parent, posInit, dragFuncs, clickFuncs, labelText, isPlacerButton) {
 	this.tree = tree;
 	this.mode = 'tree';
 	this.pos = posInit.copy();
@@ -818,13 +802,32 @@ function TreeButton(tree, parent, posInit, dragFuncs, clickFuncs, labelText, isP
 	this.haveUpdatedLabel = false;
 	this.updateLabel(labelText, true);
 	this.inUse = false;
+	if (!this.dragFuncs) { // click is taken care of in drag funcs. 
+		this.assignClickFuncs() 
+	}
+	/*
+		click funcs formatted as 
+		{
+			rect: {
+				tree:
+				object:
+			}
+			arrows: {
+				tree:
+				object:
+			}
+		}
+	*/
 	this.arrowAngle = 0;//sorry about right/left, 0/180 use.  right -> 0, left -> 180.  Tossing angle around is nice for getting position without a bunch of ifs
 }
 
-_.extend(TreeButton.prototype, assignHover, {
+_.extend(ArrowButton.prototype, assignHover, {
 	toTreeMode: function() {
 		this.mode = 'tree';
-		if (this.arrowAngle = 180) {
+		if (!this.dragFuncs) {
+			this.assignClickFuncs();
+		}
+		if (this.arrowAngle = Math.PI) {
 			this.pointArrows('right')
 		}
 	},
@@ -849,6 +852,9 @@ _.extend(TreeButton.prototype, assignHover, {
 	},
 	toObjectMode: function() {
 		this.mode = 'object';
+		if (!this.dragFuncs) {
+			this.assignClickFuncs();
+		}
 		if (this == this.tree.clickedButton || this == this.tree.editingButton) {
 			this.tree.editingButton = this;
 			this.pointArrows('left');
@@ -858,6 +864,15 @@ _.extend(TreeButton.prototype, assignHover, {
 		} else {
 			//this.flyToPos(P(0, 75));
 			this.flyToPos(P(-this.tree.buttonDims.dx-50, this.pos.y), 150);
+		}
+	},
+	assignClickFuncs: function() {
+		if (this.clickFuncs) {
+			this.rect.click(this.clickFuncs[this.mode]['rect']);
+			this.innerRect.click(this.clickFuncs[this.mode]['arrows']);
+			for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
+				this.arrows[arrowIdx].click(this.clickFuncs[this.mode]['arrows']);
+			}
 		}
 	},
 	displace: function(dir) {
@@ -990,15 +1005,18 @@ _.extend(TreeButton.prototype, assignHover, {
 	},
 	pointArrows: function(dir) {// 'left', 'right'
 		if (dir == 'left') {
-			this.arrowAngle = 180;
+			this.arrowAngle = Math.PI;
 		} else if (dir == 'right') {
 			this.arrowAngle = 0;
+		} else if (dir == 'down') {
+			this.arrowAngle = Math.PI/2; 
 		}
-		
+		var innerRectCenter = this.innerRectPos().movePt(this.tree.innerRectDims.copy().mult(.5));
 		for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
 			var arrow = this.arrows[arrowIdx];
-			var pos = this.arrowPos(arrowIdx);
-			arrow.transform('t' + pos.x + ',' + pos.y + 'r' + this.arrowAngle + ',0,0');
+			var arrowPos = this.arrowPos(arrowIdx).rotate(innerRectCenter, this.arrowAngle);
+			//arrowCenter.rotate(innerRectCenter, this.arrowAngle);
+			arrow.transform('r' + this.arrowAngle*this.tree.degToRad + ',0,0T' + arrowPos.x + ',' + arrowPos.y);
 			
 		}
 	},
@@ -1042,9 +1060,11 @@ _.extend(TreeButton.prototype, assignHover, {
 			this.rect.transform('t' + rectPos.x + ',' + rectPos.y).toFront();
 			this.innerRect.transform('t' + innerRectPos.x + ',' + innerRectPos.y).toFront();
 			this.label.transform('t' + labelPos.x + ',' + labelPos.y).toFront();
+
+			var innerRectCenter = this.innerRectPos().movePt(this.tree.innerRectDims.copy().mult(.5));
 			for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
-				var arrowPos = this.arrowPos(arrowIdx);
-				this.arrows[arrowIdx].transform('t' + arrowPos.x + ',' + arrowPos.y + 'r' + this.arrowAngle + ',0,0').toFront();
+				var arrowPos = this.arrowPos(arrowIdx).rotate(innerRectCenter, this.arrowAngle);
+				this.arrows[arrowIdx].transform('r' + this.arrowAngle*this.tree.degToRad + ',0,0T' + arrowPos.x + ',' + arrowPos.y).toFront();
 			}
 		}
 			
@@ -1059,10 +1079,12 @@ _.extend(TreeButton.prototype, assignHover, {
 			this.rect.animate({transform:'t' + rectPos.x + ',' + rectPos.y}, time, 'ease-in-out').toFront();;
 			this.innerRect.animate({transform:'t' + innerRectPos.x + ',' + innerRectPos.y}, time, 'ease-in-out').toFront();
 			this.label.animate({transform:'t' + labelPos.x + ',' + labelPos.y}, time, 'ease-in-out').toFront();
+			
+			var innerRectCenter = this.innerRectPos().movePt(this.tree.innerRectDims.copy().mult(.5));
 			for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
-				var arrowPos = this.arrowPos(arrowIdx);
-				this.arrows[arrowIdx].animate({transform:'t' + arrowPos.x + ',' + arrowPos.y + 'r' + this.arrowAngle + ',0,0'}, time, 'ease-in-out').toFront();
-				this.arrows[arrowIdx].toFront();
+				var arrowPos = this.arrowPos(arrowIdx).rotate(innerRectCenter, this.arrowAngle);
+				this.arrows[arrowIdx].animate({transform:'r' + this.arrowAngle*this.tree.degToRad + ',0,0T' + arrowPos.x + ',' + arrowPos.y}, time, 'ease-in-out').toFront();
+				
 			}
 		}
 	},
@@ -1075,10 +1097,10 @@ _.extend(TreeButton.prototype, assignHover, {
 	arrowPos: function(arrowIdx) {//dirPointed assumes right
 		var x = this.pos.x + this.tree.buttonDims.dx - this.tree.innerRectDims.dx + this.tree.arrowOffset + arrowIdx*(this.tree.arrowSpacing + this.tree.arrowThickness);
 		var y = this.pos.y + (this.tree.buttonDims.dy - this.tree.arrowDims.dy)/2;
-		if (this.arrowAngle == 180) {
-			x += this.tree.arrowDims.dx;
-			y += this.tree.arrowDims.dy;
-		}
+		//if (this.arrowAngle == 180) {
+		//	x += this.tree.arrowDims.dx;
+		//	y += this.tree.arrowDims.dy;
+		//}
 		return P(x, y);
 	},
 	labelPos: function() {
@@ -1124,6 +1146,7 @@ _.extend(TreeButton.prototype, assignHover, {
 		}
 	},
 });
+
 
 function Receptacle(tree, pos, dims, labelText, onHoverIn, onHoverOut, onDropInto) {//yo yo, need to send dims
 	this.tree = tree;
