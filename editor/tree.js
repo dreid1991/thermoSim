@@ -102,7 +102,9 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.mode = 'tree';
 		this.showBottomPanel();
 		this.editingButton = undefined;
-		this.topButtons.push(this.clickedButton);
+		if (this.clickedButton) {
+			this.addTopButton(this.clickedButton);
+		}
 		this.unclickButton();
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
 			var section = this.sections[sectionIdx];
@@ -143,17 +145,23 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		}
 		this.dirButtons.redo.toFront();
 		this.dirButtons.undo.toFront();
+		this.objSelector.toFront();
 		for (var topButtonIdx=0; topButtonIdx<this.topButtons.length; topButtonIdx++) {
 			this.topButtons[topButtonIdx].toFront();
 		}
 	},
 	addTopButton: function(button) {
 		this.topButtons.push(button);
+		button.memberOf.push(this.topButtons);
 	},
 	removeTopButton: function(button) {
 		var idx = this.topButtons.indexOf(button);
 		if (idx!=-1) {
 			this.topButtons.splice(idx, 1);
+		}
+		var memberIdx = button.memberOf.indexOf(this.topButtons);
+		if (memberIdx!=-1) {
+			this.topButtons.splice(memberIdx, 1);
 		}
 	},
 	hideBottomPanel: function() {
@@ -303,10 +311,12 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 	},
 	makePanels: function() {
 		var bottom = this.paper.rect(0, this.paper.height - this.panelDimsBottom.dy, this.panelDimsBottom.dx, this.panelDimsBottom.dy).attr({
-			fill: this.panelCol.hex
+			fill: this.panelCol.hex,
+			'stroke-width': 0
 		})
 		var top = this.paper.rect(0, 0, this.panelDimsTop.dx, this.panelDimsTop.dy).attr({
-			fill: this.panelCol.hex
+			fill: this.panelCol.hex,
+			'stroke-width': 0
 		})
 		return {bottom:bottom, top:top}
 	},
@@ -792,6 +802,7 @@ var assignHover = {
 
 function ArrowButton(tree, parent, posInit, dragFuncs, clickFuncs, labelText, isPlacerButton) {
 	this.tree = tree;
+	this.memberOf = [];
 	this.mode = 'tree';
 	this.pos = posInit.copy();
 	this.dragFuncs = dragFuncs;
@@ -891,17 +902,24 @@ _.extend(ArrowButton.prototype, assignHover, {
 	},
 	assignClickFuncs: function() {
 		if (this.clickFuncs) {
-			this.rect.unclick();
+			this.rect.unclick(this.getClickFunc(this.rect));
 			this.rect.click(this.clickFuncs[this.mode]['rect']);
-			this.innerRect.unclick();
+			this.innerRect.unclick(this.getClickFunc(this.innerRect));
 			this.innerRect.click(this.clickFuncs[this.mode]['arrows']);
 			if (this.label) {
-				this.label.unclick()
+				this.label.unclick(this.getClickFunc(this.label))
 				this.label.click(this.clickFuncs[this.mode]['rect']);
 			}
 			for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
-				this.arrows[arrowIdx].unclick();
+				this.arrows[arrowIdx].unclick(this.getClickFunc(this.label));
 				this.arrows[arrowIdx].click(this.clickFuncs[this.mode]['arrows']);
+			}
+		}
+	},
+	getClickFunc: function(raphaelObj) {
+		for (var eventIdx=0; eventIdx<raphaelObj.events.length; eventIdx++) {
+			if (raphaelObj.events[eventIdx].name == 'click') {
+				return raphaelObj.events[eventIdx].f;
 			}
 		}
 	},
@@ -1015,7 +1033,7 @@ _.extend(ArrowButton.prototype, assignHover, {
 			}
 			var maxWidth = this.tree.buttonDims.dx - this.tree.labelIndent - this.tree.innerRectDims.dx - 5;
 			var tempText = '';
-			var label = this.tree.paper.text(0, 0, tempText).attr({'text-anchor': 'start', 'font-size': this.tree.labelTextSize});
+			var label = this.tree.paper.text(0, 0, tempText).attr({'text-anchor': 'start', 'font-size': this.tree.labelTextSize, fill: config.textCol.hex});
 			var tooWide = false;
 			
 			for (var letterIdx=labelText.length; letterIdx>=0; letterIdx--) {
@@ -1033,7 +1051,7 @@ _.extend(ArrowButton.prototype, assignHover, {
 			}
 			translateObj(label, pos);
 			this.assignHover(label, 'rect', this.tree.rectColHover, this.tree.rectCol);
-			if (this.dragFuncs) {
+			if (this.dragFuncs && this.dragFuncs[this.mode]) {
 				label.drag(this.dragFuncs[this.mode].onMove, this.dragFuncs[this.mode].onStart, this.dragFuncs[this.mode].onEnd);
 			}
 			label.parent = this;
@@ -1187,9 +1205,18 @@ _.extend(ArrowButton.prototype, assignHover, {
 	remove: function() {
 		this.rect.remove();
 		this.innerRect.remove();
-		this.label.remove();
+		if (this.label) {
+			this.label.remove();
+		}
 		for (var arrowIdx=0; arrowIdx<this.arrows.length; arrowIdx++) {
 			this.arrows[arrowIdx].remove();
+		}
+		for (var memberIdx=0; memberIdx<this.memberOf; memberIdx++) {
+			var list = this.memberOf[memberIdx];
+			var idx = list.indexOf(this);
+			if (idx!=-1) {
+				list.splice(idx, 1);
+			}
 		}
 	},
 });
