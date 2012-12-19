@@ -98,7 +98,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 	},
 	toTreeMode: function() {
 		this.bgRect.show();
-		this.elementAdded.hide();
+		this.elementAdder.hide();
 		this.mode = 'tree';
 		this.showBottomPanel();
 		this.editingButton = undefined;
