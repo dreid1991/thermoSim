@@ -14,7 +14,7 @@ function Tree(paper/*, pos*/) {
 	this.posO = this.pos.copy();
 	this.totalButtonHeight = this.buttonDims.dy + this.buttonSpacing;
 	this.buttonPosObjectModeSelected = P(this.buttonSpacing, this.panelDimsTop.dy-this.totalButtonHeight);
-	this.objSelectorPos = P(this.panelDimsTop.dx - this.buttonSpacing - this.buttonDims.dx, this.panelDimsTop.dy-this.totalButtonHeight)
+	this.elementAdderPos = P(this.panelDimsTop.dx - this.buttonSpacing - this.buttonDims.dx, this.panelDimsTop.dy-this.totalButtonHeight)
 	this.labelIndent = config.labelIndent;
 	this.labelTextSize = config.textSizeMed;
 	this.promptIndent = 30;
@@ -35,7 +35,7 @@ function Tree(paper/*, pos*/) {
 	this.rectColHover = config.buttonFillColHover;//'#5c93b2';
 	//this.rectColSelect = Col(82, 108, 122);//'#526c7a';
 	//this.rectColStroke = Col(59, 68, 73);//'#3b4449';
-	this.populateObjSelector();
+	this.populateelementAdder();
 	this.mode = 'tree';
 	//this.circleCol = Col(59, 68, 73);//Col(120, 180, 213);
 	//this.circleColHover = Col(110, 170, 203);
@@ -49,8 +49,8 @@ function Tree(paper/*, pos*/) {
 	this.panels = this.makePanels();
 	this.placerButtonBG = this.makePlacerButton(false);
 	this.placerButton = this.makePlacerButton(true);
-	this.objSelector = new Dropdown(this.paper, this, this.objSelectorPos, this.buttonDims, 'New object', this.rectCol, this.rectColHover);
-	this.objSelector.hide();
+	this.elementAdder = new ElementAdder(this.paper, this, this.elementAdderPos, this.buttonDims, 'New Element', this.rectCol, this.rectColHover);
+	this.elementAdder.hide();
 	this.bgRect = this.makeBGRect();
 	this.editingButton = undefined; //the one getting working on while in object mode
 	this.clickedButton = undefined;
@@ -98,7 +98,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 	},
 	toTreeMode: function() {
 		this.bgRect.show();
-		this.objSelector.hide();
+		this.elementAdded.hide();
 		this.mode = 'tree';
 		this.showBottomPanel();
 		this.editingButton = undefined;
@@ -125,7 +125,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.bgRect.hide();
 		this.mode = 'object';
 		this.hideBottomPanel();
-		this.objSelector.show();
+		this.elementAdder.show();
 		for (var sectionIdx=0; sectionIdx<this.sections.length; sectionIdx++) {
 			var section = this.sections[sectionIdx];
 			section.button.toObjectMode();
@@ -145,7 +145,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		}
 		this.dirButtons.redo.toFront();
 		this.dirButtons.undo.toFront();
-		this.objSelector.toFront();
+		this.elementAdder.toFront();
 		for (var topButtonIdx=0; topButtonIdx<this.topButtons.length; topButtonIdx++) {
 			this.topButtons[topButtonIdx].toFront();
 		}
@@ -260,7 +260,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		}
 		return toRemove;
 	},
-	populateObjSelector: function() {
+	populateelementAdder: function() {
 	
 	},
 	removeUnused: function(toRemove) {

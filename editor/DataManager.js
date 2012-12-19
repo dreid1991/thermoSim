@@ -3,6 +3,11 @@ function DataManager() {
 	this.sectionNum = 0;
 	this.promptNum = 0;
 	this.objNum = 0;
+	this.wallNum = 0;
+	this.listenerNum = 0;
+	this.dotsNum = 0;
+	this.readoutEntryNum = 0;
+	this.commandNum = 0;
 	this.hist = [new SearchTree()];
 }
 
@@ -47,4 +52,30 @@ DataManager.prototype = {
 		this.objNum++;
 		return id;
 	},
+	getWallId: function() {
+		var id = 'w' + this.wallNum;
+		this.wallNum++;
+		return id;
+	},
+	getListenerId: function() {
+		var id = 'l' + this.listenerNum;
+		this.listenerNum++;
+		return id;
+	},
+	getDotsId: function() {
+		var id = 'd' + this.dotsNum;
+		this.dotsNum++;
+		return id;
+	},
+	getReadoutEntryId: function() {
+		var id = 'rE' + this.readoutEntryNum;
+		this.readoutEntryNum++;
+		return id;
+	},
+	getCommandId: function() {
+		var id = 'c' + this.commandNum;
+		this.commandNum++;
+		return id;
+	},
+
 }

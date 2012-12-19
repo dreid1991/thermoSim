@@ -7,6 +7,7 @@ function Dropdown(paper, tree, pos, dims, text, fillCol, hoverCol) {
 	this.dims = dims.copy();
 	this.text = text;
 	this.itemDims = V(dims.dx, this.textSize*1.7);
+	this.mouseOutPadding = 30;
 	this.fillCol = fillCol.copy();
 	this.hoverCol = hoverCol.copy();
 	this.textSize = config.textSizeMed;
@@ -28,6 +29,7 @@ Dropdown.prototype = {
 	},
 	expand: function() {
 		this.expanded = true;
+		this.setupMouseOut()
 		for (var itemIdx=0; itemIdx<this.items.length; itemIdx++) {
 			this.items[itemIdx].show();
 		}
@@ -35,10 +37,27 @@ Dropdown.prototype = {
 	},
 	contract: function() {
 		this.expanded = false;
+		$(document).unbind('mousemove', this.hoverFunc);
+		this.hoverFunc = undefined;
 		for (var itemIdx=0; itemIdx<this.items.length; itemIdx++) {
 			this.items[itemIdx].hide();
 		}
 		this.bottomRound.hide();
+	},
+	makeHoverFunc: function(self, pos, dims) {
+		return function() {
+			var mousePos = posOnPaper(globalMousePos, self.paper);
+			if (mousePos.x < pos.x || mousePos.x > pos.x+dims.dx || mousePos.y < pos.y || mousePos.y > pos.y+dims.dy){
+				self.contract();
+			}
+		}
+	},
+	setupMouseOut: function() {
+		var dropdownDims = V(this.dims.dx, this.dims.dy + this.items.length*this.itemDims.dy);
+		var hoverDims = dropdownDims.copy().add(V(2*this.mouseOutPadding, 2*this.mouseOutPadding));
+		var hoverPos = this.pos.copy().movePt(V(-this.mouseOutPadding, -this.mouseOutPadding));
+		this.hoverFunc = this.makeHoverFunc(this, hoverPos, hoverDims);
+		$(document).mousemove(this.hoverFunc);
 	},
 	makeBottomRound: function() {
 		var round = this.paper.rect(0, 0, this.dims.dx, config.buttonRounding*2, config.buttonRounding);
