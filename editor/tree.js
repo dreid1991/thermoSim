@@ -7,6 +7,7 @@ function Tree(paper/*, pos*/) {
 	this.innerRectDims = V(30, this.buttonDims.dy);
 	this.buttonSpacing = 7;
 	this.displaceDist = 9;
+	this.transitionTime = 400;
 	this.degToRad = 360/(2*Math.PI);
 	this.panelDimsTop = V(this.paper.width, 2*this.buttonDims.dy+3*this.buttonSpacing);
 	this.panelDimsBottom = V(this.paper.width, 50);
@@ -97,6 +98,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.moveAllToPositions('fly');
 	},
 	toTreeMode: function() {
+		$('#objDiv').animate({height: '0px', top: '0px'}, this.transitionTime, function(){$('#objDiv').hide()});
 		this.bgRect.show();
 		this.elementAdder.hide();
 		this.mode = 'tree';
@@ -123,6 +125,12 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 	},
 	toObjectMode: function() {
 		this.bgRect.hide();
+		var wrapperHeight = $('#treeWrapper').height();
+		$('#objDiv').css({top: '0px', height: '0px'});
+		$('#objDiv').show();
+		var yFinal = this.panelDimsTop.dy - wrapperHeight;
+		var heightFinal = -yFinal;
+		$('#objDiv').animate({height: heightFinal + 'px', top: yFinal + 'px'}, this.transitionTime, function(){console.log('finished');});
 		this.mode = 'object';
 		this.hideBottomPanel();
 		this.elementAdder.show();

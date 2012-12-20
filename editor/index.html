@@ -20,19 +20,36 @@
 <!Attention:  Images you plan to use in raphael should go here so their dimensions can be loaded.>
 </div>
 <style>
+	#treeWrapper {
+		position:absolute;
+		height:620px;
+		width:330px;
+		top:30px;
+		border:1px solid #333;
+	}
 	#treeDiv {
+		position:relative;
 		height:620px; 
 		width:330px; 
-		border:1px solid #333; 	
-	
+		
+	}
+	#objDiv {
+		background-color: black;
+		position: relative;
+		height: 0px;
+		width :100%
 	}
 </style>
+<div id='treeWrapper' class='treeWrapper'>
+	<div id='treeDiv' class='treeDiv'>
 
-<div id='treeDiv' class='treeDiv'>
-
+	</div>
+	<div id='objDiv' class='objDiv'>
+			
+	</div>
 </div>
-
 <script>
+
 globalMousePos = P(0, 0);
 //$('#canvas').animate({width: '0px'}, 5000, function(){$('#canvas').hide()}) yo yo, check dis out
 $(document).mousemove(function(e) {
@@ -40,6 +57,7 @@ $(document).mousemove(function(e) {
 	globalMousePos.y = e.pageY;
 })
 window.onload = function() {
+	$('#objDiv').hide();
 	paper = Raphael('treeDiv', $('#treeDiv').width(), $('#treeDiv').height());
 	data = new DataManager();
 	tree = new Tree(paper, P(15, 15));
