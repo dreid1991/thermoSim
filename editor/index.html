@@ -1,9 +1,12 @@
 <html>
 <body>
+<link type='text/css' href = '../css/custom-theme/jquery-ui-1.8.23.custom.css' rel='stylesheet' />
+<link type='text/css' href = '../styles.css' rel='stylesheet'/>
+<script src='../js/jquery-1.7.2.min.js'></script>
+<script src = '../js/jquery-ui-1.8.20.custom.min.js'></script>
 <script src='../raphael.js'></script>
 <script src='../indepClasses.js'></script>
 <script src='../underscore-min.js'></script>
-<script src='../js/jquery-1.7.2.min.js'></script>
 <script src='elementData.js'></script>
 <script src='SceneDatatypes.js'></script>
 <script src='ElementAdder.js'></script>
@@ -29,35 +32,52 @@
 	}
 	#treeDiv {
 		position:relative;
-		height:620px; 
+		height:620px;
 		width:330px; 
-		
+		z-index:2;
 	}
 	#objDiv {
 		background-color: black;
 		position: relative;
-		height: 0px;
+		height: 500px;
 		width :100%
 	}
+
 </style>
 <div id='treeWrapper' class='treeWrapper'>
 	<div id='treeDiv' class='treeDiv'>
 
 	</div>
 	<div id='objDiv' class='objDiv'>
-			
+		<h3>Section 1 </h3>
+		<div>
+			<p>This is some lovely content.  Read to the end.</p>
+		</div>
+		<h3>Section 2 </h3>
+		<div>
+			<p>Some more content.  I hope you like it.</p>
+		</div>
 	</div>
-</div>
-<script>
 
+</div>
+
+<script>
+$('#objDiv').accordion();
+$('#objDiv2').accordion();
 globalMousePos = P(0, 0);
 //$('#canvas').animate({width: '0px'}, 5000, function(){$('#canvas').hide()}) yo yo, check dis out
 $(document).mousemove(function(e) {
 	globalMousePos.x = e.pageX;
 	globalMousePos.y = e.pageY;
 })
+/*
+PLAN:  Set paper size to 100px, set overflow to visible
+
+Can't figure out how to set overflow - consider making a paper just for the dropdown.  That would handle the dropdown hovering nicely, I think.
+*/
+
 window.onload = function() {
-	$('#objDiv').hide();
+	//$('#objDiv').hide();
 	paper = Raphael('treeDiv', $('#treeDiv').width(), $('#treeDiv').height());
 	data = new DataManager();
 	tree = new Tree(paper, P(15, 15));
@@ -66,6 +86,21 @@ window.onload = function() {
 	tree.addPrompt(P(0,0));
 	tree.addPrompt(P(0,0))
 }
+
+/*
+	<div id='objDiv2' class='objDiv2'>
+		<h3>Section 1 </h3>
+		<div>
+			<p>This is some lovely content.  Read to the end.</p>
+		</div>
+		<h3>Section 2 </h3>
+		<div>
+			<p>Some more content.  I hope you like it.</p>
+		</div>
+	</div>
+
+*/
+
 
 </script>
 

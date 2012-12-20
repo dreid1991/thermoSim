@@ -98,7 +98,10 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.moveAllToPositions('fly');
 	},
 	toTreeMode: function() {
-		$('#objDiv').animate({height: '0px', top: '0px'}, this.transitionTime, function(){$('#objDiv').hide()});
+		//$('#objDiv').animate({height: '0px', top: '0px'}, this.transitionTime, function(){$('#objDiv').hide()});
+		$('#treeDiv').animate({height: $('#treeWrapper').height() + 'px'}, this.transitionTime);
+		$('#objDiv').hide();
+		
 		this.bgRect.show();
 		this.elementAdder.hide();
 		this.mode = 'tree';
@@ -124,13 +127,23 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		}, this.toPosTime);
 	},
 	toObjectMode: function() {
+		var self = this;
 		this.bgRect.hide();
 		var wrapperHeight = $('#treeWrapper').height();
-		$('#objDiv').css({top: '0px', height: '0px'});
+		var treeHeightFinal = this.panelDimsTop.dy
+		//this.paper.setSize(this.paper.width, treeHeightFinal);
+		//$('#objDiv').css({top: '0px', height: '0px'});
 		$('#objDiv').show();
-		var yFinal = this.panelDimsTop.dy - wrapperHeight;
+		var yFinal = treeHeightFinal - wrapperHeight;
 		var heightFinal = -yFinal;
-		$('#objDiv').animate({height: heightFinal + 'px', top: yFinal + 'px'}, this.transitionTime, function(){console.log('finished');});
+		//$('#objDiv').animate({height: heightFinal + 'px', top: 0 + 'px'}, this.transitionTime);
+		$('#treeDiv').animate({height: this.panelDimsTop.dy + 'px'}, this.transitionTime, function() {
+			self.paper.setSize(self.paper.width, treeHeightFinal);
+		
+		});
+		//$('#treeDiv').hide();
+		
+		
 		this.mode = 'object';
 		this.hideBottomPanel();
 		this.elementAdder.show();
