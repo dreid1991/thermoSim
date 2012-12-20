@@ -41,7 +41,7 @@ Dropdown.prototype = {
 		this.expanded = true;
 		this.setupMouseOut()
 
-		var paperPos = posGlobal(this.pos.copy().movePt(V(0, this.dims.dy)), this.paper);
+		var paperPos = posGlobal(this.pos.copy().movePt(V(0, this.dims.dy)), $('#treeDiv'));
 		/*$(this.dropdownDiv).css({
 			top: paperPos.y,
 			left: paperPos.x
@@ -61,7 +61,7 @@ Dropdown.prototype = {
 		$(this.dropdownDiv).hide();
 	},
 	makeDropdownDiv: function() {
-		var paperPos = posGlobal(this.pos.copy().movePt(V(0, this.dims.dy)), this.paper);
+		var paperPos = this.pos.copy().movePt(V(0, this.dims.dy));//posGlobal(this.pos.copy().movePt(V(0, this.dims.dy)), $('#treeDiv'));
 		var dropdownDiv = $('<div></div>')
 		$('#treeWrapper').append(dropdownDiv);	
 		$(dropdownDiv).css({
@@ -88,7 +88,7 @@ Dropdown.prototype = {
 	},
 	setupMouseOut: function() {
 		var dropdownDims = V(this.dims.dx, this.dims.dy + this.items.length*this.itemDims.dy);
-		var pos = this.pos.copy();
+		var pos = posGlobal(this.pos, $('#treeDiv'));
 		this.hoverFunc = this.makeHoverFunc(this, pos, dropdownDims);
 		$(document).mousemove(this.hoverFunc);
 	},

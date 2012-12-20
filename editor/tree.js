@@ -1357,6 +1357,9 @@ function arrayDifference(a, b) {
 function posOnPaper(mousePos, paper) {
 	return P(mousePos.x-paper._left, mousePos.y-paper._top);
 }
-function posGlobal(pos, paper) {
-	return P(pos.x + paper._left, pos.y + paper._top);
+function posGlobal(pos, div) {
+	try{
+	var offset = $(div).offset();
+	return P(pos.x + offset.left, pos.y + offset.top);
+	}catch(e){console.trace()}
 }
