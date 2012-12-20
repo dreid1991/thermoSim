@@ -38,7 +38,7 @@ ElementAdder.prototype = {
 		this.dropdown.toFront();
 	},
 	makeDropdown: function() {
-		var dropdown = new Dropdown(this.paper, this.tree, this.pos, this.buttonDims, this.labelText, this.rectCol, this.rectColHover);
+		var dropdown = new Dropdown(this.paper, this.tree, 'elementAdder', this.pos, this.buttonDims, this.labelText, this.rectCol, this.rectColHover);
 		for (var idx=0; idx<this.elementOrder.length; idx++) {
 			var element = this.elementMd[this.elementOrder[idx]];
 			dropdown.addItem(element.labelText, function() {

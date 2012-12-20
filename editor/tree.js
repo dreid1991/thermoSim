@@ -139,6 +139,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		//$('#objDiv').animate({height: heightFinal + 'px', top: 0 + 'px'}, this.transitionTime);
 		$('#treeDiv').animate({height: this.panelDimsTop.dy + 'px'}, this.transitionTime, function() {
 			self.paper.setSize(self.paper.width, treeHeightFinal);
+			
 		
 		});
 		//$('#treeDiv').hide();
@@ -1356,4 +1357,7 @@ function arrayDifference(a, b) {
 }
 function posOnPaper(mousePos, paper) {
 	return P(mousePos.x-paper._left, mousePos.y-paper._top);
+}
+function posGlobal(pos, paper) {
+	return P(pos.x + paper._left, pos.y + paper._top);
 }

@@ -1,6 +1,7 @@
-function Dropdown(paper, tree, pos, dims, text, fillCol, hoverCol) {
+function Dropdown(paper, tree, handle, pos, dims, text, fillCol, hoverCol) {
 	this.paper = paper;
 	this.textSize = config.textSizeMed;
+	this.handle = handle;
 	this.expanded = false;
 	this.tree = tree;
 	this.pos = pos.copy();
@@ -15,34 +16,67 @@ function Dropdown(paper, tree, pos, dims, text, fillCol, hoverCol) {
 	this.button = new ArrowButton(this.tree, this, this.pos, undefined, this.clickFuncs, this.text, true);
 	this.button.toObjectMode(false);
 	this.button.pointArrows('down');
-	this.bottomRound = this.makeBottomRound();
-	this.bottomRound.hide();
 	this.items = [];
+	this.dropdownDiv = this.makeDropdownDiv();
+	this.dropdownPaper = this.makeDropdownPaper();
+	$(this.dropdownDiv).hide();
+	this.bottomRound = this.makeBottomRound();
+	//this.bottomRound.hide();
 }
 
 Dropdown.prototype = {
 	addItem: function(labelText, onClick) {
-		var pos = this.pos.copy().movePt(V(0, this.dims.dy + this.items.length*this.itemDims.dy-1));
-		this.items.push(new DropdownItem(this.paper, pos, this.itemDims, this.textSize, labelText, onClick, this.fillCol, this.hoverCol));
-		this.items[this.items.length-1].hide();
+		
+		var pos = P(0, 0).movePt(V(0, this.items.length*this.itemDims.dy-1));
+		
+		this.items.push(new DropdownItem(this.dropdownPaper, pos, this.itemDims, this.textSize, labelText, onClick, this.fillCol, this.hoverCol));
+		//this.items[this.items.length-1].hide();
+		
+		$(this.dropdownDiv).css({height: this.items.length*this.itemDims.dy + config.buttonRounding})
+		this.dropdownPaper.setSize($(this.dropdownDiv).width(), $(this.dropdownDiv).height())
+		
 		translateObj(this.bottomRound, pos.copy().movePt(V(0, this.itemDims.dy-config.buttonRounding)));
 	},
 	expand: function() {
 		this.expanded = true;
 		this.setupMouseOut()
-		for (var itemIdx=0; itemIdx<this.items.length; itemIdx++) {
-			this.items[itemIdx].show();
-		}
-		this.bottomRound.show();
+
+		var paperPos = posGlobal(this.pos.copy().movePt(V(0, this.dims.dy)), this.paper);
+		/*$(this.dropdownDiv).css({
+			top: paperPos.y,
+			left: paperPos.x
+		});*/
+		$(this.dropdownDiv).show();
 	},
 	contract: function() {
 		this.expanded = false;
 		$(document).unbind('mousemove', this.hoverFunc);
 		this.hoverFunc = undefined;
+		/*
 		for (var itemIdx=0; itemIdx<this.items.length; itemIdx++) {
 			this.items[itemIdx].hide();
 		}
 		this.bottomRound.hide();
+		*/
+		$(this.dropdownDiv).hide();
+	},
+	makeDropdownDiv: function() {
+		var paperPos = posGlobal(this.pos.copy().movePt(V(0, this.dims.dy)), this.paper);
+		var dropdownDiv = $('<div></div>')
+		$('#treeWrapper').append(dropdownDiv);	
+		$(dropdownDiv).css({
+			position: 'absolute', 
+			left: paperPos.x, 
+			top: paperPos.y,
+			width: this.dims.dx,
+			'z-index': 3,
+			height: 0,
+		})
+		$(dropdownDiv).attr('id', this.handle);
+		return $('#' + this.handle)[0];
+	},
+	makeDropdownPaper: function() {
+		return Raphael(this.handle, $('#' + this.handle).width(), $('#' + this.handle).height());
 	},
 	makeHoverFunc: function(self, pos, dims) {
 		return function() {
@@ -60,12 +94,12 @@ Dropdown.prototype = {
 		$(document).mousemove(this.hoverFunc);
 	},
 	makeBottomRound: function() {
-		var round = this.paper.rect(0, 0, this.dims.dx, config.buttonRounding*2, config.buttonRounding);
+		var round = this.dropdownPaper.rect(0, 0, this.dims.dx, config.buttonRounding*2, config.buttonRounding);
 		round.attr({
 			'stroke-width': 0,
 			fill: this.fillCol.hex
 		})
-		translateObj(round, this.pos.copy().movePt(V(0, this.dims.dy-config.buttonRounding)));
+		translateObj(round, P(0, 0).movePt(V(0, this.dims.dy-config.buttonRounding)));
 		return round;
 	},
 	toFront: function() {
@@ -138,7 +172,7 @@ DropdownItem.prototype = {
 		return rect;
 	},
 	makeLabel: function() {
-		var labelPos = this.pos.copy().movePt(V(this.labelIndent, this.dims.dy/2));
+		var labelPos = this.pos.copy().movePt(V(this.labelIndent, this.dims.dy/2+this.textSize/2));
 		var label = this.paper.text(0, 0, this.labelText).attr({'font-size': this.textSize, 'text-anchor': 'start', fill: config.textCol.hex});
 		translateObj(label, labelPos);
 		label.hover(
