@@ -88,9 +88,8 @@ Dropdown.prototype = {
 	},
 	setupMouseOut: function() {
 		var dropdownDims = V(this.dims.dx, this.dims.dy + this.items.length*this.itemDims.dy);
-		var hoverDims = dropdownDims.copy().add(V(2*this.mouseOutPadding, 2*this.mouseOutPadding));
-		var hoverPos = this.pos.copy().movePt(V(-this.mouseOutPadding, 0));
-		this.hoverFunc = this.makeHoverFunc(this, hoverPos, hoverDims);
+		var pos = this.pos.copy();
+		this.hoverFunc = this.makeHoverFunc(this, pos, dropdownDims);
 		$(document).mousemove(this.hoverFunc);
 	},
 	makeBottomRound: function() {

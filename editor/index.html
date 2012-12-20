@@ -39,17 +39,10 @@
 	#objDiv {
 		background-color: black;
 		position: relative;
-		height: 500px;
+		height: 0px;
 		width :100%
 	}
-	#floater {
-		z-index:3;
-		position: absolute;
-		height: 100px;
-		width: 100px;
-		top: 200px;
-		left: 80px;
-	}
+
 
 </style>
 <div id='treeWrapper' class='treeWrapper'>
@@ -66,8 +59,7 @@
 			<p>Some more content.  I hope you like it.</p>
 		</div>
 	</div>
-	<div id='floater' class='floater'>
-	</div>
+
 
 </div>
 
@@ -80,14 +72,10 @@ $(document).mousemove(function(e) {
 	globalMousePos.x = e.pageX;
 	globalMousePos.y = e.pageY;
 })
-/*
-PLAN:  Set paper size to 100px, set overflow to visible
 
-Can't figure out how to set overflow - consider making a paper just for the dropdown.  That would handle the dropdown hovering nicely, I think.
-*/
 
 window.onload = function() {
-	//$('#objDiv').hide();
+	$('#objDiv').hide();
 	paper = Raphael('treeDiv', $('#treeDiv').width(), $('#treeDiv').height());
 	data = new DataManager();
 	tree = new Tree(paper, P(15, 15));
@@ -97,19 +85,7 @@ window.onload = function() {
 	tree.addPrompt(P(0,0))
 }
 
-/*
-	<div id='objDiv2' class='objDiv2'>
-		<h3>Section 1 </h3>
-		<div>
-			<p>This is some lovely content.  Read to the end.</p>
-		</div>
-		<h3>Section 2 </h3>
-		<div>
-			<p>Some more content.  I hope you like it.</p>
-		</div>
-	</div>
 
-*/
 
 
 </script>

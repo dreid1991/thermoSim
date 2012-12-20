@@ -99,11 +99,13 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 	},
 	toTreeMode: function() {
 		//$('#objDiv').animate({height: '0px', top: '0px'}, this.transitionTime, function(){$('#objDiv').hide()});
-		$('#treeDiv').animate({height: $('#treeWrapper').height() + 'px'}, this.transitionTime);
-		$('#objDiv').hide();
+		var finalDims = V($('#treeWrapper').width(), $('#treeWrapper').height());
+		this.paper.setSize(finalDims.dx, finalDims.dy);
+		$('#treeDiv').animate({height: finalDims.dy + 'px'}, this.transitionTime);
+		$('#objDiv').animate({height: 0 + 'px'}, this.transitionTime, function(){$('#objDiv').hide()});
 		
 		this.bgRect.show();
-		this.elementAdder.hide();
+		//this.elementAdder.hide();
 		this.mode = 'tree';
 		this.showBottomPanel();
 		this.editingButton = undefined;
@@ -131,17 +133,14 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.bgRect.hide();
 		var wrapperHeight = $('#treeWrapper').height();
 		var treeHeightFinal = this.panelDimsTop.dy
-		//this.paper.setSize(this.paper.width, treeHeightFinal);
 		//$('#objDiv').css({top: '0px', height: '0px'});
 		$('#objDiv').show();
-		var yFinal = treeHeightFinal - wrapperHeight;
-		var heightFinal = -yFinal;
+		var objDivHeight = wrapperHeight - treeHeightFinal;
 		//$('#objDiv').animate({height: heightFinal + 'px', top: 0 + 'px'}, this.transitionTime);
 		$('#treeDiv').animate({height: this.panelDimsTop.dy + 'px'}, this.transitionTime, function() {
 			self.paper.setSize(self.paper.width, treeHeightFinal);
-			
-		
 		});
+		$('#objDiv').animate({height: objDivHeight + 'px'}, this.transitionTime);
 		//$('#treeDiv').hide();
 		
 		
