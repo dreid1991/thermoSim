@@ -159,6 +159,9 @@ DropdownItem.prototype = {
 		this.rect.hide();
 		this.label.hide();
 	},
+	getLabelText: function() {
+		
+	},
 	makeRect: function() {
 		var rect = this.paper.rect(0, 0, this.dims.dx, this.dims.dy).attr({'stroke-width':0, fill:this.fillCol.hex});
 		translateObj(rect, this.pos);

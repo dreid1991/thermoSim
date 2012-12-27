@@ -1,3 +1,25 @@
+
+assignHover = {
+	assignHover: function(raphaelShape, toChange, hoverOnCol, hoverOffCol) {
+		if (this.isPlacerButton) {
+			raphaelShape.hover(this.hoverOnChangeAll, this.hoverOffChangeAll);
+		} else {
+			raphaelShape.hover(
+				function() {
+					this.parent[toChange].attr({fill:hoverOnCol.hex});
+				},
+				function() {
+					try{this.parent[toChange].attr({fill:hoverOffCol.hex});
+					} catch(e) {console.log('Hovering out of removed shape')};
+				}
+			)
+		}
+	},
+
+}
+
+
+
 SectionFuncs = {
 	sectionDragStartTreeMode: function() {
 		this.parent.sectionIds = this.parent.tree.getSectionIds();

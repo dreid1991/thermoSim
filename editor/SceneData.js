@@ -1,4 +1,4 @@
-function SceneMd() {
+function SceneData() {
 	this.type = undefined;
 	this.walls = [];
 	this.listeners = [];
@@ -10,7 +10,7 @@ function SceneMd() {
 }
 //type will be defined on run based on block position
 
-_.extend(SceneMd.prototype, updateValue = {
+_.extend(SceneData.prototype, updateValue = {
 	addWall: function() {
 		var attrs = this.buildNewElement('wall');
 		attrs.id = data.getWallId();

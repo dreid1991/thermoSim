@@ -47,4 +47,10 @@ ElementAdder.prototype = {
 		}
 		return dropdown;
 	},
+	makeClickFunc: function () {
+		var self = this;
+		return function() {
+			self.tree.addElement
+		}
+	}
 }
