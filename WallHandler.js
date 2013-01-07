@@ -190,14 +190,30 @@ WallMethods = {
 			this[wallIdx].g = g;
 			this[wallIdx].pConst = pConst;
 			this[wallIdx].data = {};
-			this[wallIdx].data.pInt = new Array();
-			this[wallIdx].data.pExt = new Array();
-			this[wallIdx].data.t = new Array();
-			this[wallIdx].data.RMS = new Array(); // m/s
-			this[wallIdx].data.v = new Array();
-			this[wallIdx].data.m = new Array();
-			this[wallIdx].data.work = new Array(); // kj
-			this[wallIdx].data.q = new Array(); //kj
+			this[wallIdx].data['pInt'] = new Array();
+			this[wallIdx].data['pExt'] = new Array();
+			this[wallIdx].data['t'] = new Array();
+			this[wallIdx].data['RMS'] = new Array(); // m/s
+			this[wallIdx].data['v'] = new Array();
+			this[wallIdx].data['m'] = new Array();
+			this[wallIdx].data['work'] = new Array(); // kj
+			this[wallIdx].data['q'] = new Array(); //kj
+			this[wallIdx]['recordingTemp'] = false;
+			this[wallIdx]['recordingPInt'] = false;
+			this[wallIdx]['recordingPExt'] = false;
+			this[wallIdx]['recordingVol'] = false;
+			this[wallIdx]['recordingWork'] = false;
+			this[wallIdx]['recordingMass'] = false;
+			this[wallIdx]['recordingQ'] = false;
+			this[wallIdx]['recordingRMS'] = false;
+			this[wallIdx]['displayingTemp'] = false;
+			this[wallIdx]['displayingPInt'] = false;
+			this[wallIdx]['displayingPExt'] = false;
+			this[wallIdx]['displayingVol'] = false;
+			this[wallIdx]['displayingWork'] = false;
+			this[wallIdx]['displayingMass'] = false;
+			this[wallIdx]['displayingQ'] = false;
+			this[wallIdx]['displayingRMS'] = false;
 			this[wallIdx].q = 0;
 			this[wallIdx].pIntLen = 35;
 			this[wallIdx].eToAdd = 0;
@@ -208,6 +224,7 @@ WallMethods = {
 			this[wallIdx].pLastRecord = turn;
 			this[wallIdx].mass = 0;
 			this[wallIdx].parent = this;
+			this[
 			this[handle] = this[wallIdx];
 			record = defaultTo(true, record);
 			if(record){	
@@ -1142,6 +1159,10 @@ WallMethods = {
 			recordDataStop('RMS' + this.handle);
 			return this;
 		},
+		recordStop: function(dataType) {
+			//this['recording' perhaps do handle, datatype for consistant capitalization to I can make one func
+		}
+		//if I want to generalize stop *and* use the closure compiler, need to make isRecording object
 		recordAllStop: function(){
 			if(this.recordingTemp){this.recordTempStop();};
 			if(this.recordingPInt){this.recordPIntStop();};
