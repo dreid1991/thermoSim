@@ -1124,7 +1124,6 @@ WallMethods = {
 		},
 		recordWorkStop: function(){
 			this.recordingWork = false;
-			removeListener(curLevel, 'update', 'recordWork'+this.handle);
 			recordDataStop('work' + this.handle);
 			return this;
 		},
