@@ -46,6 +46,9 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 		};
 		//predetermining lengths to prevent rxn prods from reacting again on same turn.  Could make things slow
 		//defining grid locally speeds up by ~250ms/500runs (1000->750)
+	// if(started){
+		// var then = Date.now();
+	// }	
 		for (var spcName in this.spcs){
 			var dots = this.spcs[spcName].dots;
 			for (var dotIdx=spcLens[spcName]-1; dotIdx>=0; dotIdx--) {
@@ -54,6 +57,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 				var gridY = Math.floor(dot.y/gridSize);
 				var doAdd = true;
 				//hey - define x & y mins so I don't have to call each time?
+
 				gridLoop:
 					for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){
 						for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, ySpan); y++){
@@ -74,6 +78,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 							}
 						}
 					}
+					
 				if (gridX>=0 && gridY>=0 && gridX<this.numCols && gridY<this.numRows) {
 					if (doAdd) {
 						grid[gridX][gridY].push(dot);
@@ -89,6 +94,14 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 				*/
 			}
 		}
+	// if(started&&counted<500){
+		// counted++;
+		// total+=Date.now()-then;
+	// }else if (counted==500){
+		// console.log(total);
+		// counted=0;
+		// total=0;
+	// }
 	},
 	impactStd: function(a, b, UVAB, perpAB, perpBA){
 		var perpABRes = (perpAB*(a.m-b.m)+2*b.m*perpBA)/(a.m+b.m);

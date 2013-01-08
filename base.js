@@ -58,10 +58,10 @@ $(function(){
 	turnUpdater = setInterval('curLevel.update()', updateInterval);
 	dataUpdater = setInterval('curLevel.updateData()', dataInterval);
 
-	/*Timing stuff
 	started = false;
 	counted = 0;
 	total = 0;
+	/*Timing stuff
 
 	if(started){
 		var then = Date.now();
@@ -92,14 +92,14 @@ function checkIdeality(){
 	
 }
 */
-
+/*
 function foo() {
 	//console.log('START TURN READOUT');
 	var dot1 = spcs.spc1.dots[0];
 	var dot2 = spcs.spc1.dots[1];
 	//var dot3 = spcs.spc1.dots[2];
 	var total = dot1.temp() + dot2.temp();// + dot3.temp();
-	var shouldBe = keo + dot1.peLast + dot2.peLast +/* dot3.peLast + */attractor.eDebt  - peo;
+	var shouldBe = keo + dot1.peLast + dot2.peLast + dot3.peLast + attractor.eDebt  - peo;
 	var difference = shouldBe-total;
 	
 	console.log('total ke+ ' + total);
@@ -128,7 +128,7 @@ function HOLDSTILL() {
 	//spcs.spc1.dots[2].x=330;
 	//spcs.spc1.dots[2].y=300;
 }
-
+*/
 
 
 function gauss(avg, stdev){
@@ -388,33 +388,23 @@ function recordDataStop(handle){
 	removeListener(window['curLevel'], listenerType, handle);
 }
 function addEqs(text){
-	var eqIdx = text.indexOf('||EQ');
-	var toHTML = function(eqNum, subStr){
-		if(subStr && subStr =="CE"){
-			return "<p><center><img src = 'img/"+imgPath+"/eq"+eqNum+".gif'</img></center></p>";
-		} else if (subStr && subStr == "BR") {
-			return "<br><center><img src = 'img/"+imgPath+"/eq"+eqNum+".gif'</img></center>";
-		} else {
-			return "<img src = 'img/"+imgPath+"/eq"+eqNum+".gif'</img>";
+	var isEq = /\|\|EQ[0-9]*(CE|BR|\|\|)/;
+	var replacement;
+	
+	while (true) {
+		var result = isEq.exec(text);
+		if (result == null) break;
+		str = result[0];
+		if (/CE$/.test(str)) {
+			var replacement = '<p><center><img src = "img/' + imgPath + '/eq' + parseFloat(str.slice(4, str.length)) + '.gif"</img></center></p>';
+		} else if (/BR$/.test(str)) {
+			var replacement = '<br><center><img src = "img/' + imgPath + '/eq' + parseFloat(str.slice(4, str.length)) + '.gif"</img></center>';
+		} else if (/\|\|$/.test(str)) {
+			var replacement = '<img src = "img/' + imgPath + '/eq' + parseFloat(str.slice(4, str.length)) + '.gif"</img>';
 		}
+		text = text.replace(str, replacement);
 	}
-
-	while(eqIdx!=-1){
-		for(var charIdx=eqIdx+4; charIdx<text.length; charIdx++){
-			var subStr = text.substring(charIdx, charIdx+2);
-			if (subStr=="||" || subStr=="CE") {
-				break;
-			} else if (subStr=="||" || subStr=="BR") {
-				break;
-			} else if(charIdx+2==text.length) {
-				break;
-			}
-		}
-		var eqNum = text.substring(eqIdx+4, charIdx);
-		var eqHTML = toHTML(eqNum, subStr);
-		text = text.replace("||EQ"+eqNum+subStr, eqHTML);
-		eqIdx = text.indexOf('||EQ');
-	}
+	
 	return text;
 }
 
