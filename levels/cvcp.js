@@ -1,3 +1,26 @@
+
+canvasHeight = 450;
+$(function(){
+	imgPath = 'cvcp';
+	animText = new AnimText(c);
+	myCanvas.height = canvasHeight;
+	renderer = new Renderer();
+	window['curLevel'] = new cvcp();
+	curLevel = window['curLevel'];
+	curLevel.cutSceneEnd();
+	curLevel.init();
+	$('button').button();
+	$('#resetExp').click(function(){curLevel.reset()});
+	$('#toSim').click(function(){nextPrompt()});
+	$('#toLastStep').click(function(){prevPrompt()});
+	$('#previous').click(function(){prevPrompt()});
+	$('#next').click(function(){nextPrompt()});
+});
+
+myCanvas.width = $('#main').width();
+
+
+
 function cvcp(){
 	this.setStds();
 	this.wallSpeed = 1;
@@ -71,8 +94,14 @@ _.extend(cvcp.prototype,
 						{type: 'Heater', attrs: {handle: 'heaterLeft', wallInfo: 'left'}},
 						{type: 'Heater', attrs: {handle: 'heaterRight', wallInfo: 'right'}}
 					],
+					records: [
+					],
 					readoutEntries: [
-						{wallHandle: 'left', data:'TempSmooth', readout:'mainReadout'}
+						{wallHandle: 'left', data:'TempSmooth', readout: 'mainReadout'},
+						{wallHandle: 'left', data:'Q', readout: 'mainReadout'},
+						{wallHandle: 'right', data:'TempSmooth', readout: 'mainReadout'},
+						{wallHandle: 'right', data:'Q', readout: 'mainReadout'},
+						
 						//WHICH WALL, WHAT THING, WHERE
 						
 					],
@@ -228,11 +257,6 @@ _.extend(cvcp.prototype,
 		}
 
 	]
-	
-
-
-
-
 
 }
 )

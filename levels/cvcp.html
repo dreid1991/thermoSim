@@ -2,9 +2,6 @@
 <body>
 <link type='text/css' href = '../css/custom-theme/jquery-ui-1.8.23.custom.css' rel='stylesheet' />
 <link type='text/css' href = '../styles.css' rel='stylesheet'/>
-<script src = '../underscore-min.js'></script>
-<script src = '../js/jquery-1.7.2.min.js'></script>
-<script src = '../js/jquery-ui-1.8.20.custom.min.js'></script>
 <div class='noSelect wrapper'>
 	<div id='main' class='main noSelect'>
 		<div id='mainHeader' class='header noSelect'>
@@ -92,6 +89,10 @@
 
 	<div id='baseDash' class='bottomRound noSelect'></div>
 </div>
+<script src = '../underscore-min.js'></script>
+<script src = '../js/jquery-1.7.2.min.js'></script>
+<script src = '../js/jquery-ui-1.8.20.custom.min.js'></script>
+
 <script src = '../indepClasses.js'></script>
 <script src = '../inheritFuncs.js'></script>
 <script src = '../DrawingTools.js'></script>
@@ -107,6 +108,7 @@
 <script src = '../Attractor.js'></script>
 <script src = '../DataHandler.js'></script>
 <script src = '../WallHandler.js'></script>
+<script src = '../WallStringsToFunctions.js'></script>
 <script src = '../Renderer.js'></script>
 <script src = '../objects01.js'></script>
 <script src = '../objects02.js'></script>
@@ -114,36 +116,8 @@
 <script src = '../animText.js'></script>
 <script src = '../Readout.js'></script>
 <script src = '../LevelTools.js'></script>
-<script src = 'cvcp.js'></script>
 <script src = '../base.js'></script>
-<script type = 'text/javascript'>
-var curLevel;
-canvasHeight = 450;
-$(function(){
-	imgPath = 'cvcp';
-	animText = new AnimText(c);
-	myCanvas.height = canvasHeight;
-	renderer = new Renderer();
-	curLevel = new cvcp();
-
-	curLevel.cutSceneEnd();
-	curLevel.init();
-	$('button').button();
-	$('#resetExp').click(function(){curLevel.reset()});
-	$('#toSim').click(function(){nextPrompt()});
-	$('#toLastStep').click(function(){prevPrompt()});
-	$('#previous').click(function(){prevPrompt()});
-	$('#next').click(function(){nextPrompt()});
-});
-
-myCanvas.width = $('#main').width();
-
-
-</script>
-
-
-
-
+<script src = 'cvcp.js'></script>
 
 </body>
 </html>

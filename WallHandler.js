@@ -224,7 +224,6 @@ WallMethods = {
 			this[wallIdx].pLastRecord = turn;
 			this[wallIdx].mass = 0;
 			this[wallIdx].parent = this;
-			this[
 			this[handle] = this[wallIdx];
 			record = defaultTo(true, record);
 			if(record){	
@@ -704,7 +703,7 @@ WallMethods = {
 					{pos:textPos.copy().movePt({dy:-20}), col:curLevel.bgCol},
 					{text:'Speed = '+round(V,1)+'m/s', time:3000}
 			);
-		},			
+		}	
 	
 	
 	},
@@ -1110,29 +1109,33 @@ WallMethods = {
 			return this;
 		},
 		recordMass: function() {
-			this.recordingMass = true;
-			recordData('mass' + this.handle, this.data.m, function(){return this.mass}, this, 'update');		
+			if (!this.recordingMass.val) {
+				this.recordingMass.val = true;
+				recordData('mass' + this.handle, this.data.m, function(){return this.mass}, this, 'update');	
+			}
 			return this;			
 		},
 		recordQ: function() {
-			this.recordingQ = true;
-			recordData('q' + this.handle, this.data.q, function(){return this.q}, this, 'update');
+			if (!this.recordingQ.val) {
+				this.recordingQ.val = true;
+				recordData('q' + this.handle, this.data.q, function(){return this.q}, this, 'update');
+			}
 			return this;
 		},
 		recordStop: function(isRecording, str) {
 			isRecording.val = false;
 			recordDataStop(str + this.handle);
-		}
+		},
 		//if I want to generalize stop *and* use the closure compiler, need to make isRecording object
 		recordAllStop: function(){
-			if(this.recordingTemp.val){this.recordStop('t');};
-			if(this.recordingPInt.val){this.recordStop('pInt');};
-			if(this.recordingPExt.val){this.recordStop('pExt');};
-			if(this.recordingVol.val){this.recorStop('v');};
-			if(this.recordingWork.val){this.recorStop('work');};
-			if(this.recordingMass.val){this.recorStop('mass');};
-			if(this.recordingQ.val){this.recorStop('q');};;
-			if(this.recordingRMS.val){this.recorStop('RMS');};
+			if(this.recordingTemp.val){this.recordStop(this.recordingTemp, 't');};
+			if(this.recordingPInt.val){this.recordStop(this.recordingPInt, 'pInt');};
+			if(this.recordingPExt.val){this.recordStop(this.recordingPExt, 'pExt');};
+			if(this.recordingVol.val){this.recordStop(this.recordingVol, 'v');};
+			if(this.recordingWork.val){this.recordStop(this.recordingWork, 'work');};
+			if(this.recordingMass.val){this.recordStop(this.recordingMass, 'mass');};
+			if(this.recordingQ.val){this.recordStop(this.recordingQ, 'q');};
+			if(this.recordingRMS.val){this.recordStop(this.recordingRMS, 'RMS');};
 			return this;
 		},	
 		resetWork: function(){
@@ -1144,9 +1147,9 @@ WallMethods = {
 			return this;
 		},
 		//HEY - YOU SHOULD _PROBABLY_ MAKE A FUNCTION THAT DOES THESE DISPLAY THINGS GIVEN SOME INPUTS.  I MEAN, THIS IS A LOT OF NEARLY IDENTICAL CODE
-		displayWork: function(readoutHandle, label, decPlaces){
-			if(this.recordingWork && !this.displayingWork){
-				this.displayingWork = true;
+		displayWork: function(readoutHandle, label, decPlaces) {
+			if (this.recordingWork.val && !this.displayingWork.val) {
+				this.displayingWork.val = true;
 				decPlaces = defaultTo(1, decPlaces);
 				var dataSet = this.data.work;
 				label = defaultTo('Work:', label);
@@ -1168,8 +1171,8 @@ WallMethods = {
 			return this;
 		},
 		displayTemp: function(readoutHandle, label, decPlaces, smooth){
-			if (this.recordingTemp && !this.displayingTemp) {
-				this.displayingTemp = true;
+			if (this.recordingTemp.val && !this.displayingTemp.val) {
+				this.displayingTemp.val = true;
 				decPlaces = defaultTo(0, decPlaces);
 				var dataSet = this.data.t;
 				label = defaultTo('Temp:', label);
@@ -1206,8 +1209,8 @@ WallMethods = {
 			return this.displayTemp(readoutHandle, label, decPlaces, true);
 		},
 		displayPInt: function(readoutHandle, label, decPlaces){
-			if(this.recordingPInt && !this.displayingPInt){
-				this.displayingPInt = true;
+			if(this.recordingPInt.val && !this.displayingPInt.val){
+				this.displayingPInt.val = true;
 				decPlaces = defaultTo(1, decPlaces);
 				var dataSet = this.data.pInt;
 				label = defaultTo('Pint:', label);
@@ -1229,8 +1232,8 @@ WallMethods = {
 			return this;
 		},
 		displayPExt: function(readoutHandle, label, decPlaces){
-			if(this.recordingPExt && !this.displayingPExt){
-				this.displayingPExt = true;
+			if(this.recordingPExt.val && !this.displayingPExt.val){
+				this.displayingPExt.val = true;
 				decPlaces = defaultTo(1, decPlaces);
 				var dataSet = this.data.pExt;
 				label = defaultTo('Pext:', label);
@@ -1258,8 +1261,8 @@ WallMethods = {
 			return this;
 		},
 		displayVol: function(readoutHandle, label, decPlaces){
-			if(this.recordingVol && !this.displayingVol){
-				this.displayingVol = true;
+			if(this.recordingVol.val && !this.displayingVol.val){
+				this.displayingVol.val = true;
 				decPlaces = defaultTo(1, decPlaces);
 				var dataSet = this.data.v;
 				label = defaultTo('Volume:', label);
@@ -1281,8 +1284,8 @@ WallMethods = {
 			return this;
 		},
 		displayMass: function(readoutHandle, label, decPlaces){
-			if(this.recordingMass && !this.displayingMass){
-				this.displayingMass = true;
+			if(this.recordingMass.val && !this.displayingMass.val){
+				this.displayingMass.val = true;
 				decPlaces = defaultTo(0, decPlaces);
 				var dataSet = this.data.m;
 				label = defaultTo('Mass:', label);
@@ -1309,8 +1312,8 @@ WallMethods = {
 			return this;			
 		},
 		displayQ: function(readoutHandle, label, decPlaces){
-			if (this.recordingQ && !this.displayingQ) {
-				this.displayingQ = true;
+			if (this.recordingQ.val && !this.displayingQ.val) {
+				this.displayingQ.val = true;
 				decPlaces = defaultTo(1, decPlaces);
 				var dataSet = this.data.q;
 				label = defaultTo('Q:', label);
@@ -1339,8 +1342,8 @@ WallMethods = {
 			return this;
 		},
 		displayRMS: function(readoutHandle, label, decPlaces) {
-			if(this.recordingRMS && !this.displayingRMS){
-				this.displayingRMS = true;
+			if(this.recordingRMS.val && !this.displayingRMS.val){
+				this.displayingRMS.val = true;
 				var decPlaces = defaultTo(0, decPlaces);
 				var dataSet = this.data.RMS;
 				label = defaultTo('RMS:', label);
@@ -1363,8 +1366,8 @@ WallMethods = {
 		
 		},
 		displayQArrowsRate: function(threshold){
-			if (this.recordingQ && !this.displayingQArrowsRate && !this.displayingQArrowsAmmt) {
-				this.displayingQArrowsRate = true;
+			if (this.recordingQ.val && !this.displayingQArrowsRate.val && !this.displayingQArrowsAmmt.val) {
+				this.displayingQArrowsRate.val = true;
 				this.idxLastArrow = Math.max(0, this.data.q.length-1);
 				this.qArrowThreshold = defaultTo(threshold, .3);
 				addListener(curLevel, 'update', 'checkForDisplayArrows' + this.handle, this.checkDisplayArrows, this);
@@ -1374,8 +1377,8 @@ WallMethods = {
 			}
 		},
 		displayQArrowsAmmt: function(qMax) {
-			if (this.recordingQ && !this.displayingQArrowsRate && !this.displayingQArrowsAmmt) {
-				this.displayingQArrowsAmmt = true;
+			if (this.recordingQ.val && !this.displayingQArrowsRate.val && !this.displayingQArrowsAmmt.val) {
+				this.displayingQArrowsAmmt.val = true;
 				this.qArrowsAmmtInit(defaultTo(3, qMax));
 			} else {
 				console.log('Tried to display q arrowsAmmt for wall ' + this.handle + ' while not recording or already displaying.  Will not display.');

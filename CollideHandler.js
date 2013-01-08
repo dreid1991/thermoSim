@@ -57,7 +57,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 				gridLoop:
 					for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){
 						for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, ySpan); y++){
-							for (var neighborIdx=grid[x][y].length-1; neighborIdx>-1; neighborIdx-=1){
+							for (var neighborIdx=grid[x][y].length-1; neighborIdx>-1; neighborIdx--){
 								var neighbor = grid[x][y][neighborIdx];
 								var dx = dot.x-neighbor.x;
 								var dy = dot.y-neighbor.y;

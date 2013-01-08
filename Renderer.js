@@ -15,6 +15,7 @@ Renderer.prototype = {
 		this.renderDots(scene.dots);
 		this.renderWalls(scene.walls, scene);
 		this.renderObjs(scene.objs);
+		this.addRecording(scene.records);
 		this.addReadoutEntries(scene.readoutEntries);
 		this.addListeners(scene.listeners);
 		
@@ -37,7 +38,8 @@ Renderer.prototype = {
 	renderWalls: function(newWalls, scene) {
 		var newWalls = defaultTo([], newWalls);
 		if (scene.type == 'section') {
-			walls = new WallHandler();
+			window['walls'] = new WallHandler();
+			walls = window['walls'];
 		}
 		for (var wallIdx=0; wallIdx<newWalls.length; wallIdx++) {
 			var newWall = newWalls[wallIdx];
@@ -52,11 +54,28 @@ Renderer.prototype = {
 			curLevel[obj.type + obj.handle] = new objFunc(obj.attrs);
 		}
 	},
+	addRecording: function(data) {
+		data = defaultTo([], data);
+		for (var dataIdx=0; dataIdx<data.length; dataIdx++) {
+			var entry = data[dataIdx];
+			var func = WallMethods.getFunc.record(entry.data);
+			if (func) {
+				func.apply(walls[entry.wallHandle]);
+			} else {
+				console.log("Couldn't parse " + entry.data + " for wall " + entry.wallHandle);
+			}
+		}
+	},
 	addReadoutEntries: function(entries) {
 		entries = defaultTo([], entries);
 		for (var entryIdx=0; entryIdx<entries.length; entryIdx++) {
 			var entry = entries[entryIdx];
-			walls[entry.wallHandle]['display' + entry.data](entry.readout);
+			var func = WallMethods.getFunc.display(entry.data);
+			if (func) {
+				func.apply(walls[entry.wallHandle]);
+			} else {
+				console.log("Couldn't parse " + entry.data + " for wall " + entry.wallHandle);
+			}			
 		}
 	},
 	addListeners: function(listeners) {
