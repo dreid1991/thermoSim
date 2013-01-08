@@ -1581,7 +1581,7 @@ WallMethods = {
 											stroke:stroke,
 											dims:dims,
 											dimsFinal:dimsFinal,
-											lifespan:3500,
+											lifespan:3500
 										});
 							distAlongLine += pxStep;
 						}	
@@ -1589,7 +1589,7 @@ WallMethods = {
 				}
 			}
 			 
-		},
+		}
 		
 	},
 //////////////////////////////////////////////////////////////////////////
@@ -1752,7 +1752,7 @@ WallMethods = {
 			dot.v.dy += 2*wallUV.dx*perpV;
 			dot.x -= wallUV.dy
 			dot.y += wallUV.dx
-		},
+		}
 		/*
 		reflectChangeSpd: function(dot, wallUV, perpVIn, perpVOut){
 			dot.v.dx -= wallUV.dy*perpVIn + wallUV.dy*perpVOut;
@@ -1761,5 +1761,5 @@ WallMethods = {
 			dot.y += wallUV.dx		
 		},
 		*/
-	},
+	}
 }

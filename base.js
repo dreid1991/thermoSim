@@ -381,11 +381,11 @@ function deepCopy(object){
 function recordData(handle, list, func, obj, listenerType){
 	var listenerType = defaultTo('record', listenerType)
 	store('record' + handle, listenerType);
-	addListener(curLevel, listenerType, handle, function(){list.pushNumber(func.apply(obj))}, obj);
+	addListener(window['curLevel'], listenerType, handle, function(){list.pushNumber(func.apply(obj))}, obj);
 }
 function recordDataStop(handle){
 	var listenerType = getStore('record' + handle);
-	removeListener(curLevel, listenerType, handle);
+	removeListener(window['curLevel'], listenerType, handle);
 }
 function addEqs(text){
 	var eqIdx = text.indexOf('||EQ');
@@ -487,7 +487,7 @@ function S(newSectionIdx, newPromptIdx, forceReset) {
 	showPrompt(newSectionIdx, newPromptIdx, forceReset)
 }
 function showPrompt(newSectionIdx, newPromptIdx, forceReset){
-	var newSection = curLevel.sections[newSectionIdx];
+	var newSection = window['curLevel'].sections[newSectionIdx];
 	var newPrompt = newSection.prompts[newPromptIdx];
 	var changedSection = newSectionIdx!=sectionIdx;
 	var promptIdxsToClean = getpromptIdxsToClean(newSectionIdx, newPromptIdx);
@@ -521,13 +521,13 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 		addListener(curLevel, 'sectionCleanUp', 'removeArrowAndText',
 			function(){
 				removeListenerByName(curLevel, 'update', 'drawArrow');
-				removeListenerByName(curLevel, 'update', 'animText');
+				removeListenerByName(window['curLevel'], 'update', 'animText');
 			},
 		this);
-		curLevel.delayGraphs();
+		window['curLevel'].delayGraphs();
 	}
 	if (newPrompt.setup) {
-		newPrompt.setup.apply(curLevel)
+		newPrompt.setup.apply(window['curLevel'])
 	}
 	newPrompt.text = evalText(addStored(newPrompt.text));
 	if (!newPrompt.quiz) {
@@ -536,13 +536,13 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 	sectionIdx = newSectionIdx;
 	promptIdx = newPromptIdx;
 	if (newPrompt.cutScene) {	
-		curLevel.cutSceneStart(newPrompt.text, newPrompt.cutScene, newPrompt.quiz)
+		window['curLevel'].cutSceneStart(newPrompt.text, newPrompt.cutScene, newPrompt.quiz)
 	} else {
 		if (newPrompt.quiz) {
 			var quiz = newPrompt.quiz;
 			$('#nextPrevDiv').hide();
 			$('#prompt').html(defaultTo('', newPrompt.text));
-			curLevel.appendQuiz(newPrompt.quiz, 'prompt')
+			window['curLevel'].appendQuiz(newPrompt.quiz, 'prompt')
 		} else {
 			$('#prompt').html(newPrompt.text);
 		}
@@ -556,7 +556,7 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 function getpromptIdxsToClean(newSectionIdx, newPromptIdx) {
 	//attn please - this only works for going forwards
 	//would need to make like an 'added by' tag for backwards to work
-	var curSection = curLevel.sections[sectionIdx];
+	var curSection = window['curLevel'].sections[sectionIdx];
 	if (newSectionIdx>sectionIdx || (sectionIdx==newSectionIdx && newPromptIdx>promptIdx)) {
 		var cleanUps = []
 		for (var pIdx=promptIdx; pIdx<curSection.prompts.length; pIdx++) {
@@ -569,7 +569,7 @@ function getpromptIdxsToClean(newSectionIdx, newPromptIdx) {
 }
 
 function nextPrompt(forceAdvance){
-	var curSection = curLevel.sections[sectionIdx];
+	var curSection = window['curLevel'].sections[sectionIdx];
 	var curPrompt = defaultTo({}, curSection.prompts[promptIdx]);
 	
 	if (forceAdvance) {
@@ -592,9 +592,9 @@ function nextPrompt(forceAdvance){
 function getNextIdxs() {
 	var newSectionIdx = sectionIdx;
 	var newPromptIdx = promptIdx;
-	var curSection = curLevel.sections[sectionIdx];
+	var curSection = window['curLevel'].sections[sectionIdx];
 	if (promptIdx+1==curSection.prompts.length) {
-		if (sectionIdx+1 < curLevel.sections.length) {
+		if (sectionIdx+1 < window['curLevel'].sections.length) {
 			newSectionIdx++;
 			newPromptIdx=0;
 		}
@@ -610,7 +610,7 @@ function getPrevIdxs() {
 	if (promptIdx==0) {
 		if (sectionIdx>0) {
 			newSectionIdx--;
-			newPromptIdx=curLevel.sections[newSectionIdx].prompts.length-1;
+			newPromptIdx=window['curLevel'].sections[newSectionIdx].prompts.length-1;
 		}
 	} else {
 		newPromptIdx--;

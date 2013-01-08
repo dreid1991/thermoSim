@@ -1,0 +1,1 @@
+java -jar ../compiler.jar --compilation_level SIMPLE_OPTIMIZATIONS --externs testExterns.js --js WallHandler.js --js_output_file wallcompiled.js

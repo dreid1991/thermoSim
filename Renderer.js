@@ -4,20 +4,20 @@ function Renderer() {
 
 Renderer.prototype = {
 	render: function(scene) {
-		if (scene.type.indexOf('section') != -1) {
-			currentSetupType = scene.type;
+		if (scene['type'].indexOf('section') != -1) {
+			currentSetupType = scene['type'];
 		} else {
-			currentSetupType = scene.type + window[scene.type + 'Idx'];
+			currentSetupType = scene['type'] + window[scene['type'] + 'Idx'];
 		}
 		if (!curLevel[currentSetupType + 'CleanUp'] && scene.type == 'prompt') {
 			curLevel.makeListenerHolder('prompt' + promptIdx + 'CleanUp');
 		}
-		this.renderDots(scene.dots);
-		this.renderWalls(scene.walls, scene);
-		this.renderObjs(scene.objs);
-		this.addRecording(scene.records);
-		this.addReadoutEntries(scene.readoutEntries);
-		this.addListeners(scene.listeners);
+		this.renderDots(scene['dots']);
+		this.renderWalls(scene['walls'], scene);
+		this.renderObjs(scene['objs']);
+		this.addRecording(scene['records']);
+		this.addReadoutEntries(scene['readoutEntries']);
+		this.addListeners(scene['listeners']);
 		
 		
 
@@ -29,7 +29,7 @@ Renderer.prototype = {
 		for (var popIdx=0; popIdx<toPopulate.length; popIdx++) {
 			var curPop = toPopulate[popIdx];
 			if (spcs[curPop.type]) {
-				spcs[curPop.type].populate(curPop.pos, curPop.dims, curPop.count, curPop.temp, curPop.returnTo, curPop.tag);
+				spcs[curPop.type].populate(curPop['pos'], curPop['dims'], curPop['count'], curPop['temp'], curPop['returnTo'], curPop['tag']);
 			} else {
 				console.log('Trying to populate bad species type ' + curPop.type);
 			}
@@ -37,7 +37,7 @@ Renderer.prototype = {
 	},
 	renderWalls: function(newWalls, scene) {
 		var newWalls = defaultTo([], newWalls);
-		if (scene.type == 'section') {
+		if (scene['type'] == 'section') {
 			window['walls'] = new WallHandler();
 			walls = window['walls'];
 		}
@@ -50,19 +50,19 @@ Renderer.prototype = {
 		objs = defaultTo([], objs);
 		for (var objIdx=0; objIdx<objs.length; objIdx++) {
 			var obj = objs[objIdx];
-			var objFunc = window[obj.type]
-			curLevel[obj.type + obj.handle] = new objFunc(obj.attrs);
+			var objFunc = window[obj['type']];
+			curLevel[obj['type'] + obj['handle']] = new objFunc(obj['attrs']);
 		}
 	},
 	addRecording: function(data) {
 		data = defaultTo([], data);
 		for (var dataIdx=0; dataIdx<data.length; dataIdx++) {
 			var entry = data[dataIdx];
-			var func = WallMethods.getFunc.record(entry.data);
+			var func = WallMethods.getFunc.record(entry['data']);
 			if (func) {
-				func.apply(walls[entry.wallHandle]);
+				func.apply(walls[entry['wallHandle']]);
 			} else {
-				console.log("Couldn't parse " + entry.data + " for wall " + entry.wallHandle);
+				console.log("Couldn't parse " + entry['data'] + " for wall " + entry['wallHandle']);
 			}
 		}
 	},
@@ -70,11 +70,11 @@ Renderer.prototype = {
 		entries = defaultTo([], entries);
 		for (var entryIdx=0; entryIdx<entries.length; entryIdx++) {
 			var entry = entries[entryIdx];
-			var func = WallMethods.getFunc.display(entry.data);
+			var func = WallMethods.getFunc.display(entry['data']);
 			if (func) {
-				func.apply(walls[entry.wallHandle]);
+				func.apply(walls[entry['wallHandle']]);
 			} else {
-				console.log("Couldn't parse " + entry.data + " for wall " + entry.wallHandle);
+				console.log("Couldn't parse " + entry['data'] + " for wall " + entry['wallHandle']);
 			}			
 		}
 	},

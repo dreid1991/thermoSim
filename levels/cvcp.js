@@ -6,7 +6,6 @@ $(function(){
 	myCanvas.height = canvasHeight;
 	renderer = new Renderer();
 	window['curLevel'] = new cvcp();
-	curLevel = window['curLevel'];
 	curLevel.cutSceneEnd();
 	curLevel.init();
 	$('button').button();

@@ -60,7 +60,7 @@ LevelTools = {
 		}
 	},
 	cutSceneStart: function(text, mode, quiz) {
-		addListener(curLevel, 'prompt' + promptIdx + 'CleanUp', 'endCutScene',
+		addListener(window['curLevel'], 'prompt' + promptIdx + 'CleanUp', 'endCutScene',
 			function() {
 				this.cutSceneEnd()
 			},
@@ -383,9 +383,9 @@ LevelTools = {
 		this.numUpdates = 0;
 	},
 	delayGraphs: function() {
-		addListener(curLevel, 'data', 'run', function() {
+		addListener(window['curLevel'], 'data', 'run', function() {
 			this.dataRunNoGraphs();
-			addListener(curLevel, 'data', 'run', this.dataRun, this);
+			addListener(window['curLevel'], 'data', 'run', this.dataRun, this);
 		},
 		this);
 	},
@@ -429,7 +429,7 @@ LevelTools = {
 		}
 		this.setUpdateRunListener();
 
-		addListener(curLevel, cleanUpWith + 'CleanUp', 'gravityStop', this.gravityStop, this);
+		addListener(window['curLevel'], cleanUpWith + 'CleanUp', 'gravityStop', this.gravityStop, this);
 	},
 	gravityStop: function() {
 		this.gravitying = false;
@@ -451,7 +451,7 @@ LevelTools = {
 		cleanUpWith = defaultTo('section', cleanUpWith);
 		attractor.assignELastAll();
 		this.setUpdateRunListener();
-		addListener(curLevel, cleanUpWith + 'CleanUp', 'attractStop', this.attractStop, this);
+		addListener(window['curLevel'], cleanUpWith + 'CleanUp', 'attractStop', this.attractStop, this);
 	},
 	attractStop: function() {
 		this.attracting = false;
@@ -525,14 +525,14 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		decPlaces = defaultTo(1, decPlaces);
 		if(typeof(data)=='Array'){
 			this.readout.addEntry(handle, label, units, data[data.length-1], undefined, decPlaces);
-			addListener(curLevel, 'data', 'track'+handle,
+			addListener(window['curLevel'], 'data', 'track'+handle,
 				function(){
 					this.readout.tick(handle, data[data.length-1]);
 				},
 			this);
 		}else if (typeof(data)=='function'){
 			this.readout.addEntry(handle, label, units, data(), undefined, decPlaces);
-			addListener(curLevel, 'data', 'track'+handle,
+			addListener(window['curLevel'], 'data', 'track'+handle,
 				function(){
 					this.readout.tick(handle, data());
 				},
@@ -540,7 +540,7 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		}
 	},
 	trackStop: function(handle){
-		removeListener(curLevel, 'data', 'track' + handle);
+		removeListener(window['curLevel'], 'data', 'track' + handle);
 	},
 	trackExtentRxnStart: function(handle, rxnInfo){
 		var spcsLocal = spcs;
@@ -553,7 +553,7 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 			compInfo.init = initCount;
 
 		}
-		addListener(curLevel, 'data', 'trackExtentRxn' + handle,
+		addListener(window['curLevel'], 'data', 'trackExtentRxn' + handle,
 			function(){
 				var extent = Number.MAX_VALUE;
 				for (var compIdx=0; compIdx<rxnInfo.length; compIdx++){
@@ -569,7 +569,7 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		this);
 	},
 	trackExtentRxnStop: function(handle){
-		removeListener(curLevel, 'data', 'trackExtentRxn' + handle);
+		removeListener(window['curLevel'], 'data', 'trackExtentRxn' + handle);
 	},
 	*/
 	makeListenerHolders: function(){
