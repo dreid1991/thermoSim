@@ -12,7 +12,7 @@ elementAttrs = {
 	wallHandle:
 		{type: String},
 	dotInfo:
-		{type: Object},  //Need to figure out composites
+		{type: Object}  //Need to figure out composites
 }
 
 elementMd = {
@@ -41,7 +41,7 @@ elementMd = {
 			show:
 				{type: Boolean},
 			temp:
-				{type: Number},
+				{type: Number}
 			//add some border stuff
 		}
 	},
@@ -53,7 +53,7 @@ elementMd = {
 			data:
 				{type: String},
 			readoutHandle:
-				{type: String},
+				{type: String}
 		}
 			
 		//{wallHandle: 'left', data:'TempSmooth', readout:'mainReadout'}
@@ -151,7 +151,7 @@ elementMd = {
 			max:
 				{type: Number},
 			makePiston:
-				{type: Boolean},
+				{type: Boolean}
 		}
 	},
 	heater: {
@@ -164,7 +164,7 @@ elementMd = {
 			dims:
 				elementAttrs.dims, //Need to make an optional/required thing
 			max:
-				{type: Number},
+				{type: Number}
 			
 		}
 	},
@@ -174,7 +174,7 @@ elementMd = {
 			handle:
 				elementAttrs.handle,
 			wallHandle:
-				elementAttrs.wallHandle,
+				elementAttrs.wallHandle
 		}
 	},
 	sandbox: {
@@ -187,7 +187,7 @@ elementMd = {
 			init: 
 				{type: Number},
 			max:
-				{type: Number},			
+				{type: Number}
 		}
 	},
 	tempChanger: {
@@ -200,7 +200,7 @@ elementMd = {
 			sliderPos:
 				{type: String},
 			info:
-				elementAttrs.dotInfo,
+				elementAttrs.dotInfo
 				
 		}
 	
@@ -215,7 +215,7 @@ elementMd = {
 			sliderPos:
 				{type: String},
 			info:
-				elementAttrs.dotInfo,
+				elementAttrs.dotInfo
 				
 		}
 	},

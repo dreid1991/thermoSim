@@ -70,7 +70,7 @@ Dropdown.prototype = {
 			top: paperPos.y,
 			width: this.dims.dx,
 			'z-index': 3,
-			height: 0,
+			height: 0
 		})
 		$(dropdownDiv).attr('id', this.handle);
 		return $('#' + this.handle)[0];
@@ -132,7 +132,7 @@ Dropdown.prototype = {
 				arrows: function(){console.log('Dropdown is in tree mode!')}
 			}
 		}
-	},
+	}
 
 }
 

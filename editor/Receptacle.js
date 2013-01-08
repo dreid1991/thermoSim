@@ -17,7 +17,7 @@ Receptacle.prototype = {
 		translateObj(rect, this.pos);
 		rect.attr({
 			fill: this.tree.panelCol.hex,
-			stroke: this.tree.rectCol.hex,
+			stroke: this.tree.rectCol.hex
 		})
 		return rect;
 	},
@@ -38,6 +38,6 @@ Receptacle.prototype = {
 		var label = this.tree.paper.text(0, 0, this.labelText).attr({'font-size': this.tree.labelTextSize});
 		translateObj(label, pos);
 		return label;
-	},
+	}
 
 }

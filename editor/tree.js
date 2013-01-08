@@ -551,7 +551,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		}
 		this.staticsToFront();
 
-	},
+	}
 
 })
 

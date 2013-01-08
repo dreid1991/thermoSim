@@ -56,7 +56,7 @@ _.extend(SceneData.prototype, updateValue = {
 			attrs[attr] = undefined;
 		}
 		return attrs;
-	},
+	}
 
 
 });

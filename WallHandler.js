@@ -198,22 +198,22 @@ WallMethods = {
 			this[wallIdx].data['m'] = new Array();
 			this[wallIdx].data['work'] = new Array(); // kj
 			this[wallIdx].data['q'] = new Array(); //kj
-			this[wallIdx]['recordingTemp'] = false;
-			this[wallIdx]['recordingPInt'] = false;
-			this[wallIdx]['recordingPExt'] = false;
-			this[wallIdx]['recordingVol'] = false;
-			this[wallIdx]['recordingWork'] = false;
-			this[wallIdx]['recordingMass'] = false;
-			this[wallIdx]['recordingQ'] = false;
-			this[wallIdx]['recordingRMS'] = false;
-			this[wallIdx]['displayingTemp'] = false;
-			this[wallIdx]['displayingPInt'] = false;
-			this[wallIdx]['displayingPExt'] = false;
-			this[wallIdx]['displayingVol'] = false;
-			this[wallIdx]['displayingWork'] = false;
-			this[wallIdx]['displayingMass'] = false;
-			this[wallIdx]['displayingQ'] = false;
-			this[wallIdx]['displayingRMS'] = false;
+			this[wallIdx].recordingTemp = {val: false};
+			this[wallIdx].recordingPInt = {val: false};
+			this[wallIdx].recordingPExt = {val: false};
+			this[wallIdx].recordingVol = {val: false};
+			this[wallIdx].recordingWork = {val: false};
+			this[wallIdx].recordingMass = {val: false};
+			this[wallIdx].recordingQ = {val: false};
+			this[wallIdx].recordingRMS = {val: false};
+			this[wallIdx].displayingTemp = {val: false};
+			this[wallIdx].displayingPInt = {val: false};
+			this[wallIdx].displayingPExt = {val: false};
+			this[wallIdx].displayingVol = {val: false};
+			this[wallIdx].displayingWork = {val: false};
+			this[wallIdx].displayingMass = {val: false};
+			this[wallIdx].displayingQ = {val: false};
+			this[wallIdx].displayingRMS = {val: false};
 			this[wallIdx].q = 0;
 			this[wallIdx].pIntLen = 35;
 			this[wallIdx].eToAdd = 0;
@@ -1013,7 +1013,7 @@ WallMethods = {
 			this.recordQ();
 		},
 		recordTemp: function() {
-			this.recordingTemp = true;
+			this.recordingTemp.val = true;
 			//if (this.parent.numWalls>1) {
 				var tempFunc = dataHandler.tempFunc({tag:this.handle})
 			//}else{
@@ -1023,8 +1023,8 @@ WallMethods = {
 			return this;
 		},
 		recordRMS: function() {
-			if (this.recordingTemp) {
-				this.recordingRMS = true;
+			if (this.recordingTemp.val) {
+				this.recordingRMS.val = true;
 				//HEY - I AM ASSUMING THAT IF YOU GET RMS, IT IS OF ONE TYPE OF MOLECULE
 				if (this.parent.numWalls>1) {
 					var tag = this.handle;
@@ -1059,25 +1059,25 @@ WallMethods = {
 			}
 		},
 		recordPInt: function() {
-			this.recordingPInt = true;
+			this.recordingPInt.val = true;
 			this.pIntList = new Array();
 			this.pIntIdx = 0;
 			recordData('pInt' + this.handle, this.data.pInt, this.pInt, this, 'update');
 			return this;
 		},
 		recordPExt: function() {
-			this.recordingPExt = true;
+			this.recordingPExt.val = true;
 			recordData('pExt' + this.handle, this.data.pExt, this.pExt, this, 'update');
 			return this;
 		},
 		recordVol: function() {
-			this.recordingVol = true;
+			this.recordingVol.val = true;
 			recordData('v' + this.handle, this.data.v, function(){return this.parent.wallVolume(this.handle)}, this, 'update');
 			return this;
 		},
 		recordWork: function() {
-			if (!this.recordingWork) {
-				this.recordingWork = true;
+			if (!this.recordingWork.val) {
+				this.recordingWork.val = true;
 				this.work = 0;
 				var LTOM3LOCAL = LtoM3;
 				var PCONSTLOCAL = pConst;
@@ -1089,23 +1089,23 @@ WallMethods = {
 				var heightLast = trackPt.y;
 				//Attention - at some point, employ some trickyness to first add a listener for first turn that records zero, then add real listener that uses func below. 
 				//this will work after first turn since volume is _always_ recorded before work (vol is added as default to wall, work is added later by objects)
-				addListenerOnce(curLevel, 'update', 'recordWorkFirst' + this.handle,
-					function() {
-						this.work = 0;
-						//this.data.work.push(0);
-						addListener(curLevel, 'update', 'recordWork'+this.handle,
-							function(){
-								var len = this.data.v.length;
-								var dV = LTOM3LOCAL*(this.data.v[len-1] - this.data.v[len-2])
-								var p = this.pExt()*PUNITTOPALOCAL;
-								this.work -= JTOKJLOCAL*p*dV;
-								heightLast = trackPt.y;
-								//this.data.work.push(this.work);
-							},
-						this);
-					},
-				this);
-				recordData('work' + this.handle, this.data.work, function(){return this.work}, this, 'update');
+				var self = this;
+				
+				var calcWork = function() {
+					var len = self.data.v.length;
+					var dV = LTOM3LOCAL*(self.data.v[len-1] - self.data.v[len-2])
+					if (dV != undefined) {
+						var p = self.pExt()*PUNITTOPALOCAL;
+						self.work -= JTOKJLOCAL*p*dV;
+						heightLast = trackPt.y;
+						return self.work;
+					} else {
+						self.work = 0;
+						return 0;
+					}
+				}
+
+				recordData('work' + this.handle, this.data.work, calcWork, this, 'update');
 			}
 			return this;
 		},
@@ -1119,59 +1119,20 @@ WallMethods = {
 			recordData('q' + this.handle, this.data.q, function(){return this.q}, this, 'update');
 			return this;
 		},
-		recordTempStop: function(){
-			this.recordingTemp = false;
-			recordDataStop('t' + this.handle);
-			return this;
-		},
-		recordPIntStop: function(){
-			this.recordingPInt = false;
-			recordDataStop('pInt' + this.handle);
-			return this;
-		},
-		recordPExtStop: function(){	
-			this.recordingPExt = false;
-			recordDataStop('pExt' + this.handle);
-			return this;
-		},
-		recordVolStop: function(){
-			this.recordingVol = false;
-			recordDataStop('v' + this.handle);
-			return this;
-		},
-		recordWorkStop: function(){
-			this.recordingWork = false;
-			recordDataStop('work' + this.handle);
-			return this;
-		},
-		recordMassStop: function(){
-			this.recordingMass = false;
-			recordDataStop('mass' + this.handle);
-			return this;
-		},
-		recordQStop: function(){
-			this.recordingQ = false
-			recordDataStop('q' + this.handle);
-			return this;
-		},
-		recordRMSStop: function() {
-			this.recordingRMS = false;
-			recordDataStop('RMS' + this.handle);
-			return this;
-		},
-		recordStop: function(dataType) {
-			//this['recording' perhaps do handle, datatype for consistant capitalization to I can make one func
+		recordStop: function(isRecording, str) {
+			isRecording.val = false;
+			recordDataStop(str + this.handle);
 		}
 		//if I want to generalize stop *and* use the closure compiler, need to make isRecording object
 		recordAllStop: function(){
-			if(this.recordingTemp){this.recordTempStop();};
-			if(this.recordingPInt){this.recordPIntStop();};
-			if(this.recordingPExt){this.recordPExtStop();};
-			if(this.recordingVol){this.recordVolStop();};
-			if(this.recordingWork){this.recordWorkStop();};
-			if(this.recordingMass){this.recordMassStop();};
-			if(this.recordingQ){this.recordQStop();};
-			if(this.recordingRMS){this.recordRMSStop();};
+			if(this.recordingTemp.val){this.recordStop('t');};
+			if(this.recordingPInt.val){this.recordStop('pInt');};
+			if(this.recordingPExt.val){this.recordStop('pExt');};
+			if(this.recordingVol.val){this.recorStop('v');};
+			if(this.recordingWork.val){this.recorStop('work');};
+			if(this.recordingMass.val){this.recorStop('mass');};
+			if(this.recordingQ.val){this.recorStop('q');};;
+			if(this.recordingRMS.val){this.recorStop('RMS');};
 			return this;
 		},	
 		resetWork: function(){

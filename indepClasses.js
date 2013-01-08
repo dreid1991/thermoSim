@@ -55,7 +55,7 @@ Species.prototype = {
 		} else {
 			dotManager.removeByInfo({name:this.def.spcName});
 		}
-	},
+	}
 }
 function Point(x, y){
 	this.x = x;
@@ -226,7 +226,7 @@ Color.prototype = {
 	},
 	sameAs: function(b){
 		return this.r == b.r && this.g == b.g && this.b == b.b;
-	},
+	}
 
 }
 Point.prototype = {
@@ -470,5 +470,5 @@ Dot.prototype = {
 		for (var listIdx=0; listIdx<this.parentLists.length; listIdx++) {
 			this.parentLists[listIdx].splice(this.parentLists[listIdx].indexOf(this), 1);
 		}
-	},
+	}
 }

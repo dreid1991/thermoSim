@@ -8,6 +8,6 @@ config = {
 	buttonDimsSmall: V(30, 30),
 	buttonDimsMedium: V(70, 30), //actually make some nice dimensions please
 	buttonDimsLarge: V(150, 30),
-	imagePadding: .05,
+	imagePadding: .05
 
 }

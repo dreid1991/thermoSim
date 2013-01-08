@@ -14,7 +14,7 @@ assignHover = {
 				}
 			)
 		}
-	},
+	}
 
 }
 
@@ -442,7 +442,7 @@ PlacerRectFuncs = {
 				onEnd: undefined
 			}
 		}
-	},
+	}
 
 }
 
@@ -503,6 +503,6 @@ ReceptacleFuncs = { //button has pos, parent has totalHeight, totalWidth,
 		for (var unhoverIdx=0; unhoverIdx<button.hoveringOver.length; unhoverIdx++) {
 			button.hoveringOver[unhoverIdx].onHoverOut();
 		}
-	},
+	}
 
 }

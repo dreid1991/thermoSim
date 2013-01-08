@@ -76,6 +76,6 @@ DataManager.prototype = {
 		var id = 'c' + this.commandNum;
 		this.commandNum++;
 		return id;
-	},
+	}
 
 }

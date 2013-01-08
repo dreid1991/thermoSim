@@ -157,7 +157,7 @@ _.extend(ArrowButton.prototype, assignHover, {
 		rect.attr({
 			fill: this.tree.rectCol.hex,
 			//stroke: this.tree.rectColStroke.hex,
-			'stroke-width': 0,
+			'stroke-width': 0
 			//'stroke-linejoin': 'round',
 		});
 		if (this.dragFuncs) {
@@ -417,5 +417,5 @@ _.extend(ArrowButton.prototype, assignHover, {
 				list.splice(idx, 1);
 			}
 		}
-	},
+	}
 });
