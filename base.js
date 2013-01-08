@@ -70,7 +70,7 @@ $(function(){
 	if(started&&counted<500){
 		counted++;
 		total+=Date.now()-then;
-	}else if (counted==500){
+	} else if (counted==500){
 		console.log(total);
 		counted=0;
 		total=0;
@@ -138,9 +138,9 @@ function gauss(avg, stdev){
 function boundedStep(cur, setPt, step){
 	step = Math.abs(step);
 	var sign = 1;
-	if(cur==setPt){
+	if (cur==setPt) {
 		return cur;
-	}else{
+	} else {
 		var dist = setPt-cur;
 		sign = Math.abs(dist)/dist;
 	}
@@ -253,7 +253,7 @@ function unique(name, obj){
 			return name;
 		} else {
 			var uniqueId = 1;
-			while(obj[name+uniqueId]){
+			while (obj[name+uniqueId]) {
 				uniqueId++;
 			}
 			return name+uniqueId;
@@ -350,16 +350,16 @@ function loadListener(object, typeName){
 	}
 	
 }
-function store(attrName, val){
+function store (attrName, val) {
 	stored[attrName] = val;
 }
-function getStore(attrName){
+function getStore (attrName) {
 	return stored[attrName];
 }
-function eraseStore(attrName){
-	if(attrName){
+function eraseStore (attrName) {
+	if (attrName) {
 		stored[attrName] = undefined;
-	}else{
+	} else {
 		stored = {};
 	}
 }
@@ -367,9 +367,9 @@ function eraseStore(attrName){
 function deepCopy(object){
 	var copy = new object.constructor();
 	for (var item in object){
-		if(typeof object[item] == 'object'){
+		if (typeof object[item] == 'object') {
 			copy[item] = deepCopy(object[item]);
-		}else{
+		} else {
 			copy[item] = object[item];
 		}
 	} 
@@ -437,7 +437,7 @@ function makeSlider(wrapperDivId, sliderDivId, title, attrs, handlers, initVisib
 		var ui;
 		if(obj===undefined){
 			sliderBind(sliderDiv, eventType, func, '');
-		}else{
+		} else {
 			sliderBind(sliderDiv, eventType, func, obj);
 		}
 		
@@ -685,38 +685,39 @@ function prevPrompt(){
 
 
 function addStored(text) {
-	var getIdx = text.indexOf('GET_');
-	while (getIdx!=-1) {
-		if (text[getIdx+3] == '#') {
-			var endIdx = text.indexOf("|");
-			var gotten = parseFloat(getStore(text.slice(getIdx+5, endIdx)));
-			text = text.replace(text.slice(getIdx, endIdx+1), gotten);
+	var get;
+	var gotten;
+	var testExpr = /GET_#{0,1}[A-Za-z0-9]\|/;
+	while (true) {
+		var cmmdList = testExpr.exec(text);
+		if (cmmdList == null) break;
+		var cmmd = cmmdList[0];
+		if (cmmd.indexOf('#') {
+			get = cmmd.slice(5, cmmd.length-1);
+			gotten = parseFloat(getStore(get));
 		} else {
-			var endIdx = text.indexOf("|");
-			if (endIdx==-1) {
-				console.log('YOUR GETS IN TEXT BLOCKS ARE MESSED UP.  MUST END WITH |');
-				break;
-			}
-			var gotten = parseFloat(getStore(text.slice(getIdx+4, endIdx)));
-			text = text.replace(text.slice(getIdx, endIdx+1), gotten);		
+			get = cmmd.slice(4, cmmd.length-1);
+			gotten = getStore(get);
 		}
-		getIdx = text.indexOf('GET');
+		text = text.replace(cmmd, gotten);
 	}
 	return text;
 }
 
 function evalText(text) {
-	var evalIdx = text.indexOf('EVAL_');
-	while (evalIdx!=-1) {
-		var endIdx = text.indexOf("|");
-		if (endIdx==-1) {
-			console.log('YOUR EVALS IN TEXT BLOCKS ARE MESSED UP.  MUST END WITH |');
-			break;
-		}
-		var evaled = eval(text.slice(evalIdx+5, endIdx));
-		text = text.replace(text.slice(evalIdx, endIdx+1), evaled);		
-		evalIdx = text.indexOf('EVAL_');	
+	var testExpr = /EVAL_[0-9\(\)\+\-\*\/\]*|/;
 	
+	while (true) {
+		var evalList = textExpr.exec(text);
+		if (evalList == null) break;
+		var evalItem = evalList[0];
+		var cmmd = evalItem.slice(5, cmmd.length - 1);
+		try {
+			result = eval(cmmd);
+		} catch(e) {
+			console.log('Bad eval ' + evalItem + ', cmmd is ' + cmmd);
+		}
+		text = text.replace(evalItem, result);
 	}
 	return text;
 }
@@ -789,7 +790,7 @@ function byAttr(obj, attrVal, attr) {
 				return obj[listIdx];
 			}
 		}
-	}else{
+	} else {
 		for (var name in obj) {
 			if (obj[name][attr]==attrVal){
 				return obj[name];
