@@ -1,1 +1,0 @@
-java -jar ../../compiler.jar --compilation_level SIMPLE_OPTIMIZATIONS --

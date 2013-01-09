@@ -692,7 +692,7 @@ function addStored(text) {
 		var cmmdList = testExpr.exec(text);
 		if (cmmdList == null) break;
 		var cmmd = cmmdList[0];
-		if (cmmd.indexOf('#') {
+		if (cmmd.indexOf('#')) {
 			get = cmmd.slice(5, cmmd.length-1);
 			gotten = parseFloat(getStore(get));
 		} else {
@@ -705,10 +705,10 @@ function addStored(text) {
 }
 
 function evalText(text) {
-	var testExpr = /EVAL_[0-9\(\)\+\-\*\/\]*|/;
+	var testExpr = /EVAL_[0-9\(\)\+\-\*\/]*\|/;
 	
 	while (true) {
-		var evalList = textExpr.exec(text);
+		var evalList = testExpr.exec(text);
 		if (evalList == null) break;
 		var evalItem = evalList[0];
 		var cmmd = evalItem.slice(5, cmmd.length - 1);

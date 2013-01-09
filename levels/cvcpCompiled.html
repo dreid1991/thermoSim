@@ -1,0 +1,100 @@
+<html>
+<body>
+<link type='text/css' href = '../css/custom-theme/jquery-ui-1.8.23.custom.css' rel='stylesheet' />
+<link type='text/css' href = '../styles.css' rel='stylesheet'/>
+<div class='noSelect wrapper'>
+	<div id='main' class='main noSelect'>
+		<div id='mainHeader' class='header noSelect'>
+			
+		</div>
+		<div id='canvasDiv' class='canvasDiv noSelect'>
+			<canvas id='myCanvas'>
+			</canvas>
+		</div>
+		<div id='display' class='display noSelect'>
+				<div id='intText' class='displayText noSelect'>
+			</div>
+		</div>
+
+
+		<div id='dashIntro' class='dashMed noSelect'>
+			<center>
+				<button id='toSim' class='noSelect'>To the simulation!</button>
+			</center>
+			
+		</div>
+		<div id='dashRun' class='dashMed noSelect' style='position:relative'>
+			<center>
+				<div id='buttons'>
+		
+				</div>
+			</center>
+			<center>
+				<div id='sliderHolderSingle'>
+					<div id='sliderHolderCenter' style='width:300px'>
+					
+					</div>
+				</div>
+			</center>
+			<center>
+				<div id='sliderHolderDouble'>
+					<div id='sliderHolderLeft' style='display:inline-block;width:200px'>
+					</div>
+					<div id='sliderSpacer' style='display:inline-block;width:75px'>
+					</div>
+					<div id='sliderHolderRight' style='display:inline-block;width:200px'>
+					</div>
+				</div>
+			</center>
+			<button id='resetExp' style='position:absolute;right:.5em;bottom:.25em'><img src='img/refresh.gif'></img></button>
+		</div>
+		<div id='dashCutScene' class='dashMed noSelect'></div>
+		<div id='dashOutro' class='dash noSelect ' >
+			<center>
+				<button id='toLastStep'>Back to the simulation</button>
+			</center>
+			
+			
+		</div>
+		
+
+	</div>
+	<div id='auxSlots' class='auxSlots noSelect'>
+		<div id='aux1' class='aux' filledWith=''>
+		</div>
+		<div id='auxSpacer' class='auxSpacer'>
+		</div>
+		<div id='aux2' class='aux' filledWith=''>
+		</div>
+	</div>
+</div>
+<br>
+<div id='base' class='base noSelect'>
+	<div id='baseHeader' class='header noSelect'></div>
+	<div class='borderedBlock noSelect'>
+		<div id='quesHolder noSelect'>
+		</div>
+		<div style='padding:10px' class='displayText noSelect'>
+			<div id='prompt'>
+			
+			</div>
+		
+			<div id='nextPrevDiv' align='right'>
+				<button id = 'previous'>Previous</button>
+				<button id = 'next'>Next</button>
+			</div>
+
+		</div>
+	</div>
+
+	<div id='baseDash' class='bottomRound noSelect'></div>
+</div>
+<script src = '../underscore-min.js'></script>
+<script src = '../js/jquery-1.7.2.min.js'></script>
+<script src = '../js/jquery-ui-1.8.20.custom.min.js'></script>
+
+<script src = '../core-compiled.js'></script>
+<script src = 'cvcp.js'></script>
+
+</body>
+</html>

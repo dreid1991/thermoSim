@@ -57,7 +57,7 @@ Renderer.prototype = {
 		data = defaultTo([], data);
 		for (var dataIdx=0; dataIdx<data.length; dataIdx++) {
 			var entry = data[dataIdx];
-			walls[entry.wallHandle]['record' + entry.data];
+			walls[entry.wallHandle]['record' + entry.data]();
 		}
 	},
 	addReadoutEntries: function(entries) {

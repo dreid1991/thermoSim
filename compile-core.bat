@@ -1,0 +1,28 @@
+java -jar ../compiler.jar ^
+--compilation_level SIMPLE_OPTIMIZATIONS ^
+--language_in ECMASCRIPT5 ^
+--js indepClasses.js ^
+--js inheritFuncs.js ^
+--js DrawingTools.js ^
+--js DotManager.js ^
+--js AuxFunctions.js ^
+--js GraphBase.js ^
+--js GraphScatter.js ^
+--js GraphHist.js ^
+--js GraphBlank.js ^
+--js SpeciesDefs.js ^
+--js ReactionHandler.js ^
+--js CollideHandler.js ^
+--js Attractor.js ^
+--js DataHandler.js ^
+--js WallHandler.js ^
+--js Renderer.js ^
+--js objects01.js ^
+--js objects02.js ^
+--js objects03.js ^
+--js AuxPicture.js ^
+--js animText.js ^
+--js Readout.js ^
+--js LevelTools.js ^
+--js base.js ^
+--js_output_file core-compiled.js

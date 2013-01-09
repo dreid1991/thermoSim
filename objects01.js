@@ -1156,7 +1156,6 @@ DragArrow.prototype = {
 	remove: function(){
 		removeListener(curLevel, 'mousedown', 'dragArrow'+this.name);
 		removeListener(curLevel, 'update', 'drawDragArrow'+this.name);
-		delete this;//DOESN'T DO ANYTHING
 	},
 	checkSelected: function(){
 		var mousePos = mouseOffset(this.canvasElement);
