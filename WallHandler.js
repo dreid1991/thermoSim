@@ -332,8 +332,8 @@ WallMethods = {
 					var gridX = Math.floor(dot.x/gridDim);
 					var gridY = Math.floor(dot.y/gridDim);
 					//HEY - DO TESTING TO FIGURE OUT IF SHOULD DEFINED Math.min(gridspot...) OR CALCULATE EACH TIME
-					for (var x=Math.max(gridX-1, 0); x<=Math.min(gridX+1, xSpan); x++){
-						for (var y=Math.max(gridY-1, 0); y<=Math.min(gridY+1, ySpan); y++){
+					for (var x=Math.max(gridX-1, 0), xCeil=Math.min(gradX+1, xSpan)+1; x<xCeil; x++){
+						for (var y=Math.max(gridY-1, 0), yCeil=Math.min(gridY+1, ySpan)+1; y<yCeil; y++){
 							
 							for (var wallIdx=0; wallIdx<this.length; wallIdx++){
 								var gridSquare = this[wallIdx].wallGrids[x][y];
@@ -375,7 +375,7 @@ WallMethods = {
 			var reverseWallUV = V(-wallUV.dx, -wallUV.dy);
 			var dotVecA = V(dot.x-wallPtA.x, dot.y-wallPtA.y);
 			var dotVecB = V(dot.x-wallPtB.x, dot.y-wallPtB.y);
-			return (dotVecA.dotProd(wallUV)>=0 && dotVecB.dotProd(reverseWallUV)>=0)
+			return dotVecA.dotProd(wallUV)>=0 && dotVecB.dotProd(reverseWallUV)>=0;
 		},
 		////////////////////////////////////////////////////////////
 		//WALL HIT HANDLER WRAPPERS
