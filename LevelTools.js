@@ -152,7 +152,7 @@ LevelTools = {
 			nextPrompt();
 		}
 		var idButton = 'textAreaSubmit';
-		submitHTML = "<table border=0><tr><td width=75%></td><td><button id='" + idButton + "' class='noSelect'>Submit</button></td></tr></table>";
+		submitHTML = "<table border=0><tr><td width=75%></td><td>" + makeButtonHTML(idButton, 'Submit') + "</td></tr></table>";
 		$('#'+appendTo).html($('#'+appendTo).html() + submitHTML);
 		buttonBind(idButton, onclickSubmit);
 	},
@@ -239,7 +239,7 @@ LevelTools = {
 		for (var buttonIdx=0; buttonIdx<buttons.length; buttonIdx++){
 			var button = buttons[buttonIdx];
 			ids[buttonIdx] = defaultTo('question' + questionIdx + 'option' + buttonIdx, button.buttonId);
-			buttonHTML += "<td><button id='" + ids[buttonIdx] + "' class='noSelect'>" + button.text + "</button></td>"
+			buttonHTML += "<td>" + makeButtonHTML(idx[buttonIdx], button.text) + "</td>";
 		}
 		buttonHTML += "</tr></table></center>";
 		$('#'+appendTo).html($('#' + appendTo).html() + buttonHTML);
@@ -288,7 +288,7 @@ LevelTools = {
 			var option = options[optionIdx];
 			var divId = optionIdx;
 			ids[optionIdx] = 'question' + questionIdx + 'option' + optionIdx;
-			multChoiceHTML += "<div id='"+ids[optionIdx]+"' class='multChoiceBlock'>"+option.text+"</div>";
+			multChoiceHTML += "<div id='"+ids[optionIdx]+"' class='sim multChoiceBlock'>"+option.text+"</div>";
 		}
 		$('#'+appendTo).html($('#'+appendTo).html() + multChoiceHTML);
 		this.bindMultChoiceFuncs(question, options, ids);

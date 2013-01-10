@@ -1,6 +1,7 @@
 java -jar ../compiler.jar ^
 --compilation_level SIMPLE_OPTIMIZATIONS ^
 --language_in ECMASCRIPT5 ^
+--js Templater.js ^
 --js indepClasses.js ^
 --js inheritFuncs.js ^
 --js DrawingTools.js ^

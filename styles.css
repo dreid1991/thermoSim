@@ -1,28 +1,28 @@
-.wrapper{
+.sim.wrapper{
 	display:inline-block;
 }
-.main{
+.sim.main{
 	width:550px;
 	float:left;
 	/*display:inline-block;*/
 }
 
-.auxSlots{
+.sim.auxSlots{
 	margin-left:570px;
 }
 
-.aux{
+.sim.aux{
 	position:relative;
 }
 
-.noSelect{
+.sim.noSelect{
 	-moz-user-select: none; 
 	-khtml-user-select: none; 
 	-webkit-user-select: none; 
 	-o-user-select: none; 
 }
 
-.header{
+.sim.header{
 	height:25px;
 	border-top-left-radius:20px;
 	border-top-right-radius:20px;
@@ -32,7 +32,7 @@
 	color:white;
 	padding:2px;
 }
-.multChoiceBlock{
+.sim.multChoiceBlock{
 	width:400px;
 	padding:5px;
 	border-radius:15px;
@@ -40,14 +40,14 @@
 	border:3px solid;
 	border-color:#b3b2b1;
 }
-.displayLong{
+.sim.displayLong{
 	height:500px;
 	background-color:#05111a;
 	border-top: 3px solid;
 	border-bottom:3px solid;
 	border-color:#b3b2b1;
 }
-.display{
+.sim.display{
 	height:450px;
 	background-color:#05111a;
 	border-top: 3px solid;
@@ -56,25 +56,25 @@
 	
 }
 
-.canvasDiv{
+.sim.canvasDiv{
 	border-top: 3px solid;
 	border-bottom:3px solid;
 	border-color:#b3b2b1;	
 }
-.displayText{
+.sim.displayText{
 	font-family:georgia, garamond;/*WHAT IS GARAMOND?  SHOULD GET OTHER FALLBACKS.*/
 	font-size:medium;
 	color:white;
 	padding:5px;
 }
-.niceFont{
+.sim.niceFont{
 	font-family:georgia, garamond;
 }
-.bottomAlign{
+.sim.bottomAlign{
 	vertical-align:bottom;
 	position:relative;
 }
-.dash{
+.sim.dash{
 	height:130px;
 	border-bottom-left-radius:20px;
 	border-bottom-right-radius:20px;
@@ -82,7 +82,7 @@
 	color:white;
 	padding:10px;
 }
-.dashMed{
+.sim.dashMed{
 	height:70px;
 	border-bottom-left-radius:20px;
 	border-bottom-right-radius:20px;
@@ -91,10 +91,10 @@
 	padding:10px;
 	padding:10px;
 }
-.whiteFont{
+.sim.whiteFont{
 	color:white;
 }
-.dashShort{
+.sim.dashShort{
 	height:40px;
 	border-bottom-left-radius:20px;
 	border-bottom-right-radius:20px;
@@ -102,7 +102,7 @@
 	color:white;
 	padding:10px;
 }	
-.bottomRound{
+.sim.bottomRound{
 	height:0px;
 	border-bottom-left-radius:20px;
 	border-bottom-right-radius:20px;
@@ -110,37 +110,37 @@
 	color:white;
 	padding:10px;
 }
-.auxSpacer{
+.sim.auxSpacer{
 	height:10px;
 }
-.borderedBlock{
+.sim.borderedBlock{
 	background-color:#05111a;
 	border-top: 3px solid;
 	border-bottom:3px solid;
 	border-color:#b3b2b1;
 }
 /*
-.question{
+.sim.question{
 	background-color:#05111a;
 	color:white;
 	padding:10px;
 }
 */
-.base{
+.sim.base{
 	padding-top:10px;
 	display:inline-block;
 	width:750px;
 }
-.answerDiv{
+.sim.answerDiv{
 	color:white;
 	width:300px;
 	display:inline-block;
 }
-.answerBox{
+.sim.answerBox{
 	width:500px;
 	height:50px;
 }
-.submit{
+.sim.submit{
 	color:white;
 	float:right;
 	display:inline-block;

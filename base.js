@@ -3,9 +3,9 @@ $(function(){
 	_.extend(Array.prototype, toInherit.ArrayExtenders);
 	_.extend(Math, toInherit.MathExtenders);
 	_.extend(String.prototype, toInherit.StringExtenders);
-	
+	templater = new Templater();
 	//String.prototype.killWhiteSpace = StringExtenders.killWhiteSpace;
-	
+	globalHTMLClass = 'sim';
 	hoverCol = Col(0, 81, 117);
 	dotManager = new DotManager();
 	turn = 0;
@@ -412,7 +412,7 @@ function makeSlider(wrapperDivId, sliderDivId, title, attrs, handlers, initVisib
 	var wrapperDiv = $('#' + wrapperDivId);
 	wrapperDiv.html('');
 	wrapperDiv.append('<center>'+title+'</center>');
-	wrapperDiv.append("<div id='"+sliderDivId+"parent' style='padding:5px'><div id='"+sliderDivId+"'></div></div>");
+	wrapperDiv.append("<div id='"+sliderDivId+"parent' style='padding:5px' class='sim'><div id='"+sliderDivId+"' class='sim'></div></div>");
 	divParent = $('#'+sliderDivId+'parent');
 	sliderDiv = $('#' + sliderDivId);
 	sliderDiv.slider({});
@@ -454,7 +454,7 @@ function sliderBind(div, eventType, func, obj){
 }
 function addButton(id, text, divId){
 	divId = defaultTo('buttons', divId);
-	$('#'+divId).append('<button id='+id+'>'+text+'</button>');
+	$('#'+divId).append("<button id="+id+" class='sim'>"+text+"</button>");
 	var button = $('button#'+id);
 	button.button();
 	return button;
@@ -466,6 +466,37 @@ function buttonBind(id, func){
 	var button = $('#'+id);
 	button.click(func);
 	return button;
+}
+function makeButtonHTML(id, text) {
+	return "<button id=" + id + " class='sim noSelect'" + text + "</button>";
+}
+// makeDivHtml like so:
+// {attr1:[1, 2, ],
+// attr2:
+// }
+function makeDivHTML(attrs, style, content) {
+	//_.template("<div 
+	var html = '<div';
+	for (var attr in attrs) {
+		var vals = attrs[attr];
+		html += " " + attr + "='";
+		html += vals.join(' ');
+		html += "'";
+	}
+	if (style) {
+		html += " style='";
+		var styleStrs = [];
+		for (var stylet in style) {
+			styleStrs.push(stylet + ': ' + style[stylet] + ';');
+		
+		}
+		html += styleStrs.join(' ');
+		html += "'";
+	}
+	html += '>';
+	html += content;
+	html += '</div>';
+	return html;
 }
 function hideSliders(){
 	for (var handleIdx=0; handleIdx<sliderList.length; idIdx++){
