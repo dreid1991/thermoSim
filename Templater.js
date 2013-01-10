@@ -12,11 +12,31 @@ Templater.prototype = {
 		return this.elemTemp(obj);
 	},
 	img: function(obj) {
-		obj.type = 'img';
+		obj ? obj.type = 'img' : obj = {type: 'img'};
 		return this.elem(obj);
 	},
 	div: function(obj) {
-		obj.type = 'div';
+		obj ? obj.type = 'div' : obj = {type: 'div'};
+		return this.elem(obj);
+	},
+	button: function(obj) {
+		obj ? obj.type = 'button' : obj = {type: 'button'};
+		return this.elem(obj);
+	},
+	textarea: function(obj) {
+		obj ? obj.type = 'textarea' : obj = {type: 'textarea'};
+		return this.elem(obj);
+	},
+	p: function(obj) {
+		obj ? obj.type = 'p' : obj = {type: 'p'};
+		return this.elem(obj);
+	},
+	br: function(obj) {
+		obj ? obj.type = 'br' : obj = {type: 'br'};
+		return this.elem(obj);
+	},
+	center: function(obj) {
+		obj ? obj.type = 'center' : obj = {type: 'center'};
 		return this.elem(obj);
 	},
 	style: function(obj) {

@@ -152,7 +152,8 @@ LevelTools = {
 			nextPrompt();
 		}
 		var idButton = 'textAreaSubmit';
-		submitHTML = "<table border=0><tr><td width=75%></td><td>" + makeButtonHTML(idButton, 'Submit') + "</td></tr></table>";
+		var submitHTML = templater.div({style: {width: '65%', display: 'inline-block'}}) + templater.button({attrs:{id: [idButton]}, style: {display: 'inline-block'}, innerHTML:'Submit'});
+		//var submitHTML = "<table border=0><tr><td width=75%></td><td>" + templater.button({attrs:{id: [idButton]}, innerHTML:'Submit'}) + "</td></tr></table>";
 		$('#'+appendTo).html($('#'+appendTo).html() + submitHTML);
 		buttonBind(idButton, onclickSubmit);
 	},
@@ -239,7 +240,7 @@ LevelTools = {
 		for (var buttonIdx=0; buttonIdx<buttons.length; buttonIdx++){
 			var button = buttons[buttonIdx];
 			ids[buttonIdx] = defaultTo('question' + questionIdx + 'option' + buttonIdx, button.buttonId);
-			buttonHTML += "<td>" + makeButtonHTML(idx[buttonIdx], button.text) + "</td>";
+			buttonHTML += "<td>" + templater.button({attrs:{id: [ids[buttonIdx]]}, innerHTML:button.text}) + "</td>";
 		}
 		buttonHTML += "</tr></table></center>";
 		$('#'+appendTo).html($('#' + appendTo).html() + buttonHTML);
@@ -288,7 +289,7 @@ LevelTools = {
 			var option = options[optionIdx];
 			var divId = optionIdx;
 			ids[optionIdx] = 'question' + questionIdx + 'option' + optionIdx;
-			multChoiceHTML += "<div id='"+ids[optionIdx]+"' class='sim multChoiceBlock'>"+option.text+"</div>";
+			multChoiceHTML += templater.div({attrs: {id: [ids[optionIdx]], class: ['multChoiceBlock']}, innerHTML: option.text})
 		}
 		$('#'+appendTo).html($('#'+appendTo).html() + multChoiceHTML);
 		this.bindMultChoiceFuncs(question, options, ids);
@@ -339,7 +340,8 @@ LevelTools = {
 		if (cols>20) {
 			textBoxHTML += '<br>';
 		}
-		textBoxHTML += "<textarea id='"+idText+"' rows='" +rows+ "' cols='" +cols+ "' placeholder='"+boxText+"'></textarea>";
+		textBoxHTML += templater.textarea({attrs: {id: [idText], rows: [rows], cols: [cols], placeholder: [boxText]}})
+		//"<textarea id='"+idText+"' rows='" +rows+ "' cols='" +cols+ "' placeholder='"+boxText+"'></textarea>";
 		if (question.units) {
 			textBoxHTML += question.units;
 		}

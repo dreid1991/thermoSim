@@ -43,23 +43,23 @@ _.extend(cvcp.prototype,
 		{//B0
 			setup:undefined,
 			prompts:[
-				{//P0
-					setup:undefined,
-					cutScene:true,
-					text:"<p>It's time to look at heat capacities!</p><p>For an ideal monatomic gas, which of these is correct?  c<sub>V</sub> means heat capacity at constant volume, c<sub>P</sub> means heat capacity at constant pressure.",
-					quiz:[
-						{	
-							type:'multChoice', 
-							options:
-								[
-								{text:"||EQ1|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
-								{text:"||EQ2|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
-								{text:"||EQ1|| and ||EQ4||", isCorrect: true},
-								{text:"||EQ2|| and ||EQ5||", isCorrect: false, message:"That's not correct"}
-							]
-						}
-					],
-				},
+				// {//P0
+					// setup:undefined,
+					// cutScene:true,
+					// text:"<p>It's time to look at heat capacities!</p><p>For an ideal monatomic gas, which of these is correct?  c<sub>V</sub> means heat capacity at constant volume, c<sub>P</sub> means heat capacity at constant pressure.",
+					// quiz:[
+						// {	
+							// type:'multChoice', 
+							// options:
+								// [
+								// {text:"||EQ1|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
+								// {text:"||EQ2|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
+								// {text:"||EQ1|| and ||EQ4||", isCorrect: true},
+								// {text:"||EQ2|| and ||EQ5||", isCorrect: false, message:"That's not correct"}
+							// ]
+						// }
+					// ],
+				// },
 				{//P1
 					setup:undefined,
 					cutScene:true,

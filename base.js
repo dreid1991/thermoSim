@@ -222,16 +222,10 @@ function returnEscapist(dot){
 	dot.y = y;
 }
 function defaultTo(defaultVal, inputVal){
-	if(inputVal !== undefined){
-		return inputVal;
-	}
-	return defaultVal;
+	return inputVal === undefined ? defaultVal : inputVal;
 } 
 function validNumber(num){
-	if(!isNaN(num)){
-		return num;
-	}
-	return false;
+	return isNaN(num) ? false : num;
 }
 function round(val, dec){
 	var pow = Math.pow(10,dec);
@@ -396,12 +390,21 @@ function addEqs(text){
 		if (result == null) break;
 		str = result[0];
 		if (/CE$/.test(str)) {
-			var replacement = '<p><center><img src = "img/' + imgPath + '/eq' + parseFloat(str.slice(4, str.length)) + '.gif"</img></center></p>';
+			var replacement = templater.p(
+				{innerHTML: templater.center(
+					{innerHTML: templater.img({attrs: {src: ['img/' + imgPath + '/eq' + parseFloat(str.slice(4, str.length)) + '.gif']}})
+					})
+				});
 		} else if (/BR$/.test(str)) {
-			var replacement = '<br><center><img src = "img/' + imgPath + '/eq' + parseFloat(str.slice(4, str.length)) + '.gif"</img></center>';
+			var replacement = templater.br(
+				{innerHTML: templater.center(
+					{innerHTML: templater.img({attrs: {src: ['img/' + imgPath + '/eq' + parseFloat(str.slice(4, str.length)) + '.gif']}})
+					})
+				});
 		} else if (/\|\|$/.test(str)) {
-			var replacement = '<img src = "img/' + imgPath + '/eq' + parseFloat(str.slice(4, str.length)) + '.gif"</img>';
-		}
+			var replacement = templater.img({attrs: {src: ['img/' + imgPath + '/eq' + parseFloat(str.slice(4, str.length)) + '.gif']}});
+				
+		}	
 		text = text.replace(str, replacement);
 	}
 	
@@ -410,11 +413,27 @@ function addEqs(text){
 
 function makeSlider(wrapperDivId, sliderDivId, title, attrs, handlers, initVisibility){
 	var wrapperDiv = $('#' + wrapperDivId);
+	var html = '';
 	wrapperDiv.html('');
-	wrapperDiv.append('<center>'+title+'</center>');
-	wrapperDiv.append("<div id='"+sliderDivId+"parent' style='padding:5px' class='sim'><div id='"+sliderDivId+"' class='sim'></div></div>");
-	divParent = $('#'+sliderDivId+'parent');
-	sliderDiv = $('#' + sliderDivId);
+	html += templater.center({innerHTML: title});
+	html += templater.div({
+		attrs: {
+			id:	[sliderDivId + 'parent']
+		},
+		style: {
+			padding: '5px'
+		},
+		innerHTML: templater.div(
+			{
+			attrs: {
+				id: [sliderDivId]
+			}
+		})
+	})
+	
+	wrapperDiv.append(html);
+	var divParent = $('#'+sliderDivId+'parent');
+	var sliderDiv = $('#' + sliderDivId);
 	sliderDiv.slider({});
 	sliderDiv.slider("option",attrs);
 	//sliderDiv.attr({width:divParent.width()-10});
@@ -442,7 +461,7 @@ function makeSlider(wrapperDivId, sliderDivId, title, attrs, handlers, initVisib
 		}
 		
 	}
-	if(initVisibility){
+	if (initVisibility) {
 		div[initVisibility]();
 	}
 	sliderList.push(sliderDivId);
@@ -467,37 +486,7 @@ function buttonBind(id, func){
 	button.click(func);
 	return button;
 }
-function makeButtonHTML(id, text) {
-	return "<button id=" + id + " class='sim noSelect'" + text + "</button>";
-}
-// makeDivHtml like so:
-// {attr1:[1, 2, ],
-// attr2:
-// }
-function makeDivHTML(attrs, style, content) {
-	//_.template("<div 
-	var html = '<div';
-	for (var attr in attrs) {
-		var vals = attrs[attr];
-		html += " " + attr + "='";
-		html += vals.join(' ');
-		html += "'";
-	}
-	if (style) {
-		html += " style='";
-		var styleStrs = [];
-		for (var stylet in style) {
-			styleStrs.push(stylet + ': ' + style[stylet] + ';');
-		
-		}
-		html += styleStrs.join(' ');
-		html += "'";
-	}
-	html += '>';
-	html += content;
-	html += '</div>';
-	return html;
-}
+
 function hideSliders(){
 	for (var handleIdx=0; handleIdx<sliderList.length; idIdx++){
 		var handle = sliderList[handleIdx];
