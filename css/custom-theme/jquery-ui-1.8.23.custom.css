@@ -53,13 +53,13 @@
 
 /* Component containers
 ----------------------------------*/
-.ui-widget { font-family: Verdana,Arial,sans-serif; font-size: 1.1em; }
-.ui-widget .ui-widget { font-size: 1em; }
-.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Verdana,Arial,sans-serif; font-size: 1em; }
-.ui-widget-content { border: 1px solid #0072c7; background: #d6dcff url(images/ui-bg_flat_100_d6dcff_40x100.png) 50% 50% repeat-x; color: #000000; }
-.ui-widget-content a { color: #000000; }
-.ui-widget-header { border: 1px solid #4297d7; background: #2191c0 url(images/ui-bg_gloss-wave_75_2191c0_500x100.png) 50% 50% repeat-x; color: #eaf5f7; font-weight: bold; }
-.ui-widget-header a { color: #eaf5f7; }
+.sim.ui-widget { font-family: Verdana,Arial,sans-serif; font-size: 1.1em; }
+.sim.ui-widget .ui-widget { font-size: 1em; }
+.sim.ui-widget input, .sim.ui-widget select, .sim.ui-widget textarea, .sim.ui-widget button { font-family: Verdana,Arial,sans-serif; font-size: 1em; }
+.sim.ui-widget-content { border: 1px solid #0072c7; background: #d6dcff url(images/ui-bg_flat_100_d6dcff_40x100.png) 50% 50% repeat-x; color: #000000; }
+.sim.ui-widget-content a { color: #000000; }
+.sim.ui-widget-header { border: 1px solid #4297d7; background: #2191c0 url(images/ui-bg_gloss-wave_75_2191c0_500x100.png) 50% 50% repeat-x; color: #eaf5f7; font-weight: bold; }
+.sim.ui-widget-header a { color: #eaf5f7; }
 
 /* Interaction states
 ----------------------------------*/
@@ -401,14 +401,14 @@ button.sim.ui-button-icon-only { width: 2.4em; } /* button elements seem to need
 button.sim.ui-button-icons-only { width: 3.7em; } 
 
 /*button text element */
-.ui-button .ui-button-text { display: block; line-height: 1.4;  }
-.ui-button-text-only .ui-button-text { padding: .4em 1em; }
+.sim.ui-button .ui-button-text { display: block; line-height: 1.4;  }
+.sim.ui-button-text-only .ui-button-text { padding: .4em 1em; }
 .ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { padding: .4em; text-indent: -9999999px; }
 .ui-button-text-icon-primary .ui-button-text, .ui-button-text-icons .ui-button-text { padding: .4em 1em .4em 2.1em; }
 .ui-button-text-icon-secondary .ui-button-text, .ui-button-text-icons .ui-button-text { padding: .4em 2.1em .4em 1em; }
 .ui-button-text-icons .ui-button-text { padding-left: 2.1em; padding-right: 2.1em; }
 /* no icon support for input elements, provide padding by default */
-input.ui-button { padding: .4em 1em; }
+input.sim.ui-button { padding: .4em 1em; }
 
 /*button icon element(s) */
 .ui-button-icon-only .ui-icon, .ui-button-text-icon-primary .ui-icon, .ui-button-text-icon-secondary .ui-icon, .ui-button-text-icons .ui-icon, .ui-button-icons-only .ui-icon { position: absolute; top: 50%; margin-top: -8px; }
@@ -418,11 +418,11 @@ input.ui-button { padding: .4em 1em; }
 .ui-button-text-icons .ui-button-icon-secondary, .ui-button-icons-only .ui-button-icon-secondary { right: .5em; }
 
 /*button sets*/
-.ui-buttonset { margin-right: 7px; }
-.ui-buttonset .ui-button { margin-left: 0; margin-right: -.3em; }
+.sim.ui-buttonset { margin-right: 7px; }
+.sim.ui-buttonset .ui-button { margin-left: 0; margin-right: -.3em; }
 
 /* workarounds */
-button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra padding in Firefox */
+button.sim.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra padding in Firefox */
 /*!
  * jQuery UI Dialog 1.8.23
  *
@@ -453,21 +453,21 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
  *
  * http://docs.jquery.com/UI/Slider#theming
  */
-.ui-slider { position: relative; text-align: left; }
-.ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 1.2em; height: 1.2em; cursor: default; }
-.ui-slider .ui-slider-range { position: absolute; z-index: 1; font-size: .7em; display: block; border: 0; background-position: 0 0; }
+.sim.ui-slider { position: relative; text-align: left; }
+.sim.ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 1.2em; height: 1.2em; cursor: default; }
+.sim.ui-slider .ui-slider-range { position: absolute; z-index: 1; font-size: .7em; display: block; border: 0; background-position: 0 0; }
 
-.ui-slider-horizontal { height: .8em; }
-.ui-slider-horizontal .ui-slider-handle { top: -.3em; margin-left: -.6em; }
-.ui-slider-horizontal .ui-slider-range { top: 0; height: 100%; }
-.ui-slider-horizontal .ui-slider-range-min { left: 0; }
-.ui-slider-horizontal .ui-slider-range-max { right: 0; }
+.sim.ui-slider-horizontal { height: .8em; }
+.sim.ui-slider-horizontal .ui-slider-handle { top: -.3em; margin-left: -.6em; }
+.sim.ui-slider-horizontal .ui-slider-range { top: 0; height: 100%; }
+.sim.ui-slider-horizontal .ui-slider-range-min { left: 0; }
+.sim.ui-slider-horizontal .ui-slider-range-max { right: 0; }
 
-.ui-slider-vertical { width: .8em; height: 100px; }
-.ui-slider-vertical .ui-slider-handle { left: -.3em; margin-left: 0; margin-bottom: -.6em; }
-.ui-slider-vertical .ui-slider-range { left: 0; width: 100%; }
-.ui-slider-vertical .ui-slider-range-min { bottom: 0; }
-.ui-slider-vertical .ui-slider-range-max { top: 0; }/*!
+.sim.ui-slider-vertical { width: .8em; height: 100px; }
+.sim.ui-slider-vertical .ui-slider-handle { left: -.3em; margin-left: 0; margin-bottom: -.6em; }
+.sim.ui-slider-vertical .ui-slider-range { left: 0; width: 100%; }
+.sim.ui-slider-vertical .ui-slider-range-min { bottom: 0; }
+.sim.ui-slider-vertical .ui-slider-range-max { top: 0; }/*!
  * jQuery UI Tabs 1.8.23
  *
  * Copyright 2012, AUTHORS.txt (http://jqueryui.com/about)

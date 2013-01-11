@@ -35,44 +35,44 @@ _.extend(cvcp.prototype,
 			LevelTools, 
 {
 	init: function() {
+		this.readout = new Readout('mainReadout', 30, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), 'left');
 		$('#mainHeader').html('c<sub>v</sub> vs. c<sub>P</sub');
 		showPrompt(0, 0, true);
-		this.readout = new Readout('mainReadout', 30, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), 'left');
 	},
 	sections: [
-		{//B0
-			setup:undefined,
-			prompts:[
-				// {//P0
+		// {//B0
+			// setup:undefined,
+			// prompts:[
+				// // {//P0
+					// // setup:undefined,
+					// // cutScene:true,
+					// // text:"<p>It's time to look at heat capacities!</p><p>For an ideal monatomic gas, which of these is correct?  c<sub>V</sub> means heat capacity at constant volume, c<sub>P</sub> means heat capacity at constant pressure.",
+					// // quiz:[
+						// // {	
+							// // type:'multChoice', 
+							// // options:
+								// // [
+								// // {text:"||EQ1|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
+								// // {text:"||EQ2|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
+								// // {text:"||EQ1|| and ||EQ4||", isCorrect: true},
+								// // {text:"||EQ2|| and ||EQ5||", isCorrect: false, message:"That's not correct"}
+							// // ]
+						// // }
+					// // ],
+				// // },
+				// {//P1
 					// setup:undefined,
 					// cutScene:true,
-					// text:"<p>It's time to look at heat capacities!</p><p>For an ideal monatomic gas, which of these is correct?  c<sub>V</sub> means heat capacity at constant volume, c<sub>P</sub> means heat capacity at constant pressure.",
+					// text:"<p>Right.</p><p>So an ideal gas has a higher heat capacity under constant pressure than under constant volume.  We're going to investigate these processes to figure out why that is.</p><p>First, what does it mean in terms of energy required to heat a given system that c<sub>P</sub> is greater than c<sub>v</sub>?</p>",
 					// quiz:[
 						// {	
-							// type:'multChoice', 
-							// options:
-								// [
-								// {text:"||EQ1|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
-								// {text:"||EQ2|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
-								// {text:"||EQ1|| and ||EQ4||", isCorrect: true},
-								// {text:"||EQ2|| and ||EQ5||", isCorrect: false, message:"That's not correct"}
-							// ]
-						// }
-					// ],
-				// },
-				{//P1
-					setup:undefined,
-					cutScene:true,
-					text:"<p>Right.</p><p>So an ideal gas has a higher heat capacity under constant pressure than under constant volume.  We're going to investigate these processes to figure out why that is.</p><p>First, what does it mean in terms of energy required to heat a given system that c<sub>P</sub> is greater than c<sub>v</sub>?</p>",
-					quiz:[
-						{	
-						type:'text',
-						text:'Type your answer here.',
-						},
-					]
-				}
-			]
-		},
+						// type:'text',
+						// text:'Type your answer here.',
+						// },
+					// ]
+				// }
+			// ]
+		// },
 		{//B1
 			
 			setup: function() {
