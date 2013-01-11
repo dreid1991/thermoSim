@@ -105,6 +105,7 @@ _.extend(cvcp.prototype,
 						
 					],
 					listeners: [
+					//these don't actually do anything because [broken] prompt ones superscede them.  that is okay.  Not important right now.
 						{wallHandle: 'left', dataList: 't', is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'},
 						{wallHandle: 'right', dataList: 't', is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'}
 					]
