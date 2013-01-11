@@ -434,7 +434,8 @@ function makeSlider(wrapperDivId, sliderDivId, title, attrs, handlers, initVisib
 	wrapperDiv.append(html);
 	var divParent = $('#'+sliderDivId+'parent');
 	var sliderDiv = $('#' + sliderDivId);
-	sliderDiv.slider({});
+	//sliderDiv.slider({});
+	addJQueryElems($(sliderDiv), 'slider');
 	sliderDiv.slider("option",attrs);
 	//sliderDiv.attr({width:divParent.width()-10});
 	/*
