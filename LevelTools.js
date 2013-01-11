@@ -128,7 +128,7 @@ LevelTools = {
 					var id = self.getTextAreaId(questionIdx);
 					var submitted = $('#'+id).val();
 					if (submitted.killWhiteSpace()!='') {
-						store('userAnswerB'+sectionIdx+'P'+promptIdx+'Q'+questionIdx, submitted);
+						store('userAnswerS'+sectionIdx+'P'+promptIdx+'Q'+questionIdx, submitted);
 						question.answerText(submitted);
 						question.isAnswered = true;
 						if (question.answer) {

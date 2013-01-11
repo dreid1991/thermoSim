@@ -39,6 +39,10 @@ Templater.prototype = {
 		obj ? obj.type = 'center' : obj = {type: 'center'};
 		return this.elem(obj);
 	},
+	canvas: function(obj) {
+		obj ? obj.type = 'canvas' : obj = {type: 'canvas'};
+		return this.elem(obj);
+	},
 	style: function(obj) {
 		return this.styleTemp(obj);
 	},

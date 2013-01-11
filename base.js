@@ -730,12 +730,12 @@ function prevPrompt(){
 function addStored(text) {
 	var get;
 	var gotten;
-	var testExpr = /GET_#{0,1}[A-Za-z0-9]\|/;
+	var testExpr = /GET_#{0,1}[A-Za-z0-9]*\|/;
 	while (true) {
 		var cmmdList = testExpr.exec(text);
 		if (cmmdList == null) break;
 		var cmmd = cmmdList[0];
-		if (cmmd.indexOf('#')) {
+		if (cmmd.indexOf('#')>=0) {
 			get = cmmd.slice(5, cmmd.length-1);
 			gotten = parseFloat(getStore(get));
 		} else {

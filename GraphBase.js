@@ -33,9 +33,31 @@ GraphBase = {
 		}
 		this.parentDiv.html('');
 		this.parentDivId = $(this.parentDiv).attr('id');
-		//var str = "</div><div id = '" + this.graphDivHandle + "' style = position:relative><canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas><button id='" + this.buttonId + "' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button></div><div class='graphSpacer noSelect' id='"+this.handle + "GraphSpacer'>"
-		var str = "<canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas><button id='" + this.buttonId + "' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button>";
-		var canvasDiv = $(str);
+		var html = templater.canvas({
+			attrs: {
+				id: [this.handle + 'Graph'],
+				class: ['noSelect'],
+				width: [dims.dx],
+				height: [dims.dy]
+			},
+		})
+		html += templater.button({
+			attrs: {
+				id: [this.buttonId]
+			},
+			style: {
+				position: 'absolute',
+				right: '.5em',
+				bottom: '.5em'
+			},
+			innerHTML: templater.img({
+				attrs: {
+					src: ['img/refresh.gif']
+				}
+				})
+			});
+			
+		var canvasDiv = $(html);
 		
 		$(this.parentDiv).append(canvasDiv);
 		$('#' + this.buttonId).button();
@@ -54,8 +76,14 @@ GraphBase = {
 		}
 		this.parentDiv.html('');
 		this.parentDivId = $(this.parentDiv).attr('id');
-		//var str = "</div><div id = '" + this.graphDivHandle + "' style = position:relative><canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas><button id='" + this.buttonId + "' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button></div><div class='graphSpacer noSelect' id='"+this.handle + "GraphSpacer'>"
-		var str = "<canvas id ='" + this.handle + "Graph' width=" + dims.dx + " height=" + dims.dy+ " class='noSelect'></canvas>";
+		var html = templater.canvas({
+			attrs: {
+				id: [this.handle + 'Graph'],
+				class: ['noSelect'],
+				width: [dims.dx],
+				height: [dims.dy]
+			},
+		})
 		var canvasDiv = $(str);
 		
 		$(this.parentDiv).append(canvasDiv);

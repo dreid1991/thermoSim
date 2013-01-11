@@ -39,7 +39,7 @@ _.extend(Reversibility.prototype,
 		showPrompt(0, 0, true);
 	},
 	sections:[
-		{//B0
+		{//S0
 			setup:undefined,
 			prompts:[
 				{//P0
@@ -56,7 +56,7 @@ _.extend(Reversibility.prototype,
 				}
 			],
 		},
-		{//B1
+		{//S1
 			setup:
 				function() {
 					currentSetupType = 'section';
@@ -98,7 +98,7 @@ _.extend(Reversibility.prototype,
 							//alertUnsatisfied:"Expand the system by dragging the weight off of the piston",
 							//storeAtSatisfy:{work:walls[0].data.work}});
 						},
-					text:"You calculated GET_userAnswerB1P0Q0| kJ for the isothermal compression process.  How does that compare to the value of heat?  Explain.",
+					text:"You calculated GET_userAnswerS1P0Q0| kJ for the isothermal compression process.  How does that compare to the value of heat?  Explain.",
 					title:"Current step",
 					quiz:[
 						{	
@@ -120,7 +120,7 @@ _.extend(Reversibility.prototype,
 							//alertUnsatisfied:"Expand the system by dragging the weight off of the piston",
 							//storeAtSatisfy:{work:walls[0].data.work}});
 						},
-					text:'Now remove the block and let the piston isothermally expand.  For the compression process, you estimated that it "cost" you GET_userAnswerB1P0Q0| kJ of work.  Estimate how much work you "got back" from the expansion.',
+					text:'Now remove the block and let the piston isothermally expand.  For the compression process, you estimated that it "cost" you GET_userAnswerS1P0Q0| kJ of work.  Estimate how much work you "got back" from the expansion.',
 					title:"Current step",
 					quiz:[
 						{	
@@ -140,13 +140,13 @@ _.extend(Reversibility.prototype,
 							//alertUnsatisfied:"Expand the system by dragging the weight off of the piston",
 							//storeAtSatisfy:{work:walls[0].data.work}});
 						},
-					text:"<p>Indeed, so it 'cost' you EVAL_round(GET_workB1P0| + GET_workB1P2|,1)| more kJ to compress the system than you 'got back' when expanding it.</p>",
+					text:"<p>Indeed, so it 'cost' you EVAL_round(GET_workS1P0| + GET_workS1P2|,1)| more kJ to compress the system than you 'got back' when expanding it.</p>",
 					title:"Current step",
 	
 				},				
 			]
 		},
-		{//B2
+		{//S2
 			setup: 
 				function() {
 					currentSetupType = 'section';
@@ -233,7 +233,7 @@ _.extend(Reversibility.prototype,
 				}
 			]
 		},
-		{//B3
+		{//S3
 			setup: 
 				function() {
 					currentSetupType = 'section';
@@ -272,7 +272,7 @@ _.extend(Reversibility.prototype,
 				{//P2
 					setup: undefined,
 					cutScene:true,
-					text:"Last time when putting on slowly, did GET#workB1P0| kJ of work.  This time when putting on quickly, did GET#workB3P0| kJ work.  Ask why?",
+					text:"Last time when putting on slowly, did GET#workS1P0| kJ of work.  This time when putting on quickly, did GET#workS3P0| kJ work.  Ask why?",
 					quiz:[
 						{
 							type:'text',
@@ -284,7 +284,7 @@ _.extend(Reversibility.prototype,
 			]
 		},
 
-		{//B4
+		{//S4
 			setup: 
 				function() {
 					currentSetupType = 'section';
@@ -321,7 +321,7 @@ _.extend(Reversibility.prototype,
 				}
 			]
 		},
-		{//B5
+		{//S5
 			setup: 
 				function() {
 					currentSetupType = 'section';

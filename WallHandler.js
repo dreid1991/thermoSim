@@ -1095,7 +1095,7 @@ WallMethods = {
 				var calcWork = function() {
 					var len = self.data.v.length;
 					var dV = LTOM3LOCAL*(self.data.v[len-1] - self.data.v[len-2])
-					if (dV != undefined) {
+					if (!isNaN(dV)) {
 						var p = self.pExt()*PUNITTOPALOCAL;
 						self.work -= JTOKJLOCAL*p*dV;
 						heightLast = trackPt.y;
@@ -1456,16 +1456,16 @@ WallMethods = {
 		},
 
 		displayAllStop: function(){
-			if(this.displayingVol){this.displayVolStop();};
-			if(this.displayingPInt){this.displayPIntStop();};
-			if(this.displayingPExt){this.displayPExtStop();};
-			if(this.displayingWork){this.displayWorkStop();};
-			if(this.displayingTemp){this.displayTempStop();};
-			if(this.displayingMass){this.displayMassStop();};
-			if(this.displayingQ){this.displayQStop();};
-			if(this.displayingQArrowsRate){this.displayQArrowsRateStop();};
-			if(this.displayingQArrowAmmt){this.displayQArrowsAmmtStop();};
-			if(this.displayingRMS){this.displayRMSStop();};
+			if(this.displayingVol.val){this.displayVolStop();};
+			if(this.displayingPInt.val){this.displayPIntStop();};
+			if(this.displayingPExt.val){this.displayPExtStop();};
+			if(this.displayingWork.val){this.displayWorkStop();};
+			if(this.displayingTemp.val){this.displayTempStop();};
+			if(this.displayingMass.val){this.displayMassStop();};
+			if(this.displayingQ.val){this.displayQStop();};
+			if(this.displayingQArrowsRate.val){this.displayQArrowsRateStop();};
+			if(this.displayingQArrowsAmmt.val){this.displayQArrowsAmmtStop();};
+			if(this.displayingRMS.val){this.displayRMSStop();};
 			return this;
 		},
 		resetQ: function() {
