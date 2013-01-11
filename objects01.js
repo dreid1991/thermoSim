@@ -1620,7 +1620,8 @@ function StateListener(attrs){//like dataList... is:'greaterThan', ... targetVal
 	this.type = 'StateListener';
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.conditionsOn = this.cleanUpWith.killNumbers();
-	this.dataList = walls[attrs.wallHandle].data[attrs.dataList];
+	
+	this.dataList = walls[defaultTo(attrs.wallHandle, 0)].data[attrs.dataList];
 	this.is = attrs.is
 	this.targetVal = attrs.targetVal;
 	this.tolerance = defaultTo(.05, attrs.tolerance);

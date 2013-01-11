@@ -8,7 +8,7 @@ $(function(){
 	window['curLevel'] = new cvcp();
 	curLevel.cutSceneEnd();
 	curLevel.init();
-	$('button').button();
+	addJQueryElems($('button'), 'button');
 	$('#resetExp').click(function(){curLevel.reset()});
 	$('#toSim').click(function(){nextPrompt()});
 	$('#toLastStep').click(function(){prevPrompt()});

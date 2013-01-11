@@ -471,11 +471,34 @@ function sliderBind(div, eventType, func, obj){
 	div.bind(eventType, function(event, ui){func.apply(obj, [event, ui])});
 	return div;
 }
+
+function addJQueryElems(elems, funcName) {
+	elems = elems instanceof Array ? elems : [elems];
+	for (var elemIdx=0; elemIdx<elems.length; elemIdx++) {
+		var elem = elems[elemIdx];
+		$(elem)[funcName]();
+		recursiveAddClass(elem, globalHTMLClass);
+	}
+
+}
+
+
+
+function recursiveAddClass(elem, HTMLClass) {
+	$(elem).addClass(HTMLClass);
+	var children = $(elem).children();
+	for (var childIdx=0; childIdx<children.length; childIdx++) {
+		var child = $(children[childIdx]);
+		recursiveAddClass(child, HTMLClass);
+	}
+	
+}
+
 function addButton(id, text, divId){
 	divId = defaultTo('buttons', divId);
-	$('#'+divId).append("<button id="+id+" class='sim'>"+text+"</button>");
+	$('#'+divId).append(templater.button({attrs: {id: [id]}}));
 	var button = $('button#'+id);
-	button.button();
+	addJqueryElem(button, 'button');
 	return button;
 }
 function removeButton(id) {

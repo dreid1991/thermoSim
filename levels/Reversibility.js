@@ -1,21 +1,44 @@
 function Reversibility(){
 
 	this.setStds();
-
-	this.readout = new Readout('mainReadout', 15, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), 'left');
+	this.readouts = {};
 
 	addSpecies(['spc1', 'spc3']);
 	this.massInit = 33;
 
 }
+
+
+canvasHeight = 500;
+$(function(){
+	imgPath = 'rev';
+	animText = new AnimText(c);
+	myCanvas.height = canvasHeight;
+	window['curLevel'] = new Reversibility();
+
+	curLevel.cutSceneEnd();
+	curLevel.init();
+	addJQueryElems($('button'), 'button');
+	$('#resetExp').click(function(){curLevel.reset()});
+	$('#toSim').click(function(){nextPrompt()});
+	$('#toLastStep').click(function(){prevPrompt()});
+	$('#previous').click(function(){prevPrompt()});
+	$('#next').click(function(){nextPrompt()});
+});
+
+myCanvas.width = $('#main').width();
+
+
+
 _.extend(Reversibility.prototype, 
 			LevelTools, 
 {
 	init: function() {
+		this.readout = new Readout('mainReadout', 30, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), 'left');
 		$('#mainHeader').html("Reversible and Irreversible Processes");
 		showPrompt(0, 0, true);
 	},
-	blocks:[
+	sections:[
 		{//B0
 			setup:undefined,
 			prompts:[
@@ -36,7 +59,7 @@ _.extend(Reversibility.prototype,
 		{//B1
 			setup:
 				function() {
-					currentSetupType = 'block';
+					currentSetupType = 'section';
 					this.unCompSetup();
 					this.makeGraph();
 					this.dragWeights = new DragWeights({weightDefs:[{count:1, pressure:2}], weightScalar:70, displayText:false, massInit:0, compMode:'cPAdiabaticDamped', pistonOffset:V(130,-41)});
@@ -49,7 +72,7 @@ _.extend(Reversibility.prototype,
 					setup:
 						function() {
 							currentSetupType = 'prompt0';
-							this.listener = new StateListener({dataList:walls[0].data.v, is:'equalTo', targetVal:7.5, tolerance:.04, storeAtSatisfy:{work:walls[0].data.work}, alertUnsatisfied:"Click and drag the block onto the piston."});	
+							this.listener = new StateListener({dataList:'v', is:'equalTo', targetVal:7.5, tolerance:.04, storeAtSatisfy:{work:walls[0].data.work}, alertUnsatisfied:"Click and drag the block onto the piston."});	
 							//this.pListener = new StateListener({dataList:walls[0].data.pExt, is:'equalTo', targetVal:4, atSatisfyFunc: {func:function(){this.dragWeights.freeze()}, obj:this}});
 							//this.compListener = new StateListener({dataList:walls[0].data.v, is:'lessThan', targetVal:7.8, 
 							//alertUnsatisfied:"Compress the system by dragging the weight up from the bin", 
@@ -126,7 +149,7 @@ _.extend(Reversibility.prototype,
 		{//B2
 			setup: 
 				function() {
-					currentSetupType = 'block';
+					currentSetupType = 'section';
 					this.unCompSetup();
 					this.makeGraph();
 					this.dragWeights = new DragWeights({weightDefs:[{count:2, pressure:2}], weightScalar:70, displayText:false, massInit:0, compMode:'cPAdiabaticDamped', pistonOffset:V(130,-41)});
@@ -213,7 +236,7 @@ _.extend(Reversibility.prototype,
 		{//B3
 			setup: 
 				function() {
-					currentSetupType = 'block';
+					currentSetupType = 'section';
 					this.unCompSetup();
 					this.makeGraph();
 					this.dragWeights = new DragWeights({weightDefs:[{count:2, pressure:2}], displayText:false, pInit:2})
@@ -264,7 +287,7 @@ _.extend(Reversibility.prototype,
 		{//B4
 			setup: 
 				function() {
-					currentSetupType = 'block';
+					currentSetupType = 'section';
 					this.unCompSetup();
 					this.makeGraph();
 					this.dragWeights = new DragWeights({weightDefs:[{count:8, pressure:2}], displayText:false, pInit:2})
@@ -301,7 +324,7 @@ _.extend(Reversibility.prototype,
 		{//B5
 			setup: 
 				function() {
-					currentSetupType = 'block';
+					currentSetupType = 'section';
 					this.unCompSetup();
 					this.makeGraph();
 					this.sandbox = new Sandbox({pMin:2, pInit:2, pMax:4});
@@ -347,16 +370,16 @@ _.extend(Reversibility.prototype,
 		walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'cVIsothermal', handles:['container'], bounds:[{yMin:68, yMax:435}], vols:[15], temps:[240.7]});
 		this.borderStd({min:40});
 		//spcs['spc1'].populate(P(35, 150), V(460, 250), 2, 215.38);
-		spcs['spc1'].populate(P(42, 100), V(468, 310), 750, 240.7);
-		spcs['spc3'].populate(P(42, 100), V(468, 310), 750, 240.7);
+		spcs['spc1'].populate(P(42, 100), V(468, 310), 750, 240.7, 'container');
+		spcs['spc3'].populate(P(42, 100), V(468, 310), 750, 240.7, 'container');
 	},
 	compSetup: function(){
 		walls = WallHandler({pts:[[P(40,68), P(510,68), P(510,410), P(40,410)]], handlers:'cVIsothermal', handles:['container'], bounds:[{yMin:68, yMax:435}], vols:[10.1], temps:[240.7]});
 		this.borderStd({min:68});
 		var maxY = walls[0][0].y;
 		var height = walls[0][3].y-walls[0][0].y;
-		spcs['spc1'].populate(P(35, maxY+10), V(460, height-20), 814, 240.7);
-		spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 611, 240.7);
+		spcs['spc1'].populate(P(35, maxY+10), V(460, height-20), 814, 240.7, 'container');
+		spcs['spc3'].populate(P(35, maxY+10), V(460, height-20), 611, 240.7, 'container');
 	},
 
 

@@ -118,7 +118,6 @@ LevelTools = {
 		if (makeSubmitButton) {
 			this.makeSubmitButton(appendTo);
 		}
-		$('button').button();
 	},
 	makeSubmitButton: function(appendTo) {
 		var self = this;
@@ -156,6 +155,7 @@ LevelTools = {
 		//var submitHTML = "<table border=0><tr><td width=75%></td><td>" + templater.button({attrs:{id: [idButton]}, innerHTML:'Submit'}) + "</td></tr></table>";
 		$('#'+appendTo).html($('#'+appendTo).html() + submitHTML);
 		buttonBind(idButton, onclickSubmit);
+		addJQueryElems($('#' + idButton), 'button');
 	},
 	appendQuestion: function(question, appendTo, questionIdx){
 		question.answered = false;
