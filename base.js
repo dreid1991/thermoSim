@@ -9,6 +9,10 @@ $(function(){
 	hoverCol = Col(0, 81, 117);
 	dotManager = new DotManager();
 	turn = 0;
+	window.graphs = {
+		Scatter: GraphScatter,
+		Hist: GraphHist
+	}
 	$('#canvasDiv').hide();
 	$('#base').hide();
 	$('#dashIntro').hide();

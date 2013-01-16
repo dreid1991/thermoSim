@@ -7,7 +7,7 @@ function CollideHandler(){
 	this.rxns = {};
 	this.setDefaultHandler({func:this.impactStd, obj:this});
 	this.dotManager = dotManager;
-	console.log("Made supercollider");
+	//console.log("Made supercollider");
 }
 _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 	setDefaultHandler: function(handler){

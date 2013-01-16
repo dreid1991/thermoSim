@@ -108,6 +108,16 @@ _.extend(cvcp.prototype,
 					//these don't actually do anything because [broken] prompt ones superscede them.  that is okay.  Not important right now.
 						{wallHandle: 'left', dataList: 't', is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'},
 						{wallHandle: 'right', dataList: 't', is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'}
+					],
+					graphs: [
+						{type: 'Scatter', handle:'pVSv', xLabel:"P Int.", yLabel:"Temp (K)", axesInit:{x:{min:6, step:2}, y:{min:0, step:1}},
+							sets:[
+								{address:'t', label:'Temp', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
+								 data:{x:walls[0].data.pInt, y:walls[0].data.t}, trace:true}
+							]
+						}
+		// this.graphs.pVSv.addSet({address:'pExt', label:'P Ext.', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
+								// data:{x:walls[0].data.v, y:walls[0].data.pExt}, trace:true});					
 					]
 				})
 			},
