@@ -20,8 +20,6 @@ function GraphScatter(attrs) {
 	this.yEnd = .05;
 	this.gridSpacing = 40;
 	
-	this.addPtThreshold = 5;
-	
 	this.setNumGridLines();
 	this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1)}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1)}};
 	this.axisRange = {x:{min:0, max:0}, y:{min:0, max:0}};
@@ -38,19 +36,22 @@ function GraphScatter(attrs) {
 }
 _.extend(GraphScatter.prototype, AuxFunctions, GraphBase, 
 	{
-		addSet: function(attrs){//address, label, pointCol, flashCol, data){
+		addSet: function(attrs){//address, label, pointCol, flashCol, data:{x:{wallInfo, data}, y:{same}}){
 			var set = {};
 			set.label = attrs.label;
 			set.x = [];
 			set.y = [];
-			set.xInitDataIdx = attrs.data.x.length-1;
-			set.yInitDataIdx = attrs.data.y.length-1;
+			var data = {x: walls[attrs.data.x.wallInfo].data[attrs.data.x.data], y: walls[attrs.data.y.wallInfo].data[attrs.data.y.data]};;
+			set.xInitDataIdx = data.x.length-1;
+			set.yInitDataIdx = data.y.length-1;
 			set.pointCol = attrs.pointCol;
 			set.flashCol = attrs.flashCol;
+			set.fillInPts = attrs.fillInPts;
+			set.fillInPtsMin = attrs.fillInPtsMin;
 			set.trace = defaultTo(false, attrs.trace);
-			set.getLast = this.makePtDataGrabFunc(attrs.data);
+			set.getLast = this.makePtDataGrabFunc(data);
 			set.show = true;
-			set.src = attrs.data;
+			set.src = data;
 			
 			
 			this.data[attrs.address] = set;
@@ -100,9 +101,12 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 					if (set.x.length>0) {
 						var last = P(set.x[set.x.length-1], set.y[set.y.length-1]);
 						var lastDataIdx = set.ptDataIdxs[set.ptDataIdxs.length-1];
-						var turnPtInfo = this.addPtsAtTurns(newPt, newDataIdx, last, lastDataIdx, set, address);
-						toAdd = toAdd.concat(turnPtInfo.newPts);
-						set.ptDataIdxs = set.ptDataIdxs.concat(turnPtInfo.dataIdxs);
+						if (set.fillInPts) {
+							var turnPtInfo = this.addPtsAtTurns(newPt, newDataIdx, last, lastDataIdx, set, address);
+							toAdd = toAdd.concat(turnPtInfo.newPts);
+							set.ptDataIdxs = set.ptDataIdxs.concat(turnPtInfo.dataIdxs);
+						}
+						
 					}
 					toAdd.push(newPt);
 					set.ptDataIdxs.push(newDataIdx);
@@ -139,7 +143,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 				var yIdx = bDataIdx.y + dataIdx;
 				var aToData = V(xScale*(src.x[xIdx]-a.x), yScale*(src.y[yIdx]-a.y));
 				var dist = Math.abs(aToData.dotProd(perpUV));
-				if (dist>this.addPtThreshold) {
+				if (dist>set.fillInPtsMin) {
 					var ptOverLine = P(src.x[xIdx], src.y[yIdx]);
 					var edgePtInfo = this.getEdgePt({x:xIdx, y:yIdx}, bDataIdx, perpUV, ptOverLine, dist, a, src, xScale, yScale);
 					if (!edgePtInfo) {
@@ -151,16 +155,6 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 					var restOfTurnPts = this.addPtsAtTurns(edgePt, edgeDataIdx, b, bDataIdx, set, address);
 					return {newPts:[edgePt].concat(restOfTurnPts.newPts), dataIdxs:[edgeDataIdx].concat(restOfTurnPts.dataIdxs)};
 				}
-				/*
-				if dist>thresh
-					placeInfo = placeEdgePt();
-					pt = placeInfo.pt;
-					ptDataIdx = placeInfo.ptDataIdx (need x and y)
-					var rest = this.addPtsAtTurns(pt, ptDataIdx, b, bDataIdx, set);
-					var ptsToReturn = rest.pts.push(pt);
-					var ptDataIdxsToReturn = rest.ptDataIdxs.push(ptDataIdx);
-					return {pts:(this.addPtsAtTurns(pt, ptDataIdx, b, bDataIdx, set), ptDataIdxs:
-				*/
 			}
 			return {newPts: [], dataIdxs:[]};
 			

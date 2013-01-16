@@ -59,7 +59,17 @@ toInherit = {
 		},
 		killNumbers: function() {
 			return this.replace(/[0-9]/g, '');
-		}
+		},
+		toCamelCase: function() {
+			 return this.replace(/(?:^\w|[A-Z]|\b\w)/g, function(letter, index) {
+				return index == 0 ? letter.toLowerCase() : letter.toUpperCase();
+			  }).replace(/\s+/g, '');
+		},
+		toCapitalCamelCase: function() {
+			 return this.replace(/(?:^\w|[A-Z]|\b\w)/g, function(letter, index) {
+				return letter.toUpperCase();
+			  }).replace(/\s+/g, '');		
+		},
 	},
 	ArrowFuncs: {
 		getPts: function(){

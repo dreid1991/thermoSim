@@ -18,6 +18,7 @@ Renderer.prototype = {
 		this.addRecording(scene.records || []);
 		this.addReadoutEntries(scene.readoutEntries || []);
 		this.addListeners(scene.listeners || []);
+		this.addGraphs(scene.graphs || []);
 		
 		
 
@@ -54,13 +55,13 @@ Renderer.prototype = {
 	addRecording: function(data) {
 		for (var dataIdx=0; dataIdx<data.length; dataIdx++) {
 			var entry = data[dataIdx];
-			walls[entry.wallHandle]['record' + entry.data]();
+			walls[entry.wallInfo]['record' + entry.data.toCapitalCamelCase()]();
 		}
 	},
 	addReadoutEntries: function(entries) {
 		for (var entryIdx=0; entryIdx<entries.length; entryIdx++) {
 			var entry = entries[entryIdx];
-			walls[entry.wallHandle]['display' + entry.data]();
+			walls[entry.wallInfo]['display' + entry.data.toCapitalCamelCase()]();
 		}
 	},
 	addListeners: function(listeners) {
@@ -80,7 +81,7 @@ Renderer.prototype = {
 		//Need to make data be stored as strings, not reference
 		for (var graphIdx=0; graphIdx<graphs.length; graphIdx++) {
 			var graph = graphs[graphIdx];
-			curLevel.graphs[graph.handle] = new graphs[graph.type](graph);
+			curLevel.graphs[graph.handle] = new window.Graphs[graph.type](graph);
 			for (var setIdx=0; setIdx<graph.sets.length; setIdx++) {
 				var set = graph.sets[setIdx];
 				curLevel.graphs[graph.handle].addSet(set);

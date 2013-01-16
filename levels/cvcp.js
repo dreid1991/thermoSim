@@ -96,10 +96,10 @@ _.extend(cvcp.prototype,
 					records: [
 					],
 					readoutEntries: [
-						{wallHandle: 'left', data:'TempSmooth', readout: 'mainReadout'},
-						{wallHandle: 'left', data:'Q', readout: 'mainReadout'},
-						{wallHandle: 'right', data:'TempSmooth', readout: 'mainReadout'},
-						{wallHandle: 'right', data:'Q', readout: 'mainReadout'},
+						{wallInfo: 'left', data:'tempSmooth', readout: 'mainReadout'},
+						{wallInfo: 'left', data:'q', readout: 'mainReadout'},
+						{wallInfo: 'right', data:'tempSmooth', readout: 'mainReadout'},
+						{wallInfo: 'right', data:'q', readout: 'mainReadout'},
 						
 						//WHICH WALL, WHAT THING, WHERE
 						
@@ -110,10 +110,20 @@ _.extend(cvcp.prototype,
 						{wallHandle: 'right', dataList: 't', is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'}
 					],
 					graphs: [
-						{type: 'Scatter', handle:'pVSv', xLabel:"P Int.", yLabel:"Temp (K)", axesInit:{x:{min:6, step:2}, y:{min:0, step:1}},
+						{type: 'Scatter', handle:'pVSvLeft', xLabel:"P Int.", yLabel:"Temp (K)", axesInit:{x:{min:6, step:2}, y:{min:0, step:50}},
 							sets:[
 								{address:'t', label:'Temp', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
-								 data:{x:walls[0].data.pInt, y:walls[0].data.t}, trace:true}
+								 data:{x: {wallInfo: 'left', data: 'q'}, y: {wallInfo: 'left', data: 't'}}, trace: false, fillInPts: false, fillInPtsMin: 5}
+								
+							]
+						},
+						{type: 'Scatter', handle:'pVSvRight', xLabel:"P Int.", yLabel:"Temp (K)", axesInit:{x:{min:6, step:2}, y:{min:0, step:50}},
+							sets:[
+								{address:'t', label:'Temp', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
+								 data:{x: {wallInfo: 'right', data: 'q'}, y: {wallInfo: 'right', data: 't'}}, trace: false, fillInPts: false, fillInPtsMin: 5},
+								
+								{address:'v', label:'Vol', pointCol:Col(50,255,50), flashCol:Col(255,200,200),
+								 data:{x: {wallInfo: 'right', data: 'pInt'}, y: {wallInfo: 'right', data: 'v'}}, trace: false, fillInPts: false, fillInPtsMin: 5}
 							]
 						}
 		// this.graphs.pVSv.addSet({address:'pExt', label:'P Ext.', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
