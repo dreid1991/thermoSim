@@ -1,6 +1,30 @@
+
+canvasHeight = 450;
+$(function(){
+	imgPath = 'work';
+	animText = new AnimText(c);
+	myCanvas.height = canvasHeight;
+	renderer = new Renderer();
+	window['curLevel'] = new Work();
+	curLevel.cutSceneEnd();
+	curLevel.init();
+	addJQueryElems($('button'), 'button');
+	$('#resetExp').click(function(){curLevel.reset()});
+	$('#toSim').click(function(){nextPrompt()});
+	$('#toLastStep').click(function(){prevPrompt()});
+	$('#previous').click(function(){prevPrompt()});
+	$('#next').click(function(){nextPrompt()});
+});
+
+myCanvas.width = $('#main').width();
+
+
+
+
 function Work(){
 	this.setStds();
-	this.readout = new Readout('mainReadout', 30, myCanvas.width-155, 25, '13pt calibri', Col(255,255,255), 'left');
+	this.readouts = {};
+	
 	this.compMode = 'Isothermal';
 
 	
@@ -12,15 +36,16 @@ _.extend(Work.prototype,
 			LevelTools, 
 {
 	init: function(){
+		this.readout = new Readout('mainReadout', 30, myCanvas.width-155, 25, '13pt calibri', Col(255,255,255), 'left');
 		$('#mainHeader').text('Work');
 		showPrompt(0, 0, true);
 	},	
 	
-	blocks:[
+	sections:[
 		{//B0
 			setup:
 				function() {
-					currentSetupType = 'block';
+					currentSetupType = 'section';
 					new AuxPicture('img/work/block0Pic1.jpg');
 					new AuxPicture('img/work/block0Pic2.jpg');
 					
@@ -65,7 +90,7 @@ _.extend(Work.prototype,
 		{//B1
 			setup: 
 				function() {
-					currentSetupType = 'block';
+					currentSetupType = 'section';
 					walls = WallHandler({pts:[[P(40,30), P(510,30), P(510,440), P(40,440)]], handlers:'staticAdiabatic', handles:['container']});
 					walls[0].setHitMode('ArrowSpd');
 					this.borderStd({min:30});
@@ -97,7 +122,7 @@ _.extend(Work.prototype,
 		{//B2
 			setup:
 				function() {
-					currentSetupType = 'block';
+					currentSetupType = 'section';
 
 					walls = WallHandler({pts:[[P(40,60), P(510,60), P(510,380), P(40,380)]], handlers:'staticAdiabatic', handles:['container'], vols:[15]});
 					spcs['spc1'].populate(P(45,65), V(460, 300), 1000, 200);
@@ -149,8 +174,8 @@ _.extend(Work.prototype,
 		{//B3
 			setup:
 				function() {
-					currentSetupType = 'block';
-					this.blocks[2].setup.apply(this);
+					currentSetupType = 'section';
+					this.sections[2].setup.apply(this);
 					walls[0].displayTemp();
 					walls[0].displayWork();
 					this.graphs.tVSv = new GraphScatter({handle:'tVSv', xLabel:"Volume (L)", yLabel:"Temperature (K)",
@@ -163,7 +188,7 @@ _.extend(Work.prototype,
 					setup:
 						function() {
 							currentSetupType = 'prompt0';
-							this.blocks[2].prompts[0].setup.apply(this);
+							this.sections[2].prompts[0].setup.apply(this);
 						},
 					text:"Previously you answered that the compression did GET_userAnswerB2P0Q0|kJ on the system bringing it to a final temperature of GET_userAnswerB2P1Q0|K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
 					quiz:[
