@@ -1631,7 +1631,7 @@ function StateListener(attrs){//like dataList... is:'greaterThan', ... targetVal
 	this.priorities = {true:defaultTo(0, attrs.prioritySatisfied), false:defaultTo(0, attrs.priorityUnsatisfied)};
 	
 	this.storeAtSatisfy = defaultTo({}, attrs.storeAtSatisfy);
-	this.atSatisfyFunc = defaultTo(undefined, attrs.atSatisfyFunc);
+	this.atSatisfyCmmds = defaultTo(undefined, attrs.atSatisfyCmmds);
 	this.amSatisfied = false;
 	this.makeConditionFunc();
 	return this.init();
@@ -1661,8 +1661,8 @@ _.extend(StateListener.prototype, objectFuncs, {
 				if (this.condition()) {
 					this.amSatisfied = true;
 					this.recordVals();
-					if (this.atSatisfyFunc) {
-						this.atSatisfyFunc.func.apply(this.atSatisfyFunc.obj);
+					if (this.atSatisfyCmmds) {
+						renderer.render({commands: this.atSatisfyCmmds})
 					}
 					removeListener(curLevel, 'update', this.handle);
 				}
@@ -1701,12 +1701,12 @@ _.extend(StateListener.prototype, objectFuncs, {
 	},
 	recordVals: function(){
 		this.results = {};
-		for (var storeName in this.storeAtSatisfy){
-			var storeAs = storeName + 'S' + sectionIdx + 'P' + promptIdx;
-			var data = this.storeAtSatisfy[storeName];
+		for (var storeIdx=0; storeIdx<this.storeAtSatisfy.length; storeIdx++) {
+			var store = this.storeAtSatisfy[storeIdx];
+			var handle = store.handle + 'S' + sectionIdx + 'P' + promptIdx;
+			var data = getObjFromPath(store.path, window);
 			var value = round(data[data.length-1], 1);
-			store(storeAs, value);
-			this.results[storeAs] = value;
+			store(handle, value);
 		}
 	},
 	isSatisfied: function(){

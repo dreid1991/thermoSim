@@ -18,6 +18,7 @@ _.extend(Attractor.prototype, toInherit.gridder, {
 		this.xSpan = Math.floor(myCanvas.width/this.gridSize);
 		this.ySpan = Math.floor(myCanvas.height/this.gridSize);
 		this.dotManager = dotManager;
+		return this;
 	},
 	attract: function() {
 		var grid = this.makeGrid();

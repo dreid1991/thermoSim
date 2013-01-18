@@ -450,6 +450,7 @@ LevelTools = {
 	attract: function(attrs) {
 		this.attracting = true;
 		cleanUpWith = defaultTo('section', attrs.cleanUpWith);
+		attractor.setup();
 		attractor.assignELastAll();
 		this.setUpdateRunListener();
 		addListener(window['curLevel'], cleanUpWith + 'CleanUp', 'attractStop', this.attractStop, this);

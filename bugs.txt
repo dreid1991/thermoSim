@@ -1,0 +1,2 @@
+check out comment it LevelTools.gravity.  There may be a problem with gravity.
+attracting is gaining energy in at least cvcp - seems stable with ~200 dots in static container

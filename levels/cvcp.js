@@ -104,11 +104,7 @@ _.extend(cvcp.prototype,
 						//WHICH WALL, WHAT THING, WHERE
 						
 					],
-					listeners: [
-					//these don't actually do anything because [broken] prompt ones superscede them.  that is okay.  Not important right now.
-						{wallHandle: 'left', dataList: 't', is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'},
-						{wallHandle: 'right', dataList: 't', is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'}
-					],
+/*
 					graphs: [
 						{type: 'Scatter', handle:'pVSvLeft', xLabel:"P Int.", yLabel:"Temp (K)", axesInit:{x:{min:6, step:2}, y:{min:0, step:50}},
 							sets:[
@@ -127,7 +123,7 @@ _.extend(cvcp.prototype,
 							]
 						}
 				
-					],
+					*/
 				})
 			},
 			/*
@@ -158,7 +154,13 @@ _.extend(cvcp.prototype,
 				{//P0
 					setup: 
 						function(){
-							currentSetupType = 'prompt0';
+							renderer.render({
+								type: 'prompt',
+								listeners: [
+									{wallHandle: 'left', dataList: 't', is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:''},
+									{wallHandle: 'right', dataList: 't', is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'}
+								]
+							})
 							//walls[1].setDefaultReadout(this.piston.readout);
 							//walls[1].displayPExt('pistonReadoutRightPiston');
 							//walls[0].displayQ('mainReadout');
@@ -174,6 +176,7 @@ _.extend(cvcp.prototype,
 						},
 					]
 				},
+				/*
 				{//P0
 					setup: 
 						function(){
@@ -192,6 +195,7 @@ _.extend(cvcp.prototype,
 						},
 					]
 				},
+				*/
 				{//P1
 					setup:undefined,
 					text:"<p>It took 0.5 kJ to bring the constant volume container to 250K while the constant pressure container took 0.8 kJ.</p>Do you have any theories about why that is?<br>",

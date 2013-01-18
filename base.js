@@ -486,7 +486,21 @@ function addJQueryElems(elems, funcName) {
 	}
 
 }
-
+function getObjFromPath(objPath, curObj) {
+	if (!objPath || objPath == '') {
+		return curObj
+	}
+	var nextDir = /[^\.]{1,}/.exec(objPath)[0];
+	objPath = objPath.slice(objPath.indexOf(nextDir) + nextDir.length, objPath.length);
+	newObj = curObj[nextDir];
+	if (newObj) {
+		return getObjFromPath(objPath, newObj);
+	} else {
+		console.log('tried to get bad obj path ' + objPath + ' from object ' + curObj);
+		console.trace();
+		return  
+	}
+}
 
 
 function recursiveAddClass(elem, HTMLClass) {

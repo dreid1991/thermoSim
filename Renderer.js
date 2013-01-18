@@ -4,10 +4,15 @@ function Renderer() {
 
 Renderer.prototype = {
 	render: function(scene) {
-		if (scene.type.indexOf('section') != -1) {
-			currentSetupType = scene.type;
-		} else {
-			currentSetupType = scene.type + window[scene.type + 'Idx'];
+		if (scene.type) {
+			if (/section/.test(scene.type)) {
+				currentSetupType = scene.type;
+			} else if (/prompt/.test(scene.type)){
+				currentSetupType = scene.type + window[scene.type + 'Idx'];
+			} else {
+				console.log ('what is a scene.type of ' + scene.type + '?');
+				console.trace();
+			}
 		}
 		if (!curLevel[currentSetupType + 'CleanUp'] && scene.type == 'prompt') {
 			curLevel.makeListenerHolder('prompt' + promptIdx + 'CleanUp');
@@ -69,7 +74,7 @@ Renderer.prototype = {
 	addListeners: function(listeners) {
 		for (var listenerIdx=0; listenerIdx<listeners.length; listenerIdx++) {
 			var listener = listeners[listenerIdx];
-			new StateListener(listener); 
+			var foo = new StateListener(listener); 
 			//I don't think state listeners are ever referenced through curLevel., so I don't have to name them as keys in curLevel
 		}
 	},
@@ -86,24 +91,13 @@ Renderer.prototype = {
 	doCommands: function(cmmds) {
 		for (var cmmdIdx=0; cmmdIdx<cmmds.length; cmmdIdx++) {
 			var cmmd = cmmds[cmmdIdx];
-			var obj = this.getObjFromStr(cmmd.obj, window);
+			var obj = getObjFromPath(cmmd.path, window);
 			obj[cmmd.func](cmmd.attrs || {});
 		}
 	},
-	getObjFromStr: function(objPath, curObj) {
-		if (!objPath || objPath == '') {
-			return curObj
-		}
-		var nextDir = /[^\.]{1,}/.exec(objPath)[0];
-		objPath = objPath.slice(objPath.indexOf(nextDir) + nextDir.length, objPath.length);
-		newObj = curObj[nextDir];
-		if (newObj) {
-			return this.getObjFromStr(objPath, newObj);
-		} else {
-			console.log('tried to get bad obj path ' + objPath + ' from object ' + curObj);
-			console.trace();
-			return  
-		}
-	},
 
+/*
+Listener store on satisfy: path, handle
+
+*/
 }
