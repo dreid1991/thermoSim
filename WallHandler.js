@@ -8,6 +8,7 @@ function WallHandler(attrs){//pts, handlers, handles, bounds, includes, vols, sh
 	_.extend(newWall, WallMethods.main, WallMethods.collideMethods);
 	addListener(curLevel, 'sectionCleanUp', 'walls', newWall.remove, newWall)
 	newWall.cVIsothermal32 = newWall.cVIsothermal;
+	newWall.defaultCol = Col(255, 255, 255);
 	if (attrs) {//Yo yo, you can just do new WallHander() and then add walls
 		newWall.assemble(attrs);//pts, handles, bounds, includes, vols, shows, records)
 		if (attrs.handles.length!=attrs.pts.length) {
@@ -171,7 +172,7 @@ WallMethods = {
 			}
 			return wallGrid;
 		},
-		setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show, record, tSet){
+		setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show, record, tSet, col){
 			bounds = defaultTo({yMin:30, yMax: 435}, bounds);
 			include = defaultTo(1, include);
 			this[wallIdx] = pts;
@@ -181,9 +182,10 @@ WallMethods = {
 			this[wallIdx].hitMode = 'Std';
 			this[wallIdx].v = 0;
 			this[wallIdx].bounds = bounds;
-			if(vol){
+			if (vol) {
 				this[wallIdx].setVol(vol);
 			}
+			this[wallIdx].col = defaultTo(this.defaultCol, col);
 			this[wallIdx].show = defaultTo(true, show);
 			this.closeWall(this[wallIdx]);
 			this[wallIdx].ptsInit = this.copyWallPts(this[wallIdx]);
@@ -236,9 +238,11 @@ WallMethods = {
 		addWall: function(attrs){
 			this.numWalls++;
 			var newIdx = this.length;
-			this.setWallVals(newIdx, attrs.pts, attrs.handle, attrs.bounds, attrs.include, attrs.vol, attrs.show, attrs.record, attrs.temp);
+			this.setWallVals(newIdx, attrs.pts, attrs.handle, attrs.bounds, attrs.include, attrs.vol, attrs.show, attrs.record, attrs.temp, attrs.col);
 			this.setupWall(newIdx);
 			this.setWallHandler(newIdx, attrs.handler);
+			this[newIdx].addBorder(attrs.border);
+			
 		},
 		setPtsInit: function(){
 			for (var wallIdx=0; wallIdx<this.length; wallIdx++){
@@ -421,7 +425,7 @@ WallMethods = {
 						dot.v.dy = -Math.sqrt(discrim);
 					}		
 				} else { 
-					//should not have gotten as far up as reflection over wall moved it     so dyFinal>0/
+					//should not have gotten as far up as reflection over wall moved it     so dyFinal<0/
 					//so basically I'm setting a new velocity (1e-7)and solving for the approptiate y
 					dot.v.dy = -1.e-7;
 					dot.y = (dot.v.dy*dot.v.dy - dyo*dyo)/(2*gInternal) + yo;
@@ -958,7 +962,13 @@ WallMethods = {
 			return this;
 		},
 
-	
+		addBorder: function(attrs) {
+			if (attrs) {
+				if (defaultTo('std', attrs.type) == 'std') {
+					this.border([1, 2, 3, 4], attrs.width || 5, attrs.col || this.col.copy().adjust(-100, -100, -100), [{y:attrs.yMin}, {}, {}, {y:attrs.yMin}]);
+				}
+			}
+		},
 		border: function(wallPts, thickness, col, ptAdjusts){
 			this.bordered = true;
 			var drawCanvas = c;

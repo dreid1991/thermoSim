@@ -43,23 +43,23 @@ _.extend(cvcp.prototype,
 		// {//B0
 			// setup:undefined,
 			// prompts:[
-				// // {//P0
-					// // setup:undefined,
-					// // cutScene:true,
-					// // text:"<p>It's time to look at heat capacities!</p><p>For an ideal monatomic gas, which of these is correct?  c<sub>V</sub> means heat capacity at constant volume, c<sub>P</sub> means heat capacity at constant pressure.",
-					// // quiz:[
-						// // {	
-							// // type:'multChoice', 
-							// // options:
-								// // [
-								// // {text:"||EQ1|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
-								// // {text:"||EQ2|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
-								// // {text:"||EQ1|| and ||EQ4||", isCorrect: true},
-								// // {text:"||EQ2|| and ||EQ5||", isCorrect: false, message:"That's not correct"}
-							// // ]
-						// // }
-					// // ],
-				// // },
+				// {//P0
+					// setup:undefined,
+					// cutScene:true,
+					// text:"<p>It's time to look at heat capacities!</p><p>For an ideal monatomic gas, which of these is correct?  c<sub>V</sub> means heat capacity at constant volume, c<sub>P</sub> means heat capacity at constant pressure.",
+					// quiz:[
+						// {	
+							// type:'multChoice', 
+							// options:
+								// [
+								// {text:"||EQ1|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
+								// {text:"||EQ2|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
+								// {text:"||EQ1|| and ||EQ4||", isCorrect: true},
+								// {text:"||EQ2|| and ||EQ5||", isCorrect: false, message:"That's not correct"}
+							// ]
+						// }
+					// ],
+				// },
 				// {//P1
 					// setup:undefined,
 					// cutScene:true,
@@ -78,8 +78,8 @@ _.extend(cvcp.prototype,
 			setup: function() {
 				renderer.render({
 					type: 'section',
-					walls: [{pts:[P(40,190), P(255,190), P(255,425), P(40,425)], handler:'staticAdiabatic', handle:'left', bounds:undefined, vol:5},
-							{pts:[P(295,190), P(510,190), P(510,425), P(295,425)], handler:'staticAdiabatic', handle:'right', bounds:{yMin:50, yMax:275}, vol:5}
+					walls: [{pts:[P(40,190), P(255,190), P(255,425), P(40,425)], handler:'staticAdiabatic', handle:'left', bounds:undefined, vol:5, /*border: 'std', */col:Col(255, 0, 0)},
+							{pts:[P(295,190), P(510,190), P(510,425), P(295,425)], handler:'staticAdiabatic', handle:'right', bounds:{yMin:50, yMax:275}, vol:5, border: {type: 'std', col:Col(100, 200, 100), width:7}}
 					],
 					
 					//borders should be option in wall
@@ -126,9 +126,8 @@ _.extend(cvcp.prototype,
 								 data:{x: {wallInfo: 'right', data: 'pInt'}, y: {wallInfo: 'right', data: 'v'}}, trace: false, fillInPts: false, fillInPtsMin: 5}
 							]
 						}
-		// this.graphs.pVSv.addSet({address:'pExt', label:'P Ext.', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
-								// data:{x:walls[0].data.v, y:walls[0].data.pExt}, trace:true});					
-					]
+				
+					],
 				})
 			},
 			/*

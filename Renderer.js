@@ -19,7 +19,7 @@ Renderer.prototype = {
 		this.addReadoutEntries(scene.readoutEntries || []);
 		this.addListeners(scene.listeners || []);
 		this.addGraphs(scene.graphs || []);
-		
+		this.doCommands(scene.commands || []);
 		
 
 		
@@ -37,19 +37,21 @@ Renderer.prototype = {
 		}	
 	},
 	renderWalls: function(newWalls, scene) {
-		if (scene['type'] == 'section') {
-			window['walls'] = new WallHandler();
+		if (newWalls.length) {
+			if (scene['type'] == 'section') {
+				window['walls'] = new WallHandler();
+			}
+			for (var wallIdx=0; wallIdx<newWalls.length; wallIdx++) {
+				var newWall = newWalls[wallIdx];
+				walls.addWall(newWall);
+			}	
 		}
-		for (var wallIdx=0; wallIdx<newWalls.length; wallIdx++) {
-			var newWall = newWalls[wallIdx];
-			walls.addWall(newWall);
-		}	
 	},
 	renderObjs: function(objs) {
 		for (var objIdx=0; objIdx<objs.length; objIdx++) {
 			var obj = objs[objIdx];
 			var objFunc = window[obj.type];
-			curLevel[obj.type + obj.handle] = new objFunc(obj.attrs);
+			curLevel[obj.type + obj.attrs.handle] = new objFunc(obj.attrs);
 		}
 	},
 	addRecording: function(data) {
@@ -72,13 +74,6 @@ Renderer.prototype = {
 		}
 	},
 	addGraphs: function(graphs) {
-		// this.graphs.pVSv = new GraphScatter({handle:'pVSv', xLabel:"Volume (L)", yLabel:"Pressure (bar)",
-							// axesInit:{x:{min:6, step:2}, y:{min:0, step:1}}});
-		// this.graphs.pVSv.addSet({address:'pExt', label:'P Ext.', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
-								// data:{x:walls[0].data.v, y:walls[0].data.pExt}, trace:true});		
-		// this.graphs.pVSv.addSet({address:'pInt', label:'P Int.', pointCol:Col(50,255,50), flashCol:Col(200,255,200),
-								// data:{x:walls[0].data.v, y:walls[0].data.pInt}, trace:true});	
-		//Need to make data be stored as strings, not reference
 		for (var graphIdx=0; graphIdx<graphs.length; graphIdx++) {
 			var graph = graphs[graphIdx];
 			curLevel.graphs[graph.handle] = new window.Graphs[graph.type](graph);
@@ -87,6 +82,28 @@ Renderer.prototype = {
 				curLevel.graphs[graph.handle].addSet(set);
 			}
 		}
-	}
+	},
+	doCommands: function(cmmds) {
+		for (var cmmdIdx=0; cmmdIdx<cmmds.length; cmmdIdx++) {
+			var cmmd = cmmds[cmmdIdx];
+			var obj = this.getObjFromStr(cmmd.obj, window);
+			obj[cmmd.func](cmmd.attrs || {});
+		}
+	},
+	getObjFromStr: function(objPath, curObj) {
+		if (!objPath || objPath == '') {
+			return curObj
+		}
+		var nextDir = /[^\.]{1,}/.exec(objPath)[0];
+		objPath = objPath.slice(objPath.indexOf(nextDir) + nextDir.length, objPath.length);
+		newObj = curObj[nextDir];
+		if (newObj) {
+			return this.getObjFromStr(objPath, newObj);
+		} else {
+			console.log('tried to get bad obj path ' + objPath + ' from object ' + curObj);
+			console.trace();
+			return  
+		}
+	},
 
 }

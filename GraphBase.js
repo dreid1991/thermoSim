@@ -60,7 +60,7 @@ GraphBase = {
 		var canvasDiv = $(html);
 		
 		$(this.parentDiv).append(canvasDiv);
-		$('#' + this.buttonId).button();
+		addJQueryElems($('#' + this.buttonId), 'button');
 		$('#' + this.buttonId).click(function(){self.reset()})
 		this.graphHTMLElement = document.getElementById(this.handle+'Graph');
 		this.graph = this.graphHTMLElement.getContext('2d');

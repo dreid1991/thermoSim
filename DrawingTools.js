@@ -25,11 +25,11 @@ DrawingTools.prototype = {
 		}
 	},
 	walls: function(walls, col){
-		c.beginPath();
-		c.strokeStyle = col.hex;		
 		for (var wallIdx=0; wallIdx<walls.length; wallIdx++){
 			var wall = walls[wallIdx];
-			if(wall.show){
+			if (wall.show) {
+				c.beginPath();
+				c.strokeStyle = wall.col.hex;
 				c.moveTo(wall[0].x, wall[0].y);
 				for (var ptIdx=1; ptIdx<wall.length-1; ptIdx++){
 					var pt = wall[ptIdx];

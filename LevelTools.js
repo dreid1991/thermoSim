@@ -152,8 +152,7 @@ LevelTools = {
 		}
 		var idButton = 'textAreaSubmit';
 		var submitHTML = templater.div({style: {width: '65%', display: 'inline-block'}}) + templater.button({attrs:{id: [idButton]}, style: {display: 'inline-block'}, innerHTML:'Submit'});
-		//var submitHTML = "<table border=0><tr><td width=75%></td><td>" + templater.button({attrs:{id: [idButton]}, innerHTML:'Submit'}) + "</td></tr></table>";
-		$('#'+appendTo).html($('#'+appendTo).html() + submitHTML);
+		$('#'+appendTo).append(submitHTML);
 		buttonBind(idButton, onclickSubmit);
 		addJQueryElems($('#' + idButton), 'button');
 	},
@@ -243,7 +242,7 @@ LevelTools = {
 			buttonHTML += "<td>" + templater.button({attrs:{id: [ids[buttonIdx]]}, innerHTML:button.text}) + "</td>";
 		}
 		buttonHTML += "</tr></table></center>";
-		$('#'+appendTo).html($('#' + appendTo).html() + buttonHTML);
+		$('#'+appendTo).append(buttonHTML);
 		this.bindButtonListeners(question, buttons, ids);
 	},
 	bindButtonListeners: function(question, buttons, ids){
@@ -291,7 +290,7 @@ LevelTools = {
 			ids[optionIdx] = 'question' + questionIdx + 'option' + optionIdx;
 			multChoiceHTML += templater.div({attrs: {id: [ids[optionIdx]], class: ['multChoiceBlock']}, innerHTML: option.text})
 		}
-		$('#'+appendTo).html($('#'+appendTo).html() + multChoiceHTML);
+		$('#'+appendTo).append(multChoiceHTML);
 		this.bindMultChoiceFuncs(question, options, ids);
 	},
 	bindMultChoiceFuncs: function(question, options, ids){
@@ -341,11 +340,10 @@ LevelTools = {
 			textBoxHTML += '<br>';
 		}
 		textBoxHTML += templater.textarea({attrs: {id: [idText], rows: [rows], cols: [cols], placeholder: [boxText]}})
-		//"<textarea id='"+idText+"' rows='" +rows+ "' cols='" +cols+ "' placeholder='"+boxText+"'></textarea>";
 		if (question.units) {
 			textBoxHTML += question.units;
 		}
-		$('#'+appendTo).html($('#'+appendTo).html() + textBoxHTML);
+		$('#' + appendTo).append(textBoxHTML);
 	},
 	getTextAreaId: function(idx) {
 		return 'textArea' + idx;
@@ -421,9 +419,10 @@ LevelTools = {
 			addListener(this, 'update', 'run', this.updateRunBasic, this);
 		}
 	},
-	gravity: function(cleanUpWith) {
+	gravity: function(attrs) {
+	
 		this.gravitying = true;
-		cleanUpWith = defaultTo('section', cleanUpWith);
+		cleanUpWith = defaultTo('section', attrs.cleanUpWith);
 		//YO YO - MAKE IT CLEAN UP
 		//Problem with hitting wall, slowly loses energy.  Would need to do something similar to wall hitting its bounds
 		for (var wallIdx=0; wallIdx<walls.length; wallIdx++) {
@@ -448,9 +447,9 @@ LevelTools = {
 			}
 		}
 	},
-	attract: function(cleanUpWith) {
+	attract: function(attrs) {
 		this.attracting = true;
-		cleanUpWith = defaultTo('section', cleanUpWith);
+		cleanUpWith = defaultTo('section', attrs.cleanUpWith);
 		attractor.assignELastAll();
 		this.setUpdateRunListener();
 		addListener(window['curLevel'], cleanUpWith + 'CleanUp', 'attractStop', this.attractStop, this);
@@ -491,7 +490,7 @@ LevelTools = {
 	drawRun: function(){
 		draw.clear(this.bgCol);
 		draw.dots();
-		draw.walls(walls, this.wallCol);
+		draw.walls(walls);
 	},
 	resetGraphs: function(){
 		for (var graphName in this.graphs){
