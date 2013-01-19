@@ -66,6 +66,7 @@ _.extend(ArrowButton.prototype, assignHover, {
 		if (move !== false) {
 			if (this == this.tree.clickedButton || this == this.tree.editingButton) {
 				this.tree.editingButton = this;
+				this.tree.editingScene = this.parent;
 				this.pointArrows('left');
 				this.tree.editingButton = this;
 				this.flyToPos(this.tree.buttonPosObjectModeSelected, 200);

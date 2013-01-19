@@ -11,51 +11,36 @@ function SceneData() {
 //type will be defined on run based on block position
 
 _.extend(SceneData.prototype, updateValue = {
-	addWall: function() {
-		var attrs = this.buildNewElement('wall');
-		attrs.id = data.getWallId();
-		this.walls.push(attrs);
-		return attrs;
+	addElement: function(md) {
+		var elem = this.buildNewElement(md);
+		elem.id = md.id.apply(data);
+		this.pushToList(elem);
 	},
-	addListener: function() {
-		var attrs = this.buildNewElement('listener');
-		attrs.id = data.getListenerId();
-		this.listeners.push(attrs);
-		return attrs;
-	},
-	addObject: function(type) {
-		var attrs = this.buildNewElement(type);
-		attrs.id = data.getObjectId();
-		this.objects.push(attrs);
-		return attrs;
-	},
-	addDots: function() {
-		var attrs = this.buildNewElement('dots');
-		attrs.id = data.getDotsId();
-		this.dots.push(attrs);
-		return attrs;
-	},
-	addReadoutEntry: function() {
-		var attrs = this.buildNewElement('readoutEntry')
-		attrs.id = data.getReadoutEntryId();
-		this.readoutEntries.push(attrs);
-		return attrs;
-	},
-	addCommand: function() {
-		var attrs = this.buildNewElement('command');
-		attrs.id = data.getCommandId();
-		this.commands.push(attrs);
-		return attrs;
-	},
-	buildNewElement: function(type) {
-		var elemData = elementData[type];
-		var attrs = {};
-		var labelText = elemData.labelText;
-		attrs.labelText = labelText;
-		for (var attr in elemData.attrs) {
-			attrs[attr] = undefined;
+	buildNewElement: function(md) {
+		var elem = {};
+		elem.vals = {};
+		elem.src = md;
+		elem.labelText = md.labelText;
+		for (var attr in md.attrs) {
+			elem.vals[attr] = undefined;
 		}
-		return attrs;
+		return elem;
+	},
+	pushToList: function(elem) {
+		var type = elem.src.type;
+		if (type == 'Wall') {
+			this.walls.push(elem);
+		} else if (type == 'Dots') {
+			this.dots.push(elem);
+		} else if (type == 'StateListener') {
+			this.listeners.push(elem);
+		} else if (type == 'ReadoutEntry') {
+			this.readoutEntries.push(elem);
+		} else if (type == 'Command') {
+			this.commands.push(elem);
+		} else {
+			this.objects.push(elem);
+		}
 	}
 
 

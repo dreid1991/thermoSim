@@ -22,6 +22,9 @@ function TreePrompt(tree, section, posInit, dragFuncs, clickFuncs, labelText, in
 }
 
 TreePrompt.prototype = {
+	addElement: function(elem) {
+		this.sceneData.addElement(elem);
+	},
 	getSection: function() {
 		return this.section;
 	},

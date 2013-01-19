@@ -1,20 +1,21 @@
 <html>
 <body>
-<link type='text/css' href = '../css/custom-theme/jquery-ui-1.8.23.custom.css' rel='stylesheet' />
+<link type='text/css' href = '../css/custom-theme/jquery-ui-1.9.2.custom.css' rel='stylesheet' />
 <link type='text/css' href = '../styles.css' rel='stylesheet'/>
-<script src='../js/jquery-1.7.2.min.js'></script>
-<script src = '../js/jquery-ui-1.8.20.custom.min.js'></script>
+<script src='../js/jquery-1.9.0.min.js'></script>
+<script src = '../js/jquery-ui-1.9.2.custom.min.js'></script>
 <script src='../raphael.js'></script>
 <script src='../indepClasses.js'></script>
 <script src='../underscore-min.js'></script>
+<script src='../Templater.js'></script>
+<script src='DataManager.js'></script>
 <script src='elementData.js'></script>
 <script src='SceneData.js'></script>
-<script src='ElementAdder.js'></script>
+<script src='ElementDropdown.js'></script>
 <script src='config.js'></script>
 <script src='treeFuncs.js'></script>
 <script src='SearchTree.js'></script>
 <script src='Dropdown.js'></script>
-<script src='DataManager.js'></script>
 <script src='ArrowButton.js'></script>
 <script src='TreePrompt.js'></script>
 <script src='TreeSection.js'></script>
@@ -54,25 +55,12 @@
 
 	</div>
 	<div id='objDiv' class='objDiv'>
-		<div id='accordion'>
-			<h3><div style='margin-left: 2em'>Section 1</div></h3>
-			<div>
-				<div style='font-size: small'>
-					Thing one: <input type='text' id='foo'>
-				</div>
-			</div>
-			<h3><div style='margin-left: 2em'>Section 2 </div></h3>
-			<div>
-				<p>Some more content.  I hope you like it.</p>
-			</div>
-		</div>
 	</div>
 
 
 </div>
 
 <script>
-$('#accordion').accordion();
 
 globalMousePos = P(0, 0);
 //$('#canvas').animate({width: '0px'}, 5000, function(){$('#canvas').hide()}) yo yo, check dis out

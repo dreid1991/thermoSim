@@ -15,12 +15,16 @@ elementAttrs = {
 		{type: Object}  //Need to figure out composites
 }
 
-elementMd = {
+elementMD = {
+//Objects ones must correspond to their function name in the simulation.
+
 //I am changing wallInfo to wallHandle
 //instead of pressure or mass, allow only pressure input, because who wants mass anyway?
 	wall: {
 	//type, label, something about how data is input
 		labelText: 'Wall',
+		type: 'Wall',
+		id: DataManager.prototype.getWallId,
 		attrs: {
 			isBox:
 				{type: Boolean},
@@ -44,9 +48,12 @@ elementMd = {
 				{type: Number}
 			//add some border stuff
 		}
+		
 	},
 	readoutEntry: {
 		labelText: 'Readout entry',
+		type: 'ReadoutEntry',
+		id: DataManager.prototype.readoutEntryId,
 		attrs: {
 			wallHandle: 
 				elementAttrs.wallHandle,
@@ -60,6 +67,8 @@ elementMd = {
 	},
 	dots: {
 		labelText: 'Molecules',
+		type: 'Dots',
+		id: DataManager.prototype.getDotsId,
 		attrs: {
 			pos:
 				elementAttrs.pos,
@@ -80,6 +89,8 @@ elementMd = {
 	//wallHandle: 'left', dataList: 't', is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'
 	listener: {
 		labelText: 'Listener',
+		type: 'StateListener',
+		id: DataManager.prototype.getListenerId,
 		attrs: {
 			wallHandle:
 				elementAttrs.wallHandle,
@@ -101,6 +112,8 @@ elementMd = {
 	},
 	weights: {
 		labelText: 'Weights',
+		type: 'DragWeights',
+		id: DataManager.prototype.getObjId,
 		attrs: {
 			handle:
 				elementAttrs.handle,
@@ -123,6 +136,8 @@ elementMd = {
 	},
 	compArrow: {
 		labelText: 'Compression Arrow',
+		type: 'CompArrow',
+		id: DataManager.prototype.getObjId,
 		attrs: {
 			handle:
 				elementAttrs.handle,
@@ -137,6 +152,8 @@ elementMd = {
 	piston: {
 	//{type: 'Piston', attrs: {handle: 'RightPiston', wallInfo: 'right', min:2, init:2, max:2, makeSlider:false}
 		labelText: 'Piston',
+		type: 'Piston',
+		id: DataManager.prototype.getObjId,
 		attrs: {
 			handle:
 				elementAttrs.handle,
@@ -156,6 +173,8 @@ elementMd = {
 	},
 	heater: {
 		labelText: 'Heater',
+		type: 'Heater',
+		id: DataManager.prototype.getObjId,
 		attrs: {
 			handle: 
 				elementAttrs.handle,
@@ -170,6 +189,8 @@ elementMd = {
 	},
 	stops: {
 		labelText: 'Stops',
+		type: 'Stops',
+		id: DataManager.prototype.getObjId,
 		attrs: {
 			handle:
 				elementAttrs.handle,
@@ -179,6 +200,8 @@ elementMd = {
 	},
 	sandbox: {
 		labelText: 'Sandbox',
+		type: 'Sandbox',
+		id: DataManager.prototype.getObjId,
 		attrs: {
 			handle: 
 				elementAttrs.handle,
@@ -192,6 +215,8 @@ elementMd = {
 	},
 	tempChanger: {
 		labelText: 'Temp changer',
+		type: 'TempChanger',
+		id: DataManager.prototype.getObjId,
 		attrs: {
 			min:
 				{type: Number},
@@ -207,6 +232,8 @@ elementMd = {
 	},
 	RMSChanger: {
 		labelText: 'RMS changer',
+		type: 'RMSChanger',
+		id: DataManager.prototype.getObjId,
 		attrs: {
 			min:
 				{type: Number},
@@ -221,6 +248,8 @@ elementMd = {
 	},
 	arrowStatic: {
 		labelText: 'Arrow static',
+		type: 'ArrowStatic',
+		id: DataManager.prototype.getObjId,
 		attrs: {
 			
 		}

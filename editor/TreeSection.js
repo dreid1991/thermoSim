@@ -34,6 +34,9 @@ For section, need to store:
 	Yo yo, should do some kind of what meta-data each thing has for generalized getting.  Or maybe not since getting will only be done in one place and arguments are given in order, so I'll need to specify at some point anyway...
 */
 TreeSection.prototype = {
+	addElement: function(elem) {
+		this.sceneData.addElement(elem);
+	},
 	addPrompt: function(cornerPos, prompt) {
 		var newIdx = this.getNewPromptIdx(cornerPos);
 		if (!prompt) {

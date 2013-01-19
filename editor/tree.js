@@ -36,7 +36,7 @@ function Tree(paper/*, pos*/) {
 	this.rectColHover = config.buttonFillColHover;//'#5c93b2';
 	//this.rectColSelect = Col(82, 108, 122);//'#526c7a';
 	//this.rectColStroke = Col(59, 68, 73);//'#3b4449';
-	this.populateelementAdder();
+	this.populateElementAdder();
 	this.mode = 'tree';
 	//this.circleCol = Col(59, 68, 73);//Col(120, 180, 213);
 	//this.circleColHover = Col(110, 170, 203);
@@ -53,6 +53,7 @@ function Tree(paper/*, pos*/) {
 	this.elementAdder = new ElementAdder(this.paper, this, this.elementAdderPos, this.buttonDims, 'New Element', this.rectCol, this.rectColHover);
 	this.elementAdder.hide();
 	this.bgRect = this.makeBGRect();
+	this.editingScene = undefined;
 	this.editingButton = undefined; //the one getting working on while in object mode
 	this.clickedButton = undefined;
 	this.receptacles = [this.makeTrash(this.trashPos)];
@@ -108,6 +109,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		this.mode = 'tree';
 		this.showBottomPanel();
 		this.editingButton = undefined;
+		this.editingScene = undefined;
 		if (this.clickedButton) {
 			this.addTopButton(this.clickedButton);
 		}
@@ -280,7 +282,7 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		}
 		return toRemove;
 	},
-	populateelementAdder: function() {
+	populateElementAdder: function() {
 	
 	},
 	removeUnused: function(toRemove) {
@@ -551,7 +553,10 @@ _.extend(Tree.prototype, SectionFuncs, PromptFuncs, BGRectFuncs, PlacerRectFuncs
 		}
 		this.staticsToFront();
 
-	}
+	},
+	addElement: function(elem) {
+		this.editingScene.addElement(elem);
+	},
 
 })
 
