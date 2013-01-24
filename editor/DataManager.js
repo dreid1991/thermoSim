@@ -7,6 +7,7 @@ function DataManager() {
 	this.listenerNum = 0;
 	this.dotsNum = 0;
 	this.readoutEntryNum = 0;
+	this.recordNum = 0;
 	this.commandNum = 0;
 	this.hist = [new SearchTree()];
 }
@@ -65,6 +66,11 @@ DataManager.prototype = {
 	getDotsId: function() {
 		var id = 'd' + this.dotsNum;
 		this.dotsNum++;
+		return id;
+	},
+	getRecordId: function() {
+		var id = 'r' + this.recordNum;
+		this.recordNum++;
 		return id;
 	},
 	getReadoutEntryId: function() {

@@ -1,47 +1,73 @@
+TYPES = {
+	title: 'title',
+	genInfo: 'genInfo', //is cutScene, text
+	quiz: 'quiz',	
+	wall: 'Wall',
+	dots: 'Dots',
+	listener: 'StateListener',
+	entry: 'ReadoutEntry',
+	record: 'Record',
+	cmmd: 'Command',
+	piston: 'Piston',
+	dragWeights: 'DragWeights',
+	
+
+}
+
 function SceneData() {
 	this.type = undefined;
+	this.title = undefined;
+	this.genInfo = undefined;
+	this.quiz = undefined;
 	this.walls = [];
 	this.listeners = [];
 	this.objects = [];
 	this.dots = [];
 	this.readoutEntries = [];
+	this.records = [];
 	this.commands = []; //for gravity, attractions,
+	this.html = {
+		title: undefined,
+		genInfo: undefined,
+		quiz: undefined,
+		walls: undefined,
+		dots: undefined,
+		objects: undefined,
+		readoutEntries: undefined,
+		listeners: undefined,
+		records: undefined,
+		commands: undefined,
+		
+	};
 
 }
 //type will be defined on run based on block position
 
 _.extend(SceneData.prototype, updateValue = {
 	addElement: function(md) {
-		var elem = this.buildNewElement(md);
-		elem.id = md.id.apply(data);
+		var elem = new md();
+		elem.id = elem.id.apply(data);
 		this.pushToList(elem);
 	},
-	buildNewElement: function(md) {
-		var elem = {};
-		elem.vals = {};
-		elem.src = md;
-		elem.labelText = md.labelText;
-		for (var attr in md.attrs) {
-			elem.vals[attr] = undefined;
-		}
-		return elem;
-	},
 	pushToList: function(elem) {
-		var type = elem.src.type;
-		if (type == 'Wall') {
+		var type = elem.type;
+		if (type == TYPES.wall) {
 			this.walls.push(elem);
-		} else if (type == 'Dots') {
+		} else if (type == TYPES.dots) {
 			this.dots.push(elem);
-		} else if (type == 'StateListener') {
+		} else if (type == TYPES.listener) {
 			this.listeners.push(elem);
-		} else if (type == 'ReadoutEntry') {
+		} else if (type == TYPES.entry) {
 			this.readoutEntries.push(elem);
-		} else if (type == 'Command') {
+		} else if (type == TYPES.cmmd) {
 			this.commands.push(elem);
+		} else if (type == TYPES.record) {
+			this.records.push(elem);
 		} else {
 			this.objects.push(elem);
 		}
-	}
+	},
+	renderElem: function(elem) {
 
 
 });
