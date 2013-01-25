@@ -7,8 +7,6 @@ For prompt, need to store:
 
 function TreePrompt(tree, section, posInit, dragFuncs, clickFuncs, labelText, inheritedId) {
 	this.tree = tree;
-	this.section = section;
-	this.sceneData = new SceneData();
 	this.dragFuncs = dragFuncs;
 	this.clickFuncs = clickFuncs;
 	this.labelText = labelText;
@@ -19,6 +17,11 @@ function TreePrompt(tree, section, posInit, dragFuncs, clickFuncs, labelText, in
 	} else {
 		this.id = inheritedId;
 	}
+	this.section = section;
+	if ($('#' + this.id).length) {
+		$('#objDiv').append(templater.div({attrs: {id: [this.id]}}));
+	}
+	this.sceneData = new SceneData($('#' + this.id));
 }
 
 TreePrompt.prototype = {

@@ -42,49 +42,7 @@ elementMD = {
 
 //I am changing wallInfo to wallHandle
 //instead of pressure or mass, allow only pressure input, because who wants mass anyway?
-	wall: function() {
-	//type, label, something about how data is input
-		var self = this;
-		this.labelText = 'Wall',
-		this.type = TYPES.wall,
-		this.id = DataManager.prototype.getWallId,
-		this.attrs = {
-			isBox: {
-				fields:{
-					isBox: {
-						type: 'checkbox',
-						extendable: false
-					},
-				},
-				procFields: function() {
-					
-					
-				},
-				children: undefined
-			}/*,
-			pts: {
-				type: Array
-			},
-			pos:
-				elementAttrs.pos,
-			dims:	
-				elementAttrs.dims,
-			handle:
-				elementAttrs.handle,
-			handler:
-				{type: String},
-			vol: 
-				{type: Number},
-			bounds:
-				{type: Object},
-			show:
-				{type: Boolean},
-			temp:
-				{type: Number}
-			//add some border stuff*/
-		}
-		
-	},
+
 	readoutEntry: function() {
 		// labelText: 'Readout entry',
 		// type: 'ReadoutEntry',
@@ -289,7 +247,66 @@ elementMD = {
 			
 		// }
 	
-	}
+	},
+	wall: function() {
+	//type, label, something about how data is input
+		this.containerDiv = undefined;
+		this.labelText = 'Wall',
+		this.type = TYPES.wall,
+		this.id = data.getWallId(),
+		this.attrs = {
+			isBox: {
+				type: 'checkbox',
+				title: 'Is box',
+				postText: undefined,
+				extendable: false,
+				value: undefined,
+				procFields: function(attr, field) {
+					attr.value = $(field).val();
+				},
+				
+			},
+			pts: {
+				type: 'folder',
+				title: 'Points',
+				fields: {
+					x: {
+						type: 'textarea',
+						title: 'X',
+						divId: undefined
+					},
+					y: {
+						type: 'textarea',
+						title: 'Y',
+						divId: undefined,
+					}
+				},
+				value: undefined,
+				procFields: function(attr, fields) {
+					attr.value = P($(fields.x).val(), $(fields.y).val());
+				}
+			},
+			/*
+			pos:
+				elementAttrs.pos,
+			dims:	
+				elementAttrs.dims,
+			handle:
+				elementAttrs.handle,
+			handler:
+				{type: String},
+			vol: 
+				{type: Number},
+			bounds:
+				{type: Object},
+			show:
+				{type: Boolean},
+			temp:
+				{type: Number}
+			//add some border stuff*/
+
+		}
+	},
 
 
 }
@@ -297,32 +314,47 @@ $(function() {
 	for (var mdName in elementMD) {
 		var md = elementMD[mdName];
 		_.extend(md.prototype, {
+			setContainerDiv: function(div) {
+				this.containerDiv = div;
+			},
 			genHTML: function() {
 				var html = '';
 				var indent = 0;
 				for (var attrName in this.attrs) {
-					this.genAttrHTML(this.attrs, attrName, indent);
+					html += this.genAttrHTML(this.attrs, attrName, this.id, indent);
 				}
+				this.containerDiv.append(templater.div({attrs:{id: [this.id]}, innerHTML: html}));
 			},
-			genAttrHTML: function(attrs, attrName, indent) {
-				
+			genAttrHTML: function(attrs, attrName, id, indent) {
+				id += '.' + attrName;
 				var attrHTML = '';
 				var attr = attrs[attrName];
-				var fields = attr.fields;
-				for (var fieldName in fields) {
-					var field = fields[fieldName];
-					attrHTML += this.genFieldHTML(field, indent);
+				if (attr.type == 'folder') {
+					for (var fieldName in attr.fields) {
+						attrHTML += this.getAttrHTML(attr.fields, fieldName, id, indent++);
+					}
+				} else {
+					attrHTML += this.getFieldHTML(attr, id, indent);
 				}
-				indent++;
-				for (var childName in children) {
-					attrHTML += this.genAttrHTML(children, childName, indent);
-				}
+
 				return attrHTML;
 				
 			},
-			genFieldHTML: function(field, indent) {
-				//and here's where the meat goes
+			genFieldHTML: function(field, id, indent) {
+				var fieldHTML = '';
+				//not worrying about indent just yet
+				fieldHTML += templater.br();
+				fieldHTML += field.title || '';
+				fieldHTML += templater.br();
+				if (field.type == 'checkbox') {
+					fieldHTML += templater.checkbox({attrs: {id: [id]}});
+					fieldHTML += field.postText || '';
+				} else if (field.type == 'textarea') {
+					fieldHTML += templater.textarea({attrs: {id: [id]}});
+					fieldHTML += field.postText || '';
+				}
+				return html;
 			}
-		}})
+		})
 	}
 })

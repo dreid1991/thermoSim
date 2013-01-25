@@ -43,6 +43,20 @@ Templater.prototype = {
 		obj ? obj.type = 'canvas' : obj = {type: 'canvas'};
 		return this.elem(obj);
 	},
+	input: function(obj) {
+		obj ? obj.type = 'input' : obj = {type: 'input'};
+		return this.elem(obj);
+	},
+	checkbox: function(obj) {
+		if (!obj) {
+			obj = {};
+		}
+		if (!obj.attrs) {
+			obj.attrs = {};
+		}
+		obj.attrs.type = ['checkbox'];
+		return this.input(obj);
+	},
 	style: function(obj) {
 		return this.styleTemp(obj);
 	},

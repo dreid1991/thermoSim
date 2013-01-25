@@ -71,7 +71,9 @@ $(document).mousemove(function(e) {
 
 
 window.onload = function() {
+	globalHTMLClass = 'editor';
 	$('#objDiv').hide();
+	templater = new Templater();
 	paper = Raphael('treeDiv', $('#treeDiv').width(), $('#treeDiv').height());
 	data = new DataManager();
 	tree = new Tree(paper, P(15, 15));

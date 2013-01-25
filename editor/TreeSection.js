@@ -2,16 +2,12 @@
 function TreeSection(tree, posInit, sectionDragFuncs, promptDragFuncs, clickFuncs, labelText, isPlacer, inheritedId) {
 	this.tree = tree;
 	this.prompts = [];
-	this.pos = posInit.copy();
-	this.sceneData = new SceneData();
-	this.initSectionIdx = undefined; //for dragging
-	this.mousePosInit = P(0, 0); //for dragging
-	this.sectionYs = []; //for dragging
 	this.sectionDragFuncs = sectionDragFuncs;
 	this.promptDragFuncs = promptDragFuncs;
 	this.clickFuncs = clickFuncs;
 	this.labelText = labelText;
 	this.isPlacer = isPlacer;
+	this.pos = posInit.copy();
 	this.button = new ArrowButton(this.tree, this, this.pos, this.sectionDragFuncs, this.clickFuncs, this.labelText, isPlacer);
 	if (inheritedId === undefined) {
 		this.id = data.getSectionId();
@@ -19,6 +15,13 @@ function TreeSection(tree, posInit, sectionDragFuncs, promptDragFuncs, clickFunc
 	} else {
 		this.id = inheritedId;
 	}
+	if ($('#' + this.id).length) {
+		$('#objDiv').append(templater.div({attrs: {id: [this.id]}}));
+	}
+	this.sceneData = new SceneData($('#' + this.id));
+	this.initSectionIdx = undefined; //for dragging
+	this.mousePosInit = P(0, 0); //for dragging
+	this.sectionYs = []; //for dragging
  
 }
 /*

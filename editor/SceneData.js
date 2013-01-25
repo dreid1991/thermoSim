@@ -14,60 +14,57 @@ TYPES = {
 
 }
 
-function SceneData() {
+function SceneData(sceneDiv) {
+	this.sceneDiv = sceneDiv;
 	this.type = undefined;
-	this.title = undefined;
-	this.genInfo = undefined;
-	this.quiz = undefined;
-	this.walls = [];
-	this.listeners = [];
-	this.objects = [];
-	this.dots = [];
-	this.readoutEntries = [];
-	this.records = [];
-	this.commands = []; //for gravity, attractions,
-	this.html = {
-		title: undefined,
-		genInfo: undefined,
-		quiz: undefined,
-		walls: undefined,
-		dots: undefined,
-		objects: undefined,
-		readoutEntries: undefined,
-		listeners: undefined,
-		records: undefined,
-		commands: undefined,
-		
-	};
+	this.containers = { //this will be the order they appear in
+		title: {contents: undefined, div: undefined},
+		genInfo: {contents: undefined, div: undefined},
+		quiz: {contents: undefined, div: undefined},
+		walls: {contents: [], div: undefined},
+		listeners: {contents: [], div: undefined},
+		objects: {contents: [], div: undefined},
+		dots: {contents: [], div: undefined},
+		readoutEntries: {contents: [], div: undefined},
+		records: {contents: [], div: undefined},
+		commands: {contents: [], div: undefined},
+	}
+	this.divs = this.genDivs(this.sceneDiv, this.containers)
 
 }
-//type will be defined on run based on block position
 
 _.extend(SceneData.prototype, updateValue = {
 	addElement: function(md) {
 		var elem = new md();
-		elem.id = elem.id.apply(data);
+		
 		this.pushToList(elem);
 	},
 	pushToList: function(elem) {
 		var type = elem.type;
 		if (type == TYPES.wall) {
-			this.walls.push(elem);
+			this.walls.contents.push(elem);
 		} else if (type == TYPES.dots) {
-			this.dots.push(elem);
+			this.dots.contents.push(elem);
 		} else if (type == TYPES.listener) {
-			this.listeners.push(elem);
+			this.listeners.contents.push(elem);
 		} else if (type == TYPES.entry) {
-			this.readoutEntries.push(elem);
+			this.readoutEntries.contents.push(elem);
 		} else if (type == TYPES.cmmd) {
-			this.commands.push(elem);
+			this.commands.contents.push(elem);
 		} else if (type == TYPES.record) {
-			this.records.push(elem);
+			this.records.contents.push(elem);
 		} else {
-			this.objects.push(elem);
+			this.objects.contents.push(elem);
 		}
 	},
-	renderElem: function(elem) {
+	genDivs: function(sceneDiv, containers) {
+		var sceneId = $(sceneDiv).attr('id');
+		for (var typeName in containers) {
+			var id = sceneId + '.' + typeName;
+			$(sceneDiv).append(templater.div({attrs: {id: [id]}}));
+			containers[typeName].div = $('#' + id);
+		}
+	}
 
 
 });
