@@ -312,6 +312,7 @@ elementMD = {
 
 
 }
+//if a folder, fields will be object, else field is just a jquery object
 $(function() {
 	for (var mdName in elementMD) {
 		var md = elementMD[mdName];
@@ -325,7 +326,9 @@ $(function() {
 				for (var attrName in this.attrs) {
 					html += this.genAttrHTML(this.attrs, attrName, this.id, indent);
 				}
-				this.containerDiv.append(templater.div({attrs:{id: [this.id]}, innerHTML: html}));
+				this.elemWrapper = templater.div({attrs:{id: [this.id]}, innerHTML: html});
+				this.containerDiv.append(this.elemWrapper);
+				this.bindFuncs();
 			},
 			genAttrHTML: function(attrs, attrName, id, indent) {
 				id += '_' + attrName;
@@ -356,7 +359,36 @@ $(function() {
 					fieldHTML += field.postText || '';
 				}
 				return fieldHTML;
-			}
+			},
+			bindFuncs: function() {
+				for (var attrName in this.attrs) {
+					var id = $(this.elemWrapper).attr('id');
+					var attr = this.attrs[attrName];
+					var func = attr.procFields;
+					if (attr.type == 'folder') {
+						var fields = {}
+						this.appendFolderContents(attr, fields, id + '_' + attrName, attr, fields, func);
+					} else {
+						this.bindFunc($('#' + id + '_' + attrName), attr, $('#' + id + '_' + attrName), func);
+					}
+				}
+			},
+			appendFolderContents: function(attr, fields, id, topAttrs, topFields, func) {
+				for (var fieldName in attr.fields) {
+					var field = attr.fields[fieldName];
+					if (field.type == 'folder') {
+						fields[fieldName] = {};
+						this.appendFolderContents(attr[attrName], fields[attrName], id + '_' + attrName, topAttrs, topFields, func);
+					} else {
+						fields[fieldName] = $('#' + id + '_' + fieldName);
+						this.bindFunc($(fields[fieldName]), topAttrs, topFields, func);
+					}
+				}
+			},
+			bindFunc: function(div, attr, fields, func) {
+				var self = this;
+				$(div).change(function() {func.apply(self, [attr, fields])});
+			},
 		})
 	}
 })
