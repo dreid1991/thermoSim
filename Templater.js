@@ -32,8 +32,7 @@ Templater.prototype = {
 		return this.elem(obj);
 	},
 	br: function(obj) {
-		obj ? obj.type = 'br' : obj = {type: 'br'};
-		return this.elem(obj);
+		return '<br>';
 	},
 	center: function(obj) {
 		obj ? obj.type = 'center' : obj = {type: 'center'};

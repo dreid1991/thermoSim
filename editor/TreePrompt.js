@@ -18,7 +18,7 @@ function TreePrompt(tree, section, posInit, dragFuncs, clickFuncs, labelText, in
 		this.id = inheritedId;
 	}
 	this.section = section;
-	if ($('#' + this.id).length) {
+	if (!$('#' + this.id).length) {
 		$('#objDiv').append(templater.div({attrs: {id: [this.id]}}));
 	}
 	this.sceneData = new SceneData($('#' + this.id));

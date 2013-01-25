@@ -14,6 +14,7 @@ TYPES = {
 
 }
 
+
 function SceneData(sceneDiv) {
 	this.sceneDiv = sceneDiv;
 	this.type = undefined;
@@ -36,31 +37,36 @@ function SceneData(sceneDiv) {
 _.extend(SceneData.prototype, updateValue = {
 	addElement: function(md) {
 		var elem = new md();
-		
-		this.pushToList(elem);
+		var container = this.pushToList(elem);
+		elem.setContainer(container.div);
+		elem.genHTML();
 	},
 	pushToList: function(elem) {
 		var type = elem.type;
+		var container;
 		if (type == TYPES.wall) {
-			this.walls.contents.push(elem);
+			container = this.containers.walls;
 		} else if (type == TYPES.dots) {
-			this.dots.contents.push(elem);
+			tcontainer = this.containers.dots;
 		} else if (type == TYPES.listener) {
-			this.listeners.contents.push(elem);
+			container = this.containers.listeners;
 		} else if (type == TYPES.entry) {
-			this.readoutEntries.contents.push(elem);
+			container = this.containers.readoutEntries;
 		} else if (type == TYPES.cmmd) {
-			this.commands.contents.push(elem);
+			container = this.containers.commands;
 		} else if (type == TYPES.record) {
-			this.records.contents.push(elem);
+			container = this.containers.records;
 		} else {
-			this.objects.contents.push(elem);
+			container = this.containers.objects;
 		}
+		container.contents.push(elem);
+		return container;
+
 	},
 	genDivs: function(sceneDiv, containers) {
 		var sceneId = $(sceneDiv).attr('id');
 		for (var typeName in containers) {
-			var id = sceneId + '.' + typeName;
+			var id = sceneId + '_' + typeName;
 			$(sceneDiv).append(templater.div({attrs: {id: [id]}}));
 			containers[typeName].div = $('#' + id);
 		}

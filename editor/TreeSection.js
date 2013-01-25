@@ -15,7 +15,7 @@ function TreeSection(tree, posInit, sectionDragFuncs, promptDragFuncs, clickFunc
 	} else {
 		this.id = inheritedId;
 	}
-	if ($('#' + this.id).length) {
+	if (!$('#' + this.id).length) {
 		$('#objDiv').append(templater.div({attrs: {id: [this.id]}}));
 	}
 	this.sceneData = new SceneData($('#' + this.id));

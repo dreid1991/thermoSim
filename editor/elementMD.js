@@ -248,12 +248,14 @@ elementMD = {
 		// }
 	
 	},
-	wall: function() {
+	wall: function(attrs) {
+		attrs = attrs || {};
 	//type, label, something about how data is input
 		this.containerDiv = undefined;
-		this.labelText = 'Wall',
-		this.type = TYPES.wall,
-		this.id = data.getWallId(),
+		this.labelText = 'Wall';
+		if (attrs.returnLabel) return this.labelText;
+		this.type = TYPES.wall;
+		this.id = data.getWallId();
 		this.attrs = {
 			isBox: {
 				type: 'checkbox',
@@ -314,7 +316,7 @@ $(function() {
 	for (var mdName in elementMD) {
 		var md = elementMD[mdName];
 		_.extend(md.prototype, {
-			setContainerDiv: function(div) {
+			setContainer: function(div) {
 				this.containerDiv = div;
 			},
 			genHTML: function() {
@@ -326,15 +328,15 @@ $(function() {
 				this.containerDiv.append(templater.div({attrs:{id: [this.id]}, innerHTML: html}));
 			},
 			genAttrHTML: function(attrs, attrName, id, indent) {
-				id += '.' + attrName;
+				id += '_' + attrName;
 				var attrHTML = '';
 				var attr = attrs[attrName];
 				if (attr.type == 'folder') {
 					for (var fieldName in attr.fields) {
-						attrHTML += this.getAttrHTML(attr.fields, fieldName, id, indent++);
+						attrHTML += this.genAttrHTML(attr.fields, fieldName, id, indent++);
 					}
 				} else {
-					attrHTML += this.getFieldHTML(attr, id, indent);
+					attrHTML += this.genFieldHTML(attr, id, indent);
 				}
 
 				return attrHTML;
@@ -350,10 +352,10 @@ $(function() {
 					fieldHTML += templater.checkbox({attrs: {id: [id]}});
 					fieldHTML += field.postText || '';
 				} else if (field.type == 'textarea') {
-					fieldHTML += templater.textarea({attrs: {id: [id]}});
+					fieldHTML += templater.textarea({attrs: {id: [id], rows: [1]}});
 					fieldHTML += field.postText || '';
 				}
-				return html;
+				return fieldHTML;
 			}
 		})
 	}

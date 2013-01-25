@@ -41,7 +41,7 @@ ElementAdder.prototype = {
 		var dropdown = new Dropdown(this.paper, this.tree, 'elementAdder', this.pos, this.buttonDims, this.labelText, this.rectCol, this.rectColHover);
 		for (var idx=0; idx<this.elems.length; idx++) {
 			var elem = this.elems[idx];
-			dropdown.addItem(elem.labelText, this.makeClickFunc(elem));
+			dropdown.addItem(elem({returnLabel: 'true'}), this.makeClickFunc(elem));
 		}
 		return dropdown;
 	},
