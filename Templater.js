@@ -31,12 +31,31 @@ Templater.prototype = {
 		obj ? obj.type = 'p' : obj = {type: 'p'};
 		return this.elem(obj);
 	},
-	br: function(obj) {
+	br: function() {
 		return '<br>';
+	},
+	tab: function() {
+		return '&#09;';
+	},
+	table: function(obj) {
+		obj ? obj.type = 'table' : obj = {type: 'table'};
+		return this.elem(obj);
+	},
+	tr: function(obj) {
+		obj ? obj.type = 'tr' : obj = {type: 'tr'};
+		return this.elem(obj);
+	},
+	td: function(obj) {
+		obj ? obj.type = 'td' : obj = {type: 'td'};
+		return this.elem(obj);
 	},
 	center: function(obj) {
 		obj ? obj.type = 'center' : obj = {type: 'center'};
 		return this.elem(obj);
+	},
+	label: function(obj) {
+		obj ? obj.type = 'label' : obj = {type: 'label'};
+		return this.elem(obj);	
 	},
 	canvas: function(obj) {
 		obj ? obj.type = 'canvas' : obj = {type: 'canvas'};

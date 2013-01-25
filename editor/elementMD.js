@@ -259,8 +259,9 @@ elementMD = {
 		this.attrs = {
 			isBox: {
 				type: 'checkbox',
-				title: 'Is box',
+				title: 'Is box: ',
 				postText: undefined,
+				inline: true,
 				extendable: false,
 				value: undefined,
 				procFields: function(attr, field) {
@@ -270,17 +271,24 @@ elementMD = {
 			},
 			pts: {
 				type: 'folder',
-				title: 'Points',
+				title: 'Points: ',
+				fieldsInline: true, //true means there won't be a break between each field
 				fields: {
 					x: {
 						type: 'textarea',
-						title: 'X',
-						divId: undefined
+						title: 'X: ',
+						divId: undefined,
+						rows: 1,
+						inline: true, //true means there won't be a break between that field's label and its input
+						cols: 5
 					},
 					y: {
 						type: 'textarea',
-						title: 'Y',
+						title: 'Y: ',
 						divId: undefined,
+						inline: true,
+						rows: 1,
+						cols: 5
 					}
 				},
 				value: undefined,
@@ -321,44 +329,50 @@ $(function() {
 				this.containerDiv = div;
 			},
 			genHTML: function() {
-				var html = '';
+				var menuItems = [];
 				var indent = 0;
 				for (var attrName in this.attrs) {
-					html += this.genAttrHTML(this.attrs, attrName, this.id, indent);
+					menuItems.push(this.genAttrHTML(this.attrs, attrName, this.id, indent));
 				}
-				this.elemWrapper = templater.div({attrs:{id: [this.id]}, innerHTML: html});
+				this.elemWrapper = templater.div({attrs:{id: [this.id]}, innerHTML: renderMenuItem(this.wrapMenu(menuItems))});
 				this.containerDiv.append(this.elemWrapper);
 				this.bindFuncs();
 			},
 			genAttrHTML: function(attrs, attrName, id, indent) {
 				id += '_' + attrName;
-				var attrHTML = '';
+				var attrHTML = undefined
 				var attr = attrs[attrName];
 				if (attr.type == 'folder') {
+					var folder = {title: undefined, content: [], type: 'folder'};
+					folder.title = this.genFolderHTML(attr);
+					folder.fieldsInline = attr.fieldsInline;
 					for (var fieldName in attr.fields) {
-						attrHTML += this.genAttrHTML(attr.fields, fieldName, id, indent++);
+						folder.content.push(this.genAttrHTML(attr.fields, fieldName, id, indent++));
 					}
+					attrHTML = folder;
 				} else {
-					attrHTML += this.genFieldHTML(attr, id, indent);
+					attrHTML = this.genFieldHTML(attr, id, indent);
 				}
 
 				return attrHTML;
 				
 			},
 			genFieldHTML: function(field, id, indent) {
-				var fieldHTML = '';
-				//not worrying about indent just yet
-				fieldHTML += templater.br();
-				fieldHTML += field.title || '';
-				fieldHTML += templater.br();
+				var title, input, post;
+				
+				title = field.title ? templater.label({attrs:{'for': [id]}, style: {display: 'inline-block'}, innerHTML: field.title}) : '';
+				
 				if (field.type == 'checkbox') {
-					fieldHTML += templater.checkbox({attrs: {id: [id]}});
-					fieldHTML += field.postText || '';
+					input = templater.checkbox({attrs: {id: [id]}});
+					post = field.postText || '';
 				} else if (field.type == 'textarea') {
-					fieldHTML += templater.textarea({attrs: {id: [id], rows: [1]}});
-					fieldHTML += field.postText || '';
+					input = templater.textarea({attrs: {id: [id], rows: [field.rows || 1], cols: [field.cols || 7]}});
+					post = field.postText || '';
 				}
-				return fieldHTML;
+				return {title: title, indent: indent, input: input, post: post, type: 'field', inline: field.inline};
+			},
+			genFolderHTML: function(attr) {
+				return attr.title;
 			},
 			bindFuncs: function() {
 				for (var attrName in this.attrs) {
@@ -389,6 +403,48 @@ $(function() {
 				var self = this;
 				$(div).change(function() {func.apply(self, [attr, fields])});
 			},
+			wrapMenu: function(menuItems) {
+				return {title: this.labelText, content: menuItems, type: 'folder'}
+			}
 		})
 	}
 })
+
+
+function renderMenuItem(item) {
+	if (item.type == 'folder') {
+		var titleDiv = templater.div({innerHTML: item.title});
+		var content = item.content;
+		var contentHTML = [];
+		for (var contentIdx=0; contentIdx<content.length; contentIdx++) {
+			contentHTML.push(renderMenuItem(content[contentIdx]));
+		}
+		var returnHTML = '';
+		if (item.fieldsInline) {
+			for (var htmlIdx=0; htmlIdx<contentHTML.length; htmlIdx++) {
+				returnHTML += templater.div({innerHTML: contentHTML[htmlIdx], style: {display: 'inline-block'}});
+			}			
+		} else {
+			for (var htmlIdx=0; htmlIdx<contentHTML.length; htmlIdx++) {
+				returnHTML += templater.div({innerHTML: contentHTML[htmlIdx]});
+			}
+		}
+		returnHTML = templater.div({innerHTML: titleDiv + returnHTML});
+		return returnHTML;
+	} else {
+		if (item.inline) {
+			//wrapping in a table to make input boxes and labels line up nicely
+			return templater.div({innerHTML: 
+				templater.table({innerHTML: 
+					templater.tr({innerHTML: 
+						templater.td({innerHTML: item.title}) + 
+						templater.td({innerHTML: templater.div({innerHTML: item.input, style: {display: 'inline-block'}})}) +
+						templater.td({innerHTML: item.post || ''})
+					})
+				})
+			});
+		} else {
+			return templater.div({innerHTML: item.title + templater.div({innerHTML: item.input}) + (item.post || '')});
+		}
+	}
+}
