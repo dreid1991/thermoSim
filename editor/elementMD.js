@@ -256,7 +256,7 @@ elementMD = {
 		if (attrs.returnLabel) return this.labelText;
 		this.type = TYPES.wall;
 		this.id = data.getWallId();
-		this.attrs = {
+		this.fields = {
 			isBox: {
 				type: 'checkbox',
 				title: 'Is box: ',
@@ -277,23 +277,29 @@ elementMD = {
 					x: {
 						type: 'textarea',
 						title: 'X:',
-						divId: undefined,
-						rows: 1,
 						inline: true, //true means there won't be a break between that field's label and its input
-						cols: 5
+						rows: 1,
+						cols: 5,
+						val: undefined,
+						process: function(attr, field) {
+							attr.value = $(fields).val();
+						}
 					},
 					y: {
 						type: 'textarea',
 						title: 'Y:',
-						divId: undefined,
 						inline: true,
 						rows: 1,
-						cols: 5
+						cols: 5,
+						val: undefined,
+						process: function(attr, field) {
+							attr.value = $(fields).val();
+						}
 					}
 				},
-				value: undefined,
-				procFields: function(attr, fields) {
-					attr.value = P($(fields.x).val(), $(fields.y).val());
+				val: undefined,
+				process: function(attr, children) {
+					attr.val = P(children.x.val, children.y.val);
 				}
 			},
 			/*
@@ -325,39 +331,41 @@ $(function() {
 	for (var mdName in elementMD) {
 		var md = elementMD[mdName];
 		_.extend(md.prototype, {
+			val: {},
+			isTop: true,
+			type: 'folder',
 			setContainer: function(div) {
 				this.containerDiv = div;
 			},
 			genHTML: function() {
 				var menuItems = [];
-				var indent = 0;
-				for (var attrName in this.attrs) {
-					menuItems.push(this.genAttrHTML(this.attrs, attrName, this.id, indent));
+				for (var fieldName in this.fields) {
+					menuItems.push(this.genAttrHTML(this.fields, fieldName, this.id));
 				}
-				this.elemWrapper = templater.div({attrs:{id: [this.id]}, innerHTML: renderMenuItem(this.wrapMenu(menuItems))});
+				this.elemWrapper = templater.div({attrs:{id: [this.id]}, innerHTML: this.assembleItems(this.wrapMenu(menuItems))});
 				this.containerDiv.append(this.elemWrapper);
-				this.bindFuncs();
+				this.bindFuncs(this, $(this.elemWrapper).attr('id'));
 			},
-			genAttrHTML: function(attrs, attrName, id, indent) {
-				id += '_' + attrName;
+			genAttrHTML: function(fields, fieldName, id) {
+				id += '_' + fieldName;
 				var attrHTML = undefined
-				var attr = attrs[attrName];
-				if (attr.type == 'folder') {
+				var field = fields[fieldName];
+				if (field.type == 'folder') {
 					var folder = {title: undefined, content: [], type: 'folder'};
-					folder.title = this.genFolderHTML(attr);
-					folder.fieldsInline = attr.fieldsInline;
-					for (var fieldName in attr.fields) {
-						folder.content.push(this.genAttrHTML(attr.fields, fieldName, id, indent++));
+					folder.title = this.genFolderHTML(field);
+					folder.fieldsInline = field.fieldsInline;
+					for (var subFieldName in field.fields) {
+						folder.content.push(this.genAttrHTML(field.fields, subFieldName, id));
 					}
 					attrHTML = folder;
 				} else {
-					attrHTML = this.genFieldHTML(attr, id, indent);
+					attrHTML = this.genFieldHTML(field, id);
 				}
 
 				return attrHTML;
 				
 			},
-			genFieldHTML: function(field, id, indent) {
+			genFieldHTML: function(field, id) {
 				var title, input, post;
 				
 				title = field.title ? templater.label({attrs:{'for': [id]}, style: {display: 'inline-block'}, innerHTML: field.title}) : '';
@@ -369,23 +377,42 @@ $(function() {
 					input = templater.textarea({attrs: {id: [id], rows: [field.rows || 1], cols: [field.cols || 7]}});
 					post = field.postText || '';
 				}
-				return {title: title, indent: indent, input: input, post: post, type: 'field', inline: field.inline};
+				return {title: title, input: input, post: post, type: 'field', inline: field.inline};
 			},
-			genFolderHTML: function(attr) {
-				return attr.title;
+			genFolderHTML: function(field) {
+				return field.title;
 			},
-			bindFuncs: function() {
-				for (var attrName in this.attrs) {
-					var id = $(this.elemWrapper).attr('id');
-					var attr = this.attrs[attrName];
-					var func = attr.procFields;
-					if (attr.type == 'folder') {
-						var fields = {}
-						this.appendFolderContents(attr, fields, id + '_' + attrName, attr, fields, func);
-					} else {
-						this.bindFunc($('#' + id + '_' + attrName), attr, $('#' + id + '_' + attrName), func);
+			bindFuncs: function(field, id, parent, fieldName, children) {
+				//was dealing with id from top
+				var func = field.process;
+				if (field.type == 'folder') {
+					var children = {};
+					var subFields = field.fields;
+					for (var subFieldName in subFields) {
+						var subField = subFields[subFieldName];
+						this.bindFuncs(subField, id/*dostuff*/, field, subFieldName, children);
+						
 					}
+				} else {
+					children[fieldName] = field;
+					this.bindInput($('#' + id + '_' + fieldName), field, parent, func);
 				}
+			
+				// for (var fieldName in this.fields) {
+					// var id = $(this.elemWrapper).attr('id');
+					// var field = this.fields[fieldName];
+					// var func = field.procFields;
+					// if (field.type == 'folder') {
+						// var subFields = {}
+						// this.appendFolderContents(field, subFields, id + '_' + fieldName, field, subFields, func);
+					// } else {
+						// this.bindFunc($('#' + id + '_' + fieldName), attr, $('#' + id + '_' + fieldName), func);
+					// }
+				// }
+			},
+			bindInput: function(div, field, parent, func) {
+				var self = this;
+				$(div).change(function() {func.apply(self, [field, div]); parent.process.apply(self)});
 			},
 			appendFolderContents: function(attr, fields, id, topAttrs, topFields, func) {
 				for (var fieldName in attr.fields) {
@@ -399,53 +426,51 @@ $(function() {
 					}
 				}
 			},
-			bindFunc: function(div, attr, fields, func) {
-				var self = this;
-				$(div).change(function() {func.apply(self, [attr, fields])});
-			},
+			// bindFunc: function(div, attr, fields, func) {
+				// var self = this;
+				// $(div).change(function() {func.apply(self, [attr, fields])});
+			// },
 			wrapMenu: function(menuItems) {
 				return {title: this.labelText, content: menuItems, type: 'folder'}
+			},
+			assembleItems: function(item) {
+				if (item.type == 'folder') {
+					//
+					var titleDiv = templater.div({innerHTML: item.title});
+					var content = item.content;
+					var contentHTML = [];
+					for (var contentIdx=0; contentIdx<content.length; contentIdx++) {
+						contentHTML.push(this.assembleItems(content[contentIdx]));
+					}
+					var returnHTML = '';
+					if (item.fieldsInline) {
+						for (var htmlIdx=0; htmlIdx<contentHTML.length; htmlIdx++) {
+							returnHTML += templater.div({innerHTML: contentHTML[htmlIdx], style: {display: 'inline-block'}});
+						}			
+					} else {
+						for (var htmlIdx=0; htmlIdx<contentHTML.length; htmlIdx++) {
+							returnHTML += templater.div({innerHTML: contentHTML[htmlIdx]});
+						}
+					}
+					returnHTML = templater.div({innerHTML: titleDiv + templater.div({innerHTML: returnHTML, style: {position: 'relative', left: '1.5em'}})});
+					return returnHTML;
+				} else {
+					if (item.inline) {
+						//wrapping in a table to make input boxes and labels line up nicely
+						return templater.div({innerHTML: 
+							templater.table({attrs: {cellspacing: [0], border: [0], bordercolor: ['red']}, innerHTML: 
+								templater.tr({innerHTML: 
+									templater.td({innerHTML: item.title + '&nbsp;&nbsp;'}) + 
+									templater.td({innerHTML: templater.div({innerHTML: item.input})}) +
+									templater.td({innerHTML: item.post || ''})
+								})
+							})
+						});
+					} else {
+						return templater.div({innerHTML: item.title + templater.div({innerHTML: item.input}) + (item.post || '')});
+					}
+				}			
 			}
 		})
 	}
 })
-
-
-function renderMenuItem(item) {
-	if (item.type == 'folder') {
-		//
-		var titleDiv = templater.div({innerHTML: item.title});
-		var content = item.content;
-		var contentHTML = [];
-		for (var contentIdx=0; contentIdx<content.length; contentIdx++) {
-			contentHTML.push(renderMenuItem(content[contentIdx]));
-		}
-		var returnHTML = '';
-		if (item.fieldsInline) {
-			for (var htmlIdx=0; htmlIdx<contentHTML.length; htmlIdx++) {
-				returnHTML += templater.div({innerHTML: contentHTML[htmlIdx], style: {display: 'inline-block'}});
-			}			
-		} else {
-			for (var htmlIdx=0; htmlIdx<contentHTML.length; htmlIdx++) {
-				returnHTML += templater.div({innerHTML: contentHTML[htmlIdx]});
-			}
-		}
-		returnHTML = templater.div({innerHTML: titleDiv + templater.div({innerHTML: returnHTML, style: {position: 'relative', left: '1.5em'}})});
-		return returnHTML;
-	} else {
-		if (item.inline) {
-			//wrapping in a table to make input boxes and labels line up nicely
-			return templater.div({innerHTML: 
-				templater.table({attrs: {cellspacing: [0], border: [0], cellPadding: [0], bordercolor: ['red']}, innerHTML: 
-					templater.tr({innerHTML: 
-						templater.td({innerHTML: item.title + '&nbsp;&nbsp;'}) + 
-						templater.td({innerHTML: templater.div({innerHTML: item.input})}) +
-						templater.td({innerHTML: item.post || ''})
-					})
-				})
-			});
-		} else {
-			return templater.div({innerHTML: item.title + templater.div({innerHTML: item.input}) + (item.post || '')});
-		}
-	}
-}
