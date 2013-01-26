@@ -276,7 +276,7 @@ elementMD = {
 				fields: {
 					x: {
 						type: 'textarea',
-						title: 'X: ',
+						title: 'X:',
 						divId: undefined,
 						rows: 1,
 						inline: true, //true means there won't be a break between that field's label and its input
@@ -284,7 +284,7 @@ elementMD = {
 					},
 					y: {
 						type: 'textarea',
-						title: 'Y: ',
+						title: 'Y:',
 						divId: undefined,
 						inline: true,
 						rows: 1,
@@ -413,6 +413,7 @@ $(function() {
 
 function renderMenuItem(item) {
 	if (item.type == 'folder') {
+		//
 		var titleDiv = templater.div({innerHTML: item.title});
 		var content = item.content;
 		var contentHTML = [];
@@ -429,16 +430,16 @@ function renderMenuItem(item) {
 				returnHTML += templater.div({innerHTML: contentHTML[htmlIdx]});
 			}
 		}
-		returnHTML = templater.div({innerHTML: titleDiv + returnHTML});
+		returnHTML = templater.div({innerHTML: titleDiv + templater.div({innerHTML: returnHTML, style: {position: 'relative', left: '1.5em'}})});
 		return returnHTML;
 	} else {
 		if (item.inline) {
 			//wrapping in a table to make input boxes and labels line up nicely
 			return templater.div({innerHTML: 
-				templater.table({innerHTML: 
+				templater.table({attrs: {cellspacing: [0], border: [0], cellPadding: [0], bordercolor: ['red']}, innerHTML: 
 					templater.tr({innerHTML: 
-						templater.td({innerHTML: item.title}) + 
-						templater.td({innerHTML: templater.div({innerHTML: item.input, style: {display: 'inline-block'}})}) +
+						templater.td({innerHTML: item.title + '&nbsp;&nbsp;'}) + 
+						templater.td({innerHTML: templater.div({innerHTML: item.input})}) +
 						templater.td({innerHTML: item.post || ''})
 					})
 				})
