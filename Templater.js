@@ -66,12 +66,8 @@ Templater.prototype = {
 		return this.elem(obj);
 	},
 	checkbox: function(obj) {
-		if (!obj) {
-			obj = {};
-		}
-		if (!obj.attrs) {
-			obj.attrs = {};
-		}
+		obj = obj || {};
+		obj.attrs = obj.attrs || {};
 		obj.attrs.type = ['checkbox'];
 		return this.input(obj);
 	},

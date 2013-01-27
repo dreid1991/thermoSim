@@ -42,7 +42,7 @@ _.extend(SceneData.prototype, updateValue = {
 		elem.genHTML();
 	},
 	pushToList: function(elem) {
-		var type = elem.type;
+		var type = elem.objType;
 		var container;
 		if (type == TYPES.wall) {
 			container = this.containers.walls;
