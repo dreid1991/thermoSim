@@ -254,8 +254,15 @@ elementMD = {
 		this.containerDiv = undefined;
 		this.labelText = 'Wall';
 		if (attrs.returnLabel) return this.labelText;
-		this.type = TYPES.wall;
+		this.objType = TYPES.wall;
+		this.type = 'folder';
 		this.id = data.getWallId();
+		this.val = {};
+		this.process = function(attr, children) {
+			for (var childName in children) {
+				attr.val[childName] = children[childName].val;
+			}
+		},
 		this.fields = {
 			isBox: {
 				type: 'checkbox',
@@ -263,9 +270,9 @@ elementMD = {
 				postText: undefined,
 				inline: true,
 				extendable: false,
-				value: undefined,
-				procFields: function(attr, field) {
-					attr.value = $(field).val();
+				val: undefined,
+				process: function(attr, field) {
+					attr.val = $(field).is(':checked')
 				},
 				
 			},
@@ -282,7 +289,7 @@ elementMD = {
 						cols: 5,
 						val: undefined,
 						process: function(attr, field) {
-							attr.value = $(fields).val();
+							attr.val = $(field).val();
 						}
 					},
 					y: {
@@ -293,7 +300,7 @@ elementMD = {
 						cols: 5,
 						val: undefined,
 						process: function(attr, field) {
-							attr.value = $(fields).val();
+							attr.val = $(field).val();
 						}
 					}
 				},
@@ -382,7 +389,7 @@ $(function() {
 			genFolderHTML: function(field) {
 				return field.title;
 			},
-			bindFuncs: function(field, id, parent, fieldName, children) {
+			bindFuncs: function(field, id, parent, fieldName) {
 				//was dealing with id from top
 				var func = field.process;
 				if (field.type == 'folder') {
@@ -390,25 +397,29 @@ $(function() {
 					var subFields = field.fields;
 					for (var subFieldName in subFields) {
 						var subField = subFields[subFieldName];
-						this.bindFuncs(subField, id/*dostuff*/, field, subFieldName, children);
+						children[subFieldName] = subField;
+						this.bindFolder(field, parent, children);
+						var childId = fieldName ? id + '_' + fieldName : id;
+						this.bindFuncs(subField, childId, field, subFieldName);
 						
 					}
 				} else {
-					children[fieldName] = field;
 					this.bindInput($('#' + id + '_' + fieldName), field, parent, func);
 				}
-			
-				// for (var fieldName in this.fields) {
-					// var id = $(this.elemWrapper).attr('id');
-					// var field = this.fields[fieldName];
-					// var func = field.procFields;
-					// if (field.type == 'folder') {
-						// var subFields = {}
-						// this.appendFolderContents(field, subFields, id + '_' + fieldName, field, subFields, func);
-					// } else {
-						// this.bindFunc($('#' + id + '_' + fieldName), attr, $('#' + id + '_' + fieldName), func);
-					// }
-				// }
+			},
+			bindFolder: function(field, parent, children) {
+				var oldProcess = field.process;
+				var self = this;
+				if (parent) {
+					field.process = function() {
+						oldProcess.apply(self, [field, children]);
+						parent.process();
+					}
+				} else {
+					field.process = function() {
+						oldProcess.apply(self, [field, children])
+					}
+				}
 			},
 			bindInput: function(div, field, parent, func) {
 				var self = this;
