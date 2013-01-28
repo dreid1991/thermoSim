@@ -8,7 +8,7 @@ Templater.prototype = {
 		obj.style = obj.style || undefined;
 		obj.innerHTML = obj.innerHTML || '';
 		!obj.attrs.class ? obj.attrs.class = [globalHTMLClass] : obj.attrs.class.push(globalHTMLClass);
-		
+		obj.templater = this;
 		return this.elemTemp(obj);
 	},
 	img: function(obj) {

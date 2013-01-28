@@ -279,6 +279,7 @@ elementMD = {
 			pts: {
 				type: 'folder',
 				title: 'Points: ',
+				extendable: true,
 				fieldsInline: true, //true means there won't be a break between each field
 				fields: {
 					x: {
@@ -306,6 +307,8 @@ elementMD = {
 				},
 				val: undefined,
 				process: function(attr, children) {
+					attr.val = [];
+					//for (var childIdx=0; is list now
 					attr.val = P(children.x.val, children.y.val);
 				}
 			},
@@ -342,6 +345,7 @@ $(function() {
 			folderArrowDim: 13,
 			stdExts: {
 				content: 'content',
+				header: 'header',
 				title: 'title',
 				wrapper: 'wrapper',
 				expander: 'expander',
@@ -350,75 +354,82 @@ $(function() {
 			setContainer: function(div) {
 				this.containerDiv = div;
 			},
-			//So first I assemble the HTML in getAttrHTML as some js objects with types, content, and html blocks for the input and titles.  
-			//Then assembleItems puts it together into one big html string.
-			//Then bindFuncs binds change and process functions to changes bubble up through the folders
-			//folder has attrs: title, content, type, id.  Id is for the title and content divs.  They are theId_std_(content|title) 
-			//input has attrs: title, input, post, type, inline.  Title, input, and post and the three html blocks.  Before the input, the input, after the input.  type is 'field'
-			genHTML: function() {
-				var menuItems = [];
-				for (var fieldName in this.fields) {
-					menuItems.push(this.genAttrHTML(this.fields, fieldName, this.id));
-				}
-				this.elemWrapper = templater.div({attrs:{id: [this.id]}, innerHTML: this.assembleItems(this.wrapMenu(menuItems))});
-				this.containerDiv.append(this.elemWrapper);
-				this.bindFuncs(this, $(this.elemWrapper).attr('id'));
-				this.bindExpanders();
-			},
-			genAttrHTML: function(fields, fieldName, id) {
-				id += '_' + fieldName;
-				var attrHTML = undefined
-				var field = fields[fieldName];
-				if (field.type == 'folder') {
-					var folder = {title: undefined, content: [], type: 'folder', id: id};
-					folder.title = this.genFolderHTML(field);
-					folder.fieldsInline = field.fieldsInline;
-					for (var subFieldName in field.fields) {
-						folder.content.push(this.genAttrHTML(field.fields, subFieldName, id));
-					}
-					attrHTML = folder;
-				} else {
-					attrHTML = this.genFieldHTML(field, id);
-				}
 
-				return attrHTML;
-				
+			//only folders can be extendable.  Non-folders and single inputs
+			
+			//Take 2
+			genHTML: function() {
+				var wrapperDiv = $(templater.div({attrs: {id: [[this.id, 'std', this.stdExts.wrapper].join('_')]}}));
+				this.containerDiv.append(wrapperDiv);
+				this.genFieldHTML(this, [this.id], wrapperDiv, undefined)
 			},
-			genFieldHTML: function(field, id) {
-				var title, input, post;
+			genFieldHTML: function(field, ids, wrapper, parent) {
+				var process = field.process;
+				var headerId = ids.concat(['std', this.stdExts.header]).join('_');
+				var titleId = ids.concat(['std', this.stdExts.title]).join('_');
+				var contentId = ids.concat(['std', this.stdExts.content]).join('_');
 				
-				title = field.title ? templater.label({attrs:{'for': [id]}, innerHTML: field.title}) : '';
+				var headerHTML = templater.div({attrs: {id: [headerId]}, innerHTML: templater.div({attrs: {id: [titleId]}, innerHTML: field.title})});
 				
-				if (field.type == 'checkbox') {
-					input = templater.checkbox({attrs: {id: [id]}});
-					post = field.postText || '';
-				} else if (field.type == 'textarea') {
-					input = templater.textarea({attrs: {id: [id], rows: [field.rows || 1], cols: [field.cols || 7]}});
-					post = field.postText || '';
-				}
-				return {title: title, input: input, post: post, type: 'field', inline: field.inline};
-			},
-			genFolderHTML: function(field) {
-				return field.title;
-			},
-			bindFuncs: function(field, id, parent, fieldName) {
-				var func = field.process;
-				if (field.type == 'folder') {
-					var children = {};
-					var subFields = field.fields;
-					for (var subFieldName in subFields) {
-						var subField = subFields[subFieldName];
-						children[subFieldName] = subField;
-						this.bindFolder(field, parent, children);
-						var childId = fieldName ? id + '_' + fieldName : id;
-						this.bindFuncs(subField, childId, field, subFieldName);
-						
-					}
-					var titleDiv = $('#' + id + '_std_' + this.stdExts.title);
-					var contentDiv = $('#' + id + '_std_' + this.stdExts.content);
+				if (field.inline) {
+					var contentHTML = templater.div({attrs: {id: [contentId]}});
+				
+					bodyHTML = templater.table({attrs: {cellspacing: [0], border: [0]}, innerHTML:
+								templater.tr({innerHTML: 
+									templater.td({innerHTML: headerHTML}) + //need to have spaces and headerHTML in different td or it offsets the content down a little bit
+									templater.td({innerHTML: '&nbsp;&nbsp;'}) + 
+									templater.td({innerHTML: contentHTML}) 
+								})
+							});
 				} else {
-					this.bindInput($('#' + id + '_' + fieldName), field, parent, func);
+					var contentHTML = templater.div({attrs: {id: [contentId]}, style: {position: 'relative', left: '1.5em'}});
+					bodyHTML = headerHTML + contentHTML;
 				}
+				
+				$(wrapper).append(bodyHTML);
+				var header = $('#' + headerId);
+				var title = $('#' + titleId);
+				var content = $('#' + contentId);
+				if (field.type == 'folder') {
+					this.genFolderHTML(field, ids, content, parent, process)
+				} else {
+					this.genInputHTML(field, ids, parent, process, title, content);
+				}
+			},
+			genFolderHTML: function(field, ids, content, parent, process) {
+				var subFields = field.fields;
+				//writing so that each folder starts with one child.  More will be added if extandable
+				var children = [{}];
+				var child = children[0];
+				for (var subFieldName in subFields) {
+					var subField = subFields[subFieldName];
+					child[subFieldName] = subField;
+					var subFieldIds = ids.concat([subFieldName]);
+					var subFieldWrapperId = subFieldIds.concat(['std', this.stdExts.wrapper]).join('_');
+					if (field.fieldsInline) {
+						subFieldDivHTML = templater.div({attrs: {id: [subFieldWrapperId]}, style: {display: 'inline-block'}});
+					} else {
+						subFieldDivHTML = templater.div({attrs: {id: [subFieldWrapperId]}});
+					}
+					$(content).append(subFieldDivHTML);
+					this.bindFolder(field, parent, children);
+					this.genFieldHTML(subField, subFieldIds, $('#' + subFieldWrapperId), field);
+				}			
+			},
+			genInputHTML: function(field, ids, parent, process, title, content) {
+				var id = ids.join('_');
+				this.appendInput(content, field, id);
+				$(title).attr('for', id);
+				this.bindInput($('#' + id), field, parent, process);
+			},
+			appendInput: function(div, field, id) {
+				var inputHTML;
+				if (field.type == 'textarea') {
+					inputHTML = templater.textarea({attrs: {id: [id], rows: [field.rows || 1], cols: [field.cols || 7]}});
+				} else if (field.type == 'checkbox') {
+					inputHTML = templater.checkbox({attrs: {id: [id]}});
+				}
+				$(div).append(inputHTML);
 			},
 			bindFolder: function(field, parent, children) {
 				var oldProcess = field.process;
@@ -447,82 +458,30 @@ $(function() {
 					}
 				}
 			},
-			bindExpander: function(exp) {
-				var contentDiv = $('#' + $(exp).attr('itemId') + '_std_' + this.stdExts.content);
-				var img = $('#' + $(exp).attr('imgId'));
-				var expanded = true;
-				$(exp).click(function() {
-					if (expanded) {
-						expanded = false;
-						$(img).attr('src', 'img/folder_closed.png');
-						$(contentDiv).hide();
-					} else {
-						expanded = true;
-						$(img).attr('src', 'img/folder_open.png');
-						$(contentDiv).show();
-					}
-				})
-			},
-			appendFolderContents: function(attr, fields, id, topAttrs, topFields, func) {
-				for (var fieldName in attr.fields) {
-					var field = attr.fields[fieldName];
-					if (field.type == 'folder') {
-						fields[fieldName] = {};
-						this.appendFolderContents(attr[attrName], fields[attrName], id + '_' + attrName, topAttrs, topFields, func);
-					} else {
-						fields[fieldName] = $('#' + id + '_' + fieldName);
-						this.bindFunc($(fields[fieldName]), topAttrs, topFields, func);
-					}
-				}
-			},
-			wrapMenu: function(menuItems) {
-				return {title: this.labelText, content: menuItems, type: 'folder', id: this.id}
-			},
-			assembleItems: function(item) {
-				if (item.type == 'folder') {
-					var titleDiv = templater.div({innerHTML: item.title, attrs: {id: [item.id + '_std_title']}});
-					var content = item.content;
-					var contentHTML = [];
-					for (var contentIdx=0; contentIdx<content.length; contentIdx++) {
-						contentHTML.push(this.assembleItems(content[contentIdx]));
-					}
-					var returnHTML = '';
-					if (item.fieldsInline) {
-						for (var htmlIdx=0; htmlIdx<contentHTML.length; htmlIdx++) {
-							returnHTML += templater.div({innerHTML: contentHTML[htmlIdx], style: {display: 'inline-block'}});
-						}			
-					} else {
-						for (var htmlIdx=0; htmlIdx<contentHTML.length; htmlIdx++) {
-							returnHTML += templater.div({innerHTML: contentHTML[htmlIdx]});
-						}
-					}
-					var contentWrapperDiv = templater.div({innerHTML: returnHTML, attrs: {id: [item.id + '_std_' + this.stdExts.content]}, style: {position: 'relative', left: '1.5em'}})
-					var expanderDiv = this.genExpanderDiv(item.id);
-					returnHTML = templater.div({attrs: {id: [item.id + '_std_' + this.stdExts.wrapper]}, innerHTML: expanderDiv + titleDiv + contentWrapperDiv});
-					return returnHTML;
-				} else {
-					if (item.inline) {
-						//wrapping in a table to make input boxes and labels line up nicely
-						return templater.table({attrs: {cellspacing: [0], border: [0]}, innerHTML: 
-								templater.tr({innerHTML: 
-									templater.td({innerHTML: item.title + '&nbsp;&nbsp;'}) + 
-									templater.td({innerHTML: templater.div({innerHTML: item.input})}) +
-									templater.td({innerHTML: item.post || ''})
-								})
-							});
-						
-					} else {
-						return item.title + templater.div({innerHTML: item.input}) + (item.post || '');
-					}
-				}			
-			},
-			genExpanderDiv: function(itemId) {
-				var expanderId = itemId + '_std_' + this.stdExts.expander;
-				var imgId = expanderId + '_' + this.stdExts.image;
-				var className = this.stdExts.expander;
-				this.newExpanders ? this.newExpanders.push(expanderId) : this.newExpanders = [expanderId];
-				return templater.div({style: {position: 'relative', left: '-' + (this.folderArrowDim + 2) + 'px', top: this.folderArrowDim*.2 + 'px', width: '0px', height: '0px'}, attrs: {id: [expanderId], itemId: [itemId], imgId: [imgId], 'class': [className]}, innerHTML: templater.img({attrs: {src: ['img/folder_open.png'], id: [imgId], width: [this.folderArrowDim], height: [this.folderArrowDim]}})});
-			},
+			// genExpanderDiv: function(itemId) {
+				// var expanderId = itemId + '_std_' + this.stdExts.expander;
+				// var imgId = expanderId + '_' + this.stdExts.image;
+				// var className = this.stdExts.expander;
+				// this.newExpanders ? this.newExpanders.push(expanderId) : this.newExpanders = [expanderId];
+				// return templater.div({style: {position: 'relative', left: '-' + (this.folderArrowDim + 2) + 'px', top: this.folderArrowDim*.2 + 'px', width: '0px', height: '0px'}, attrs: {id: [expanderId], itemId: [itemId], imgId: [imgId], 'class': [className]}, innerHTML: templater.img({attrs: {src: ['img/folder_open.png'], id: [imgId], width: [this.folderArrowDim], height: [this.folderArrowDim]}})});
+			// },
+			// genExtenders: function(menuItems) {
+				// for (var itemIdx=0; itemIdx<menuItems.length; itemIdx++) {
+					// var item = menuItems[itemIdx];
+					// if (item.type == 'folder') {
+						// if (item.extendable) {
+							// this.genExtender(item);
+						// }
+						// this.genExtenders(item);
+					// }
+					
+				// }
+			// },
+			// genExtender: function(menuItem) {
+				// var id = menuItem.id;
+				// //was here
+				
+			// },
 		})
 	}
 })

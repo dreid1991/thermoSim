@@ -1,3 +1,6 @@
+//this is up here to show that it needs to get moved elsewhere
+
+
 function Tree(paper/*, pos*/) {
 	this.paper = paper;
 	this.someImage = new Image();
