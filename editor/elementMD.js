@@ -253,12 +253,14 @@ elementMD = {
 	//type, label, something about how data is input
 		this.containerDiv = undefined; //set in setContainer function
 		this.labelText = 'Wall';
+		this.title = this.labelText;
 		if (attrs.returnLabel) return this.labelText;
 		this.val = {};
 		this.objType = TYPES.wall;
 		this.id = data.getWallId();
 		//process functions are wrapped so attr and children refer to themselves and their fields.  The wrapper calls the parent's process function so the changes bubble up
 		this.process = function(attr, children) {
+			var children = children[0]
 			for (var childName in children) {
 				attr.val[childName] = children[childName].val;
 			}
@@ -307,9 +309,8 @@ elementMD = {
 				},
 				val: undefined,
 				process: function(attr, children) {
-					attr.val = [];
 					//for (var childIdx=0; is list now
-					attr.val = P(children.x.val, children.y.val);
+					attr.val = P(children[0].x.val, children[0].y.val);
 				}
 			},
 			/*
