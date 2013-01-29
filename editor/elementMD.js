@@ -272,7 +272,6 @@ elementMD = {
 				postText: undefined,
 				inline: true,
 				extendable: false,
-				val: undefined,
 				process: function(valObj, field) {
 					valObj.val = $(field).is(':checked')
 				},
@@ -290,7 +289,6 @@ elementMD = {
 						inline: true, //true means there won't be a break between that field's label and its input
 						rows: 1,
 						cols: 5,
-						val: undefined,
 						process: function(valObj, field) {
 							valObj.val = parseFloat($(field).val());
 						}
@@ -301,13 +299,11 @@ elementMD = {
 						inline: true,
 						rows: 1,
 						cols: 5,
-						val: undefined,
 						process: function(valObj, field) {
 							valObj.val = parseFloat($(field).val());
 						}
 					}
 				},
-				val: undefined,
 				process: function(valObj, children) {
 					valObj.val = [];
 					for (var childIdx=0; childIdx<children.length; childIdx++) {
@@ -426,7 +422,6 @@ $(function() {
 				}
 			},
 			genFolderHTML: function(field, ids, content, parent, expander, header, valObj) {
-				this.genExpanderHTML(expander, ids, content);
 				var subFields = field.fields;
 				//writing so that each folder starts with one child.  More will be added if extandable
 				var children = [];
@@ -437,9 +432,14 @@ $(function() {
 					self.folderSpawnChild(field, ids, content, children, idNum, childRemovable)
 				}
 				spawn();
+				var toggleDivs = [content];
 				if (field.extendable) {
 					this.genExtender(header, spawn, ids);
+					toggleDivs.push($('#' + ids.concat(['std', this.stdExts.extender]).join('_')));
 				}
+				
+				this.genExpanderHTML(expander, ids, toggleDivs);
+				
 				this.bindFolder(field, parent, valObj, children);
 			},
 			folderSpawnChild: function(field, ids, content, children, idNum, removable) {
@@ -542,23 +542,26 @@ $(function() {
 					}
 				})
 			},
-			bindExpander: function(img, content) {
+			bindExpander: function(img, toggleDivs) {
 				var expanded = true;
 				$(img).click(function() {
 					if (expanded) {
 						expanded = false;
 						$(img).attr('src', 'img/folder_closed.png');
-						$(content).hide();
+						for (var divIdx=0; divIdx<toggleDivs.length; divIdx++) {
+							$(toggleDivs[divIdx]).hide();
+						}
 					} else {
 						expanded = true;
 						$(img).attr('src', 'img/folder_open.png');
-						$(content).show();
+						for (var divIdx=0; divIdx<toggleDivs.length; divIdx++) {
+							$(toggleDivs[divIdx]).show();
+						}
 					}
 				})
 			},
-			genExpanderHTML: function(parent, ids, content) {
+			genExpanderHTML: function(parent, ids, toggleDivs) {
 				var imgId = ids.concat(['std', this.stdExts.image]).join('_');
-				var className = this.stdExts.expander;
 				var img = templater.img({
 					attrs: {
 						src: ['img/folder_open.png'], 
@@ -569,7 +572,7 @@ $(function() {
 				});
 
 				$(parent).append(img);
-				this.bindExpander($('#' + imgId), content);
+				this.bindExpander($('#' + imgId), toggleDivs);
 			},
 			genExtender: function(header, spawn, ids) {
 				var id = ids.concat(['std', this.stdExts.extender]).join('_');
