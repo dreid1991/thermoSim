@@ -374,7 +374,6 @@ $(function() {
 				
 				if (field.inline) {
 					var contentHTML = templater.div({attrs: {id: [contentId]}});
-				
 					bodyHTML = templater.table({attrs: {cellspacing: [0], border: [0]}, innerHTML:
 								templater.tr({innerHTML: 
 									templater.td({innerHTML: headerHTML}) + //need to have spaces and headerHTML in different td or it offsets the content down a little bit
@@ -386,18 +385,35 @@ $(function() {
 					var contentHTML = templater.div({attrs: {id: [contentId]}, style: {position: 'relative', left: '1.5em'}});
 					bodyHTML = headerHTML + contentHTML;
 				}
-				
+				if (field.type == 'folder') {
+					bodyHTML = templater.div({
+						attrs: {
+							id: [ids.concat(['std', this.stdExts.expander]).join('_')]
+						}, 
+						style:{
+							position: 'relative', 
+							left: '-' + (this.folderArrowDim + 2) + 'px', 
+							top: this.folderArrowDim*.2 + 'px', 
+							width: '0px', 
+							height: '0px'
+						}
+					}) + bodyHTML;
+					
+				}
 				$(wrapper).append(bodyHTML);
 				var header = $('#' + headerId);
 				var title = $('#' + titleId);
 				var content = $('#' + contentId);
+				
 				if (field.type == 'folder') {
-					this.genFolderHTML(field, ids, content, parent, process)
+					var expander = $('#' + ids.concat(['std', this.stdExts.expander]).join('_'));
+					this.genFolderHTML(field, ids, content, parent, process, expander)
 				} else {
 					this.genInputHTML(field, ids, parent, process, title, content);
 				}
 			},
-			genFolderHTML: function(field, ids, content, parent, process) {
+			genFolderHTML: function(field, ids, content, parent, process, expander) {
+				this.genExpanderHTML(expander, ids, content);
 				var subFields = field.fields;
 				//writing so that each folder starts with one child.  More will be added if extandable
 				var children = [{}];
@@ -450,22 +466,44 @@ $(function() {
 				var self = this;
 				$(div).change(function() {func.apply(self, [field, div]); parent.process.apply(self)});
 			},
-			bindExpanders: function() {
-				var newExpanders = this.newExpanders;
-				if (newExpanders) {
-					for (var expIdx=0; expIdx<newExpanders.length; expIdx++) {
-						var exp = $('#' + newExpanders[expIdx]);
-						this.bindExpander(exp);
+
+			bindExpander: function(img, content) {
+				var expanded = true;
+				$(img).click(function() {
+					if (expanded) {
+						expanded = false;
+						$(img).attr('src', 'img/folder_closed.png');
+						$(content).hide();
+					} else {
+						expanded = true;
+						$(img).attr('src', 'img/folder_open.png');
+						$(content).show();
 					}
-				}
+				})
 			},
-			// genExpanderDiv: function(itemId) {
-				// var expanderId = itemId + '_std_' + this.stdExts.expander;
-				// var imgId = expanderId + '_' + this.stdExts.image;
-				// var className = this.stdExts.expander;
-				// this.newExpanders ? this.newExpanders.push(expanderId) : this.newExpanders = [expanderId];
-				// return templater.div({style: {position: 'relative', left: '-' + (this.folderArrowDim + 2) + 'px', top: this.folderArrowDim*.2 + 'px', width: '0px', height: '0px'}, attrs: {id: [expanderId], itemId: [itemId], imgId: [imgId], 'class': [className]}, innerHTML: templater.img({attrs: {src: ['img/folder_open.png'], id: [imgId], width: [this.folderArrowDim], height: [this.folderArrowDim]}})});
-			// },
+			genExpanderHTML: function(parent, ids, content) {
+				var imgId = ids.concat(['std', this.stdExts.image]).join('_');
+				var className = this.stdExts.expander;
+				var img = templater.img({
+					attrs: {
+						src: ['img/folder_open.png'], 
+						id: [imgId], 
+						width: [this.folderArrowDim], 
+						height: [this.folderArrowDim]
+					}
+				});
+				// var div = templater.div({style: {position: 'relative', 
+												// left: '-' + (this.folderArrowDim + 2) + 'px', 
+												// top: this.folderArrowDim*.2 + 'px', 
+												// width: '0px', 
+												// height: '0px'}, 
+										// attrs: {id: [expanderId], 
+												// imgId: [imgId], 
+												// 'class': [className]}, 
+										
+				$(parent).append(img);
+				this.bindExpander($('#' + imgId), content);
+			},
 			// genExtenders: function(menuItems) {
 				// for (var itemIdx=0; itemIdx<menuItems.length; itemIdx++) {
 					// var item = menuItems[itemIdx];
