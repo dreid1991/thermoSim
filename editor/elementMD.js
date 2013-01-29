@@ -339,7 +339,14 @@ elementMD = {
 
 
 }
-//if a folder, fields will be object, else field is just a jquery object
+//if a folder, fields will be object, else field is just a jquery object.  Then the element md's wouldn't have to be functions anymore and you wouldn't have to do all this extending.
+
+
+
+//Attn - you could almost CERTAINLY make this into a menu rendering class that just accepted one of the objects in elementMD
+//also, make a 'deletable' option that applies to members of an extendable field and things you added from the menu.
+
+//make expander work by sending ids.  Then I can get any of the inner divs using stdExts
 $(function() {
 	for (var mdName in elementMD) {
 		var md = elementMD[mdName];
@@ -354,7 +361,9 @@ $(function() {
 				childWrapper: 'childWrapper',
 				expander: 'expander',
 				aux: 'aux',
-				image: 'img'
+				image: 'img',
+				childInner: 'childInner',
+				remove: 'remove'
 			},
 			setContainer: function(div) {
 				this.containerDiv = div;
@@ -424,8 +433,8 @@ $(function() {
 				var idNum = {val: 0};
 				var self = this;
 				var spawn = function () {
-					
-					self.folderSpawnChild(field, ids, content, children, idNum)
+					var childRemovable = field.extendable;
+					self.folderSpawnChild(field, ids, content, children, idNum, childRemovable)
 				}
 				spawn();
 				if (field.extendable) {
@@ -433,13 +442,20 @@ $(function() {
 				}
 				this.bindFolder(field, parent, valObj, children);
 			},
-			folderSpawnChild: function(field, ids, content, children, idNum) {
+			folderSpawnChild: function(field, ids, content, children, idNum, removable) {
 				var child = {};
 				children.push(child);
-				var childWrapperId = ids.concat(['std', this.stdExts.childWrapper, 'id' + idNum.val]).join('_')
+				var childWrapperId = ids.concat(['std', this.stdExts.childWrapper, 'id' + idNum.val]).join('_');
+				var childInnerId = ids.concat(['std', this.stdExts.childInner, 'id' + idNum.val]).join('_');
 				var childWrapperHTML = templater.div({attrs: {id: [childWrapperId]}});
+				var childInnerHTML = templater.div({attrs: {id: [childInnerId]}, style: {display: 'inline-block'}});
+				
 				$(content).append(childWrapperHTML);
 				var childWrapper = $('#' + childWrapperId);
+				$(childWrapper).append(childInnerHTML);
+				var childInner = $('#' + childInnerId);
+				
+				
 				var subFields = field.fields;
 				for (var subFieldName in subFields) {
 					var subField = subFields[subFieldName];
@@ -451,10 +467,34 @@ $(function() {
 					} else {
 						subFieldDivHTML = templater.div({attrs: {id: [subFieldWrapperId]}});
 					}
-					$(childWrapper).append(subFieldDivHTML);
+					$(childInner).append(subFieldDivHTML);
 					this.genFieldHTML(subField, subFieldIds, $('#' + subFieldWrapperId), field, child[subFieldName]);
 				}	
+				if (removable) {
+					this.genRemoveHTML(childWrapper, ids, idNum, children, child);
+				}
 				idNum.val++;
+			},
+			genRemoveHTML: function(toRemove, ids, idNum, children, child) {
+				if (idNum) {
+					var removeId = ids.concat([idNum.val, 'std', this.stdExts.remove]).join('_');
+				} else {
+					var removeId = ids.concat(['std', this.stdExts.remove]).join('_');
+				}
+				var top = ($(toRemove).height() - this.iconDim)/2;
+				var removeHTML = templater.div({
+					style: {
+						display: 'inline-block',
+						position: 'relative',
+						'vertical-align': 'top',
+						top: Math.round(top) + 'px'
+					},
+					innerHTML: templater.img({attrs: {src: ['img/remove.png'], id: [removeId]}, style: {width: this.iconDim, height: this.iconDim}})
+				})
+				$(toRemove).append(removeHTML);
+				var remove = $('#' + removeId);
+				this.bindRemove(toRemove, remove, children, child)
+				
 			},
 			genInputHTML: function(field, ids, parent, process, title, content, valObj) {
 				var id = ids.join('_');
@@ -489,7 +529,19 @@ $(function() {
 				var self = this;
 				$(div).change(function() {func.apply(self, [valObj, div]); parent.process.apply(self)});
 			},
-
+			bindRemove: function(toRemove, remove, children, child) {
+				$(remove).click(function() {
+					$(toRemove).remove();
+					if (children && child) {
+						for (var childIdx=0; childIdx<children.length; childIdx++) {
+							if (child == children[childIdx]) {
+								children.splice(childIdx, 1);
+								break;
+							}
+						}
+					}
+				})
+			},
 			bindExpander: function(img, content) {
 				var expanded = true;
 				$(img).click(function() {
