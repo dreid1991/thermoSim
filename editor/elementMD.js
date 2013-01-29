@@ -309,8 +309,10 @@ elementMD = {
 				},
 				val: undefined,
 				process: function(valObj, children) {
-					//for (var childIdx=0; is list now
-					valObj.val = P(children[0].x.val, children[0].y.val);
+					valObj.val = [];
+					for (var childIdx=0; childIdx<children.length; childIdx++) {
+						valObj.val.push(P(children[childIdx].x.val, children[childIdx].y.val))
+					}
 				}
 			},
 			/*
@@ -343,13 +345,13 @@ $(function() {
 		var md = elementMD[mdName];
 		_.extend(md.prototype, {
 			type: 'folder',
-			folderArrowDim: 13,
+			iconDim: 13,
 			stdExts: {
 				content: 'content',
 				header: 'header',
 				title: 'title',
 				wrapper: 'wrapper',
-				fieldsWrapper: 'fieldsWrapper',
+				childWrapper: 'childWrapper',
 				expander: 'expander',
 				aux: 'aux',
 				image: 'img'
@@ -360,7 +362,6 @@ $(function() {
 
 			//only folders can be extendable.  Non-folders and single inputs
 			
-			//Take 2
 			genHTML: function() {
 				var wrapperDiv = $(templater.div({attrs: {id: [[this.id, 'std', this.stdExts.wrapper].join('_')]}}));
 				this.containerDiv.append(wrapperDiv);
@@ -371,10 +372,7 @@ $(function() {
 				var headerId = ids.concat(['std', this.stdExts.header]).join('_');
 				var titleId = ids.concat(['std', this.stdExts.title]).join('_');
 				var contentId = ids.concat(['std', this.stdExts.content]).join('_');
-				//var auxId = ids.concat(['std', this.stdExts.aux]).join('_');
-				
-				//var auxHTML = templater.div({attrs: {id: [auxId]}, style: {display: 'inline-block'}});
-				
+
 				var headerHTML = templater.div({attrs: {id: [headerId]}, innerHTML: templater.div({attrs: {id: [titleId]}, innerHTML: field.title})});
 				
 				if (field.inline) {
@@ -397,8 +395,8 @@ $(function() {
 						}, 
 						style:{
 							position: 'relative', 
-							left: '-' + (this.folderArrowDim + 2) + 'px', 
-							top: this.folderArrowDim*.2 + 'px', 
+							left: '-' + (this.iconDim + 2) + 'px', 
+							top: this.iconDim*.2 + 'px', 
 							width: '0px', 
 							height: '0px'
 						}
@@ -413,38 +411,50 @@ $(function() {
 				
 				if (field.type == 'folder') {
 					var expander = $('#' + ids.concat(['std', this.stdExts.expander]).join('_'));
-					this.genFolderHTML(field, ids, content, parent, expander, valObj)
+					this.genFolderHTML(field, ids, content, parent, expander, header, valObj)
 				} else {
 					this.genInputHTML(field, ids, parent, process, title, content, valObj);
 				}
 			},
-			genFolderHTML: function(field, ids, content, parent, expander, valObj) {
+			genFolderHTML: function(field, ids, content, parent, expander, header, valObj) {
 				this.genExpanderHTML(expander, ids, content);
 				var subFields = field.fields;
 				//writing so that each folder starts with one child.  More will be added if extandable
 				var children = [];
-				
-				this.folderSpawnChild(field, ids, content, children)
-				//I just moved bindFolder out of the loop.  Pretty sure that's fine, but make sure things still bubble up at some point
+				var idNum = {val: 0};
+				var self = this;
+				var spawn = function () {
+					
+					self.folderSpawnChild(field, ids, content, children, idNum)
+				}
+				spawn();
+				if (field.extendable) {
+					this.genExtender(header, spawn, ids);
+				}
 				this.bindFolder(field, parent, valObj, children);
 			},
-			folderSpawnChild: function(field, ids, content, children) {
+			folderSpawnChild: function(field, ids, content, children, idNum) {
 				var child = {};
 				children.push(child);
+				var childWrapperId = ids.concat(['std', this.stdExts.childWrapper, 'id' + idNum.val]).join('_')
+				var childWrapperHTML = templater.div({attrs: {id: [childWrapperId]}});
+				$(content).append(childWrapperHTML);
+				var childWrapper = $('#' + childWrapperId);
 				var subFields = field.fields;
 				for (var subFieldName in subFields) {
 					var subField = subFields[subFieldName];
 					child[subFieldName] = {val: undefined};
-					var subFieldIds = ids.concat([subFieldName]);
+					var subFieldIds = ids.concat([subFieldName, 'id' + idNum.val]);
 					var subFieldWrapperId = subFieldIds.concat(['std', this.stdExts.wrapper]).join('_');
 					if (field.fieldsInline) {
 						subFieldDivHTML = templater.div({attrs: {id: [subFieldWrapperId]}, style: {display: 'inline-block'}});
 					} else {
 						subFieldDivHTML = templater.div({attrs: {id: [subFieldWrapperId]}});
 					}
-					$(content).append(subFieldDivHTML);
+					$(childWrapper).append(subFieldDivHTML);
 					this.genFieldHTML(subField, subFieldIds, $('#' + subFieldWrapperId), field, child[subFieldName]);
-				}					
+				}	
+				idNum.val++;
 			},
 			genInputHTML: function(field, ids, parent, process, title, content, valObj) {
 				var id = ids.join('_');
@@ -501,31 +511,42 @@ $(function() {
 					attrs: {
 						src: ['img/folder_open.png'], 
 						id: [imgId], 
-						width: [this.folderArrowDim], 
-						height: [this.folderArrowDim]
+						width: [this.iconDim], 
+						height: [this.icomDim]
 					}
 				});
 
 				$(parent).append(img);
 				this.bindExpander($('#' + imgId), content);
 			},
-			// genExtenders: function(menuItems) {
-				// for (var itemIdx=0; itemIdx<menuItems.length; itemIdx++) {
-					// var item = menuItems[itemIdx];
-					// if (item.type == 'folder') {
-						// if (item.extendable) {
-							// this.genExtender(item);
-						// }
-						// this.genExtenders(item);
-					// }
+			genExtender: function(header, spawn, ids) {
+				var id = ids.concat(['std', this.stdExts.extender]).join('_');
+				var titleId = ids.concat(['std', this.stdExts.title]).join('_');
+				$('#' + titleId).css({display: 'inline-block'});
+				var extenderHTML = templater.div({
+					style: {
+						display: 'inline-block'
+					},
+					innerHTML: 
+						templater.img({
+							attrs: {
+								src: ['img/add.png'],
+								id: [id]
+							},
+							style: {
+								display: 'inline-block',
+								width: this.iconDim,
+								height: this.iconDim,
+								position: 'relative',
+								top: this.iconDim*.2,
+								left: this.iconDim*.5
+							}
+						})
 					
-				// }
-			// },
-			// genExtender: function(menuItem) {
-				// var id = menuItem.id;
-				// //was here
-				
-			// },
+				})
+				$(header).append(extenderHTML);
+				$('#' + id).click(spawn);
+			},
 		})
 	}
 })
