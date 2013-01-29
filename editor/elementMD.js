@@ -259,10 +259,10 @@ elementMD = {
 		this.objType = TYPES.wall;
 		this.id = data.getWallId();
 		//process functions are wrapped so attr and children refer to themselves and their fields.  The wrapper calls the parent's process function so the changes bubble up
-		this.process = function(attr, children) {
+		this.process = function(valObj, children) {
 			var children = children[0]
 			for (var childName in children) {
-				attr.val[childName] = children[childName].val;
+				valObj.val[childName] = children[childName].val;
 			}
 		},
 		this.fields = {
@@ -273,8 +273,8 @@ elementMD = {
 				inline: true,
 				extendable: false,
 				val: undefined,
-				process: function(attr, field) {
-					attr.val = $(field).is(':checked')
+				process: function(valObj, field) {
+					valObj.val = $(field).is(':checked')
 				},
 				
 			},
@@ -291,8 +291,8 @@ elementMD = {
 						rows: 1,
 						cols: 5,
 						val: undefined,
-						process: function(attr, field) {
-							attr.val = parseFloat($(field).val());
+						process: function(valObj, field) {
+							valObj.val = parseFloat($(field).val());
 						}
 					},
 					y: {
@@ -302,15 +302,15 @@ elementMD = {
 						rows: 1,
 						cols: 5,
 						val: undefined,
-						process: function(attr, field) {
-							attr.val = parseFloat($(field).val());
+						process: function(valObj, field) {
+							valObj.val = parseFloat($(field).val());
 						}
 					}
 				},
 				val: undefined,
-				process: function(attr, children) {
+				process: function(valObj, children) {
 					//for (var childIdx=0; is list now
-					attr.val = P(children[0].x.val, children[0].y.val);
+					valObj.val = P(children[0].x.val, children[0].y.val);
 				}
 			},
 			/*
@@ -349,7 +349,9 @@ $(function() {
 				header: 'header',
 				title: 'title',
 				wrapper: 'wrapper',
+				fieldsWrapper: 'fieldsWrapper',
 				expander: 'expander',
+				aux: 'aux',
 				image: 'img'
 			},
 			setContainer: function(div) {
@@ -362,13 +364,16 @@ $(function() {
 			genHTML: function() {
 				var wrapperDiv = $(templater.div({attrs: {id: [[this.id, 'std', this.stdExts.wrapper].join('_')]}}));
 				this.containerDiv.append(wrapperDiv);
-				this.genFieldHTML(this, [this.id], wrapperDiv, undefined)
+				this.genFieldHTML(this, [this.id], wrapperDiv, undefined, this)
 			},
-			genFieldHTML: function(field, ids, wrapper, parent) {
+			genFieldHTML: function(field, ids, wrapper, parent, valObj) {
 				var process = field.process;
 				var headerId = ids.concat(['std', this.stdExts.header]).join('_');
 				var titleId = ids.concat(['std', this.stdExts.title]).join('_');
 				var contentId = ids.concat(['std', this.stdExts.content]).join('_');
+				//var auxId = ids.concat(['std', this.stdExts.aux]).join('_');
+				
+				//var auxHTML = templater.div({attrs: {id: [auxId]}, style: {display: 'inline-block'}});
 				
 				var headerHTML = templater.div({attrs: {id: [headerId]}, innerHTML: templater.div({attrs: {id: [titleId]}, innerHTML: field.title})});
 				
@@ -378,7 +383,7 @@ $(function() {
 								templater.tr({innerHTML: 
 									templater.td({innerHTML: headerHTML}) + //need to have spaces and headerHTML in different td or it offsets the content down a little bit
 									templater.td({innerHTML: '&nbsp;&nbsp;'}) + 
-									templater.td({innerHTML: contentHTML}) 
+									templater.td({innerHTML: contentHTML})
 								})
 							});
 				} else {
@@ -400,6 +405,7 @@ $(function() {
 					}) + bodyHTML;
 					
 				}
+				
 				$(wrapper).append(bodyHTML);
 				var header = $('#' + headerId);
 				var title = $('#' + titleId);
@@ -407,20 +413,28 @@ $(function() {
 				
 				if (field.type == 'folder') {
 					var expander = $('#' + ids.concat(['std', this.stdExts.expander]).join('_'));
-					this.genFolderHTML(field, ids, content, parent, process, expander)
+					this.genFolderHTML(field, ids, content, parent, expander, valObj)
 				} else {
-					this.genInputHTML(field, ids, parent, process, title, content);
+					this.genInputHTML(field, ids, parent, process, title, content, valObj);
 				}
 			},
-			genFolderHTML: function(field, ids, content, parent, process, expander) {
+			genFolderHTML: function(field, ids, content, parent, expander, valObj) {
 				this.genExpanderHTML(expander, ids, content);
 				var subFields = field.fields;
 				//writing so that each folder starts with one child.  More will be added if extandable
-				var children = [{}];
-				var child = children[0];
+				var children = [];
+				
+				this.folderSpawnChild(field, ids, content, children)
+				//I just moved bindFolder out of the loop.  Pretty sure that's fine, but make sure things still bubble up at some point
+				this.bindFolder(field, parent, valObj, children);
+			},
+			folderSpawnChild: function(field, ids, content, children) {
+				var child = {};
+				children.push(child);
+				var subFields = field.fields;
 				for (var subFieldName in subFields) {
 					var subField = subFields[subFieldName];
-					child[subFieldName] = subField;
+					child[subFieldName] = {val: undefined};
 					var subFieldIds = ids.concat([subFieldName]);
 					var subFieldWrapperId = subFieldIds.concat(['std', this.stdExts.wrapper]).join('_');
 					if (field.fieldsInline) {
@@ -429,15 +443,14 @@ $(function() {
 						subFieldDivHTML = templater.div({attrs: {id: [subFieldWrapperId]}});
 					}
 					$(content).append(subFieldDivHTML);
-					this.bindFolder(field, parent, children);
-					this.genFieldHTML(subField, subFieldIds, $('#' + subFieldWrapperId), field);
-				}			
+					this.genFieldHTML(subField, subFieldIds, $('#' + subFieldWrapperId), field, child[subFieldName]);
+				}					
 			},
-			genInputHTML: function(field, ids, parent, process, title, content) {
+			genInputHTML: function(field, ids, parent, process, title, content, valObj) {
 				var id = ids.join('_');
 				this.appendInput(content, field, id);
 				$(title).attr('for', id);
-				this.bindInput($('#' + id), field, parent, process);
+				this.bindInput($('#' + id), valObj, parent, process);
 			},
 			appendInput: function(div, field, id) {
 				var inputHTML;
@@ -448,23 +461,23 @@ $(function() {
 				}
 				$(div).append(inputHTML);
 			},
-			bindFolder: function(field, parent, children) {
+			bindFolder: function(field, parent, valObj, children) {
 				var oldProcess = field.process;
 				var self = this;
 				if (parent) {
 					field.process = function() {
-						oldProcess.apply(self, [field, children]);
+						oldProcess.apply(self, [valObj, children]);
 						parent.process();
 					}
 				} else {
 					field.process = function() {
-						oldProcess.apply(self, [field, children])
+						oldProcess.apply(self, [valObj, children])
 					}
 				}
 			},
-			bindInput: function(div, field, parent, func) {
+			bindInput: function(div, valObj, parent, func) {
 				var self = this;
-				$(div).change(function() {func.apply(self, [field, div]); parent.process.apply(self)});
+				$(div).change(function() {func.apply(self, [valObj, div]); parent.process.apply(self)});
 			},
 
 			bindExpander: function(img, content) {
@@ -492,15 +505,7 @@ $(function() {
 						height: [this.folderArrowDim]
 					}
 				});
-				// var div = templater.div({style: {position: 'relative', 
-												// left: '-' + (this.folderArrowDim + 2) + 'px', 
-												// top: this.folderArrowDim*.2 + 'px', 
-												// width: '0px', 
-												// height: '0px'}, 
-										// attrs: {id: [expanderId], 
-												// imgId: [imgId], 
-												// 'class': [className]}, 
-										
+
 				$(parent).append(img);
 				this.bindExpander($('#' + imgId), content);
 			},
