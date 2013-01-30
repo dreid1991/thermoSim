@@ -10,8 +10,10 @@ TYPES = {
 	cmmd: 'Command',
 	piston: 'Piston',
 	dragWeights: 'DragWeights',
-	
+}
 
+MENUTRIGGERS = {
+	wallHandle: 
 }
 
 
@@ -36,7 +38,7 @@ function SceneData(sceneDiv) {
 
 _.extend(SceneData.prototype, updateValue = {
 	addElement: function(md) {
-		var elem = new md();
+		var elem = new md({parent: this});
 		var container = this.pushToList(elem);
 		elem.setContainer(container.div);
 		elem.genHTML();

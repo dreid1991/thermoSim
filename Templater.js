@@ -71,6 +71,14 @@ Templater.prototype = {
 		obj.attrs.type = ['checkbox'];
 		return this.input(obj);
 	},
+	select: function(obj) {
+		obj ? obj.type = 'select' : obj = {type: 'select'};
+		return this.elem(obj);
+	},
+	option: function(obj) {
+		obj ? obj.type = 'option' : obj = {type: 'option'};
+		return this.elem(obj);		
+	},
 	style: function(obj) {
 		return this.styleTemp(obj);
 	},

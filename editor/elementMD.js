@@ -249,6 +249,7 @@ elementMD = {
 	
 	},
 	wall: function(attrs) {
+		this.parent = attrs.parent;
 		attrs = attrs || {};
 	//type, label, something about how data is input
 		this.containerDiv = undefined; //set in setContainer function
@@ -266,9 +267,19 @@ elementMD = {
 			}
 		},
 		this.fields = {
+			handle: {
+				type: 'textarea',
+				title: 'Handle:',
+				inline: true,
+				cols: 12,
+				process: function(valObj, field) {
+					valObj.val = parseFloat($(field).val());
+				}
+			},
+			
 			isBox: {
 				type: 'checkbox',
-				title: 'Is box: ',
+				title: 'Is box:',
 				postText: undefined,
 				inline: true,
 				extendable: false,
@@ -276,6 +287,28 @@ elementMD = {
 					valObj.val = $(field).is(':checked')
 				},
 				
+			},
+			pie: {
+				type: 'dropdown',
+				populate: [MENUTRIGGERS.wallHandle],
+				inline: true,
+				process: function(valObj, field) {
+					valObj.val = $(field).val();
+				}
+			},
+			fruit: {
+				type: 'dropdown',
+				options: [
+					{val: 'foo', text: 'foo'},
+					{val: 'goo', text: 'goo'}
+				],
+					
+				
+				title: 'Fruit type:',
+				inline: true,
+				process: function(valObj, field) {
+					valObj.val = $(field).val();
+				}
 			},
 			pts: {
 				type: 'folder',
@@ -342,7 +375,7 @@ elementMD = {
 //Attn - you could almost CERTAINLY make this into a menu rendering class that just accepted one of the objects in elementMD
 //also, make a 'deletable' option that applies to members of an extendable field and things you added from the menu.
 
-//make expander work by sending ids.  Then I can get any of the inner divs using stdExts
+//For right now, triggers will only populate dropdowns because I can't think of any other cases where they'd be used.  Maybe checkboxes...  Maybe.
 $(function() {
 	for (var mdName in elementMD) {
 		var md = elementMD[mdName];
@@ -511,6 +544,20 @@ $(function() {
 					inputHTML = templater.textarea({attrs: {id: [id], rows: [field.rows || 1], cols: [field.cols || 7]}});
 				} else if (field.type == 'checkbox') {
 					inputHTML = templater.checkbox({attrs: {id: [id]}});
+				} else if (field.type == 'dropdown') {
+					var selectObj = {attrs: {id: [id]}, innerHTML: ''}
+					if (field.populate) {
+						var trigger = field.populate;
+						
+					} else if (field.options) {
+						for (var optionIdx=0; optionIdx<field.options.length; optionIdx++) {
+							var option = field.options[optionIdx];
+							selectObj.innerHTML += templater.option({attrs: {value: [option.val]}, innerHTML: option.text});
+						}
+						
+					}
+					var inputHTML = templater.select(selectObj);
+					
 				}
 				$(div).append(inputHTML);
 			},
