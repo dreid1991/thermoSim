@@ -369,7 +369,7 @@ $(function() {
 			//only folders can be extendable.  Non-folders and single inputs
 			
 			genHTML: function() {
-				var wrapperDiv = $(templater.div({attrs: {id: [[this.id, 'std', this.stdExts.wrapper].join('_')]}}));
+				var wrapperDiv = $(templater.div({style: {position: 'relative'}, attrs: {id: [[this.id, 'std', this.stdExts.wrapper].join('_')]}}));
 				this.containerDiv.append(wrapperDiv);
 				this.genFieldHTML(this, [this.id], wrapperDiv, undefined, this)
 			},
@@ -400,7 +400,7 @@ $(function() {
 							id: [ids.concat(['std', this.stdExts.expander]).join('_')]
 						}, 
 						style:{
-							position: 'relative', 
+							position: 'absolute', 
 							left: '-' + (this.iconDim + 2) + 'px', 
 							top: this.iconDim*.2 + 'px', 
 							width: this.iconDim + 'px', 
@@ -449,7 +449,7 @@ $(function() {
 				children.push(child);
 				var childWrapperId = ids.concat(['std', this.stdExts.childWrapper, 'id' + idNum.val]).join('_');
 				var childInnerId = ids.concat(['std', this.stdExts.childInner, 'id' + idNum.val]).join('_');
-				var childWrapperHTML = templater.div({attrs: {id: [childWrapperId]}});
+				var childWrapperHTML = templater.div({attrs: {id: [childWrapperId]}, style: {position: 'relative'}});
 				var childInnerHTML = templater.div({attrs: {id: [childInnerId]}, style: {display: 'inline-block'}});
 				
 				$(content).append(childWrapperHTML);
@@ -465,9 +465,9 @@ $(function() {
 					var subFieldIds = ids.concat([subFieldName, 'id' + idNum.val]);
 					var subFieldWrapperId = subFieldIds.concat(['std', this.stdExts.wrapper]).join('_');
 					if (field.fieldsInline) {
-						subFieldDivHTML = templater.div({attrs: {id: [subFieldWrapperId]}, style: {display: 'inline-block'}});
+						subFieldDivHTML = templater.div({attrs: {id: [subFieldWrapperId]}, style: {display: 'inline-block', position: 'relative'}});
 					} else {
-						subFieldDivHTML = templater.div({attrs: {id: [subFieldWrapperId]}});
+						subFieldDivHTML = templater.div({attrs: {id: [subFieldWrapperId]}, style: {position: 'relative'}});
 					}
 					$(childInner).append(subFieldDivHTML);
 					this.genFieldHTML(subField, subFieldIds, $('#' + subFieldWrapperId), field, child[subFieldName]);
@@ -571,8 +571,7 @@ $(function() {
 						id: [wrapperId],
 					},
 					style: {
-						width: this.iconDim,
-						height: this.iconDim,
+
 					},
 					innerHTML: templater.img({
 						attrs: {
