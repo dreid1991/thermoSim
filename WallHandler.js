@@ -251,7 +251,6 @@ WallMethods.main = {
 			this[wallIdx].ptsInit = this.copyWallPts(this[wallIdx]);
 		}
 	},
-
 	copyWallPts: function(wall){
 		var len = wall.length;
 		var copy = new Array(len);

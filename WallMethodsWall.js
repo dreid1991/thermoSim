@@ -847,6 +847,16 @@ WallMethods.wall = {
 			this.idxLastArrow = turn;
 		}
 	},
+	getPt: function(idx) {
+		return this[idx];
+	},
+	getUV: function(idx) {
+		return this.wallUVs[idx];
+	},
+	getPerpUV: function(idx) {
+		return this.wallPerpUVs[idx];
+	},
+	
 	populateArrows: function(dQ){
 		var rotations = {'-1':'cw', '1':'ccw'};
 		var dist = 30;

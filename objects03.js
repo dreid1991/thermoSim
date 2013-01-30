@@ -249,3 +249,84 @@ _.extend(ArrowStatic.prototype, objectFuncs, toInherit.ArrowFuncs, {
 
 }
 )
+	//wallInfo, flows(array), ptIdxs, percentOffset
+	//flows as {name: {nDot: , temp:}}
+function Inlet (attrs) {
+	//need to add clean up at some point
+	this.type = 'Inlet';
+	this.handle = attrs.handle;
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
+	this.width = defaultTo(50, attrs.height);
+	this.depth = defaultTo(20, attrs.depth);
+	this.wallInfo = attrs.wallInfo;
+	this.wall = walls[this.wallInfo];
+	this.ptIdxs = attrs.ptIdxs;
+	this.percentOffset = attrs.percentOffset;
+	this.flows = this.processFlows(attrs.flows);
+	this.init();
+}
+
+_.extend(Inlet.prototype, objectFuncs, {
+	init: function() {
+		var aIdx = Math.min(ptIdxs[0], ptIdxs[1]);
+		var bIdx = Math.max(ptIdxs[0], ptIdxs[1]);
+		var a = this.wall.getPt(a).copy();
+		var b = this.wall.getPt(b).copy();
+		var perp = this.wall.getPerpUV(a);
+		var UV = this.wall.getUV(a);
+		var pts = this.getPts(a, b, UV, perp);
+		//add pts to wall, need to figure out handler.  I guess use the one for pt a
+		//make wall check if any adjacent points are equal, splice out if they are (to deal with depth == 0 case)
+		var inletLine = {pos: pts[1].copy(), vec: pts[1].VTo(pts[2]), dir: perp.copy()};
+		this.makeInlet(inletLine, this.flows);
+	},
+	pts: function(a, b, UV, perp, percentOffset) {
+		var distAB = a.VTo(b).mag();
+		var widthPercent = this.width/(2*distAB);
+		this.percentOffset = Math.min(1 - widthPercent, Math.max(widthPercent, percentOffset);
+		var aOffset = percentOffset - widthPercent;
+		var bOffset = percentOffset + widthPercent;
+		var pt1 = a.copy().fracMoveTo(b, aOffset);
+		var pt4 = b.copy().fracMoveTo(a, bOffset);
+		var pt2 = pt1.copy().movePt(perp.copy().neg().mult(this.depth));
+		var pt3 = pt4.copy().movePt(perp.copy().neg().mult(this.depth));
+		return [pt1, pt2, pt3, pt4];
+	},
+	processFlows: function(flows) {
+		var procdFlows = [];
+		for (var spcName in flows) {
+			var flow = flows[spcName];
+			procdFlows.push({spc: spcs[spcName], temp: flow.temp, nDot: flow.nDot, returnTo: this.wallInfo, tag: flow.tag})
+			procdFlows[procdFlows.length-1].nDot *= updateInterval/1000;
+		}
+		return procdFlows;
+	},
+	makeInlet: function(inletLine, flows) {
+		var inletPos = inletLine.pos;
+		var inletVec = inletLine.vec;
+		var inletDir = inletLine.dir;
+		var dotBank = new Array(flows.length);
+		var flowLen = flows.length;
+		for (var i=0; i<dotBank.length; i++) dotBank[i] = 0;
+		addListener(curLevel, 'update', this.type + this.handle, function() {
+			for (var flowIdx=0; flowIdx<flowLen; flowIdx++) {
+				var flow = flows[flowIdx];
+				dotBank[flowIdx] += flow.nDot;
+				var toMake = Math.floor(dotBank[flowIdx])
+				if (toMake) {
+					var newDots = [];
+					for (var makeIdx=0; makeIdx<toMake; makeIdx++) {
+						var rnd = Math.random();
+						var pos = P(inletPos.x + inletVec.dx * rnd, inletPos.y + inletVec.dy * rnd);
+						newDots.push({pos: pos, dir: inletDir, temp: flow.temp, returnTo: flow.returnTo, tag: flow.tag})
+						
+					}
+					flow.spc.place(newDots);
+					dotBank[flowIdx] -= toMake;
+				}
+			}
+		}, undefined) //maybe context should be this.  Will see if it's needed
+	}
+
+
+})

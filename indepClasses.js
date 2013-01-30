@@ -55,24 +55,33 @@ Species.prototype = {
 		} else {
 			dotManager.removeByInfo({name:this.def.spcName});
 		}
+	},
+	place: function(dotsInfo) { //as [{pos: , dir: , temp: , tag: , returhTo: }]
+		var birthList = [];
+		for (var infoIdx=0; infoIdx<dotsInfo.length; infoIdx++) {
+			var info = dotsInfo[infoIdx];
+			birthList.push(info.pos.x, info.pos.y, dir.copy().mult(tempToV(this.m, info.temp)), this.m, this.r, this.def.spcName, this.def.idNum, info.tag, info.returnTo);
+		}
+		dotManager.add(birthList);
+	}
+	placeSingle: function(pos, dir, temp, tag, returnTo) {
+		birth = D(pos.x, pos.y, dir.copy().mult(tempToV(this.m, temp)), this.m, this.r, this.def.spcName, this.def.idNum, tag, returnTo);
+		dotManager.add(birth);
 	}
 }
 function Point(x, y){
 	this.x = x;
 	this.y = y;
-	return this;
 }
 function Vector(dx, dy){
 	this.dx = dx;
 	this.dy = dy;
-	return this;
 }
 function Color(r, g, b){
 	this.r = r;
 	this.g = g;
 	this.b = b;
 	this.setHex();
-	return this;
 }
 
 
