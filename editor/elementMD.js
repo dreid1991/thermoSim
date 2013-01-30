@@ -349,6 +349,7 @@ $(function() {
 		_.extend(md.prototype, {
 			type: 'folder',
 			iconDim: 13,
+			hoverBG: Col(215, 215, 215),
 			stdExts: {
 				content: 'content',
 				header: 'header',
@@ -402,8 +403,8 @@ $(function() {
 							position: 'relative', 
 							left: '-' + (this.iconDim + 2) + 'px', 
 							top: this.iconDim*.2 + 'px', 
-							width: '0px', 
-							height: '0px'
+							width: this.iconDim + 'px', 
+							height: this.iconDim + 'px'
 						}
 					}) + bodyHTML;
 					
@@ -429,8 +430,9 @@ $(function() {
 				var self = this;
 				var spawn = function () {
 					var childRemovable = field.extendable;
-					self.folderSpawnChild(field, ids, content, children, idNum, childRemovable)
+					self.folderSpawnChild(field, ids, content, children, idNum, childRemovable);
 				}
+				
 				spawn();
 				var toggleDivs = [content];
 				if (field.extendable) {
@@ -493,6 +495,7 @@ $(function() {
 				})
 				$(toRemove).append(removeHTML);
 				var remove = $('#' + removeId);
+				this.enableHover(remove);
 				this.bindRemove(toRemove, remove, children, child)
 				
 			},
@@ -562,46 +565,75 @@ $(function() {
 			},
 			genExpanderHTML: function(parent, ids, toggleDivs) {
 				var imgId = ids.concat(['std', this.stdExts.image]).join('_');
-				var img = templater.img({
+				var wrapperId = ids.concat(['std', this.stdExts.image, this.stdExts.wrapper]).join('_');
+				var wrapper = templater.div({
 					attrs: {
-						src: ['img/folder_open.png'], 
-						id: [imgId], 
-						width: [this.iconDim], 
-						height: [this.icomDim]
-					}
-				});
+						id: [wrapperId],
+					},
+					style: {
+						width: this.iconDim,
+						height: this.iconDim,
+					},
+					innerHTML: templater.img({
+						attrs: {
+							src: ['img/folder_open.png'], 
+							id: [imgId], 
+							width: [this.iconDim], 
+							height: [this.icomDim]
+						}
+					})
+				})
 
-				$(parent).append(img);
+				$(parent).append(wrapper);
+				this.enableHover($('#' + wrapperId));
 				this.bindExpander($('#' + imgId), toggleDivs);
 			},
 			genExtender: function(header, spawn, ids) {
-				var id = ids.concat(['std', this.stdExts.extender]).join('_');
+				var idWrapper = ids.concat(['std', this.stdExts.extender]).join('_');
+				var idImg = ids.concat(['std', this.stdExts.extender, this.stdExts.image]).join('_');
 				var titleId = ids.concat(['std', this.stdExts.title]).join('_');
 				$('#' + titleId).css({display: 'inline-block'});
 				var extenderHTML = templater.div({
 					style: {
-						display: 'inline-block'
+						display: 'inline-block',
+						position: 'relative',
+						top: this.iconDim*.2,
+						left: this.iconDim*.5
+					},
+					attrs: {
+						id: [idWrapper]
 					},
 					innerHTML: 
 						templater.img({
 							attrs: {
 								src: ['img/add.png'],
-								id: [id]
+								id: [idImg]
 							},
 							style: {
 								display: 'inline-block',
 								width: this.iconDim,
 								height: this.iconDim,
-								position: 'relative',
-								top: this.iconDim*.2,
-								left: this.iconDim*.5
+
 							}
 						})
 					
 				})
 				$(header).append(extenderHTML);
-				$('#' + id).click(spawn);
+				var wrapper = $('#' + idWrapper);
+				this.enableHover(wrapper);
+				$('#' + idWrapper).click(spawn);
 			},
+			enableHover: function(div) {
+				var self = this;
+				$(div).hover(
+					function(){
+						$(div).css('background-color', self.hoverBG.hex);
+					},
+					function() {
+						$(div).css('background-color', '');
+					}
+				)
+			}
 		})
 	}
 })
