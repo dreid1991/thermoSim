@@ -13,7 +13,7 @@ TYPES = {
 }
 
 MENUTRIGGERS = {
-	wallHandle: 
+	//wallHandle: 
 }
 
 

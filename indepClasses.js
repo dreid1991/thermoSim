@@ -63,7 +63,7 @@ Species.prototype = {
 			birthList.push(info.pos.x, info.pos.y, dir.copy().mult(tempToV(this.m, info.temp)), this.m, this.r, this.def.spcName, this.def.idNum, info.tag, info.returnTo);
 		}
 		dotManager.add(birthList);
-	}
+	},
 	placeSingle: function(pos, dir, temp, tag, returnTo) {
 		birth = D(pos.x, pos.y, dir.copy().mult(tempToV(this.m, temp)), this.m, this.r, this.def.spcName, this.def.idNum, tag, returnTo);
 		dotManager.add(birth);
