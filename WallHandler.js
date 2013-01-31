@@ -262,7 +262,7 @@ WallMethods.main = {
 	idxByHandle: function(handle){
 		
 		for (var idx=0; idx<this.length; idx++){
-			if(handle==this[idx].handle){
+			if (handle==this[idx].handle) {
 				return idx;
 			}
 		}
@@ -271,9 +271,9 @@ WallMethods.main = {
 	},
 	idxByInfo: function(info){
 		var wallIdx;
-		if(parseFloat(info)!=info){
+		if (parseFloat(info)!=info) {
 			return this.idxByHandle(info)
-		}else{
+		} else {
 			return info;
 		}
 	},

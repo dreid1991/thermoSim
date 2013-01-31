@@ -847,6 +847,40 @@ WallMethods.wall = {
 			this.idxLastArrow = turn;
 		}
 	},
+	addPts: function(spliceIdx, toAdd) {
+		//can't just set concat result equal to this because this's prototype is extended
+		//will use handler of wall at spliceIdx because they're usually all the same anyway
+		var oldHandlers = [];
+		var idx = this.parent.idxByInfo(this.handle);
+		for (var handlerIdx=spliceIdx; handlerIdx<this.length; handlerIdx++) {
+			oldHandlers.push(this.parent.getSubWallHandler(idx, spliceIdx))
+		}
+		var oldPts = this.concat();
+		var newPts = oldPts.slice(0, spliceIdx).concat(toAdd, oldPts.slice(spliceIdx, oldPts.length));
+		for (var ptIdx=0; ptIdx<newPts.length; ptIdx++) {
+			this[ptIdx] = newPts[ptIdx];
+		}
+		for (var movedPtIdx=spliceIdx + toAdd.length; movedPtIdx<this.length; movedPtIdx++) {
+			this.parent.setSubWallHandler(this.handle, movedPtIdx, oldHandlers[movedPtIdx - toAdd.length - spliceIdx]);
+		}
+		var newHandler = oldHandlers[0] || this.parent[id + '-' + (spliceIdx - 1)];
+		for (var newPtIdx=spliceIdx; newPtIdx<spliceIdx + toAdd.length; newPtIdx++) {
+			this.parent.setSubWallHandler(this.handle, newPtIdx, newHandler)
+		}
+		this.parent.setupWall(this.handle);
+	},
+	removePts: function(spliceIdx, num) {
+		var handlers = [];
+		var idx = this.parent.idxByInfo(this.handle);
+		for (var toMoveIdx = spliceIdx + num; toMoveIdx<this.length; toMoveIdx++) {
+			handlers.push(this.parent.getSubWallHandler(idx, toMoveIdx));
+		}
+		this.splice(spliceIdx, num);
+		for (var subWallIdx=spliceIdx; subWallIdx<this.length; subWallIdx++) {
+			this.parent.setSubWallHandler(idx, subWallIdx, handlers[subWallIdx-spliceIdx]);
+		}
+		this.parent.setupWall(this.handle);
+	},
 	getPt: function(idx) {
 		return this[idx];
 	},

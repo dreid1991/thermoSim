@@ -283,7 +283,7 @@ _.extend(Inlet.prototype, objectFuncs, {
 	pts: function(a, b, UV, perp, percentOffset) {
 		var distAB = a.VTo(b).mag();
 		var widthPercent = this.width/(2*distAB);
-		this.percentOffset = Math.min(1 - widthPercent, Math.max(widthPercent, percentOffset);
+		this.percentOffset = Math.min(1 - widthPercent, Math.max(widthPercent, percentOffset));
 		var aOffset = percentOffset - widthPercent;
 		var bOffset = percentOffset + widthPercent;
 		var pt1 = a.copy().fracMoveTo(b, aOffset);
