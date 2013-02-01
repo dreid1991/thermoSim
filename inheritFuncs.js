@@ -49,7 +49,7 @@ toInherit = {
 	},
 	MathExtenders:{
 		log10: function(val){
-			return Math.log(val)/Math.log(10);	
+			return Math.log(val)/2.302585092994045684017;	//log(10)
 		},
 
 	},

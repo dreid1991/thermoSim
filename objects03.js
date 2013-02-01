@@ -256,8 +256,10 @@ function Inlet (attrs) {
 	this.type = 'Inlet';
 	this.handle = attrs.handle;
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
-	this.width = defaultTo(50, attrs.height=== 0 ? 1 : attrs.height); //can't be 0 or you'll have duplicate wall pts.  Could deal with this, just... later
-	this.depth = defaultTo(20, attrs.depth=== 0 ? 1 : attrs.depth);
+	//if depth is 0, just have it not add any pointsa
+	this.makePts = attrs.depth;
+	this.width = defaultTo(50, attrs.height);
+	this.depth = defaultTo(20, attrs.depth);
 	this.wallInfo = attrs.wallInfo;
 	this.wall = walls[this.wallInfo];
 	this.ptIdxs = attrs.ptIdxs;
@@ -277,7 +279,9 @@ _.extend(Inlet.prototype, objectFuncs, {
 		var pts = this.getPts(a, b, UV, perp, this.fracOffset);
 		//add pts to wall, need to figure out handler.  I guess use the one for pt a
 		//make wall check if any adjacent points are equal, splice out if they are (to deal with depth == 0 case)
-		this.wall.addPts(this.ptIdxs[1], pts);
+		if (this.makePts) {
+			this.wall.addPts(this.ptIdxs[1], pts);
+		}
 		var inletLine = {pos: pts[1].copy(), vec: pts[1].VTo(pts[2]), dir: perp.copy()};
 		//this.makeInlet(inletLine, this.flows);
 	},
