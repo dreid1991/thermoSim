@@ -83,15 +83,17 @@ _.extend(cvcp.prototype,
 					],
 					
 					//borders should be option in wall
-					dots: [	{type: 'spc1', pos: P(45,200), dims: V(200, 200), count: 350, temp:150, returnTo: 'left', tag: 'left'},
-							{type: 'spc3', pos: P(45,200), dims: V(200, 200), count: 250, temp:150, returnTo: 'left', tag: 'left'},
+					dots: [	{type: 'spc1', pos: P(45,200), dims: V(200, 200), count: 3/*50*/, temp:150, returnTo: 'left', tag: 'left'},
+							{type: 'spc3', pos: P(45,200), dims: V(200, 200), count: 2/*50*/, temp:150, returnTo: 'left', tag: 'left'},
 							{type: 'spc1', pos: P(300,200), dims: V(200, 200), count: 350, temp:150, returnTo: 'right', tag: 'right'},
 							{type: 'spc3', pos: P(300,200), dims: V(200, 200), count: 350, temp:150, returnTo: 'right', tag: 'right'}
 					],
 					objs: [
 						{type: 'Piston', attrs: {handle: 'RightPiston', wallInfo: 'right', min:2, init:2, max:2, makeSlider:false}},
-						{type: 'Heater', attrs: {handle: 'heaterLeft', wallInfo: 'left'}},
-						{type: 'Heater', attrs: {handle: 'heaterRight', wallInfo: 'right'}}
+						/*{type: 'Heater', attrs: {handle: 'heaterLeft', wallInfo: 'left'}},*/
+						{type: 'Heater', attrs: {handle: 'heaterRight', wallInfo: 'right'}},
+						{type: 'Inlet', attrs: {handle: 'inny', wallInfo: 'left', ptIdxs: [3, 4], fracOffset: .3, makeSlider: true, flows: [{spcName: 'spc1', nDotMax: .01, temp: 300, tag: 'left'}, {spcName: 'spc3', nDotMax: .02, temp: 50, tag: 'left'}]}},
+						{type: 'Outlet', attrs: {handle: 'outty', wallInfo: 'left', ptIdxs: [0, 1], fracOffset: .3}}
 					],
 					records: [
 					],

@@ -239,10 +239,10 @@ WallMethods.wall = {
 	unsetMass: function(chunkName){
 		if(!chunkName){
 			for (var chunkName in this.massChunks){
-				this.massChunks[chunkName] = undefined;
+				delete this.massChunk[chunkName]
 			}		
 		}else{
-			this.massChunks[chunkName] = undefined;
+			delete this.massChunks[chunkName];
 		}
 		this.updateMass();
 		return this;

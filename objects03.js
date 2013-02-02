@@ -145,12 +145,12 @@ function sillyArrow(){
 }
 
 function sillierArrow() {
-	return new ArrowStatic({pos:P(100, 100),
+	return new ArrowStatic({pos:P(00, 00),
 					dims:V(100,50),
-					angle:Math.PI,
+					angle:0,
 					fill:Col(150, 0, 0),
 					stroke:Col(0, 255, 255),
-					label:'LOL',
+					label:undefined,
 					});
 					
 }
@@ -168,16 +168,15 @@ function ArrowStatic(attrs) {
 			this.label = false;
 	}
 	if (attrs.angle) {
-			this.angle = attrs.angle;
-		} else if (attrs.UV) {
-			this.angle = UVToAngle(attrs.UV);
+		this.angle = attrs.angle;
+	} else if (attrs.UV) {
+		this.angle = UVToAngle(attrs.UV);
 	}
 	this.setTextOffset();
 	this.fill = attrs.fill.copy();
 	this.textCol = defaultTo(Col(255,255,255), attrs.textCol);
 	this.stroke = defaultTo(attrs.stroke, Col(0,0,0));
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
-	return this.init();
+	this.init();
 }
 _.extend(ArrowStatic.prototype, objectFuncs, toInherit.ArrowFuncs, {
 	init: function() {
@@ -188,7 +187,6 @@ _.extend(ArrowStatic.prototype, objectFuncs, toInherit.ArrowFuncs, {
 				addListener(curLevel, 'update', this.updateListenerName, this.runNoLabel, this);
 		}
 		this.addCleanUp();
-		return this;		
 	},
 	runLabel: function() {
 		this.drawCanvas.save();
@@ -249,62 +247,98 @@ _.extend(ArrowStatic.prototype, objectFuncs, toInherit.ArrowFuncs, {
 
 }
 )
-	//wallInfo, flows(array), ptIdxs, fracOffset
-	//flows as {name: {nDot: , temp:}}
-function Inlet (attrs) {
-	//need to add clean up at some point
-	this.type = 'Inlet';
-	this.handle = attrs.handle;
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
-	//if depth is 0, just have it not add any pointsa
-	this.makePts = attrs.depth;
-	this.width = defaultTo(50, attrs.height);
-	this.depth = defaultTo(20, attrs.depth);
-	this.wallInfo = attrs.wallInfo;
-	this.wall = walls[this.wallInfo];
-	this.ptIdxs = attrs.ptIdxs;
-	this.fracOffset = attrs.fracOffset;
-	this.flows = this.processFlows(attrs.flows);
-	this.init();
-}
 
-_.extend(Inlet.prototype, objectFuncs, {
-	init: function() {
-		var aIdx = Math.min(this.ptIdxs[0], this.ptIdxs[1]);
-		var bIdx = Math.max(this.ptIdxs[0], this.ptIdxs[1]);
-		var a = this.wall.getPt(aIdx).copy();
-		var b = this.wall.getPt(bIdx).copy();
-		var perp = this.wall.getPerpUV(aIdx);
-		var UV = this.wall.getUV(aIdx);
-		var pts = this.getPts(a, b, UV, perp, this.fracOffset);
-		//add pts to wall, need to figure out handler.  I guess use the one for pt a
-		//make wall check if any adjacent points are equal, splice out if they are (to deal with depth == 0 case)
-		if (this.makePts) {
-			this.wall.addPts(this.ptIdxs[1], pts);
-		}
-		var inletLine = {pos: pts[1].copy(), vec: pts[1].VTo(pts[2]), dir: perp.copy()};
-		//this.makeInlet(inletLine, this.flows);
-	},
+var flowFuncs = {
 	getPts: function(a, b, UV, perp, fracOffset) {
 		var distAB = a.VTo(b).mag();
-		var widthPercent = this.width/(2*distAB);
-		this.fracOffset = Math.min(1 - widthPercent, Math.max(widthPercent, fracOffset));
-		var aOffset = fracOffset - widthPercent;
-		var bOffset = fracOffset - widthPercent;
+		var widthFrac = this.width/(distAB);
+		this.fracOffset = Math.max(Math.min(this.fracOffset, 1 - widthFrac/2), widthFrac/2);
+		var aOffset = fracOffset - widthFrac;
+		var bOffset = fracOffset + widthFrac;
 		var pt1 = a.copy().fracMoveTo(b, aOffset);
-		var pt4 = b.copy().fracMoveTo(a, bOffset);
+		var pt4 = a.copy().fracMoveTo(b, bOffset);
 		var pt2 = pt1.copy().movePt(perp.copy().neg().mult(this.depth));
 		var pt3 = pt4.copy().movePt(perp.copy().neg().mult(this.depth));
 		return [pt1, pt2, pt3, pt4];
 	},
+	addPts: function() {
+		var aIdx = Math.min(this.ptIdxs[0], this.ptIdxs[1]);
+		var bIdx = Math.max(this.ptIdxs[0], this.ptIdxs[1]);
+		var a = this.wall.getPt(aIdx).copy();
+		var b = this.wall.getPt(bIdx).copy();
+		this.perp = this.wall.getPerpUV(aIdx);
+		var UV = this.wall.getUV(aIdx);
+		this.pts = this.getPts(a, b, UV, this.perp, this.fracOffset);
+	},
+	addArrows: function(UV, type) {
+		var width = this.width;
+		var arrowCount = this.width > 30 ? 2 : 1;
+		var pos = this.pts[1].copy();
+		pos.movePt(UV.copy().neg().mult(this.arrowDims.dy/3));
+		var ptVec = this.pts[1].VTo(this.pts[2]);
+		var stepAdvance = ptVec.copy().UV().copy().mult(ptVec.mag()/(arrowCount + 1));
+		for (var ctIdx=0; ctIdx<arrowCount; ctIdx++) {
+			pos.movePt(stepAdvance);
+			new ArrowStatic({pos: pos, dims: this.arrowDims, UV: UV.copy(), fill: this.arrowFill, stroke: this.arrowStroke, cleanUpWith: this.cleanUpWith})
+		}
+	}
+}
+
+	//wallInfo, flows(array), ptIdxs, fracOffset, makeSlider, fracOpen
+	//flows as [{spcName: , nDotMax: , temp: }]
+function Inlet (attrs) {
+	this.arrowDims = V(15, 20);
+	this.arrowFill = Col(200, 0, 0);
+	this.arrowStroke = Col(100, 100, 100);
+	//still need to add those arrows
+	this.type = 'Inlet';
+	this.handle = attrs.handle;
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
+	this.width = defaultTo(50, attrs.height);
+	this.depth = defaultTo(20, attrs.depth);
+	this.fracOpen = defaultTo(1, attrs.fracOpen);
+	//if depth is 0, just have it not add any pointsa
+	this.makePts = this.depth;
+	this.wallInfo = attrs.wallInfo;
+	this.wall = walls[this.wallInfo];
+	this.ptIdxs = attrs.ptIdxs;
+	this.fracOffset = defaultTo(.5, attrs.fracOffset);
+	this.flows = this.processFlows(attrs.flows);
+	this.makeSlider = attrs.makeSlider;
+	if(this.makeSlider){
+		this.sliderId = this.addSlider('Flow rate', {value: this.fracOpen*100}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
+	}
+	this.addCleanUp();
+	this.init();
+	
+}
+
+_.extend(Inlet.prototype, flowFuncs, objectFuncs, {
+	init: function() {
+		this.addPts();
+		
+		//add pts to wall, need to figure out handler.  I guess use the one for pt a
+		//make wall check if any adjacent points are equal, splice out if they are (to deal with depth == 0 case)
+		if (this.makePts) {
+			this.wall.addPts(this.ptIdxs[1], this.pts);
+		}
+		var inletLine = {pos: this.pts[1].copy(), vec: this.pts[1].VTo(this.pts[2]), dir: this.perp.copy()};
+		this.addArrows(this.pts[1].VTo(this.pts[2]).UV().perp('ccw'));
+		this.makeInlet(inletLine, this.flows);
+	},
+
+
 	processFlows: function(flows) {
 		var procdFlows = [];
-		for (var spcName in flows) {
-			var flow = flows[spcName];
-			procdFlows.push({spc: spcs[spcName], temp: flow.temp, nDot: flow.nDot, returnTo: this.wallInfo, tag: flow.tag})
-			procdFlows[procdFlows.length-1].nDot *= updateInterval/1000;
+		for (var flowIdx=0; flowIdx<flows.length; flowIdx++) {
+			var flow = flows[flowIdx];
+			procdFlows.push({spc: spcs[flow.spcName], temp: flow.temp, nDotMax: flow.nDotMax, returnTo: this.wallInfo, tag: flow.tag})
+			procdFlows[procdFlows.length-1].nDotMax *= 1000 / updateInterval;
 		}
 		return procdFlows;
+	},
+	parseSlider: function(event, ui){
+		this.fracOpen = ui.value / 100;
 	},
 	makeInlet: function(inletLine, flows) {
 		var inletPos = inletLine.pos;
@@ -316,7 +350,7 @@ _.extend(Inlet.prototype, objectFuncs, {
 		addListener(curLevel, 'update', this.type + this.handle, function() {
 			for (var flowIdx=0; flowIdx<flowLen; flowIdx++) {
 				var flow = flows[flowIdx];
-				dotBank[flowIdx] += flow.nDot;
+				dotBank[flowIdx] += this.fracOpen * flow.nDotMax;
 				var toMake = Math.floor(dotBank[flowIdx])
 				if (toMake) {
 					var newDots = [];
@@ -330,8 +364,45 @@ _.extend(Inlet.prototype, objectFuncs, {
 					dotBank[flowIdx] -= toMake;
 				}
 			}
-		}, undefined) //maybe context should be this.  Will see if it's needed
+		}, this) //maybe context should be this.  Will see if it's needed
+	},
+	remove: function() {
+		if (this.sliderId) {
+			this.removeSlider();
+		}
+		removeListener(curLevel, 'update', this.type + this.handle);
+	
 	}
 
 
+})
+function Outlet(attrs) {
+	this.arrowDims = V(15, 20);
+	this.arrowFill = Col(200, 0, 0);	
+	this.arrowStroke = Col(100, 100, 100);
+	this.type = 'Outlet';
+	this.handle = attrs.handle;
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
+	//if depth is 0, just have it not add any pointsa
+	this.width = defaultTo(10, attrs.height);
+	this.depth = defaultTo(20, attrs.depth);
+	this.fracOpen = defaultTo(1, attrs.fracOpen);
+	this.makePts = this.depth;
+	this.wallInfo = attrs.wallInfo;
+	this.wall = walls[this.wallInfo];
+	this.ptIdxs = attrs.ptIdxs;
+	this.fracOffset = defaultTo(.5, attrs.fracOffset);
+	this.init();
+}
+
+_.extend(Outlet.prototype, flowFuncs, objectFuncs, {
+	init: function() {	
+		this.addPts();
+		if (this.makePts) {
+			this.wall.addPts(this.ptIdxs[1], this.pts);
+		}
+		var subWallIdx = Math.min(this.ptIdxs[0], this.ptIdxs[1]) + 2;
+		this.addArrows(this.pts[1].VTo(this.pts[2]).UV().perp('cw'));
+		walls.setSubWallHandler(this.wallInfo, subWallIdx, 'outlet');
+	}		
 })

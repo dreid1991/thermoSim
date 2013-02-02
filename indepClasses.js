@@ -60,7 +60,7 @@ Species.prototype = {
 		var birthList = [];
 		for (var infoIdx=0; infoIdx<dotsInfo.length; infoIdx++) {
 			var info = dotsInfo[infoIdx];
-			birthList.push(info.pos.x, info.pos.y, dir.copy().mult(tempToV(this.m, info.temp)), this.m, this.r, this.def.spcName, this.def.idNum, info.tag, info.returnTo);
+			birthList.push(D(info.pos.x, info.pos.y, info.dir.copy().mult(tempToV(this.m, info.temp)), this.m, this.r, this.def.spcName, this.def.idNum, info.tag, info.returnTo));
 		}
 		dotManager.add(birthList);
 	},
