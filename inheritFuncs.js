@@ -70,6 +70,9 @@ toInherit = {
 				return letter.toUpperCase();
 			  }).replace(/\s+/g, '');		
 		},
+		sanitize: function() {
+			return this.replace(/'/g, '&#39;').replace(/"/g, '&#34;').replace(/</g, '&#60;').replace(/>/g, '&#62;').replace(/{/g, '&#123;').replace(/}/g, '&#125;');
+		}
 	},
 	ArrowFuncs: {
 		getPts: function(){

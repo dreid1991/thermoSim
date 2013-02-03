@@ -581,7 +581,7 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 	if (newPrompt.setup) {
 		newPrompt.setup.apply(window['curLevel'])
 	}
-	newPrompt.text = evalText(addStored(newPrompt.text));
+	//newPrompt.text = evalText(addStored(newPrompt.text)); done in renderer now
 	if (!newPrompt.quiz) {
 		$('#nextPrevDiv').show();
 	}
@@ -744,44 +744,107 @@ function prevPrompt(){
 	showPrompt(prevIdxs.newSectionIdx, prevIdxs.newPromptIdx);
 }
 
-
+/*
+Ahem, I am redefining how get and eval are done.  
+get(idStr, type ('int', 'float', 'string'), default, min, max, 
+eval(expr, decPlaces, default, min, max)
+*/
 
 function addStored(text) {
-	var get;
-	var gotten;
-	var testExpr = /GET_#{0,1}[A-Za-z0-9]*\|/;
+	//if you EVER find a way to do regexp lookbehinds, use it here.  
+
+	var testExpr = /get[\s]*([A-Za-z0-9,\s\-]*)/;
 	while (true) {
-		var cmmdList = testExpr.exec(text);
+		var cmmdExpr = testExpr.exec(text);
 		if (cmmdList == null) break;
 		var cmmd = cmmdList[0];
-		if (cmmd.indexOf('#')>=0) {
-			get = cmmd.slice(5, cmmd.length-1);
-			gotten = parseFloat(getStore(get));
-		} else {
-			get = cmmd.slice(4, cmmd.length-1);
-			gotten = getStore(get);
+		var args = sliceArgs(cmmd);
+		var idStr = args[0];
+		var type = args[1];
+		var defVal = args[2];
+		var min = Number(args[3]);
+		var max = Number(args[4]);
+		var isInt = type == 'int';
+		var isFloat = type == 'float';
+		var isNum = isInt || isFloat;
+		var isStr = type == 'string';
+		if (type == 'int' || type == 'float') defVal = Number(defVal);
+		
+		var gotten = getStore(idStr);
+		var val;
+		if (gotten) {
+			if (isInt) {
+				val = Math.round(parseFloat(gotten));
+			} else if (isFloat) {
+				val = parseFloat(gotten);
+			} else if (isStr) {
+				val = gotten.sanitize();
+			}
+			if (isNum) {
+				if (min === undefined || isNaN(min)) min = val;
+				if (max === undefined || isNaN(max)) max = val;
+				val = Math.max(min, Math.min(max, val));
+			}
 		}
-		text = text.replace(cmmd, gotten);
+		
+		if (!val) {
+			val = defVal;
+		}
+		text = text.replace(cmmd, val);
 	}
 	return text;
 }
 
+
+
 function evalText(text) {
-	var testExpr = /EVAL_[0-9\(\)\+\-\*\/]*\|/;
+	var testExpr = /eval[\s]*([0-9\(\)\+\-\*\/\s,]*)/;
 	
 	while (true) {
 		var evalList = testExpr.exec(text);
 		if (evalList == null) break;
 		var evalItem = evalList[0];
-		var cmmd = evalItem.slice(5, cmmd.length - 1);
+		var args = sliceArgs(evalItem);
+		var expr = args[0];
+		var decPlaces = args[1];
+		var def = args[2];
+		var min = args[3];
+		var max = args[4];
+		var val;
 		try {
-			result = eval(cmmd);
+			val = eval(expr);
 		} catch(e) {
-			console.log('Bad eval ' + evalItem + ', cmmd is ' + cmmd);
+			console.log('Bad eval ' + evalItem + ', expr is ' + expr);
 		}
-		text = text.replace(evalItem, result);
+		
+		val = Math.max(min, Math.min(max, val));
+		if (val === undefined || isNaN(val) && def !== undefined && !isNaN(def)) {
+			val = def;
+		}
+		if (val !== undefined && !isNaN(val)) { //my round doesn't have any error handling, so need to do that here
+			if (min === undefined || isNaN(min)) min = val;
+			if (max === undefined || isNaN(max)) max = val;
+			if (decPlaces > 0 || decPlaces === 0) val = round(val, Math.round(decPlaces));
+		}
+		text = text.replace(evalItem, val);
 	}
 	return text;
+}
+
+function sliceArgs(expr) {
+	var args = [];
+	var working = expr;
+	var hasCommas = working.indexOf(',') > -1;
+	working = working.replace(/[A-Za-z0-9\s-]*\(/, '');
+	working = working.replace(')', '');
+	working += ','; //if you'll pardon the slop, just adding a comma to the end is a really easy way to make the below function work for just one argument or the last argument in a function
+	while (hasCommas) {
+		var idx = working.indexOf(',');
+		args.push(working.slice(0, idx).killWhiteSpace());
+		working = working.slice(idx + 1, working.length);
+		hasCommas = working.indexOf(',') > -1;
+	}
+	return args;	
 }
 
 function alertValid(str) {

@@ -4,6 +4,7 @@ function Renderer() {
 
 Renderer.prototype = {
 	render: function(scene) {
+		//scene = this.getAndEval(scene); //copying all objects, replacing GET tags with value and EVAL ing
 		if (scene.type) {
 			if (/section/.test(scene.type)) {
 				currentSetupType = scene.type;
@@ -95,6 +96,32 @@ Renderer.prototype = {
 			obj[cmmd.func](cmmd.attrs || {});
 		}
 	},
+	getAndEval: function(scene) {
+		var copy = {};
+		for (var name in scene) {
+			var scenelet = scene[name];
+			if (scenelet instanceof Number) {
+			} else if (scenelet instanceof String) {
+				copy[name] = evalText(addStored(scenelet));
+			} else if (scenelet instanceof Point) {
+				var x = this.getAndEval(scenelet.x);
+				var y = this.getAndEval(scenelet.y);
+				copy[name] = P(x, y);
+			} else if (scenelet instanceof Vector) {
+				var dx = this.getAndEval(scenelet.dx);
+				var dy = this.getAndEval(scenelet.dy);
+				copy[name] = V(dx, dy);
+			} else if (scenelet instanceof Color) {
+				var r = this.getAndEval(scenelet.r);
+				var g = this.getAndEval(scenelet.g);
+				var b = this.getAndEval(scenelet.b);
+				copy[name] = Col(r, g, b);
+			} else if (scenelet instanceof object) {
+				copy[name] = this.getAndEval(scenelet);
+			}
+		}
+		return copy;
+	}
 
 /*
 Listener store on satisfy: path, handle
