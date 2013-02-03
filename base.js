@@ -752,12 +752,7 @@ eval(expr, decPlaces, default, min, max)
 
 function addStored(text) {
 	//if you EVER find a way to do regexp lookbehinds, use it here.  
-
-	var testExpr = /get[\s]*([A-Za-z0-9,\s\-]*)/;
-	while (true) {
-		var cmmdExpr = testExpr.exec(text);
-		if (cmmdList == null) break;
-		var cmmd = cmmdList[0];
+	return text.replace(/get[\s]*([A-Za-z0-9,\s\-]*)/g, function(subStr, idx) {
 		var args = sliceArgs(cmmd);
 		var idStr = args[0];
 		var type = args[1];
@@ -790,20 +785,14 @@ function addStored(text) {
 		if (!val) {
 			val = defVal;
 		}
-		text = text.replace(cmmd, val);
-	}
-	return text;
+		return val;
+	})
 }
 
 
 
 function evalText(text) {
-	var testExpr = /eval[\s]*([0-9\(\)\+\-\*\/\s,]*)/;
-	
-	while (true) {
-		var evalList = testExpr.exec(text);
-		if (evalList == null) break;
-		var evalItem = evalList[0];
+	return text.replace(/eval[\s]*([0-9\(\)\+\-\*\/\s,\.]*)/g, function(evalItem, idx) {
 		var args = sliceArgs(evalItem);
 		var expr = args[0];
 		var decPlaces = args[1];
@@ -826,9 +815,8 @@ function evalText(text) {
 			if (max === undefined || isNaN(max)) max = val;
 			if (decPlaces > 0 || decPlaces === 0) val = round(val, Math.round(decPlaces));
 		}
-		text = text.replace(evalItem, val);
-	}
-	return text;
+		return val;
+	})
 }
 
 function sliceArgs(expr) {
