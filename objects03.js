@@ -294,7 +294,7 @@ function Inlet (attrs) {
 	this.type = 'Inlet';
 	this.handle = attrs.handle;
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
-	this.width = defaultTo(50, attrs.height);
+	this.width = defaultTo(30, attrs.height);
 	this.depth = defaultTo(20, attrs.depth);
 	this.fracOpen = defaultTo(1, attrs.fracOpen);
 	//if depth is 0, just have it not add any pointsa
@@ -384,7 +384,7 @@ function Outlet(attrs) {
 	this.handle = attrs.handle;
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	//if depth is 0, just have it not add any pointsa
-	this.width = defaultTo(10, attrs.height);
+	this.width = defaultTo(30, attrs.height);
 	this.depth = defaultTo(20, attrs.depth);
 	this.fracOpen = defaultTo(1, attrs.fracOpen);
 	this.makePts = this.depth;

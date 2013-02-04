@@ -55,7 +55,7 @@ toInherit = {
 	},
 	StringExtenders:{
 		killWhiteSpace: function() {
-			return this.replace(/\s/g, '');
+			return this.replace(/\s+/g, '');
 		},
 		killNumbers: function() {
 			return this.replace(/[0-9]/g, '');

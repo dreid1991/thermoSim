@@ -4,7 +4,7 @@ function Renderer() {
 
 Renderer.prototype = {
 	render: function(scene) {
-		//scene = this.getAndEval(scene); //copying all objects, replacing GET tags with value and EVAL ing
+		scene = this.getAndEval(scene); //copying all objects, replacing GET tags with value and EVAL ing
 		if (scene.type) {
 			if (/section/.test(scene.type)) {
 				currentSetupType = scene.type;
@@ -96,31 +96,39 @@ Renderer.prototype = {
 			obj[cmmd.func](cmmd.attrs || {});
 		}
 	},
-	getAndEval: function(scene) {
-		var copy = {};
-		for (var name in scene) {
-			var scenelet = scene[name];
-			if (scenelet instanceof Number) {
-			} else if (scenelet instanceof String) {
-				copy[name] = evalText(addStored(scenelet));
-			} else if (scenelet instanceof Point) {
-				var x = this.getAndEval(scenelet.x);
-				var y = this.getAndEval(scenelet.y);
-				copy[name] = P(x, y);
-			} else if (scenelet instanceof Vector) {
-				var dx = this.getAndEval(scenelet.dx);
-				var dy = this.getAndEval(scenelet.dy);
-				copy[name] = V(dx, dy);
-			} else if (scenelet instanceof Color) {
-				var r = this.getAndEval(scenelet.r);
-				var g = this.getAndEval(scenelet.g);
-				var b = this.getAndEval(scenelet.b);
-				copy[name] = Col(r, g, b);
-			} else if (scenelet instanceof object) {
-				copy[name] = this.getAndEval(scenelet);
+	getAndEval: function(sceneElem) {
+		if (typeof sceneElem == 'number') {
+			return sceneElem;
+		} else if (typeof sceneElem == 'string') {
+			return evalText(addStored(sceneElem));
+		} else if (typeof sceneElem == 'boolean') {
+			return sceneElem;
+		} else if (sceneElem instanceof Point) {
+			var x = this.getAndEval(sceneElem.x);
+			var y = this.getAndEval(sceneElem.y);
+			return P(x, y);
+		} else if (sceneElem instanceof Vector) {
+			var dx = this.getAndEval(sceneElem.dx);
+			var dy = this.getAndEval(sceneElem.dy);
+			return V(dx, dy);
+		} else if (sceneElem instanceof Color) {
+			var r = this.getAndEval(sceneElem.r);
+			var g = this.getAndEval(sceneElem.g);
+			var b = this.getAndEval(sceneElem.b);
+			return Col(r, g, b);
+		} else if (sceneElem instanceof Array) {
+			var newArr = [];
+			for (var idx=0; idx<sceneElem.length; idx++) {
+				newArr.push(this.getAndEval(sceneElem[idx]));
 			}
+			return newArr = newArr;
+		} else if (sceneElem instanceof Object) {
+			var newObj = {};
+			for (var name in sceneElem) {
+				newObj[name] = this.getAndEval(sceneElem[name])
+			}
+			return newObj;
 		}
-		return copy;
 	}
 
 /*

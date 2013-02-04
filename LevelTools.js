@@ -88,7 +88,7 @@ LevelTools = {
 			$('#dashCutScene').show();
 			$('#base').hide();
 			this.cutSceneText(text);
-			this.appendQuiz(quiz, 'intText');
+			this.appendQuiz(quiz, $('#intText'));
 		}
 		$('#canvasDiv').hide();
 		$('#display').show();
@@ -97,6 +97,18 @@ LevelTools = {
 		
 	},
 	appendQuiz: function(quiz, appendTo) {
+		var wrapperHTML = templater.div({attrs: {id: ['quizWrapper']}, style: {display: 'inline-block'}});
+		var contentHTML = templater.div({attrs: {id: ['quizContent'], 'class': ['niceFont', 'whiteFont']}});
+		var footerHTML = templater.div({attrs: {id: ['quizFooter']}});
+
+		$(appendTo).append(wrapperHTML);
+		var wrapper = $('#quizWrapper');
+		$(quizWrapper).append(contentHTML);
+		$(quizWrapper).append(footerHTML);
+		
+		var content = $('#quizContent');
+		var footer = $('#quizFooter');
+		
 		var makeSubmitButton = false;
 		this.quiz = new Array(quiz.length);
 		this.quiz.allAnswered = function() {
@@ -107,54 +119,77 @@ LevelTools = {
 			}
 			return 1;
 		}
+		var hideDir = true;
 		for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
 			var question = quiz[questionIdx];
 			if (question.type == 'text' || question.type == 'textSmall') {
-				makeSubmitButton = true;
+				var submitAdvance = true;
+			} else if (question.type == 'setVals') {
+				var submitSetVal = true;
+				hideDir = false;
 			}
-			this.appendQuestion(question, appendTo, questionIdx);
+			this.appendQuestion(question, content, questionIdx);
 		}
 		//Okay, this quiz structure needs work
-		if (makeSubmitButton) {
-			this.makeSubmitButton(appendTo);
+		hideDir ? $('#nextPrevDiv').hide() : $('#nextPrevDiv').show()
+		if (submitAdvance) {
+			this.makeSubmitButton(footer, this.submitAdvanceFunc(), 'Submit');
+		} else if (submitSetVal) {
+			this.makeSubmitButton(footer, this.submitSetValFunc(), 'Set values');
 		}
 	},
-	makeSubmitButton: function(appendTo) {
+	makeSubmitButton: function(appendTo, func, text) {
 		var self = this;
-		var onclickSubmit = function() {
-			for (var questionIdx=0; questionIdx<self.quiz.length; questionIdx++) {
-				var question = self.quiz[questionIdx];
-				if (question.type=='text' || question.type=='textSmall') {
-					var id = self.getTextAreaId(questionIdx);
-					var submitted = $('#'+id).val();
-					if (submitted.killWhiteSpace()!='') {
-						store('userAnswerS'+sectionIdx+'P'+promptIdx+'Q'+questionIdx, submitted);
-						question.answerText(submitted);
-						question.isAnswered = true;
-						if (question.answer) {
-							if (fracDiff(parseFloat(question.answer), parseFloat(submitted))<.05){
-								question.correct = true;
-							} else {
-								question.correct = false;
-							}
-						} else {
-							question.correct = true;
-						}
-					} else {
-						question.correct = false;
-						question.isAnswered = false
-					}
-				}
-			
-			}
-			//Hey - am not finished making it so you can cleany mix type of questions yet
-			nextPrompt();
-		}
+		var onclickSubmit = func;
 		var idButton = 'textAreaSubmit';
-		var submitHTML = templater.div({style: {width: '65%', display: 'inline-block'}}) + templater.button({attrs:{id: [idButton]}, style: {display: 'inline-block'}, innerHTML:'Submit'});
-		$('#'+appendTo).append(submitHTML);
+		var submitHTML = templater.button({attrs:{id: [idButton]}, style: {'float': 'right'}, innerHTML: text});
+		$(appendTo).append(submitHTML);
 		buttonBind(idButton, onclickSubmit);
 		addJQueryElems($('#' + idButton), 'button');
+	},
+	submitAdvanceFunc: function() {
+		var self = this;
+		return function() {
+			self.storeText();
+			//Hey - am not finished making it so you can cleany mix type of questions yet
+			nextPrompt();
+		}	
+	},
+	submitSetValFunc: function() {
+		var self = this;
+		return function() {
+			self.storeText();
+			S(sectionIdx, promptIdx, true);
+		}
+	},
+	storeText: function() {
+		for (var questionIdx=0; questionIdx<this.quiz.length; questionIdx++) {
+			var question = this.quiz[questionIdx];
+			if (question.type=='text' || question.type=='textSmall' || question.type == 'setVals') {
+				var id = this.getTextAreaId(questionIdx);
+				var storeAs = $('#' + id).attr('storeAs');
+				var submitted = $('#' + id).val();
+				if (submitted.killWhiteSpace() != '') {
+					if (storeAs === undefined) storeAs = 'ansS'+sectionIdx+'P'+promptIdx+'Q'+questionIdx;
+					store(storeAs, submitted);
+					question.answerText(submitted);
+					question.isAnswered = true;
+					if (question.answer) {
+						if (fracDiff(parseFloat(question.answer), parseFloat(submitted))<.05){
+							question.correct = true;
+						} else {
+							question.correct = false;
+						}
+					} else {
+						question.correct = true;
+					}
+				} else {
+					question.correct = false;
+					question.isAnswered = false
+				}
+			}
+		
+		}	
 	},
 	appendQuestion: function(question, appendTo, questionIdx){
 		question.answered = false;
@@ -166,7 +201,9 @@ LevelTools = {
 		} else if (question.type == 'text') {
 			this.appendTextBox(question, appendTo, 3, 60, question.units, questionIdx);
 		} else if (question.type == 'textSmall') {
-			this.appendTextBox(question, appendTo, 1, 6, question.units, questionIdx);
+			this.appendTextBox(question, appendTo, 1, 10, question.units, questionIdx);
+		} else if (question.type == 'setVals') {
+			this.appendTextBox(question, appendTo, 1, 10, question.units, questionIdx);
 		}
 		this.quiz[questionIdx] = question;
 	},
@@ -242,7 +279,7 @@ LevelTools = {
 			buttonHTML += "<td>" + templater.button({attrs:{id: [ids[buttonIdx]]}, innerHTML:button.text}) + "</td>";
 		}
 		buttonHTML += "</tr></table></center>";
-		$('#'+appendTo).append(buttonHTML);
+		$(appendTo).append(buttonHTML);
 		this.bindButtonListeners(question, buttons, ids);
 	},
 	bindButtonListeners: function(question, buttons, ids){
@@ -290,7 +327,7 @@ LevelTools = {
 			ids[optionIdx] = 'question' + questionIdx + 'option' + optionIdx;
 			multChoiceHTML += templater.div({attrs: {id: [ids[optionIdx]], class: ['multChoiceBlock']}, innerHTML: option.text})
 		}
-		$('#'+appendTo).append(multChoiceHTML);
+		$(appendTo).append(multChoiceHTML);
 		this.bindMultChoiceFuncs(question, options, ids);
 	},
 	bindMultChoiceFuncs: function(question, options, ids){
@@ -334,16 +371,29 @@ LevelTools = {
 		question.label = defaultTo('', question.label);
 		var idText = this.getTextAreaId(questionIdx);
 		var boxText = defaultTo('Type your answer here.', question.text);
-		textBoxHTML += '<br>';
-		textBoxHTML += question.label;
-		if (cols>20) {
-			textBoxHTML += '<br>';
-		}
-		textBoxHTML += templater.textarea({attrs: {id: [idText], rows: [rows], cols: [cols], placeholder: [boxText]}})
-		if (question.units) {
-			textBoxHTML += question.units;
-		}
-		$('#' + appendTo).append(textBoxHTML);
+		
+		var textareaAttrs = {id: [idText], rows: [rows], cols: [cols] , placeholder: [boxText]};
+		if (question.storeAs) textareaAttrs.storeAs = [question.storeAs];
+		textareaHTML = templater.textarea({attrs: textareaAttrs});
+		
+		var textBoxHTML = templater.table({attrs: {'class': ['niceFont', 'whiteFont']}, innerHTML:
+			templater.tr({innerHTML:
+				templater.td({innerHTML:
+					question.label
+				}) +
+				templater.td({innerHTML:
+					'&#32;&#32;'
+				}) +
+				templater.td({innerHTML:
+					textareaHTML
+				}) +
+				templater.td({innerHTML:
+					question.units || ''
+				})
+			})
+		})
+
+		$(appendTo).append(textBoxHTML);
 	},
 	getTextAreaId: function(idx) {
 		return 'textArea' + idx;

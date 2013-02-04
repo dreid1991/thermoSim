@@ -66,8 +66,9 @@ _.extend(cvcp.prototype,
 					text:"<p>Right.</p><p>So an ideal gas has a higher heat capacity under constant pressure than under constant volume.  We're going to investigate these processes to figure out why that is.</p><p>First, what does it mean in terms of energy required to heat a given system that c<sub>P</sub> is greater than c<sub>v</sub>?</p>",
 					quiz:[
 						{	
-						type:'text',
-						text:'Type your answer here.',
+							storeAs: 'foo',
+							type:'text',
+							text:'Type your answer here.',
 						},
 					]
 				}
@@ -85,14 +86,14 @@ _.extend(cvcp.prototype,
 					//borders should be option in wall
 					dots: [	{type: 'spc1', pos: P(45,200), dims: V(200, 200), count: 3/*50*/, temp:150, returnTo: 'left', tag: 'left'},
 							{type: 'spc3', pos: P(45,200), dims: V(200, 200), count: 2/*50*/, temp:150, returnTo: 'left', tag: 'left'},
-							{type: 'spc1', pos: P(300,200), dims: V(200, 200), count: 350, temp:150, returnTo: 'right', tag: 'right'},
-							{type: 'spc3', pos: P(300,200), dims: V(200, 200), count: 350, temp:150, returnTo: 'right', tag: 'right'}
+							{type: 'spc1', pos: P(300,200), dims: V(200, 200), count: 'get(foo, int, 350, 1, 1000)', temp:150, returnTo: 'right', tag: 'right'},
+							{type: 'spc3', pos: P(300,200), dims: V(200, 200), count: 'eval(get(nummy, float, .25, .001, 2)*1000, 0, 250, 10, 500)', temp:150, returnTo: 'right', tag: 'right'}
 					],
 					objs: [
-						{type: 'Piston', attrs: {handle: 'RightPiston', wallInfo: 'right', min:2, init:2, max:2, makeSlider:false}},
+						{type: 'Piston', attrs: {handle: 'RightPiston', wallInfo: 'right', min:'get(goo, float, 2, 1, 1000)', init:'get(goo, float, 2, 1, 1000)', max:7, makeSlider:false}},
 						/*{type: 'Heater', attrs: {handle: 'heaterLeft', wallInfo: 'left'}},*/
 						{type: 'Heater', attrs: {handle: 'heaterRight', wallInfo: 'right'}},
-						{type: 'Inlet', attrs: {handle: 'inny', wallInfo: 'left', ptIdxs: [3, 4], fracOffset: .3, makeSlider: true, flows: [{spcName: 'spc1', nDotMax: .01, temp: 300, tag: 'left'}, {spcName: 'spc3', nDotMax: .02, temp: 50, tag: 'left'}]}},
+						{type: 'Inlet', attrs: {handle: 'inny', wallInfo: 'left', ptIdxs: [3, 4], fracOffset: .3, makeSlider: true, flows: [{spcName: 'spc1', nDotMax: .0001, temp: 300, tag: 'left'}, {spcName: 'spc3', nDotMax: .02, temp: 50, tag: 'left'}]}},
 						{type: 'Outlet', attrs: {handle: 'outty', wallInfo: 'left', ptIdxs: [0, 1], fracOffset: .3}}
 					],
 					records: [
@@ -173,9 +174,19 @@ _.extend(cvcp.prototype,
 					text:"Okay, here’s a constant volume and a constant pressure container.  Both are adiabatic and contain 0.6 moles of an ideal monatomic gas.  Heat the two containers to 250 K.  How do the energies used compare?",
 					quiz:[
 						{	
-						type:'text',
-						text:'Type your answer here.',
+							type:'setVals',
+							label: 'hello',
+							storeAs: 'goo',
+							text:'',
+							units: 'boo'
 						},
+						{
+							type:'setVals',
+							label: 'num moles:',
+							storeAs: 'nummy',
+							text: '',
+							units: 'moles'
+						}
 					]
 				},
 				/*

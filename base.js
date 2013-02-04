@@ -552,7 +552,6 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 	if (newPrompt.setup) {
 		newPrompt.setup.apply(window['curLevel'])
 	}
-	//newPrompt.text = evalText(addStored(newPrompt.text)); done in renderer now
 	if (!newPrompt.quiz) {
 		$('#nextPrevDiv').show();
 	}
@@ -563,11 +562,11 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 	} else {
 		if (newPrompt.quiz) {
 			var quiz = newPrompt.quiz;
-			$('#nextPrevDiv').hide();
-			$('#prompt').html(defaultTo('', newPrompt.text));
-			window['curLevel'].appendQuiz(newPrompt.quiz, 'prompt')
+			//$('#nextPrevDiv').hide();
+			$('#prompt').html(defaultTo('', templater.div({innerHTML: newPrompt.text})));
+			window['curLevel'].appendQuiz(newPrompt.quiz, $('#prompt'))
 		} else {
-			$('#prompt').html(newPrompt.text);
+			$('#prompt').html(templater.div({innerHTML: newPrompt.text}));
 		}
 	}
 	$('#baseHeader').html(newPrompt.title);
@@ -724,8 +723,8 @@ img(path, breakStyle (p, br), center (boolean))
 
 function addStored(text) {
 	//if you EVER find a way to do regexp lookbehinds, use it here.  
-	return text.replace(/get[\s]*\([A-Za-z0-9,\s\-]*\)/g, function(subStr, idx) {
-		var args = sliceArgs(cmmd);
+	return text.replace(/get[\s]*\([A-Za-z0-9,\s\-\.]*\)/g, function(subStr, idx) {
+		var args = sliceArgs(subStr);
 		var idStr = args[0];
 		var type = args[1];
 		var defVal = args[2];
@@ -754,7 +753,7 @@ function addStored(text) {
 			}
 		}
 		
-		if (!val) {
+		if (val === undefined || isNaN(val)) {
 			val = defVal;
 		}
 		return val;
@@ -764,7 +763,8 @@ function addStored(text) {
 
 
 function evalText(text) {
-	return text.replace(/eval[\s]*\([0-9\(\)\+\-\*\/\s,\.]*\)/g, function(evalItem, idx) {
+	if (typeof text == 'number') return;
+	text = text.replace(/eval[\s]*\([0-9\(\)\+\-\*\/\s,\.]*\)/g, function(evalItem, idx) {
 		var args = sliceArgs(evalItem);
 		var expr = args[0];
 		var decPlaces = args[1];
@@ -789,6 +789,8 @@ function evalText(text) {
 		}
 		return val;
 	})
+	var toReturn = Number(text) == text ? Number(text) : text;
+	return toReturn;
 }
 
 function addImgs(text){

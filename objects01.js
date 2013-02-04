@@ -1231,7 +1231,8 @@ function Piston(attrs){
 	this.left = this.wall[0].x;
 	this.width = this.wall[1].x-this.left;
 	this.pistonPt = this.wall[0];
-	this.setMass(defaultTo(2, attrs.init));
+	var pInit = defaultTo(2, attrs.init)
+	this.setMass(pInit);
 
 	this.height = 500;
 	this.draw = this.makeDrawFunc(this.height, this.left, this.width);
@@ -1251,8 +1252,8 @@ function Piston(attrs){
 	
 	walls.setSubWallHandler(this.wallInfo, 0, 'cPAdiabaticDamped' + compAdj);		
 	//this.wall.setDefaultReadout(this.readout);
-	if(this.makeSlider){
-		this.sliderId = this.addSlider('Pressure', {value:this.pToPercent(this.val)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
+	if (this.makeSlider) {
+		this.sliderId = this.addSlider('Pressure', {value: this.pToPercent(pInit)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
 	}
 	this.addCleanUp();
 	
@@ -1328,6 +1329,9 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		addListener(curLevel, 'update', 'drawPiston'+this.handle, this.draw, '');
 		this.readout.show();
 		return this;
+	},
+	pToPercent: function(p) {
+		return (p - this.min)/(this.max - this.min);
 	},
 	hide: function(){
 		removeListener(curLevel, 'update', 'drawPiston'+this.handle);

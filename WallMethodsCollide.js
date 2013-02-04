@@ -161,7 +161,7 @@ WallMethods.collideMethods ={
 		dot.y += wallUV.dx
 	},
 	outlet: function(dot) {
-		dotManager.removeh(dot);
+		dotManager.remove(dot);
 	}
 	/*
 	reflectChangeSpd: function(dot, wallUV, perpVIn, perpVOut){

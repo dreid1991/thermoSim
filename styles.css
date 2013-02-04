@@ -62,13 +62,13 @@
 	border-color:#b3b2b1;	
 }
 .sim.displayText{
-	font-family:georgia, garamond;/*WHAT IS GARAMOND?  SHOULD GET OTHER FALLBACKS.*/
+	font-family:Verdana, garamond;/*WHAT IS GARAMOND?  SHOULD GET OTHER FALLBACKS.*/
 	font-size:medium;
 	color:white;
 	padding:5px;
 }
 .sim.niceFont{
-	font-family:georgia, garamond;
+	font-family:Verdana, garamond;
 }
 .sim.bottomAlign{
 	vertical-align:bottom;
