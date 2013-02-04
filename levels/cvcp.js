@@ -52,10 +52,10 @@ _.extend(cvcp.prototype,
 							type:'multChoice', 
 							options:
 								[
-								{text:"||EQ1|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
-								{text:"||EQ2|| and ||EQ3||", isCorrect: false, message:"That's not correct"},
-								{text:"||EQ1|| and ||EQ4||", isCorrect: true},
-								{text:"||EQ2|| and ||EQ5||", isCorrect: false, message:"That's not correct"}
+								{text:"img(img/cvcp/eq1.gif) and img(img/cvcp/eq3.gif)", isCorrect: false, message:"That's not correct"},
+								{text:"img(img/cvcp/eq2.gif) and img(img/cvcp/eq3.gif)", isCorrect: false, message:"That's not correct"},
+								{text:"img(img/cvcp/eq1.gif) and img(img/cvcp/eq4.gif)", isCorrect: true},
+								{text:"img(img/cvcp/eq2.gif) and img(img/cvcp/eq5.gif)", isCorrect: false, message:"That's not correct"}
 							]
 						}
 					],

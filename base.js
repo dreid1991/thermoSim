@@ -385,35 +385,6 @@ function recordDataStop(handle){
 	var listenerType = getStore('record' + handle);
 	removeListener(window['curLevel'], listenerType, handle);
 }
-function addEqs(text){
-	var isEq = /\|\|EQ[0-9]*(CE|BR|\|\|)/;
-	var replacement;
-	
-	while (true) {
-		var result = isEq.exec(text);
-		if (result == null) break;
-		str = result[0];
-		if (/CE$/.test(str)) {
-			var replacement = templater.p(
-				{innerHTML: templater.center(
-					{innerHTML: templater.img({attrs: {src: ['img/' + imgPath + '/eq' + parseFloat(str.slice(4, str.length)) + '.gif']}})
-					})
-				});
-		} else if (/BR$/.test(str)) {
-			var replacement = templater.br(
-				{innerHTML: templater.center(
-					{innerHTML: templater.img({attrs: {src: ['img/' + imgPath + '/eq' + parseFloat(str.slice(4, str.length)) + '.gif']}})
-					})
-				});
-		} else if (/\|\|$/.test(str)) {
-			var replacement = templater.img({attrs: {src: ['img/' + imgPath + '/eq' + parseFloat(str.slice(4, str.length)) + '.gif']}});
-				
-		}	
-		text = text.replace(str, replacement);
-	}
-	
-	return text;
-}
 
 function makeSlider(wrapperDivId, sliderDivId, title, attrs, handlers, initVisibility){
 	var wrapperDiv = $('#' + wrapperDivId);
@@ -745,14 +716,15 @@ function prevPrompt(){
 }
 
 /*
-Ahem, I am redefining how get and eval are done.  
+Ahem, I am redefining how get, eval, and img are done.  
 get(idStr, type ('int', 'float', 'string'), default, min, max, 
 eval(expr, decPlaces, default, min, max)
+img(path, breakStyle (p, br), center (boolean))
 */
 
 function addStored(text) {
 	//if you EVER find a way to do regexp lookbehinds, use it here.  
-	return text.replace(/get[\s]*([A-Za-z0-9,\s\-]*)/g, function(subStr, idx) {
+	return text.replace(/get[\s]*\([A-Za-z0-9,\s\-]*\)/g, function(subStr, idx) {
 		var args = sliceArgs(cmmd);
 		var idStr = args[0];
 		var type = args[1];
@@ -792,7 +764,7 @@ function addStored(text) {
 
 
 function evalText(text) {
-	return text.replace(/eval[\s]*([0-9\(\)\+\-\*\/\s,\.]*)/g, function(evalItem, idx) {
+	return text.replace(/eval[\s]*\([0-9\(\)\+\-\*\/\s,\.]*\)/g, function(evalItem, idx) {
 		var args = sliceArgs(evalItem);
 		var expr = args[0];
 		var decPlaces = args[1];
@@ -819,13 +791,35 @@ function evalText(text) {
 	})
 }
 
+function addImgs(text){
+	return text.replace(/img[\s]*\([A-Za-z0-9\+\-\*\/\s,\.]*\)/g, function(imgFunc, idx) {
+		var args = sliceArgs(imgFunc);
+		var path = args[0];
+		var breakStyle = args[1];
+		var center = args[2];
+		var imgHTML = templater.img({attrs: {src: [path], 'class': [globalHTMLClass]}});
+		
+		if (center) {
+			imgHTML = templater.center({innerHTML: ingHTML});
+		}
+		if (breakStyle == 'br') {
+			imgHTML = templater.br() + imgHTML + templater.br();
+		} else if (breakStyle == 'p') {
+			imgHTML = templater.p({innerHTML: imgHTML});
+		}
+		return imgHTML;
+	})
+}
+
+
+
 function sliceArgs(expr) {
 	var args = [];
 	var working = expr;
-	var hasCommas = working.indexOf(',') > -1;
 	working = working.replace(/[A-Za-z0-9\s-]*\(/, '');
 	working = working.replace(')', '');
-	working += ','; //if you'll pardon the slop, just adding a comma to the end is a really easy way to make the below function work for just one argument or the last argument in a function
+	working += ','; //if you'll pardon the slop, just adding a comma to the end is a really easy way to make the below function work for the last argument in a function
+	var hasCommas = working.indexOf(',') > -1;
 	while (hasCommas) {
 		var idx = working.indexOf(',');
 		args.push(working.slice(0, idx).killWhiteSpace());

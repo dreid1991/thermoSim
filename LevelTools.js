@@ -27,8 +27,8 @@ LevelTools = {
 				var title = prompt.title;
 				var text = prompt.text;
 				var quiz = prompt.quiz;
-				if(title){prompt.title = addEqs(title);}
-				if(text){prompt.text = addEqs(text);}
+				if(title){prompt.title = addImgs(title);}
+				if(text){prompt.text = addImgs(text);}
 				if (quiz) {
 					for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
 						var question = quiz[questionIdx];
@@ -38,7 +38,7 @@ LevelTools = {
 								for (optionElement in option) {
 									var element = option[optionElement];
 									if (typeof(element)=='string') {
-										option[optionElement] = addEqs(element);
+										option[optionElement] = addImgs(element);
 									}						
 								}
 							}
