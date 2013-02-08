@@ -5,7 +5,6 @@ function CollideHandler(){
 	this.cp = cp;
 	this.cv = cv;
 	this.rxns = {};
-	this.rxnStrs = {};
 	this.setDefaultHandler({func:this.impactStd, obj:this});
 	this.dotManager = dotManager;
 	//console.log("Made supercollider");
@@ -27,6 +26,9 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 		var min = Math.min(idA, idB);
 		var max = Math.max(idA, idB);
 		this[min + '-' + max] = handler;
+	},
+	setHandleByIdStr: function(idStr, handler) {
+		this[idStr] = handler;
 	},
 	getNumSpcs: function(){
 		var numSpcs = 0;
