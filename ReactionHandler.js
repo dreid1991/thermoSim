@@ -1,7 +1,6 @@
 ReactionHandler = {
-	addReaction: function(attrs){ //aName, bName, hRxn, activE, prods)
+	addReaction: function(attrs){ //rctA, rctB, hRxn, activeTemp, prods)
 		attrs.parent = this;
-		attrs.container = this.rxns;
 		var rxn = new this.Reaction(attrs);
 		
 		if (rxn.rctA && rxn.rctB) {
@@ -40,6 +39,7 @@ ReactionHandler = {
 	
 	Reaction: function(attrs) { //prods as {name1: count, name2, count2}  hRxn in kj/mol, activeTemp in kelvin
 		this.handle = attrs.handle;
+		this.parent = attrs.parent;
 		this.rctA = attrs.rctA || attrs.rctB; //spcName
 		this.rctB = attrs.rctA && attrs.rctB ? attrs.rctB : undefined; //spcName
 		this.rctADef = this.parent.defs[this.rctA];
@@ -48,9 +48,10 @@ ReactionHandler = {
 		this.hRxn = this.convertHRxn(attrs.hRxn); //to temperature
 		
 		if (this.rctA && !this.rctADef) return console.log('reactant a ' + this.rctA + " doesn't exist");
-		if (this.rctB && !this.rctBef) return console.log('reactant b ' + this.rctB + " doesn't exist");
+		if (this.rctB && !this.rctBDef) return console.log('reactant b ' + this.rctB + " doesn't exist");
 		
 		this.prods = this.reformatProds(attrs.prods);
+		this.prodCount = this.countProds(this.prods);
 
 	},
 	
@@ -60,7 +61,7 @@ ReactionHandler = {
 	removeAllReactions: function(){
 		this.setDefaultHandler({func:this.impactStd, obj:this});
 	},
-	genIdStr: function(defA, defB) {
+	getIdStr: function(defA, defB) {
 		return defA.idNum < defB.idNum ? defA.idNum + '-' + defB.idNum : defB.idNum + '-' + defA.idNum;
 	},
 	//end public
@@ -68,14 +69,14 @@ ReactionHandler = {
 	initPair: function(rxn, reIniting) {
 		//rctA, rctB, rctDefA, rctDefB, activeTemp, hRxn, prods
 		
-		var idStr = this.genIdStr(rctDefA, rctDefB);
+		var idStr = this.getIdStr(rxn.rctADef, rxn.rctBDef);
 		
 		if (!reIniting) this.rxns[idStr] ? this.rxns[idStr].push(rxn) : this.rxns[idStr] = [rxn];
 		
 		var isMultiple = this.rxns[idStr].length > 1;
 
 		if (isMultiple) {
-			this.setHandler(rxn.rctA, rxn.rctA, {func:this.rctHandlerMultPairs(idStr), obj:this});
+			this.setHandler(rxn.rctA, rxn.rctB, {func:this.rctHandlerMultPairs(idStr), obj:this});
 		} else {
 			this.setHandler(rxn.rctA, rxn.rctB, {func:this.rctHandlerSinglePair(idStr), obj:this});
 		}	
@@ -136,10 +137,11 @@ ReactionHandler = {
 		var activeTemp = rxn.activeTemp;
 		var hRxn = rxn.hRxn;
 		var prods = rxn.prods;
+		var prodCount = rxn.prodCount;
 		return function(a, b, UVAB, perpAB, perpBA) {
 			var hitTemp = this.hitTemp(a, b, perpAB, -perpBA);
-			if (Math.random() > this.probFunc(hitTemp, activeTemp)) {
-				this.react(a, b, hRxn, prods)
+			if (Math.random() < this.probFunc(hitTemp, activeTemp)) {
+				this.react(a, b, hRxn, prods, prodCount)
 				return false;
 			}
 			return this.impactStd(a, b, UVAB, perpAB, perpBA);
@@ -154,18 +156,18 @@ ReactionHandler = {
 			var hitTemp = this.hitTemp(a, b, perpAB, -perpBA);
 			var probs = [];
 			var sumProbs = 0;
-			for (var pairIdx=0; pairIdx<pairs.length; pairIdx++) {
-				probs[pairIdx] = this.probFunc(hitTemp, rxns[pairIdx].activE);
-				sumProbs += probs[pairIdx];
+			for (var rxnIdx=0; rxnIdx<rxns.length; rxnIdx++) {
+				probs[rxnIdx] = this.probFunc(hitTemp, rxns[rxnIdx].activeTemp);
+				sumProbs += probs[rxnIdx];
 			}
-			var normalFact = subProbs > 1 ? 1 / subProbs : 1;
+			var normalFact = sumProbs > 1 ? 1 / sumProbs : 1;
 			
 			var rxnIdx = this.pickRxnIdx(probs, normalFact);
 			
 			if (rxnIdx===false) {
 				return this.impactStd(a, b, UVAB, perpAB, perpBA);
 			} else {
-				this.react(a, b, rxns[rxnIdx].hRxn, rxns[rxnIdx].prods);
+				this.react(a, b, rxns[rxnIdx].hRxn, rxns[rxnIdx].prods, rxns[rxnIdx].prodCount);
 				return false;
 			}
 		};
@@ -183,8 +185,8 @@ ReactionHandler = {
 		}
 		return false;
 	},
-	react: function(a, b, hRxn, prods) {
-		var prodTemp = (a.temp() + b.temp() - hRxn)/prods.length; //hey - should make hRxn be in j or kj and convert at some point
+	react: function(a, b, hRxn, prods, prodCount) {
+		var prodTemp = (a.temp() + b.temp() - hRxn)/prodCount; 
 		this.dotManager.remove([a, b]);
 		var x = .5*(a.x + b.x);
 		var y = .5*(a.y + b.y);
@@ -225,8 +227,15 @@ ReactionHandler.Reaction.prototype = {
 		}
 		return reformat;	
 	},
+	countProds: function(prods) {
+		var count = 0;
+		for (var idx=0; idx<prods.length; idx++) {
+			count += prods[idx].count;
+		}
+		return count;
+	},
 	convertHRxn: function(hRxn) {
-		return tConat * hRxn;// / (JtoKJ * N) <- equals 1
+		return tConst * hRxn;// / (JtoKJ * N) <- equals 1
 	
 	},
 }

@@ -27,7 +27,7 @@ function cvcp(){
 	this.compMode = 'Isothermal';//is this used?
 
 	
-	addSpecies(['spc1', 'spc3', 'spc4', 'spc5']);
+	addSpecies(['spc1', 'spc3', 'spc4', 'spc5', 'spc6']);
 	this.yMin = 30;
 	this.yMax = 350;
 }
@@ -108,6 +108,7 @@ _.extend(cvcp.prototype,
 						//WHICH WALL, WHAT THING, WHERE
 						
 					],
+					
 /*
 					graphs: [
 						{type: 'Scatter', handle:'pVSvLeft', xLabel:"P Int.", yLabel:"Temp (K)", axesInit:{x:{min:6, step:2}, y:{min:0, step:50}},
@@ -129,6 +130,8 @@ _.extend(cvcp.prototype,
 				
 					*/
 				})
+				collide.addReaction({rctA: 'spc1', rctB: 'spc3', hRxn: 0, activeTemp: 350, prods: {spc4: 3}});
+				collide.addReaction({rctA: 'spc1', rctB: 'spc3', hRxn: 0, activeTemp: 700, prods: {spc5: 1}});
 			},
 			/*
 			setup:

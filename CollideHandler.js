@@ -21,14 +21,22 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 	
 	},
 	setHandler: function(aName, bName, handler){
-		var idA = speciesDefs[aName].idNum;
-		var idB = speciesDefs[bName].idNum;
-		var min = Math.min(idA, idB);
-		var max = Math.max(idA, idB);
-		this[min + '-' + max] = handler;
+		var idStr = this.getIdStr(this.defs[aName], this.defs[bName]);
+		if (this.isIdStr(idStr)) {
+			this[idStr] = handler;
+		} else {
+			console.log('bad spc names ' + aName + ' ' + bName);
+		}
 	},
 	setHandleByIdStr: function(idStr, handler) {
-		this[idStr] = handler;
+		if (this.isIdStr(idStr)) {
+			this[idStr] = handler;
+		} else {
+			console.log('bad id string ' + idStr);
+		}
+	},
+	isIdStr: function(idStr) {
+		return /^[0-9]+\-[0-9]+$/.test(idStr)
 	},
 	getNumSpcs: function(){
 		var numSpcs = 0;
