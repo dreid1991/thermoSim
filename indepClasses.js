@@ -455,7 +455,7 @@ Dot.prototype = {
 	setTemp: function(newTemp) {
 		var curTemp = this.temp();
 		//if (curTemp!=0) {
-			this.v.mult(Math.sqrt(newTemp/curTemp));
+			this.v.mult(Math.sqrt(newTemp / curTemp));
 		/*  SHOULD ZERO-TEMP CASE BECOME A THING, USE BELOW,  BUT AT CURRENT I DON'T THINK IT MUST
 		} else {
 			var v = Math.sqrt(2*newTemp/(this.tConst*this.m));
@@ -468,7 +468,7 @@ Dot.prototype = {
 	},
 	adjTemp: function(delta) {
 		var curTemp = this.temp();
-		this.v.mult(Math.sqrt((curTemp+delta)/curTemp));
+		this.v.mult(Math.sqrt((curTemp + delta) / curTemp));
 		return this;
 	},
 	speed: function(){

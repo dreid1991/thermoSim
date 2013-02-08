@@ -137,21 +137,18 @@ function DragWeights(attrs){
 	this.wallInfo = 			defaultTo(0, attrs.wallInfo);
 	this.wall = 				walls[this.wallInfo];
 	this.zeroY = 				defaultTo(this.wall[2].y, attrs.min);
-	this.pistonPt =				defaultTo(this.wall[0], attrs.pistonPt);
+	this.pistonPt =				defaultTo(this.wall[0], attrs.pistonPt); //this will not work with just data based levels.  If I want this, will need to store as {wallInfo, ptIdx}
 	this.pistonOffset =			defaultTo(undefined, attrs.pistonOffset);
 	this.wallHandler = 			defaultTo('cPAdiabaticDamped', attrs.compMode) + compAdj;
-	this.readout = 				defaultTo(curLevel.readout, attrs.readout);
-	this.binY = 				defaultTo(myCanvas.height-15, attrs.binY);
+	this.binY = 				defaultTo(myCanvas.eight-15, attrs.binY);
 	this.blockCol = 			defaultTo(Col(224, 165, 75), attrs.blockCol);
 	this.binCol = 				defaultTo(Col(150, 150, 150), attrs.binCol);
-	if (attrs.pInit) {
-		this.massInit = this.pressureToMass(attrs.pInit);
-	} else {
-		this.massInit = 		defaultTo(25, defaultTo(curLevel.massInit, attrs.massInit));
-	}
+	
+	attrs.pInit !== undefined ? this.massInit = this.pressureToMass(attrs.pInit) : this.massInit = this.pressureToMass(1);
+
 	this.binHeight = 			defaultTo(45, attrs.binHeight);
 	this.weightDimRatio = 		defaultTo(.5, attrs.weightDimRatio);
-	this.flySpeed =				defaultTo(20, attrs.flySpeed);
+	this.moveSpeed =			defaultTo(20, attrs.moveSpeed);
 	this.weightScalar = 		defaultTo(70, attrs.weightScalar);//specific volume
 	this.displayText = 			defaultTo(true, attrs.displayText);
 	
@@ -161,7 +158,6 @@ function DragWeights(attrs){
 	this.pistonBinWidth = 150;
 	this.pistonBinSpacing = 15;
 	this.blockSpacing = 2;
-	this.moveSpeed = 20;
 	this.mass = this.massInit;
 	this.massChunkName = 'dragWeights';
 	this.weightsOnPiston = [];
@@ -207,10 +203,10 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		var dims = {};
 		for (var groupIdx=0; groupIdx<weightDefs.length; groupIdx++){
 			var weightDef = weightDefs[groupIdx];
-			if (weightDef.pressure) {
-				weightDef.mass = this.pressureToMass(weightDef.pressure);
-			}
-			weightDef.mass/=weightDef.count;
+			// if (weightDef.pressure) {
+				// weightDef.mass = this.pressureToMass(weightDef.pressure);
+			// }
+			// weightDef.mass/=weightDef.count;
 			var width = Math.sqrt(weightDef.mass*this.weightScalar/this.weightDimRatio);
 			var height = width*this.weightDimRatio;
 			dims[weightDef.name] = V(width, height);
@@ -222,9 +218,16 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 			weightDefs[weightIdx].name = 'grp' + weightIdx;
 		}
 	},
+	assignMasses: function(weightDefs) {//pressure is the pressure per block
+		for (var groupIdx=0; groupIdx<weightDefs.length; groupIdx++){
+			weightDef = weightDefs[groupIdx];
+			weightDef.mass = this.pressureToMass(weightDef.pressure);
+		}
+	},
 	makeWeights: function(weightDefs){
 		this.nameWeights(weightDefs);
 		var weightGroups = {};
+		this.assignMasses(weightDefs);
 		var weightDims = this.getWeightDims(weightDefs)
 		var weightId = 0;
 		for (var groupIdx=0; groupIdx<weightDefs.length; groupIdx++){
@@ -232,6 +235,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 			var weightGroup = {}; 
 			weightGroup.name = weightDef.name;
 			weightGroup.dims = weightDims[weightGroup.name];
+			weightGroup.pressure = weightDef.pressure;
 			weightGroup.mass = weightDef.mass;
 			weightGroup.weights = [];
 			for (var weightIdx=0; weightIdx<weightDef.count; weightIdx++){
@@ -249,7 +253,6 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		return weightGroups;
 	},
 	makeStoreBins: function(){
-
 		var center = (this.wall[0].x + this.wall[1].x)/2;
 		var bins = {};
 		var numGroups = this.getNumGroups();
@@ -406,27 +409,27 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	},
 	getPistonMass: function(){
 		var totalMass=0;
-		for (var weightName in this.weightGroups){
+		for (var weightName in this.weightGroups) {
 			var weightGroup = this.weightGroups[weightName];
 			var weights = weightGroup.weights;
 			var mass = weightGroup.mass;
-			for(var weightIdx=0; weightIdx<weights.length; weightIdx++){
-				if(weights[weightIdx].status=='piston'){totalMass+=mass};
+			for (var weightIdx=0; weightIdx<weights.length; weightIdx++) {
+				if (weights[weightIdx].status=='piston') totalMass+=mass;
 			}
 		}
 		return totalMass+this.massInit;
 	},
 	dropAllIntoStores: function(special){
-		for (var group in this.weightGroups){
+		for (var group in this.weightGroups) {
 			var weightGroup = this.weightGroups[group];
-			for (var weightIdx=0; weightIdx<weightGroup.weights.length; weightIdx++){
+			for (var weightIdx=0; weightIdx<weightGroup.weights.length; weightIdx++) {
 				var weight = weightGroup.weights[weightIdx];
-				if(weight.status=='piston'){
+				if (weight.status=='piston') {
 					weight.status = 'inTransit';
 					weight.slot.isFull = false;
 					this.takeOffPiston(weight);
 					this.dropIntoBin(weight, 'store', special);
-				}else if(weight.status!='store'/* && weight.status!='inTransit'*/){
+				} else if(weight.status!='store'/* && weight.status!='inTransit'*/) {
 					weight.status = 'inTransit';
 					this.dropIntoBin(weight, 'store', special);
 				}//NOTE - BLOCKS AREADY MOVING WILL NOT GET DROPPED. SHOULD ADD DESTINATION AND IF DEST==PISTON, DROP TO BIN
@@ -549,8 +552,8 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 			if (bin.visible) {
 				var x = bin.x + this.storeBinWidth/2
 				var y = bin.y - this.binHeight+10;
-				var mass = this.weightGroups[binName].mass;
-				var text = mass + ' kg each';
+				var mass = this.weightGroups[binName].pressure;
+				var text = mass + ' bar each';
 				draw.text(text, P(x, y), this.font, this.fontCol, 'center', 0, c);
 			}
 		}
@@ -1379,12 +1382,14 @@ function Heater(attrs){
 	dims.dy corresponds to short side
 	*/
 	this.dims = defaultTo(V(100,40), attrs.dims);
-	if(attrs.wallInfo){
-		this.wall = walls[attrs.wallInfo];
-		this.pos = this.centerOnWall(attrs.wallInfo, this.dims);
-	}else{
+	
+	this.wall = walls[attrs.wallInfo];
+	if (attrs.pos) {
 		this.pos = attrs.pos;
+	} else {
+		this.pos = this.centerOnWall(attrs.wallInfo, this.dims);
 	}
+	
 	this.makeSlider = defaultTo(true, attrs.makeSlider);
 	this.handle = defaultTo('heaty', attrs.handle);
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
@@ -1395,15 +1400,15 @@ function Heater(attrs){
 	this.rot = defaultTo(0, attrs.rotation);
 
 	this.center = this.pos.copy().movePt(this.dims.copy().mult(.5));
-	var colMax = Col(200,0,0);
-	var colMin = Col(0,0,200);
-	var colDefault = Col(100, 100, 100);
+	var colMax = defaultTo(Col(200,0,0), attrs.colMax);
+	var colMin = defaultTo(Col(0,0,200), attrs.colMin);
+	var colDefault = defaultTo(Col(100, 100, 100), attrs.colDefault);
 	this.draw = this.makeDrawFunc(colMin, colDefault, colMax);
 	this.wallPts = this.pos.roundedRect(this.dims, .3, 'ccw');
 	this.eAdded=0;
 	
 	this.addCleanUp();
-	if(this.makeSlider){
+	if (this.makeSlider) {
 
 		this.sliderId = this.addSlider('Heater', {value:50}, 
 			[{eventType:'slide', obj:this, func:this.parseSlider},

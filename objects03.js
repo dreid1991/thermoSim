@@ -290,7 +290,6 @@ function Inlet (attrs) {
 	this.arrowDims = V(15, 20);
 	this.arrowFill = Col(200, 0, 0);
 	this.arrowStroke = Col(100, 100, 100);
-	//still need to add those arrows
 	this.type = 'Inlet';
 	this.handle = attrs.handle;
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
@@ -305,7 +304,7 @@ function Inlet (attrs) {
 	this.fracOffset = defaultTo(.5, attrs.fracOffset);
 	this.flows = this.processFlows(attrs.flows);
 	this.makeSlider = attrs.makeSlider;
-	if(this.makeSlider){
+	if (this.makeSlider) {
 		this.sliderId = this.addSlider('Flow rate', {value: this.fracOpen*100}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
 	}
 	this.addCleanUp();

@@ -1,37 +1,55 @@
 ReactionHandler = {
-	addReaction: function(aName, bName, hRxn, activE, prods) {
-		if (bName) {
-			this.addRxnPair(aName, bName, hRxn, activE, prods);
+	addReaction: function(attrs){ //aName, bName, hRxn, activE, prods)
+		attrs.parent = this;
+		attrs.container = this.rxns;
+		this.rxns[attrs.handle] = new this.Reaction(attrs);
+		
+		if (this.rctA && this.rctB) {
+			this.initPair(this.rxns[attrs.handle])
+		} else if (this.rctA) {
+			this.initDecomp(this.rxns[attrs.handle]);
 		} else {
-			this.addRxnDecomp(aName, hRxn, activE, prods);
+			console.log('Bad reaction names');
+			console.log(attrs);
+			console.trace();
 		}
+	},
+	Reaction: function(attrs) { //prods as {name1: count, name2, count2}  hRxn in kj/mol, activeTemp in kelvin
+		this.handle = attrs.handle;
+		this.rctA = attrs.rctA || attrs.rctB; //spcName
+		this.rctB = attrs.rctA && attrs.rctB ? attrs.rctB : undefined; //spcName
+		this.rctADef = this.parent.defs[this.rctA];
+		this.rctBDef = this.parent.defs[this.rctB];
+		this.activeTemp = attrs.activeTemp;
+		this.hRxn = this.convertHRxn(attrs.hRxn); //to temperature
+		
+		if (this.rctA && !this.rctADef) return console.log('reactant a ' + this.rctA + " doesn't exist");
+		if (this.rctB && !this.rctBef) return console.log('reactant b ' + this.rctB + " doesn't exist");
+		
+		this.prods = this.reformatProds(attrs.prods);
 
 	},
+	
+
+
 	//make a removeReaction function
 	removeAllReactions: function(){
 		this.setDefaultHandler({func:this.impactStd, obj:this});
 	},
+	genIdStr: function(defA, defB) {
+		return defA.idNum < defB.idNum ? defA.idNum + '-' + defB.idNum : defB.idNum + '-' + defA.idNum;
+	},
 	//end public
 	//maybe automatically adding reverse should reverse activE be specified
-	addRxnPair: function(aName, bName, hRxn, activE, prods) {
-		var idA = this.defs[aName].idNum;
-		var idB = this.defs[bName].idNum;
-		var low = Math.min(idA, idB);
-		var high = Math.max(idA, idB);
-		var idStr = low + '-' + high;
+	initPair: function(rctA, rctB, rctDefA, rctDefB, activeTemp, hRxn, prods) {
+
+		var idStr = this.genIdStr(rctDefA, rctDefB);
 		this.rxns[idStr].push({hRxn:hRxn, activE:activE, prods:this.reformatProds(prods), prodCount:this.countProds(prods)});
 		if (this.rxns[idStr].length==1) {
 			this.setHandler(aName, bName, {func:this.setupReactSinglePair(this.rxns[idStr]), obj:this});
 		} else {
 			this.setHandler(aName, bName, {func:this.setupReactMultPairs(this.rxns[idStr]), obj:this});
 		}	
-	},
-	reformatProds: function(prods) {
-		var reformat = [];
-		for (var name in prods) {
-			reformat.push({name:name, count:prods[name]});
-		}
-		return reformat;
 	},
 	countProds: function(prods) {
 		var count = 0;
@@ -168,4 +186,19 @@ ReactionHandler = {
 		}
 	},	
 
+}
+
+ReactionHandler.Reaction.prototype = {
+
+	reformatProds: function(prods) {
+		var reformat = [];
+		for (var name in prods) {
+			reformat.push({name:name, count:prods[name]});
+		}
+		return reformat;	
+	},
+	convertHRxn: function(hRxn) {
+		return tConat * hRxn;// / (JtoKJ * N) <- equals 1
+	
+	},
 }

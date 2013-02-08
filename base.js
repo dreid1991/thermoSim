@@ -42,7 +42,7 @@ $(function(){
 	//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
 	pxToE = Math.sqrt(tConst); //gotten for a dot... T = 1/2*m*(v*pxToE)^2.  For energy conservation in attraction. 
 	KB = 1.38*Math.pow(10,-23)
-	ACTUALN = 6.022*Math.pow(10,23);
+	ACTUALN = 6.022e23;
 	g = 1.75;
 	gInternal = .01;
 	workConst = .158e-3;//for kJ;
@@ -208,12 +208,17 @@ function changeRMS(info, newRMS){
 
 function tempToV(mass, temp){
 	//T/tConst = 0.5*m*v^2
-	temp = 2*temp/tConst;
-	return Math.sqrt(temp/mass);
+	temp = 2 * temp / tConst;
+	return Math.sqrt(temp / mass);
 }
 function VToTemp(mass, v){
-	return .5*mass*v*v*tConst;
+	return .5 * mass * v * v * tConst;
 }
+
+function tempToKE(temp) {
+	return temp / tConst;
+}
+
 function returnEscapist(dot){
 	returnTo = defaultTo(0, dot.returnTo);
 	var pt1 = walls[returnTo][0];

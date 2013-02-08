@@ -5,6 +5,7 @@ function CollideHandler(){
 	this.cp = cp;
 	this.cv = cv;
 	this.rxns = {};
+	this.rxnStrs = {};
 	this.setDefaultHandler({func:this.impactStd, obj:this});
 	this.dotManager = dotManager;
 	//console.log("Made supercollider");
@@ -46,9 +47,6 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 		};
 		//predetermining lengths to prevent rxn prods from reacting again on same turn.  Could make things slow
 		//defining grid locally speeds up by ~250ms/500runs (1000->750)
-	if(started){
-		var then = Date.now();
-	}	
 		for (var spcName in this.spcs){
 			var dots = this.spcs[spcName].dots;
 			for (var dotIdx=spcLens[spcName]-1; dotIdx>=0; dotIdx--) {
@@ -87,14 +85,6 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 				}
 			}
 		}
-	if(started&&counted<500){
-		counted++;
-		total+=Date.now()-then;
-	}else if (counted==500){
-		console.log(total);
-		counted=0;
-		total=0;
-	}
 	},
 	impactStd: function(a, b, UVAB, perpAB, perpBA){
 		var perpABRes = (perpAB*(a.m-b.m)+2*b.m*perpBA)/(a.m+b.m);
