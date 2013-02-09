@@ -166,11 +166,11 @@ ReactionHandler = {
 	},
 	
 	pickRxnIdx: function(probs, normalFact) {
-		var rnd = Math.random();
+		var threshold = Math.random();
 		var sum = 0;
 		for (var probIdx=0; probIdx<probs.length; probIdx++) {
 			sum += probs[probIdx] * normalFact;
-			if (sum>=rnd) {
+			if (sum > threshold) {
 				return probIdx;
 			}
 		}
@@ -186,27 +186,16 @@ ReactionHandler = {
 			var newDots = new Array(prods[prodIdx].count);
 			for (var countIdx=0; countIdx<prods[prodIdx].count; countIdx++) {
 				var angle = Math.random()*2*Math.PI;
-				var UV = V(Math.sin(angle), Math.cos(angle))
-				newDots[countIdx] = D(x+UV.dx*3, y+UV.dy*3, UV, this.defs[name].m, this.defs[name].r, name, this.defs[name].idNum, a.tag, a.returnTo); 
+				var UV = V(Math.sin(angle), Math.cos(angle));
+
+				newDots[countIdx] = D(x+UV.dx*3, y+UV.dy*3, vec, this.defs[name].m, this.defs[name].r, name, this.defs[name].idNum, a.tag, a.returnTo); 
 				newDots[countIdx].setTemp(prodTemp);
 			}
 			this.dotManager.add(newDots);
 		}
 		return false;
 		
-	},
-
-	checkMassConserve: function(a, b, products){
-		var massIn = a.m + b.m;
-		var massOut = 0;
-		for (var prodIdx=0; prodIdx<products.length; prodIdx++){
-			massOut += spcs[products[prodIdx].spc].m*products[prodIdx].count;
-		}
-		if(massIn!=massOut){
-			console.log('YOUR ATTENTION PLEASE: MASS IS NOT CONSERVED IN THE REACTION BETWEEN ' + a.name + ' AND ' + b.name);
-		}
-	},	
-
+	}
 }
 
 ReactionHandler.Reaction.prototype = {
@@ -250,7 +239,7 @@ ReactionHandler.Reaction.prototype = {
 		return count;
 	},
 	convertHRxn: function(hRxn) {
-		return tConst * hRxn;// / (JtoKJ * N) <- equals 1
+		return hRxn / cp;// deltaH/mol = 1000 * deltaH/molecule, deltaH/molecule = cp * deltaT
 	
 	},
 }
