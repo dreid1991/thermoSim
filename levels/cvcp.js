@@ -130,8 +130,9 @@ _.extend(cvcp.prototype,
 				
 					*/
 				})
-				collide.addReaction({rctA: 'spc1', rctB: 'spc3', hRxn: 0, activeTemp: 350, prods: {spc4: 3}});
-				collide.addReaction({rctA: 'spc1', rctB: 'spc3', hRxn: 0, activeTemp: 700, prods: {spc5: 1}});
+				//collide.addReaction({rctA: 'spc1', rctB: 'spc3', hRxn: 0, activeTemp: 350, prods: {spc4: 3}});
+				//collide.addReaction({rctA: 'spc1', rctB: 'spc3', hRxn: 0, activeTemp: 700, prods: {spc5: 1}});
+				collide.addReaction({handle: 'handley', rctA: 'spc1', hRxn: 0, activeTemp: 700, prods: {spc5: 1}});
 			},
 			/*
 			setup:

@@ -38,6 +38,7 @@ ReactionHandler = {
 	},
 	
 	Reaction: function(attrs) { //prods as {name1: count, name2, count2}  hRxn in kj/mol, activeTemp in kelvin
+		this.attrs = attrs;
 		this.handle = attrs.handle;
 		this.parent = attrs.parent;
 		this.rctA = attrs.rctA || attrs.rctB; //spcName
@@ -91,38 +92,28 @@ ReactionHandler = {
 	//Input prods as {name:count, ...}
 	//reformatting since looping through array is faster than looping through obj
 	//internally formatted as [{name:'...', count:#}..]
-	addRxnDecomp: function(aName, hRxn, activE, prods) {
-		var idA = speciesDefs[aName].idNum;
-	
-
-		var pairProdsDouble = this.doubleProds(deepCopy(prods));
-		this.addRxnPair(aName, aName, 2*hRxn, 2*activE, pairProdsDouble);
-		//so if it hits itself, both can decompose with twice deltaHRxn and activation energy, or just one can through reaction below
-
-		for (var spcDefName in speciesDefs) {
-			var spcDef = speciesDefs[spcDefName];
-			var idB = spcDef.idNum;
-
-			var pairProds = this.plusOne(deepCopy(prods), spcDefName);
+	initDecomp: function(rxn) {
+		var rctA = rxn.rctA;
+		var idA = rxn.rctADef.idNum;
+		for (var rctB in this.defs) {
+			var rxnPair = rxn.copy();
+			var rctBDef = this.defs[rctB];
+			rxnPair.rctB = rctB;
+			rxnPair.rctBDef = rctBDef;
 			
-			this.addRxnPair(aName, spcDefName, hRxn, activE, pairProds);
+			var idB = rctBDef.idNum;
+			if (idA == idB) {
+				rxnPair.activeTemp *= 2;
+				rxnPair.hRxn *= 2;
+				rxnPair.doubleProds();
+			} else {
+				rxnPair.increaseProd(rctB, 1);
+			}
+			this.initPair(rxnPair);
 			
 		}
 	},
-	doubleProds: function(prods) {
-		for (var prod in prods) {
-			prods[prod]*=2;
-		}
-		return prods;
-	},
-	plusOne: function(prods, spc) {
-		if (prods[spc] === undefined) {
-			prods[spc] = 1;
-		} else {
-			prods[spc]++;
-		}
-		return prods;
-	},
+
 	hitTemp: function(a, b, perpAB, perpBA){
 		return .5*(Math.abs(perpAB)*perpAB*a.m + Math.abs(perpBA)*perpBA*b.m)*this.tConst;
 		//abs will handle dots moving away from other dot
@@ -219,7 +210,31 @@ ReactionHandler = {
 }
 
 ReactionHandler.Reaction.prototype = {
-
+	copy: function() {
+		var copy = new this.parent.Reaction(this.attrs);
+		return copy; //no mutable values from attrs are used directly, so this should be safe.
+	},
+	doubleProds: function() {
+		for (var prodIdx=0; prodIdx<this.prods.length; prodIdx++) {
+			this.prods[prodIdx].count *= 2;
+		}
+		this.prodCount *= 2;
+		return this;
+	},
+	increaseProd: function(spcName, increaseBy) {
+		var isEntry = false;
+		for (var prodIdx=0; prodIdx<this.prods.length; prodIdx++) {
+			var prod = this.prods[prodIdx];
+			if (prod.name == spcName) {
+				prod.count += increaseBy;
+				isEntry = true;
+				break;
+			}
+		}
+		if (!isEntry) this.prods.push({name: spcName, count: increaseBy});
+		this.prodCount += increaseBy;
+		return this;
+	},
 	reformatProds: function(prods) {
 		var reformat = [];
 		for (var name in prods) {
