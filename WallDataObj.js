@@ -1,6 +1,7 @@
 WallMethods.DataObj = function() {
 	this.srcVal = [];
 	this.idVal;
+	this.idArgsVal;
 	this.wallHandleVal;
 	this.recordingVal = false;
 	this.displayingVal = false;
@@ -13,6 +14,13 @@ WallMethods.DataObj.prototype = {
 	id: function(id) {
 		if (id) this.idVal = id;
 		return this.idVal;
+	},
+	idArgs: function(args) {
+		if (args) this.idArgsVal = args;
+		return this.idArgsVal;
+	},
+	argsMatch: function(testArgs) {
+		return objectsEqual(this.idArgsVal, testArgs);
 	},
 	readout: function(readout) {
 		if (readout) this.readoutVal = readout;

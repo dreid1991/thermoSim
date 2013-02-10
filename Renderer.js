@@ -4,6 +4,10 @@ function Renderer() {
 
 Renderer.prototype = {
 	render: function(scene) {
+		if (!scene) return;
+		
+		if (typeof scene == 'function') return scene.apply(curLevel);
+		
 		scene = this.getAndEval(scene); //copying all objects, replacing GET tags with value and EVAL ing
 		if (scene.type) {
 			if (/section/.test(scene.type)) {
@@ -11,7 +15,7 @@ Renderer.prototype = {
 			} else if (/prompt/.test(scene.type)){
 				currentSetupType = scene.type + window[scene.type + 'Idx'];
 			} else {
-				console.log ('what is a scene.type of ' + scene.type + '?');
+				console.log ('scene.type of ' + scene.type + " is not valid.  Use 'section' or 'prompt'");
 				console.trace();
 			}
 		}

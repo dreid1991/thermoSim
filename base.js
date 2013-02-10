@@ -541,9 +541,7 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 		emptyListener(curLevel, 'sectionCleanUp');
 		emptyListener(curLevel, 'sectionCondition');
 		
-		if (newSection.setup) {
-			newSection.setup.apply(curLevel);
-		}
+		renderer.render(newSection.setup);
 
 		
 		addListener(curLevel, 'sectionCleanUp', 'removeArrowAndText',
@@ -554,9 +552,8 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 		this);
 		window['curLevel'].delayGraphs();
 	}
-	if (newPrompt.setup) {
-		newPrompt.setup.apply(window['curLevel'])
-	}
+	renderer.render(newPrompt.setup);
+
 	if (!newPrompt.quiz) {
 		$('#nextPrevDiv').show();
 	}
@@ -924,6 +921,29 @@ function extend(old, add) {
 		return add(old());
 	}
 }
+function objectsEqual(a, b) {
+	return Math.min(objectsEqualInDirection(a, b), objectsEqualInDirection(b, a));
+	
+}
+function objectsEqualInDirection(a, b) {
+	for (var alet in a) {
+		if (b && b.hasOwnProperty(alet)) {
+			if (typeof a[alet] == 'object') {
+				if (!objectsEqual(a[alet], b[alet])) {
+					return false;
+				}
+			} else {
+				if (a[alet] != b[alet]) {
+					return false;
+				}
+			}
+		} else {
+			return false;
+		}
+	}
+	return true;
+}
+
 function rms(vals) {
 	var sum=0;
 	for (var valIdx=0; valIdx<vals.length; valIdx++){

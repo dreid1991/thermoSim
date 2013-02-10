@@ -306,11 +306,23 @@ WallMethods.wall = {
 		if (this.data[type]) {
 			if (this.data[type] instanceof Array) {
 				for (var idx=0; idx<this.data[type].length; idx++) {
-					if (this.data[type][idx].match(args)) return this.data[type][idx];
+					if (this.data[type][idx].argsMatch(args)) return this.data[type][idx];
 				}
 				console.log("Couldn't find data " + type + " with args " + args);
 			} else {
 				return this.data[type]
+			}
+		}
+	},
+	removeDataObj: function(type, args) { 
+		if (this.data[type]) {
+			if (this.data[type] instanceof Array) {
+				for (var idx=0; idx<this.data[type].length; idx++) {
+					if (this.data[type][idx].argsMatch(args)) return this.data[type].splice(idx, 1);
+				}
+				console.log("Couldn't find data " + type + " with args " + args);
+			} else {
+				return delete this.data[type]
 			}
 		}
 	},
@@ -474,12 +486,12 @@ WallMethods.wall = {
 		dataObj.recording(true);
 		dataObj.id('count' + (info.spcName || '').toCapitalCamelCase() + (info.tag || '').toCapitalCamelCase());
 		dataObj.wallHandle(this.handle);
-		//I don't need to record anything.  It's already being recording by the dot manager.  I just point to it.
+		dataObj.idArgs(info);
 		var wall = this;
 		var recordStr = dataObj.id() + dataObj.wallHandle();
 		dataObj.recordStop(function(){
 			dataObj.recording(false);
-			wall.removeData('count', info)
+			wall.removeDataObj('count', info)
 			recordDataStop(recordStr);
 		});
 		recordData(recordStr, dataObj.src(), function() {return dots.length}, this, 'update');
@@ -495,12 +507,12 @@ WallMethods.wall = {
 		dataObj.recording(true);
 		dataObj.id('frac' + (info.spcName || '').toCapitalCamelCase() + (info.tag || '').toCapitalCamelCase());
 		dataObj.wallHandle(this.handle);
-		//I don't need to record anything.  It's already being recording by the dot manager.  I just point to it.
+		dataObj.idArgs(info);
 		var wall = this;
 		var recordStr = dataObj.id() + dataObj.wallHandle();
 		dataObj.recordStop(function(){
 			dataObj.recording(false);
-			wall.removeData('frac', info);
+			wall.removeDataObj('frac', info);
 			recordDataStop(recordStr);
 		});
 		recordData(recordStr, dataObj.src(), function() {return countList.length/totalList.length}, this, 'update');
