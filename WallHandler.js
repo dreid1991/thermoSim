@@ -194,6 +194,7 @@ WallMethods.main = {
 		this[wallIdx].g = g;
 		this[wallIdx].pConst = pConst;
 		this[wallIdx].data = {};
+		/*
 		this[wallIdx].data['pInt'] = new Array();
 		this[wallIdx].data['pExt'] = new Array();
 		this[wallIdx].data['t'] = new Array();
@@ -202,6 +203,11 @@ WallMethods.main = {
 		this[wallIdx].data['m'] = new Array();
 		this[wallIdx].data['work'] = new Array(); // kj
 		this[wallIdx].data['q'] = new Array(); //kj
+		this.assignRecording(this[wallIdx].data);
+		this.assignDisplaying(this[wallIdx].data);
+		*/
+		/*
+	
 		this[wallIdx].recordingTemp = {val: false};
 		this[wallIdx].recordingPInt = {val: false};
 		this[wallIdx].recordingPExt = {val: false};
@@ -220,6 +226,7 @@ WallMethods.main = {
 		this[wallIdx].displayingRMS = {val: false};
 		this[wallIdx].displayingQArrowsRate = {val: false};
 		this[wallIdx].displayingQArrowsAmmt = {val: false};
+		*/
 		this[wallIdx].q = 0;
 		this[wallIdx].pIntLen = 35;
 		this[wallIdx].eToAdd = 0;
@@ -434,6 +441,12 @@ WallMethods.main = {
 		}
 		
 		
+	},
+	assignRecording: function(data) {
+		for (var dataSet in data) data.recording = false;
+	},
+	assignDisplaying: function(data) {
+		for (var dataSet in data) data.displaying = false;
 	},
 	////////////////////////////////////////////////////////////
 	//END

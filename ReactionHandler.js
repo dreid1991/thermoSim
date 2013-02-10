@@ -188,7 +188,7 @@ ReactionHandler = {
 				var angle = Math.random()*2*Math.PI;
 				var UV = V(Math.sin(angle), Math.cos(angle));
 
-				newDots[countIdx] = D(x+UV.dx*3, y+UV.dy*3, vec, this.defs[name].m, this.defs[name].r, name, this.defs[name].idNum, a.tag, a.returnTo); 
+				newDots[countIdx] = D(x+UV.dx*3, y+UV.dy*3, UV, this.defs[name].m, this.defs[name].r, name, this.defs[name].idNum, a.tag, a.returnTo); 
 				newDots[countIdx].setTemp(prodTemp);
 			}
 			this.dotManager.add(newDots);

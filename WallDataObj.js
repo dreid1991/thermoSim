@@ -1,0 +1,49 @@
+WallMethods.DataObj = function() {
+	this.srcVal = [];
+	this.idVal;
+	this.wallHandleVal;
+	this.recordingVal = false;
+	this.displayingVal = false;
+	this.recordStopVal = undefined;
+	this.displayStopVal = undefined;
+}
+
+WallMethods.DataObj.prototype = {
+	id: function(id) {
+		if (id) this.idVal = id;
+		return this.idVal;
+	},
+
+	wallHandle: function(wallHandle) {
+		if (wallHandle) this.wallHandleVal = wallHandle;
+		return this.wallHandleVal;
+	},
+	src: function(src) {
+		if (src) this.srcVal = src;
+		return this.srcVal;
+	},
+	recording: function(recording) {
+		if (recording) this.recordingVal = recording;
+		this.recordingVal;
+	},
+	displaying: function(displaying) {
+		if (displaying) this.displayingVal = displaying;
+		return this.displayingVal;
+	},
+	//attn: the function behavior is different from the value behavior.  It calls instead of returns the values if no argument is given.
+	//This is inconsistant, but I think fits the use cases better
+	recordStop: function(func) {
+		if (func) {
+			this.recordStopVal = func;
+		} else if (this.recordStopVal) {
+			this.recordStopVal();
+		}
+	},
+	displayStop: function(func) {
+		if (func) {
+			this.displayStopVal = func;
+		} else if (this.displayStopVal) {
+			this.displayStopVal();
+		}
+	},
+}

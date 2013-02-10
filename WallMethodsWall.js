@@ -236,12 +236,12 @@ WallMethods.wall = {
 		this.updateMass();
 		return this;
 	},
-	unsetMass: function(chunkName){
-		if(!chunkName){
+	unsetMass: function(chunkName) {
+		if (!chunkName) {
 			for (var chunkName in this.massChunks){
 				delete this.massChunk[chunkName]
 			}		
-		}else{
+		} else {
 			delete this.massChunks[chunkName];
 		}
 		this.updateMass();
@@ -310,17 +310,24 @@ WallMethods.wall = {
 		this.recordQ();
 	},
 	recordTemp: function() {
-		this.recordingTemp.val = true;
-		//if (this.parent.numWalls>1) {
+		if (!this.data.t || !this.data.t.recording()) {
+			this.data.t = new WallMethods.DataObj();
+			var dataObj = this.data.t;
+			dataObj.recording(true)
+			dataObj.recordStop(this.recordStop);
+			dataObj.id('t');
+			dataObj.wallHandle(this.handle);
 			var tempFunc = dataHandler.tempFunc({tag:this.handle})
-		//}else{
-		//	var tempFunc = dataHandler.tempFunc();
-		//}		
-		recordData('t' + this.handle, this.data.t, tempFunc, this, 'update');
+			
+			recordData(this.data.t.id() + this.handle, dataObj.src(), tempFunc, this, 'update');
+		}
 		return this;
 	},
 	recordRMS: function() {
-		if (this.recordingTemp.val) {
+		if (!this.data.RMS || !this.data.RMS.recording()) {
+			this.data.RMS = new WallMethods.DataObj();
+			var dataObj = this.data.RMS;
+			this.setupStdDataObj(dataObj, 'RMS');
 			this.recordingRMS.val = true;
 			//HEY - I AM ASSUMING THAT IF YOU GET RMS, IT IS OF ONE TYPE OF MOLECULE
 			if (this.parent.numWalls>1) {
@@ -333,7 +340,7 @@ WallMethods.wall = {
 				var temp = this.data.t[this.data.t.length-1];
 				return Math.sqrt(3000*KB*temp*ACTUALN/mass)
 			}
-			recordData('RMS' + this.handle, this.data.RMS, RMSFunc, this, 'update');
+			recordData(dataObj.id() + this.handle, dataObj.src(), RMSFunc, this, 'update');
 		} else {
 			console.log('Tried to record RMS of wall ' + this.handle + ' while not recording temp.  Will not record.');
 		}
@@ -356,25 +363,42 @@ WallMethods.wall = {
 		}
 	},
 	recordPInt: function() {
-		this.recordingPInt.val = true;
-		this.pIntList = new Array();
-		this.pIntIdx = 0;
-		recordData('pInt' + this.handle, this.data.pInt, this.pInt, this, 'update');
+		if (!this.data.pInt || !this.data.pInt.recording()) {
+			this.data.pInt = new WallMethods.DataObj();
+			var dataObj = this.data.pInt;
+			this.setupStdDataObj(dataObj, 'pInt');
+			this.pIntList = new Array();
+			this.pIntIdx = 0;
+			recordData(dataObj.id() + this.handle, dataObj.src(), this.pInt, this, 'update');
+			
+		}
+
 		return this;
 	},
 	recordPExt: function() {
-		this.recordingPExt.val = true;
-		recordData('pExt' + this.handle, this.data.pExt, this.pExt, this, 'update');
+		if (!this.data.pExt || !this.data.pExt.recording()) {
+			this.data.pExt = new WallMethods.DataObj();
+			var dataObj = this.data.pExt;
+			this.setupStdDataObj(dataObj, 'pExp');
+			recordData(dataObj.id() + this.handle, dataObj.src(), this.pExt, this, 'update');
+		}
 		return this;
 	},
 	recordVol: function() {
-		this.recordingVol.val = true;
-		recordData('v' + this.handle, this.data.v, function(){return this.parent.wallVolume(this.handle)}, this, 'update');
+		if (!this.data.v || !this.data.v.recording()) {
+			this.data.v = new WallMethods.DataObj();
+			var dataObj = this.data.v;
+			this.setupStdDataObj(dataObj, 'v');
+			recordData(dataObj.id() + this.handle, dataObj.src(), function() {return this.parent.wallVolume(this.handle)}, this, 'update');
+		}
 		return this;
 	},
 	recordWork: function() {
-		if (!this.recordingWork.val) {
-			this.recordingWork.val = true;
+		if (!this.data.work || !this.data.work.recording()) {
+			this.data.work = new WallMethods.DataObj();
+			var dataObj = this.data.work;
+			this.setupStdDataObj(dataObj, 'work');
+			
 			this.work = 0;
 			var LTOM3LOCAL = LtoM3;
 			var PCONSTLOCAL = pConst;
@@ -382,19 +406,19 @@ WallMethods.wall = {
 			var VCONSTLOCAL = vConst;
 			var JTOKJLOCAL = JtoKJ;
 			var trackPt = this[0];
-			var width = this[1].x-this[0].x;
+
 			var heightLast = trackPt.y;
 			//Attention - at some point, employ some trickyness to first add a listener for first turn that records zero, then add real listener that uses func below. 
 			//this will work after first turn since volume is _always_ recorded before work (vol is added as default to wall, work is added later by objects)
 			var self = this;
-			
+			//var pExtList = this.data.get
+			var volSrc = this.data.v.src();
 			var calcWork = function() {
-				var len = self.data.v.length;
-				var dV = LTOM3LOCAL*(self.data.v[len-1] - self.data.v[len-2])
+				var len = volSrc.length
+				var dV = LTOM3LOCAL*(volSrc[len-1] - volSrc[len-2])
 				if (!isNaN(dV)) {
 					var p = self.pExt()*PUNITTOPALOCAL;
 					self.work -= JTOKJLOCAL*p*dV;
-					heightLast = trackPt.y;
 					return self.work;
 				} else {
 					self.work = 0;
@@ -402,38 +426,45 @@ WallMethods.wall = {
 				}
 			}
 
-			recordData('work' + this.handle, this.data.work, calcWork, this, 'update');
+			recordData(dataObj.id() + this.handle, dataObj.src(), calcWork, this, 'update');
 		}
 		return this;
 	},
 	recordMass: function() {
-		if (!this.recordingMass.val) {
-			this.recordingMass.val = true;
-			recordData('mass' + this.handle, this.data.m, function(){return this.mass}, this, 'update');	
+		if (!this.data.mass || !this.data.mass.recording()) {
+			this.data.mass = new WallMethods.DataObj();
+			var dataObj = this.data.mass;
+			this.setupStdDataObj(dataObj, 'mass');
+			recordData(dataObj.id() + this.handle, dataObj.src(), function(){return this.mass}, this, 'update');	
 		}
 		return this;			
 	},
 	recordQ: function() {
-		if (!this.recordingQ.val) {
-			this.recordingQ.val = true;
-			recordData('q' + this.handle, this.data.q, function(){return this.q}, this, 'update');
+		if (!this.data.q || !this.data.q.recording()) {
+			this.data.q = new WallMethods.DataObj();
+			var dataObj = this.data.q;
+			this.setupStdDataObj(dataObj, 'q');
+			recordData(dataObj.id() + this.handle, dataObj.src(), function(){return this.q}, this, 'update');
 		}
 		return this;
 	},
-	recordStop: function(isRecording, str) {
-		isRecording.val = false;
-		recordDataStop(str + this.handle);
+	setupStdDataObj: function(dataObj, id) {
+		dataObj.recording(true);
+		dataObj.recordStop(this.recordStop);
+		dataObj.id(id);
+		dataObj.wallHandle(this.wallHandle);
+	},
+	//to be called in context of DataObj
+	recordStop: function() {
+		this.recording(false);
+		recordDataStop(this.id + this.wallHandle);
 	},
 	//if I want to generalize stop *and* use the closure compiler, need to make isRecording object
 	recordAllStop: function(){
-		if(this.recordingTemp.val){this.recordStop(this.recordingTemp, 't');};
-		if(this.recordingPInt.val){this.recordStop(this.recordingPInt, 'pInt');};
-		if(this.recordingPExt.val){this.recordStop(this.recordingPExt, 'pExt');};
-		if(this.recordingVol.val){this.recordStop(this.recordingVol, 'v');};
-		if(this.recordingWork.val){this.recordStop(this.recordingWork, 'work');};
-		if(this.recordingMass.val){this.recordStop(this.recordingMass, 'mass');};
-		if(this.recordingQ.val){this.recordStop(this.recordingQ, 'q');};
-		if(this.recordingRMS.val){this.recordStop(this.recordingRMS, 'RMS');};
+		for (var dataObjName in this.data) {
+			var dataObj = this.data[dataObjName];
+			dataObj.recordStop();
+		}
 		return this;
 	},	
 	resetWork: function(){
@@ -697,7 +728,7 @@ WallMethods.wall = {
 	},
 	displayPIntStop: function(){
 		this.displayingPInt = false;
-		removeListener(curLevel, 'data', 'displayPInt'+this.handle);
+		removeListener(curLevel, 'update', 'displayPInt'+this.handle);
 		this.pIntReadout.removeEntry('pInt' + this.handle);
 		return this;
 	},
@@ -721,13 +752,13 @@ WallMethods.wall = {
 	},
 	displayMassStop: function(){
 		this.displayingMass = false;
-		removeListener(curLevel, 'data', 'displayMass' + this.handle)
+		removeListener(curLevel, 'update', 'displayMass' + this.handle)
 		this.massReadout.removeEntry('mass' + this.handle);	
 		return this;			
 	},
 	displayQStop: function(){
 		this.displayingQ = false;
-		removeListener(curLevel, 'data', 'displayQ' + this.handle);
+		removeListener(curLevel, 'update', 'displayQ' + this.handle);
 		this.qReadout.removeEntry('q' + this.handle);
 		return this;
 	},
@@ -763,6 +794,12 @@ WallMethods.wall = {
 		if(this.displayingQArrowsAmmt.val){this.displayQArrowsAmmtStop();};
 		if(this.displayingRMS.val){this.displayRMSStop();};
 		return this;
+	},
+	makeDataList: function() {
+		var list = [];
+		list.displaying = false;
+		list.recording = false;
+		return list;
 	},
 	resetQ: function() {
 		this.q = 0;
