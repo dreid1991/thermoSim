@@ -98,6 +98,8 @@ _.extend(cvcp.prototype,
 						{type: 'Outlet', attrs: {handle: 'outty', wallInfo: 'left', ptIdxs: [0, 1], fracOffset: .3}}
 					],
 					records: [
+						{wallInfo: 'right', data: 'count', attrs: {spcName: 'spc1', tag: 'right'}},
+						{wallInfo: 'right', data: 'frac', attrs: {spcName: 'spc1', tag: 'right'}}
 					],
 					readoutEntries: [
 						{wallInfo: 'left', data:'tempSmooth', readout: 'mainReadout'},

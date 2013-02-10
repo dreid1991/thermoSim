@@ -459,6 +459,53 @@ WallMethods.wall = {
 		}
 		return dataObj;
 	},
+	recordCount: function(info) {
+			// this.data.pInt = new WallMethods.DataObj();
+			// var dataObj = this.data.pInt;
+			// this.setupStdDataObj(dataObj, 'pInt');
+			// this.pIntList = new Array();
+			// this.pIntIdx = 0;
+			// recordData(dataObj.id() + this.handle, dataObj.src(), this.pInt, this, 'update');
+		var dots = dotManager.createIfNotExists(info);
+		if (!this.data.count) this.data.count = [];
+		//list is okay.  Will use getDataObj func
+		this.data.count.push(new WallMethods.DataObj());
+		var dataObj = this.data.count[this.data.count.length-1];
+		dataObj.recording(true);
+		dataObj.id('count' + (info.spcName || '').toCapitalCamelCase() + (info.tag || '').toCapitalCamelCase());
+		dataObj.wallHandle(this.handle);
+		//I don't need to record anything.  It's already being recording by the dot manager.  I just point to it.
+		var wall = this;
+		var recordStr = dataObj.id() + dataObj.wallHandle();
+		dataObj.recordStop(function(){
+			dataObj.recording(false);
+			wall.removeData('count', info)
+			recordDataStop(recordStr);
+		});
+		recordData(recordStr, dataObj.src(), function() {return dots.length}, this, 'update');
+		return dataObj;
+	},
+	recordFrac: function(info) {
+		var countList = dotManager.createIfNotExists(info);
+		var totalList = dotManager.createIfNotExists(info.tag ? {tag: info.tag} : undefined);
+		if (!this.data.frac) this.data.frac = [];
+		//list is okay.  Will use getDataObj func
+		this.data.frac.push(new WallMethods.DataObj());
+		var dataObj = this.data.frac[this.data.frac.length-1];
+		dataObj.recording(true);
+		dataObj.id('frac' + (info.spcName || '').toCapitalCamelCase() + (info.tag || '').toCapitalCamelCase());
+		dataObj.wallHandle(this.handle);
+		//I don't need to record anything.  It's already being recording by the dot manager.  I just point to it.
+		var wall = this;
+		var recordStr = dataObj.id() + dataObj.wallHandle();
+		dataObj.recordStop(function(){
+			dataObj.recording(false);
+			wall.removeData('frac', info);
+			recordDataStop(recordStr);
+		});
+		recordData(recordStr, dataObj.src(), function() {return countList.length/totalList.length}, this, 'update');
+		return dataObj;		
+	},
 	setupStdDataObj: function(dataObj, id) {
 		dataObj.recording(true);
 		dataObj.recordStop(this.recordStop);

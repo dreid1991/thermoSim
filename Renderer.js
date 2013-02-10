@@ -63,7 +63,7 @@ Renderer.prototype = {
 	addRecording: function(data) {
 		for (var dataIdx=0; dataIdx<data.length; dataIdx++) {
 			var entry = data[dataIdx];
-			walls[entry.wallInfo]['record' + entry.data.toCapitalCamelCase()]();
+			walls[entry.wallInfo]['record' + entry.data.toCapitalCamelCase()](entry.attrs);
 		}
 	},
 	addReadoutEntries: function(entries) {

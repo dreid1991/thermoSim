@@ -58,6 +58,17 @@ DotManager.prototype = {
 			this.lists[list].splice(0, this.lists[list].length);
 		}
 	},
+	createIfNotExists: function(info) {
+		if (info.spcName && info.tag) {
+			return this.getByNameAndTag(info);
+		} else if (info.spcName) {
+			return this.getByName(info.spcName);
+		} else if (info.tag) {
+			return this.getByTag(info.tag);
+		} else {
+			return this.lists.ALLDOTS;
+		}
+	},
 	
 //end public funcs
 	addFunc: function(list, dot) {
