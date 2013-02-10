@@ -470,11 +470,16 @@ WallMethods.wall = {
 		this.recording(false);
 		recordDataStop(this.id() + this.wallHandle());
 	},
-	//if I want to generalize stop *and* use the closure compiler, need to make isRecording object
 	recordAllStop: function(){
 		for (var dataObjName in this.data) {
 			var dataObj = this.data[dataObjName];
-			dataObj.recordStop();
+			if (dataObj instanceof Array) {
+				for (var idx=0; idx<dataObj.length; idx++) {
+					dataObj[idx].recordStop();
+				}
+			} else {
+				dataObj.recordStop();
+			}
 		}
 		return this;
 	},	
@@ -486,131 +491,7 @@ WallMethods.wall = {
 		this.q = 0;
 		return this;
 	},
-	//HEY - YOU SHOULD _PROBABLY_ MAKE A FUNCTION THAT DOES THESE DISPLAY THINGS GIVEN SOME INPUTS.  I MEAN, THIS IS A LOT OF NEARLY IDENTICAL CODE
-	displayWork: function(readoutHandle, label, decPlaces) {
-		if (this.recordingWork.val && !this.displayingWork.val) {
-			this.displayingWork.val = true;
-			decPlaces = defaultTo(1, decPlaces);
-			var dataSet = this.data.work;
-			label = defaultTo('Work:', label);
-			this.workReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-			var firstVal = dataSet[dataSet.length-1];
-			if(!validNumber(firstVal)){
-				firstVal = 0;
-			}
-			this.workReadout.addEntry('work' + this.handle, label, 'kJ', firstVal, undefined, decPlaces);
-			addListener(curLevel, 'update', 'displayWork' + this.handle,
-				function(){
-					this.workReadout.hardUpdate('work' + this.handle, dataSet[dataSet.length-1]);
-				},
-			this);	
-			this.addCleanUpIfPrompt('displayWork', this.displayWorkStop);
-		} else {
-			console.log('Tried to display work of wall ' + this.handle + ' while not recording.  Will not display.');
-		}
-		return this;
-	},
-	displayTemp: function(readoutHandle, label, decPlaces, smooth){
-		if (this.recordingTemp.val && !this.displayingTemp.val) {
-			this.displayingTemp.val = true;
-			decPlaces = defaultTo(0, decPlaces);
-			var dataSet = this.data.t;
-			label = defaultTo('Temp:', label);
-			this.tempReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-			var firstVal = dataSet[dataSet.length-1];
-			if (!validNumber(firstVal)) {
-				firstVal = 0;
-			}
-			this.tempReadout.addEntry('temp' + this.handle, label, 'K', firstVal, undefined, decPlaces);
-			if (!smooth) {
-				addListener(curLevel, 'update', 'displayTemp' + this.handle,
-					function() {
-						this.tempReadout.hardUpdate('temp' + this.handle, dataSet[dataSet.length-1]);
-					},
-				this);	
-			} else {
-				addListener(curLevel, 'update', 'displayTemp' + this.handle,
-					function() {
-						var sum = 0;
-						for (var tempIdx=dataSet.length-5; tempIdx<dataSet.length; tempIdx++) {
-							sum += dataSet[tempIdx];
-						}
-						this.tempReadout.hardUpdate('temp' + this.handle, sum*=.2);
-					},
-				this);
-			}
-			this.addCleanUpIfPrompt('displayTemp', this.displayTempStop);
-		}else{
-			console.log('Tried to display temp of wall ' + this.handle + ' while not recording.  Will not display.');
-		}
-		return this;
-	},
-	displayTempSmooth: function(readoutHandle, label, decPlaces) {
-		return this.displayTemp(readoutHandle, label, decPlaces, true);
-	},
-	displayPInt: function(readoutHandle, label, decPlaces){
-		if(this.recordingPInt.val && !this.displayingPInt.val){
-			this.displayingPInt.val = true;
-			decPlaces = defaultTo(1, decPlaces);
-			var dataSet = this.data.pInt;
-			label = defaultTo('Pint:', label);
-			this.pIntReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-			var firstVal = dataSet[dataSet.length-1];
-			if (!validNumber(firstVal)) {
-				firstVal = 0;
-			}
-			this.pIntReadout.addEntry('pInt' + this.handle, label, 'bar', firstVal, undefined, decPlaces);
-			addListener(curLevel, 'update', 'displayPInt'+this.handle,
-				function(){
-					this.pIntReadout.hardUpdate('pInt' + this.handle, dataSet[dataSet.length-1]);
-				},
-			this);
-			this.addCleanUpIfPrompt('displayPInt', this.displayPIntStop);
-		}else{
-			console.log('Tried to display pInt of wall ' + this.handle + ' while not recording.  Will not display.');
-		}
-		return this;
-	},
-	displayPExt: function(readoutHandle, label, decPlaces){
-		var dataObj = this.getDataObj('pExt');
-		if (dataObj && dataObj.recording()) {
-			var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-			var units = 'bar';
-			decPlaces = defaultTo(1, decPlaces);
-			var label = defaultTo('Pext:', label);
-			this.displayStd(dataObj, readout, label, decPlaces, units);
-		} else {
-			console.log('Failed to display ' + dataObj.wallHandle() + ' ' + dataObj.id());
-		}
-		// if(this.recordingPExt.val && !this.displayingPExt.val){
-			// this.displayingPExt.val = true;
-			// decPlaces = defaultTo(1, decPlaces);
-			// var dataSet = this.data.pExt;
-			// label = defaultTo('Pext:', label);
-			// this.pExtReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-			// var firstVal = dataSet[dataSet.length-1];
-			// if(!validNumber(firstVal)){
-				// firstVal = 0;
-			// }
-			// this.pExtReadout.addEntry('pExt' + this.handle, label, 'bar', firstVal, undefined, decPlaces);
-			// var lastVal = 0;
-			// addListener(curLevel, 'update', 'displayPExt'+this.handle,
-				// function(){
-					// var curVal = dataSet[dataSet.length-1];
-					// if(curVal!=lastVal){
-						// this.pExtReadout.tick('pExt' + this.handle, curVal);
-						// lastVal = curVal;
-					// }
-					
-				// },
-			// this);
-			// this.addCleanUpIfPrompt('displayPExt', this.displayPExtStop);
-		// }else{//OR ALREADY DISPLAYING - MAKE ERROR MESSAGES FOR TRYING TO DISPLAY WHILE ALREADY DISPLAYING
-			// console.log('Tried to display pExt of wall ' + this.handle + ' while not recording.  Will not display.');
-		// }
-		// return this;
-	},
-	displayStd: function(dataObj, readout, label, decPlaces, units) {
+	displayStd: function(dataObj, readout, label, decPlaces, units, func) {
 		//wrappers will check if data object is recording
 		if (!dataObj.displaying()) {
 			dataObj.displaying(true);
@@ -624,11 +505,17 @@ WallMethods.wall = {
 			var entryHandle = dataObj.id() + dataObj.wallHandle().toCapitalCamelCase();
 			var listenerStr = 'display' + entryHandle.toCapitalCamelCase();
 			readout.addEntry(entryHandle, label, units, firstVal, undefined, decPlaces);
-			addListener(curLevel, 'update', listenerStr,
-				function() {
-					readout.hardUpdate(entryHandle, src[src.length-1]);
-				},
-			this);
+			if (func) {
+				addListener(curLevel, 'update', listenerStr,
+					function() {func(entryHandle, src)},
+				this);
+			} else {
+				addListener(curLevel, 'update', listenerStr,
+					function() {
+						readout.hardUpdate(entryHandle, src[src.length-1]);
+					},
+				this);
+			}
 			dataObj.displayStop(function() {
 				this.displaying(false);
 				this.readout().removeEntry(entryHandle);
@@ -638,126 +525,149 @@ WallMethods.wall = {
 			console.log('Tried to display ' + dataObj.id() + ' for wall ' + dataObj.wallHandle() + ' while already displaying');
 		}
 	},
-	displayVol: function(readoutHandle, label, decPlaces){
-		
-		if(this.recordingVol.val && !this.displayingVol.val){
-			this.displayingVol.val = true;
-			decPlaces = defaultTo(1, decPlaces);
-			var dataSet = this.data.v;
-			label = defaultTo('Volume:', label);
-			this.volReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-			var firstVal = dataSet[dataSet.length-1];
-			if(!validNumber(firstVal)){
-				firstVal = 0;
-			}
-			this.volReadout.addEntry('vol' + this.handle, label, 'L', firstVal, undefined, decPlaces);
-			addListener(curLevel, 'update', 'displayVolume' + this.handle,
-				function(){
-					this.volReadout.hardUpdate('vol' + this.handle, dataSet[dataSet.length-1]);
-				},
-			this);
-			this.addCleanUpIfPrompt('displayVol', this.displayVolStop);
-		}else{
-			console.log('Tried to display volume of wall ' + this.handle + ' while not recording.  Will not display.');			
+	displayWork: function(readoutHandle, label, decPlaces) {
+		var dataObj = this.getDataObj('work');
+		if (!dataObj || !dataObj.recording()) {
+			dataObj = this.recordTemp();
 		}
-		return this;
+		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		var units = 'kJ';
+		decPlaces = defaultTo(0, decPlaces);
+		var label = defaultTo('Work:', label);
+		this.displayStd(dataObj, readout, label, decPlaces, units);
 	},
-	displayMass: function(readoutHandle, label, decPlaces){
-		if(this.recordingMass.val && !this.displayingMass.val){
-			this.displayingMass.val = true;
-			decPlaces = defaultTo(0, decPlaces);
-			var dataSet = this.data.m;
-			label = defaultTo('Mass:', label);
-			this.massReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-			var firstVal = dataSet[dataSet.length-1];
-			if(!validNumber(firstVal)){
-				firstVal = 0;
-			}
-			this.massReadout.addEntry('mass' + this.handle, label, 'kg', firstVal, undefined, decPlaces);
-			var lastVal = 0;
-			addListener(curLevel, 'update', 'displayMass' + this.handle,
-				function(){
-					var curVal = dataSet[dataSet.length-1];
-					if(curVal!=lastVal){
-						this.massReadout.hardUpdate('mass' + this.handle, curVal);
-						lastVal = curVal;
-					}
-				},
-			this);
-			this.addCleanUpIfPrompt('displayMass', this.displayMassStop);
-		}else{
-			console.log('Tried to display mass of wall ' + this.handle + ' while not recording.  Will not display.');			
+	displayTemp: function(readoutHandle, label, decPlaces, smooth){
+		var func;
+		var dataObj = this.getDataObj('t');
+		if (!dataObj || !dataObj.recording()) {
+			dataObj = this.recordTemp();
 		}
-		return this;			
+		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		var units = 'K';
+		decPlaces = defaultTo(0, decPlaces);
+		var label = defaultTo('Temp:', label);
+		if (smooth) {
+			func = function(entryHandle, src) {
+				var sum = 0;
+				for (var tempIdx=src.length-5; tempIdx<src.length; tempIdx++) {
+					sum += src[tempIdx];
+				}
+				readout.hardUpdate(entryHandle, sum *= .2);
+			}
+		}
+		this.displayStd(dataObj, readout, label, decPlaces, units, func);
 	},
-	displayQ: function(readoutHandle, label, decPlaces){
-		if (this.recordingQ.val && !this.displayingQ.val) {
-			this.displayingQ.val = true;
-			decPlaces = defaultTo(1, decPlaces);
-			var dataSet = this.data.q;
-			label = defaultTo('Q:', label);
-			this.qReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-			var firstVal = dataSet[dataSet.length-1];
-			if(!validNumber(firstVal)){
-				firstVal = 0;
-			}
-			this.qReadout.addEntry('q' + this.handle, label, 'kJ', firstVal, undefined, decPlaces);
-			var lastVal = 0;
-			addListener(curLevel, 'update', 'displayQ'+this.handle,
-				function(){
-					var curVal = dataSet[dataSet.length-1];
-					if(curVal!=lastVal){
-						this.qReadout.hardUpdate('q' + this.handle, curVal);
-						lastVal = curVal;
-					}
-					
-				},
-			this);
-			this.addCleanUpIfPrompt('displayQ', this.displayQStop);
-
-		}else{
-			console.log('Tried to display q of wall ' + this.handle + ' while not recording.  Will not display.');
+	displayTempSmooth: function(readoutHandle, label, decPlaces) {
+		this.displayTemp(readoutHandle, label, decPlaces, true);
+	}, 
+	displayPInt: function(readoutHandle, label, decPlaces){
+		var dataObj = this.getDataObj('pInt');
+		if (!dataObj || !dataObj.recording()) {
+			dataObj = this.recordPInt();
 		}
-		return this;
-	},
-	displayRMS: function(readoutHandle, label, decPlaces) {
-		if(this.recordingRMS.val && !this.displayingRMS.val){
-			this.displayingRMS.val = true;
-			var decPlaces = defaultTo(0, decPlaces);
-			var dataSet = this.data.RMS;
-			label = defaultTo('RMS:', label);
-			this.RMSReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-			var firstVal = dataSet[dataSet.length-1];
-			if(!validNumber(firstVal)){
-				firstVal = 0;
-			}
-			this.RMSReadout.addEntry('RMS' + this.handle, label, 'm/s', firstVal, undefined, decPlaces);
-			addListener(curLevel, 'data', 'displayRMS' + this.handle,
-				function(){
-					this.RMSReadout.tick('RMS' + this.handle, dataSet[dataSet.length-1]);
-				},
-			this);	
-			this.addCleanUpIfPrompt('displayRMS', this.displayRMSStop);
-		}else{
-			console.log('Tried to display RMS of wall ' + this.handle + ' while not recording.  Will not display.');
-		}
-		return this;		
+		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		var units = 'bar';
+		decPlaces = defaultTo(1, decPlaces);
+		var label = defaultTo('Pext:', label);
+		this.displayStd(dataObj, readout, label, decPlaces, units);
 	
 	},
+	displayPExt: function(readoutHandle, label, decPlaces){
+		var dataObj = this.getDataObj('pExt');
+		if (!dataObj || !dataObj.recording()) {
+			dataObj = this.recordPExt();
+		}
+		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		var units = 'bar';
+		decPlaces = defaultTo(1, decPlaces);
+		var label = defaultTo('Pext:', label);
+		this.displayStd(dataObj, readout, label, decPlaces, units);
+	},
+	displayVol: function(readoutHandle, label, decPlaces){
+		var dataObj = this.getDataObj('v');
+		if (!dataObj || !dataObj.recording()) {
+			dataObj = this.recordVol();
+		}
+		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		var units = 'L';
+		decPlaces = defaultTo(1, decPlaces);
+		var label = defaultTo('Vol:', label);
+		this.displayStd(dataObj, readout, label, decPlaces, units);
+	},
+	displayMass: function(readoutHandle, label, decPlaces){
+		var dataObj = this.getDataObj('mass');
+		if (!dataObj || !dataObj.recording()) {
+			dataObj = this.recordMass();
+		}
+		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		var units = 'kg';
+		decPlaces = defaultTo(1, decPlaces);
+		var label = defaultTo('Mass:', label);
+		this.displayStd(dataObj, readout, label, decPlaces, units);		
+	},
+	displayQ: function(readoutHandle, label, decPlaces){
+		var dataObj = this.getDataObj('q');
+		if (!dataObj || !dataObj.recording()) {
+			dataObj = this.recordQ();
+		}
+		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		var units = 'kJ';
+		decPlaces = defaultTo(1, decPlaces);
+		var label = defaultTo('Q:', label);
+		this.displayStd(dataObj, readout, label, decPlaces, units);	
+	},
+	displayRMS: function(readoutHandle, label, decPlaces) {
+		var dataObj = this.getDataObj('RMS');
+		if (!dataObj || !dataObj.recording()) {
+			dataObj = this.recordRMS();
+		}
+		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		var units = 'm/s';
+		decPlaces = defaultTo(1, decPlaces);
+		var label = defaultTo('RMS:', label);
+		this.displayStd(dataObj, readout, label, decPlaces, units);		
+	
+	},
+	// I think I will have to abuse the DataObj for the arrows
 	displayQArrowsRate: function(threshold){
-		if (this.recordingQ.val && !this.displayingQArrowsRate.val && !this.displayingQArrowsAmmt.val) {
-			this.displayingQArrowsRate.val = true;
-			this.idxLastArrow = Math.max(0, this.data.q.length-1);
+		if (this.data.q.recording() && !(this.data.qArrowsRate && this.data.qArrowsRate.recording()) && !(this.data.qArrowsAmmt && this.data.qArrowsAmmt.recording())) {
+			this.data.qArrowsRate = new WallMethods.DataObj();
+			var dataObj = this.data.qArrowsRate;
+			dataObj.displaying(true);
+			dataObj.wallHandle(this.handle);
+			dataObj.id('qArrowsRate');
+			this.turnLastArrow = Math.max(0, this.data.q.length-1);
 			this.qArrowThreshold = defaultTo(threshold, .3);
-			addListener(curLevel, 'update', 'checkForDisplayArrows' + this.handle, this.checkDisplayArrows, this);
+			var listenerStr = 'checkForDisplayArrows' + dataObj.wallHandle();
+			var self = this;
+			qSrc = this.data.q.src();
+			addListener(curLevel, 'update', listenerStr, function() {self.checkDisplayArrows(qSrc)}, this);
+			this.turnLastArrow = turn;
+			dataObj.displayStop(function() {
+				this.displaying(false);
+				removeListener(curLevel, 'update', listenerStr);
+				removeListenerByName(curLevel, 'update', 'ArrowFly');
+			})
 		} else {
 			console.log('Tried to display q arrowsRate for wall ' + this.handle + ' while not recording or already displaying.  Will not display.');
 			console.trace();
 		}
 	},
 	displayQArrowsAmmt: function(qMax) {
-		if (this.recordingQ.val && !this.displayingQArrowsRate.val && !this.displayingQArrowsAmmt.val) {
-			this.displayingQArrowsAmmt.val = true;
+		if (this.data.q.recording() && !(this.data.qArrowsRate && this.data.qArrowsRate.recording()) && !(this.data.qArrowsAmmt && this.data.qArrowsAmmt.recording())) {
+			this.data.qArrowsAmmt = new WallMethods.DataObj();
+			var dataObj = this.data.qArrowsAmmt;
+			dataObj.displaying(true);
+			dataObj.wallHandle(this.handle);
+			dataObj.id('qArrowsAmmt');
+			var wall = this;
+			dataObj.displayStop(function() {
+				this.displaying(false);
+				for (var arrowIdx=0; arrowIdx<wall.qArrowsAmmt.length; arrowIdx++) {
+					wall.qArrowsAmmt[arrowIdx].remove();
+				}
+				removeListener(curLevel, 'update', this.wallHandle() + 'updateQAmmtArrows');
+			})
 			this.qArrowsAmmtInit(defaultTo(3, qMax));
 		} else {
 			console.log('Tried to display q arrowsAmmt for wall ' + this.handle + ' while not recording or already displaying.  Will not display.');
@@ -770,79 +680,17 @@ WallMethods.wall = {
 			addListener(curLevel, currentSetupType + 'CleanUp', displayType + this.handle, func, this);
 		}			
 	},
-	displayVolStop: function(){
-		this.displayingVol = false;
-		this.volReadout.removeEntry('vol' + this.handle);
-		removeListener(curLevel, 'update', 'displayVolume' + this.handle);
-		return this;
-	},
-	displayPIntStop: function(){
-		this.displayingPInt = false;
-		removeListener(curLevel, 'update', 'displayPInt'+this.handle);
-		this.pIntReadout.removeEntry('pInt' + this.handle);
-		return this;
-	},
-	displayPExtStop: function(){
-		this.displayingPExt = false;
-		removeListener(curLevel, 'update', 'displayPExt'+this.handle);
-		this.pExtReadout.removeEntry('pExt' + this.handle);
-		return this;
-	},
-	displayWorkStop: function(){
-		this.displayingWork = false;
-		this.workReadout.removeEntry('work' + this.handle);
-		removeListener(curLevel, 'update', 'displayWork'+this.handle);
-		return this;
-	},
-	displayTempStop: function(){
-		this.displayingTemp = false;
-		removeListener(curLevel, 'update', 'displayTemp' + this.handle)
-		this.tempReadout.removeEntry('temp' + this.handle);
-		return this;
-	},
-	displayMassStop: function(){
-		this.displayingMass = false;
-		removeListener(curLevel, 'update', 'displayMass' + this.handle)
-		this.massReadout.removeEntry('mass' + this.handle);	
-		return this;			
-	},
-	displayQStop: function(){
-		this.displayingQ = false;
-		removeListener(curLevel, 'update', 'displayQ' + this.handle);
-		this.qReadout.removeEntry('q' + this.handle);
-		return this;
-	},
-	displayQArrowsRateStop: function(){
-		this.displayingQArrowsRate = false;
-		removeListener(curLevel, 'update', 'checkDisplayArrows' + this.handle);
-		removeListenerByName(curLevel, 'update', 'ArrowFly');
-		return this;
-	},
-	displayQArrowsAmmtStop: function() {
-		this.displayingQArrowsAmmt = false;
-		for (var arrowIdx=0; arrowIdx<this.qArrowsAmmt.length; arrowIdx++) {
-			this.qArrowsAmmt[arrowIdx].remove();
-		}
-		removeListener(curLevel, 'update', this.handle + 'updateQAmmtArrows');
-	},
-	displayRMSStop: function(){
-		this.displayingRMS = false;
-		removeListener(curLevel, 'data', 'displayRMS' + this.handle)
-		this.RMSReadout.removeEntry('RMS' + this.handle);
-		return this;
-	},
-
 	displayAllStop: function(){
-		if(this.displayingVol.val){this.displayVolStop();};
-		if(this.displayingPInt.val){this.displayPIntStop();};
-		if(this.displayingPExt.val){this.displayPExtStop();};
-		if(this.displayingWork.val){this.displayWorkStop();};
-		if(this.displayingTemp.val){this.displayTempStop();};
-		if(this.displayingMass.val){this.displayMassStop();};
-		if(this.displayingQ.val){this.displayQStop();};
-		if(this.displayingQArrowsRate.val){this.displayQArrowsRateStop();};
-		if(this.displayingQArrowsAmmt.val){this.displayQArrowsAmmtStop();};
-		if(this.displayingRMS.val){this.displayRMSStop();};
+		for (var dataObjName in this.data) {
+			var dataObj = this.data[dataObjName];
+			if (dataObj instanceof Array) {
+				for (var idx=0; idx<dataObj.length; idx++) {
+					dataObj[idx].displayStop();
+				}
+			} else {
+				dataObj.displayStop();
+			}
+		}
 		return this;
 	},
 	makeDataList: function() {
@@ -927,11 +775,11 @@ WallMethods.wall = {
 			}
 		}
 	},
-	checkDisplayArrows: function(){
-		var dQ = this.data.q[this.data.q.length-1] - this.data.q[this.idxLastArrow];
+	checkDisplayArrows: function(q){
+		var dQ = q[q.length-1] - q[this.turnLastArrow];
 		if (Math.abs(dQ)>this.qArrowThreshold) {
 			this.populateArrows(dQ);
-			this.idxLastArrow = turn;
+			this.turnLastArrow = turn;
 		}
 	},
 	addPts: function(spliceIdx, toAdd) {
@@ -987,7 +835,7 @@ WallMethods.wall = {
 		var qList = this.data.q;
 		var heatTransSign = getSign(dQ);
 		var UVRot = rotations[heatTransSign];
-		this.idxLastArrow = this.data.q.length-1;
+		this.turnLastArrow = this.data.q.src().length-1;
 		var dims = V(110*Math.abs(dQ), 170*Math.abs(dQ));//big numbers from adjusting to q per turn so if I change interval, size of arrows doesn't change
 		var dimsFinal = dims.copy();
 		dimsFinal.dx *= 1.4;

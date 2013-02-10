@@ -100,13 +100,12 @@ _.extend(cvcp.prototype,
 					records: [
 					],
 					readoutEntries: [
-						// {wallInfo: 'left', data:'tempSmooth', readout: 'mainReadout'},
-						// {wallInfo: 'left', data:'q', readout: 'mainReadout'},
-						// {wallInfo: 'right', data:'tempSmooth', readout: 'mainReadout'},
-						// {wallInfo: 'right', data:'q', readout: 'mainReadout'},
-						{wallInfo: 'right', data: 'pExt', readout: 'mainReadout'}
+						{wallInfo: 'left', data:'tempSmooth', readout: 'mainReadout'},
+						{wallInfo: 'left', data:'q', readout: 'mainReadout'},
+						{wallInfo: 'right', data:'tempSmooth', readout: 'mainReadout'},
+						{wallInfo: 'right', data:'q', readout: 'mainReadout'},
 						//WHICH WALL, WHAT THING, WHERE
-						
+						{wallInfo: 'right', data:'qArrowsRate', readout: undefined}
 					],
 					
 /*
