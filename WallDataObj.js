@@ -6,6 +6,7 @@ WallMethods.DataObj = function() {
 	this.displayingVal = false;
 	this.recordStopVal = undefined;
 	this.displayStopVal = undefined;
+	this.readoutVal;
 }
 
 WallMethods.DataObj.prototype = {
@@ -13,7 +14,10 @@ WallMethods.DataObj.prototype = {
 		if (id) this.idVal = id;
 		return this.idVal;
 	},
-
+	readout: function(readout) {
+		if (readout) this.readoutVal = readout;
+		return this.readoutVal;
+	},
 	wallHandle: function(wallHandle) {
 		if (wallHandle) this.wallHandleVal = wallHandle;
 		return this.wallHandleVal;
@@ -23,11 +27,11 @@ WallMethods.DataObj.prototype = {
 		return this.srcVal;
 	},
 	recording: function(recording) {
-		if (recording) this.recordingVal = recording;
-		this.recordingVal;
+		if (recording !== undefined) this.recordingVal = recording;
+		return this.recordingVal;
 	},
 	displaying: function(displaying) {
-		if (displaying) this.displayingVal = displaying;
+		if (displaying !== undefined) this.displayingVal = displaying;
 		return this.displayingVal;
 	},
 	//attn: the function behavior is different from the value behavior.  It calls instead of returns the values if no argument is given.

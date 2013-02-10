@@ -92,7 +92,7 @@ _.extend(cvcp.prototype,
 					objs: [
 						{type: 'Piston', attrs: {handle: 'RightPiston', wallInfo: 'right', min:'get(goo, float, 2, 1, 1000)', init:'get(goo, float, 2, 1, 1000)', max:7, makeSlider:false}},
 						/*{type: 'Heater', attrs: {handle: 'heaterLeft', wallInfo: 'left'}},*/
-						{type: 'DragWeights', attrs: {wallInfo: 'right', weightDefs:[{count:2, pressure:2}, {count: 4, pressure: .5}], weightScalar:70, displayText:true, pInit:0, compMode:'cPAdiabaticDamped', pistonOffset:V(130,-41)}},
+						//{type: 'DragWeights', attrs: {wallInfo: 'right', weightDefs:[{count:2, pressure:2}, {count: 4, pressure: .5}], weightScalar:70, displayText:true, pInit:0, compMode:'cPAdiabaticDamped', pistonOffset:V(130,-41)}},
 						{type: 'Heater', attrs: {handle: 'heaterRight', wallInfo: 'right'}},
 						{type: 'Inlet', attrs: {handle: 'inny', wallInfo: 'left', ptIdxs: [3, 4], fracOffset: .3, makeSlider: true, flows: [{spcName: 'spc1', nDotMax: .0001, temp: 300, tag: 'left'}, {spcName: 'spc3', nDotMax: .02, temp: 50, tag: 'left'}]}},
 						{type: 'Outlet', attrs: {handle: 'outty', wallInfo: 'left', ptIdxs: [0, 1], fracOffset: .3}}
@@ -104,7 +104,7 @@ _.extend(cvcp.prototype,
 						// {wallInfo: 'left', data:'q', readout: 'mainReadout'},
 						// {wallInfo: 'right', data:'tempSmooth', readout: 'mainReadout'},
 						// {wallInfo: 'right', data:'q', readout: 'mainReadout'},
-						
+						{wallInfo: 'right', data: 'pExt', readout: 'mainReadout'}
 						//WHICH WALL, WHAT THING, WHERE
 						
 					],

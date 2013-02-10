@@ -302,7 +302,18 @@ WallMethods.wall = {
 		this.bordered = false;
 		removeListener(curLevel, 'update', 'drawBorder' + this.handle);
 	},
-	
+	getDataObj: function(type, args) { //data will be list of DataObjs if it's like fractional conversion where there can be one for each species or tag.  Else is just DataObj
+		if (this.data[type]) {
+			if (this.data[type] instanceof Array) {
+				for (var idx=0; idx<this.data[type].length; idx++) {
+					if (this.data[type][idx].match(args)) return this.data[type][idx];
+				}
+				console.log("Couldn't find data " + type + " with args " + args);
+			} else {
+				return this.data[type]
+			}
+		}
+	},
 	recordDefaults: function(){
 		this.recordTemp();
 		this.recordPInt();
@@ -373,16 +384,16 @@ WallMethods.wall = {
 			
 		}
 
-		return this;
+		return dataObj;
 	},
 	recordPExt: function() {
 		if (!this.data.pExt || !this.data.pExt.recording()) {
 			this.data.pExt = new WallMethods.DataObj();
 			var dataObj = this.data.pExt;
-			this.setupStdDataObj(dataObj, 'pExp');
+			this.setupStdDataObj(dataObj, 'pExt');
 			recordData(dataObj.id() + this.handle, dataObj.src(), this.pExt, this, 'update');
 		}
-		return this;
+		return dataObj;
 	},
 	recordVol: function() {
 		if (!this.data.v || !this.data.v.recording()) {
@@ -391,7 +402,7 @@ WallMethods.wall = {
 			this.setupStdDataObj(dataObj, 'v');
 			recordData(dataObj.id() + this.handle, dataObj.src(), function() {return this.parent.wallVolume(this.handle)}, this, 'update');
 		}
-		return this;
+		return dataObj;
 	},
 	recordWork: function() {
 		if (!this.data.work || !this.data.work.recording()) {
@@ -412,7 +423,7 @@ WallMethods.wall = {
 			//this will work after first turn since volume is _always_ recorded before work (vol is added as default to wall, work is added later by objects)
 			var self = this;
 			//var pExtList = this.data.get
-			var volSrc = this.data.v.src();
+			var volSrc = this.getDataObj('v').src();
 			var calcWork = function() {
 				var len = volSrc.length
 				var dV = LTOM3LOCAL*(volSrc[len-1] - volSrc[len-2])
@@ -428,7 +439,7 @@ WallMethods.wall = {
 
 			recordData(dataObj.id() + this.handle, dataObj.src(), calcWork, this, 'update');
 		}
-		return this;
+		return dataObj;
 	},
 	recordMass: function() {
 		if (!this.data.mass || !this.data.mass.recording()) {
@@ -437,7 +448,7 @@ WallMethods.wall = {
 			this.setupStdDataObj(dataObj, 'mass');
 			recordData(dataObj.id() + this.handle, dataObj.src(), function(){return this.mass}, this, 'update');	
 		}
-		return this;			
+		return dataObj;			
 	},
 	recordQ: function() {
 		if (!this.data.q || !this.data.q.recording()) {
@@ -446,18 +457,18 @@ WallMethods.wall = {
 			this.setupStdDataObj(dataObj, 'q');
 			recordData(dataObj.id() + this.handle, dataObj.src(), function(){return this.q}, this, 'update');
 		}
-		return this;
+		return dataObj;
 	},
 	setupStdDataObj: function(dataObj, id) {
 		dataObj.recording(true);
 		dataObj.recordStop(this.recordStop);
 		dataObj.id(id);
-		dataObj.wallHandle(this.wallHandle);
+		dataObj.wallHandle(this.handle);
 	},
 	//to be called in context of DataObj
 	recordStop: function() {
 		this.recording(false);
-		recordDataStop(this.id + this.wallHandle);
+		recordDataStop(this.id() + this.wallHandle());
 	},
 	//if I want to generalize stop *and* use the closure compiler, need to make isRecording object
 	recordAllStop: function(){
@@ -561,35 +572,74 @@ WallMethods.wall = {
 		return this;
 	},
 	displayPExt: function(readoutHandle, label, decPlaces){
-		if(this.recordingPExt.val && !this.displayingPExt.val){
-			this.displayingPExt.val = true;
+		var dataObj = this.getDataObj('pExt');
+		if (dataObj && dataObj.recording()) {
+			var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+			var units = 'bar';
 			decPlaces = defaultTo(1, decPlaces);
-			var dataSet = this.data.pExt;
-			label = defaultTo('Pext:', label);
-			this.pExtReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-			var firstVal = dataSet[dataSet.length-1];
-			if(!validNumber(firstVal)){
+			var label = defaultTo('Pext:', label);
+			this.displayStd(dataObj, readout, label, decPlaces, units);
+		} else {
+			console.log('Failed to display ' + dataObj.wallHandle() + ' ' + dataObj.id());
+		}
+		// if(this.recordingPExt.val && !this.displayingPExt.val){
+			// this.displayingPExt.val = true;
+			// decPlaces = defaultTo(1, decPlaces);
+			// var dataSet = this.data.pExt;
+			// label = defaultTo('Pext:', label);
+			// this.pExtReadout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+			// var firstVal = dataSet[dataSet.length-1];
+			// if(!validNumber(firstVal)){
+				// firstVal = 0;
+			// }
+			// this.pExtReadout.addEntry('pExt' + this.handle, label, 'bar', firstVal, undefined, decPlaces);
+			// var lastVal = 0;
+			// addListener(curLevel, 'update', 'displayPExt'+this.handle,
+				// function(){
+					// var curVal = dataSet[dataSet.length-1];
+					// if(curVal!=lastVal){
+						// this.pExtReadout.tick('pExt' + this.handle, curVal);
+						// lastVal = curVal;
+					// }
+					
+				// },
+			// this);
+			// this.addCleanUpIfPrompt('displayPExt', this.displayPExtStop);
+		// }else{//OR ALREADY DISPLAYING - MAKE ERROR MESSAGES FOR TRYING TO DISPLAY WHILE ALREADY DISPLAYING
+			// console.log('Tried to display pExt of wall ' + this.handle + ' while not recording.  Will not display.');
+		// }
+		// return this;
+	},
+	displayStd: function(dataObj, readout, label, decPlaces, units) {
+		//wrappers will check if data object is recording
+		if (!dataObj.displaying()) {
+			dataObj.displaying(true);
+			var src = dataObj.src();
+			dataObj.readout(readout);
+			var firstVal = src[src.length-1];
+			if (!validNumber(firstVal)) {
 				firstVal = 0;
 			}
-			this.pExtReadout.addEntry('pExt' + this.handle, label, 'bar', firstVal, undefined, decPlaces);
-			var lastVal = 0;
-			addListener(curLevel, 'update', 'displayPExt'+this.handle,
-				function(){
-					var curVal = dataSet[dataSet.length-1];
-					if(curVal!=lastVal){
-						this.pExtReadout.tick('pExt' + this.handle, curVal);
-						lastVal = curVal;
-					}
-					
+			var readout = dataObj.readout();
+			var entryHandle = dataObj.id() + dataObj.wallHandle().toCapitalCamelCase();
+			var listenerStr = 'display' + entryHandle.toCapitalCamelCase();
+			readout.addEntry(entryHandle, label, units, firstVal, undefined, decPlaces);
+			addListener(curLevel, 'update', listenerStr,
+				function() {
+					readout.hardUpdate(entryHandle, src[src.length-1]);
 				},
 			this);
-			this.addCleanUpIfPrompt('displayPExt', this.displayPExtStop);
-		}else{//OR ALREADY DISPLAYING - MAKE ERROR MESSAGES FOR TRYING TO DISPLAY WHILE ALREADY DISPLAYING
-			console.log('Tried to display pExt of wall ' + this.handle + ' while not recording.  Will not display.');
+			dataObj.displayStop(function() {
+				this.displaying(false);
+				this.readout().removeEntry(entryHandle);
+				removeListener(curLevel, 'update', listenerStr);
+			})
+		} else {
+			console.log('Tried to display ' + dataObj.id() + ' for wall ' + dataObj.wallHandle() + ' while already displaying');
 		}
-		return this;
 	},
 	displayVol: function(readoutHandle, label, decPlaces){
+		
 		if(this.recordingVol.val && !this.displayingVol.val){
 			this.displayingVol.val = true;
 			decPlaces = defaultTo(1, decPlaces);

@@ -140,7 +140,7 @@ function DragWeights(attrs){
 	this.pistonPt =				defaultTo(this.wall[0], attrs.pistonPt); //this will not work with just data based levels.  If I want this, will need to store as {wallInfo, ptIdx}
 	this.pistonOffset =			defaultTo(undefined, attrs.pistonOffset);
 	this.wallHandler = 			defaultTo('cPAdiabaticDamped', attrs.compMode) + compAdj;
-	this.binY = 				defaultTo(myCanvas.eight-15, attrs.binY);
+	this.binY = 				defaultTo(myCanvas.height-15, attrs.binY);
 	this.blockCol = 			defaultTo(Col(224, 165, 75), attrs.blockCol);
 	this.binCol = 				defaultTo(Col(150, 150, 150), attrs.binCol);
 	
@@ -179,8 +179,8 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	init: function(){
 		this.weightGroups = this.makeWeights(this.tempWeightDefs);
 		this.bins = {};
-		this.bins['store'] = this.makeStoreBins();
-		this.bins['piston'] = this.makePistonBins();
+		this.bins.store = this.makeStoreBins();
+		this.bins.piston = this.makePistonBins();
 		//this.dropAllstores();
 		walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);
 		if (!this.displayText) {
