@@ -327,22 +327,30 @@ WallMethods.wall = {
 		}
 	},
 	recordDefaults: function(){
+		this.recordTime();
 		this.recordTemp();
 		this.recordPInt();
 		this.recordVol();
-		this.recordQ();
+		this.recordQ();//Do I want this as a default?  I don't *think* so.
+	},
+	recordTime: function() {
+		this.data.time = new WallMethods.DataObj();
+		var dataObj = this.data.time;
+		this.setupStdDataObj(dataObj, 'time');
+		var tInit = Date.now();
+		var getTime = function() {
+			return (Date.now() - tInit) / 1000;
+		}
+		recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), getTime, this, 'update');
 	},
 	recordTemp: function() {
 		if (!this.data.t || !this.data.t.recording()) {
-			this.data.t = new WallMethods.DataObj();
-			var dataObj = this.data.t;
-			dataObj.recording(true)
-			dataObj.recordStop(this.recordStop);
-			dataObj.id('t');
-			dataObj.wallHandle(this.handle);
+			this.data.temp = new WallMethods.DataObj();
+			var dataObj = this.data.temp;
+			this.setupStdDataObj(dataObj, 'temp');
 			var tempFunc = dataHandler.tempFunc({tag:this.handle})
 			
-			recordData(this.data.t.id() + this.handle, dataObj.src(), tempFunc, this, 'update');
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), tempFunc, this, 'update');
 		}
 		return this;
 	},
@@ -351,19 +359,15 @@ WallMethods.wall = {
 			this.data.RMS = new WallMethods.DataObj();
 			var dataObj = this.data.RMS;
 			this.setupStdDataObj(dataObj, 'RMS');
-			this.recordingRMS.val = true;
 			//HEY - I AM ASSUMING THAT IF YOU GET RMS, IT IS OF ONE TYPE OF MOLECULE
-			if (this.parent.numWalls>1) {
-				var tag = this.handle;
-			} else {
-				tag = undefined;
-			}			
-			var mass = this.getRMSMass(tag);
+				
+			var mass = this.getRMSMass(this.handle);
 			var RMSFunc = function() {
 				var temp = this.data.t[this.data.t.length-1];
 				return Math.sqrt(3000*KB*temp*ACTUALN/mass)
 			}
-			recordData(dataObj.id() + this.handle, dataObj.src(), RMSFunc, this, 'update');
+			//figure out RMS at some point
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), RMSFunc, this, 'update');
 		} else {
 			console.log('Tried to record RMS of wall ' + this.handle + ' while not recording temp.  Will not record.');
 		}
@@ -392,7 +396,7 @@ WallMethods.wall = {
 			this.setupStdDataObj(dataObj, 'pInt');
 			this.pIntList = new Array();
 			this.pIntIdx = 0;
-			recordData(dataObj.id() + this.handle, dataObj.src(), this.pInt, this, 'update');
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), this.pInt, this, 'update');
 			
 		}
 
@@ -403,7 +407,7 @@ WallMethods.wall = {
 			this.data.pExt = new WallMethods.DataObj();
 			var dataObj = this.data.pExt;
 			this.setupStdDataObj(dataObj, 'pExt');
-			recordData(dataObj.id() + this.handle, dataObj.src(), this.pExt, this, 'update');
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), this.pExt, this, 'update');
 		}
 		return dataObj;
 	},
@@ -412,7 +416,7 @@ WallMethods.wall = {
 			this.data.v = new WallMethods.DataObj();
 			var dataObj = this.data.v;
 			this.setupStdDataObj(dataObj, 'v');
-			recordData(dataObj.id() + this.handle, dataObj.src(), function() {return this.parent.wallVolume(this.handle)}, this, 'update');
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function() {return this.parent.wallVolume(this.handle)}, this, 'update');
 		}
 		return dataObj;
 	},
@@ -449,7 +453,7 @@ WallMethods.wall = {
 				}
 			}
 
-			recordData(dataObj.id() + this.handle, dataObj.src(), calcWork, this, 'update');
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), calcWork, this, 'update');
 		}
 		return dataObj;
 	},
@@ -458,7 +462,7 @@ WallMethods.wall = {
 			this.data.mass = new WallMethods.DataObj();
 			var dataObj = this.data.mass;
 			this.setupStdDataObj(dataObj, 'mass');
-			recordData(dataObj.id() + this.handle, dataObj.src(), function(){return this.mass}, this, 'update');	
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function(){return this.mass}, this, 'update');	
 		}
 		return dataObj;			
 	},
@@ -467,7 +471,7 @@ WallMethods.wall = {
 			this.data.q = new WallMethods.DataObj();
 			var dataObj = this.data.q;
 			this.setupStdDataObj(dataObj, 'q');
-			recordData(dataObj.id() + this.handle, dataObj.src(), function(){return this.q}, this, 'update');
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function(){return this.q}, this, 'update');
 		}
 		return dataObj;
 	},
@@ -597,7 +601,7 @@ WallMethods.wall = {
 	},
 	displayTemp: function(readoutHandle, label, decPlaces, smooth){
 		var func;
-		var dataObj = this.getDataObj('t');
+		var dataObj = this.getDataObj('temp');
 		if (!dataObj || !dataObj.recording()) {
 			dataObj = this.recordTemp();
 		}

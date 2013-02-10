@@ -110,26 +110,25 @@ _.extend(cvcp.prototype,
 						{wallInfo: 'right', data:'qArrowsRate', readout: undefined}
 					],
 					
-/*
+
 					graphs: [
 						{type: 'Scatter', handle:'pVSvLeft', xLabel:"P Int.", yLabel:"Temp (K)", axesInit:{x:{min:6, step:2}, y:{min:0, step:50}},
 							sets:[
-								{address:'t', label:'Temp', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
-								 data:{x: {wallInfo: 'left', data: 'q'}, y: {wallInfo: 'left', data: 't'}}, trace: false, fillInPts: false, fillInPtsMin: 5}
+								{address:'temp', label:'Temp', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
+								 data:{x: {wallInfo: 'left', data: 'pInt'}, y: {wallInfo: 'left', data: 'temp'}}, trace: false, fillInPts: false, fillInPtsMin: 5}
 								
 							]
 						},
-						{type: 'Scatter', handle:'pVSvRight', xLabel:"P Int.", yLabel:"Temp (K)", axesInit:{x:{min:6, step:2}, y:{min:0, step:50}},
+						{type: 'Scatter', handle:'pVSvRight', xLabel:"P Int.", yLabel:"Temp (K)", axesInit:{x:{min:0, step:30}, y:{min:0, step:50}},
 							sets:[
-								{address:'t', label:'Temp', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
-								 data:{x: {wallInfo: 'right', data: 'q'}, y: {wallInfo: 'right', data: 't'}}, trace: false, fillInPts: false, fillInPtsMin: 5},
+								{address:'cnt', label:'Count', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
+								 data:{x: {wallInfo: 'right', data: 'time'}, y: {wallInfo: 'right', data: 'count', args: {spcName: 'spc1', tag: 'right'}}}, trace: false, fillInPts: false, fillInPtsMin: 5},
 								
-								{address:'v', label:'Vol', pointCol:Col(50,255,50), flashCol:Col(255,200,200),
-								 data:{x: {wallInfo: 'right', data: 'pInt'}, y: {wallInfo: 'right', data: 'v'}}, trace: false, fillInPts: false, fillInPtsMin: 5}
+								
 							]
 						}
-				
-					*/
+					]
+					
 				})
 				//collide.addReaction({rctA: 'spc1', rctB: 'spc3', hRxn: 0, activeTemp: 350, prods: {spc4: 3}});
 				//collide.addReaction({rctA: 'spc1', rctB: 'spc3', hRxn: 0, activeTemp: 700, prods: {spc5: 1}});
@@ -167,8 +166,8 @@ _.extend(cvcp.prototype,
 							renderer.render({
 								type: 'prompt',
 								listeners: [
-									{wallHandle: 'left', dataList: 't', is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:''},
-									{wallHandle: 'right', dataList: 't', is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'}
+									{wallInfo: 'left', dataList: 'temp', /*can have args*/is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:''},
+									{wallInfo: 'right', dataList: 'temp', is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'}
 								]
 							})
 							//walls[1].setDefaultReadout(this.piston.readout);

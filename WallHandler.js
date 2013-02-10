@@ -194,39 +194,6 @@ WallMethods.main = {
 		this[wallIdx].g = g;
 		this[wallIdx].pConst = pConst;
 		this[wallIdx].data = {};
-		/*
-		this[wallIdx].data['pInt'] = new Array();
-		this[wallIdx].data['pExt'] = new Array();
-		this[wallIdx].data['t'] = new Array();
-		this[wallIdx].data['RMS'] = new Array(); // m/s
-		this[wallIdx].data['v'] = new Array();
-		this[wallIdx].data['m'] = new Array();
-		this[wallIdx].data['work'] = new Array(); // kj
-		this[wallIdx].data['q'] = new Array(); //kj
-		this.assignRecording(this[wallIdx].data);
-		this.assignDisplaying(this[wallIdx].data);
-		*/
-		/*
-	
-		this[wallIdx].recordingTemp = {val: false};
-		this[wallIdx].recordingPInt = {val: false};
-		this[wallIdx].recordingPExt = {val: false};
-		this[wallIdx].recordingVol = {val: false};
-		this[wallIdx].recordingWork = {val: false};
-		this[wallIdx].recordingMass = {val: false};
-		this[wallIdx].recordingQ = {val: false};
-		this[wallIdx].recordingRMS = {val: false};
-		this[wallIdx].displayingTemp = {val: false};
-		this[wallIdx].displayingPInt = {val: false};
-		this[wallIdx].displayingPExt = {val: false};
-		this[wallIdx].displayingVol = {val: false};
-		this[wallIdx].displayingWork = {val: false};
-		this[wallIdx].displayingMass = {val: false};
-		this[wallIdx].displayingQ = {val: false};
-		this[wallIdx].displayingRMS = {val: false};
-		this[wallIdx].displayingQArrowsRate = {val: false};
-		this[wallIdx].displayingQArrowsAmmt = {val: false};
-		*/
 		this[wallIdx].q = 0;
 		this[wallIdx].pIntLen = 35;
 		this[wallIdx].eToAdd = 0;
@@ -239,7 +206,7 @@ WallMethods.main = {
 		this[wallIdx].parent = this;
 		this[handle] = this[wallIdx];
 		record = defaultTo(true, record);
-		if(record){	
+		if (record) {	
 			this[wallIdx].recordDefaults();
 		}
 	},
