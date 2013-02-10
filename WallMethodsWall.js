@@ -475,30 +475,24 @@ WallMethods.wall = {
 		}
 		return dataObj;
 	},
-	recordCount: function(info) {
-			// this.data.pInt = new WallMethods.DataObj();
-			// var dataObj = this.data.pInt;
-			// this.setupStdDataObj(dataObj, 'pInt');
-			// this.pIntList = new Array();
-			// this.pIntIdx = 0;
-			// recordData(dataObj.id() + this.handle, dataObj.src(), this.pInt, this, 'update');
+	recordMoles: function(info) {
 		var dots = dotManager.createIfNotExists(info);
-		if (!this.data.count) this.data.count = [];
+		if (!this.data.moles) this.data.moles = [];
 		//list is okay.  Will use getDataObj func
-		this.data.count.push(new WallMethods.DataObj());
-		var dataObj = this.data.count[this.data.count.length-1];
+		this.data.moles.push(new WallMethods.DataObj());
+		var dataObj = this.data.moles[this.data.moles.length-1];
 		dataObj.recording(true);
-		dataObj.id('count' + (info.spcName || '').toCapitalCamelCase() + (info.tag || '').toCapitalCamelCase());
+		dataObj.id('moles' + (info.spcName || '').toCapitalCamelCase() + (info.tag || '').toCapitalCamelCase());
 		dataObj.wallHandle(this.handle);
 		dataObj.idArgs(info);
 		var wall = this;
 		var recordStr = dataObj.id() + dataObj.wallHandle();
 		dataObj.recordStop(function(){
 			dataObj.recording(false);
-			wall.removeDataObj('count', info)
+			wall.removeDataObj('moles', info)
 			recordDataStop(recordStr);
 		});
-		recordData(recordStr, dataObj.src(), function() {return dots.length}, this, 'update');
+		recordData(recordStr, dataObj.src(), function() {return dots.length / N}, this, 'update');
 		return dataObj;
 	},
 	recordFrac: function(info) {

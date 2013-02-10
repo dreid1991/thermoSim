@@ -41,8 +41,8 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			set.label = attrs.label;
 			set.x = [];
 			set.y = [];
-			var xData = walls[attrs.data.x.wallInfo].getDataObj(attrs.data.x.data, attrs.data.x.args).src();
-			var yData = walls[attrs.data.y.wallInfo].getDataObj(attrs.data.y.data, attrs.data.y.args).src();
+			var xData = walls[attrs.data.x.wallInfo].getDataObj(attrs.data.x.data, attrs.data.x.attrs).src();
+			var yData = walls[attrs.data.y.wallInfo].getDataObj(attrs.data.y.data, attrs.data.y.attrs).src();
 			var data = {x: xData, y: yData};
 			set.xInitDataIdx = data.x.length-1;
 			set.yInitDataIdx = data.y.length-1;
