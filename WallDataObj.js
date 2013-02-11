@@ -1,6 +1,7 @@
 WallMethods.DataObj = function() {
 	this.srcVal = [];
 	this.idVal;
+	this.typeVal;
 	this.idArgsVal;
 	this.wallHandleVal;
 	this.recordingVal = false;
@@ -14,6 +15,10 @@ WallMethods.DataObj.prototype = {
 	id: function(id) {
 		if (id) this.idVal = id;
 		return this.idVal;
+	},
+	type: function(type) {
+		if (type) this.typeVal = type;
+		return this.typeVal;	
 	},
 	idArgs: function(args) {
 		if (args) this.idArgsVal = args;

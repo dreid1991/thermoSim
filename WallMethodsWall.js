@@ -308,7 +308,6 @@ WallMethods.wall = {
 				for (var idx=0; idx<this.data[type].length; idx++) {
 					if (this.data[type][idx].argsMatch(args)) return this.data[type][idx];
 				}
-				console.log("Couldn't find data " + type + " with args " + args);
 			} else {
 				return this.data[type]
 			}
@@ -354,6 +353,7 @@ WallMethods.wall = {
 		}
 		return this;
 	},
+
 	recordRMS: function() {
 		if (!this.data.RMS || !this.data.RMS.recording()) {
 			this.data.RMS = new WallMethods.DataObj();
@@ -475,24 +475,26 @@ WallMethods.wall = {
 		}
 		return dataObj;
 	},
+	recordVDist: function(info) {
+		var dots = dotManager.createIfNotExists(info);
+		if (!this.data.vDist) this.data.vDist = [];
+		
+		if (this.getDataObj('vDist', info) == undefined) {
+			this.data.vDist.push(new WallMethods.DataObj());
+			var dataObj = this.data.vDist[this.data.vDist.length-1];
+			this.setupStdDataObj(dataObj, 'vDist');
+			
+		
+		}
+	},
 	recordMoles: function(info) {
 		var dots = dotManager.createIfNotExists(info);
 		if (!this.data.moles) this.data.moles = [];
 		//list is okay.  Will use getDataObj func
 		this.data.moles.push(new WallMethods.DataObj());
 		var dataObj = this.data.moles[this.data.moles.length-1];
-		dataObj.recording(true);
-		dataObj.id('moles' + (info.spcName || '').toCapitalCamelCase() + (info.tag || '').toCapitalCamelCase());
-		dataObj.wallHandle(this.handle);
-		dataObj.idArgs(info);
-		var wall = this;
-		var recordStr = dataObj.id() + dataObj.wallHandle();
-		dataObj.recordStop(function(){
-			dataObj.recording(false);
-			wall.removeDataObj('moles', info)
-			recordDataStop(recordStr);
-		});
-		recordData(recordStr, dataObj.src(), function() {return dots.length / N}, this, 'update');
+		this.setupInfoDataObj(dataObj, 'moles', info);
+		recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function() {return dots.length / N}, this, 'update');
 		return dataObj;
 	},
 	recordFrac: function(info) {
@@ -502,27 +504,33 @@ WallMethods.wall = {
 		//list is okay.  Will use getDataObj func
 		this.data.frac.push(new WallMethods.DataObj());
 		var dataObj = this.data.frac[this.data.frac.length-1];
-		dataObj.recording(true);
-		dataObj.id('frac' + (info.spcName || '').toCapitalCamelCase() + (info.tag || '').toCapitalCamelCase());
-		dataObj.wallHandle(this.handle);
-		dataObj.idArgs(info);
-		var wall = this;
-		var recordStr = dataObj.id() + dataObj.wallHandle();
-		dataObj.recordStop(function(){
-			dataObj.recording(false);
-			wall.removeDataObj('frac', info);
-			recordDataStop(recordStr);
-		});
-		recordData(recordStr, dataObj.src(), function() {return countList.length/totalList.length}, this, 'update');
+		this.setupInfoDataObj(dataObj, 'frac', info);
+
+		recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function() {return countList.length/totalList.length}, this, 'update');
 		return dataObj;		
 	},
 	setupStdDataObj: function(dataObj, id) {
 		dataObj.recording(true);
 		dataObj.recordStop(this.recordStop);
 		dataObj.id(id);
+		dataObj.type(id);
 		dataObj.wallHandle(this.handle);
 	},
+	setupInfoDataObj: function(dataObj, type, info) {
+		dataObj.recording(true);
+		dataObj.recordStop(this.recordStopDestroy);
+		dataObj.id(type + (info.spcName || '').toCapitalCamelCase() + (info.tag || '').toCapitalCamelCase());
+		dataObj.wallHandle(this.handle);
+		dataObj.type(type);
+		dataObj.idArgs(info);
+	},
 	//to be called in context of DataObj
+	recordStopDestroy: function() {
+		this.recording(false);
+		walls[this.wallHandle()].removeDataObj(this.type(), this.idArgs());
+		recordDataStop(this.id() + this.wallHandle());	
+
+	},
 	recordStop: function() {
 		this.recording(false);
 		recordDataStop(this.id() + this.wallHandle());

@@ -433,11 +433,11 @@ LevelTools = {
 		this.numUpdates = 0;
 	},
 	delayGraphs: function() {
-		addListener(window['curLevel'], 'data', 'run', function() {
-			this.dataRunNoGraphs();
-			addListener(window['curLevel'], 'data', 'run', this.dataRun, this);
-		},
-		this);
+		var self = this;
+		window.setTimeout(function() {
+			self.dataRunNoGraphs();
+			addListener(curLevel, 'data', 'run', self.dataRun, self);
+		}, 250);
 	},
 	dataRunNoGraphs: function() {
 		for (var datum in this.recordListeners.listeners){

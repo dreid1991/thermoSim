@@ -547,10 +547,10 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 		addListener(curLevel, 'sectionCleanUp', 'removeArrowAndText',
 			function(){
 				removeListenerByName(curLevel, 'update', 'drawArrow');
-				removeListenerByName(window['curLevel'], 'update', 'animText');
+				removeListenerByName(curLevel, 'update', 'animText');
 			},
 		this);
-		window['curLevel'].delayGraphs();
+		curLevel.delayGraphs();
 	}
 	renderer.render(newPrompt.setup);
 

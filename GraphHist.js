@@ -37,13 +37,16 @@ and leaving open possibility of multiple sets (though that would probably look c
 */
 _.extend(GraphHist.prototype, GraphBase, 
 	{
-		addSet: function(address, barCol, data){
+		addSet: function(attrs){
+			//just using set.x
+			//histogram will curently only accept lists in the data object
+			var xData = walls[attrs.data.x.wallInfo].getDataObj(attrs.data.x.data, attrs.data.x.attrs).src();
 			var set = {};
 			set.x = [];
 			set.y = [];
-			set.barCol = barCol;
+			set.barCol = attrs.barCol;
 			set.getLast = this.makeHistDataGrabFunc(data);
-			this.data[address] = set;
+			this.data.theData = set;
 			this.drawAllBG();
 		},
 		drawAllData: function(){
@@ -70,7 +73,7 @@ _.extend(GraphHist.prototype, GraphBase,
 				theOnlyAddress = address;
 				last = this.data[theOnlyAddress].getLast();
 			}
-			this.data[theOnlyAddress].x = this.data[theOnlyAddress].x.concat(last.data);
+			this.data[theOnlyAddress].x = last.data;
 			this.makeBins(theOnlyAddress);
 		},
 		plotData: function(vals){
@@ -94,11 +97,12 @@ _.extend(GraphHist.prototype, GraphBase,
 			this.drawAllData();
 		},
 		makeBinBlanks: function(data){
-			var bins = {};
-			this.binWidth = round((this.valRange.x.max - this.valRange.x.min)/(this.numBins-1),1);
-			for(var binIdx=0; binIdx<this.numBins; binIdx++){
-				min = this.valRange.x.min + this.binWidth*binIdx;
-				bins[String(min)] = 0; // hey - if this has a decimal in it, it may break things
+			var bins =[];
+			this.binWidth = round((this.valRange.x.max - this.valRange.x.min)/(this.numBins-1), 1);
+			for (var binIdx=0; binIdx<this.numBins; binIdx++) {
+				bins.push(0);
+				//min = this.valRange.x.min + this.binWidth*binIdx;
+				//bins[String(min)] = 0; 
 			}
 			return bins;
 		},
@@ -106,8 +110,8 @@ _.extend(GraphHist.prototype, GraphBase,
 			for (var dataIdx=0; dataIdx<data.length; dataIdx++){
 				var min = this.valRange.x.min;
 				var val = data[dataIdx];
-				var binIdx = Math.floor((val-min)/this.binWidth)*this.binWidth + min;
-				this.bins[String(binIdx)]++;
+				var binIdx = Math.floor((val-min)/this.binWidth);
+				this.bins[binIdx] ++;
 			}
 		},
 		setYAxis: function(){
@@ -120,17 +124,16 @@ _.extend(GraphHist.prototype, GraphBase,
 			this.setAxisBoundsY();
 		},
 		graphBins: function(){
-			var theData = '';
+			var theData;
 			for (var dataName in this.data){
 				theData = dataName;
 			}
 			var barCol = this.data[theData].barCol
-			for (var binName in this.bins){
-				var xULPt = parseFloat(binName);
-				var yULPt = this.bins[binName];
-				var xLRPt = parseFloat(binName) + this.binWidth;
+			for (var binIdx=0; binIdx<this.bins.length; binIdx++) {
+				var xULPt = this.binWidth * binIdx;
+				var yULPt = this.bins[binIdx];
+				var xLRPt = this.binWidth * (binIdx + 1);
 				var yLRPt = 0;
-				
 				var ULCoord = this.valToCoord(P(xULPt,yULPt));
 				var LRCoord = this.valToCoord(P(xLRPt,yLRPt));
 				var dims = ULCoord.VTo(LRCoord);
