@@ -99,7 +99,8 @@ _.extend(cvcp.prototype,
 					],
 					records: [
 						{wallInfo: 'right', data: 'moles', attrs: {spcName: 'spc1', tag: 'right'}},
-						{wallInfo: 'right', data: 'frac', attrs: {spcName: 'spc1', tag: 'right'}}
+						{wallInfo: 'right', data: 'frac', attrs: {spcName: 'spc1', tag: 'right'}},
+						{wallInfo: 'right', data: 'vDist', attrs: {spcName: 'spc1', tag: 'right'}}
 					],
 					readoutEntries: [
 						{wallInfo: 'left', data:'tempSmooth', readout: 'mainReadout'},
@@ -119,12 +120,17 @@ _.extend(cvcp.prototype,
 								
 							]
 						},
-						{type: 'Scatter', handle:'pVSvRight', xLabel:"P Int.", yLabel:"Temp (K)", axesInit:{x:{min:0, step:30}, y:{min:0, step:.50}},
-							sets:[
-								{address:'cnt', label:'moles', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
-								 data:{x: {wallInfo: 'right', data: 'time'}, y: {wallInfo: 'right', data: 'moles', attrs: {spcName: 'spc1', tag: 'right'}}}, trace: false, fillInPts: false, fillInPtsMin: 5},
+						// {type: 'Scatter', handle:'pVSvRight', xLabel:"P Int.", yLabel:"Temp (K)", axesInit:{x:{min:0, step:30}, y:{min:0, step:.50}},
+							// sets:[
+								// {address:'cnt', label:'moles', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
+								 // data:{x: {wallInfo: 'right', data: 'time'}, y: {wallInfo: 'right', data: 'moles', attrs: {spcName: 'spc1', tag: 'right'}}}, trace: false, fillInPts: false, fillInPtsMin: 5},
 								
 								
+							// ]
+						// }
+						{type: 'Hist', handle: 'histy', xLabel: 'Velocities', yLabel: 'Count', axesInit: {x: {min: 0, step: 10}, y: {min:0, step: 10}},
+							sets: [
+								{barCol: Col(150, 0, 0), data: {x: {wallInfo: 'right', data: 'vDist', attrs: {spcName: 'spc1', tag: 'right'}}}}
 							]
 						}
 					]

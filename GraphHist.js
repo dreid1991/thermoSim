@@ -1,22 +1,24 @@
-function GraphHist(handle, width, height, xLabel, yLabel, axisInit, data){
+function GraphHist(attrs){
 	this.active = true;
-	this.handle = handle;
-	this.dims = V(width, height);
-	this.xLabel = xLabel;
-	this.yLabel = yLabel;
+	this.handle = attrs.handle;
+	this.dims = this.getDims();
+	this.xLabel = attrs.xLabel;
+	this.yLabel = attrs.yLabel;
 	this.labelFontSize = 15;
 	this.axisValFontSize = 11;
+	var axisInit = attrs.axesInit;
 	this.labelFont = this.labelFontSize+ 'pt calibri';
 	this.axisValFont = this.axisValFontSize+ 'pt calibri';
 	this.borderSpacing = 70;
-	this.xStart = this.borderSpacing/width;
-	this.yStart = 1-this.borderSpacing/height;
+	this.xStart = this.borderSpacing/this.dims.dx;
+	this.yStart = 1-this.borderSpacing/this.dims.dy;
 	this.legendWidth = 80;
 	this.xEnd = .95;
 	this.yEnd = .05;
 	this.gridSpacing = 40;
 	this.numBins = 18;
 	this.setNumGridLines();
+	
 	this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1)}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1)}};
 	this.axisRange = {x:{min:0, max:0}, y:{min:0, max:0}};
 	this.data = {};
@@ -28,14 +30,14 @@ function GraphHist(handle, width, height, xLabel, yLabel, axisInit, data){
 	this.setStds();
 	var canvasData = this.makeCanvas(this.dims);
 	this.drawAllBG();
-	this.addSet('only', barCol, data);
+	//this.addSet('only', barCol, data);
 }
 /*
 Good evening:  I am keeping histogram data in data.someName, not just data, even though there is only one for now.
 Trying to make functions where base references data.someName as reusable as possible
 and leaving open possibility of multiple sets (though that would probably look confusing)
 */
-_.extend(GraphHist.prototype, GraphBase, 
+_.extend(GraphHist.prototype, AuxFunctions, GraphBase, 
 	{
 		addSet: function(attrs){
 			//just using set.x
@@ -45,7 +47,7 @@ _.extend(GraphHist.prototype, GraphBase,
 			set.x = [];
 			set.y = [];
 			set.barCol = attrs.barCol;
-			set.getLast = this.makeHistDataGrabFunc(data);
+			set.getLast = this.makeHistDataGrabFunc(xData);
 			this.data.theData = set;
 			this.drawAllBG();
 		},
@@ -116,8 +118,8 @@ _.extend(GraphHist.prototype, GraphBase,
 		},
 		setYAxis: function(){
 			var maxCount = 0;
-			for (var binName in this.bins){
-				maxCount = Math.max(this.bins[binName], maxCount);
+			for (var binIdx=0; binIdx<this.bins.length; binIdx++) {
+				maxCount = Math.max(this.bins[binIdx], maxCount);
 			}
 			this.valRange.y.min=0;
 			this.valRange.y.max = maxCount;

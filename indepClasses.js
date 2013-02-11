@@ -10,6 +10,7 @@ function Dot(x, y, v, mass, radius, spcName, idNum, tag, returnTo){
 	this.returnTo = returnTo;
 	this.tConst = tConst;
 	this.pxToE = pxToE;
+	this.pxToMS = pxToMS;
 	this.parentLists = [];
 	this.peLast = 0;
 	this.tempLast = 0;

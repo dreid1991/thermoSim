@@ -384,7 +384,7 @@ function deepCopy(object){
 function recordData(handle, list, func, obj, listenerType){
 	var listenerType = defaultTo('record', listenerType)
 	store('record' + handle, listenerType);
-	addListener(window['curLevel'], listenerType, handle, function(){list.pushNumber(func.apply(obj))}, obj);
+	addListener(window['curLevel'], listenerType, handle, function(){list.push(func.apply(obj))}, obj); //was pushnumber.  Changed away so I could push lists. 
 }
 function recordDataStop(handle){
 	var listenerType = getStore('record' + handle);

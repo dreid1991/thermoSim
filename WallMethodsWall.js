@@ -482,8 +482,15 @@ WallMethods.wall = {
 		if (this.getDataObj('vDist', info) == undefined) {
 			this.data.vDist.push(new WallMethods.DataObj());
 			var dataObj = this.data.vDist[this.data.vDist.length-1];
-			this.setupStdDataObj(dataObj, 'vDist');
-			
+			this.setupInfoDataObj(dataObj, 'vDist', info);
+			var dataFunc = function() {
+				var vs = [];
+				for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
+					vs.push(dots[dotIdx].speed());
+				}
+				return vs;
+			}
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), dataFunc, this, 'update');
 		
 		}
 	},
