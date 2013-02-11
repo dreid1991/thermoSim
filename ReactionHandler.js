@@ -239,7 +239,6 @@ ReactionHandler.Reaction.prototype = {
 		return count;
 	},
 	convertHRxn: function(hRxn) {
-		return hRxn / cp;// deltaH/mol = 1000 * deltaH/molecule, deltaH/molecule = cp * deltaT
-	
+		return hRxn * 1000 / cv;// to temperature
 	},
 }

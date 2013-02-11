@@ -2,6 +2,9 @@
 Contains:
 	Clamps
 	ArrowStatic
+	Inlet
+	Outlet
+	Tracer
 in that order
 */
 
@@ -404,4 +407,57 @@ _.extend(Outlet.prototype, flowFuncs, objectFuncs, {
 		this.addArrows(this.pts[1].VTo(this.pts[2]).UV().perp('cw'));
 		walls.setSubWallHandler(this.wallInfo, subWallIdx, 'outlet');
 	}		
+})
+
+
+function Tracer(attrs) {
+	this.handle = attrs.handle;
+	this.type = 'Tracer';
+	this.info = attrs.info;
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
+	this.col = defaultTo(Col(175, 175, 175), attrs.col);
+	this.lifespan = Math.round(1000/updateInterval * defaultTo(5, attrs.lifespan));
+	this.listenerHandle = this.type + this.handle + 'Draw';
+	this.listenerHandleSearch = this.type + this.handle + 'Search';
+	this.addCleanUp();
+	this.drawCanvas = c;
+	this.drawingTools = draw;
+	this.init();
+	
+}
+
+_.extend(Tracer.prototype, objectFuncs, {
+	init: function() {
+		this.dot = this.getDot();
+		this.pts = [];
+		if (this.dot) {
+			removeListener(curLevel, 'update', this.listenerHandleSearch);
+			addListener(curLevel, 'update', this.listenerHandle, this.draw, this);
+		} else {
+			addListener(curLevel, 'update', this.listenerHandleSearch, this.init, this);
+		}
+	},
+	getDot: function() {
+		var potentials = dotManager.get(this.info);
+		if (potentials.length > 0) {
+			if (this.info.idx && this.info.idx < potentials.length) {
+				return potentials[this.info.idx];
+			} else {
+				return potentials[Math.floor(Math.random() * potentials.length)];
+			}
+		}
+	},
+	draw: function() {
+		if (this.dot.active) {
+			this.pts.push(P(this.dot.x, this.dot.y));
+			if (this.pts.length > this.lifespan) this.pts.splice(0, 1);
+			this.drawingTools.path(this.pts, this.col, this.drawCanvas);
+		} else {
+			this.init();
+		}
+	},
+	remove: function() {
+		removeListener(curLevel, 'update', this.listenerHandleSearch);
+		removeListener(curLevel, 'update', this.listenerHandle);
+	},
 })

@@ -18,6 +18,7 @@ function Dot(x, y, v, mass, radius, spcName, idNum, tag, returnTo){
 	this.attractStr = speciesDef.attractStr;
 	this.attractStrs = speciesDef.attractStrs;
 	this.attractRad = speciesDef.attractRad;
+	this.active = true;
 	return this;
 	
 }
@@ -479,5 +480,6 @@ Dot.prototype = {
 		for (var listIdx=0; listIdx<this.parentLists.length; listIdx++) {
 			this.parentLists[listIdx].splice(this.parentLists[listIdx].indexOf(this), 1);
 		}
+		this.active = false;
 	}
 }
