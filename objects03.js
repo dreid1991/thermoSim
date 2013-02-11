@@ -10,13 +10,13 @@ in that order
 //////////////////////////////////////////////////////////////////////////
 function Clamps(attrs) {
 	this.type = 'Clamps';
+	this.handle = attrs.handle;
 	this.draw = defaultTo(false, attrs.draw);
 	this.releaseWith = defaultTo('button', attrs.releaseWith);
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
-	this.clampee = attrs.clampee;
 	this.currentClamper = undefined;
 	this.clamps = attrs.clamps;
-	this.wall = this.clampee.wall;
+	this.wall = walls[attrs.wallInfo];
 	this.buttonId = 'clampRelease' + this.wall.handle;
 	this.wallHandler = this.wall.parent.getSubWallHandler(this.wall.handle, 0);
 	this.init();
@@ -44,7 +44,7 @@ _.extend(Clamps.prototype, objectFuncs, {
 			var clamp = this.clamps[clampIdx];
 			if (clamp.vol) {
 				clamp.y = this.wall.volToY(clamp.vol)
-				clamp.vol = undefined;
+				delete clamp.vol;
 			}
 			clamp.clamping = false;
 		}

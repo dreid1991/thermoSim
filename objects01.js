@@ -103,6 +103,7 @@ objectFuncs = {
 		var centerHTML = $('#sliderHolderCenter').html();
 		$('#sliderHolderCenter').html('');
 		$('#sliderHolderLeft').html(centerHTML);
+		//look into jQuery.clone
 	},//DOESN'T WORK  MUST MIGRATE ALL BOUND FUNCTIONS AS WELL, I THINK
 	removeSlider: function() {
 		this.sliderWrapper.html('');
@@ -1252,8 +1253,8 @@ function Piston(attrs){
 	
 	this.wall.recordPExt();
 	this.wall.recordWork();
-	
-	walls.setSubWallHandler(this.wallInfo, 0, 'cPAdiabaticDamped' + compAdj);		
+	this.wallHandler = defaultTo('cPAdiabaticDamped', attrs.compMode) + compAdj;	
+	walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);		
 	//this.wall.setDefaultReadout(this.readout);
 	if (this.makeSlider) {
 		this.sliderId = this.addSlider('Pressure', {value: this.pToPercent(pInit)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
@@ -1565,11 +1566,11 @@ function Stops(attrs){
 	this.wall = walls[this.wallInfo];
 	this.pts = this.wall;
 	
-	if(stopPt.volume){
+	if(stopPt.vol){
 		var width = this.pts[0].distTo(this.pts[1]);
-		var length = stopPt.volume/(vConst*width);
+		var length = stopPt.vol/(vConst*width);
 		this.height = this.pts[2].y-length;
-	}else if (stopPt.height){
+	}else if (stopPt.y){
 		this.height = stopPt.height;
 	}
 	this.willDraw = defaultTo(true, attrs.draw);

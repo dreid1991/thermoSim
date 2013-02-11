@@ -25,21 +25,12 @@ function Sandbox(attrs){
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.wall = walls[this.wallInfo];
-	if (attrs.pInit) {
-		this.mass = this.pressureToMass(attrs.pInit);
-	} else {
-		this.mass = defaultTo(10, attrs.massInit);
-	}
-	if (attrs.pMax) {
-		this.massMax = this.pressureToMass(attrs.pMax);
-	} else {
-		this.massMax = defaultTo(75, attrs.massMax);
-	}
-	if (attrs.pMin) {
-		this.massMin = this.pressureToMass(attrs.pMin);
-	} else {
-		this.massMin = defaultTo(10, attrs.massMin);
-	}
+	//must send init as pressure
+	this.mass = this.pressureToMass(defaultTo(2, attrs.init));
+	this.massMin = this.pressureToMass(defaultTo(.5, attrs.min));
+	this.massMax = this.pressureToMass(defaultTo(15, attrs.max));
+
+
 	this.particleMass = defaultTo(.01, attrs.partMass);
 	this.buttonAddId = 'sandAdd';
 	this.buttonRemoveId = 'sandRemove';
@@ -691,7 +682,7 @@ function TempChanger(attrs) {
 	this.val = dataHandler.temp(this.info);
 	this.max = defaultTo(1500, attrs.max);
 	this.sliderPos = attrs.sliderPos;
-	this.handle = 'TempChanger' + Math.round(this.min).toString() + Math.round(this.val).toString() + Math.round(this.max).toString() + Math.round(Math.random()*1000);
+	this.handle = attrs.handle;;
 	this.totalDots = dataHandler.count(this.info);
 	this.addCleanUp();
 	return this.init();
@@ -724,7 +715,8 @@ function RMSChanger(attrs) {
 	this.min = defaultTo(1, attrs.min);
 	this.val = dataHandler.RMS(this.info);
 	this.max = defaultTo(15, attrs.max);
-	this.handle = 'RMSChanger' + Math.round(this.min).toString() + Math.round(this.val).toString() + Math.round(this.max).toString() + Math.round(Math.random()*1000);
+	this.handle = attrs.handle;
+	//this.handle = 'RMSChanger' + Math.round(this.min).toString() + Math.round(this.val).toString() + Math.round(this.max).toString() + Math.round(Math.random()*1000);
 	this.totalDots = dataHandler.count(this.info);
 	this.sliderPos = attrs.sliderPos;
 	this.addCleanUp();
