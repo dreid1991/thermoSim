@@ -130,16 +130,17 @@ _.extend(cvcp.prototype,
 						// }
 						{type: 'Hist', handle: 'histy', xLabel: 'Velocities', yLabel: 'Count', axesInit: {x: {min: 0, step: 10}, y: {min:0, step: 10}},
 							sets: [
-								{barCol: Col(150, 0, 0), data: {x: {wallInfo: 'right', data: 'vDist', attrs: {spcName: 'spc1', tag: 'right'}}}}
+								{barCol: Col(150, 0, 0), data: {x: {wallInfo: 'right', data: 'vDist', attrs: {tag: 'right', spcName: 'spc1'}}}}
 							]
 						}
-					]
+					],
+					rxns: []
 					
 				})
 				//collide.addReaction({rctA: 'spc1', rctB: 'spc3', hRxn: 0, activeTemp: 350, prods: {spc4: 3}});
 				//collide.addReaction({rctA: 'spc1', rctB: 'spc3', hRxn: 0, activeTemp: 700, prods: {spc5: 1}});
-				collide.addReaction({handle: 'decomp', rctA: 'spc1', hRxn: -2, activeTemp: 700, prods: {spc6: 1}}); // should change activeTemp to e or something.  make it so you can add hRxn and active reasonably.
-				collide.addReaction({handle: 'decomp2', rctA: 'spc6', hRxn: 2, activeTemp: 900, prods: {spc1: 1}});
+				collide.addReaction({handle: 'decomp', rctA: 'spc1', hRxn: -2, activeE: 8.72, prods: {spc6: 1}}); // should change activeTemp to e or something.  make it so you can add hRxn and active reasonably.
+				collide.addReaction({handle: 'decomp2', rctA: 'spc6', hRxn: 2, activeE: 10.72, prods: {spc1: 1}});
 			},
 			/*
 			setup:

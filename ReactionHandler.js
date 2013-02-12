@@ -1,5 +1,5 @@
 ReactionHandler = {
-	addReaction: function(attrs){ //rctA, rctB, hRxn, activeTemp, prods)
+	addReaction: function(attrs){ //rctA, rctB, hRxn, activeE, prods)
 		attrs.parent = this;
 		var rxn = new this.Reaction(attrs);
 		
@@ -37,7 +37,7 @@ ReactionHandler = {
 		}
 	},
 	
-	Reaction: function(attrs) { //prods as {name1: count, name2, count2}  hRxn in kj/mol, activeTemp in kelvin
+	Reaction: function(attrs) { //prods as {name1: count, name2, count2}  hRxn in kj/mol, activeE in kj/mol
 		this.attrs = attrs;
 		this.handle = attrs.handle;
 		this.parent = attrs.parent;
@@ -45,8 +45,8 @@ ReactionHandler = {
 		this.rctB = attrs.rctA && attrs.rctB ? attrs.rctB : undefined; //spcName
 		this.rctADef = this.parent.defs[this.rctA];
 		this.rctBDef = this.parent.defs[this.rctB];
-		this.activeTemp = attrs.activeTemp;
-		this.hRxn = this.convertHRxn(attrs.hRxn); //to temperature
+		this.activeTemp = this.convertToTemp(attrs.activeE);
+		this.hRxn = this.convertToTemp(attrs.hRxn); 
 		
 		if (this.rctA && !this.rctADef) return console.log('reactant a ' + this.rctA + " doesn't exist");
 		if (this.rctB && !this.rctBDef) return console.log('reactant b ' + this.rctB + " doesn't exist");
@@ -238,7 +238,7 @@ ReactionHandler.Reaction.prototype = {
 		}
 		return count;
 	},
-	convertHRxn: function(hRxn) {
-		return hRxn * 1000 / cv;// to temperature
-	},
+	convertToTemp: function(enthalpy) { //in kj
+		return enthalpy / (cv * JtoKJ);
+	}
 }
