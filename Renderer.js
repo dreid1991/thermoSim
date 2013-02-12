@@ -73,7 +73,7 @@ Renderer.prototype = {
 	addReadoutEntries: function(entries) {
 		for (var entryIdx=0; entryIdx<entries.length; entryIdx++) {
 			var entry = entries[entryIdx];
-			walls[entry.wallInfo]['display' + entry.data.toCapitalCamelCase()]();
+			walls[entry.wallInfo]['display' + entry.data.toCapitalCamelCase()](entry.attrs);
 		}
 	},
 	addListeners: function(listeners) {
