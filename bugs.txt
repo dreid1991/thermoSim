@@ -2,3 +2,5 @@ check out comment it LevelTools.gravity.  There may be a problem with gravity.
 attracting is gaining energy in at least cvcp - response: seems stable with ~200 dots in static container
 
 This is a trivial change to explore forking.  This change was made in the reiddan account.
+
+This is another trivial change, but this one is made on the dreid1991 repo
