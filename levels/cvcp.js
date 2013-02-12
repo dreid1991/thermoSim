@@ -134,13 +134,13 @@ _.extend(cvcp.prototype,
 							]
 						}
 					],
-					rxns: []
+					rxns: [
+						{handle: 'decomp', rctA: 'spc1', hRxn: -2, activeE: 8.72, prods: {spc6: 1}},
+						{handle: 'decomp2', rctA: 'spc6', hRxn: 2, activeE: 10.72, prods: {spc1: 1}}
+						
+					]
 					
 				})
-				//collide.addReaction({rctA: 'spc1', rctB: 'spc3', hRxn: 0, activeTemp: 350, prods: {spc4: 3}});
-				//collide.addReaction({rctA: 'spc1', rctB: 'spc3', hRxn: 0, activeTemp: 700, prods: {spc5: 1}});
-				collide.addReaction({handle: 'decomp', rctA: 'spc1', hRxn: -2, activeE: 8.72, prods: {spc6: 1}}); // should change activeTemp to e or something.  make it so you can add hRxn and active reasonably.
-				collide.addReaction({handle: 'decomp2', rctA: 'spc6', hRxn: 2, activeE: 10.72, prods: {spc1: 1}});
 			},
 			/*
 			setup:

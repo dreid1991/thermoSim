@@ -29,6 +29,7 @@ Renderer.prototype = {
 		this.addReadoutEntries(scene.readoutEntries || []);
 		this.addListeners(scene.listeners || []);
 		this.addGraphs(scene.graphs || []);
+		this.addRxns(scene.rxns || []);
 		this.doCommands(scene.commands || []);
 		
 
@@ -81,6 +82,11 @@ Renderer.prototype = {
 			var listener = listeners[listenerIdx];
 			var foo = new StateListener(listener); 
 			//I don't think state listeners are ever referenced through curLevel., so I don't have to name them as keys in curLevel
+		}
+	},
+	addRxns: function(rxns) {
+		for (var rxnIdx=0; rxnIdx<rxns.length; rxnIdx++) {
+			collide.addReaction(rxns[rxnIdx]);
 		}
 	},
 	addGraphs: function(graphs) {
