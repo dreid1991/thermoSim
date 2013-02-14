@@ -10,9 +10,9 @@ Renderer.prototype = {
 		
 		scene = this.getAndEval(scene); //copying all objects, replacing GET tags with value and EVAL ing
 		if (scene.type) {
-			if (/section/.test(scene.type)) {
+			if (/section/i.test(scene.type)) {
 				currentSetupType = scene.type;
-			} else if (/prompt/.test(scene.type)){
+			} else if (/prompt/i.test(scene.type)){
 				currentSetupType = scene.type + window[scene.type + 'Idx'];
 			} else {
 				console.log ('scene.type of ' + scene.type + " is not valid.  Use 'section' or 'prompt'");
@@ -40,8 +40,8 @@ Renderer.prototype = {
 		var toPopulate = dots
 		for (var popIdx=0; popIdx<toPopulate.length; popIdx++) {
 			var curPop = toPopulate[popIdx];
-			if (spcs[curPop.type]) {
-				spcs[curPop.type].populate(curPop.pos, curPop.dims, curPop.count, curPop.temp, curPop.returnTo, curPop.tag);
+			if (spcs[curPop.type || curPop.spcName]) { //converting to using spcName instead of type but don't want to break old content.  Will phase out.
+				spcs[curPop.type || curPop.spcName].populate(curPop.pos, curPop.dims, curPop.count, curPop.temp, curPop.returnTo, curPop.tag);
 			} else {
 				console.log('Trying to populate bad species type ' + curPop.type);
 			}

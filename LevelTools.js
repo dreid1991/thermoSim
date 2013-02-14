@@ -27,17 +27,17 @@ LevelTools = {
 				var title = prompt.title;
 				var text = prompt.text;
 				var quiz = prompt.quiz;
-				if(title){prompt.title = addImgs(title);}
-				if(text){prompt.text = addImgs(text);}
+				if (title) prompt.title = addImgs(title);
+				if (text) prompt.text = addImgs(text);
 				if (quiz) {
 					for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
 						var question = quiz[questionIdx];
-						if (question.options){
+						if (question.options) {
 							for (optionIdx=0; optionIdx<question.options.length; optionIdx++) {
 								var option = question.options[optionIdx];
 								for (optionElement in option) {
 									var element = option[optionElement];
-									if (typeof(element)=='string') {
+									if (typeof(element) == 'string') {
 										option[optionElement] = addImgs(element);
 									}						
 								}
@@ -51,7 +51,7 @@ LevelTools = {
 
 	move: function(){
 		var spcLocal = this.spcs;
-		for (var spcName in spcLocal){
+		for (var spcName in spcLocal) {
 			var dots = spcLocal[spcName].dots;
 			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
 				dots[dotIdx].x += dots[dotIdx].v.dx;
@@ -437,6 +437,7 @@ LevelTools = {
 		window.setTimeout(function() {
 			self.dataRunNoGraphs();
 			addListener(curLevel, 'data', 'run', self.dataRun, self);
+			//addListener(curLevel, 'update'/*'data'*/, 'runGraphs', self.dataRun, self);
 		}, 250);
 	},
 	dataRunNoGraphs: function() {

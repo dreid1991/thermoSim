@@ -86,10 +86,10 @@ _.extend(GraphHist.prototype, AuxFunctions, GraphBase,
 			this.data[theOnlyAddress].x = vals;
 			this.makeBins(theOnlyAddress)
 		},
-		getAxisBounds: function(){
-			this.getXBounds();
-			this.getYBounds();
-		},
+		// getAxisBounds: function(){
+			// this.getXBounds();
+			// this.getYBounds();
+		// },
 		makeBins: function(theOnlyAddress){
 			this.valRange.x = this.getRange('x');
 			this.setAxisBoundsX();

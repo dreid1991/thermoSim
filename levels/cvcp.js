@@ -80,7 +80,7 @@ _.extend(cvcp.prototype,
 				renderer.render({
 					type: 'section',
 					walls: [{pts:[P(40,190), P(255,190), P(255,425), P(40,425)], handler:'staticAdiabatic', handle:'left', bounds:undefined, vol:5, border: {type: 'std', col: Col(155, 155, 155)}},
-							{pts:[P(295,190), P(510,190), P(510,425), P(295,425)], handler:'staticAdiabatic', handle:'right', bounds:{yMin:50, yMax:275}, vol:5, border: {type: 'std', col:Col(155, 155, 155), width:5}}
+							{pts:[P(295,190), P(510,190), P(510,425), P(295,425)], handler:'staticAdiabatic', handle:'right', bounds:{yMin:50, yMax:275}, vol:5, border: {type: 'std', yMin: 50, col:Col(155, 155, 155), width:5}}
 					],
 					
 					//borders should be option in wall
@@ -113,13 +113,13 @@ _.extend(cvcp.prototype,
 					
 
 					graphs: [
-						{type: 'Scatter', handle:'pVSvLeft', xLabel:"P Int.", yLabel:"Temp (K)", axesInit:{x:{min:6, step:2}, y:{min:0, step:50}},
-							sets:[
-								{address:'temp', label:'Temp', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
-								 data:{x: {wallInfo: 'left', data: 'pInt'}, y: {wallInfo: 'left', data: 'temp'}}, trace: false, fillInPts: false, fillInPtsMin: 5}
+						// {type: 'Scatter', handle:'pVSvLeft', xLabel:"P Int.", yLabel:"Temp (K)", axesInit:{x:{min:6, step:2}, y:{min:0, step:50}},
+							// sets:[
+								// {address:'temp', label:'Temp', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
+								 // data:{x: {wallInfo: 'left', data: 'pInt'}, y: {wallInfo: 'left', data: 'temp'}}, trace: false, fillInPts: false, fillInPtsMin: 5}
 								
-							]
-						},
+							// ]
+						// },
 						// {type: 'Scatter', handle:'pVSvRight', xLabel:"P Int.", yLabel:"Temp (K)", axesInit:{x:{min:0, step:30}, y:{min:0, step:.50}},
 							// sets:[
 								// {address:'cnt', label:'moles', pointCol:Col(255,50,50), flashCol:Col(255,200,200),
@@ -135,8 +135,8 @@ _.extend(cvcp.prototype,
 						}
 					],
 					rxns: [
-						{handle: 'decomp', rctA: 'spc1', hRxn: -2, activeE: 8.72, prods: {spc6: 1}},
-						{handle: 'decomp2', rctA: 'spc6', hRxn: 2, activeE: 10.72, prods: {spc1: 1}}
+						{handle: 'decomp', rctA: 'spc1', hRxn: -2, activeE: 9, prods: {spc6: 2}},
+						{handle: 'recomb', rctA: 'spc6', rctB: 'spc6', hRxn: 2, activeE: 11, prods: {spc1: 1}}
 						
 					]
 					

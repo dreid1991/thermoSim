@@ -365,31 +365,51 @@ GraphBase = {
 	},
 	getXBounds: function(){
 		var rangeX = this.valRange.x.max-this.valRange.x.min;
-		if(rangeX!=0){
-			var unroundStepX = rangeX/(this.numGridLines.x-2);
+		var newBounds = {min: undefined, max: undefined};
+		var newStepSize;
+		//axes cannot shrink.  
+		if (rangeX!=0) {
+			var unroundStepX = rangeX / (this.numGridLines.x-2);
 			var expStepX = Math.pow(10, Math.floor(Math.log10(unroundStepX)))
-			this.stepSize.x = Math.ceil(unroundStepX/expStepX)*expStepX;
-			this.axisRange.x.min = Math.floor(this.valRange.x.min/this.stepSize.x)*this.stepSize.x;
-			this.axisRange.x.max = this.axisRange.x.min + (this.numGridLines.x-1)*this.stepSize.x;
-		}else{
-			this.axisRange.x.min = Math.floor(this.valRange.x.min);
-			this.stepSize.x = .2;
-			this.axisRange.x.max = this.axisRange.x.min + this.stepSize.x*this.numGridLines.x;	
+			newStepSize = Math.ceil(unroundStepX / expStepX) * expStepX;
+			newBounds.min = Math.floor(this.valRange.x.min / newStepSize) * newStepSize;
+			newBounds.max = newBounds.min + (this.numGridLines.x - 1) * newStepSize;
+			//this.stepSize.x = Math.ceil(unroundStepX/expStepX)*expStepX;
+			//this.axisRange.x.min = Math.floor(this.valRange.x.min/this.stepSize.x)*this.stepSize.x;
+			//this.axisRange.x.max = this.axisRange.x.min + (this.numGridLines.x-1)*this.stepSize.x;
+		} else {
+			newStepSize = .2;
+			newBounds.min = Math.floor(this.valRange.x.min);
+			newBounds.max = newBounds.min + newStepSize * this.numGridLines.x;
+			// this.axisRange.x.min = Math.floor(this.valRange.x.min);
+			// this.stepSize.x = .2;
+			// this.axisRange.x.max = this.axisRange.x.min + this.stepSize.x*this.numGridLines.x;	
+		}
+		if (newBounds.min < this.axisRange.x.min || newBounds.max > this.axisRange.x.max) {
+			this.axisRange.x.min = newBounds.min;
+			this.axisRange.x.max = newBounds.max;
+			this.stepSize.x = newStepSize;
 		}
 	},
 	getYBounds: function(){
 		var rangeY = Math.abs(this.valRange.y.max-this.valRange.y.min);
-		if(rangeY!=0){
-			var unroundStepY = rangeY/(this.numGridLines.y-2);
+		var newBounds = {min: undefined, max: undefined};
+		var newStepSize;
+		if (rangeY!=0) {
+			var unroundStepY = rangeY / (this.numGridLines.y-2);
 			var expStepY = Math.pow(10, Math.floor(Math.log10(unroundStepY)))
-			this.stepSize.y = Math.ceil(unroundStepY/expStepY)*expStepY;
-			this.axisRange.y.min = Math.floor(this.valRange.y.min/this.stepSize.y)*this.stepSize.y;
-			this.axisRange.y.max = this.axisRange.y.min + (this.numGridLines.y-1)*this.stepSize.y;
-		}else{
-			this.axisRange.y.min = Math.floor(this.valRange.y.min);
-			this.stepSize.y = .2;
-			this.axisRange.y.max = this.axisRange.y.min + this.stepSize.y*this.numGridLines.y;	
-			
+			newStepSize = Math.ceil(unroundStepY / expStepY) * expStepY;
+			newBounds.min = Math.floor(this.valRange.y.min / newStepSize) * newStepSize;
+			newBounds.max = newBounds.min + (this.numGridLines.y-1) * newStepSize;
+		} else {
+			newBounds.min = Math.floor(this.valRange.y.min);
+			newStepSize = .2;
+			newBounds.max = this.axisRange.y.min + newStepSize * this.numGridLines.y;	
+		}
+		if (newBounds.min < this.axisRange.y.min || newBounds.max > this.axisRange.y.max) {
+			this.axisRange.y.min = newBounds.min;
+			this.axisRange.y.max = newBounds.max;
+			this.stepSize.y = newStepSize;
 		}
 	},
 	drawAxisVals: function(){
@@ -519,23 +539,6 @@ GraphBase = {
 		return P(x,y);
 	},
 	flashInit: function(toDraw){
-			/*
-			for (var address in toDraw) {
-				var newPtIdxs = toDraw[address];
-				var set = this.data[address]
-				for (var ptIdx=0; ptIdx<newPtIdxs.length; ptIdx++) {
-					var newIdx = newPtIdxs[ptIdx];
-					var xPt = set.x[newIdx];
-					var yPt = set.y[newIdx];
-					var ptCol = set.pointCol;
-					if (set.trace) {
-						this.trace(set, newIdx)
-					}
-					this.graphPt(xPt, yPt, ptCol);
-				}
-			
-			}
-			*/
 		this.flashers = [];
 		for (var address in toDraw) {
 			var newPtIdxs = toDraw[address];
@@ -559,30 +562,6 @@ GraphBase = {
 				addListener(curLevel, 'update', 'flash'+this.handle, this.flashRun, this);
 			}
 		}
-		/*
-		this.flashers = [];
-		for (var flashIdx=0; flashIdx<pts.length; flashIdx++){
-			var pt = pts[flashIdx];
-			//if(this.data[pt.address].show){
-
-
-				var pos = this.valToCoord(pt);
-				var x = pos.x;
-				var y = pos.y;
-				var pointCol = this.data[pt.address].pointCol;
-				var flashCol = this.data[pt.address].flashCol;
-				var curCol = Col(flashCol.r, flashCol.g, flashCol.b);
-				var imagePos = P(x - this.characLen*this.flashMult-1, y - this.characLen*this.flashMult-1);
-				var len = this.characLen*2*this.flashMult+2;
-				var curCharacLen = this.characLen*this.flashMult;
-				var imageData = this.graph.getImageData(imagePos.x, imagePos.y, len, len);
-				this.flashers.push({pos:pos, pointCol:pointCol, flashCol:flashCol, curCol:curCol, curCharacLen:curCharacLen, imagePos:imagePos, imageData:imageData});
-			//}
-		}
-		if(this.flashers.length>0){
-			addListener(curLevel, 'update', 'flash'+this.handle, this.flashRun, this);
-		}
-		*/
 	},
 	flashRun: function(){
 		this.eraseFlashers();
@@ -592,7 +571,7 @@ GraphBase = {
 			this.drawPt(flasher.pos, flasher.curCol, flasher.curCharacLen);
 			this.flasherNextStep(flasher);
 		}
-		if(this.doneFlashing()){
+		if (this.doneFlashing()) {
 			
 			removeListener(curLevel, 'update', 'flash'+this.handle);
 			this.eraseFlashers();
