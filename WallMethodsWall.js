@@ -330,7 +330,7 @@ WallMethods.wall = {
 		this.recordTemp();
 		this.recordPInt();
 		this.recordVol();
-		if (this.isothermal) this.recordQ();
+		this.isothermal && this.recordQ();
 	},
 	recordTime: function() {
 		this.data.time = new WallMethods.DataObj();
