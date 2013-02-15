@@ -41,10 +41,10 @@ _.extend(cvcp.prototype,
 	},
 	sections: [
 		{//B0
-			setup:undefined,
+			sceneData:undefined,
 			prompts:[
 				{//P0
-					setup:undefined,
+					sceneData:undefined,
 					cutScene:true,
 					text:"<p>It's time to look at heat capacities!</p><p>For an ideal monatomic gas, which of these is correct?  c<sub>V</sub> means heat capacity at constant volume, c<sub>P</sub> means heat capacity at constant pressure.",
 					quiz:[
@@ -61,7 +61,7 @@ _.extend(cvcp.prototype,
 					],
 				},
 				{//P1
-					setup:undefined,
+					sceneData:undefined,
 					cutScene:true,
 					text:"<p>Right.</p><p>So an ideal gas has a higher heat capacity under constant pressure than under constant volume.  We're going to investigate these processes to figure out why that is.</p><p>First, what does it mean in terms of energy required to heat a given system that c<sub>P</sub> is greater than c<sub>v</sub>?</p>",
 					quiz:[
@@ -76,7 +76,7 @@ _.extend(cvcp.prototype,
 		},
 		{//B1
 			
-			setup: function() {
+			sceneData: function() {
 				renderer.render({
 					type: 'section',
 					walls: [{pts:[P(40,190), P(255,190), P(255,425), P(40,425)], handler:'staticAdiabatic', handle:'left', bounds:undefined, vol:5, border: {type: 'std', col: Col(155, 155, 155)}},
@@ -97,12 +97,13 @@ _.extend(cvcp.prototype,
 						{type: 'Inlet', attrs: {handle: 'inny', wallInfo: 'left', ptIdxs: [3, 4], fracOffset: .3, makeSlider: true, flows: [{spcName: 'spc1', nDotMax: .0001, temp: 300, tag: 'left'}, {spcName: 'spc3', nDotMax: .02, temp: 50, tag: 'left'}]}},
 						{type: 'Outlet', attrs: {handle: 'outty', wallInfo: 'left', ptIdxs: [0, 1], fracOffset: .3}}
 					],
-					records: [
+					dataRecord: [
 						{wallInfo: 'right', data: 'moles', attrs: {spcName: 'spc1', tag: 'right'}},
 						{wallInfo: 'right', data: 'frac', attrs: {spcName: 'spc1', tag: 'right'}},
-						{wallInfo: 'right', data: 'vDist', attrs: {spcName: 'spc1', tag: 'right'}}
+						{wallInfo: 'right', data: 'vDist', attrs: {spcName: 'spc1', tag: 'right'}},
+						{wallInfo: 'right', data: 'mass'}
 					],
-					readoutEntries: [
+					dataDisplay: [
 						{wallInfo: 'left', data:'tempSmooth', readout: 'mainReadout'},
 						{wallInfo: 'left', data:'q', readout: 'mainReadout'},
 						{wallInfo: 'right', data:'tempSmooth', readout: 'mainReadout'},
@@ -143,7 +144,7 @@ _.extend(cvcp.prototype,
 				})
 			},
 			/*
-			setup:
+			sceneData:
 				function() {
 					currentSetupType = 'section';
 					//walls = WallHandler({pts:[[P(40,190), P(255,190), P(255,425), P(40,425)], [P(295,190), P(510,190), P(510,425), P(295,425)]], handlers:'staticAdiabatic', handles:['left', 'right'], bounds:[undefined, {yMin:50, yMax:275}], vols:[5,5]});
@@ -168,13 +169,13 @@ _.extend(cvcp.prototype,
 				*/
 			prompts:[
 				{//P0
-					setup: 
+					sceneData: 
 						function(){
 							renderer.render({
 								type: 'prompt',
 								listeners: [
-									{wallInfo: 'left', dataList: 'temp', /*can have args*/is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:''},
-									{wallInfo: 'right', dataList: 'temp', is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'}
+									{dataSet: {wallInfo: 'left', data: 'temp'}, is:'equalTo', checkVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:''},
+									{dataSet: {wallInfo: 'right', data: 'temp'}, is:'equalTo', checkVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'}
 								]
 							})
 							//walls[1].setDefaultReadout(this.piston.readout);
@@ -204,7 +205,7 @@ _.extend(cvcp.prototype,
 				},
 				/*
 				{//P0
-					setup: 
+					sceneData: 
 						function(){
 							currentSetupType = 'prompt1';
 							//walls[1].setDefaultReadout(this.piston.readout);
@@ -223,7 +224,7 @@ _.extend(cvcp.prototype,
 				},
 				*/
 				{//P1
-					setup:undefined,
+					sceneData:undefined,
 					text:"<p>It took 0.5 kJ to bring the constant volume container to 250K while the constant pressure container took 0.8 kJ.</p>Do you have any theories about why that is?<br>",
 					quiz:[
 						{	
@@ -233,7 +234,7 @@ _.extend(cvcp.prototype,
 					]
 				},
 				{//P2
-					setup:undefined,
+					sceneData:undefined,
 					cutScene:true,
 					text:"<p>Let's think about those systems.  When you heated the constant volume container, where did the added energy go?</p>",
 					quiz:[
@@ -249,7 +250,7 @@ _.extend(cvcp.prototype,
 					],
 				},
 				{//P3
-					setup:undefined,
+					sceneData:undefined,
 					cutScene:true,
 					text:"<p>Good.  When you heated the constant <i>pressure</i> container, where did the added energy go?</p>",
 					quiz:[
@@ -268,7 +269,7 @@ _.extend(cvcp.prototype,
 
 		},
 		{//B2
-			setup:
+			sceneData:
 				function() {
 					this.sections[1].setup.apply(this);
 					//walls[1].setDefaultReadout(this.piston.readout);
@@ -277,7 +278,7 @@ _.extend(cvcp.prototype,
 				},
 			prompts:[
 				{//P0
-					setup:
+					sceneData:
 						function() {
 							this.leftTemp250 = new StateListener({dataList:walls[0].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});
 							this.rightTemp250 = new StateListener({dataList:walls[1].data.t, is:'equalTo', targetVal:250, alertUnsatisfied:"Bring the containers to 250 K", priorityUnsatisfied:1, checkOn:'conditions'});							
@@ -295,10 +296,10 @@ _.extend(cvcp.prototype,
 			]
 		},
 		{//B3
-			setup:undefined,
+			sceneData:undefined,
 			prompts:[
 				{
-					setup:undefined,
+					sceneData:undefined,
 					cutScene:true,
 					text:"<p>End of simulation.</p>",
 				}

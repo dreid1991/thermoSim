@@ -1248,7 +1248,7 @@ function Piston(attrs){
 	var readoutY = this.pistonBottom.pos.y-2+this.pistonPt.y;
 	var readoutFont = '12pt calibri';
 	var readoutFontCol = Col(255, 255, 255);
-	this.readout = new Readout('pistonReadout' + this.handle, readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, 'center');
+	this.readout = new Readout('pistonReadout' + this.handle.toCapitalCamelCase(), readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, 'center');
 	this.wall.moveInit();
 	
 	this.wall.recordPExt();
@@ -1390,7 +1390,7 @@ function Heater(attrs){
 	} else {
 		this.pos = this.centerOnWall(attrs.wallInfo, this.dims);
 	}
-	
+	this.wall.recordQ();
 	this.makeSlider = defaultTo(true, attrs.makeSlider);
 	this.handle = defaultTo('heaty', attrs.handle);
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
@@ -1626,14 +1626,14 @@ _.extend(Stops.prototype, objectFuncs, {
 //////////////////////////////////////////////////////////////////////////
 //STATE LISTENER
 //////////////////////////////////////////////////////////////////////////
-function StateListener(attrs){//like dataList... is:'greaterThan', ... targetVal
+function StateListener(attrs){//like dataList... is:'greaterThan', ... checkVal
 	this.type = 'StateListener';
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.conditionsOn = this.cleanUpWith.killNumbers();
-
-	this.dataList = walls[walls.idxByInfo(attrs.wallInfo)].getDataObj(attrs.dataList, attrs.attrs).src();
+	var dataInfo = attrs.dataSet;
+	this.dataList = walls[dataInfo.wallInfo].getDataObj(dataInfo.data, dataInfo.attrs).src();
 	this.is = attrs.is
-	this.targetVal = attrs.targetVal;
+	this.checkVal = attrs.checkVal;
 	this.tolerance = defaultTo(.05, attrs.tolerance);
 	this.checkOn = attrs.checkOn;
 	this.alerts = {true:attrs.alertSatisfied, false:attrs.alertUnsatisfied};
@@ -1686,13 +1686,13 @@ _.extend(StateListener.prototype, objectFuncs, {
 		this);	
 	},
 	makeConditionFunc: function(){
-		if (this.targetVal instanceof Array) {
+		if (this.checkVal instanceof Array) {
 			this.condition = function() {
-				return this[this.is](this.dataList[this.dataList.length-1], this.targetVal[this.targetVal.length-1]);
+				return this[this.is](this.dataList[this.dataList.length-1], this.checkVal[this.checkVal.length-1]);
 			}
 		} else {
 			this.condition = function() {
-				return this[this.is](this.dataList[this.dataList.length-1], this.targetVal);
+				return this[this.is](this.dataList[this.dataList.length-1], this.checkVal);
 			}
 		
 		}		

@@ -1,5 +1,6 @@
 LevelTools = {
 	setStds: function(){
+		this.addSceneDataTypes();
 		this.addEqs();
 		this.setDefaultPromptVals()
 		this.graphs = {};
@@ -18,6 +19,17 @@ LevelTools = {
 		addListener(this, 'data', 'run', this.dataRun, this);
 		
 		this.spcs = spcs;
+	},
+	addSceneDataTypes: function() {
+		//will still need to add type if you're rendering a function.  
+		for (var sIdx=0; sIdx<this.sections.length; sIdx++) {
+			var section = this.sections[sIdx];
+			if (section.sceneData) section.sceneData.type = 'section';
+			for (var pIdx=0; pIdx<section.prompts.length; pIdx++) {
+				var prompt = section.prompts[pIdx];
+				if (prompt.sceneData) prompt.sceneData.type = 'prompt';
+			}
+		}
 	},
 	addEqs: function(){
 		for (var sectionIdxLocal=0; sectionIdxLocal<this.sections.length; sectionIdxLocal++) {

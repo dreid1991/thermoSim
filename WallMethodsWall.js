@@ -330,7 +330,7 @@ WallMethods.wall = {
 		this.recordTemp();
 		this.recordPInt();
 		this.recordVol();
-		this.recordQ();//Do I want this as a default?  I don't *think* so.
+		if (this.isothermal) this.recordQ();
 	},
 	recordTime: function() {
 		this.data.time = new WallMethods.DataObj();

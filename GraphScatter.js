@@ -49,7 +49,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			set.pointCol = attrs.pointCol;
 			set.flashCol = attrs.flashCol;
 			set.fillInPts = attrs.fillInPts;
-			set.fillInPtsMin = attrs.fillInPtsMin;
+			set.fillInPtsMin = defaultTo(5, attrs.fillInPtsMin);
 			set.trace = defaultTo(false, attrs.trace);
 			set.getLast = this.makePtDataGrabFunc(data);
 			set.show = true;

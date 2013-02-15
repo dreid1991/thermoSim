@@ -540,8 +540,12 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 		
 		emptyListener(curLevel, 'sectionCleanUp');
 		emptyListener(curLevel, 'sectionCondition');
-		
-		renderer.render(newSection.setup);
+		//attn - once setup is out of use, remove the condition that checks for it
+		if (newSection.setup) {
+			renderer.render(newSection.setup);
+		} else {
+			renderer.render(newSection.sceneData);
+		}
 
 		
 		addListener(curLevel, 'sectionCleanUp', 'removeArrowAndText',
@@ -552,7 +556,11 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 		this);
 		curLevel.delayGraphs();
 	}
-	renderer.render(newPrompt.setup);
+	if (newPrompt.setup) {
+		renderer.render(newPrompt.setup);
+	} else {
+		renderer.render(newPrompt.sceneData);
+	}
 
 	if (!newPrompt.quiz) {
 		$('#nextPrevDiv').show();
@@ -718,7 +726,7 @@ function prevPrompt(){
 
 /*
 Ahem, I am redefining how get, eval, and img are done.  
-get(idStr, type ('int', 'float', 'string'), default, min, max, 
+get(idStr, type ('int', 'float', 'string'), default, min, max)
 eval(expr, decPlaces, default, min, max)
 img(path, breakStyle (p, br), center (boolean))
 */
@@ -801,7 +809,7 @@ function addImgs(text){
 		var path = args[0];
 		var breakStyle = args[1];
 		var center = args[2];
-		var imgHTML = templater.img({attrs: {src: [path], 'class': [globalHTMLClass]}});
+		var imgHTML = templater.img({attrs: {src: [path]}});
 		
 		if (center) {
 			imgHTML = templater.center({innerHTML: ingHTML});
