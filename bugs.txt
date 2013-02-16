@@ -4,3 +4,5 @@ attracting is gaining energy in at least cvcp - response: seems stable with ~200
 This is a trivial change to explore forking.  This change was made in the reiddan account.
 
 This is another trivial change, but this one is made on the dreid1991 repo
+
+this is a change
