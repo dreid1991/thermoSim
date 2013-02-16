@@ -640,7 +640,7 @@ WallMethods.wall = {
 		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
 		var units = 'bar';
 		decPlaces = defaultTo(1, decPlaces);
-		var label = defaultTo('Pext:', label);
+		var label = defaultTo('P_int:', label);
 		this.displayStd(dataObj, readout, label, decPlaces, units);
 	
 	},
@@ -652,7 +652,7 @@ WallMethods.wall = {
 		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
 		var units = 'bar';
 		decPlaces = defaultTo(1, decPlaces);
-		var label = defaultTo('Pext:', label);
+		var label = defaultTo('P_ext:', label);
 		this.displayStd(dataObj, readout, label, decPlaces, units);
 	},
 	displayVol: function(readoutHandle, label, decPlaces){

@@ -40,7 +40,7 @@ _.extend(cvcp.prototype,
 		showPrompt(0, 0, true);
 	},
 	sections: [
-		{//B0
+		{//S0
 			sceneData:undefined,
 			prompts:[
 				{//P0
