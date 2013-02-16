@@ -702,7 +702,7 @@ function checkWillAdvanceQuiz(){
 	//isCorrect will alert for wrong answers and maybe for no answer (if text box, I guess)
 	var allCorrect = 1;
 	var quiz = curLevel.quiz;
-	if (quiz.length>0) {
+	if (quiz && quiz.length>0) {
 		if (!quiz.allAnswered()) {
 			alert("You haven't answered all the questions");
 			return 0;
@@ -732,7 +732,6 @@ img(path, breakStyle (p, br), center (boolean))
 */
 
 function addStored(text) {
-	//if you EVER find a way to do regexp lookbehinds, use it here.  
 	return text.replace(/get[\s]*\([A-Za-z0-9,\s\-\.]*\)/g, function(subStr, idx) {
 		var args = sliceArgs(subStr);
 		var idStr = args[0];
