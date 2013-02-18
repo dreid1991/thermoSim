@@ -51,50 +51,47 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 		var ySpan = this.ySpan;
 		this.grid = this.makeGrid();
 		var grid = this.grid;
-		var spcLens = {};
-		for (var spcName in this.spcs) {
-			spcLens[spcName] = this.spcs[spcName].dots.length;
-		};
-		//predetermining lengths to prevent rxn prods from reacting again on same turn.  Could make things slow
+
 		//defining grid locally speeds up by ~250ms/500runs (1000->750)
-		for (var spcName in this.spcs){
-			var dots = this.spcs[spcName].dots;
-			for (var dotIdx=spcLens[spcName]-1; dotIdx>=0; dotIdx--) {
-				var dot = dots[dotIdx];
-				var gridX = Math.floor(dot.x/gridSize);
-				var gridY = Math.floor(dot.y/gridSize);
-				var doAdd = true;
-				//hey - define x & y mins so I don't have to call each time?
-				//In optimizing, DO NOT define min and max locally.  It slows things down a lot.
-				gridLoop:
-					for (var x=Math.max(gridX-1, 0), xCeil=Math.min(gridX+1, xSpan)+1; x<xCeil; x++){
-						for (var y=Math.max(gridY-1, 0), yCeil=Math.min(gridY+1, ySpan)+1; y<yCeil; y++){
-							for (var neighborIdx=grid[x][y].length-1; neighborIdx>-1; neighborIdx--){
-								var neighbor = grid[x][y][neighborIdx];
-								var dx = dot.x-neighbor.x;
-								var dy = dot.y-neighbor.y;
-								if (dx*dx+dy*dy<=(dot.r+neighbor.r)*(dot.r+neighbor.r)) {
-									var handler = this[Math.min(dot.idNum, neighbor.idNum) + '-' + Math.max(dot.idNum, neighbor.idNum)];
-									var UVAB = V(neighbor.x-dot.x, neighbor.y-dot.y).UV();
-									//YO YO - TRY INLINING ALL  OF THESE FUNCTIONS (THE VECTOR MATH) AND SEE IF IT MAKES IT FASTER.  
-									if (handler.func.apply(handler.obj, [dot, neighbor, UVAB, dot.v.dotProd(UVAB), neighbor.v.dotProd(UVAB)])===false) {
-										doAdd = false;
-										grid[x][y].splice(neighborIdx, 1);
-										break gridLoop;
-									}
+		var dots = dotManager.lists.ALLDOTS;
+		
+		for (var dotIdx=dots.length - 1; dotIdx>-1; dotIdx--) {
+	
+			var dot = dots[dotIdx];
+			var gridX = Math.floor(dot.x/gridSize);
+			var gridY = Math.floor(dot.y/gridSize);
+			var doAdd = true;
+			//hey - define x & y mins so I don't have to call each time?
+			//In optimizing, DO NOT define min and max locally.  It slows things down a lot.
+			gridLoop:
+				for (var x=Math.max(gridX-1, 0), xCeil=Math.min(gridX+1, xSpan)+1; x<xCeil; x++){
+					for (var y=Math.max(gridY-1, 0), yCeil=Math.min(gridY+1, ySpan)+1; y<yCeil; y++){
+						for (var neighborIdx=grid[x][y].length-1; neighborIdx>-1; neighborIdx--){
+							var neighbor = grid[x][y][neighborIdx];
+							var dx = dot.x-neighbor.x;
+							var dy = dot.y-neighbor.y;
+							if (dx*dx+dy*dy<=(dot.r+neighbor.r)*(dot.r+neighbor.r)) {
+								var handler = this[Math.min(dot.idNum, neighbor.idNum) + '-' + Math.max(dot.idNum, neighbor.idNum)];
+								var UVAB = V(neighbor.x-dot.x, neighbor.y-dot.y).UV();
+								//YO YO - TRY INLINING ALL  OF THESE FUNCTIONS (THE VECTOR MATH) AND SEE IF IT MAKES IT FASTER.  
+								if (handler.func.apply(handler.obj, [dot, neighbor, UVAB, dot.v.dotProd(UVAB), neighbor.v.dotProd(UVAB)])===false) {
+									doAdd = false;
+									grid[x][y].splice(neighborIdx, 1);
+									break gridLoop;
 								}
 							}
 						}
 					}
-					
-				if (gridX>=0 && gridY>=0 && gridX<this.numCols && gridY<this.numRows) {
-					doAdd && grid[gridX][gridY].push(dot);
-				} else {
-					returnEscapist(dot);
-					console.log("ball out of bounds");		
 				}
+				
+			if (gridX>=0 && gridY>=0 && gridX<this.numCols && gridY<this.numRows) {
+				doAdd && grid[gridX][gridY].push(dot);
+			} else {
+				returnEscapist(dot);
+				console.log("ball out of bounds");		
 			}
 		}
+		
 	},
 	impactStd: function(a, b, UVAB, perpAB, perpBA){
 		var perpABRes = (perpAB*(a.m-b.m)+2*b.m*perpBA)/(a.m+b.m);

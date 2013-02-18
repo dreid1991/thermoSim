@@ -304,34 +304,33 @@ WallMethods.main = {
 		var gridDim = this.gridDim;
 		var xSpan = this.xSpan;
 		var ySpan = this.ySpan;
-		var spcsLocal = spcs;
-		for (var spcName in spcsLocal){
-			var spc = spcsLocal[spcName].dots;
-			for (var dotIdx=0; dotIdx<spc.length; dotIdx++){
-				var dot = spc[dotIdx];
-				var checkedWalls = [];
-				var gridX = Math.floor(dot.x/gridDim);
-				var gridY = Math.floor(dot.y/gridDim);
-				//HEY - DO TESTING TO FIGURE OUT IF SHOULD DEFINED Math.min(gridspot...) OR CALCULATE EACH TIME
-				for (var x=Math.max(gridX-1, 0), xCeil=Math.min(gridX+1, xSpan)+1; x<xCeil; x++){
-					for (var y=Math.max(gridY-1, 0), yCeil=Math.min(gridY+1, ySpan)+1; y<yCeil; y++){
-						
-						for (var wallIdx=0; wallIdx<this.length; wallIdx++){
-							var gridSquare = this[wallIdx].wallGrids[x][y];
+		var dots = dotManager.lists.ALLDOTS;
+	
+		for (var dotIdx=0; dotIdx<dots.length; dotIdx++){
+			var dot = dots[dotIdx];
+			var checkedWalls = [];
+			var gridX = Math.floor(dot.x/gridDim);
+			var gridY = Math.floor(dot.y/gridDim);
+			//HEY - DO TESTING TO FIGURE OUT IF SHOULD DEFINED Math.min(gridspot...) OR CALCULATE EACH TIME
+			for (var x=Math.max(gridX-1, 0), xCeil=Math.min(gridX+1, xSpan)+1; x<xCeil; x++){
+				for (var y=Math.max(gridY-1, 0), yCeil=Math.min(gridY+1, ySpan)+1; y<yCeil; y++){
+					
+					for (var wallIdx=0; wallIdx<this.length; wallIdx++){
+						var gridSquare = this[wallIdx].wallGrids[x][y];
 
-							for (var lineIdx=0; lineIdx<gridSquare.length; lineIdx++){
-								var line = gridSquare[lineIdx];
-								if (this.haveChecked([wallIdx, line], checkedWalls)===false){
-									//add if hit, break out of this dot's loops
-									this.checkWallHit(dot, [wallIdx, line]);
-									checkedWalls.push([wallIdx, line]);
-								}
+						for (var lineIdx=0; lineIdx<gridSquare.length; lineIdx++){
+							var line = gridSquare[lineIdx];
+							if (this.haveChecked([wallIdx, line], checkedWalls)===false){
+								//add if hit, break out of this dot's loops
+								this.checkWallHit(dot, [wallIdx, line]);
+								checkedWalls.push([wallIdx, line]);
 							}
 						}
 					}
 				}
 			}
 		}
+		
 	},
 	checkWallHit: function(dot, line){
 		var wallIdx = line[0];
