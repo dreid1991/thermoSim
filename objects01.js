@@ -28,6 +28,11 @@ compressorFuncs = {
 }
 
 objectFuncs = {
+	setupStd: function() {
+		this.addCleanUp();
+		if (this.handle) this.addToCurLevel();
+		this.wrapRemove();
+	},
 	addCleanUp: function(){
 		this.cleanUpListenerName = unique(this.type + defaultTo('', this.handle), curLevel[this.cleanUpWith + 'CleanUpListeners'].listeners);
 		addListener(curLevel, this.cleanUpWith + 'CleanUp', this.cleanUpListenerName, function(){
@@ -35,6 +40,24 @@ objectFuncs = {
 															removeListener(curLevel, this.cleanUpWith + 'CleanUp', this.cleanUpListenerName)
 														},
 														this);
+	},
+	wrapRemove: function() {
+		var removeOld = this.remove;
+		this.remove = function() {
+			if (this.handle) this.removeFromCurLevel();
+			this.removeCleanUp();
+			removeOld.apply(this);
+		}
+	},
+	addToCurLevel: function() {
+		curLevel[this.type.toCamelCase() + this.handle.toCapitalCamelCase()] = this;
+	},
+	removeFromCurLevel: function() {
+		if (curLevel[this.type.toCamelCase() + this.handle.toCapitalCamelCase()] == this) {
+			delete curLevel[this.type.toCamelCase() + this.handle.toCapitalCamelCase()];
+		} else {
+			console.log("Trying to remove " + this.type.toCamelCase() + this.handle.toCapitalCamelCase() + " but handle doesn't belong to this object");
+		}
 	},
 	removeCleanUp: function(){
 		removeListener(curLevel, this.cleanUpWith + 'CleanUp', this.cleanUpListenerName);
@@ -172,7 +195,7 @@ function DragWeights(attrs){
 	this.wall.recordWork();
 	this.wall.recordMass();
 	
-	this.addCleanUp();
+	this.setupStd();
 	return this.init();
 }
 
@@ -742,8 +765,7 @@ function Pool(attrs){
 	this.tube.walls.xPts = this.getTubeXPts(this.tube.ID, this.tube.OD);
 	this.tube.floor = this.tube.wallThickness+5;
 	
-	this.addCleanUp();
-	
+	this.setupStd();
 	return this.init();
 }
 
@@ -966,6 +988,7 @@ _.extend(Pool.prototype, objectFuncs, compressorFuncs, {
 
 //////////////////////////////////////////////////////////////////////////
 //DRAG ARROW
+	//This is meant to be used internally so I'm not adding 'setupStd' right now
 //////////////////////////////////////////////////////////////////////////
 function DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds){
 	this.type = 'DragArrow';
@@ -1201,7 +1224,7 @@ function CompArrow(attrs){
 	listeners.onUp = function(){};
 	this.dragArrow = new DragArrow(pos, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds).show();
 	
-	this.addCleanUp();
+	this.setupStd();
 	
 	return this;
 }
@@ -1259,7 +1282,7 @@ function Piston(attrs){
 	if (this.makeSlider) {
 		this.sliderId = this.addSlider('Pressure', {value: this.pToPercent(pInit)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
 	}
-	this.addCleanUp();
+	this.setupStd();
 	
 	return this.show();
 }
@@ -1408,7 +1431,7 @@ function Heater(attrs){
 	this.wallPts = this.pos.roundedRect(this.dims, .3, 'ccw');
 	this.eAdded=0;
 	
-	this.addCleanUp();
+	this.setupStd();
 	if (this.makeSlider) {
 
 		this.sliderId = this.addSlider('Heater', {value:50}, 
@@ -1545,7 +1568,7 @@ _.extend(Heater.prototype, objectFuncs, {
 	remove: function(){
 		this.removeSlider();
 		removeListener(curLevel, 'update', 'drawHeater'+this.handle);
-		if(window.walls && !walls.removed){
+		if (window.walls && !walls.removed) {
 			walls.removeWall('heater' + this.handle);
 		}
 	}
@@ -1578,7 +1601,7 @@ function Stops(attrs){
 	if (this.willDraw) {
 		this.draw = this.makeDrawFunc(this.height);
 	}
-	this.addCleanUp();	
+	this.setupStd();	
 	
 	return this.init();
 }
@@ -1644,7 +1667,8 @@ function StateListener(attrs){//like dataList... is:'greaterThan', ... checkVal
 	this.atSatisfyCmmds = defaultTo(undefined, attrs.atSatisfyCmmds);
 	this.amSatisfied = false;
 	this.makeConditionFunc();
-	return this.init();
+	this.setupStd();
+	this.init();
 }
 _.extend(StateListener.prototype, objectFuncs, {
 	init: function(){
@@ -1653,7 +1677,7 @@ _.extend(StateListener.prototype, objectFuncs, {
 		} else {
 			this.initCheckOnInterval(); // check if condition is met at update interval, once true, is done and condition is met
 		}
-		this.addCleanUp();
+		
 	},
 	initCheckOnConditions: function() {
 		this.handle = unique('StateListener' + this.is, curLevel[this.conditionsOn + 'ConditionListeners'].listeners);

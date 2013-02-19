@@ -27,7 +27,7 @@ function Clamps(attrs) {
 
 _.extend(Clamps.prototype, objectFuncs, {
 	init: function() {
-		this.addCleanUp();
+		this.setupStd();
 		this.wall.moveStop();
 		this.assembleClamps();
 		if (this.releaseWith=='button') {
@@ -189,7 +189,7 @@ _.extend(ArrowStatic.prototype, objectFuncs, toInherit.ArrowFuncs, {
 			} else {
 				addListener(curLevel, 'update', this.updateListenerName, this.runNoLabel, this);
 		}
-		this.addCleanUp();
+		this.setupStd();
 	},
 	runLabel: function() {
 		this.drawCanvas.save();
@@ -310,7 +310,7 @@ function Inlet (attrs) {
 	if (this.makeSlider) {
 		this.sliderId = this.addSlider('Flow rate', {value: this.fracOpen*100}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
 	}
-	this.addCleanUp();
+	this.setupStd();
 	this.init();
 	
 }
@@ -419,7 +419,7 @@ function Tracer(attrs) {
 	this.lifespan = Math.round(1000/updateInterval * defaultTo(5, attrs.lifespan));
 	this.listenerHandle = this.type + this.handle + 'Draw';
 	this.listenerHandleSearch = this.type + this.handle + 'Search';
-	this.addCleanUp();
+	this.setupStd();
 	this.drawCanvas = c;
 	this.drawingTools = draw;
 	this.init();

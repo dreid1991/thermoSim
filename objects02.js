@@ -56,7 +56,7 @@ function Sandbox(attrs){
 
 	this.pistonPt = this.wall[0].y;
 	
-	this.addCleanUp();
+	this.setupStd();
 	
 	return this.init();	
 }
@@ -300,7 +300,7 @@ function ParticleEmitter(attrs){
 	this.dirSpread = defaultTo(0, attrs.dirSpread);
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	this.makeBounds();
-	this.addCleanUp();
+	this.setupStd();
 	this.particles = [];
 	return this.init();
 }
@@ -505,7 +505,7 @@ _.extend(ArrowFly.prototype, objectFuncs, toInherit.ArrowFuncs, {
 	init: function(){
 		this.updateListenerName = unique(this.type + defaultTo('', this.handle), curLevel.updateListeners.listeners);
 		addListener(curLevel, 'update', this.updateListenerName, this.run, this);
-		this.addCleanUp();
+		this.setupStd();
 		return this;
 	},
 	run: function(){
@@ -684,7 +684,7 @@ function TempChanger(attrs) {
 	this.sliderPos = attrs.sliderPos;
 	this.handle = attrs.handle;;
 	this.totalDots = dataHandler.count(this.info);
-	this.addCleanUp();
+	this.setupStd();
 	return this.init();
 }
 _.extend(TempChanger.prototype, objectFuncs, {
@@ -719,7 +719,7 @@ function RMSChanger(attrs) {
 	//this.handle = 'RMSChanger' + Math.round(this.min).toString() + Math.round(this.val).toString() + Math.round(this.max).toString() + Math.round(Math.random()*1000);
 	this.totalDots = dataHandler.count(this.info);
 	this.sliderPos = attrs.sliderPos;
-	this.addCleanUp();
+	this.setupStd();
 	return this.init();
 }
 _.extend(RMSChanger.prototype, objectFuncs, {

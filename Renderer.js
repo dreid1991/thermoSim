@@ -62,7 +62,7 @@ Renderer.prototype = {
 		for (var objIdx=0; objIdx<objs.length; objIdx++) {
 			var obj = objs[objIdx];
 			var objFunc = window[obj.type];
-			curLevel[obj.type + obj.attrs.handle] = new objFunc(obj.attrs);
+			new objFunc(obj.attrs); //object is added to curLevel in stdSetup in objectFuncs
 		}
 	},
 	dataRecord: function(data) {
