@@ -1,0 +1,128 @@
+<html>
+<body>
+<link type='text/css' href = '../css/custom-theme/jquery-ui-1.9.2.custom.sim.css' rel='stylesheet' />
+<link type='text/css' href = '../styles.css' rel='stylesheet'/>
+<div class='sim noSelect wrapper'>
+	<div id='main' class='sim main noSelect'>
+		<div id='mainHeader' class='sim header noSelect'>
+			
+		</div>
+		<div id='canvasDiv' class='sim canvasDiv noSelect'>
+			<canvas id='myCanvas'>
+			</canvas>
+		</div>
+		<div id='display' class='sim display noSelect'>
+				<div id='intText' class='sim displayText noSelect'>
+			</div>
+		</div>
+
+
+		<div id='dashIntro' class='sim dashMed noSelect'>
+			<center>
+				<button id='toSim' class='sim noSelect'>To the simulation!</button>
+			</center>
+			
+		</div>
+		<div id='dashRun' class='sim dashMed noSelect' style='position:relative'>
+			<center>
+				<div id='buttons' class='sim'>
+		
+				</div>
+			</center>
+			<center>
+				<div id='sliderHolderSingle' class='sim'>
+					<div id='sliderHolderCenter' style='width:300px'>
+					
+					</div>
+				</div>
+			</center>
+			<center>
+				<div id='sliderHolderDouble' class='sim'>
+					<div id='sliderHolderLeft' style='display:inline-block;width:200px' class='sim'>
+					</div>
+					<div id='sliderSpacer' style='display:inline-block;width:75px' class='sim'>
+					</div>
+					<div id='sliderHolderRight' style='display:inline-block;width:200px' class='sim'>
+					</div>
+				</div>
+			</center>
+			<button id='resetExp' style='position:absolute;right:.5em;bottom:.25em' class='sim'><img src='img/refresh.gif'></img></button>
+		</div>
+		<div id='dashCutScene' class='sim dashMed noSelect'></div>
+		<div id='dashOutro' class='sim dash noSelect ' >
+			<center>
+				<button id='toLastStep' class='sim'>Back to the simulation</button>
+			</center>
+			
+			
+		</div>
+
+	</div>
+	<div id='auxSlots' class='sim auxSlots noSelect'>
+		<div id='aux1' class='sim aux' filledWith=''>
+		</div>
+		<div id='auxSpacer' class='sim auxSpacer'>
+		</div>
+		<div id='aux2' class='sim aux' filledWith=''>
+		</div>
+	</div>
+</div>
+<br>
+<div id='base' class='sim base noSelect'>
+	<div id='baseHeader' class='sim header noSelect'></div>
+	<div class='sim borderedBlock noSelect'>
+		<div id='quesHolder noSelect'>
+		</div>
+		<div style='padding:10px' class='sim displayText noSelect'>
+			<div id='prompt'>
+			
+			</div>
+		
+			<div id='nextPrevDiv' align='right' class='sim'>
+				<button id = 'previous'>Previous</button>
+				<button id = 'next'>Next</button>
+			</div>
+
+		</div>
+	</div>
+
+	<div id='baseDash' class='sim bottomRound noSelect'></div>
+</div>
+<script src = '../underscore-min.js'></script>
+<script src = '../js/jquery-1.9.0.min.js'></script>
+<script src = '../js/jquery-ui-1.9.2.custom.min.js'></script>
+
+<script src = '../Templater.js'></script>
+<script src = '../indepClasses.js'></script>
+<script src = '../inheritFuncs.js'></script>
+<script src = '../DrawingTools.js'></script>
+<script src = '../DotManager.js'></script>
+<script src = '../AuxFunctions.js'></script>
+<script src = '../GraphBase.js'></script>
+<script src = '../GraphScatter.js'></script>
+<script src = '../GraphHist.js'></script>
+<script src = '../GraphBlank.js'></script>
+<script src = '../SpeciesDefs.js'></script>
+<script src = '../ReactionHandler.js'></script>
+<script src = '../CollideHandler.js'></script>
+<script src = '../Attractor.js'></script>
+<script src = '../DataHandler.js'></script>
+<script src = '../WallHandler.js'></script>
+<script src = '../WallDataObj.js'></script>
+<script src = '../WallMethodsWall.js'></script>
+<script src = '../WallMethodsCollide.js'></script>
+<script src = '../Renderer.js'></script>
+<script src = '../objects01.js'></script>
+<script src = '../objects02.js'></script>
+<script src = '../objects03.js'></script>
+<script src = '../AuxPicture.js'></script>
+<script src = '../animText.js'></script>
+<script src = '../Readout.js'></script>
+<script src = '../LevelTools.js'></script>
+<script src = '../base.js'></script>
+<script src = 'TryingIsothermal.js'></script>
+
+
+</script>
+</body>
+</html>

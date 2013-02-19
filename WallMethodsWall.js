@@ -174,19 +174,17 @@ WallMethods.wall = {
 	},
 	isothermalInit: function(){
 		this.eToAdd = 0;
-		if(this.parent.numWalls>1){
-			var countFunc = dataHandler.countFunc({tag:this.handle})
-		}else{
-			var countFunc = dataHandler.countFunc();
-		}		
-		if(!this.isothermal){
+		var activeDots = dotManager.get({tag: this.handle});
+		var tempData = this.data.temp.src();
+		if (!this.isothermal) {
 			addListener(curLevel, 'data', 'recordEnergyForIsothermal' + this.handle,
 				function(){
-					var tLast = defaultTo(this.tSet, this.data.t[this.data.t.length-1]);
+					var tLast = tempData[tempData.length-1] || this.tSet;
 					var dt = this.tSet - tLast;
-					this.eToAdd = cv*countFunc()*dt/N;
+					this.eToAdd = cv*activeDots.length*dt/N;
 				},
 			this);
+			this.recordQ();
 		}
 		for (var lineIdx=0; lineIdx<this.length; lineIdx++){
 			this[lineIdx].isothermal = true;
@@ -330,7 +328,6 @@ WallMethods.wall = {
 		this.recordTemp();
 		this.recordPInt();
 		this.recordVol();
-		this.isothermal && this.recordQ();
 	},
 	recordTime: function() {
 		this.data.time = new WallMethods.DataObj();
