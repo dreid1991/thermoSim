@@ -74,7 +74,7 @@ Renderer.prototype = {
 	dataDisplay: function(entries) {
 		for (var entryIdx=0; entryIdx<entries.length; entryIdx++) {
 			var entry = entries[entryIdx];
-			walls[entry.wallInfo]['display' + entry.data.toCapitalCamelCase()](entry.attrs);
+			walls[entry.wallInfo]['display' + entry.data.toCapitalCamelCase()](entry);
 		}
 	},
 	addListeners: function(listeners) {

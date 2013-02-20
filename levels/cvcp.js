@@ -106,8 +106,9 @@ _.extend(cvcp.prototype,
 					dataDisplay: [
 						{wallInfo: 'left', data:'tempSmooth', readout: 'mainReadout'},
 						{wallInfo: 'left', data:'q', readout: 'mainReadout'},
-						{wallInfo: 'right', data:'tempSmooth', readout: 'mainReadout'},
-						{wallInfo: 'right', data:'q', readout: 'mainReadout'},
+						{wallInfo: 'right', data:'tempSmooth', readout: 'pistonReadoutRightPiston'},
+					//	{wallInfo: 'right', data:'frac', attrs: {spcName: 'spc1', tag: 'right'}, readout: 'mainReadout'},
+						{wallInfo: 'right', data:'moles', attrs: {spcName: 'spc1', tag: 'right'}, readout: 'mainReadout'},
 						//WHICH WALL, WHAT THING, WHERE
 						{wallInfo: 'right', data:'qArrowsRate', readout: undefined}
 					],
