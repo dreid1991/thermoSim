@@ -412,7 +412,7 @@ WallMethods.wall = {
 		if (!this.data.v || !this.data.v.recording()) {
 			this.data.v = new WallMethods.DataObj();
 			var dataObj = this.data.v;
-			this.setupStdDataObj(dataObj, 'v');
+			this.setupStdDataObj(dataObj, 'vol');
 			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function() {return this.parent.wallVolume(this.handle)}, this, 'update');
 		}
 		return dataObj;
@@ -436,7 +436,7 @@ WallMethods.wall = {
 			//this will work after first turn since volume is _always_ recorded before work (vol is added as default to wall, work is added later by objects)
 			var self = this;
 			//var pExtList = this.data.get
-			var volSrc = this.getDataObj('v').src();
+			var volSrc = this.getDataObj('vol').src();
 			var calcWork = function() {
 				var len = volSrc.length
 				var dV = LTOM3LOCAL*(volSrc[len-1] - volSrc[len-2])
@@ -653,7 +653,7 @@ WallMethods.wall = {
 		this.displayStd(dataObj, readout, label, decPlaces, units);
 	},
 	displayVol: function(readoutHandle, label, decPlaces){
-		var dataObj = this.getDataObj('v');
+		var dataObj = this.getDataObj('vol');
 		if (!dataObj || !dataObj.recording()) {
 			dataObj = this.recordVol();
 		}
