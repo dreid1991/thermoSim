@@ -174,19 +174,17 @@ WallMethods.wall = {
 	},
 	isothermalInit: function(){
 		this.eToAdd = 0;
-		if(this.parent.numWalls>1){
-			var countFunc = dataHandler.countFunc({tag:this.handle})
-		}else{
-			var countFunc = dataHandler.countFunc();
-		}		
-		if(!this.isothermal){
+		var activeDots = dotManager.get({tag: this.handle});
+		var tempData = this.data.temp.src();
+		if (!this.isothermal) {
 			addListener(curLevel, 'data', 'recordEnergyForIsothermal' + this.handle,
 				function(){
-					var tLast = defaultTo(this.tSet, this.data.t[this.data.t.length-1]);
+					var tLast = tempData[tempData.length-1] || this.tSet;
 					var dt = this.tSet - tLast;
-					this.eToAdd = cv*countFunc()*dt/N;
+					this.eToAdd = cv*activeDots.length*dt/N;
 				},
 			this);
+			this.recordQ();
 		}
 		for (var lineIdx=0; lineIdx<this.length; lineIdx++){
 			this[lineIdx].isothermal = true;
@@ -330,7 +328,6 @@ WallMethods.wall = {
 		this.recordTemp();
 		this.recordPInt();
 		this.recordVol();
-		this.isothermal && this.recordQ();
 	},
 	recordTime: function() {
 		this.data.time = new WallMethods.DataObj();
@@ -412,10 +409,10 @@ WallMethods.wall = {
 		return dataObj;
 	},
 	recordVol: function() {
-		if (!this.data.v || !this.data.v.recording()) {
-			this.data.v = new WallMethods.DataObj();
-			var dataObj = this.data.v;
-			this.setupStdDataObj(dataObj, 'v');
+		if (!this.data.vol || !this.data.vol.recording()) {
+			this.data.vol = new WallMethods.DataObj();
+			var dataObj = this.data.vol;
+			this.setupStdDataObj(dataObj, 'vol');
 			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function() {return this.parent.wallVolume(this.handle)}, this, 'update');
 		}
 		return dataObj;
@@ -439,7 +436,7 @@ WallMethods.wall = {
 			//this will work after first turn since volume is _always_ recorded before work (vol is added as default to wall, work is added later by objects)
 			var self = this;
 			//var pExtList = this.data.get
-			var volSrc = this.getDataObj('v').src();
+			var volSrc = this.getDataObj('vol').src();
 			var calcWork = function() {
 				var len = volSrc.length
 				var dV = LTOM3LOCAL*(volSrc[len-1] - volSrc[len-2])
@@ -597,7 +594,10 @@ WallMethods.wall = {
 			console.log('Tried to display ' + dataObj.id() + ' for wall ' + dataObj.wallHandle() + ' while already displaying');
 		}
 	},
-	displayWork: function(readoutHandle, label, decPlaces) {
+	displayWork: function(attrs) {
+		var readoutHandle = attrs.readout;
+		var label = attrs.label;
+		var decPlaces = attrs.decPlaces;
 		var dataObj = this.getDataObj('work');
 		if (!dataObj || !dataObj.recording()) {
 			dataObj = this.recordTemp();
@@ -608,7 +608,10 @@ WallMethods.wall = {
 		var label = defaultTo('Work:', label);
 		this.displayStd(dataObj, readout, label, decPlaces, units);
 	},
-	displayTemp: function(readoutHandle, label, decPlaces, smooth){
+	displayTemp: function(attrs) {
+		var readoutHandle = attrs.readout;
+		var label = attrs.label;
+		var decPlaces = attrs.decPlaces;
 		var func;
 		var dataObj = this.getDataObj('temp');
 		if (!dataObj || !dataObj.recording()) {
@@ -618,7 +621,7 @@ WallMethods.wall = {
 		var units = 'K';
 		decPlaces = defaultTo(0, decPlaces);
 		var label = defaultTo('Temp:', label);
-		if (smooth) {
+		if (attrs.smooth) {
 			func = function(entryHandle, src) {
 				var sum = 0;
 				for (var tempIdx=src.length-5; tempIdx<src.length; tempIdx++) {
@@ -629,10 +632,14 @@ WallMethods.wall = {
 		}
 		this.displayStd(dataObj, readout, label, decPlaces, units, func);
 	},
-	displayTempSmooth: function(readoutHandle, label, decPlaces) {
-		this.displayTemp(readoutHandle, label, decPlaces, true);
+	displayTempSmooth: function(attrs) {
+		attrs.smooth = true;
+		this.displayTemp(attrs);
 	}, 
-	displayPInt: function(readoutHandle, label, decPlaces){
+	displayPInt: function(attrs) {
+		var readoutHandle = attrs.readout;
+		var label = attrs.label;
+		var decPlaces = attrs.decPlaces;
 		var dataObj = this.getDataObj('pInt');
 		if (!dataObj || !dataObj.recording()) {
 			dataObj = this.recordPInt();
@@ -644,7 +651,10 @@ WallMethods.wall = {
 		this.displayStd(dataObj, readout, label, decPlaces, units);
 	
 	},
-	displayPExt: function(readoutHandle, label, decPlaces){
+	displayPExt: function(attrs) {
+		var readoutHandle = attrs.readout;
+		var label = attrs.label;
+		var decPlaces = attrs.decPlaces;
 		var dataObj = this.getDataObj('pExt');
 		if (!dataObj || !dataObj.recording()) {
 			dataObj = this.recordPExt();
@@ -655,8 +665,11 @@ WallMethods.wall = {
 		var label = defaultTo('P_ext:', label);
 		this.displayStd(dataObj, readout, label, decPlaces, units);
 	},
-	displayVol: function(readoutHandle, label, decPlaces){
-		var dataObj = this.getDataObj('v');
+	displayVol: function(attrs) {
+		var readoutHandle = attrs.readout;
+		var label = attrs.label;
+		var decPlaces = attrs.decPlaces;
+		var dataObj = this.getDataObj('vol');
 		if (!dataObj || !dataObj.recording()) {
 			dataObj = this.recordVol();
 		}
@@ -666,7 +679,10 @@ WallMethods.wall = {
 		var label = defaultTo('Vol:', label);
 		this.displayStd(dataObj, readout, label, decPlaces, units);
 	},
-	displayMass: function(readoutHandle, label, decPlaces){
+	displayMass: function(attrs) {
+		var readoutHandle = attrs.readout;
+		var label = attrs.label;
+		var decPlaces = attrs.decPlaces;
 		var dataObj = this.getDataObj('mass');
 		if (!dataObj || !dataObj.recording()) {
 			dataObj = this.recordMass();
@@ -677,7 +693,10 @@ WallMethods.wall = {
 		var label = defaultTo('Mass:', label);
 		this.displayStd(dataObj, readout, label, decPlaces, units);		
 	},
-	displayQ: function(readoutHandle, label, decPlaces){
+	displayQ: function(attrs) {
+		var readoutHandle = attrs.readout;
+		var label = attrs.label;
+		var decPlaces = attrs.decPlaces;
 		var dataObj = this.getDataObj('q');
 		if (!dataObj || !dataObj.recording()) {
 			dataObj = this.recordQ();
@@ -688,7 +707,10 @@ WallMethods.wall = {
 		var label = defaultTo('Q:', label);
 		this.displayStd(dataObj, readout, label, decPlaces, units);	
 	},
-	displayRMS: function(readoutHandle, label, decPlaces) {
+	displayRMS: function(attrs) {
+		var readoutHandle = attrs.readout;
+		var label = attrs.label;
+		var decPlaces = attrs.decPlaces;
 		var dataObj = this.getDataObj('RMS');
 		if (!dataObj || !dataObj.recording()) {
 			dataObj = this.recordRMS();
@@ -700,8 +722,43 @@ WallMethods.wall = {
 		this.displayStd(dataObj, readout, label, decPlaces, units);		
 	
 	},
+	displayMoles: function(attrs) {
+		var readoutHandle = attrs.readout;
+		var label = attrs.label;
+		var decPlaces = attrs.decPlaces;
+		var dotAttrs = attrs.attrs;
+		var dataObj = this.getDataObj('moles', dotAttrs);
+		if (!dataObj) {
+			console.log('Not recording for moles');
+			console.log(dotAttrs);
+		} else {
+			var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+			var units = 'Moles';
+			decPlaces = defaultTo(2, decPlaces);
+			var label = defaultTo((dotAttrs.spcName || '') + ':', label);
+			this.displayStd(dataObj, readout, label, decPlaces, units);	
+		}
+	},
+	displayFrac: function(attrs) {
+		var readoutHandle = attrs.readout;
+		var label = attrs.label;
+		var decPlaces = attrs.decPlaces;
+		var dotAttrs = attrs.attrs;
+		var dataObj = this.getDataObj('frac', dotAttrs);
+		if (!dataObj) {
+			console.log('Not recording for frac');
+			console.log(dotAttrs);
+		} else {
+			var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+			var units = '';
+			decPlaces = defaultTo(2, decPlaces);
+			var label = defaultTo('Mole frac:', label);
+			this.displayStd(dataObj, readout, label, decPlaces, units);	
+		}
+	},		
 	// I think I will have to abuse the DataObj for the arrows
-	displayQArrowsRate: function(threshold){
+	displayQArrowsRate: function(attrs){
+		var threshold = attrs.threshold
 		if (this.data.q.recording() && !(this.data.qArrowsRate && this.data.qArrowsRate.recording()) && !(this.data.qArrowsAmmt && this.data.qArrowsAmmt.recording())) {
 			this.data.qArrowsRate = new WallMethods.DataObj();
 			var dataObj = this.data.qArrowsRate;
@@ -725,7 +782,8 @@ WallMethods.wall = {
 			console.trace();
 		}
 	},
-	displayQArrowsAmmt: function(qMax) {
+	displayQArrowsAmmt: function(attrs) {
+		var qMax = attrs.qMax;
 		if (this.data.q.recording() && !(this.data.qArrowsRate && this.data.qArrowsRate.recording()) && !(this.data.qArrowsAmmt && this.data.qArrowsAmmt.recording())) {
 			this.data.qArrowsAmmt = new WallMethods.DataObj();
 			var dataObj = this.data.qArrowsAmmt;
@@ -747,6 +805,7 @@ WallMethods.wall = {
 			
 		}
 	},
+
 	addCleanUpIfPrompt: function(displayType, func) {
 		if (currentSetupType.indexOf('prompt') != -1) {
 			addListener(curLevel, currentSetupType + 'CleanUp', displayType + this.handle, func, this);
