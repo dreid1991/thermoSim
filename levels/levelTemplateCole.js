@@ -42,21 +42,42 @@ _.extend(LevelTemplate.prototype,
 				{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'staticAdiabatic', handle: 'wally'} 
+					{pts: [P(50, 200), P(250, 200), P(250, 400), P(50, 400)], handler: 'staticAdiabatic', handle: 'LeftWall'},
+					{pts: [P(300, 200), P(500, 200), P(500, 400), P(300, 400)], handler: 'staticAdiabatic', handle: 'RightWall', temp: 300}
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(200, 200), count: 50, temp: 300, returnTo: 'wally', tag: 'wally'} 
+					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 50, temp: 300, returnTo: 'LeftWall', tag: 'LeftWall'},
+					{spcName: 'spc1', pos: P(305, 210), dims: V(150,150), count: 50, temp: 300, returnTo: 'RightWall', tag: 'RightWall'}
+				],
+				objs: [
+					{type: 'Piston',
+					attrs: {handle:'RightPiston', wallInfo: 'RightWall'}
+					},
+					{type: 'Piston',
+					attrs: {handle: 'LeftPiston', wallInfo: 'LeftWall'}
+					}
 				],
 				dataDisplay: [
-					{wallInfo: "wally", data:'temp', readout: 'mainReadout'},
-					{wallInfo: 'wally', data:'pInt', readout: 'mainReadout'}
-				]
+					{wallInfo: 'RightWall', data:'pInt', readout: 'pistonReadoutRightPiston'},
+					{wallInfo: 'RightWall', data:'vol', readout: 'pistonReadoutRightPiston'},
+					{wallInfo: 'RightWall', data:'pInt', readout: 'pistonReadoutLeftPiston'},
+					{wallInfo: 'RightWall', data:'vol', readout: 'pistonReadoutLeftPiston'}
+				],
 			},
 			prompts: [
 				{
 					sceneData: undefined,
 					title: 'wooo!',
-					text: 'loooo!'
+					text: 'loooo!',
+				},
+				{
+					sceneData: {
+						objs: [
+							{type: 'Heater',
+							attrs: {handle:'heaterLeft',wallInfo: 'LeftWall'}
+							}
+						],
+					}
 				},
 				{
 					sceneData: undefined,
