@@ -39,7 +39,7 @@ _.extend(LevelTemplate.prototype,
 		showPrompt(0, 0, true);
 	},
 	sections: [
-		{
+				{
 			sceneData: {
 				walls: [
 					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'staticAdiabatic', handle: 'wally'} 
@@ -65,6 +65,7 @@ _.extend(LevelTemplate.prototype,
 				}
 			]
 		}
+
 			
 	]
 
