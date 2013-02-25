@@ -39,7 +39,27 @@ _.extend(LevelTemplate.prototype,
 		showPrompt(0, 0, true);
 	},
 	sections: [
-				{
+		{//First Question
+			sceneData: undefined,
+				prompts:[ 
+					{
+						sceneData:undefined,
+						cutScene:true,
+						text: 'Lets Talk about work! Click the correct answer to advance!',
+						quiz: [
+							{type: 'multChoice',
+							options:[
+								{text:"Nope", isCorrect: false, message:"That's not correct"},
+								{text:"Nope", isCorrect: false, message:"That's not correct"},
+								{text:"Click Me!", isCorrect: true},
+								{text:"Nope", isCorrect: false, message:"That's not correct"}
+							]
+							}
+						]
+					}
+				]
+		},
+		{//First Scene
 			sceneData: {
 				walls: [
 					{pts: [P(50, 200), P(250, 200), P(250, 400), P(50, 400)], handler: 'staticAdiabatic', handle: 'LeftWall'},
@@ -55,32 +75,34 @@ _.extend(LevelTemplate.prototype,
 					},
 					{type: 'Piston',
 					attrs: {handle: 'LeftPiston', wallInfo: 'LeftWall'}
+					},
+					{type: 'DragWeights',
+					attrs: {handle:'dragsL', wallInfo:'LeftWall', weightDefs:[{count:2, pressure:2}], pistonOffset: V(130,-41),binHeight: 30, pInit: 0}
+					},
+					{type: 'DragWeights',
+					attrs: {handle:'dragsR', wallInfo:'RightWall', weightDefs:[{count:2, pressure:2}], pistonOffset: V(130,-41),binHeight: 30, pInit: 0}
 					}
 				],
+				graphs: [
+							{type: 'Scatter', handle: 'PvsW', xLabel: "P Int.", yLabel: "Work", axesInit:{x:{min:6, step:2},y:{min:0, step:2}},
+								sets: [
+									{address:'work', label: 'Work', pointCol:Col(255,50,50), flashCol:Col(255,200,200),data:{x: {wallInfo: 'LeftWall', data: 'pExt'},y: {wallInfo: 'LeftWall', data: 'q'}},trace: false, fillInPts: false, fillInPtsMin: 5}
+								]	
+							}
+				],	
 				dataDisplay: [
 					{wallInfo: 'RightWall', data:'pInt', readout: 'pistonReadoutRightPiston'},
-					{wallInfo: 'RightWall', data:'vol', readout: 'pistonReadoutRightPiston'},
-					{wallInfo: 'RightWall', data:'pInt', readout: 'pistonReadoutLeftPiston'},
-					{wallInfo: 'RightWall', data:'vol', readout: 'pistonReadoutLeftPiston'}
-				],
+					{wallInfo: 'LeftWall', data:'pInt', readout: 'pistonReadoutLeftPiston'}
+				]
 			},
-			prompts: [
+			prompts:[
 				{
-					sceneData: undefined,
+				sceneData: undefined,
 					title: 'wooo!',
-					text: 'loooo!',
+					text: 'Scene 1!',
 				},
 				{
-					sceneData: {
-						objs: [
-							{type: 'Heater',
-							attrs: {handle:'heaterLeft',wallInfo: 'LeftWall'}
-							}
-						],
-					}
-				},
-				{
-					sceneData: undefined,
+				sceneData: undefined,
 					title: 'wooo!',
 					text: 'some more text!'
 				}
