@@ -218,6 +218,7 @@ WallMethods.main = {
 		this.setupWall(newIdx);
 		this.setWallHandler(newIdx, attrs.handler);
 		this[newIdx].addBorder(attrs.border);
+		if (attrs.hitMode) this.setHitMode(attrs.hitMode);
 		
 	},
 	setPtsInit: function(){

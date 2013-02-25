@@ -35,14 +35,14 @@ _.extend(LevelTemplate.prototype,
 {
 	init: function() {
 		this.readout = new Readout('mainReadout', 30, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), 'left');
-		$('#mainHeader').html('Level template');
+		$('#mainHeader').html('Work');
 		showPrompt(0, 0, true);
 	},
 	sections: [
 		{//First Question
 			sceneData: undefined,
 				prompts:[ 
-					{
+					{//Prompt 1
 						sceneData:undefined,
 						cutScene:true,
 						text: 'Lets Talk about work! Click the correct answer to advance!',
@@ -56,14 +56,19 @@ _.extend(LevelTemplate.prototype,
 							]
 							}
 						]
-					}
+					},
+					{//Prompt 2
+						sceneData:undefined,
+						cutScene:true,
+						text: 'Indeed. This equation tells us that work done on a system is equal to how hard you compress a container per area times how much you compress it.</p><p>Now from the first law, we know ---- </p><p> for our adiabatic system, which of the following relations is correct, if we assume constat heat capacity
+						
 				]
 		},
 		{//First Scene
 			sceneData: {
 				walls: [
 					{pts: [P(50, 200), P(250, 200), P(250, 400), P(50, 400)], handler: 'staticAdiabatic', handle: 'LeftWall'},
-					{pts: [P(300, 200), P(500, 200), P(500, 400), P(300, 400)], handler: 'staticAdiabatic', handle: 'RightWall', temp: 300}
+					{pts: [P(300, 200), P(500, 200), P(500, 400), P(300, 400)], handler: 'cVIsothermal', handle: 'RightWall', temp: 300}
 				],
 				dots: [
 					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 50, temp: 300, returnTo: 'LeftWall', tag: 'LeftWall'},
@@ -84,27 +89,34 @@ _.extend(LevelTemplate.prototype,
 					}
 				],
 				graphs: [
-							{type: 'Scatter', handle: 'PvsW', xLabel: "P Int.", yLabel: "Work", axesInit:{x:{min:6, step:2},y:{min:0, step:2}},
+							{type: 'Scatter', handle: 'PvsW', xLabel: "Temp.", yLabel: "Work", axesInit:{x:{min:6, step:2},y:{min:0, step:1}},
 								sets: [
-									{address:'work', label: 'Work', pointCol:Col(255,50,50), flashCol:Col(255,200,200),data:{x: {wallInfo: 'LeftWall', data: 'pExt'},y: {wallInfo: 'LeftWall', data: 'q'}},trace: false, fillInPts: false, fillInPtsMin: 5}
+									{address:'work', label: 'Work', pointCol:Col(255,50,50), flashCol:Col(255,200,200),data:{x: {wallInfo: 'LeftWall', data: 'temp'},y: {wallInfo: 'LeftWall', data: 'work'}},trace: false, fillInPts: false, fillInPtsMin: 5}
 								]	
 							}
 				],	
 				dataDisplay: [
-					{wallInfo: 'RightWall', data:'pInt', readout: 'pistonReadoutRightPiston'},
-					{wallInfo: 'LeftWall', data:'pInt', readout: 'pistonReadoutLeftPiston'}
+					{wallInfo: 'RightWall', data:'temp', readout: 'pistonReadoutRightPiston'},
+					{wallInfo: 'LeftWall', data:'temp', readout: 'pistonReadoutLeftPiston'}
 				]
 			},
 			prompts:[
 				{
-				sceneData: undefined,
+					sceneData:{	
+						objs: [
+							{type: 'Heater',
+							attrs: {handle: 'heaterLeft', wallInfo: 'LeftWall', makeSlider: true}
+							}
+						]
+					},
 					title: 'wooo!',
 					text: 'Scene 1!',
+					
 				},
 				{
 				sceneData: undefined,
-					title: 'wooo!',
-					text: 'some more text!'
+				title: 'wooo!',
+				text: 'some more text!'
 				}
 			]
 		}
