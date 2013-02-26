@@ -159,7 +159,7 @@ WallMethods.wall = {
 	},
 
 	setHitMode: function(inputMode){
-		this.hitMode = inputMode;
+		(/^[sS]td$/.test(inputMode) || /^[aA]rrowDV$/.test(inputMode) || /^[aA]rrowSpd$/.test(inputMode) || /^[gG]ravity$$/.test(inputMode)) ? this.hitMode = inputMode.toCapitalCamelCase() : console.log('bad hitMode ' + inputMode);
 	},
 	setDefaultReadout: function(readout){
 		this.defaultReadout = readout;

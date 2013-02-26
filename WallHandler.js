@@ -218,7 +218,7 @@ WallMethods.main = {
 		this.setupWall(newIdx);
 		this.setWallHandler(newIdx, attrs.handler);
 		this[newIdx].addBorder(attrs.border);
-		if (attrs.hitMode) this.setHitMode(attrs.hitMode);
+		if (attrs.hitMode) this[newIdx].setHitMode(attrs.hitMode);
 		
 	},
 	setPtsInit: function(){
@@ -365,7 +365,7 @@ WallMethods.main = {
 		var handler = this[wallIdx + '-' + subWallIdx];
 		handler.func.apply(handler.obj, [dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);		
 	},
-	didHitArrow: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV) {
+	didHitArrowDV: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV) {
 		var vo = dot.v.copy();
 		var handler = this[wallIdx + '-' + subWallIdx];
 		handler.func.apply(handler.obj, [dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
@@ -409,6 +409,7 @@ WallMethods.main = {
 		
 		
 	},
+	//is this used?
 	assignRecording: function(data) {
 		for (var dataSet in data) data.recording = false;
 	},
