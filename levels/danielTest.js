@@ -42,15 +42,19 @@ _.extend(TestLevel.prototype,
 				{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], hitMode: 'ArrowSpd', handler: 'staticAdiabatic', handle: 'wally'} 
+					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'staticAdiabatic', handle: 'wally'} 
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(200, 200), count: 5, temp: 300, returnTo: 'wally', tag: 'wally'} 
+					{spcName: 'spc1', pos: P(55, 55), dims: V(200, 200), count: 199, temp: 300, returnTo: 'wally', tag: 'wally'} 
 				],
 				objs: [
 					{
 						type: 'AuxImage',
 						attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/work/block0Pic1.jpg)'}
+					},
+					{
+						type: 'DragWeights',
+						attrs: {weightDefs: [{count: 3, pressure: 6}], pInit: .5}
 					}
 
 						

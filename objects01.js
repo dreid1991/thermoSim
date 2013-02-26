@@ -225,18 +225,28 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	},
 	getWeightDims: function(weightDefs){
 		var dims = {};
+		var adjBinWidth = this.storeBinWidth - this.blockSpacing;
+		var maxWidth = 0;
+		var maxMass = 0;
 		for (var groupIdx=0; groupIdx<weightDefs.length; groupIdx++){
 			var weightDef = weightDefs[groupIdx];
-			// if (weightDef.pressure) {
-				// weightDef.mass = this.pressureToMass(weightDef.pressure);
-			// }
-			// weightDef.mass/=weightDef.count;
+
 			var width = Math.sqrt(weightDef.mass*this.weightScalar/this.weightDimRatio);
+			
+			if (Math.max(width, maxWidth) > maxWidth) {
+				maxMass = weightDef.mass;
+				maxWidth = width;
+			}
 			var height = width*this.weightDimRatio;
 			dims[weightDef.name] = V(width, height);
 		}
+		if (maxWidth > adjBinWidth) {
+			this.weightScalar = .99 * adjBinWidth * adjBinWidth * this.weightDimRatio / maxMass;
+			return this.getWeightDims(weightDefs);
+		}
 		return dims;
 	},
+	
 	nameWeights: function(weightDefs) {
 		for (var weightIdx=0; weightIdx<weightDefs.length; weightIdx++) {
 			weightDefs[weightIdx].name = 'grp' + weightIdx;
