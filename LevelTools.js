@@ -1,7 +1,7 @@
 LevelTools = {
 	setStds: function(){
 		this.addSceneDataTypes();
-		this.addEqs();
+		this.addImgsAndMath();
 		this.setDefaultPromptVals()
 		this.graphs = {};
 		this.makePromptCleanUpHolders(0);
@@ -31,7 +31,7 @@ LevelTools = {
 			}
 		}
 	},
-	addEqs: function(){
+	addImgsAndMath: function(){
 		for (var sectionIdxLocal=0; sectionIdxLocal<this.sections.length; sectionIdxLocal++) {
 			var section = this.sections[sectionIdxLocal];
 			for (var promptIdxLocal=0; promptIdxLocal<section.prompts.length; promptIdxLocal++) {
@@ -39,8 +39,8 @@ LevelTools = {
 				var title = prompt.title;
 				var text = prompt.text;
 				var quiz = prompt.quiz;
-				if (title) prompt.title = addImgs(title);
-				if (text) prompt.text = addImgs(text);
+				if (title) prompt.title = interpreter.interpMath(interpreter.interpImgs(title));
+				if (text) prompt.text = interpreter.interpMath(interpreter.interpImgs(text));
 				if (quiz) {
 					for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
 						var question = quiz[questionIdx];
@@ -50,7 +50,7 @@ LevelTools = {
 								for (optionElement in option) {
 									var element = option[optionElement];
 									if (typeof(element) == 'string') {
-										option[optionElement] = addImgs(element);
+										option[optionElement] = interpreter.interpMath(interpreter.interpImgs(element));
 									}						
 								}
 							}
@@ -226,7 +226,7 @@ LevelTools = {
 		$('#intText').show();
 	},
 	cutSceneText: function(text){
-		$('#intText').html(text);
+		('#intText').html(text);
 	},
 	cutSceneEnd: function(){
 		this.inCutScene = false;

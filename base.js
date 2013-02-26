@@ -61,7 +61,7 @@ $(function(){
 	attractor = new Attractor();
 	turnUpdater = setInterval('curLevel.update()', updateInterval);
 	dataUpdater = setInterval('curLevel.updateData()', dataInterval);
-
+	interpreter = new ExpressionInterpreter();
 	started = false;
 	counted = 0;
 	total = 0;
@@ -568,7 +568,7 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 	sectionIdx = newSectionIdx;
 	promptIdx = newPromptIdx;
 	if (newPrompt.cutScene) {	
-		window['curLevel'].cutSceneStart(newPrompt.text, newPrompt.cutScene, newPrompt.quiz)
+		window['curLevel'].cutSceneStart(interpreter.interp(newPrompt.text), newPrompt.cutScene, newPrompt.quiz)
 	} else {
 		if (newPrompt.quiz) {
 			var quiz = newPrompt.quiz;
@@ -576,11 +576,11 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 			$('#prompt').html(defaultTo('', templater.div({innerHTML: newPrompt.text})));
 			window['curLevel'].appendQuiz(newPrompt.quiz, $('#prompt'))
 		} else {
-			$('#prompt').html(templater.div({innerHTML: newPrompt.text}));
+			$('#prompt').html(templater.div({innerHTML: interpreter.interp(newPrompt.text)}));
 		}
 	}
 	$('#baseHeader').html(newPrompt.title);
-
+	interpreter.renderMath();
 
 
 }
@@ -719,131 +719,6 @@ function checkWillAdvanceQuiz(){
 function prevPrompt(){
 	var prevIdxs = getPrevIdxs();
 	showPrompt(prevIdxs.newSectionIdx, prevIdxs.newPromptIdx);
-}
-
-/*
-Ahem, I am redefining how get, eval, and img are done.  
-get(idStr, type ('int', 'float', 'string'), default, min, max)
-eval(expr, decPlaces, default, min, max)
-img(path, breakStyle (p, br), center (boolean))
-*/
-
-function addStored(text) {
-	return text.replace(/get[\s]*\([A-Za-z0-9,\s\-\.]*\)/g, function(subStr, idx) {
-		var args = sliceArgs(subStr);
-		var idStr = args[0];
-		var type = args[1];
-		var defVal = args[2];
-		var min = Number(args[3]);
-		var max = Number(args[4]);
-		var isInt = type == 'int';
-		var isFloat = type == 'float';
-		var isNum = isInt || isFloat;
-		var isStr = type == 'string';
-		if (type == 'int' || type == 'float') defVal = Number(defVal);
-		
-		var gotten = getStore(idStr);
-		var val;
-		if (gotten) {
-			if (isInt) {
-				val = Math.round(parseFloat(gotten));
-			} else if (isFloat) {
-				val = parseFloat(gotten);
-			} else if (isStr) {
-				val = gotten.sanitize();
-			}
-			if (isNum) {
-				if (min === undefined || isNaN(min)) min = val;
-				if (max === undefined || isNaN(max)) max = val;
-				val = Math.max(min, Math.min(max, val));
-			}
-		}
-		
-		if (val === undefined || isNaN(val)) {
-			val = defVal;
-		}
-		return val;
-	})
-}
-
-
-
-function evalText(text) {
-	if (typeof text == 'number') return;
-	text = text.replace(/eval[\s]*\([0-9\(\)\+\-\*\/\s,\.]*\)/g, function(evalItem, idx) {
-		var args = sliceArgs(evalItem);
-		var expr = args[0];
-		var decPlaces = args[1];
-		var def = args[2];
-		var min = args[3];
-		var max = args[4];
-		var val;
-		try {
-			val = eval(expr);
-		} catch(e) {
-			console.log('Bad eval ' + evalItem + ', expr is ' + expr);
-		}
-		
-		val = Math.max(min, Math.min(max, val));
-		if (val === undefined || isNaN(val) && def !== undefined && !isNaN(def)) {
-			val = def;
-		}
-		if (val !== undefined && !isNaN(val)) { //my round doesn't have any error handling, so need to do that here
-			if (min === undefined || isNaN(min)) min = val;
-			if (max === undefined || isNaN(max)) max = val;
-			if (decPlaces > 0 || decPlaces === 0) val = round(val, Math.round(decPlaces));
-		}
-		return val;
-	})
-	var toReturn = Number(text) == text ? Number(text) : text;
-	return toReturn;
-}
-
-function addImgs(text, asObj){
-	return text.replace(/img[\s]*\([A-Za-z0-9\+\-\*\/\s,\.]*\)/g, function(imgFunc, idx) {
-		return parseImgFunc(imgFunc);
-	})
-}
-
-function parseImgFunc(imgFunc, asObj) {
-	var args = sliceArgs(imgFunc);
-	var path = args[0];
-	var breakStyle = args[1];
-	var center = args[2];
-	if (asObj) {
-		//HEY - as obj currently only return image, no p, br, or centering.  
-		//It is they way because of AuxPicture.  Look into that before making changes here
-		return {attrs: {src: [path]}};
-	
-	} else {
-		var imgHTML = templater.img({attrs: {src: [path]}});
-		
-		if (center) {
-			imgHTML = templater.center({innerHTML: ingHTML});
-		}
-		if (breakStyle == 'br') {
-			imgHTML = templater.br() + imgHTML + templater.br();
-		} else if (breakStyle == 'p') {
-			imgHTML = templater.p({innerHTML: imgHTML});
-		}
-		return imgHTML;	
-	}
-}
-
-function sliceArgs(expr) {
-	var args = [];
-	var working = expr;
-	working = working.replace(/[A-Za-z0-9\s-]*\(/, '');
-	working = working.replace(')', '');
-	working += ','; //if you'll pardon the slop, just adding a comma to the end is a really easy way to make the below function work for the last argument in a function
-	var hasCommas = working.indexOf(',') > -1;
-	while (hasCommas) {
-		var idx = working.indexOf(',');
-		args.push(working.slice(0, idx).killWhiteSpace());
-		working = working.slice(idx + 1, working.length);
-		hasCommas = working.indexOf(',') > -1;
-	}
-	return args;	
 }
 
 function alertValid(str) {

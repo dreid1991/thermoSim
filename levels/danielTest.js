@@ -81,7 +81,7 @@ _.extend(TestLevel.prototype,
 						}
 					],
 					title: 'wooo!',
-					text: 'loooo!'
+					text: 'math($x=5^{300}$)!'
 				},
 				{
 					sceneData: undefined,

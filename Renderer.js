@@ -111,7 +111,7 @@ Renderer.prototype = {
 		if (typeof sceneElem == 'number') {
 			return sceneElem;
 		} else if (typeof sceneElem == 'string') {
-			return evalText(addStored(sceneElem));
+			return interpreter.interpInput(sceneElem);
 		} else if (typeof sceneElem == 'boolean') {
 			return sceneElem;
 		} else if (sceneElem instanceof Point) {
