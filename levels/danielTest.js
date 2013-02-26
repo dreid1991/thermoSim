@@ -49,7 +49,7 @@ _.extend(TestLevel.prototype,
 				],
 				objs: [
 					{
-						type: 'AuxPicture',
+						type: 'AuxImage',
 						attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/reversibility1.gif)'}
 					}
 
@@ -65,7 +65,7 @@ _.extend(TestLevel.prototype,
 					sceneData: {
 						objs: [
 							{
-							type: 'AuxPicture',
+							type: 'AuxImage',
 							attrs: {handle: 'piccy', slotNum: 1, imgFunc: 'img(img/refresh.gif)'}
 							}
 						]

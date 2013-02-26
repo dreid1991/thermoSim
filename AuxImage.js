@@ -1,5 +1,5 @@
-function AuxPicture(attrs) {
-	this.type = 'AuxPicture';
+function AuxImage(attrs) {
+	this.type = 'AuxImage';
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.handle = attrs.handle;
 	this.imgFunc = attrs.imgFunc;
@@ -11,7 +11,7 @@ function AuxPicture(attrs) {
 	this.setupStd();
 }
 
-_.extend(AuxPicture.prototype, AuxFunctions, objectFuncs, {//CONSISTANT PLEASE - FUNCS/FUNCTIONS
+_.extend(AuxImage.prototype, AuxFunctions, objectFuncs, {//CONSISTANT PLEASE - FUNCS/FUNCTIONS
 	makeDiv: function(slotNum) {
 		this.parentDiv = this.pickParentDiv('picture', slotNum);
 		this.parentDiv.html('');

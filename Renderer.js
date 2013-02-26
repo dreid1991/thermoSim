@@ -62,7 +62,8 @@ Renderer.prototype = {
 		for (var objIdx=0; objIdx<objs.length; objIdx++) {
 			var obj = objs[objIdx];
 			var objFunc = window[obj.type];
-			new objFunc(obj.attrs); //object is added to curLevel in stdSetup in objectFuncs
+			//objects add themselves to curLevel
+			objFunc ? new objFunc(obj.attrs) : console.log('Bad object type ' + obj.type);
 		}
 	},
 	dataRecord: function(data) {
