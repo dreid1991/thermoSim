@@ -567,20 +567,21 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 	}
 	sectionIdx = newSectionIdx;
 	promptIdx = newPromptIdx;
+	var renderText = interpreter.interp(newPrompt.text);
 	if (newPrompt.cutScene) {	
-		window['curLevel'].cutSceneStart(interpreter.interp(newPrompt.text), newPrompt.cutScene, newPrompt.quiz)
+		window.curLevel.cutSceneStart(renderText, newPrompt.cutScene, newPrompt.quiz)
 	} else {
 		if (newPrompt.quiz) {
 			var quiz = newPrompt.quiz;
 			//$('#nextPrevDiv').hide();
-			$('#prompt').html(defaultTo('', templater.div({innerHTML: newPrompt.text})));
+			$('#prompt').html(defaultTo('', templater.div({innerHTML: renderText})));
 			window['curLevel'].appendQuiz(newPrompt.quiz, $('#prompt'))
 		} else {
-			$('#prompt').html(templater.div({innerHTML: interpreter.interp(newPrompt.text)}));
+			$('#prompt').html(templater.div({innerHTML: renderText}));
 		}
 	}
 	$('#baseHeader').html(newPrompt.title);
-	//interpreter.renderMath();
+	interpreter.renderMath();
 
 
 }

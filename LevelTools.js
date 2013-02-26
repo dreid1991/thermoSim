@@ -1,7 +1,7 @@
 LevelTools = {
 	setStds: function(){
 		this.addSceneDataTypes();
-		this.addImgsAndMath();
+		this.addImgs();
 		this.setDefaultPromptVals()
 		this.graphs = {};
 		this.makePromptCleanUpHolders(0);
@@ -31,7 +31,7 @@ LevelTools = {
 			}
 		}
 	},
-	addImgsAndMath: function(){
+	addImgs: function(){
 		for (var sectionIdxLocal=0; sectionIdxLocal<this.sections.length; sectionIdxLocal++) {
 			var section = this.sections[sectionIdxLocal];
 			for (var promptIdxLocal=0; promptIdxLocal<section.prompts.length; promptIdxLocal++) {
@@ -39,8 +39,8 @@ LevelTools = {
 				var title = prompt.title;
 				var text = prompt.text;
 				var quiz = prompt.quiz;
-				if (title) prompt.title = interpreter.interpMath(interpreter.interpImgs(title));
-				if (text) prompt.text = interpreter.interpMath(interpreter.interpImgs(text));
+				if (title) prompt.title = interpreter.interpImgs(title);
+				if (text) prompt.text = interpreter.interpImgs(text);
 				if (quiz) {
 					for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
 						var question = quiz[questionIdx];
@@ -50,7 +50,7 @@ LevelTools = {
 								for (optionElement in option) {
 									var element = option[optionElement];
 									if (typeof(element) == 'string') {
-										option[optionElement] = interpreter.interpMath(interpreter.interpImgs(element));
+										option[optionElement] = iinterpreter.interpImgs(element);
 									}						
 								}
 							}
@@ -191,7 +191,7 @@ LevelTools = {
 							question.correct = true;
 						} else {
 							if (question.messageWrong) {
-								alert(evalText(addStored(question.messageWrong)));
+								alert(interpreter.interpInput(question.messageWrong));
 							}
 							question.correct = false;
 						}

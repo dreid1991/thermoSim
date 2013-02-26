@@ -11,15 +11,12 @@ function ExpressionInterpreter() {
 
 ExpressionInterpreter.prototype = {
 	html: function(div, expr) {
-		$(div).html(this.addMath(this.addImgs(this.eval(this.addStored(expr)))));
+		$(div).html(this.addImgs(this.eval(this.addStored(expr))));
 		this.renderMath(div);
 	},
 	append: function(div, expr) {
-		$(div).append(this.addMath(this.addImgs(this.eval(this.addStored(expr)))));
+		$(div).append(this.addImgs(this.eval(this.addStored(expr))));
 		this.renderMath(div);
-	},
-	interpMath: function(expr) {
-		return this.addMath(expr);
 	},
 	interpInput: function(expr) {
 		return this.eval(this.addStored(expr));
@@ -28,10 +25,10 @@ ExpressionInterpreter.prototype = {
 		return this.addImgs(expr);
 	},
 	interp: function(expr) {
-		return this.addMath(this.addImgs(this.eval(this.addStored(expr))));
+		return this.addImgs(this.eval(this.addStored(expr)));
 	},
 	renderMath: function(div) {
-		//MathJax.Hub.Queue(['Typeset', MathJax.Hub, div ? $(div).attr('id') : undefined])
+		MathJax.Hub.Queue(['Typeset', MathJax.Hub, div ? $(div).attr('id') : undefined])
 	},
 	addStored: function(text) {
 		return text.replace(/get[\s]*\([A-Za-z0-9,\s\-\.]*\)/g, function(subStr, idx) {
@@ -152,13 +149,7 @@ ExpressionInterpreter.prototype = {
 			return imgHTML;	
 		}
 	},
-	addMath: function(text) {
-		return text.replace(/math[\s]*\([\s]*$$[^$]*$$[\s]*[A-Za-z0-9\+\-\*\/\s,\.]*\)/g, function(mathExpr, idx) {
-			var args = this.sliceMathArgs(mathExpr);
-			return templater.div({innerHTML: args[0], attrs: {id: ['MathDiv']}});
-			
-		})
-	}
+
 	
 	
 }

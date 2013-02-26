@@ -81,12 +81,12 @@ _.extend(TestLevel.prototype,
 						}
 					],
 					title: 'wooo!',
-					text: 'Hello, my l\\tovlies! $$ \frac{1}{2} $$  That was mathematical!'
+					text: 'Hello, my lovlies! $$ \\frac{1}{2} $$  That was mathematical!'
 				},
 				{
 					sceneData: undefined,
 					title: 'wooo!',
-					text: 'some more text!'
+					text: 'Why did the $$ \\int_3^\\frac{2}{3} 5dx $$ walk across the road?'
 				}
 			]
 		}
