@@ -50,7 +50,7 @@ _.extend(TestLevel.prototype,
 				objs: [
 					{
 						type: 'AuxImage',
-						attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/reversibility1.gif)'}
+						attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/work/block0Pic1.jpg)'}
 					}
 
 						
@@ -70,6 +70,16 @@ _.extend(TestLevel.prototype,
 							}
 						]
 					},
+					quiz: [
+						{
+							type: 'textSmall',
+							label: 'foo',
+							text: 'hello',
+							answer: 5,
+							messageWrong: 'hello'
+						
+						}
+					],
 					title: 'wooo!',
 					text: 'loooo!'
 				},

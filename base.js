@@ -601,14 +601,11 @@ function getpromptIdxsToClean(newSectionIdx, newPromptIdx) {
 }
 
 function nextPrompt(forceAdvance){
+	//the entry point for the submit button is submitAdvanceFunc in LevelTools
 	var curSection = window['curLevel'].sections[sectionIdx];
 	var curPrompt = defaultTo({}, curSection.prompts[promptIdx]);
-	
-	if (forceAdvance) {
-		var willAdvance = true;
-	} else {
-		var willAdvance = checkWillAdvance();
-	}
+	var willAdvance = forceAdvance || checkWillAdvance();
+
 	if (willAdvance) {
 		if (curPrompt) {
 			curPrompt.finished = true;

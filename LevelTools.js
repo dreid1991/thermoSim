@@ -190,6 +190,9 @@ LevelTools = {
 						if (fracDiff(parseFloat(question.answer), parseFloat(submitted))<.05){
 							question.correct = true;
 						} else {
+							if (question.messageWrong) {
+								alert(evalText(addStored(question.messageWrong)));
+							}
 							question.correct = false;
 						}
 					} else {
@@ -354,9 +357,6 @@ LevelTools = {
 			}
 			if (option.response) {
 				store('B'+sectionIdx+'P'+promptIdx + 'Response', option.response);
-			}
-			if (option.func) {
-				option.func();
 			}
 			question.correct = option.isCorrect;
 			question.isAnswered = true;

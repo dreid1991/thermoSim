@@ -3,8 +3,8 @@ function AnimText(drawCanvas){
 }
 AnimText.prototype = {
 	newAnim: function(init, dest, attrs){
-
-		var animName = 'animText' + Math.round(Math.random()*10000);
+		
+		var animName = unique('animText', curLevel.updateListeners.listeners);
 		//font, text, align, time
 		var text = attrs.text;
 		var moving = new Boolean();
