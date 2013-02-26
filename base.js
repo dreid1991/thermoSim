@@ -1,5 +1,6 @@
 //shared startup stuff
 $(function(){
+	MathJax.Hub.Config({tex2jax: {inlineMath: [['##','##'], ['\\(','\\)']], displayMath: [['$$', '$$']]}});
 	_.extend(Array.prototype, toInherit.ArrayExtenders);
 	_.extend(Math, toInherit.MathExtenders);
 	_.extend(String.prototype, toInherit.StringExtenders);

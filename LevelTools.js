@@ -50,7 +50,7 @@ LevelTools = {
 								for (optionElement in option) {
 									var element = option[optionElement];
 									if (typeof(element) == 'string') {
-										option[optionElement] = iinterpreter.interpImgs(element);
+										option[optionElement] = interpreter.interpImgs(element);
 									}						
 								}
 							}
