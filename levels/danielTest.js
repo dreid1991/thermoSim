@@ -87,6 +87,21 @@ _.extend(TestLevel.prototype,
 					sceneData: undefined,
 					title: 'wooo!',
 					text: 'Why did the $$ \\int_3^\\frac{2}{3} 5dx $$ walk across the road?'
+				},
+				{
+					sceneData: undefined,
+					title: 'hello',
+					text: 'this is text',
+					quiz: [
+						{
+							type: 'multChoice',
+							options: [
+								{text: '$$x=5$$', isCorrect: true},
+								
+							]
+						}
+					
+					]
 				}
 			]
 		}
