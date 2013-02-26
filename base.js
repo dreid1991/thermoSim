@@ -802,12 +802,23 @@ function evalText(text) {
 	return toReturn;
 }
 
-function addImgs(text){
+function addImgs(text, asObj){
 	return text.replace(/img[\s]*\([A-Za-z0-9\+\-\*\/\s,\.]*\)/g, function(imgFunc, idx) {
-		var args = sliceArgs(imgFunc);
-		var path = args[0];
-		var breakStyle = args[1];
-		var center = args[2];
+		return parseImgFunc(imgFunc);
+	})
+}
+
+function parseImgFunc(imgFunc, asObj) {
+	var args = sliceArgs(imgFunc);
+	var path = args[0];
+	var breakStyle = args[1];
+	var center = args[2];
+	if (asObj) {
+		//HEY - as obj currently only return image, no p, br, or centering.  
+		//It is they way because of AuxPicture.  Look into that before making changes here
+		return {attrs: {src: [path]}};
+	
+	} else {
 		var imgHTML = templater.img({attrs: {src: [path]}});
 		
 		if (center) {
@@ -818,11 +829,9 @@ function addImgs(text){
 		} else if (breakStyle == 'p') {
 			imgHTML = templater.p({innerHTML: imgHTML});
 		}
-		return imgHTML;
-	})
+		return imgHTML;	
+	}
 }
-
-
 
 function sliceArgs(expr) {
 	var args = [];

@@ -7,21 +7,38 @@ AuxFunctions = {
 		var dy = dyTotal/2;//number of aux slots;
 		return V(dx, dy);
 	},
-	pickParentDiv: function(fillWith) {
-		for (var divIdx=0; divIdx<auxHolderDivs.length; divIdx++) {
-			var div = $('#'+auxHolderDivs[divIdx]);
-			var filledWith = $(div).attr('filledWith')
-			if (filledWith == '') {
+	pickParentDiv: function(fillWith, slotNum) {
+		if (slotNum === undefined) {
+			for (var divIdx=0; divIdx<auxHolderDivs.length; divIdx++) {
+				var div = $('#' + auxHolderDivs[divIdx]);
+				var filledWith = $(div).attr('filledWith')
+				if (filledWith == '') {
+					$(div).attr('filledWith', fillWith);
+					return div;
+				}
+			}
+			console.log("Aux divs are all full!");
+			console.trace();
+		} else {
+			var div = $('#' + auxHolderDivs[slotNum]);
+			if (!div.length) {
+				console.log('Bad div idx ' + slotNum + '.  Defaulting to next empty slot');
+				return this.pickParentDiv(fillWith);
+			}
+			var filledWith = $(div).attr('filledWith');
+			if (!(filledWith == '' || filledWith == undefined)) {
+				console.log('Trying to add ' + fillWith + ' in ' + slotNum + ' but ' + slotNum + ' is already filled with ' + filledWith + '.');
+				console.log('Defaulting to next empty slot');
+				return this.pickParentDiv(fillWith) 
+			} else {
 				$(div).attr('filledWith', fillWith);
 				return div;
 			}
 		}
-		console.log("Aux divs are all full!");
-		console.trace();
 	},
 	cleanUpParent: function() {
 		$(this.parentDiv).removeAttr('style');
-		this.parentDiv.html('');
+		$(this.parentDiv).html('');
 		$(this.parentDiv).attr('filledWith', '');
 	},
 }

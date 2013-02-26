@@ -4,7 +4,7 @@ $(function(){
 	animText = new AnimText(c);
 	myCanvas.height = canvasHeight;
 	renderer = new Renderer();
-	window.curLevel = new TryingIsothermal();
+	window.curLevel = new TestLevel();
 	curLevel.cutSceneEnd();
 	curLevel.init();
 	addJQueryElems($('button'), 'button');
@@ -19,7 +19,7 @@ myCanvas.width = $('#main').width();
 
 
 
-function TryingIsothermal(){
+function TestLevel(){
 	this.setStds();
 	this.wallSpeed = 1;
 	this.readouts = {};
@@ -30,7 +30,7 @@ function TryingIsothermal(){
 	this.yMin = 30;
 	this.yMax = 350;
 }
-_.extend(TryingIsothermal.prototype, 
+_.extend(TestLevel.prototype, 
 			LevelTools, 
 {
 	init: function() {
@@ -39,24 +39,37 @@ _.extend(TryingIsothermal.prototype,
 		showPrompt(0, 0, true);
 	},
 	sections: [
-		{
+				{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'cVIsothermal', temp: 200, handle: 'wally'} 
+					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'staticAdiabatic', handle: 'wally'} 
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(200, 200), count: 500, temp: 300, returnTo: 'wally', tag: 'wally'}, 
-					{spcName: 'spc3', pos: P(55, 55), dims: V(200, 200), count: 500, temp: 300, returnTo: 'wally', tag: 'wally'} 
+					{spcName: 'spc1', pos: P(55, 55), dims: V(200, 200), count: 50, temp: 300, returnTo: 'wally', tag: 'wally'} 
+				],
+				objs: [
+					{
+						type: 'AuxPicture',
+						attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/reversibility1.gif)'}
+					}
+
+						
 				],
 				dataDisplay: [
 					{wallInfo: "wally", data:'temp', readout: 'mainReadout'},
-					{wallInfo: 'wally', data:'pInt', readout: 'mainReadout'},
-					{wallInfo: 'wally', data:'qArrowsAmmt'}
+					{wallInfo: 'wally', data:'pInt', readout: 'mainReadout'}
 				]
 			},
 			prompts: [
 				{
-					sceneData: undefined,
+					sceneData: {
+						objs: [
+							{
+							type: 'AuxPicture',
+							attrs: {handle: 'piccy', slotNum: 1, imgFunc: 'img(img/refresh.gif)'}
+							}
+						]
+					},
 					title: 'wooo!',
 					text: 'loooo!'
 				},
@@ -67,6 +80,7 @@ _.extend(TryingIsothermal.prototype,
 				}
 			]
 		}
+
 			
 	]
 

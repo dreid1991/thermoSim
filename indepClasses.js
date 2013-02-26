@@ -113,6 +113,10 @@ Vector.prototype = {
 		this.dy+=b.dy;
 		return this;
 	},
+	set: function(b) {
+		this.dx = b.dx;
+		this.dy = b.dy;
+	},
 	neg: function(){
 		this.dx*=-1;
 		this.dy*=-1;
