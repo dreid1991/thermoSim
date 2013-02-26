@@ -580,7 +580,7 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 		}
 	}
 	$('#baseHeader').html(newPrompt.title);
-	interpreter.renderMath();
+	//interpreter.renderMath();
 
 
 }

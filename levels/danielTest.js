@@ -81,7 +81,7 @@ _.extend(TestLevel.prototype,
 						}
 					],
 					title: 'wooo!',
-					text: 'math($x=5^{300}$)!'
+					text: 'Hello, my l\\tovlies! $$ \frac{1}{2} $$  That was mathematical!'
 				},
 				{
 					sceneData: undefined,

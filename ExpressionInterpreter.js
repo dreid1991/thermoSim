@@ -18,20 +18,20 @@ ExpressionInterpreter.prototype = {
 		$(div).append(this.addMath(this.addImgs(this.eval(this.addStored(expr)))));
 		this.renderMath(div);
 	},
+	interpMath: function(expr) {
+		return this.addMath(expr);
+	},
 	interpInput: function(expr) {
 		return this.eval(this.addStored(expr));
 	},
 	interpImgs: function(expr) {
 		return this.addImgs(expr);
 	},
-	interpMath: function(expr) {
-		return this.addMath(expr);
-	},
 	interp: function(expr) {
 		return this.addMath(this.addImgs(this.eval(this.addStored(expr))));
 	},
 	renderMath: function(div) {
-		MathJax.Hub.Queue(['Typeset', MathJax.Hub, div ? $(div).attr('id') : undefined])
+		//MathJax.Hub.Queue(['Typeset', MathJax.Hub, div ? $(div).attr('id') : undefined])
 	},
 	addStored: function(text) {
 		return text.replace(/get[\s]*\([A-Za-z0-9,\s\-\.]*\)/g, function(subStr, idx) {
@@ -114,23 +114,6 @@ ExpressionInterpreter.prototype = {
 			hasCommas = working.indexOf(',') > -1;
 		}
 		return args;	
-	},
-	sliceMathArgs: function(expr) {
-		var sliceLen = expr.indexOf('$$') != -1 ? 2 : 1;
-		
-		var initIdx = sliceLen == 1 ? expr.indexOf('$') : expr.indexOf('$$');
-		expr = expr.slice(initIdx + sliceLen, expr.length);
-		var endMathIdx = sliceLen == 1 ? expr.indexOf('$') : expr.indexOf('$$');;
-		var mathExpr = expr.slice(0, endMathIdx);
-		var rest = expr.slice(endMathIdx, expr.length);
-		var args = [mathExpr];
-
-		if (rest.indexOf(',') != -1) {
-			rest = rest.slice(rest.indexOf(',' + 1), rest.length);
-			var dummyExpr = 'dummy(' + rest;
-			args = args.concat(this.sliceArgs(dummyExpr));
-		}
-		return args;
 	},
 	finishAppend: function() {
 		this.div = undefined;
