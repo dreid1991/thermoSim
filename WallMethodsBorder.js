@@ -12,6 +12,9 @@ WallMethods.Border = function (attrs) {
 //open means one with open top.  It will start at the second point and go to the last with potential adjustments on all the points
 //end means it will always go to the last point
 WallMethods.Border.prototype = {
+	remove: function() {
+		removeListener(curLevel, 'update', this.listenerName);
+	},
 	pickGenerator: function(type) {
 		if (type == 'open') {
 			return this.genOpen();
@@ -30,11 +33,11 @@ WallMethods.Border.prototype = {
 	genBorder: function(thick, col, firstPt, lastPt, bluntEnds) {
 		var self = this;
 		var drawCanvas = c;
-		var listenerName = 'drawBorder' + this.wall.handle.toCapitalCamelCase();
+		this.listenerName = 'drawBorder' + this.wall.handle.toCapitalCamelCase();
 		return function() {
-			removeListener(curLevel, 'update', listenerName);
+			self.remove();
 			var segments = self.genSegs(firstPt, lastPt, thick, bluntEnds);
-			addListener(curLevel, 'update', listenerName, function() {
+			addListener(curLevel, 'update', self.listenerName, function() {
 				for (var segIdx=0; segIdx<segments.length; segIdx++) {
 					draw.fillPts(segments[segIdx], col, drawCanvas);
 				}
@@ -54,11 +57,20 @@ WallMethods.Border.prototype = {
 			var nextPtIdx = ptIdx + 1 == lastPtIdx ? 0 : ptIdx + 1;
 			var extendV1, extendV2;
 			
-			extendV1 = this.getExtendV(perpUV, prevPtIdx, firstPtIdx, thick, bluntEnds);
-			extendV2 = this.getExtendV(perpUV, nextPtIdx, lastPtIdx, thick, bluntEnds);
+			extendV1 = this.getExtendV(perpUV, prevPtIdx, firstPtIdx - 1, thick, bluntEnds);
+			extendV2 = this.getExtendV(perpUV, nextPtIdx, 0, thick, bluntEnds);
 			
 			var pt3 = pt2.copy().movePt(extendV2);
 			var pt4 = pt1.copy().movePt(extendV1);
+			if (this.type == 'open') {
+				if (ptIdx == firstPtIdx) {
+					pt1.y = this.yMin;
+					pt4.y = this.yMin
+				} else if (ptIdx == lastPtIdx - 1) {
+					pt2.y = this.yMin;
+					pt3.y = this.yMin;
+				}
+			}
 			segments.push([pt1, pt2, pt3, pt4]);
 		}
 		return segments;

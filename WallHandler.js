@@ -264,9 +264,7 @@ WallMethods.main = {
 		this.numWalls-=1;
 		this[wallInfo].recordAllStop();
 		this[wallInfo].displayAllStop();
-		if(this[wallInfo].bordered){
-			this[wallInfo].removeBorder();
-		}
+		this[wallInfo].removeBorder();
 		var wallIdx = this.idxByInfo(wallInfo);
 		this[this[wallIdx].handle] = undefined;
 		this.splice(wallIdx, 1);

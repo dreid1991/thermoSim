@@ -249,61 +249,9 @@ WallMethods.wall = {
 	addBorder: function(attrs) {
 		attrs.wall = this;
 		this.border = new WallMethods.Border(attrs);
-		// if (attrs) {
-			// if (defaultTo('std', attrs.type) == 'std') {
-				// this.border([1, 2, 3, 4], attrs.width || 5, attrs.col || this.col.copy().adjust(-100, -100, -100), [{y:attrs.yMin}, {}, {}, {y:attrs.yMin}]);
-			// }
-		// }
 	},
 	removeBorder: function() {
 		if (this.border) this.border.remove();
-	},
-	border: function(wallPts, thickness, col, ptAdjusts){
-		this.bordered = true;
-		var drawCanvas = c;
-		var pts = new Array(wallPts.length);
-		var perpUVs = new Array(wallPts.length-1)
-		var borderPts = [];
-		var targetWallPts = this;
-		var targetWallPerps = this.wallPerpUVs;
-		for (var wallPtIdx=0; wallPtIdx<wallPts.length; wallPtIdx++){
-			pts[wallPtIdx] = targetWallPts[wallPts[wallPtIdx]].copy();
-		}
-		for (var wallPtIdx=0; wallPtIdx<wallPts.length-1; wallPtIdx++){
-			perpUVs[wallPtIdx] = targetWallPerps[wallPts[wallPtIdx]].copy().neg();
-		}
-		for (var ptIdx=0; ptIdx<pts.length; ptIdx++){
-			var pt = pts[ptIdx];
-			//can give either vector or absolute position
-			pt.movePt(ptAdjusts[ptIdx]);
-			pt.position(ptAdjusts[ptIdx]);
-			borderPts.push(pt);
-		}
-		var lastAdj = perpUVs[perpUVs.length-1].copy().mult(thickness)
-		borderPts.push(pts[pts.length-1].copy().movePt(lastAdj));
-		for (var ptIdx=pts.length-2; ptIdx>0; ptIdx-=1){
-			var UVs = [perpUVs[ptIdx], perpUVs[ptIdx-1]];
-			var pt = pts[ptIdx];
-			borderPts.push(this.spacedPt(pt, UVs, thickness));
-		}
-		var firstAdj = perpUVs[0].mult(thickness)
-		borderPts.push(pts[0].copy().movePt(firstAdj));
-		borderPts.push(pts[0]);
-		addListener(curLevel, 'update', 'drawBorder' + this.handle, 
-			function(){
-				draw.fillPts(borderPts, col, drawCanvas);
-			}
-		,'');
-	},
-	spacedPt: function(pt, UVs, thickness){
-		var UV1 = UVs[0];
-		var UV2 = UVs[1];
-		var adjust = UV1.add(UV2)
-		return pt.copy().movePt(adjust.mult(thickness));
-	},
-	removeBorder: function(){
-		this.bordered = false;
-		removeListener(curLevel, 'update', 'drawBorder' + this.handle);
 	},
 	getDataObj: function(type, args) { //data will be list of DataObjs if it's like fractional conversion where there can be one for each species or tag.  Else is just DataObj
 		if (this.data[type]) {
