@@ -247,11 +247,16 @@ WallMethods.wall = {
 	},
 
 	addBorder: function(attrs) {
-		if (attrs) {
-			if (defaultTo('std', attrs.type) == 'std') {
-				this.border([1, 2, 3, 4], attrs.width || 5, attrs.col || this.col.copy().adjust(-100, -100, -100), [{y:attrs.yMin}, {}, {}, {y:attrs.yMin}]);
-			}
-		}
+		attrs.wall = this;
+		this.border = new WallMethods.Border(attrs);
+		// if (attrs) {
+			// if (defaultTo('std', attrs.type) == 'std') {
+				// this.border([1, 2, 3, 4], attrs.width || 5, attrs.col || this.col.copy().adjust(-100, -100, -100), [{y:attrs.yMin}, {}, {}, {y:attrs.yMin}]);
+			// }
+		// }
+	},
+	removeBorder: function() {
+		if (this.border) this.border.remove();
 	},
 	border: function(wallPts, thickness, col, ptAdjusts){
 		this.bordered = true;

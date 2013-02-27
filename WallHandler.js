@@ -217,7 +217,7 @@ WallMethods.main = {
 		this.setWallVals(newIdx, attrs.pts, attrs.handle, attrs.bounds, attrs.include, attrs.vol, attrs.show, attrs.record, attrs.temp, attrs.col);
 		this.setupWall(newIdx);
 		this.setWallHandler(newIdx, attrs.handler);
-		this[newIdx].addBorder(attrs.border);
+		if (attrs.border) this[newIdx].addBorder(attrs.border);
 		if (attrs.hitMode) this[newIdx].setHitMode(attrs.hitMode);
 		
 	},
