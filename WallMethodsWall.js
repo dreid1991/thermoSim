@@ -887,6 +887,7 @@ WallMethods.wall = {
 			this.parent.setSubWallHandler(this.handle, newPtIdx, newHandler)
 		}
 		this.parent.setupWall(this.handle);
+		if (this.border && !this.border.removed) this.border.update();
 	},
 	removePts: function(spliceIdx, num) {
 		var handlers = [];
@@ -899,6 +900,7 @@ WallMethods.wall = {
 			this.parent.setSubWallHandler(idx, subWallIdx, handlers[subWallIdx-spliceIdx]);
 		}
 		this.parent.setupWall(this.handle);
+		if (this.border && ! this.border.removed) this.border.update();
 	},
 	getPt: function(idx) {
 		return this[idx];

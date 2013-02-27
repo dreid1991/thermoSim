@@ -26,7 +26,7 @@ function TestLevel(){
 	this.compMode = 'Isothermal';//is this used?
 
 	
-	addSpecies(['spc1', 'spc3', 'spc4', 'spc5', 'spc6']);
+	addSpecies(['spc1', 'spc2', 'spc3', 'spc4', 'spc5', 'spc6']);
 	this.yMin = 30;
 	this.yMax = 350;
 }
@@ -51,6 +51,18 @@ _.extend(TestLevel.prototype,
 					{
 						type: 'AuxImage',
 						attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/work/block0Pic1.jpg)'}
+					},
+					{
+						type: 'Inlet',
+						attrs: {
+							handle: 'inny',
+							wallInfo: 'wally',
+							width: 40,
+							depth: 25,
+							flows: [{spcName: 'spc2', temp: 100, nDotMax: .001, tag: 'wally'}, {spcName: 'spc1', temp: 400, nDotMax: .01, tag: 'wally'}],
+							ptIdxs: [3, 4],
+							fracOffset: .2
+						}
 					},
 					{
 						type: 'DragWeights',

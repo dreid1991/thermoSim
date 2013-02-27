@@ -6,6 +6,7 @@ WallMethods.Border = function (attrs) {
 	this.thick = attrs.thickness || 5; //don't want to have value of zero anyway
 	this.update = this.pickGenerator(this.type)
 	this.update();
+	this.removed = false;
 }
 //need to do yMin stuff still
 
@@ -13,6 +14,7 @@ WallMethods.Border = function (attrs) {
 //end means it will always go to the last point
 WallMethods.Border.prototype = {
 	remove: function() {
+		this.removed = true;
 		removeListener(curLevel, 'update', this.listenerName);
 	},
 	pickGenerator: function(type) {
@@ -42,6 +44,7 @@ WallMethods.Border.prototype = {
 					draw.fillPts(segments[segIdx], col, drawCanvas);
 				}
 			})
+			self.removed = false;
 		};
 	},
 	genSegs: function(firstPt, lastPt, thick, bluntEnds) {
