@@ -31,8 +31,9 @@ ExpressionInterpreter.prototype = {
 		MathJax.Hub.Queue(['Typeset', MathJax.Hub, div ? $(div).attr('id') : undefined])
 	},
 	addStored: function(text) {
+		var self = this;
 		return text.replace(/get[\s]*\([A-Za-z0-9,\s\-\.]*\)/g, function(subStr, idx) {
-			var args = this.sliceArgs(subStr);
+			var args = self.sliceArgs(subStr);
 			var idStr = args[0];
 			var type = args[1];
 			var defVal = args[2];
@@ -68,9 +69,10 @@ ExpressionInterpreter.prototype = {
 		})	
 	},
 	eval: function(text) {
+		var self = this;
 		if (typeof text == 'number') return;
 		text = text.replace(/eval[\s]*\([0-9\(\)\+\-\*\/\s,\.]*\)/g, function(evalItem, idx) {
-			var args = this.sliceArgs(evalItem);
+			var args = self.sliceArgs(evalItem);
 			var expr = args[0];
 			var decPlaces = args[1];
 			var def = args[2];

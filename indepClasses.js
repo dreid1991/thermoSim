@@ -291,6 +291,11 @@ Point.prototype = {
 		//}
 		return this;
 	},
+	moveInDir: function(mag, dir) {
+		this.x += Math.cos(dir) * mag;
+		this.y += Math.sin(dir) * mag;
+		return this;
+	},
 	position: function(p){
 		if(p.x!==undefined){
 			this.x=p.x;

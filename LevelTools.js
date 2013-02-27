@@ -226,7 +226,7 @@ LevelTools = {
 		$('#intText').show();
 	},
 	cutSceneText: function(text){
-		('#intText').html(text);
+		$('#intText').html(text);
 	},
 	cutSceneEnd: function(){
 		this.inCutScene = false;
