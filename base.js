@@ -776,6 +776,9 @@ function getLen(pts) {
 	}
 	return len;
 }
+function inPrompt() {
+	return /prompt/i.test(currentSetupType);
+}
 function nameVar(str) {
 	if (currentSetupType=='section') {
 		return str + 'S' + sectionIdx;

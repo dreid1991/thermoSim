@@ -72,7 +72,6 @@ _.extend(TestLevel.prototype,
 						
 				],
 				dataDisplay: [
-					{wallInfo: "wally", data:'temp', readout: 'mainReadout'},
 					{wallInfo: 'wally', data:'pInt', readout: 'mainReadout'}
 				]
 			},
@@ -84,6 +83,9 @@ _.extend(TestLevel.prototype,
 							type: 'AuxImage',
 							attrs: {handle: 'piccy', slotNum: 1, imgFunc: 'img(img/refresh.gif)'}
 							}
+						],
+						dataDisplay: [
+							{wallInfo: "wally", data:'temp', readout: 'mainReadout'}
 						]
 					},
 					quiz: [

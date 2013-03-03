@@ -467,11 +467,13 @@ WallMethods.wall = {
 		return dataObj;		
 	},
 	setupStdDataObj: function(dataObj, id) {
+		
 		dataObj.recording(true);
 		dataObj.recordStop(this.recordStop);
 		dataObj.id(id);
 		dataObj.type(id);
 		dataObj.wallHandle(this.handle);
+		if (inPrompt()) this.setupPromptRecordStop(dataObj, dataObj.id());
 	},
 	setupInfoDataObj: function(dataObj, type, info) {
 		dataObj.recording(true);
@@ -480,6 +482,22 @@ WallMethods.wall = {
 		dataObj.wallHandle(this.handle);
 		dataObj.type(type);
 		dataObj.idArgs(info);
+		if (inPrompt()) this.setupPromptRecordStop(dataObj);
+	},
+	//I add a listener to clean up recording with the prompt only because everything in the wall gets removed on leaving the section.
+	setupPromptRecordStop: function(dataObj) {
+		var listenerHandle = 'recordStop' + dataObj.id().toCapitalCamelCase();
+		addListener(curLevel, currentSetupType + 'CleanUp', listenerHandle, function() {
+			dataObj.recordStop();
+			removeListener(curLevel, currentSetupType + 'CleanUp', listenerHandle);
+		})
+	},
+	setupPromptDisplayStop: function(dataObj) {
+		var listenerHandle = 'displayStop' + dataObj.id().toCapitalCamelCase();
+		addListener(curLevel, currentSetupType + 'CleanUp', listenerHandle, function() {
+			dataObj.displayStop();
+			removeListener(curLevel, currentSetupType + 'CleanUp', listenerHandle)
+		});
 	},
 	//to be called in context of DataObj
 	recordStopDestroy: function() {
@@ -516,6 +534,7 @@ WallMethods.wall = {
 	displayStd: function(dataObj, readout, label, decPlaces, units, func) {
 		//wrappers will check if data object is recording
 		if (!dataObj.displaying()) {
+			if (inPrompt()) this.setupPromptDisplayStop(dataObj);
 			dataObj.displaying(true);
 			var src = dataObj.src();
 			dataObj.readout(readout);
@@ -759,11 +778,6 @@ WallMethods.wall = {
 		}
 	},
 
-	addCleanUpIfPrompt: function(displayType, func) {
-		if (currentSetupType.indexOf('prompt') != -1) {
-			addListener(curLevel, currentSetupType + 'CleanUp', displayType + this.handle, func, this);
-		}			
-	},
 	displayAllStop: function(){
 		for (var dataObjName in this.data) {
 			var dataObj = this.data[dataObjName];
