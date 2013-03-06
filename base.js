@@ -241,6 +241,11 @@ function round(val, dec){
 	var pow = Math.pow(10,dec);
 	return Math.round(val*pow)/pow;
 }
+
+function curLevelKey(type, handle) {
+	return type.toCamelCase() + handle.toCapitalCamelCase()
+}
+
 function unique(name, obj){
 	if (typeof(obj)=="function"){
 		if (!obj(name)) {

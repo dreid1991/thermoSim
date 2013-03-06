@@ -101,10 +101,18 @@ Renderer.prototype = {
 		}
 	},
 	doCommands: function(cmmds) {
+		//{type: (‘wall’, objName), handle: ,  cmmd: , args: [{…},  ...]}
 		for (var cmmdIdx=0; cmmdIdx<cmmds.length; cmmdIdx++) {
 			var cmmd = cmmds[cmmdIdx];
-			var obj = getObjFromPath(cmmd.path, window);
-			obj[cmmd.func](cmmd.attrs || {});
+			var obj = cmmd.type ? this.getCmmdObj(cmmd.type, cmmd.handle) : window;
+			obj.apply(cmmd.cmmd, cmmd.args);
+		}
+	},
+	getCmmdObj: function(type, handle) {
+		if (/^wall$/i.test(type)) {
+			return walls[handle] || console.log('Bad command wall handle ' + handle);
+		} else {
+			return curLevel[curLevelKey(type, handle)] || console.log('Bad command data: Type ' + type + ' and handle ' + handle);
 		}
 	},
 	getAndEval: function(sceneElem) {

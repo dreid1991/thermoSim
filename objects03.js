@@ -163,6 +163,7 @@ function ArrowStatic(attrs) {
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.pos = attrs.pos.copy();
 	this.dims = attrs.dims.copy();
+	this.handle = attrs.handle;
 	this.pts = this.getPts();
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	if (attrs.label) {

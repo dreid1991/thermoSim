@@ -18,6 +18,7 @@ in that order
 function Sandbox(attrs){
 	this.type = 'Sandbox';
 	this.handle = attrs.handle;
+	this.emitterNum = 0;
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	var self = this;
 	attrs = defaultTo({}, attrs);
@@ -181,6 +182,8 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		this.emitters[this.emitters.length-1].stopFlow();
 	},
 	makeAddEmitter: function(){
+		var emitterHandle = this.handle + this.emitterNum;
+		this.emitterNum ++;
 		var onArrive = {func:this.onArriveAdd, obj:this};
 		var emitterIdx = this.emitters.length;
 		
@@ -189,7 +192,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		var centerPos = (this.wall[0].x + this.wall[1].x)/2;
 		var dist = this.wall[0].y;
 		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:this.width, dist:dist, dir:dir, col:col,
-											onRemove:onRemove, parentList:this.emitters, onArrive:onArrive});
+											onRemove:onRemove, parentList:this.emitters, onArrive:onArrive, handle: emitterHandle});
 		newEmitter.adding = true;
 		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners.listeners)
 		addListener(curLevel, 'update', moveListenerName, 
@@ -206,6 +209,8 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		return newEmitter;
 	},
 	makeRemoveEmitter: function(){
+		var emitterHandle = this.handle + this.emitterNum;
+		this.emitterNum ++;
 		var onGenerate = {func:this.onGenerateRemove, obj:this};
 		var emitterIdx = this.emitters.length;
 		var dir = -Math.PI/2;
@@ -213,7 +218,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		var centerPos = (this.wall[0].x + this.wall[1].x)/2;
 		var dist = this.wall[0].y;
 		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:this.width, dist:dist, dir:dir, col:col,
-											onRemove:onRemove, parentList:this.emitters, onGenerate:onGenerate, cleanUpWith:this.cleanUpWith});
+											onRemove:onRemove, parentList:this.emitters, onGenerate:onGenerate, cleanUpWith:this.cleanUpWith, handle: emitterHandle});
 		newEmitter.removing = true;
 		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners.listeners)
 		var wallPt = this.wall[0];
@@ -281,7 +286,7 @@ function ParticleEmitter(attrs){
 	this.type = 'ParticleEmitter';
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.pos = attrs.pos;
-	this.handle = unique('emitter' + defaultTo('', attrs.handle), curLevel.updateListeners.listeners);
+	this.handle = attrs.handle;
 	this.dir = attrs.dir;
 	this.parentList = attrs.parentList;
 	this.width = attrs.width;
@@ -683,7 +688,7 @@ function TempChanger(attrs) {
 	this.val = dataHandler.temp(this.info);
 	this.max = defaultTo(1500, attrs.max);
 	this.sliderPos = attrs.sliderPos;
-	this.handle = attrs.handle;;
+	this.handle = attrs.handle;
 	this.totalDots = dataHandler.count(this.info);
 	this.setupStd();
 	return this.init();

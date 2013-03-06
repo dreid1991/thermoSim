@@ -50,13 +50,15 @@ objectFuncs = {
 		}
 	},
 	addToCurLevel: function() {
-		curLevel[this.type.toCamelCase() + this.handle.toCapitalCamelCase()] = this;
+		
+		curLevel[curLevelKey(this.type, this.handle)] = this;
 	},
 	removeFromCurLevel: function() {
-		if (curLevel[this.type.toCamelCase() + this.handle.toCapitalCamelCase()] == this) {
-			delete curLevel[this.type.toCamelCase() + this.handle.toCapitalCamelCase()];
+		var curLevelKey = curLevelKey(this.type, this.handle);
+		if (curLevel[curLevelKey] == this) {
+			delete curLevel[curLevelKey];
 		} else {
-			console.log("Trying to remove " + this.type.toCamelCase() + this.handle.toCapitalCamelCase() + " but handle doesn't belong to this object");
+			console.log("Trying to remove " + curLevelKey + " but handle doesn't belong to this object");
 		}
 	},
 	removeCleanUp: function(){
@@ -156,7 +158,7 @@ function DragWeights(attrs){
 	//Can probably remove energy bar stuff
 	this.type = 'DragWeights';
 	this.cleanUpWith = 			defaultTo(currentSetupType, attrs.cleanUpWith);
-	this.handle = 				unique('dragWeights' + attrs.handle, curLevel);
+	this.handle = 				attrs.handle;
 	this.tempWeightDefs = 		attrs.weightDefs;
 	this.wallInfo = 			defaultTo(0, attrs.wallInfo);
 	this.wall = 				walls[this.wallInfo];
@@ -1425,7 +1427,7 @@ function Heater(attrs){
 	}
 	this.wall.recordQ();
 	this.makeSlider = defaultTo(true, attrs.makeSlider);
-	this.handle = defaultTo('heaty', attrs.handle);
+	this.handle = attrs.handle;
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	this.cornerRound = .2;
 	this.temp = defaultTo(0, attrs.init);
@@ -1591,6 +1593,7 @@ function Stops(attrs){
 	this.type = 'Stops';
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	//assumes canvas of c.  I mean, where else would they be?
+	this.handle = attrs.handle;
 	this.stopWidth = 20;
 	this.stopHeight = 5;
 	this.boundToSet = undefined;
@@ -1661,6 +1664,7 @@ _.extend(Stops.prototype, objectFuncs, {
 //////////////////////////////////////////////////////////////////////////
 function StateListener(attrs){//like dataList... is:'greaterThan', ... checkVal
 	this.type = 'StateListener';
+	this.handle = attrs.handle;
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.conditionsOn = this.cleanUpWith.killNumbers();
 	var dataInfo = attrs.dataSet;
