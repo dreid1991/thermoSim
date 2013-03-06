@@ -17,6 +17,7 @@ in that order
 
 function Sandbox(attrs){
 	this.type = 'Sandbox';
+	this.handle = attrs.handle;
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	var self = this;
 	attrs = defaultTo({}, attrs);
@@ -32,11 +33,11 @@ function Sandbox(attrs){
 
 
 	this.particleMass = defaultTo(.01, attrs.partMass);
-	this.buttonAddId = 'sandAdd';
-	this.buttonRemoveId = 'sandRemove';
+	this.buttonAddId = 'sandAdd' + this.handle;
+	this.buttonRemoveId = 'sandRemove' + this.handle;
 	this.makeButtons();
 	
-	this.massChunkName = 'sandMass' + defaultTo('', attrs.handle);
+	this.massChunkName = 'sandMass' + defaultTo('', this.handle);
 	this.wall.setMass(this.massChunkName, this.mass);	
 	this.wall.recordPExt();
 	this.wall.recordWork();

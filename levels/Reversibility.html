@@ -1,23 +1,19 @@
 <html>
 <body>
-<link type='text/css' href = '../css/custom-theme/jquery-ui-1.9.2.custom.css' rel='stylesheet' />
+<link type='text/css' href = '../css/custom-theme/jquery-ui-1.9.2.custom.sim.css' rel='stylesheet' />
 <link type='text/css' href = '../styles.css' rel='stylesheet'/>
-<script src = '../underscore-min.js'></script>
-<script src = '../js/jquery-1.9.0.min.js'></script>
-<script src = '../js/jquery-ui-1.9.2.custom.min.js'></script>
+<link type='text/css' href = '../mathStyles.css' rel='stylesheet'/>
 <div class='sim noSelect wrapper'>
 	<div id='main' class='sim main noSelect'>
 		<div id='mainHeader' class='sim header noSelect'>
 			
 		</div>
-		<div id='canvasWrapper' class='sim'>
-			<div id='canvasDiv' class='sim canvasDiv noSelect'>
-				<canvas id='myCanvas' class='sim'>
-				</canvas>
-			</div>
+		<div id='canvasDiv' class='sim canvasDiv noSelect'>
+			<canvas id='myCanvas'>
+			</canvas>
 		</div>
-		<div id='display' class='sim displayLong noSelect'>
-			<div id='intText' class='sim displayText noSelect'>
+		<div id='display' class='sim display noSelect'>
+				<div id='intText' class='sim displayText noSelect'>
 			</div>
 		</div>
 
@@ -28,40 +24,40 @@
 			</center>
 			
 		</div>
-		<div id='dashRun' class='sim dashShort noSelect' style='position:relative'>
+		<div id='dashRun' class='sim dashMed noSelect' style='position:relative'>
 			<center>
 				<div id='buttons' class='sim'>
-
+		
 				</div>
 			</center>
 			<center>
 				<div id='sliderHolderSingle' class='sim'>
-					<div id='sliderHolderCenter' class='sim' style='width:300px'>
+					<div id='sliderHolderCenter' style='width:300px'>
 					
 					</div>
 				</div>
 			</center>
 			<center>
 				<div id='sliderHolderDouble' class='sim'>
-					<div id='sliderHolderLeft' class='sim' style='display:inline-block;width:200px'>
+					<div id='sliderHolderLeft' style='display:inline-block;width:200px' class='sim'>
 					</div>
-					<div id='sliderSpacer' class='sim' style='width:100px'>
+					<div id='sliderSpacer' style='display:inline-block;width:75px' class='sim'>
 					</div>
-					<div id='sliderHolderRight' class='sim' style='width:200px'>
+					<div id='sliderHolderRight' style='display:inline-block;width:200px' class='sim'>
 					</div>
 				</div>
 			</center>
-			<button id='resetExp' class='sim' style='position:absolute;right:.5em;bottom:.5em'><img src='img/refresh.gif'></img></button>
+			<button id='resetExp' style='position:absolute;right:.5em;bottom:.25em' class='sim'><img src='img/refresh.gif'></img></button>
 		</div>
-		<div id='dashCutScene' class='sim dashShort noSelect'></div>
-		<div id='dashOutro' class='sim dashMed noSelect ' >
+		<div id='dashCutScene' class='sim dashMed noSelect'></div>
+		<div id='dashOutro' class='sim dash noSelect ' >
 			<center>
 				<button id='toLastStep' class='sim'>Back to the simulation</button>
 			</center>
 			
 			
 		</div>
-		
+
 	</div>
 	<div id='auxSlots' class='sim auxSlots noSelect'>
 		<div id='aux1' class='sim aux' filledWith=''>
@@ -76,16 +72,16 @@
 <div id='base' class='sim base noSelect'>
 	<div id='baseHeader' class='sim header noSelect'></div>
 	<div class='sim borderedBlock noSelect'>
-		<div id='quesHolder' class='sim noSelect'>
+		<div id='quesHolder noSelect'>
 		</div>
 		<div style='padding:10px' class='sim displayText noSelect'>
 			<div id='prompt'>
 			
 			</div>
 		
-			<div id='nextPrevDiv' align='right'>
-				<button id = 'previous' class='sim'>Previous</button>
-				<button id = 'next' class='sim'>Next</button>
+			<div id='nextPrevDiv' align='right' class='sim'>
+				<button id = 'previous'>Previous</button>
+				<button id = 'next'>Next</button>
 			</div>
 
 		</div>
@@ -93,7 +89,11 @@
 
 	<div id='baseDash' class='sim bottomRound noSelect'></div>
 </div>
-
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script src = '../underscore-min.js'></script>
+<script src = '../js/jquery-1.9.0.min.js'></script>
+<script src = '../js/jquery-ui-1.9.2.custom.min.js'></script>
+<script src = '../ExpressionInterpreter.js'></script>
 <script src = '../Templater.js'></script>
 <script src = '../indepClasses.js'></script>
 <script src = '../inheritFuncs.js'></script>
@@ -110,6 +110,11 @@
 <script src = '../Attractor.js'></script>
 <script src = '../DataHandler.js'></script>
 <script src = '../WallHandler.js'></script>
+<script src = '../WallDataObj.js'></script>
+<script src = '../WallMethodsWall.js'></script>
+<script src = '../WallMethodsCollide.js'></script>
+<script src = '../WallMethodsBorder.js'></script>
+<script src = '../Renderer.js'></script>
 <script src = '../objects01.js'></script>
 <script src = '../objects02.js'></script>
 <script src = '../objects03.js'></script>

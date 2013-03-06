@@ -2,6 +2,7 @@
 <body>
 <link type='text/css' href = '../css/custom-theme/jquery-ui-1.9.2.custom.sim.css' rel='stylesheet' />
 <link type='text/css' href = '../styles.css' rel='stylesheet'/>
+<link type='text/css' href = '../mathStyles.css' rel='stylesheet'/>
 <div class='sim noSelect wrapper'>
 	<div id='main' class='sim main noSelect'>
 		<div id='mainHeader' class='sim header noSelect'>
@@ -88,10 +89,11 @@
 
 	<div id='baseDash' class='sim bottomRound noSelect'></div>
 </div>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 <script src = '../underscore-min.js'></script>
 <script src = '../js/jquery-1.9.0.min.js'></script>
 <script src = '../js/jquery-ui-1.9.2.custom.min.js'></script>
-
+<script src = '../ExpressionInterpreter.js'></script>
 <script src = '../Templater.js'></script>
 <script src = '../indepClasses.js'></script>
 <script src = '../inheritFuncs.js'></script>
@@ -111,6 +113,7 @@
 <script src = '../WallDataObj.js'></script>
 <script src = '../WallMethodsWall.js'></script>
 <script src = '../WallMethodsCollide.js'></script>
+<script src = '../WallMethodsBorder.js'></script>
 <script src = '../Renderer.js'></script>
 <script src = '../objects01.js'></script>
 <script src = '../objects02.js'></script>

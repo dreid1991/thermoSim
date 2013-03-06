@@ -1744,13 +1744,14 @@ _.extend(StateListener.prototype, objectFuncs, {
 		return fracDiff(val1, val2) > this.tolerance;
 	},
 	recordVals: function(){
-		this.results = {};
+		//storeObj formatted as: {storeAs: str, data: {wallInfo: 'wally', data: 'name', attrs: {stuff}}} //data.data is weird, but trying to be consistant
 		for (var storeIdx=0; storeIdx<this.storeAtSatisfy.length; storeIdx++) {
 			var store = this.storeAtSatisfy[storeIdx];
-			var handle = store.handle + 'S' + sectionIdx + 'P' + promptIdx;
-			var data = getObjFromPath(store.path, window);
-			var value = round(data[data.length-1], 1);
-			store(handle, value);
+			var storeAs = store.storeAs;
+			var data = store.data;
+			var dataSet = walls[data.wallInfo].getDataObj(data.data, data.attrs).src();
+			var value = dataSet[dataSet.length - 1];
+			store(storeAs, value);
 		}
 	},
 	isSatisfied: function(){

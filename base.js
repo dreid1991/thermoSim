@@ -492,9 +492,9 @@ function recursiveAddClass(elem, HTMLClass) {
 
 function addButton(id, text, divId){
 	divId = defaultTo('buttons', divId);
-	$('#'+divId).append(templater.button({attrs: {id: [id]}}));
+	$('#'+divId).append(templater.button({attrs: {id: [id]}, innerHTML: text}));
 	var button = $('button#'+id);
-	addJqueryElem(button, 'button');
+	addJQueryElems(button, 'button');
 	return button;
 }
 function removeButton(id) {
