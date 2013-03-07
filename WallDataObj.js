@@ -52,14 +52,14 @@ WallMethods.DataObj.prototype = {
 	recordStop: function(func) {
 		if (func) {
 			this.recordStopVal = func;
-		} else if (this.recordStopVal) {
+		} else if (this.recordStopVal && this.recordingVal) {
 			this.recordStopVal();
 		}
 	},
 	displayStop: function(func) {
 		if (func) {
 			this.displayStopVal = func;
-		} else if (this.displayStopVal) {
+		} else if (this.displayStopVal && this.displayingVal) {
 			this.displayStopVal();
 		}
 	},

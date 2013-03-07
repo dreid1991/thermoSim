@@ -446,13 +446,17 @@ Point.prototype = {
 			console.log('tried to track ' + this.trackListenerId + " but input wasn't right");
 			console.trace();
 		}
+		this.tracking = true;
 		return this;
 	},
 	trackStop: function() {
-		removeListener(curLevel, 'update', this.trackListenerId);
-		removeListener(curLevel, this.cleanUpWith + 'CleanUp', this.trackListenerId);
-		this.trackListenerId = undefined;
-		this.cleanUpWith = undefined;
+		if (this.tracking) {
+			removeListener(curLevel, 'update', this.trackListenerId);
+			removeListener(curLevel, this.cleanUpWith + 'CleanUp', this.trackListenerId);
+			this.trackListenerId = undefined;
+			this.cleanUpWith = undefined;
+			this.tracking = false;
+		}
 		return this;
 	}
 }

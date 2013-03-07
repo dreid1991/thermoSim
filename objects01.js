@@ -54,11 +54,11 @@ objectFuncs = {
 		curLevel[curLevelKey(this.type, this.handle)] = this;
 	},
 	removeFromCurLevel: function() {
-		var curLevelKey = curLevelKey(this.type, this.handle);
-		if (curLevel[curLevelKey] == this) {
-			delete curLevel[curLevelKey];
+		var key = curLevelKey(this.type, this.handle);
+		if (curLevel[key] == this) {
+			delete curLevel[key];
 		} else {
-			console.log("Trying to remove " + curLevelKey + " but handle doesn't belong to this object");
+			console.log("Trying to remove " + key + " but handle doesn't belong to this object");
 		}
 	},
 	removeCleanUp: function(){
