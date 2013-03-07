@@ -494,38 +494,48 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		return this;
 	},
 	dropIntoBin: function(weight, binType, special){
+		var self = this;
 		weight.status = 'inTransit';
 		var dropSlotInfo = this.getDropSlot(weight.name, binType);
 		var slot = dropSlotInfo.slot;
 		slot.isFull = true;
-		
-		var slotIdNum = dropSlotInfo.id;
-		if(special=='instant'){
-			weight.pos = slot.pos.copy();
-		}
-		var uniqueNamePiece = weight.name+weight.id + 'endId' + this.wallInfo;
-		var listenerName = 'moveWeight'+ uniqueNamePiece + binType+slotIdNum;
-		if(removeListenerByName(curLevel, 'update', uniqueNamePiece)){
-			weight.slot.isFull = false;
-			weight.slot = undefined;
-		};
 		weight.slot = slot;
-		addListener(curLevel, 'update', listenerName,
-			function(){
-				var slotPos = slot.pos;
-				var UV = V(slotPos.x-weight.pos.x, slotPos.y-weight.pos.y).UV();
-				weight.pos.x = boundedStep(weight.pos.x, slotPos.x, UV.dx*this.moveSpeed);
-				weight.pos.y = boundedStep(weight.pos.y, slotPos.y, UV.dy*this.moveSpeed);
-				if(this.weightArrived(weight, slot)){
-					removeListener(curLevel, 'update', listenerName);
-					//weight.slot = slot;
-					weight.status = slot.type;
-					if(weight.status=='piston'){
-						this.putOnPiston(weight, slot);
+		var slotIdNum = dropSlotInfo.id;
+		if (special == 'instant') {
+			this.dropInstant(weight, slot);
+		} else {
+
+			var uniqueNamePiece = weight.name+weight.id + 'endId' + this.wallInfo;
+			var listenerName = 'moveWeight'+ uniqueNamePiece + binType+slotIdNum;
+			if (removeListenerByName(curLevel, 'update', uniqueNamePiece)) {
+				weight.slot.isFull = false;
+				weight.slot = undefined;
+			};
+			
+			addListener(curLevel, 'update', listenerName,
+				function(){
+					var slotPos = slot.pos;
+					var UV = V(slotPos.x-weight.pos.x, slotPos.y-weight.pos.y).UV();
+					weight.pos.x = boundedStep(weight.pos.x, slotPos.x, UV.dx*this.moveSpeed);
+					weight.pos.y = boundedStep(weight.pos.y, slotPos.y, UV.dy*this.moveSpeed);
+					if (this.weightArrived(weight, slot)) {
+						removeListener(curLevel, 'update', listenerName);
+						//weight.slot = slot;
+						self.placeWeight(weight, slot);
 					}
-				}
-			},
-		this);
+				},
+			this);
+		}
+	},
+	placeWeight: function(weight, slot) {
+		weight.status = slot.type;
+		if (weight.status=='piston') {
+			this.putOnPiston(weight, slot);
+		}
+	},
+	dropInstant: function(weight, slot) {
+		weight.pos = slot.pos.copy();
+		this.placeWeight(weight, slot);
 	},
 	weightArrived: function(weight, slot){
 		return weight.pos.sameAs(slot.pos);

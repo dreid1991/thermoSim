@@ -63,7 +63,7 @@ _.extend(TestLevel.prototype,
 					{wallInfo: 'wally', data:'pInt', readout: 'mainReadout'}
 				],
 				cmmds: [
-					/*{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}*/
+					{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}
 				]
 			},
 			prompts: [
@@ -78,7 +78,7 @@ _.extend(TestLevel.prototype,
 						],
 						listeners: [
 							
-							{dataSet: {wallInfo: 'wally', data: 'pExt'}, is: 'equalTo', checkVal: 3, alertUnsatisfied: 'booo', satisfyCmmds: [{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllIntoBins'}]}
+							{dataSet: {wallInfo: 'wally', data: 'pExt'}, is: 'equalTo', checkVal: 1, alertUnsatisfied: 'booo', satisfyCmmds: [{type: 'DragWeights', handle: 'draggy', cmmd: 'freeze'}]}
 							
 						],
 						dataDisplay: [
