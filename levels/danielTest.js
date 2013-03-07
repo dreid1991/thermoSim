@@ -63,7 +63,7 @@ _.extend(TestLevel.prototype,
 					{wallInfo: 'wally', data:'pInt', readout: 'mainReadout'}
 				],
 				cmmds: [
-					{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}
+					/*{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}*/
 				]
 			},
 			prompts: [
@@ -71,9 +71,15 @@ _.extend(TestLevel.prototype,
 					sceneData: {
 						objs: [
 							{
-							type: 'AuxImage',
-							attrs: {handle: 'piccy', slotNum: 1, imgFunc: 'img(img/refresh.gif)'}
+								type: 'AuxImage',
+								attrs: {handle: 'piccy', slotNum: 1, imgFunc: 'img(img/refresh.gif)'}
 							}
+						
+						],
+						listeners: [
+							
+							{dataSet: {wallInfo: 'wally', data: 'pExt'}, is: 'equalTo', checkVal: 3, alertUnsatisfied: 'booo', satisfyCmmds: [{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllIntoBins'}]}
+							
 						],
 						dataDisplay: [
 							{wallInfo: "wally", data:'temp', readout: 'mainReadout'}

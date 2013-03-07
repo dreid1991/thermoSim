@@ -215,7 +215,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		addListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo, this.draw, this);
 		this.unfreeze();
 		this.wall.moveInit();
-		this.dropAllIntoStores('instant');
+		this.dropAllIntoBins('instant');
 		delete this.tempWeightDefs;
 		return this;
 		
@@ -455,7 +455,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		}
 		return totalMass+this.massInit;
 	},
-	dropAllIntoStores: function(special){
+	dropAllIntoBins: function(special){
 		for (var group in this.weightGroups) {
 			var weightGroup = this.weightGroups[group];
 			for (var weightIdx=0; weightIdx<weightGroup.weights.length; weightIdx++) {
@@ -1678,7 +1678,7 @@ function StateListener(attrs){//like dataList... is:'greaterThan', ... checkVal
 	this.priorities = {true:defaultTo(0, attrs.prioritySatisfied), false:defaultTo(0, attrs.priorityUnsatisfied)};
 	
 	this.storeAtSatisfy = defaultTo({}, attrs.storeAtSatisfy);
-	this.atSatisfyCmmds = defaultTo(undefined, attrs.atSatisfyCmmds);
+	this.satisfyCmmds = defaultTo(undefined, attrs.satisfyCmmds);
 	this.amSatisfied = false;
 	this.makeConditionFunc();
 	this.setupStd();
@@ -1709,8 +1709,8 @@ _.extend(StateListener.prototype, objectFuncs, {
 				if (this.condition()) {
 					this.amSatisfied = true;
 					this.recordVals();
-					if (this.atSatisfyCmmds) {
-						renderer.render({commands: this.atSatisfyCmmds})
+					if (this.satisfyCmmds) {
+						renderer.render({cmmds: this.satisfyCmmds})
 					}
 					removeListener(curLevel, 'update', this.handle);
 				}
