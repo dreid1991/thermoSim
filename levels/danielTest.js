@@ -53,14 +53,17 @@ _.extend(TestLevel.prototype,
 						attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/work/block0Pic1.jpg)'}
 					},
 					{
-						type: 'Sandbox',
-						attrs: {handle: 'sandy', wallInfo: 'wally', min: 2, init: 3, max: 7}
+						type: 'DragWeights',
+						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 1}], pInit: 1}
 					}
 
 						
 				],
 				dataDisplay: [
 					{wallInfo: 'wally', data:'pInt', readout: 'mainReadout'}
+				],
+				cmmds: [
+					{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}
 				]
 			},
 			prompts: [

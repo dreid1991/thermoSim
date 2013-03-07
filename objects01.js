@@ -474,7 +474,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		}
 		return this;
 	},
-	dropAllIntoPistons: function(special){
+	dropAllOntoPiston: function(special){
 		for (var group in this.weightGroups){
 			var weightGroup = this.weightGroups[group];
 			for (var weightIdx=0; weightIdx<weightGroup.weights.length; weightIdx++){

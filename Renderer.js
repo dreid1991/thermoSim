@@ -30,7 +30,7 @@ Renderer.prototype = {
 		this.addListeners(scene.listeners || []);
 		this.addGraphs(scene.graphs || []);
 		this.addRxns(scene.rxns || []);
-		this.doCommands(scene.commands || []);
+		this.doCommands(scene.cmmds || []);
 		
 
 		
@@ -105,7 +105,9 @@ Renderer.prototype = {
 		for (var cmmdIdx=0; cmmdIdx<cmmds.length; cmmdIdx++) {
 			var cmmd = cmmds[cmmdIdx];
 			var obj = cmmd.type ? this.getCmmdObj(cmmd.type, cmmd.handle) : window;
-			obj.apply(cmmd.cmmd, cmmd.args);
+			var func = obj[cmmd.cmmd];
+			func ? func.apply(obj, cmmd.args) : console.log('Bad command with type ' + cmmd.type + ', handle ' + cmmd.handle + ', and command ' + cmmd.cmmd);
+		
 		}
 	},
 	getCmmdObj: function(type, handle) {
