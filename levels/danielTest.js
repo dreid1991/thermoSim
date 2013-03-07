@@ -53,20 +53,8 @@ _.extend(TestLevel.prototype,
 						attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/work/block0Pic1.jpg)'}
 					},
 					{
-						type: 'Inlet',
-						attrs: {
-							handle: 'inny',
-							wallInfo: 'wally',
-							width: 40,
-							depth: 25,
-							flows: [{spcName: 'spc2', temp: 100, nDotMax: .001, tag: 'wally'}, {spcName: 'spc1', temp: 400, nDotMax: .01, tag: 'wally'}],
-							ptIdxs: [3, 4],
-							fracOffset: .2
-						}
-					},
-					{
-						type: 'DragWeights',
-						attrs: {weightDefs: [{count: 3, pressure: 6}], pInit: .5}
+						type: 'Sandbox',
+						attrs: {handle: 'sandy', wallInfo: 'wally', min: 2, init: 3, max: 7}
 					}
 
 						
