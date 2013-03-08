@@ -1687,7 +1687,7 @@ function StateListener(attrs){//like dataList... is:'greaterThan', ... checkVal
 	
 	this.priorities = {true:defaultTo(0, attrs.prioritySatisfied), false:defaultTo(0, attrs.priorityUnsatisfied)};
 	
-	this.storeAtSatisfy = defaultTo({}, attrs.storeAtSatisfy);
+	this.satisfyStore = defaultTo(undefined, attrs.satisfyStore);
 	this.satisfyCmmds = defaultTo(undefined, attrs.satisfyCmmds);
 	this.amSatisfied = false;
 	this.makeConditionFunc();
@@ -1759,13 +1759,15 @@ _.extend(StateListener.prototype, objectFuncs, {
 	},
 	recordVals: function(){
 		//storeObj formatted as: {storeAs: str, data: {wallInfo: 'wally', data: 'name', attrs: {stuff}}} //data.data is weird, but trying to be consistant
-		for (var storeIdx=0; storeIdx<this.storeAtSatisfy.length; storeIdx++) {
-			var store = this.storeAtSatisfy[storeIdx];
-			var storeAs = store.storeAs;
-			var data = store.data;
-			var dataSet = walls[data.wallInfo].getDataObj(data.data, data.attrs).src();
-			var value = dataSet[dataSet.length - 1];
-			store(storeAs, value);
+		if (this.satisfyStore) {
+			for (var storeIdx=0; storeIdx<this.satisfyStore.length; storeIdx++) {
+				var store = this.satisfyStore[storeIdx];
+				var storeAs = store.storeAs;
+				var data = store.data;
+				var dataSet = walls[data.wallInfo].getDataObj(data.data, data.attrs).src();
+				var value = dataSet[dataSet.length - 1];
+				store(storeAs, value);
+			}
 		}
 	},
 	isSatisfied: function(){

@@ -103,17 +103,14 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 		this.breakUp(a, b, UVAB);
 		return true;
 	},
-	//HEY - TEST INLINING breakUp in impactStd - I mean, of course it's icky, but it's faster and who looks or works here anyway?
 	breakUp: function(a, b, UVAB){
 		var sumR = a.r+b.r;
 		var aXNew = b.x - UVAB.dx*sumR;
 		var aYNew = b.y - UVAB.dy*sumR;
-		var bXNew = a.x + UVAB.dx*sumR;
-		var bYNew = a.y + UVAB.dy*sumR;
+		b.x = a.x + UVAB.dx*sumR;
+		b.y = a.y + UVAB.dy*sumR;
 		a.x = aXNew;
 		a.y = aYNew;
-		b.x = bXNew;
-		b.y = bYNew;
 	},
 	setup: function(){
 		this.gridSize = 2*this.getMaxR();

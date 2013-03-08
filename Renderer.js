@@ -100,12 +100,23 @@ Renderer.prototype = {
 			}
 		}
 	},
+	//command without a 'type' will check both window and curLevel for the function
 	doCommands: function(cmmds) {
 		//{type: (‘wall’, objName), handle: ,  cmmd: , args: [{…},  ...]}
 		for (var cmmdIdx=0; cmmdIdx<cmmds.length; cmmdIdx++) {
 			var cmmd = cmmds[cmmdIdx];
-			var obj = cmmd.type ? this.getCmmdObj(cmmd.type, cmmd.handle) : window;
-			var func = obj[cmmd.cmmd];
+			var func, obj;
+			if (cmmd.type) {
+				obj = this.getCmmdObj(cmmd.type, cmmd.handle);
+			} else {
+				if (window[cmmd.cmmd]) {
+					obj = window;
+				} else if (curLevel[cmmd.cmmd]) {
+					obj = curLevel;
+				}
+			}
+			if (obj) func = obj[cmmd.cmmd];
+			
 			func ? func.apply(obj, cmmd.args) : console.log('Bad command with type ' + cmmd.type + ', handle ' + cmmd.handle + ', and command ' + cmmd.cmmd);
 		
 		}
