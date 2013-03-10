@@ -464,7 +464,7 @@ _.extend(Tracer.prototype, objectFuncs, {
 })
 
 function HypoPath(attrs) {
-	var uiDiv = $('#prompt');
+	var promptDiv = $('#prompt');
 	var pistonAttrs = attrs.pistonAttrs || {};
 	var heaterAttrs = attrs.heaterAttrs || {};
 	var compArrowAttrs = attrs.compArrowAttrs || {};
@@ -472,9 +472,10 @@ function HypoPath(attrs) {
 	this.wallInfo = attrs.wallInfo;
 	this.handle = attrs.handle;
 	//need to make min & max const for piston and comp arrow
-	this.piston = this.genPiston(pistonAttrs, this.wallInfo, this.handle);
-	this.heater = this.genHeater(heaterAttrs, this.wallInfo, this.handle);
-	this.compArrow = this.genCompArrow(compArrowAttrs, this.wallInfo, this.handle);
+	//this.piston = this.genPiston(pistonAttrs, this.wallInfo, this.handle);
+	//this.heater = this.genHeater(heaterAttrs, this.wallInfo, this.handle);
+	//this.compArrow = this.genCompArrow(compArrowAttrs, this.wallInfo, this.handle);
+	this.uiWrapper = this.genUIWrapper(promptDiv);
 	//at const P, can change temp & add drag weights
 	//at constant V, can change temp & move vol slider (maybe vol slider w/ no temp change?)
 	//at const 
@@ -497,6 +498,29 @@ _.extend(HypoPath.prototype, objectFuncs, {
 		attrs.handle = handle + 'CompArrow';
 		return new CompArrow(attrs);
 	},
+	genUIWrapper: function(promptDiv) {
+		var wrapperId = this.handle + 'Wrapper';
+		$(promptDiv).append(templater.div({attrs: {id: [wrapperId]}}));
+		var wrapperDiv = $('#' + wrapperId);
+		this.appendTitledRadio(wrapperDiv, 'ToggleComp', 'Compression mode', 1, [
+			{text: '##c_{V}##', id: 'toggleCv', cb: function() {}},
+			{text: '##c_{P}##', id: 'toggleCp', cb: function() {}}
+		])		
+		this.appendTitledRadio(wrapperDiv, 'ToggleIso', 'Isothermal', 1, [
+			{text: 'On', id: 'isoOn', cb: function() {}},
+			{text: 'Off', id: 'isoOff', cb: function() {}}
+		])
 
+	},
+	//should throw this into templater...  Once I finished writing it I will organize.
+	appendTitledRadio: function(appendTo, groupName, title, defaultIdx, items) {
+		var wrapperId = this.handle + groupName;
+		$(appendTo).append(templater.div({attrs: {id: [wrapperId]}}))
+		var wrapperDiv = $('#' + wrapperId);
+		wrapperDiv.append(templater.p({innerHTML: title}));
+		templater.appendRadio(wrapperDiv, items, defaultIdx, groupName);
+		
+	}
+	
 
 })

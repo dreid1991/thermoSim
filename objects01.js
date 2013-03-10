@@ -29,7 +29,7 @@ compressorFuncs = {
 
 objectFuncs = {
 	setupStd: function() {
-		this.toggle = 'on';
+		this.toggleState = 'on';
 		this.removed = false;
 		this.addCleanUp();
 		if (this.handle) this.addToCurLevel();
@@ -155,10 +155,10 @@ objectFuncs = {
 	toggle: function(set) {
 		if (set == 'on') {
 			this.toggleOn();
-			this.state = 'on';
+			this.toggleState = 'on';
 		} else if (set == 'off') {
 			this.toggleOff();
-			this.state = 'off';
+			this.toggleState = 'off';
 		}
 	}
 }
@@ -1331,7 +1331,7 @@ function Piston(attrs){
 	//this.wall.setDefaultReadout(this.readout);
 	if (this.makeSlider) {
 		this.sliderId = this.addSlider('Pressure', {value: this.pToPercent(pInit)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
-		this.slider = $('#' + sliderId);
+		this.slider = $('#' + this.sliderId);
 	}
 	
 	this.setupStd();
