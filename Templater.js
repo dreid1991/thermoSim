@@ -79,9 +79,59 @@ Templater.prototype = {
 		obj ? obj.type = 'option' : obj = {type: 'option'};
 		return this.elem(obj);		
 	},
+	ul: function(obj) {
+		obj ? obj.type = 'ul' : obj = {type: 'ul'};
+		return this.elem(obj);
+	},
+	li: function(obj) {
+		obj ? obj.type = 'li' : obj = {type: 'li'};
+		return this.elem(obj);
+	},
+	a: function(obj) {
+		obj ? obj.type = 'a' : obj = {type: 'a'};
+		return this.elem(obj);
+	},
+	appendRadio: function(div, items, defaultIdx, groupName) {
+		//formatted as list of option names, ids, cbs
+		var itemsHTML = '';
+		defaultIdx = defaultIdx || 0;
+		for (var itemIdx=0; itemIdx<items.length; itemIdx++) {
+			var item, text, id, aHTML, liHTML, classes;
+			item = items[itemIdx];
+			text = item.text;
+			id = item.id;
+			aHTML = this.a({innerHTML: text, attrs: {href: ['#']}});//do I need quotes?
+			//need to set which one is on first.  
+			classes = [groupName];
+			if (itemIdx == defaultIdx) classes.push('on');
+			liHTML = this.li({innerHTML: aHTML, attrs: {class: classes, id: [id]}});
+
+			itemsHTML += liHTML;
+		}
+		var HTML = this.ul({innerHTML: itemsHTML, attrs: {id: [groupName]}});
+		$(div).append(HTML);
+		
+		this.radioActivate(items, groupName);
+	},
+	radioActivate: function(items, groupName) {
+		for (var itemIdx=0; itemIdx<items.length; itemIdx++) {
+			var item, cb, id, itemDiv;
+			item = items[itemIdx];
+			itemDiv = $('#' + item.id);
+			this.bindRadio(itemDiv, groupName, item.cb);
+		}
+	},
+	bindRadio: function(item, groupName, cb) {
+		$(item).click(function() {
+			$('li.' + groupName).removeClass('on');
+			$(this).addClass('on');
+			if (cb) cb();
+		})	
+	},
 	style: function(obj) {
 		return this.styleTemp(obj);
 	},
+	//make init radio function
 	elemTemp: _.template("<<%= type%><% for (var attr in attrs) { %><%= ' ' + attr %>='<%= attrs[attr].join(' ') %>'<% } %><%= style ? ' ' : '' %><%= templater.style({style: style}) %>><%= innerHTML %></<%= type %>>"),
 	styleTemp: _.template("<% if (!style) {return ''} %>style='<% for (var stylet in style) { %><%= stylet %>:<%= style[stylet] %>;<% } %>'")
 }

@@ -29,6 +29,7 @@ compressorFuncs = {
 
 objectFuncs = {
 	setupStd: function() {
+		this.removed = false;
 		this.addCleanUp();
 		if (this.handle) this.addToCurLevel();
 		this.wrapRemove();
@@ -44,6 +45,7 @@ objectFuncs = {
 	wrapRemove: function() {
 		var removeOld = this.remove;
 		this.remove = function() {
+			this.removed = true;
 			if (this.handle) this.removeFromCurLevel();
 			this.removeCleanUp();
 			removeOld.apply(this);

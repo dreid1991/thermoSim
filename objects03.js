@@ -462,3 +462,17 @@ _.extend(Tracer.prototype, objectFuncs, {
 		removeListener(curLevel, 'update', this.listenerHandle);
 	},
 })
+
+function HypoPath(attrs) {
+	var uiDiv = $('#prompt');
+	
+	//at const P, can change temp & add drag weights
+	//at constant V, can change temp & move vol slider (maybe vol slider w/ no temp change?)
+	//at const 
+}
+
+_.extend(HypoPath.prototype, objectFuncs, {
+	//gen
+
+
+})
