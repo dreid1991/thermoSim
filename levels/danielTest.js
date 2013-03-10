@@ -55,6 +55,10 @@ _.extend(TestLevel.prototype,
 					{
 						type: 'DragWeights',
 						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 1}], pInit: 1}
+					},
+					{
+						type: 'Piston',
+						attrs: {handle: 'pistony', wallInfo: 'wally'}
 					}
 
 						

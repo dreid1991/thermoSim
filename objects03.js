@@ -465,14 +465,38 @@ _.extend(Tracer.prototype, objectFuncs, {
 
 function HypoPath(attrs) {
 	var uiDiv = $('#prompt');
+	var pistonAttrs = attrs.pistonAttrs || {};
+	var heaterAttrs = attrs.heaterAttrs || {};
+	var compArrowAttrs = attrs.compArrowAttrs || {};
 	
+	this.wallInfo = attrs.wallInfo;
+	this.handle = attrs.handle;
+	//need to make min & max const for piston and comp arrow
+	this.piston = this.genPiston(pistonAttrs, this.wallInfo, this.handle);
+	this.heater = this.genHeater(heaterAttrs, this.wallInfo, this.handle);
+	this.compArrow = this.genCompArrow(compArrowAttrs, this.wallInfo, this.handle);
 	//at const P, can change temp & add drag weights
 	//at constant V, can change temp & move vol slider (maybe vol slider w/ no temp change?)
 	//at const 
 }
 
 _.extend(HypoPath.prototype, objectFuncs, {
-	//gen
+	genPiston: function(attrs, wallInfo, handle) {
+		attrs.wallInfo = wallInfo;
+		attrs.handle = handle + 'Piston';
+		attrs.makeSlider = true; //maybe not
+		return new Piston(attrs);
+	},
+	genHeater: function(attrs, wallInfo, handle) {
+		attrs.wallInfo = wallInfo;
+		attrs.handle = handle + 'Heater';
+		return new Heater(attrs);
+	},
+	genCompArrow: function(attrs, wallInfo, handle) {
+		attrs.wallInfo = wallInfo;
+		attrs.handle = handle + 'CompArrow';
+		return new CompArrow(attrs);
+	},
 
 
 })

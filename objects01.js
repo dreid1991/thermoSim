@@ -29,6 +29,7 @@ compressorFuncs = {
 
 objectFuncs = {
 	setupStd: function() {
+		this.toggle = 'on';
 		this.removed = false;
 		this.addCleanUp();
 		if (this.handle) this.addToCurLevel();
@@ -114,7 +115,7 @@ objectFuncs = {
 				$('#sliderHolderDouble').show();
 				break;
 		}
-		var sliderId = 'slider' + this.handle;
+		var sliderId = 'slider' + this.handle.toCapitalCamelCase();
 		this.sliderWrapper = makeSlider(toAppendId, sliderId, title, attrs, handlers);
 		return sliderId;
 	},
@@ -151,6 +152,15 @@ objectFuncs = {
 	massToPressure: function(mass) {
 		return mass*pConst*g/(this.wall[1].x-this.wall[0].x);
 	},
+	toggle: function(set) {
+		if (set == 'on') {
+			this.toggleOn();
+			this.state = 'on';
+		} else if (set == 'off') {
+			this.toggleOff();
+			this.state = 'off';
+		}
+	}
 }
 //////////////////////////////////////////////////////////////////////////
 //DRAG WEIGHTS
@@ -1064,21 +1074,21 @@ DragArrow.prototype = {
 			self.drawCanvas.rotate(self.rotation);
 		}
 		this.draw = extend(this.draw, init);
-		if(this.cols.stroke){
+		if (this.cols.stroke) {
 			var strokeFill = function(){draw.fillPtsStroke(self.pts.outer, self.cols.outer, self.cols.stroke, self.drawCanvas)};
 			this.draw = extend(this.draw, strokeFill);
-		}else{
+		} else {
 			var fill = function(){draw.fillPts(self.pts.outer, self.cols.outer, self.drawCanvas)};
 			this.draw = extend(this.draw, fill);
 		}
-		if(this.cols.inner || this.cols.onClick){
-			for (var ptIdx=0; ptIdx<this.pts.outer.length; ptIdx++){
+		if (this.cols.inner || this.cols.onClick) {
+			for (var ptIdx=0; ptIdx<this.pts.outer.length; ptIdx++) {
 				var newPt = this.pts.outer[ptIdx].copy().movePt({dx:-this.dims.dx/2}).scale(P(0,0),.6).movePt({dx:this.dims.dx/2});
 				this.pts.inner.push(newPt)
 			}
-			if(this.cols.inner){
+			if( this.cols.inner) {
 				this.cols.curInner = this.cols.inner;
-			}else{
+			} else {
 				this.cols.curInner = this.cols.outer;
 			}
 			
@@ -1189,6 +1199,10 @@ DragArrow.prototype = {
 		
 		return upFunc;
 	},
+	setPos: function(pos) {
+		if (typeof pos.x == 'number') this.pos.x = pos.x;
+		if (typeof pos.y == 'number') this.pos.y = pos.y;
+	},
 	show: function(){
 		addListener(curLevel, 'mousedown', 'dragArrow'+this.name, this.clickListeners, '');
 		addListener(curLevel, 'update', 'drawDragArrow'+this.name, this.draw, '');
@@ -1227,8 +1241,7 @@ function CompArrow(attrs){
 	compMode += compAdj;
 	var makeStops = defaultTo(true, attrs.stops);
 	var bounds = defaultTo({y:{min:30, max:350}}, attrs.bounds);
-	var wall = walls[wallInfo];
-	var pos = wall[1].copy()
+	this.wall = walls[wallInfo];
 	var rotation = 0;
 	var cols = {};
 	cols.outer = Col(44, 118, 172);
@@ -1246,8 +1259,8 @@ function CompArrow(attrs){
 	listeners.onDown = function(){};
 	listeners.onMove = function(){wall.changeSetPt(this.pos.y, compMode, speed)};
 	listeners.onUp = function(){};
-	this.dragArrow = new DragArrow(pos, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds).show();
-	
+	this.dragArrowFunc = this.makeDragArrowFunc(this.wall, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds);
+	this.dragArrow = this.dragArrowFunc();
 	this.setupStd();
 	
 	return this;
@@ -1259,6 +1272,19 @@ _.extend(CompArrow.prototype, objectFuncs, {
 			this.stops.remove();
 		}
 	},
+	makeDragArrowFunc: function(wall, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds) {
+		return function () {
+			var pos = wall[1].copy();
+			return new DragArrow(pos, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds).show();
+		}
+	},
+	toggleOn: function() {
+		this.dragArrow.setPos(this.wall[1].copy());
+		this.dragArrow.show();
+	},
+	toggleOff: function() {
+		this.dragArrow.hide()
+	}
 }
 )
 
@@ -1283,7 +1309,7 @@ function Piston(attrs){
 	this.width = this.wall[1].x-this.left;
 	this.pistonPt = this.wall[0];
 	var pInit = defaultTo(2, attrs.init)
-	this.setMass(pInit);
+	this.setPressure(pInit);
 
 	this.height = 500;
 	this.draw = this.makeDrawFunc(this.height, this.left, this.width);
@@ -1305,7 +1331,9 @@ function Piston(attrs){
 	//this.wall.setDefaultReadout(this.readout);
 	if (this.makeSlider) {
 		this.sliderId = this.addSlider('Pressure', {value: this.pToPercent(pInit)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
+		this.slider = $('#' + sliderId);
 	}
+	
 	this.setupStd();
 	
 	return this.show();
@@ -1376,6 +1404,20 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		dims.adjust(0,1);
 		return {pos:pos, dims:dims, col:col};
 	},
+	toggleOn: function() {
+		if (this.slider) {
+			this.slider.slider('option', 'disabled', false);
+		}
+		this.setMass(this.massStore);
+		delete this.massStore;
+	},
+	toggleOff: function() {
+		if (this.slider) {
+			this.slider.slider('option', 'disabled', true);
+		}
+		this.massStore = this.mass;
+		this.setMass(0);
+	},
 	show: function(){
 		addListener(curLevel, 'update', 'drawPiston'+this.handle, this.draw, '');
 		this.readout.show();
@@ -1393,10 +1435,10 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		this.setPressure(this.percentToVal(ui.value));
 	},
 	setPressure: function(pressure){
-		this.setMass(pressure);
+		this.setMass(this.pressureToMass(pressure));
 	},
-	setMass: function(pressure){
-		this.mass = this.pressureToMass(pressure);
+	setMass: function(mass){
+		this.mass = mass;
 		this.wall.setMass('piston' + this.handle, this.mass);
 	},
 	setReadoutY: function(){
