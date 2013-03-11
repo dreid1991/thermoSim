@@ -83,13 +83,12 @@
 	padding:10px;
 }
 .sim.dashMed{
-	height:70px;
+	height:80px;
 	border-bottom-left-radius:20px;
 	border-bottom-right-radius:20px;
 	background-color:#05111a;
 	color:white;
-	padding:10px;
-	padding:10px;
+	padding:5px;
 }
 .sim.whiteFont{
 	color:white;
@@ -217,8 +216,6 @@ body{
 
 ul{
     list-style:none;
-    width:85px;
-    height:26px;
     margin:-13px 0 0 -42px;
 }
 

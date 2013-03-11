@@ -1,7 +1,7 @@
 WallMethods.Border = function (attrs) {
 	this.wall = attrs.wall;
 	this.type = attrs.type;
-	this.yMin = attrs.yMin;
+	this.yMin = attrs.yMin !== undefined ? attrs.yMin : this.wall[0].y;
 	this.col = attrs.col || this.wall.col.copy().adjust(-100, -100, -100);
 	this.thick = attrs.thickness || 5; //don't want to have value of zero anyway
 	this.update = this.pickGenerator(this.type)

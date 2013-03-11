@@ -93,6 +93,9 @@ Templater.prototype = {
 	},
 	appendRadio: function(div, items, defaultIdx, groupName) {
 		//formatted as list of option names, ids, cbs
+		var wrapperDivHTML = templater.div({attrs: {id: [groupName + 'TemplaterWrapper']}, style: {height: 46, position: 'relative', top: '15px'}})
+		$(div).append(wrapperDivHTML)
+		var wrapperDiv = $('#' + groupName + 'TemplaterWrapper');
 		var itemsHTML = '';
 		defaultIdx = defaultIdx || 0;
 		for (var itemIdx=0; itemIdx<items.length; itemIdx++) {
@@ -109,7 +112,7 @@ Templater.prototype = {
 			itemsHTML += liHTML;
 		}
 		var HTML = this.ul({innerHTML: itemsHTML, attrs: {id: [groupName]}});
-		$(div).append(HTML);
+		$(wrapperDiv).append(HTML);
 		
 		this.radioActivate(items, groupName);
 	},

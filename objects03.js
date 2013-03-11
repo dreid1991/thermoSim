@@ -464,10 +464,11 @@ _.extend(Tracer.prototype, objectFuncs, {
 })
 
 function HypoPath(attrs) {
-	var promptDiv = $('#prompt');
+	var promptDiv = $('#dashRun');
 	var pistonAttrs = attrs.pistonAttrs || {};
 	var heaterAttrs = attrs.heaterAttrs || {};
 	var compArrowAttrs = attrs.compArrowAttrs || {};
+		//need to deal with sliders.
 	
 	this.wallInfo = attrs.wallInfo;
 	this.handle = attrs.handle;
@@ -517,8 +518,18 @@ _.extend(HypoPath.prototype, objectFuncs, {
 		var wrapperId = this.handle + groupName;
 		$(appendTo).append(templater.div({attrs: {id: [wrapperId]}}))
 		var wrapperDiv = $('#' + wrapperId);
-		wrapperDiv.append(templater.p({innerHTML: title}));
-		templater.appendRadio(wrapperDiv, items, defaultIdx, groupName);
+		
+		tableHTML = templater.table({attrs: {cellspacing: [0], border: [0]}, innerHTML:
+			templater.tr({innerHTML: 
+				templater.td({innerHTML: title}) + //need to have spaces and headerHTML in different td or it offsets the content down a little bit
+				templater.td({innerHTML: '&nbsp;&nbsp;'}) + 
+				templater.td({innerHTML:  templater.div({attrs: {id: [wrapperId + 'buttons']}})})
+			})
+		})
+
+		$(wrapperDiv).append(tableHTML);
+		var buttonWrapper = $('#' + wrapperId + 'buttons');
+		templater.appendRadio(buttonWrapper, items, defaultIdx, groupName);
 		
 	}
 	

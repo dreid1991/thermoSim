@@ -70,7 +70,7 @@ ExpressionInterpreter.prototype = {
 	},
 	eval: function(text) {
 		var self = this;
-		if (typeof text == 'number') return;
+		if (typeof text == 'number') return text;
 		text = text.replace(/eval[\s]*\([0-9\(\)\+\-\*\/\s,\.]*\)/g, function(evalItem, idx) {
 			var args = self.sliceArgs(evalItem);
 			var expr = args[0];
@@ -96,7 +96,7 @@ ExpressionInterpreter.prototype = {
 			}
 			return val;
 		})
-		var toReturn = Number(text) == text ? Number(text) : text;
+		var toReturn = Number(text) === text ? Number(text) : text;
 		return toReturn;
 	},
 	sliceArgs: function(expr) {
