@@ -397,12 +397,13 @@ function recordDataStop(handle){
 	removeListener(window['curLevel'], listenerType, handle);
 }
 
-function makeSlider(wrapperDivId, sliderDivId, title, attrs, handlers, initVisibility){
-	var wrapperDiv = $('#' + wrapperDivId);
-	var html = '';
-	wrapperDiv.html('');
-	html += templater.center({innerHTML: title});
-	html += templater.div({
+function makeSlider(titleWrapperDiv, sliderWrapperDiv, sliderDivId, title, attrs, handlers, initVisibility){
+	// var wrapperDiv = $('#' + wrapperDivId);
+	var titleHTML = '';
+	var sliderHTML = '';
+	// wrapperDiv.html('');
+	titleHTML += templater.center({innerHTML: title}); // need to deal with this center.  Don't always want to do that
+	sliderHTML += templater.div({
 		attrs: {
 			id:	[sliderDivId + 'parent']
 		},
@@ -417,7 +418,8 @@ function makeSlider(wrapperDivId, sliderDivId, title, attrs, handlers, initVisib
 		})
 	})
 	
-	wrapperDiv.append(html);
+	titleWrapperDiv.append(titleHTML);
+	sliderWrapperDiv.append(sliderHTML);
 	var divParent = $('#'+sliderDivId+'parent');
 	var sliderDiv = $('#' + sliderDivId);
 	//sliderDiv.slider({});
@@ -452,7 +454,7 @@ function makeSlider(wrapperDivId, sliderDivId, title, attrs, handlers, initVisib
 		div[initVisibility]();
 	}
 	sliderList.push(sliderDivId);
-	return wrapperDiv;
+	return [titleWrapperDiv, sliderWrapperDiv];//YOU WERE HERE.
 }
 function sliderBind(div, eventType, func, obj){
 	div.bind(eventType, function(event, ui){func.apply(obj, [event, ui])});

@@ -93,30 +93,33 @@ objectFuncs = {
 		}
 		return this.checkForMigrateCenter();
 	},
-	addSlider: function(title, attrs, handlers, position){
-		if (!position) {
-			position = this.pickSliderPos();
-		}
-		var toAppendId;
-		switch (position) {
-			case 'left':
-				toAppendId = 'sliderHolderLeft';
-				$('#sliderHolderSingle').hide();
-				$('#sliderHolderDouble').show();
-				break;
-			case 'center':
-				toAppendId = 'sliderHolderCenter';
-				$('#sliderHolderSingle').show();
-				$('#sliderHolderDouble').hide();
-				break;
-			case 'right':
-				toAppendId = 'sliderHolderRight';
-				$('#sliderHolderSingle').hide();
-				$('#sliderHolderDouble').show();
-				break;
+	addSlider: function(title, attrs, handlers, position, sliderWrapper, sliderTitleWrapper){
+		if (!(sliderWrapper && sliderTitleWrapper)) {
+			if (!position) {
+				position = this.pickSliderPos();
+			}
+			
+			switch (position) {
+				case 'left':
+					sliderWrapper = $('#sliderHolderLeft');
+					$('#sliderHolderSingle').hide();
+					$('#sliderHolderDouble').show();
+					break;
+				case 'center':
+					sliderWrapper = $('#sliderHolderCenter');
+					$('#sliderHolderSingle').show();
+					$('#sliderHolderDouble').hide();
+					break;
+				case 'right':
+					sliderWrapper = $('#sliderHolderRight');
+					$('#sliderHolderSingle').hide();
+					$('#sliderHolderDouble').show();
+					break;
+			}
+			sliderTitleWrapper = sliderWrapper;
 		}
 		var sliderId = 'slider' + this.handle.toCapitalCamelCase();
-		this.sliderWrapper = makeSlider(toAppendId, sliderId, title, attrs, handlers);
+		this.sliderWrappers = makeSlider(sliderTitleWrapper, sliderWrapper, sliderId, title, attrs, handlers);
 		return sliderId;
 	},
 	checkForMigrateCenter: function() {
@@ -134,7 +137,11 @@ objectFuncs = {
 		//look into jQuery.clone
 	},//DOESN'T WORK  MUST MIGRATE ALL BOUND FUNCTIONS AS WELL, I THINK
 	removeSlider: function() {
-		this.sliderWrapper.html('');
+		//can be seperate wrappers for title, slider
+		for (var wrapperIdx=0; wrapperIdx<this.sliderWrappers.length; wrapperIdx++) {
+			this.sliderWrappers[wrapperIdx].html('');
+		}
+		
 	},
 	hideSliderDivs: function(){
 		$('#sliderHolderSingle').hide();
@@ -1305,6 +1312,10 @@ function Piston(attrs){
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	this.slant = .07;
 	
+	//must send neither or both of these.
+	this.sliderWrapper = attrs.sliderWrapper;
+	this.sliderTitleWrapper = attrs.sliderTitleWrapper;
+	
 	this.left = this.wall[0].x;
 	this.width = this.wall[1].x-this.left;
 	this.pistonPt = this.wall[0];
@@ -1330,7 +1341,7 @@ function Piston(attrs){
 	walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);		
 	//this.wall.setDefaultReadout(this.readout);
 	if (this.makeSlider) {
-		this.sliderId = this.addSlider('Pressure', {value: this.pToPercent(pInit)}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
+		this.sliderId = this.addSlider('Pressure', {value: this.pToPercent(pInit)}, [{eventType:'slide', obj:this, func:this.parseSlider}], this.sliderWrapper, this.sliderTitleWrapper);
 		this.slider = $('#' + this.sliderId);
 	}
 	
@@ -1473,6 +1484,9 @@ function Heater(attrs){
 	*/
 	this.dims = defaultTo(V(100,40), attrs.dims);
 	
+	this.sliderWrapper = attrs.sliderWrapper;
+	this.sliderTitleWrapper = attrs.sliderTitleWrapper;
+	
 	this.wall = walls[attrs.wallInfo];
 	if (attrs.pos) {
 		this.pos = attrs.pos;
@@ -1508,7 +1522,7 @@ function Heater(attrs){
 												this.parseSlider(event, ui)
 											}
 			},		
-			]);
+			], this.sliderWrapper, this.sliderTitleWrapper);
 	}
 	return this.init();
 }
