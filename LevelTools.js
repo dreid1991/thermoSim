@@ -25,6 +25,7 @@ LevelTools = {
 		for (var sIdx=0; sIdx<this.sections.length; sIdx++) {
 			var section = this.sections[sIdx];
 			if (section.sceneData) section.sceneData.type = 'section';
+			if (!section.prompts) console.log('Section ' + sIdx + ' has no prompts!  Sections must have at least one prompt.');
 			for (var pIdx=0; pIdx<section.prompts.length; pIdx++) {
 				var prompt = section.prompts[pIdx];
 				if (prompt.sceneData) prompt.sceneData.type = 'prompt';
