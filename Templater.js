@@ -131,6 +131,38 @@ Templater.prototype = {
 			if (cb) cb();
 		})	
 	},
+	//classes & styles have table, td, tr elems (add th?)
+	tableFromArray: function(elems, classes, styles) {
+		var tableInnerHTML = '';
+		classes = classes || {};
+		styles = styles || {};
+		var tableClass = classes.table, trClass = classes.tr, tdClass = classes.td;
+		var tableStyle = styles.table, trStyle = styles.tr, tdStyle = styles.td;
+		
+		for (var rowIdx=0; rowIdx<elems.length; rowIdx++) {
+			var row = elems[rowIdx];
+			rowInnerHTML = '';
+			for (var colIdx=0; colIdx<row.length; colIdx++) {
+				var col = row[colIdx];
+				
+				rowInnerHTML += templater.td({
+					innerHTML: col,
+					attrs: tdClass ? {'class': tdClass} : undefined,
+					style: tdStyle ? tdStyle : undefined
+				})
+			}
+			tableInnerHTML += templater.tr({
+				innerHTML: rowInnerHTML,
+				attrs: trClass ? {'class': trClass} : undefined,
+				style: trStyle ? trStyle : undefined
+			})
+		}
+		return templater.table({
+			innerHTML: tableInnerHTML,
+			attrs: tableClass ? {'class': tableClass} : undefined,
+			style: tableStyle ? tableStyle : undefined
+		})
+	},
 	style: function(obj) {
 		return this.styleTemp(obj);
 	},

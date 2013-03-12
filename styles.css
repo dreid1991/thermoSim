@@ -144,6 +144,17 @@
 	float:right;
 	display:inline-block;
 }
+table.sim.tableBorder, td.sim.tableBorder tr.sim.tableBorder {
+	border: 1px solid white;
+}
+
+td.sim.grid tr.sim.grid {
+	vertical-align: middle;
+	
+}
+table.sim.grid {
+	border: 0px;
+}
 /*
 radio button styles
 */
