@@ -576,7 +576,7 @@ WallMethods.wall = {
 		}
 		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
 		var units = 'kJ';
-		decPlaces = defaultTo(0, decPlaces);
+		decPlaces = defaultTo(1, decPlaces);
 		var label = defaultTo('Work:', label);
 		this.displayStd(dataObj, readout, label, decPlaces, units);
 	},

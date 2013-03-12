@@ -92,7 +92,7 @@ Templater.prototype = {
 		return this.elem(obj);
 	},
 	appendRadio: function(div, items, defaultIdx, groupName) {
-		//formatted as list of option names, ids, cbs
+		//formatted as list of option texts, ids, cbs
 		var wrapperDivHTML = templater.div({attrs: {id: [groupName + 'TemplaterWrapper']}, style: {height: 46, position: 'relative', top: '15px'}})
 		$(div).append(wrapperDivHTML)
 		var wrapperDiv = $('#' + groupName + 'TemplaterWrapper');
@@ -147,19 +147,19 @@ Templater.prototype = {
 				
 				rowInnerHTML += templater.td({
 					innerHTML: col,
-					attrs: tdClass ? {'class': tdClass} : undefined,
+					attrs: tdClass ? {'class': tdClass.concat()} : undefined,
 					style: tdStyle ? tdStyle : undefined
 				})
 			}
 			tableInnerHTML += templater.tr({
 				innerHTML: rowInnerHTML,
-				attrs: trClass ? {'class': trClass} : undefined,
+				attrs: trClass ? {'class': trClass.concat()} : undefined,
 				style: trStyle ? trStyle : undefined
 			})
 		}
 		return templater.table({
 			innerHTML: tableInnerHTML,
-			attrs: tableClass ? {'class': tableClass} : undefined,
+			attrs: tableClass ? {'class': tableClass.concat()} : undefined,
 			style: tableStyle ? tableStyle : undefined
 		})
 	},

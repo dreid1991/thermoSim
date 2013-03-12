@@ -469,14 +469,19 @@ function HypoPath(attrs) {
 	var heaterAttrs = attrs.heaterAttrs || {};
 	var compArrowAttrs = attrs.compArrowAttrs || {};
 		//need to deal with sliders.
-	
+	this.UIx = 4;
+	this.UIy = 2;
 	this.wallInfo = attrs.wallInfo;
 	this.handle = attrs.handle;
+	this.UIWrapper = this.genUIWrapper(promptDiv);
+	this.appendUIGrid(this.UIWrapper, this.UIx, this.UIy);
+	// UIGrid formatted as col, row
+	this.UIGrid = this.selectUIGrid(this.UIx, this.UIy);
+	this.appendRadios(this.UIGrid, P(0, 0), P(1, 0), P(0, 1), P(1, 1));
 	//need to make min & max const for piston and comp arrow
 	//this.piston = this.genPiston(pistonAttrs, this.wallInfo, this.handle);
 	//this.heater = this.genHeater(heaterAttrs, this.wallInfo, this.handle);
 	//this.compArrow = this.genCompArrow(compArrowAttrs, this.wallInfo, this.handle);
-	this.uiWrapper = this.genUIWrapper(promptDiv);
 	//at const P, can change temp & add drag weights
 	//at constant V, can change temp & move vol slider (maybe vol slider w/ no temp change?)
 	//at const 
@@ -502,16 +507,63 @@ _.extend(HypoPath.prototype, objectFuncs, {
 	genUIWrapper: function(promptDiv) {
 		var wrapperId = this.handle + 'Wrapper';
 		$(promptDiv).append(templater.div({attrs: {id: [wrapperId]}}));
-		var wrapperDiv = $('#' + wrapperId);
-		this.appendTitledRadio(wrapperDiv, 'ToggleComp', 'Compression mode', 1, [
-			{text: '##c_{V}##', id: 'toggleCv', cb: function() {}},
-			{text: '##c_{P}##', id: 'toggleCp', cb: function() {}}
-		])		
-		this.appendTitledRadio(wrapperDiv, 'ToggleIso', 'Isothermal', 1, [
-			{text: 'On', id: 'isoOn', cb: function() {}},
-			{text: 'Off', id: 'isoOff', cb: function() {}}
-		])
+		return $('#' + wrapperId);
+		// this.appendTitledRadio(wrapperDiv, 'ToggleComp', 'Compression mode', 1, [
+			// {text: '##c_{V}##', id: 'toggleCv', cb: function() {}},
+			// {text: '##c_{P}##', id: 'toggleCp', cb: function() {}}
+		// ])		
+		// this.appendTitledRadio(wrapperDiv, 'ToggleIso', 'Isothermal', 1, [
+			// {text: 'On', id: 'isoOn', cb: function() {}},
+			// {text: 'Off', id: 'isoOff', cb: function() {}}
+		// ])
 
+	},
+	appendUIGrid: function(div, x, y) {
+		//grid as cow, row, so I can use point notation
+		var classes = {td: ['middle']};
+		var styles = {};
+		var HTMLGrid = [];
+		for (var j=0; j<y; j++) {
+			var col = [];
+			for (var i=0; i<x; i++) {
+				var id = this.tableGridId(i, j);
+				col.push(templater.div({attrs: {id: [id]}}));
+			}
+			HTMLGrid.push(col);
+		}
+		$(div).append(templater.tableFromArray(HTMLGrid, classes, styles));
+	},
+	tableGridId: function(x, y) {
+		return this.handle + 'x' + x + 'y' + y;
+	},
+	selectUIGrid: function(x, y) {
+		var divs = [];
+		for (var i=0; i<x; i++) {
+			var row = [];
+			for (var j=0; j<y; j++) {
+				row.push($('#' + this.tableGridId(i, j)));	
+			}
+			divs.push(row);
+		}
+		return divs;
+	},
+	appendRadios: function(UIGrid, title1, radioWrapper1, title2, radioWrapper2) {
+		$(UIGrid[title1.x][title1.y]).html('Comp type: ');
+		$(UIGrid[title2.x][title2.y]).html('Isothermal: ');
+		templater.appendRadio(UIGrid[radioWrapper1.x][radioWrapper1.y], 
+			[
+				{text: 'c<sub>V</sub>', id: this.handle + 'cvRadio', cb: function() {}},
+				{text: 'c<sub>P</sub>', id: this.handle + 'cpRadio', cb: function() {}}
+			],
+			1, this.handle + 'CompType'
+		);
+		templater.appendRadio(UIGrid[radioWrapper2.x][radioWrapper2.y], 
+			[
+				{text: 'No', id: this.handle + 'IsoOff', cb: function() {}},
+				{text: 'Yes', id: this.handle + 'IsoOn', cb: function() {}}
+			],
+			1, this.handle + 'IsIso'
+		);
 	},
 	//should throw this into templater...  Once I finished writing it I will organize.
 	appendTitledRadio: function(appendTo, groupName, title, defaultIdx, items) {

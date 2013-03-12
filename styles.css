@@ -61,7 +61,7 @@
 	border-bottom:3px solid;
 	border-color:#b3b2b1;	
 }
-.sim.displayText{
+.sim.displayText, table, tr, td{
 	font-family:Verdana, garamond;/*WHAT IS GARAMOND?  SHOULD GET OTHER FALLBACKS.*/
 	font-size:medium;
 	color:white;
@@ -144,21 +144,38 @@
 	float:right;
 	display:inline-block;
 }
+
+table.tableBorder, tr.tableBorder, td.tableBorder {
+	border: 0px;
+	
+}
+/*
 table.sim.tableBorder, td.sim.tableBorder tr.sim.tableBorder {
 	border: 1px solid white;
 }
+*/
+table.sim.tableBorder {
+	border: 1px solid white;
+	padding: 0px;
+}
+td.sim.tableBorder {
+	border: 1px solid white;
+	padding: 1px;
+}
 
-td.sim.grid tr.sim.grid {
+
+td.sim.middle {
 	vertical-align: middle;
 	
 }
 table.sim.grid {
 	border: 0px;
 }
+
 /*
 radio button styles
 */
-/*
+
 ul.sim{
     list-style:none;
     width:85px;
@@ -214,7 +231,7 @@ ul.sim li.on.sim a.sim{
     color:#7BBA47;
     cursor: default;
 }
-*/
+
 
     Created by @JohnieHjelm. I took the liberty of doing this ON/OFF switch
     just to express my love for CSS3. You're free to use this and of course
