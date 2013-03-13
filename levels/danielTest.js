@@ -52,13 +52,13 @@ _.extend(TestLevel.prototype,
 						type: 'AuxImage',
 						attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/work/block0Pic1.jpg)'}
 					},
-					{
-						type: 'DragWeights',
-						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 1}], pInit: 1}
-					},
+					// {
+						// type: 'DragWeights',
+						// attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 1}], pInit: 1}
+					// },
 					{
 						type: 'Piston',
-						attrs: {handle: 'pistony', wallInfo: 'wally'}
+						attrs: {handle: 'pistony', wallInfo: 'wally', min: 2, init: 4, max: 6}
 					}
 
 						
@@ -67,7 +67,7 @@ _.extend(TestLevel.prototype,
 					{wallInfo: 'wally', data:'pInt', readout: 'mainReadout'}
 				],
 				cmmds: [
-					{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}
+					//{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}
 				]
 			},
 			prompts: [

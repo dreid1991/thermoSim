@@ -1435,7 +1435,7 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		return this;
 	},
 	pToPercent: function(p) {
-		return (p - this.min)/(this.max - this.min);
+		return 100 * (p - this.min)/(this.max - this.min);
 	},
 	hide: function(){
 		removeListener(curLevel, 'update', 'drawPiston'+this.handle);
