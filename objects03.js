@@ -469,6 +469,7 @@ function HypoPath(attrs) {
 	var heaterAttrs = attrs.heaterAttrs || {};
 	var compArrowAttrs = attrs.compArrowAttrs || {};
 		//need to deal with sliders.
+	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.UIx = 4;
 	this.UIy = 2;
 	this.wallInfo = attrs.wallInfo;

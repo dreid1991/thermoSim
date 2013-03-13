@@ -397,6 +397,17 @@ function recordDataStop(handle){
 	removeListener(window['curLevel'], listenerType, handle);
 }
 
+function grabAttrs(obj, attrs) {
+	var newObj = {};
+	for (var objLet in obj) {
+		newObj[objLet] = {};
+		for (var i=0; i<attrs.length; i++) {
+			newObj[objLet][attrs[i]] = obj[objLet][attrs[i]];
+		}
+	}
+	return newObj;
+}
+
 function makeSlider(titleWrapperDiv, sliderWrapperDiv, sliderDivId, title, attrs, handlers, initVisibility){
 	// var wrapperDiv = $('#' + wrapperDivId);
 	var titleHTML = '';
