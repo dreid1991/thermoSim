@@ -21,7 +21,6 @@ WallMethods.wall = {
 	volToY: function(vol) {
 		var width = this[2].distTo(this[3]);
 		var height = vol/(vConst*width);
-		//WHAT IS THIS?
 		var extendUV = this[2].VTo(this[3]).UV().perp('cw');
 		return this[2].y - height;
 	},
