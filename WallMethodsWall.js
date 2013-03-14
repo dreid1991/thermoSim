@@ -261,6 +261,8 @@ WallMethods.wall = {
 			} else {
 				return this.data[type]
 			}
+		} else {
+			return false;
 		}
 	},
 	removeDataObj: function(type, args) { 

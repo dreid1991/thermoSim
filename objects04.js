@@ -1,14 +1,16 @@
 function Liquid(attrs) {
+	//driving force convention: positive -> into liquid, neg -> into vapor
+	this.type = 'Liquid';
 	this.wallInfo = attrs.wallInfo;
 	this.wallGas = walls[this.wallInfo];
 	this.wallPts = attrs.wallPts || [this.wallGas[this.wallGas.length - 2], this.wallGas[this.wallGas.length - 3]];
-	this.handle = handle;
+	this.handle = attrs.handle;
 	this.cleanUpWith = attrs.cleanUpWith || currentSetupType;
 	var actCoeffType = attrs.actCoeffType; //twoSfxMrg for two suffix margules, 
 	var actCoeffInfo = attrs.actCoeffInfo;
 	
 	var tempInit = attrs.tempInit;
-	var spcInfo = this.makeSpcInfo(attrs.spcInfo); //formatted as {spc1: {count: #, spcVol: #, antoine: {a: #,b: #,c: #}, hVap: #} ... } spcVol in L/mol
+	var spcInfo = this.makeSpcInfo(attrs.spcInfo); //formatted as {spc1: {count: #, spcVol: #, antoineCoeffs: {a: #,b: #,c: #}, hVap: #} ... } spcVol in L/mol
 	var drivingForce = this.makeDrivingForce(spcInfo);
 	this.wallLiq = this.makeWallLiq(spcInfo, this.wallGas, this.wallPts);
 	var dataGas = this.initData(this.wallGas, spcInfo, ['pInt']);
@@ -18,8 +20,10 @@ function Liquid(attrs) {
 	this.makeDots(this.wallLiq, spcInfo, tempInit, dotMgrLiq);
 	this.rndDots = this.makeRndDots(dotManagerLiq);
 	this.actCoeffFuncs = this.makeActCoeffFuncs(actCoeffType, actCoeffInfo, spcList);
-	this.setupUpdate(spcInfo, dataGas, actCoeffFuncs, drivingForce)
 	
+	this.updateListenerName = this.type + this.handle;
+	this.setupUpdate(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, this.updateListenerName)
+	//this.setupStd();
 }
 
 _.extend(Liquid.prototype, objectFuncs, {
@@ -81,12 +85,19 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var data = {};
 		for (var extraIdx=0; extraIdx<extras.length; extraIdx++) {
 			var extra = extras[extraIdx];
-			data[extra] = wall.getDataObj(extra);
+			var dataObj = wall.getDataObj(extra);
+			if (dataObj === false) {
+				var recordFunc = 'record' + extra.toCapitalCamelCase();
+				wall[recordFunc]();
+				data[extra] = wall.getDataObj(extra).src();
+			} else {
+				data[extra] = dataObj.src();
+			}
 		}
 		for (var spcName in spcInfo) {
 			var attrs = {spcName: spcName, tag: wall.handle};
 			wall.recordFrac(attrs)
-			data[spcName] = wall.getDataObj('frac', attrs)
+			data[spcName] = wall.getDataObj('frac', attrs).src();
 		}
 		return data;
 	},
@@ -94,7 +105,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var reformat = {};
 		for (var infolet in spcInfo) {
 			var spc = spcInfo[infolet];
-			reformat[infolet] = new this.Species(infolet, spc.count, spc.hVap, spc.spcVol, spc.antoineCoefs);
+			reformat[infolet] = new this.Species(infolet, spc.count, spc.hVap, spc.spcVol, spc.antoineCoeffs);
 		}
 		return reformat;
 	},
@@ -104,14 +115,33 @@ _.extend(Liquid.prototype, objectFuncs, {
 			force[spcName] = 0;
 		}
 		return force;
+	},
+	setupUpdate: function(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName) {
+		addListener(curLevel, 'update', listenerName, function() {
+			for (var spcName in spcInfo) {
+				var spc = spcInfo[spcName];
+				var gasFrac = dataGas[spcName];
+				var liqFrac = dataLiq[spcName];
+				var liqTemp = dataLiq.temp;
+				var actCoeff = actCoeffFuncs[spcName](liqFrac, liqTemp);
+				var antCoeffs = spcInfo.antoineCoeffs;
+				var pPure = this.getPPure(antCoeffs.a, antCoeffs.b, antCoeffs.c, liqTemp);
+				var pEq = pPure * actCoeff * liqFrac;
+				var pGas = gasFrac * dataGas.pInt;
+				drivingForce[spcName] = pGas - pEq;
+			}
+		})
+	},
+	getPPure: function(a, b, c, T) {
+		Math.pow(10, a - b / (T + c));
 	}
 	
 })
 
-Liquid.prototype.Species = function(spcName, count, hVap, spcVol, antoineCoefs) {
+Liquid.prototype.Species = function(spcName, count, hVap, spcVol, antoineCoeffs) {
 	this.spcName = spcName;
 	this.count = count;
 	this.hVap = hVap;
 	this.spcVol = spcVol;
-	this.antoineCoefs = antoineCoefs;
+	this.antoineCoeffs = antoineCoeffs;
 }
