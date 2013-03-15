@@ -1,3 +1,5 @@
+//this isn't really used much.  Don't add new things that depend on it & try to eliminate those that do.
+
 function DataHandler(){
 	this.tConst = tConst;
 }

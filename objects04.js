@@ -10,19 +10,19 @@ function Liquid(attrs) {
 	var actCoeffInfo = attrs.actCoeffInfo;
 	
 	var tempInit = attrs.tempInit;
-	var spcInfo = this.makeSpcInfo(attrs.spcInfo); //formatted as {spc1: {count: #, spcVol: #, antoineCoeffs: {a: #,b: #,c: #}, hVap: #} ... } spcVol in L/mol
-	var drivingForce = this.makeDrivingForce(spcInfo);
-	this.wallLiq = this.makeWallLiq(spcInfo, this.wallGas, this.wallPts);
-	var dataGas = this.initData(this.wallGas, spcInfo, ['pInt']);
-	var dataLiq = this.initData(this.wallLiq, spcInfo, ['temp']);
-	var dotMgrLiq = new DotManager();
-	var drivingForces = this.
-	this.makeDots(this.wallLiq, spcInfo, tempInit, dotMgrLiq);
-	this.rndDots = this.makeRndDots(dotManagerLiq);
+	this.spcInfo = this.makeSpcInfo(attrs.spcInfo); //formatted as {spc1: {count: #, spcVol: #, cp: #, antoineCoeffs: {a: #,b: #,c: #}, hVap: #} ... } spcVol in L/mol
+	this.drivingForce = this.makeDrivingForce(spcInfo);
+	this.dotMgrLiq = new DotManager();
+	this.wallLiq = this.makeWallLiq(this.spcInfo, this.wallGas, this.wallPts, this.dotMgrLiq);
+	var dataGas = this.initData(this.wallGas, this.spcInfo, ['pInt']);
+	var dataLiq = this.initData(this.wallLiq, this.spcInfo, ['temp']);
+	this.makeDots(this.wallLiq, this.spcInfo, tempInit, this.dotMgrLiq) && this.deleteCount(this.spcInfo);
+	this.drawList = this.makeDrawList(this.dotMgrLiq); //need to make draw list in random order otherwise dots drawn on top will look more prominant than they are.
 	this.actCoeffFuncs = this.makeActCoeffFuncs(actCoeffType, actCoeffInfo, spcList);
 	
 	this.updateListenerName = this.type + this.handle;
-	this.setupUpdate(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, this.updateListenerName)
+	this.setupUpdate(this.spcInfo, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq)
+	
 	//this.setupStd();
 }
 
@@ -44,12 +44,12 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 		return funcs;
 	},
-	makeWallLiq: function(spcInfo, wallGas, wallPts) {
+	makeWallLiq: function(spcInfo, wallGas, wallPts, dotMgrLiq) {
 		var vol = this.getLiqWallVol(spcInfo);
 		//liq wall needs to go in opposite direction of gas wall
 		var pts = this.getWallLiqPts(wallGas, wallGasPts, vol);
 		var handler = {func: this.hit, obj: this};
-		window.walls.addWall({pts:pts, handler:handler, handle: 'liquid' + this.handle, record: false, show: false});
+		window.walls.addWall({pts:pts, handler:handler, handle: 'liquid' + this.handle, record: false, show: false, dotManager: dotMgrLiq});
 		return window.walls[window.walls.length - 1];
 	},
 	getLiqWallVol: function(spcInfo) {
@@ -105,7 +105,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var reformat = {};
 		for (var infolet in spcInfo) {
 			var spc = spcInfo[infolet];
-			reformat[infolet] = new this.Species(infolet, spc.count, spc.hVap, spc.spcVol, spc.antoineCoeffs);
+			reformat[infolet] = new this.Species(infolet, spc.count, spc.hVap, spc.cP, spc.spcVol, spc.antoineCoeffs);
 		}
 		return reformat;
 	},
@@ -116,8 +116,14 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 		return force;
 	},
-	setupUpdate: function(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName) {
-		addListener(curLevel, 'update', listenerName, function() {
+	setupUpdate: function(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName, drawList, dotMgrLiq) {
+		this.setupUpdateEquil(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName);
+		this.setupUpdateDraw(drawList);
+		this.setupUpdateMove(dotMgrLiq.ALLDOTS); //need to send list of each species.  Need to make velocity vectors for *each* group of dots. whew
+	
+	},
+	setupUpdateEquil: function(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName) {
+		addListener(curLevel, 'update', listenerName + 'Equil', function() {
 			for (var spcName in spcInfo) {
 				var spc = spcInfo[spcName];
 				var gasFrac = dataGas[spcName];
@@ -130,18 +136,49 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var pGas = gasFrac * dataGas.pInt;
 				drivingForce[spcName] = pGas - pEq;
 			}
-		})
+		})	
+	},
+	setupUpdateDraw: function(drawList) {
+		addListener(curLevel, 'update', listenerName + 'Draw', function() {
+			window.drawingTools.dotsAsst(drawList);
+		});
+	},
+	setupUpdateMove: function(dots) {
+		var stepSize = Math.max(1, dots.length / 50)
+		var numSteps = Math.max(dots.length / stepSize);
+		for (var i=0; i<numSteps; i++) {
+			var 
+		}
+		
 	},
 	getPPure: function(a, b, c, T) {
 		Math.pow(10, a - b / (T + c));
+	},
+	deleteCount: function(spcInfo) {
+		for (var a in spcInfo) {
+			delete spcInfo[a].count;
+		}
+	},
+	makeDrawList: function(dotMgr) {
+		var sacArray = dotMgr.ALLDOTS.concat();
+		var draw = [];
+		for (var i=0; i<dotMgr.ALLDOTS.length; i++) {
+			var spliceIdx = Math.floor(Math.random() * dotMgr.ALLDOTS.length);
+			draw.push(sacArray[spliceIdx]);
+			sacArray.splice(spiceIdx, 1);
+		}
+		return draw;
+		
+		
 	}
 	
 })
 
-Liquid.prototype.Species = function(spcName, count, hVap, spcVol, antoineCoeffs) {
+Liquid.prototype.Species = function(spcName, count, hVap, cP, spcVol, antoineCoeffs) {
 	this.spcName = spcName;
 	this.count = count;
 	this.hVap = hVap;
+	this.cP = cP;
 	this.spcVol = spcVol;
 	this.antoineCoeffs = antoineCoeffs;
 }

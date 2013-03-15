@@ -1262,7 +1262,7 @@ function CompArrow(attrs){
 	if (makeStops) {
 		this.stops = new Stops({stopPt:{height:bounds.y.max}, wallInfo:wallInfo});
 	}
- 
+	var wall = this.wall;
 	listeners.onDown = function(){};
 	listeners.onMove = function(){wall.changeSetPt(this.pos.y, compMode, speed)};
 	listeners.onUp = function(){};

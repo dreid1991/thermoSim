@@ -174,16 +174,17 @@ WallMethods.main = {
 		}
 		return wallGrid;
 	},
-	setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show, record, tSet, col){
+	setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show, record, tSet, col, dotMgr){
 		bounds = defaultTo({yMin:30, yMax: 435}, bounds);
 		include = defaultTo(1, include);
 		this[wallIdx] = pts;
-		_.extend(this[wallIdx], WallMethods.wall);	
+		_.extend(this[wallIdx], WallMethods.wall, WallMethods.wallDataHandler);	
 		this[wallIdx].handle = handle;
 		this[wallIdx].include = include;
 		this[wallIdx].hitMode = 'Std';
 		this[wallIdx].v = 0;
 		this[wallIdx].bounds = bounds;
+		this[wallIdx].dotManager = dotMgr || dotManager; //global gas dot manager
 		if (vol) {
 			this[wallIdx].setVol(vol);
 		}
@@ -214,7 +215,7 @@ WallMethods.main = {
 	addWall: function(attrs){
 		this.numWalls++;
 		var newIdx = this.length;
-		this.setWallVals(newIdx, attrs.pts, attrs.handle, attrs.bounds, attrs.include, attrs.vol, attrs.show, attrs.record, attrs.temp, attrs.col);
+		this.setWallVals(newIdx, attrs.pts, attrs.handle, attrs.bounds, attrs.include, attrs.vol, attrs.show, attrs.record, attrs.temp, attrs.col, attrs.dotManager);
 		this.setupWall(newIdx);
 		this.setWallHandler(newIdx, attrs.handler);
 		if (attrs.border) this[newIdx].addBorder(attrs.border);
@@ -303,7 +304,7 @@ WallMethods.main = {
 		var gridDim = this.gridDim;
 		var xSpan = this.xSpan;
 		var ySpan = this.ySpan;
-		var dots = dotManager.lists.ALLDOTS;
+		var dots = dotManager.lists.ALLDOTS; //global gas dot manager
 	
 		for (var dotIdx=0; dotIdx<dots.length; dotIdx++){
 			var dot = dots[dotIdx];
