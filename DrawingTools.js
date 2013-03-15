@@ -28,7 +28,7 @@ DrawingTools.prototype = {
 		for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
 			c.fillStyle = spcs[dots[dotIdx].spcName].cols.hex;
 			c.beginPath();
-			c.arc(dots[dotIdx].x, dots[dotIdx].r, dot[dotIdx].r, 0, Math.PI * 2, true);
+			c.arc(dots[dotIdx].x, dots[dotIdx].y, dots[dotIdx].r, 0, Math.PI * 2, true);
 			c.closePath();
 			c.fill();
 		}

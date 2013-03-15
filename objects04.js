@@ -14,9 +14,9 @@ function Liquid(attrs) {
 	this.drivingForce = this.makeDrivingForce(this.spcInfo);
 	this.dotMgrLiq = this.makeDotManager(this.spcInfo);
 	this.wallLiq = this.makeWallLiq(this.spcInfo, this.wallGas, this.wallPtIdxs, this.dotMgrLiq);
-	var dataGas = this.initData(this.wallGas, this.spcInfo, ['pInt']);
-	var dataLiq = this.initData(this.wallLiq, this.spcInfo, ['temp']);
 	this.makeDots(this.wallLiq, this.spcInfo, tempInit, this.dotMgrLiq) && this.deleteCount(this.spcInfo);
+	this.dataGas = this.initData(this.wallGas, this.spcInfo, ['pInt']);
+	this.dataLiq = this.initData(this.wallLiq, this.spcInfo, ['temp']);
 	this.drawList = this.makeDrawList(this.dotMgrLiq); //need to make draw list in random order otherwise dots drawn on top will look more prominant than they are.
 	this.actCoeffFuncs = this.makeActCoeffFuncs(this.actCoeffType, this.actCoeffInfo, this.spcInfo);
 	
@@ -43,12 +43,12 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 		return funcs;
 	},
-	makeWallLiq: function(spcInfo, wallGas, wallPtIdxs, dotMgrLiq) {
+	makeWallLiq: function(spcInfo, wallGas, wallPtIdxs, dotMgrLiq, handle) {
 		var vol = this.getLiqWallVol(spcInfo);
 		//liq wall needs to go in opposite direction of gas wall
 		var pts = this.getWallLiqPts(wallGas, wallPtIdxs, vol);
 		var handler = {func: this.hit, obj: this};
-		window.walls.addWall({pts:pts, handler:handler, handle: 'liquid' + this.handle, record: false, show: false, dotManager: dotMgrLiq});
+		window.walls.addWall({pts:pts, handler:handler, handle: 'liquid' + this.handle.toCapitalCamelCase(), record: false, show: true, dotManager: dotMgrLiq});
 		return window.walls[window.walls.length - 1];
 	},
 	getLiqWallVol: function(spcInfo) {
@@ -124,41 +124,42 @@ _.extend(Liquid.prototype, objectFuncs, {
 	},
 	setupUpdate: function(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName, drawList, dotMgrLiq) {
 		this.setupUpdateEquil(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName);
-		this.setupUpdateDraw(drawList);
+		this.setupUpdateDraw(drawList, listenerName);
 		this.setupUpdateMove(dotMgrLiq.lists.ALLDOTS); //need to send list of each species.  Need to make velocity vectors for *each* group of dots. whew
 	
 	},
 	setupUpdateEquil: function(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName) {
+		var self = this;
 		addListener(curLevel, 'update', listenerName + 'Equil', function() {
 			for (var spcName in spcInfo) {
 				var spc = spcInfo[spcName];
-				var gasFrac = dataGas[spcName];
-				var liqFrac = dataLiq[spcName];
-				var liqTemp = dataLiq.temp;
+				var gasFrac = dataGas[spcName][dataGas[spcName].length - 1];
+				var liqFrac = dataLiq[spcName][dataLiq[spcName].length - 1];
+				var liqTemp = dataLiq.temp[dataLiq.temp.length - 1];
 				var actCoeff = actCoeffFuncs[spcName](liqFrac, liqTemp);
-				var antCoeffs = spcInfo.antoineCoeffs;
-				var pPure = this.getPPure(antCoeffs.a, antCoeffs.b, antCoeffs.c, liqTemp);
+				var antCoeffs = spcInfo[spcName].antoineCoeffs;
+				var pPure = self.getPPure(antCoeffs.a, antCoeffs.b, antCoeffs.c, liqTemp);
 				var pEq = pPure * actCoeff * liqFrac;
-				var pGas = gasFrac * dataGas.pInt;
+				var pGas = gasFrac * dataGas.pInt[dataGas.pInt.length - 1];
 				drivingForce[spcName] = pGas - pEq;
 			}
 		})	
 	},
-	setupUpdateDraw: function(drawList) {
+	setupUpdateDraw: function(drawList, listenerName) {
 		addListener(curLevel, 'update', listenerName + 'Draw', function() {
-			window.drawingTools.dotsAsst(drawList);
+			window.draw.dotsAsst(drawList);
 		});
 	},
 	setupUpdateMove: function(dots) {
-		var stepSize = Math.max(1, dots.length / 50)
-		var numSteps = Math.max(dots.length / stepSize);
-		for (var i=0; i<numSteps; i++) {
-			//var 
-		}
+		// var stepSize = Math.max(1, dots.length / 50)
+		// var numSteps = Math.max(dots.length / stepSize);
+		// for (var i=0; i<numSteps; i++) {
+			// //var 
+		// }
 		
 	},
 	getPPure: function(a, b, c, T) {
-		Math.pow(10, a - b / (T + c));
+		return Math.pow(10, a - b / (T + c));
 	},
 	deleteCount: function(spcInfo) {
 		for (var a in spcInfo) {
@@ -176,7 +177,13 @@ _.extend(Liquid.prototype, objectFuncs, {
 		return draw;
 		
 		
-	}
+	},
+	hit: function(dot, wallUV, perpV){
+		dot.v.dx -= 2*wallUV.dy*perpV;
+		dot.v.dy += 2*wallUV.dx*perpV;
+		dot.x -= wallUV.dy
+		dot.y += wallUV.dx
+	},
 	
 })
 
