@@ -10,6 +10,7 @@ function Liquid(attrs) {
 	this.actCoeffInfo = attrs.actCoeffInfo;
 	
 	var tempInit = attrs.tempInit;
+	this.temp = tempInit;
 	this.spcInfo = this.makeSpcInfo(attrs.spcInfo); //formatted as {spc1: {count: #, spcVol: #, cP: #, antoineCoeffs: {a: #,b: #,c: #}, hVap: #} ... } spcVol in L/mol
 	this.drivingForce = this.makeDrivingForce(this.spcInfo);
 	this.dotMgrLiq = this.makeDotManager(this.spcInfo);
@@ -21,7 +22,7 @@ function Liquid(attrs) {
 	this.actCoeffFuncs = this.makeActCoeffFuncs(this.actCoeffType, this.actCoeffInfo, this.spcInfo);
 	
 	this.updateListenerName = this.type + this.handle;
-	this.setupUpdate(this.spcInfo, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq)
+	this.setupUpdate(this.spcInfo, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq)
 	
 	//this.setupStd();
 }
@@ -48,7 +49,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		//liq wall needs to go in opposite direction of gas wall
 		var pts = this.getWallLiqPts(wallGas, wallPtIdxs, vol);
 		var handler = {func: this.hit, obj: this};
-		window.walls.addWall({pts:pts, handler:handler, handle: 'liquid' + this.handle.toCapitalCamelCase(), record: false, show: true, dotManager: dotMgrLiq});
+		window.walls.addWall({pts:pts, handler:handler, handle: 'liquid' + this.handle.toCapitalCamelCase(), record: false, show: false, dotManager: dotMgrLiq});
 		return window.walls[window.walls.length - 1];
 	},
 	getLiqWallVol: function(spcInfo) {
@@ -122,11 +123,11 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 		return force;
 	},
-	setupUpdate: function(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName, drawList, dotMgrLiq) {
+	setupUpdate: function(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName, drawList, dotMgrLiq, wallLiq) {
 		this.setupUpdateEquil(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName);
 		this.setupUpdateDraw(drawList, listenerName);
-		this.setupUpdateMove(dotMgrLiq.lists.ALLDOTS); //need to send list of each species.  Need to make velocity vectors for *each* group of dots. whew
-	
+		this.setupUpdateMove(dotMgrLiq, spcInfo, listenerName, wallLiq);
+		//eject
 	},
 	setupUpdateEquil: function(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName) {
 		var self = this;
@@ -150,7 +151,39 @@ _.extend(Liquid.prototype, objectFuncs, {
 			window.draw.dotsAsst(drawList);
 		});
 	},
-	setupUpdateMove: function(dots) {
+	setupUpdateMove: function(dotMgr, spcInfo, listenerName, wallLiq) {
+		var self = this;
+		var dotLists = [];
+		for (var spcName in spcInfo) {
+			dotLists.push(dotMgr.get({spcName: spcName}));
+		}
+		var rndVec = 
+		addListener(curLevel, 'update', listenerName + 'Move', function() {
+			var stepSize, i, len, moveVec, dotMass, numGroups;
+			var getMoveVec = function(mass, temp) {
+				
+			}
+			//tried moving them as groups to reduce computation.  Was very noticable.
+			var xMax = wallLiq[2].x;
+			var xMin = wallLiq[1].x;
+			var yMax = wallLiq[1].y;
+			var yMin = wallLiq[0].y;
+			for (var listIdx=0; listIdx<dotLists.length; listIdx++) {
+				var dots = dotLists[listIdx];
+				len = dots.length;
+				dotMass = dots[0].m;
+				numGroups = Math.min(25, len);
+				stepSize = Math.floor(len / numGroups);
+				for (i=0; i<len; i++) {
+					var mag = tempToV(dotMass, self.temp);
+					var dir = Math.PI * 2 * Math.random();
+					moveVec = V(Math.cos(dir) * mag, Math.sin(dir) * mag);
+					dots[i].x = Math.max(xMin, Math.min(xMax, dots[i].x + moveVec.dx));
+					dots[i].y = Math.max(yMin, Math.min(yMax, dots[i].y + moveVec.dy));
+					
+				}
+			}
+		})
 		// var stepSize = Math.max(1, dots.length / 50)
 		// var numSteps = Math.max(dots.length / stepSize);
 		// for (var i=0; i<numSteps; i++) {
@@ -178,12 +211,10 @@ _.extend(Liquid.prototype, objectFuncs, {
 		
 		
 	},
-	hit: function(dot, wallUV, perpV){
-		dot.v.dx -= 2*wallUV.dy*perpV;
-		dot.v.dy += 2*wallUV.dx*perpV;
-		dot.x -= wallUV.dy
-		dot.y += wallUV.dx
+	hit: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
+		WallMethods.collideMethods.reflect(dot, wallUV, perpV);
 	},
+
 	
 })
 

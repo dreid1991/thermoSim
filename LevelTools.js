@@ -215,7 +215,7 @@ LevelTools = {
 		} else if (question.type == 'multChoice') {
 			this.appendMultChoice(question, appendTo, questionIdx);
 		} else if (question.type == 'text') {
-			this.appendTextBox(question, appendTo, 3, 60, question.units, questionIdx);
+			this.appendTextBox(question, appendTo, 3, 50, question.units, questionIdx);
 		} else if (question.type == 'textSmall') {
 			this.appendTextBox(question, appendTo, 1, 10, question.units, questionIdx);
 		} else if (question.type == 'setVals') {
@@ -389,7 +389,7 @@ LevelTools = {
 		if (question.storeAs) textareaAttrs.storeAs = [question.storeAs];
 		textareaHTML = templater.textarea({attrs: textareaAttrs});
 		
-		var textBoxHTML = templater.table({attrs: {'class': ['niceFont', 'whiteFont']}, innerHTML:
+		var textBoxHTML = (question.preText === undefined ? '' : (question.preText + templater.br())) + templater.table({attrs: {'class': ['niceFont', 'whiteFont']}, innerHTML:
 			templater.tr({innerHTML:
 				templater.td({innerHTML:
 					question.label
