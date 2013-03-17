@@ -163,32 +163,31 @@ _.extend(Liquid.prototype, objectFuncs, {
 			var getMoveVec = function(mass, temp) {
 				
 			}
-			//tried moving them as groups to reduce computation.  Was very noticable.
+			//reducing number of vectors I have to make while making motion look random by stepping at random intervals
+
 			var xMax = wallLiq[2].x;
 			var xMin = wallLiq[1].x;
 			var yMax = wallLiq[1].y;
 			var yMin = wallLiq[0].y;
+			
 			for (var listIdx=0; listIdx<dotLists.length; listIdx++) {
 				var dots = dotLists[listIdx];
 				len = dots.length;
 				dotMass = dots[0].m;
-				numGroups = Math.min(25, len);
-				stepSize = Math.floor(len / numGroups);
-				for (i=0; i<len; i++) {
+				stepSize = 15 + Math.ceil(Math.random() * 15);
+				for (var groupNum=0; groupNum<stepSize; groupNum++) {
 					var mag = tempToV(dotMass, self.temp);
 					var dir = Math.PI * 2 * Math.random();
 					moveVec = V(Math.cos(dir) * mag, Math.sin(dir) * mag);
-					dots[i].x = Math.max(xMin, Math.min(xMax, dots[i].x + moveVec.dx));
-					dots[i].y = Math.max(yMin, Math.min(yMax, dots[i].y + moveVec.dy));
-					
+					for (var dotIdx=groupNum; dotIdx<len; dotIdx+=stepSize) {
+						dots[dotIdx].x = Math.max(xMin, Math.min(xMax, dots[dotIdx].x + moveVec.dx));
+						dots[dotIdx].y = Math.max(yMin, Math.min(yMax, dots[dotIdx].y + moveVec.dy));
+					}
 				}
+
 			}
 		})
-		// var stepSize = Math.max(1, dots.length / 50)
-		// var numSteps = Math.max(dots.length / stepSize);
-		// for (var i=0; i<numSteps; i++) {
-			// //var 
-		// }
+
 		
 	},
 	getPPure: function(a, b, c, T) {
