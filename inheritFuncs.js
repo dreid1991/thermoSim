@@ -40,11 +40,6 @@ toInherit = {
 			this[idx1] = obj2;
 			this[idx2] = obj1;	
 			return this;
-		},
-		applyFunc: function(func) {
-			for (var idx=0; idx<this.length; idx++) {
-				func(this[idx]);
-			}
 		}
 	},
 	MathExtenders:{

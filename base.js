@@ -539,7 +539,7 @@ function showPrompt(newSectionIdx, newPromptIdx, forceReset){
 	var changedSection = newSectionIdx!=sectionIdx;
 	var promptIdxsToClean = getpromptIdxsToClean(newSectionIdx, newPromptIdx);
 	
-	promptIdxsToClean.applyFunc(function(idx){
+	promptIdxsToClean.map(function(value, idx){
 		curLevel.promptCleanUp(idx);
 	})
 	
