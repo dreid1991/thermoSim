@@ -20,7 +20,7 @@ function Liquid(attrs) {
 	this.dataLiq = this.initData(this.wallLiq, this.spcInfo, ['temp']);
 	this.drawList = this.makeDrawList(this.dotMgrLiq); //need to make draw list in random order otherwise dots drawn on top will look more prominant than they are.
 	this.actCoeffFuncs = this.makeActCoeffFuncs(this.actCoeffType, this.actCoeffInfo, this.spcInfo);
-	
+	this.chanceZeroDf = .2;
 	this.updateListenerName = this.type + this.handle;
 	this.setupUpdate(this.spcInfo, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq)
 	
@@ -211,7 +211,15 @@ _.extend(Liquid.prototype, objectFuncs, {
 		
 	},
 	hit: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
-		WallMethods.collideMethods.reflect(dot, wallUV, perpV);
+		//it's a sigmoid!
+		var dF = this.drivingForce;
+		if (dF[dot.spcName]) {
+			var chanceZero = this.changeZeroDf;
+			var a = chanceZero / (1 - chanceZero);
+			var chanceAbs = a / (a + Math.exp(-dF[dot.spcName]));
+		} else {
+			WallMethods.collideMethods.reflect(dot, wallUV, perpV);
+		}
 	},
 
 	
