@@ -11,7 +11,7 @@ function Liquid(attrs) {
 	this.Cp = 0; //to be set each turn/absorption and used in setting temperatures for reflecting dots.  Capital C denotes total heat capacity.
 	var tempInit = attrs.tempInit;
 	this.temp = tempInit;
-	this.spcInfo = this.makeSpcInfo(attrs.spcInfo); //formatted as {spc1: {count: #, spcVol: #, cP: #, antoineCoeffs: {a: #,b: #,c: #}, hVap: #} ... } spcVol in L/mol
+	this.spcInfo = this.makeSpcInfo(attrs.spcInfo); //formatted as {spc1: {count: #, spcVol: #, cP: #, antoineCoeffs: {a: #,b: #,c: #}, hVap: #} ... } spcVol in L/mol, hVap in kj/mol
 	this.drivingForce = this.makeDrivingForce(this.spcInfo);
 	this.dotMgrLiq = this.makeDotManager(this.spcInfo);
 	this.wallLiq = this.makeWallLiq(this.spcInfo, this.wallGas, this.wallPtIdxs, this.dotMgrLiq);
@@ -61,10 +61,16 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 		return nA;
 	},
-	getLiqWallVol: function(spcInfo) {
+	getLiqWallVol: function(spcInfo, dotMgr) {
 		var vol = 0;
-		for (var spcName in spcInfo) {
-			vol += spcInfo[spcName].spcVol * spcInfo[spcName].count / N;
+		if (!dotMgr) {
+			for (var spcName in spcInfo) {
+				vol += spcInfo[spcName].spcVol * spcInfo[spcName].count / N;
+			}
+		} else {
+			for (var spcName in spcInfo) {
+				vol += spcInfo[spcName].spcVol * dotMgr.get({spcName}).length / N;
+			}
 		}
 		return vol;
 	},
@@ -137,7 +143,8 @@ _.extend(Liquid.prototype, objectFuncs, {
 		this.calcEquil = this.setupUpdateEquil(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce);
 		this.drawDots = this.setupDrawDots(drawList);
 		this.moveDots = this.setupMoveDots(dotMgrLiq, spcInfo, wallLiq);
-		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcInfo, drivingForce, numAbs, drivingForceSensitivity);
+		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcInfo, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq);
+		var sizeWall = this.setupSizeWall(wallLiq, spcInfo, dotMgrLiq)
 		var zeroAttrs = this.zeroAttrs;
 		var calcCp = this.calcCp, calcEquil = this.calcEquil, drawDots = this.drawDots, move = this.moveDots, ejectDots = this.ejectDots;
 		addListener(curLevel, 'update', listenerName, function() {
@@ -147,6 +154,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			drawDots();
 			moveDots();
 			ejectDots();
+			sizeWall();
 		})
 	},
 	setupCalcCp: function(spcInfo, dotMgrLiq) {
@@ -225,12 +233,11 @@ _.extend(Liquid.prototype, objectFuncs, {
 
 		
 	},
-	setupEjectDots: function(dotMgrLiq, spcInfo, drivingForce, numAbs, drivingForceSensitivity) {
+	setupEjectDots: function(dotMgrLiq, spcInfo, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq) {
 		var self = this;
 		var wallGas = this.wallGas;
 		return function() {
 			var numEject;
-			var toZero = {};
 			for (var spcName in spcInfo) {
 				var dF = drivingForce[spcName];
 				var abs = numAbs[spcName];
@@ -241,13 +248,42 @@ _.extend(Liquid.prototype, objectFuncs, {
 					numEject = abs * (-dF * drivingForceSensitivity + 1);
 				}
 				if (numEject) {
-					self.eject(dotMgrLiq, window.dotManager, spcInfo, numEject, wallGas);
+					self.eject(dotMgrLiq, window.dotManager, spcInfo, spcName, numEject, wallGas, drawList, wallLiq);
 				}
 			}
 		}
 	},
-	eject: function(dotMgrLiq, dotMgrGas, spcInfo, numEject, wallGas) {
+	setupSizeWall: function(wall, spcInfo, dotMgrLiq) {
+		var self = this;
+		return function() {
+			var vol = self.getLiqWallVol(spcInfo, dotMgrLiq);
+			var height = getWallHeight(wall[2].x - wall[1].x, vol);
+			wall[0].y = wall[1].y - height;
+			wall[3].y = wall[1].y - height;
+		}
+	},
+	eject: function(dotMgrLiq, dotMgrGas, spcInfo, spcName, numEject, wallGas, drawList, wallLiq) {
+		//going to take energy out of ejected dot rather than liquid. 
+		var info = spcName[spcName];
+		var hVapPerDot = info.hVap * 1000 / N; //1000/N = 1, but if I ever change N, I don't want this to be a sneaky problem.
+		var cDot = window.cv;
+		var dHLiq = 0;
+		var dotList = dotMgrLiq.get({spcName: spcName})
+		var sliceIdx = Math.min(dotList.length, numEject);
 		
+		var toTransfer = dotList.slice(0, sliceIdx);
+		dotMgrLiq.remove(toTransfer);
+		
+		var tempEject = this.temp - hVapPerDot / cDot;
+		for (var transIdx=0; transIdx<toTransfer.length; transIdx++) {
+			var dot = toTransfer[transIdx];
+			dot.setTemp(tempEject);
+			dot.v.dy = -Math.abs(toTransfer[transIdx].v.dy)
+			dot.y = wallLiq[0].y - 1;
+			dot.setWall(wallGas.handle);
+			drawList.splice(drawList.indexOf(dot), 1);
+		}
+		dotMgrGas.add(toTransfer);
 	},
 	getPPure: function(a, b, c, T) {
 		return Math.pow(10, a - b / (T + c));
@@ -267,8 +303,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 			sacArray.splice(spliceIdx, 1);
 		}
 		return draw;
-		
-		
 	},
 	hit: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 		//it's a sigmoid!
@@ -291,9 +325,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 		drawList.splice(Math.floor(Math.random() * drawList.length), 0, dot);
 		dot.setWall(wallLiq.handle);
 		dotMgrLiq.add(dot);
-		var hVap = spcInfo[dot.spcName];
+		var hVap = spcInfo[dot.spcName]; //in kj/mol
 		this.calcCp();
-		this.temp += hVap / Cp; //may need to work out some units here
+		this.temp += hVap * 1000 / (Cp * N); //converting to j/dot
 		this.numAbs[dot.spcName]++;
 		return false; //returning false isn't used here, but I like to return false when a dot is removed from a dot/wall collision check because it is used in dot collisions.  Feels consistent.  
 	},
