@@ -482,6 +482,16 @@ Dot.prototype = {
 		*/
 		return this;
 	},
+	setWall: function(wallHandle) {
+		this.setReturnTo(wallHandle);
+		this.setTag(wallHandle);
+	},
+	setReturnTo: function(wallHandle) {
+		this.returnTo = wallHandle;
+	},
+	setTag: function(wallHandle) {
+		this.tag = wallHandle;
+	},
 	adjTemp: function(delta) {
 		var curTemp = this.temp();
 		this.v.mult(Math.sqrt((curTemp + delta) / curTemp));
