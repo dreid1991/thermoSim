@@ -18,7 +18,7 @@ function Liquid(attrs) {
 	this.wallLiq = this.makeWallLiq(this.spcInfo, this.wallGas, this.wallPtIdxs, this.dotMgrLiq);
 	this.numAbs = this.makeNumAbsorbed(this.spcInfo);
 	this.makeDots(this.wallLiq, this.spcInfo, tempInit, this.dotMgrLiq) && this.deleteCount(this.spcInfo);
-	this.dataGas = this.initData(this.wallGas, this.spcInfo, ['pInt']);
+	this.dataGas = this.initData(this.wallGas, this.spcInfo, ['pInt', 'temp']);
 	this.dataLiq = this.initData(this.wallLiq, this.spcInfo, ['temp']);
 	this.drawList = this.makeDrawList(this.dotMgrLiq); //need to make draw list in random order otherwise dots drawn on top will look more prominant than they are.
 	this.actCoeffFuncs = this.makeActCoeffFuncs(this.actCoeffType, this.actCoeffInfo, this.spcInfo);
@@ -144,7 +144,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		this.calcEquil = this.setupUpdateEquil(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce);
 		this.drawDots = this.setupDrawDots(drawList);
 		this.moveDots = this.setupMoveDots(dotMgrLiq, spcInfo, wallLiq);
-		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcInfo, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq);
+		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcInfo, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, dataGas);//you were making the liquid eject if df<0 whether hit or not
 		var sizeWall = this.setupSizeWall(wallLiq, spcInfo, dotMgrLiq)
 		var zeroAttrs = this.zeroAttrs;
 		var calcCp = this.calcCp, calcEquil = this.calcEquil, drawDots = this.drawDots, moveDots = this.moveDots, ejectDots = this.ejectDots;
@@ -241,7 +241,8 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var dF = drivingForce[spcName];
 				var abs = numAbs[spcName];
 				//converges to abs as df -> 0
-				if (dF > 0) {
+				
+				if (dF > 0) { 
 					numEject = Math.round(abs / (dF * drivingForceSensitivity + 1));
 				} else {
 					numEject = Math.round(abs * (-dF * drivingForceSensitivity + 1));
@@ -315,7 +316,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcInfo);//need to set Cp in this;
 			}
 		}
-		this.equalizeTemps(dot, wallUV, perpV);
+		this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager);
 		
 		
 	},
@@ -331,14 +332,17 @@ _.extend(Liquid.prototype, objectFuncs, {
 		this.numAbs[dot.spcName]++;
 		return false; //returning false isn't used here, but I like to return false when a dot is removed from a dot/wall collision check because it is used in dot collisions.  Feels consistent.  
 	},
-	equalizeTemps: function(dot, wallUV, perpV) {
-		var CLiq = this.Cp;
-		var CDot = cv / N; //I think cv is right, because CpLiq is basically cv as well
-		var tLiq = this.temp;
+	adjTemps: function(dot, wallUV, perpV, dataGas, dataLiq, tLiq, dotMgrGas) {
+		var CDot = cv / N;
+		var tGas = dataGas.temp[dataGas.temp.length - 1];
 		var tDot = dot.temp();
-		var tF = (CLiq * tLiq + CDot * tDot) / (CLiq + CDot);
-		this.temp = tF;
-		var vRatio = Math.sqrt(tF / tDot); //inlining vRatio show dot.setTemp so I don't have to sqrt unnecessarily
+		var CGas = dotMgrGas.count * CDot;
+		var tTarget = (tLiq * this.Cp + tGas * CGas) / (this.Cp + CGas);
+		var deltaTDot = Math.max(1.05 * (tTarget - tGas), -tDot + 10);
+		this.temp -= deltaTDot * CDot / this.Cp;
+		
+		
+		var vRatio = Math.sqrt((tDot + deltaTDot) / tDot); //inlining vRatio show dot.setTemp so I don't have to sqrt unnecessarily
 		dot.v.mult(vRatio);
 		WallMethods.collideMethods.reflect(dot, wallUV, perpV * vRatio);
 	}
