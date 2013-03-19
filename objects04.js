@@ -17,15 +17,16 @@ function Liquid(attrs) {
 	this.dotMgrLiq = this.makeDotManager(this.spcInfo);
 	this.wallLiq = this.makeWallLiq(this.spcInfo, this.wallGas, this.wallPtIdxs, this.dotMgrLiq);
 	this.numAbs = this.makeNumAbsorbed(this.spcInfo);
+	this.numEjt = deepCopy(this.numAbs);
 	this.makeDots(this.wallLiq, this.spcInfo, tempInit, this.dotMgrLiq) && this.deleteCount(this.spcInfo);
 	this.dataGas = this.initData(this.wallGas, this.spcInfo, ['pInt', 'temp']);
 	this.dataLiq = this.initData(this.wallLiq, this.spcInfo, ['temp']);
 	this.drawList = this.makeDrawList(this.dotMgrLiq); //need to make draw list in random order otherwise dots drawn on top will look more prominant than they are.
 	this.actCoeffFuncs = this.makeActCoeffFuncs(this.actCoeffType, this.actCoeffInfo, this.spcInfo);
 	this.chanceZeroDf = .2;
-	this.drivingForceSensitivity = 10;//formalize this a bit
+	this.drivingForceSensitivity = 1;//formalize this a bit
 	this.updateListenerName = this.type + this.handle;
-	this.setupUpdate(this.spcInfo, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity)
+	this.setupUpdate(this.spcInfo, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt)
 	
 	//this.setupStd();
 }
@@ -139,12 +140,12 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 		return force;
 	},
-	setupUpdate: function(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName, drawList, dotMgrLiq, wallLiq, numAbs, drivingForceSensitivity) {
+	setupUpdate: function(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName, drawList, dotMgrLiq, wallLiq, numAbs, drivingForceSensitivity, numEjt) {
 		this.calcCp = this.setupCalcCp(spcInfo, dotMgrLiq);
 		this.calcEquil = this.setupUpdateEquil(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce);
 		this.drawDots = this.setupDrawDots(drawList);
 		this.moveDots = this.setupMoveDots(dotMgrLiq, spcInfo, wallLiq);
-		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcInfo, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, dataGas);//you were making the liquid eject if df<0 whether hit or not
+		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcInfo, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt);//you were making the liquid eject if df<0 whether hit or not
 		var sizeWall = this.setupSizeWall(wallLiq, spcInfo, dotMgrLiq)
 		var zeroAttrs = this.zeroAttrs;
 		var calcCp = this.calcCp, calcEquil = this.calcEquil, drawDots = this.drawDots, moveDots = this.moveDots, ejectDots = this.ejectDots;
@@ -156,7 +157,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			moveDots();
 			ejectDots();
 			sizeWall();
-			zeroAttrs(numAbs);
+			//zeroAttrs(numAbs);
 		})
 	},
 	setupCalcCp: function(spcInfo, dotMgrLiq) {
@@ -215,40 +216,45 @@ _.extend(Liquid.prototype, objectFuncs, {
 			for (var listIdx=0; listIdx<dotLists.length; listIdx++) {
 				var dots = dotLists[listIdx];
 				len = dots.length;
-				dotMass = dots[0].m;
-				stepSize = 15 + Math.ceil(Math.random() * 15);
-				for (var groupNum=0; groupNum<stepSize; groupNum++) {
-					var mag = tempToV(dotMass, self.temp);
-					var dir = Math.PI * 2 * Math.random();
-					moveVec = V(Math.cos(dir) * mag, Math.sin(dir) * mag);
-					for (var dotIdx=groupNum; dotIdx<len; dotIdx+=stepSize) {
-						dots[dotIdx].x = Math.max(xMin, Math.min(xMax, dots[dotIdx].x + moveVec.dx));
-						dots[dotIdx].y = Math.max(yMin, Math.min(yMax, dots[dotIdx].y + moveVec.dy));
+				if (len) {
+					dotMass = dots[0].m;
+					stepSize = 15 + Math.ceil(Math.random() * 15);
+					for (var groupNum=0; groupNum<stepSize; groupNum++) {
+						var mag = tempToV(dotMass, self.temp);
+						var dir = Math.PI * 2 * Math.random();
+						moveVec = V(Math.cos(dir) * mag, Math.sin(dir) * mag);
+						for (var dotIdx=groupNum; dotIdx<len; dotIdx+=stepSize) {
+							dots[dotIdx].x = Math.max(xMin, Math.min(xMax, dots[dotIdx].x + moveVec.dx));
+							dots[dotIdx].y = Math.max(yMin, Math.min(yMax, dots[dotIdx].y + moveVec.dy));
+						}
 					}
+				} else {
+					console.log('A species is out!') && curLevel.pause();
 				}
-
 			}
 		};
 
 		
 	},
-	setupEjectDots: function(dotMgrLiq, spcInfo, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq) {
+	setupEjectDots: function(dotMgrLiq, spcInfo, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt) {
 		var self = this;
 		var wallGas = this.wallGas;
 		return function() {
-			var numEject;
 			for (var spcName in spcInfo) {
 				var dF = drivingForce[spcName];
 				var abs = numAbs[spcName];
 				//converges to abs as df -> 0
 				
 				if (dF > 0) { 
-					numEject = Math.round(abs / (dF * drivingForceSensitivity + 1));
+					numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
 				} else {
-					numEject = Math.round(abs * (-dF * drivingForceSensitivity + 1));
+					//numEjt[spcName] += abs * (-dF * drivingForceSensitivity + 1);
+					numEjt[spcName] += (wallLiq[2].x - wallLiq[1].x) * -dF * drivingForceSensitivity / 1000;
 				}
-				if (numEject) {
-					self.eject(dotMgrLiq, window.dotManager, spcInfo, spcName, numEject, wallGas, drawList, wallLiq);
+				var flr = Math.floor(numEjt[spcName])
+				if (flr) {
+					self.eject(dotMgrLiq, window.dotManager, spcInfo, spcName, flr, wallGas, drawList, wallLiq);
+					numEjt[spcName] = 0;
 				}
 			}
 		}
