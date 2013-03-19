@@ -52,6 +52,10 @@ _.extend(TestLevel.prototype,
 					{
 						type: 'AuxImage',
 						attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/work/block0Pic1.jpg)'}
+					},
+					{
+						type: 'Liquid',
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 330, spcInfo: {spc1: {count: 500, spcVol: .5, cP:75, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, hVap: 40.65}, spc3: {count: 1000, spcVol: .7, cP:80, antoineCoeffs: {a: 8.20, b: 1642.89, c: 230.3-273.15}, hVap: 38.6}}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
 					}
 					// {
 						// type: 'DragWeights',
