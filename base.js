@@ -38,6 +38,7 @@ $(function(){
 	ATMtoPA = 101325;
 	BARTOPA = 100000;
 	PUNITTOPA = BARTOPA; //current pressure unit to pascals
+	MMHGTOBAR = .0013332237;
 	JtoKJ = .001;
 	N = 1000;//Avagadro's number
 	//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 

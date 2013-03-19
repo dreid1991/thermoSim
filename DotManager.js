@@ -125,6 +125,7 @@ DotManager.prototype = {
 		}
 	},
 	execFuncOnLists: function(func, lists, dot) {
+		dot.active = true;
 		for (var listIdx=0; listIdx<lists.length; listIdx++) {
 			func(lists[listIdx], dot);
 		}

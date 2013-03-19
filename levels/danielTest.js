@@ -45,21 +45,22 @@ _.extend(TestLevel.prototype,
 					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'staticAdiabatic', handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}} 
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(200, 200), count: 199, temp: 300, returnTo: 'wally', tag: 'wally'} 
+					{spcName: 'spc1', pos: P(55, 55), dims: V(200, 200), count: 200, temp: 350, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'spc3', pos: P(55, 55), dims: V(200, 200), count: 200, temp: 350, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
 					{
 						type: 'AuxImage',
 						attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/work/block0Pic1.jpg)'}
-					},
+					}
 					// {
 						// type: 'DragWeights',
 						// attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 1}], pInit: 1}
 					// },
-					{
-						type: 'Piston',
-						attrs: {handle: 'pistony', wallInfo: 'wally', min: 2, init: 4, max: 6}
-					}
+					// {
+						// type: 'Piston',
+						// attrs: {handle: 'pistony', wallInfo: 'wally', min: 2, init: 4, max: 6}
+					// }
 
 						
 				],
@@ -80,11 +81,11 @@ _.extend(TestLevel.prototype,
 							}
 						
 						],
-						listeners: [
+						// listeners: [
 							
-							{dataSet: {wallInfo: 'wally', data: 'pExt'}, is: 'equalTo', checkVal: 1, alertUnsatisfied: 'booo', satisfyCmmds: [{type: 'DragWeights', handle: 'draggy', cmmd: 'freeze'}]}
+							// {dataSet: {wallInfo: 'wally', data: 'pExt'}, is: 'equalTo', checkVal: 1, alertUnsatisfied: 'booo', satisfyCmmds: [{type: 'DragWeights', handle: 'draggy', cmmd: 'freeze'}]}
 							
-						],
+						// ],
 						dataDisplay: [
 							{wallInfo: "wally", data:'temp', readout: 'mainReadout'}
 						]

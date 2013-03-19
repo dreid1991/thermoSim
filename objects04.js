@@ -1,5 +1,6 @@
 function Liquid(attrs) {
 	//driving force convention: positive -> into liquid, neg -> into vapor
+	//still need to do pInt adjustment for wallGas
 	this.type = 'Liquid';
 	this.wallInfo = attrs.wallInfo;
 	this.wallGas = walls[this.wallInfo];
@@ -15,16 +16,16 @@ function Liquid(attrs) {
 	this.drivingForce = this.makeDrivingForce(this.spcInfo);
 	this.dotMgrLiq = this.makeDotManager(this.spcInfo);
 	this.wallLiq = this.makeWallLiq(this.spcInfo, this.wallGas, this.wallPtIdxs, this.dotMgrLiq);
-	this.numAbs = makeNumAbsorbed(this.spcInfo);
+	this.numAbs = this.makeNumAbsorbed(this.spcInfo);
 	this.makeDots(this.wallLiq, this.spcInfo, tempInit, this.dotMgrLiq) && this.deleteCount(this.spcInfo);
 	this.dataGas = this.initData(this.wallGas, this.spcInfo, ['pInt']);
 	this.dataLiq = this.initData(this.wallLiq, this.spcInfo, ['temp']);
 	this.drawList = this.makeDrawList(this.dotMgrLiq); //need to make draw list in random order otherwise dots drawn on top will look more prominant than they are.
 	this.actCoeffFuncs = this.makeActCoeffFuncs(this.actCoeffType, this.actCoeffInfo, this.spcInfo);
 	this.chanceZeroDf = .2;
-	var driviingForceSensitivity = 2;//formalize this a bit
+	this.drivingForceSensitivity = 10;//formalize this a bit
 	this.updateListenerName = this.type + this.handle;
-	this.setupUpdate(this.spcInfo, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, driviingForceSensitivity)
+	this.setupUpdate(this.spcInfo, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity)
 	
 	//this.setupStd();
 }
@@ -69,7 +70,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			}
 		} else {
 			for (var spcName in spcInfo) {
-				vol += spcInfo[spcName].spcVol * dotMgr.get({spcName}).length / N;
+				vol += spcInfo[spcName].spcVol * dotMgr.get({spcName: spcName}).length / N;
 			}
 		}
 		return vol;
@@ -146,15 +147,16 @@ _.extend(Liquid.prototype, objectFuncs, {
 		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcInfo, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq);
 		var sizeWall = this.setupSizeWall(wallLiq, spcInfo, dotMgrLiq)
 		var zeroAttrs = this.zeroAttrs;
-		var calcCp = this.calcCp, calcEquil = this.calcEquil, drawDots = this.drawDots, move = this.moveDots, ejectDots = this.ejectDots;
+		var calcCp = this.calcCp, calcEquil = this.calcEquil, drawDots = this.drawDots, moveDots = this.moveDots, ejectDots = this.ejectDots;
+		calcCp();
 		addListener(curLevel, 'update', listenerName, function() {
-			zeroAttrs(numAbs);//maybe do only if ejected any
 			calcCp();
 			calcEquil();
 			drawDots();
 			moveDots();
 			ejectDots();
 			sizeWall();
+			zeroAttrs(numAbs);
 		})
 	},
 	setupCalcCp: function(spcInfo, dotMgrLiq) {
@@ -162,7 +164,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		return function() {
 			var Cp = 0;
 			for (var spcName in spcInfo) {
-				Cp += spcInfo[spcName].cp * dotMgrLiq.lists[spcName];
+				Cp += spcInfo[spcName].cP * dotMgrLiq.get({spcName: spcName}).length / N; //Cp in J/K  spcInfo given in J/mol-k
 			}
 			self.Cp = Cp;	
 		}
@@ -188,7 +190,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var pGas = gasFrac * dataGas.pInt[dataGas.pInt.length - 1];
 				drivingForce[spcName] = pGas - pEq;
 			}
-		})	
+		}
 	},
 	setupDrawDots: function(drawList) {
 		return function() {
@@ -203,9 +205,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 		return function() {
 			var stepSize, i, len, moveVec, dotMass, numGroups;
-			var getMoveVec = function(mass, temp) {
-				
-			}
 			//reducing number of vectors I have to make while making motion look random by stepping at random intervals
 
 			var xMax = wallLiq[2].x;
@@ -243,9 +242,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var abs = numAbs[spcName];
 				//converges to abs as df -> 0
 				if (dF > 0) {
-					numEject = abs / (dF * drivingForceSensitivity + 1);
+					numEject = Math.round(abs / (dF * drivingForceSensitivity + 1));
 				} else {
-					numEject = abs * (-dF * drivingForceSensitivity + 1);
+					numEject = Math.round(abs * (-dF * drivingForceSensitivity + 1));
 				}
 				if (numEject) {
 					self.eject(dotMgrLiq, window.dotManager, spcInfo, spcName, numEject, wallGas, drawList, wallLiq);
@@ -257,14 +256,15 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var self = this;
 		return function() {
 			var vol = self.getLiqWallVol(spcInfo, dotMgrLiq);
-			var height = getWallHeight(wall[2].x - wall[1].x, vol);
+			var height = self.getWallHeight(wall[2].x - wall[1].x, vol);
 			wall[0].y = wall[1].y - height;
 			wall[3].y = wall[1].y - height;
+			wall[4].y = wall[1].y - height;
 		}
 	},
 	eject: function(dotMgrLiq, dotMgrGas, spcInfo, spcName, numEject, wallGas, drawList, wallLiq) {
 		//going to take energy out of ejected dot rather than liquid. 
-		var info = spcName[spcName];
+		var info = spcInfo[spcName];
 		var hVapPerDot = info.hVap * 1000 / N; //1000/N = 1, but if I ever change N, I don't want this to be a sneaky problem.
 		var cDot = window.cv;
 		var dHLiq = 0;
@@ -273,7 +273,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		
 		var toTransfer = dotList.slice(0, sliceIdx);
 		dotMgrLiq.remove(toTransfer);
-		
+		//hey - you should *probably* take energy out of the liquid, not the gas because the gas will be colder than it should be due to fast gas molecs hitting liq surface more often
 		var tempEject = this.temp - hVapPerDot / cDot;
 		for (var transIdx=0; transIdx<toTransfer.length; transIdx++) {
 			var dot = toTransfer[transIdx];
@@ -286,7 +286,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		dotMgrGas.add(toTransfer);
 	},
 	getPPure: function(a, b, c, T) {
-		return Math.pow(10, a - b / (T + c));
+		return Math.pow(10, a - b / (T + c)) * MMHGTOBAR; //C is Kelvin
 	},
 	deleteCount: function(spcInfo) {
 		for (var a in spcInfo) {
@@ -307,16 +307,16 @@ _.extend(Liquid.prototype, objectFuncs, {
 	hit: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 		//it's a sigmoid!
 		var dF = this.drivingForce;
-		if (dF[dot.spcName]) {
+		if (dF[dot.spcName] !== undefined) {
 			var chanceZero = this.chanceZeroDf;
 			var a = chanceZero / (1 - chanceZero);
-			var chanceAbs = a / (a + Math.exp(-dF[dot.spcName]));
+			var chanceAbs = a / (a + Math.exp(-dF[dot.spcName] * this.drivingForceSensitivity));
 			if (chanceAbs > Math.random()) {
 				return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcInfo);//need to set Cp in this;
 			}
 		}
-		this.equalizeTemps(dot);
-		WallMethods.collideMethods.reflect(dot, wallUV, perpV);
+		this.equalizeTemps(dot, wallUV, perpV);
+		
 		
 	},
 	absorbDot: function(dot, drawList, dotMgrLiq, wallLiq, spcInfo) {
@@ -325,20 +325,22 @@ _.extend(Liquid.prototype, objectFuncs, {
 		drawList.splice(Math.floor(Math.random() * drawList.length), 0, dot);
 		dot.setWall(wallLiq.handle);
 		dotMgrLiq.add(dot);
-		var hVap = spcInfo[dot.spcName]; //in kj/mol
+		var hVap = spcInfo[dot.spcName].hVap; //in kj/mol
 		this.calcCp();
-		this.temp += hVap * 1000 / (Cp * N); //converting to j/dot
+		this.temp += hVap * 1000 / (this.Cp * N); //converting to j/dot
 		this.numAbs[dot.spcName]++;
 		return false; //returning false isn't used here, but I like to return false when a dot is removed from a dot/wall collision check because it is used in dot collisions.  Feels consistent.  
 	},
-	equalizeTemps: function(dot) {
+	equalizeTemps: function(dot, wallUV, perpV) {
 		var CLiq = this.Cp;
 		var CDot = cv / N; //I think cv is right, because CpLiq is basically cv as well
 		var tLiq = this.temp;
 		var tDot = dot.temp();
 		var tF = (CLiq * tLiq + CDot * tDot) / (CLiq + CDot);
 		this.temp = tF;
-		dot.setTemp(tF);
+		var vRatio = Math.sqrt(tF / tDot); //inlining vRatio show dot.setTemp so I don't have to sqrt unnecessarily
+		dot.v.mult(vRatio);
+		WallMethods.collideMethods.reflect(dot, wallUV, perpV * vRatio);
 	}
 	
 })

@@ -505,6 +505,7 @@ Dot.prototype = {
 		for (var listIdx=0; listIdx<this.parentLists.length; listIdx++) {
 			this.parentLists[listIdx].splice(this.parentLists[listIdx].indexOf(this), 1);
 		}
+		this.parentLists.splice(0, this.parentLists.length);
 		this.active = false;
 	}
 }
