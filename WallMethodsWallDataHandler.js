@@ -25,6 +25,8 @@ WallMethods.wallDataHandler = {
 				return this.data[type]
 			}
 		} else {
+			console.log('Tried to get bad data type "' + type + '" with args');
+			console.log(args);
 			return false;
 		}
 	},
