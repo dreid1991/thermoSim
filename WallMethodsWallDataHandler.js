@@ -15,7 +15,7 @@ WallMethods.wallDataHandler = {
 		}
 		return this.pIntList.average();
 	},
-	getDataObj: function(type, args) { //data will be list of DataObjs if it's like fractional conversion where there can be one for each species or tag.  Else is just DataObj
+	getDataObj: function(type, args, suppressOutput) { //data will be list of DataObjs if it's like fractional conversion where there can be one for each species or tag.  Else is just DataObj
 		if (this.data[type]) {
 			if (this.data[type] instanceof Array) {
 				for (var idx=0; idx<this.data[type].length; idx++) {
@@ -24,11 +24,11 @@ WallMethods.wallDataHandler = {
 			} else {
 				return this.data[type]
 			}
-		} else {
+		} else if (!suppressOutput) {
 			console.log('Tried to get bad data type "' + type + '" with args');
 			console.log(args);
-			return false;
 		}
+		return false;
 	},
 	removeDataObj: function(type, args) { 
 		if (this.data[type]) {

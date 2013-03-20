@@ -109,7 +109,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var data = {};
 		for (var extraIdx=0; extraIdx<extras.length; extraIdx++) {
 			var extra = extras[extraIdx];
-			var dataObj = wall.getDataObj(extra);
+			var dataObj = wall.getDataObj(extra, undefined, true);
 			if (dataObj === false) {
 				var recordFunc = 'record' + extra.toCapitalCamelCase();
 				wall[recordFunc]();
@@ -155,7 +155,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			calcEquil();
 			drawDots();
 			moveDots();
-			ejectDots();
+			//ejectDots();
 			sizeWall();
 			//zeroAttrs(numAbs);
 		})
@@ -314,15 +314,15 @@ _.extend(Liquid.prototype, objectFuncs, {
 	hit: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 		//it's a sigmoid!
 		var dF = this.drivingForce;
-		if (dF[dot.spcName] !== undefined) {
-			var chanceZero = this.chanceZeroDf;
-			var a = chanceZero / (1 - chanceZero);
-			var chanceAbs = a / (a + Math.exp(-dF[dot.spcName] * this.drivingForceSensitivity));
-			if (chanceAbs > Math.random()) {
+		// if (dF[dot.spcName] !== undefined) {
+			// var chanceZero = this.chanceZeroDf;
+			// var a = chanceZero / (1 - chanceZero);
+			// var chanceAbs = a / (a + Math.exp(-dF[dot.spcName] * this.drivingForceSensitivity));
+			// if (chanceAbs > Math.random()) {
 				return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcInfo);//need to set Cp in this;
-			}
-		}
-		this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager);
+			// }
+		// }
+		// this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager);
 		
 		
 	},
@@ -333,8 +333,11 @@ _.extend(Liquid.prototype, objectFuncs, {
 		dot.setWall(wallLiq.handle);
 		dotMgrLiq.add(dot);
 		var hVap = spcInfo[dot.spcName].hVap; //in kj/mol
+		var CpLiqOld = this.Cp;
 		this.calcCp();
-		this.temp += hVap * 1000 / (this.Cp * N); //converting to j/dot
+		
+		var CDot = window.cv / N;
+		this.temp = (CpLiqOld * this.temp + CDot * dot.temp() + hVap * 1000 / N) / this.Cp;
 		this.numAbs[dot.spcName]++;
 		return false; //returning false isn't used here, but I like to return false when a dot is removed from a dot/wall collision check because it is used in dot collisions.  Feels consistent.  
 	},

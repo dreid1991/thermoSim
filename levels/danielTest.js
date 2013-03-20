@@ -45,7 +45,7 @@ _.extend(TestLevel.prototype,
 					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'staticAdiabatic', handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}} 
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(200, 200), count: 1, temp: 400, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'spc1', pos: P(55, 55), dims: V(200, 200), count: 500, temp: 400, returnTo: 'wally', tag: 'wally'},
 					{spcName: 'spc3', pos: P(55, 55), dims: V(200, 200), count: 1, temp: 400, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
@@ -55,7 +55,7 @@ _.extend(TestLevel.prototype,
 					},
 					{
 						type: 'Liquid',
-						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 330, spcInfo: {spc1: {count: 500, spcVol: .5, cP:75, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, hVap: 40.65}, spc3: {count: 1000, spcVol: .7, cP:80, antoineCoeffs: {a: 8.20, b: 1642.89, c: 230.3-273.15}, hVap: 38.6}}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 330, spcInfo: {spc1: {count: 500, spcVol: .5, cP:75, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, hVap: 40.65}, spc3: {count: 1, spcVol: .7, cP:75, antoineCoeffs: {a: 8.20, b: 1642.89, c: 230.3-273.15}, hVap: 38.6}}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
 					}
 					// {
 						// type: 'DragWeights',
