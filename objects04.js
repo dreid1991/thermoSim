@@ -155,9 +155,8 @@ _.extend(Liquid.prototype, objectFuncs, {
 			calcEquil();
 			drawDots();
 			moveDots();
-			//ejectDots();
+			ejectDots();
 			sizeWall();
-			//zeroAttrs(numAbs);
 		})
 	},
 	setupCalcCp: function(spcInfo, dotMgrLiq) {
@@ -229,8 +228,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 							dots[dotIdx].y = Math.max(yMin, Math.min(yMax, dots[dotIdx].y + moveVec.dy));
 						}
 					}
-				} else {
-					console.log('A species is out!') && curLevel.pause();
 				}
 			}
 		};
@@ -240,19 +237,26 @@ _.extend(Liquid.prototype, objectFuncs, {
 	setupEjectDots: function(dotMgrLiq, spcInfo, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt) {
 		var self = this;
 		var wallGas = this.wallGas;
+		var dotLists = {};
+		for (var spcName in spcInfo) {
+			dotLists[spcName] = dotMgrLiq.get({spcName: spcName});
+		}
 		return function() {
 			for (var spcName in spcInfo) {
 				var dF = drivingForce[spcName];
 				var abs = numAbs[spcName];
 				//converges to abs as df -> 0
 				
-				if (dF > 0) { 
-					numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
-				} else {
-					//numEjt[spcName] += abs * (-dF * drivingForceSensitivity + 1);
-					numEjt[spcName] += (wallLiq[2].x - wallLiq[1].x) * -dF * drivingForceSensitivity / 1000;
-				}
+				// if (dF > 0) { 
+					// numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
+				// } else {
+					// //numEjt[spcName] += abs * (-dF * drivingForceSensitivity + 1);
+					// numEjt[spcName] += (wallLiq[2].x - wallLiq[1].x) * -dF * drivingForceSensitivity / 1000;
+				// }
+				numEjt[spcName] = 1;
+				numEjt[spcName] = Math.min(numEjt[spcName], dotLists[spcName].length);
 				var flr = Math.floor(numEjt[spcName])
+				
 				if (flr) {
 					self.eject(dotMgrLiq, window.dotManager, spcInfo, spcName, flr, wallGas, drawList, wallLiq);
 					numEjt[spcName] = 0;
@@ -274,15 +278,16 @@ _.extend(Liquid.prototype, objectFuncs, {
 		//going to take energy out of ejected dot rather than liquid. 
 		var info = spcInfo[spcName];
 		var hVapPerDot = info.hVap * 1000 / N; //1000/N = 1, but if I ever change N, I don't want this to be a sneaky problem.
-		var cDot = window.cv;
+		var CDot = window.cv / N;
+		var CpOld = this.Cp;
 		var dHLiq = 0;
 		var dotList = dotMgrLiq.get({spcName: spcName})
 		var sliceIdx = Math.min(dotList.length, numEject);
 		
 		var toTransfer = dotList.slice(0, sliceIdx);
 		dotMgrLiq.remove(toTransfer);
-		//hey - you should *probably* take energy out of the liquid, not the gas because the gas will be colder than it should be due to fast gas molecs hitting liq surface more often
-		var tempEject = this.temp - hVapPerDot / cDot;
+		var tempEject = this.temp;
+		//Cpliqo*Tliqo + nVap*hVap = Cpliqf*Tliqf + CgasTgas w/ Tgas = Tliqo
 		for (var transIdx=0; transIdx<toTransfer.length; transIdx++) {
 			var dot = toTransfer[transIdx];
 			dot.setTemp(tempEject);
@@ -292,6 +297,8 @@ _.extend(Liquid.prototype, objectFuncs, {
 			drawList.splice(drawList.indexOf(dot), 1);
 		}
 		dotMgrGas.add(toTransfer);
+		this.calcCp();
+		this.temp = (this.temp * CpOld - numEject * (hVapPerDot + this.temp * CDot)) / this.Cp;
 	},
 	getPPure: function(a, b, c, T) {
 		return Math.pow(10, a - b / (T + c)) * MMHGTOBAR; //C is Kelvin
@@ -343,18 +350,18 @@ _.extend(Liquid.prototype, objectFuncs, {
 		return false; //returning false isn't used here, but I like to return false when a dot is removed from a dot/wall collision check because it is used in dot collisions.  Feels consistent.  
 	},
 	adjTemps: function(dot, wallUV, perpV, dataGas, dataLiq, tLiq, dotMgrGas) {
-		var CDot = cv / N;
-		var tGas = dataGas.temp[dataGas.temp.length - 1];
-		var tDot = dot.temp();
-		var CGas = dotMgrGas.count * CDot;
-		var tTarget = (tLiq * this.Cp + tGas * CGas) / (this.Cp + CGas);
-		var deltaTDot = Math.max(1.05 * (tTarget - tGas), -tDot + 10);
-		this.temp -= deltaTDot * CDot / this.Cp;
+		// var CDot = cv / N;
+		// var tGas = dataGas.temp[dataGas.temp.length - 1];
+		// var tDot = dot.temp();
+		// var CGas = dotMgrGas.count * CDot;
+		// var tTarget = (tLiq * this.Cp + tGas * CGas) / (this.Cp + CGas);
+		// var deltaTDot = Math.max(1.05 * (tTarget - tGas), -tDot + 10);
+		// this.temp -= deltaTDot * CDot / this.Cp;
 		
 		
-		var vRatio = Math.sqrt((tDot + deltaTDot) / tDot); //inlining vRatio show dot.setTemp so I don't have to sqrt unnecessarily
-		dot.v.mult(vRatio);
-		WallMethods.collideMethods.reflect(dot, wallUV, perpV * vRatio);
+		// var vRatio = Math.sqrt((tDot + deltaTDot) / tDot); //inlining vRatio show dot.setTemp so I don't have to sqrt unnecessarily
+		// dot.v.mult(vRatio);
+		WallMethods.collideMethods.reflect(dot, wallUV, perpV/* * vRatio*/);
 	}
 	
 })
