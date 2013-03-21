@@ -40,10 +40,19 @@ _.extend(LevelTemplate.prototype,
 	},
 	sections: [
 		{//First Questions
-			sceneData: undefined,
+			sceneData: {
+							objs: [
+								{type:'AuxImage',
+									attrs: {handle: 'piston1', imgFunc: 'img(img/work/block0Pic2.jpg)', slotNum: 1}
+								},
+								{type:'AuxImage',
+									attrs: {handle: 'piston2', imgFunc: 'img(img/work/block0Pic1.jpg)', slotNum: 2}
+								}
+							],
+						},
 				prompts:[ 
 					{//Prompt 1
-						sceneData:undefined,
+						sceneData: undefined,
 						cutScene:true,
 						text: "Today we're going to investigate how work transfers energy to a system.  First we're going to develop the equations that describe a process on an adiabatic system. </p><p>If we compress the adiabatic system pictured to the right at a constant external pressure from state 1 to state 2, which of the following equations best represents the work done?</p>",
 						quiz: [
@@ -60,14 +69,14 @@ _.extend(LevelTemplate.prototype,
 					{//Prompt 2
 						sceneData:undefined,
 						cutScene:true,
-						text: "$$ W = -P_{ext}\\Delta V $$ <p> Indeed. This equation tells us that work done on a sustem is equal to how hard you compress a container per area times how much you compress it. <p> Now from the first law, we know $$ \\Delta U = Q + W $$ <p> For our adiabatic system, which of the following relations is correct, if we asume constant heat capacity?",
+						text: "$$ W = -P_{ext}\\Delta V $$ <p> Indeed. This equation tells us that work done on a system is equal to how hard you compress a container per area times how much you compress it. <p> Now from the first law, we know $$ \\Delta U = Q + W $$ <p> For our adiabatic system, which of the following relations is correct, if we asume constant heat capacity?",
 						quiz: [
 							{type: 'multChoice',
 								options:[
 									{text:"## nc_v\\Delta T = Q ##", isCorrect: false, message:"But it's adiabatic!"},
 									{text:"##nc_v\\Delta T = -P_{ext}\\Delta V ##", isCorrect: true},
 									{text:"##nc_p\\Delta T = -P_{ext}\\Delta V ##", isCorrect: false, message:"Why Cp?"},
-									{text:"It cannot be simplified", isCorrect: false, message:"Yes it can.  What is Q equal to for an adiabatic system?"}
+									{text:"None of these are correct", isCorrect: false, message:"Yes it can.  What is Q equal to for an adiabatic system?"}
 								]
 							}
 						]
@@ -77,7 +86,7 @@ _.extend(LevelTemplate.prototype,
 		{//First Scene
 			sceneData: {
 				walls: [
-					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'FirstWall', border: {type: 'wrap'}, hitMode: 'ArrowSpd'},
+					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'FirstWall', border: {type: 'open'}, hitMode: 'ArrowSpd'},
 				],
 				dots: [
 					{spcName: 'spc4', pos: P(55, 210), dims: V(150,150), count: 1, temp: 400, returnTo: 'FirstWall', tag: 'FirstWall'},
@@ -95,7 +104,7 @@ _.extend(LevelTemplate.prototype,
 							{dataSet: {wallInfo: 'FirstWall', data: 'temp'}, is: 'notEqualTo', checkVal: 400, alertUnsatisfied: "Try to hit the molecule with the slider and see what happens!", priorityUnsatisfied: 1}
 						]
 					},
-					text: "From the equation above we see that temperature increases as we do work by decreasing volume.  Temperature is an expression is molecular kinetic energy, so as the system is compressed, the molecules must speed up.  These ideal gas molecules can be thought of as perfectly elastic bouncy balls.  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?<p>",
+					text: "<center>##nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p>From the equation above we see that temperature increases as we do work by decreasing volume.  Temperature is an expression is molecular kinetic energy, so as the system is compressed, the molecules must speed up.  These ideal gas molecules can be thought of as perfectly elastic bouncy balls.  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?<p>",
 					quiz: [
 						{type: 'text', storeAs: 'FirstSceneAnswer', Text: 'Type your answer here.'}
 					],
@@ -130,7 +139,7 @@ _.extend(LevelTemplate.prototype,
 				graphs: [
 					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:2}, y:{min:0, step:4}}, 
 						sets:[
-							{address:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: {wallInfo: 'SecondWall', data: 'vol'}, y: {wallInfo: 'SecondWall', data: 'pExt'}}, trace: true, fillInPts: false, fillInPtsMin: 5}
+							{address:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: {wallInfo: 'SecondWall', data: 'vol'}, y: {wallInfo: 'SecondWall', data: 'pExt'}}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]
 					}
 				],
@@ -139,22 +148,22 @@ _.extend(LevelTemplate.prototype,
 				{
 					sceneData:{
 						listeners: [
-								// {dataSet: {wallInfo: 'SecondWall', data: 'pExt'}, is: 'isEqual', checkVal: 15 , atSatisfyCmmds: 'freeze' , priorityUnsatisfied: 1},
-								// {dataSet: {wallInfo: 'SecondWall', data: 'v'}, is: 'lessThan', checkVal: 10, alertUnsatisfied: "Compress the system!", priorityUnsatisfied: 1, checkOn: 'conditions'}
+								{dataSet: {wallInfo: 'SecondWall', data: 'pExt'}, is: 'equalTo', checkVal: 15 , satisfyCmmds: [{type: 'DragWeights', handle: 'DragsOne', cmmd: 'freeze'}] , priorityUnsatisfied: 1},
+								{dataSet: {wallInfo: 'SecondWall', data: 'vol'}, is: 'lessThan', checkVal: 8, alertUnsatisfied: "Compress the system!", priorityUnsatisfied: 1}
 							]
 					},
-						text: "Above is a well insulated piston cylinder assembly.  Place the block on top of the piston and observe the response.  How much work did the piston and block do on the system?",
+						text: "Above is a well insulated piston cylinder assembly.  Place the block on top of the piston and observe the response.  Calculate the amouunt of work that the piston and block did on the system?",
 						quiz: [
 							{type: 'textSmall', storeAs: 'WorkDoneAnswer', units: 'kJ', text: ''}
 						]
 				},
 				{
 					sceneData: undefined,
-						text: "The system had an initial temperature of 200 K and contains 1.8 moles of an ideal monatomic gas.  You wrote that get(WorkDoneAnswer,int) kJ of work were done.  What final temperature should the system have had?",
+						text: "The system had an initial temperature of 200 K and contains 1.8 moles of an ideal monatomic gas.  You wrote that get(WorkDoneAnswer,int) kJ of work were done.  What final temperature should the system have?",
 						quiz: [
 							{type: 'textSmall', storeAs: 'TempAnswer', units: 'K', text: ''}
 						]
-				}
+				},
 			]
 		},
 		{//Third Scene
@@ -182,21 +191,68 @@ _.extend(LevelTemplate.prototype,
 				graphs: [
 					{type: 'Scatter', handle: 'PvsVTwo', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:2}, y:{min:0, step:4}}, 
 						sets:[
-							{address:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: {wallInfo: 'ThirdWall', data: 'vol'}, y: {wallInfo: 'ThirdWall', data: 'pExt'}}, trace: true, fillInPts: false, fillInPtsMin: 5}
+							{address:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: {wallInfo: 'ThirdWall', data: 'vol'}, y: {wallInfo: 'ThirdWall', data: 'pExt'}}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]
 					},
 					{type: 'Scatter', handle: 'TvsVOne', xLabel: "Volume (L)", yLabel: "Temperature (K)", axesInit:{x:{min:6, step:2}, y:{min:0, step:200}}, 
 						sets:[
-							{address:'temp', label:'T sys', pointCol:Col(50,50,255), flashCol:Col(50,50,255), data:{x: {wallInfo: 'ThirdWall', data: 'vol'}, y: {wallInfo: 'ThirdWall', data: 'temp'}}, trace: true, fillInPts: false, fillInPtsMin: 5}
+							{address:'temp', label:'T sys', pointCol:Col(50,50,255), flashCol:Col(50,50,255), data:{x: {wallInfo: 'ThirdWall', data: 'vol'}, y: {wallInfo: 'ThirdWall', data: 'temp'}}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]
 					}	
 				]
 			},
 			prompts:[
-				{sceneData:undefined,
+				{
+					sceneData: {
+						listeners: [
+							{dataSet: {wallInfo: 'ThirdWall', data: 'pExt'}, is: 'equalTo', checkVal: 15 , satisfyCmmds: [{type: 'DragWeights', handle: 'DragsOne', cmmd: 'freeze'}] , priorityUnsatisfied: 1},
+							{dataSet: {wallInfo: 'ThirdWall', data: 'vol'}, is: 'lessThan', checkVal: 8, alertUnsatisfied: "Compress the system!", priorityUnsatisfied: 1}
+						]
+					},
 					text: "Previously you answered that the compression did get(WorkDoneAnswer,int) KJ on the system bringing it to a final temperature of get(TempAnswer,int) K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
 					quiz: [
 						{type: 'text', storeAs: 'DiscrepencyAnswer'}
+					]
+				},
+				{
+					sceneData: undefined,
+						cutScene: true,
+						text: "<center> ## nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p> If you'll notice, the T vs. V graph is linear.  Using the equation above, find what its slope should should be with 1.8 moles of an ideal monatomic gas.  Do the slopes from the equation and from the graph match?",
+						quiz: [
+							{type: 'textSmall', label: 'Slope from graph', storeAs: 'slopeFromGraph', text: " "},
+							{type: 'textSmall', label: 'Slope from equation', storeAs: 'slopeFromEquation', text: " "},
+							{type: 'text', preText: "Given our ## P_{ext} ## should the graph be linear or did something go wrong? Explain.", text: " "}
+						]
+				},
+				{
+					sceneData: undefined,
+						cutScene: true,
+						text: "Now we'll look at expanding the same system of 1.8 moles with ## P_{ext} ## of 2 bar from 7.5L to 15 L. <p> How much work will the system do on its surroundings in this expansion, and what will its final temperature be?",
+						quiz: [
+							{type: 'textSmall', label: "Work Done:",storeAs: 'workAnswer', text: " ", units: "kJ"},
+							{type: 'textSmall', label: 'Final Temperature:', storeAs: 'tempAnswer', text: " ", units: "K"}
+						]
+				},
+				{
+					sceneData: {
+						listeners: [
+							{dataSet: {wallInfo: 'ThirdWall', data: 'pExt'}, is: 'equalTo', checkVal: 15 , satisfyCmmds: [{type: 'DragWeights', handle: 'DragsOne', cmmd: 'unfreeze'}] , priorityUnsatisfied: 1},
+							{dataSet: {wallInfo: 'ThirdWall', data: 'pExt'}, is: 'equalTo', checkVal: 2 , satisfyCmmds: [{type: 'DragWeights', handle: 'DragsOne', cmmd: 'freeze'}] , priorityUnsatisfied: 1},
+							{dataSet: {wallInfo: 'ThirdWall', data: 'pExt'}, is: 'equalTo', checkVal: 15, satisfyCmmds: [{type: 'wall', handle: 'ThirdWall', cmmd: 'resetWork'}], priorityUnsatisfied: 1}
+						],
+						objs: [
+							{type: 'Stops',
+								attrs: { handle: 'stopper', wallInfo: 'ThirdWall', stopPt: {vol: 14.5}}
+							}
+						]
+					},
+					text: "You wrote that the system would do get(workAnswer, int) kJ of work for a final temperature of get(tempAnswer, int) K. Find out if you were right by performing the experiment above. ",
+				},
+				{
+					sceneData:undefined,
+					text: "The system has undergone a two-step process.  First it was compressed by adding a block.  Then it was expanded to its original volume by removing the block.  Before the compression, the system's temperature was 200K.  After the expansion, the temperature was 670 K.  Why is the system temperature higher after going through this two-step process?",
+					quiz: [
+						{type: 'text', text: "type your answer here."}
 					]
 				}
 			]
