@@ -20,7 +20,7 @@ function Liquid(attrs) {
 	this.numEjt = deepCopy(this.numAbs);
 	this.makeDots(this.wallLiq, this.wallGas, this.wallPtIdxs, this.spcInfo, tempInit, this.dotMgrLiq) && this.deleteCount(this.spcInfo);
 	this.dataGas = this.initData(this.wallGas, this.spcInfo, ['pInt', 'temp']);
-	this.dataLiq = this.initData(this.wallLiq, this.spcInfo, ['temp']);
+	this.dataLiq = this.initData(this.wallLiq, this.spcInfo);
 	this.drawList = this.makeDrawList(this.dotMgrLiq); //need to make draw list in random order otherwise dots drawn on top will look more prominant than they are.
 	this.actCoeffFuncs = this.makeActCoeffFuncs(this.actCoeffType, this.actCoeffInfo, this.spcInfo);
 	this.chanceZeroDf = .2;
@@ -107,15 +107,17 @@ _.extend(Liquid.prototype, objectFuncs, {
 	},
 	initData: function(wall, spcInfo, extras) {
 		var data = {};
-		for (var extraIdx=0; extraIdx<extras.length; extraIdx++) {
-			var extra = extras[extraIdx];
-			var dataObj = wall.getDataObj(extra, undefined, true);
-			if (dataObj === false) {
-				var recordFunc = 'record' + extra.toCapitalCamelCase();
-				wall[recordFunc]();
-				data[extra] = wall.getDataObj(extra).src();
-			} else {
-				data[extra] = dataObj.src();
+		if (extras) {
+			for (var extraIdx=0; extraIdx<extras.length; extraIdx++) {
+				var extra = extras[extraIdx];
+				var dataObj = wall.getDataObj(extra, undefined, true);
+				if (dataObj === false) {
+					var recordFunc = 'record' + extra.toCapitalCamelCase();
+					wall[recordFunc]();
+					data[extra] = wall.getDataObj(extra).src();
+				} else {
+					data[extra] = dataObj.src();
+				}
 			}
 		}
 		for (var spcName in spcInfo) {
@@ -182,7 +184,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var spc = spcInfo[spcName];
 				var gasFrac = dataGas[spcName][dataGas[spcName].length - 1];
 				var liqFrac = dataLiq[spcName][dataLiq[spcName].length - 1];
-				var liqTemp = dataLiq.temp[dataLiq.temp.length - 1];
+				var liqTemp = self.temp;
 				var actCoeff = actCoeffFuncs[spcName](liqFrac, liqTemp);
 				var antCoeffs = spcInfo[spcName].antoineCoeffs;
 				var pPure = self.getPPure(antCoeffs.a, antCoeffs.b, antCoeffs.c, liqTemp);
@@ -247,13 +249,13 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var abs = numAbs[spcName];
 				//converges to abs as df -> 0
 				
-				// if (dF > 0) { 
-					// numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
-				// } else {
-					// //numEjt[spcName] += abs * (-dF * drivingForceSensitivity + 1);
-					// numEjt[spcName] += (wallLiq[2].x - wallLiq[1].x) * -dF * drivingForceSensitivity / 1000;
-				// }
-				numEjt[spcName] = 1;
+				if (dF > 0) { 
+					numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
+				} else {
+					//numEjt[spcName] += abs * (-dF * drivingForceSensitivity + 1);
+					numEjt[spcName] += (wallLiq[0].x - wallLiq[1].x) * -dF * drivingForceSensitivity / 1000;
+				}
+				//numEjt[spcName] = 1;
 				numEjt[spcName] = Math.min(numEjt[spcName], dotLists[spcName].length);
 				var flr = Math.floor(numEjt[spcName])
 				
@@ -322,14 +324,14 @@ _.extend(Liquid.prototype, objectFuncs, {
 	hit: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 		//it's a sigmoid!
 		var dF = this.drivingForce;
-		// if (dF[dot.spcName] !== undefined) {
-			// var chanceZero = this.chanceZeroDf;
-			// var a = chanceZero / (1 - chanceZero);
-			// var chanceAbs = a / (a + Math.exp(-dF[dot.spcName] * this.drivingForceSensitivity));
-			// if (chanceAbs > Math.random()) {
-				// return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcInfo);//need to set Cp in this;
-			// }
-		// }
+		if (dF[dot.spcName] !== undefined) {
+			var chanceZero = this.chanceZeroDf;
+			var a = chanceZero / (1 - chanceZero);
+			var chanceAbs = a / (a + Math.exp(-dF[dot.spcName] * this.drivingForceSensitivity));
+			if (chanceAbs > Math.random()) {
+				return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcInfo);//need to set Cp in this;
+			}
+		}
 		this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager);
 		
 		
@@ -350,18 +352,18 @@ _.extend(Liquid.prototype, objectFuncs, {
 		return false; //returning false isn't used here, but I like to return false when a dot is removed from a dot/wall collision check because it is used in dot collisions.  Feels consistent.  
 	},
 	adjTemps: function(dot, wallUV, perpV, dataGas, dataLiq, tLiq, dotMgrGas) {
-		// var CDot = cv / N;
-		// var tGas = dataGas.temp[dataGas.temp.length - 1];
-		// var tDot = dot.temp();
-		// var CGas = dotMgrGas.count * CDot;
-		// var tTarget = (tLiq * this.Cp + tGas * CGas) / (this.Cp + CGas);
-		// var deltaTDot = Math.max(1.05 * (tTarget - tGas), -tDot + 10);
-		// this.temp -= deltaTDot * CDot / this.Cp;
+		var CDot = cv / N;
+		var tGas = dataGas.temp[dataGas.temp.length - 1];
+		var tDot = dot.temp();
+		var CGas = dotMgrGas.count * CDot;
+		var tTarget = (tLiq * this.Cp + tGas * CGas) / (this.Cp + CGas);
+		var deltaTDot = Math.max(1.05 * (tTarget - tGas), -tDot + 10);
+		this.temp -= deltaTDot * CDot / this.Cp;
 		
 		
-		// var vRatio = Math.sqrt((tDot + deltaTDot) / tDot); //inlining vRatio show dot.setTemp so I don't have to sqrt unnecessarily
-		// dot.v.mult(vRatio);
-		WallMethods.collideMethods.reflect(dot, wallUV, perpV/* * vRatio*/);
+		var vRatio = Math.sqrt((tDot + deltaTDot) / tDot); //inlining vRatio show dot.setTemp so I don't have to sqrt unnecessarily
+		dot.v.mult(vRatio);
+		WallMethods.collideMethods.reflect(dot, wallUV, perpV * vRatio);
 	}
 	
 })
