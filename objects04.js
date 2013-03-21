@@ -23,8 +23,8 @@ function Liquid(attrs) {
 	this.dataLiq = this.initData(this.wallLiq, this.spcInfo);
 	this.drawList = this.makeDrawList(this.dotMgrLiq); //need to make draw list in random order otherwise dots drawn on top will look more prominant than they are.
 	this.actCoeffFuncs = this.makeActCoeffFuncs(this.actCoeffType, this.actCoeffInfo, this.spcInfo);
-	this.chanceZeroDf = .2;
-	this.drivingForceSensitivity = 1;//formalize this a bit
+	this.chanceZeroDf = .4;
+	this.drivingForceSensitivity = 10;//formalize this a bit
 	this.updateListenerName = this.type + this.handle;
 	this.setupUpdate(this.spcInfo, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs)
 	
@@ -247,13 +247,14 @@ _.extend(Liquid.prototype, objectFuncs, {
 			for (var spcName in spcInfo) {
 				var dF = drivingForce[spcName];
 				var abs = numAbs[spcName];
+				numAbs[spcName] = 0;
 				//converges to abs as df -> 0
 				
 				if (dF > 0) { 
 					numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
 				} else {
-					//numEjt[spcName] += abs * (-dF * drivingForceSensitivity + 1);
-					numEjt[spcName] += (wallLiq[0].x - wallLiq[1].x) * -dF * drivingForceSensitivity / 1000;
+					numEjt[spcName] += 1 + Math.sqrt(abs * (-dF * drivingForceSensitivity + 1));
+					numEjt[spcName] += (wallLiq[0].x - wallLiq[1].x) * -dF * drivingForceSensitivity / 2000;
 				}
 				//numEjt[spcName] = 1;
 				numEjt[spcName] = Math.min(numEjt[spcName], dotLists[spcName].length);
