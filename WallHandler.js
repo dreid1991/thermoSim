@@ -174,7 +174,7 @@ WallMethods.main = {
 		}
 		return wallGrid;
 	},
-	setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show, record, tSet, col, dotMgr){
+	setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show, record, tSet, col, dotMgr, close){
 		bounds = defaultTo({yMin:30, yMax: 435}, bounds);
 		include = defaultTo(1, include);
 		this[wallIdx] = pts;
@@ -190,7 +190,9 @@ WallMethods.main = {
 		}
 		this[wallIdx].col = defaultTo(this.defaultCol, col);
 		this[wallIdx].show = defaultTo(true, show);
-		this.closeWall(this[wallIdx]);
+		if (close !== false) {
+			this.closeWall(this[wallIdx]);
+		}
 		this[wallIdx].ptsInit = this.copyWallPts(this[wallIdx]);
 		this[wallIdx].g = g;
 		this[wallIdx].pConst = pConst;
@@ -215,11 +217,12 @@ WallMethods.main = {
 	addWall: function(attrs){
 		this.numWalls++;
 		var newIdx = this.length;
-		this.setWallVals(newIdx, attrs.pts, attrs.handle, attrs.bounds, attrs.include, attrs.vol, attrs.show, attrs.record, attrs.temp, attrs.col, attrs.dotManager);
+		this.setWallVals(newIdx, attrs.pts, attrs.handle, attrs.bounds, attrs.include, attrs.vol, attrs.show, attrs.record, attrs.temp, attrs.col, attrs.dotManager, attrs.close);
 		this.setupWall(newIdx);
 		this.setWallHandler(newIdx, attrs.handler);
 		if (attrs.border) this[newIdx].addBorder(attrs.border);
 		if (attrs.hitMode) this[newIdx].setHitMode(attrs.hitMode);
+		return this[newIdx];
 		
 	},
 	setPtsInit: function(){
