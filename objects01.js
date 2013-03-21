@@ -1819,9 +1819,9 @@ _.extend(StateListener.prototype, objectFuncs, {
 		//storeObj formatted as: {storeAs: str, data: {wallInfo: 'wally', data: 'name', attrs: {stuff}}} //data.data is weird, but trying to be consistant
 		if (this.satisfyStore) {
 			for (var storeIdx=0; storeIdx<this.satisfyStore.length; storeIdx++) {
-				var store = this.satisfyStore[storeIdx];
-				var storeAs = store.storeAs;
-				var data = store.data;
+				var storeObj = this.satisfyStore[storeIdx];
+				var storeAs = storeObj.storeAs;
+				var data = storeObj.data;
 				var dataSet = walls[data.wallInfo].getDataObj(data.data, data.attrs).src();
 				var value = dataSet[dataSet.length - 1];
 				store(storeAs, value);
