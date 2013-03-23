@@ -154,12 +154,10 @@ _.extend(Liquid.prototype, objectFuncs, {
 		calcCp();
 		var self = this;
 		addListener(curLevel, 'update', listenerName, function() {
-			console.log('startint liq update and temp is ' + self.temp);
 			calcCp();
 			calcEquil();
 			drawDots();
 			moveDots();
-			//MAKE HEATER RECORD THIS WALL'S Q
 			ejectDots();
 			sizeWall();
 		})
@@ -392,6 +390,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var Cp = this.Cp;
 		var temp = this.temp;
 		q = Math.min(Cp * (3000 - temp), Math.max((-temp + 10) * Cp, q));
+		console.log(q/Cp);
 		this.temp += q / Cp;
 		this.wallLiq.q += q;
 	},

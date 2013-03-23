@@ -48,11 +48,11 @@ _.extend(TestLevel.prototype,
 					},
 					{
 						type: 'Liquid',
-						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcInfo: {spc1: {count: 500, spcVol: .5, cP:12.4, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, hVap: 5/*40.65*/}, spc3: {count: 1000, spcVol: .7, cP:12.4, antoineCoeffs: {a: 8.20, b: 1642.89, c: 230.3-273.15}, hVap: 3.5}}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcInfo: {spc1: {count: 500, spcVol: .5, cP:12.4, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, hVap: 5/*40.65*/}, spc3: {count: 1000, spcVol: .7, cP:12.4, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, hVap: 3.5}}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
 					},
 					{
 						type: 'Heater',
-						attrs:{wallInfo: 'wally', tempMax: 20, handle: 'heaty', liquid: {handle:'swishy'}}
+						attrs:{wallInfo: 'wally', tempMax: 20, handle: 'heaty', offset: V(0, 30), liquid: {handle:'swishy'}}
 					}
 					// {
 						// type: 'DragWeights',

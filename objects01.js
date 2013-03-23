@@ -1488,11 +1488,9 @@ function Heater(attrs){
 	this.sliderTitleWrapper = attrs.sliderTitleWrapper;
 	
 	this.wall = walls[attrs.wallInfo];
-	if (attrs.pos) {
-		this.pos = attrs.pos;
-	} else {
-		this.pos = this.centerOnWall(attrs.wallInfo, this.dims);
-	}
+	this.pos = attrs.pos ? attrs.pos : this.centerOnWall(attrs.wallInfo, this.dims);
+
+	if (attrs.offset) this.pos.movePt(attrs.offset);
 	this.wall.recordQ();
 	this.makeSlider = defaultTo(true, attrs.makeSlider);
 	this.handle = attrs.handle;
@@ -1545,7 +1543,7 @@ _.extend(Heater.prototype, objectFuncs, {
 		
 	},
 	heatLiq: function() {
-		this.liquid.addQ(this.temp * updateInterval / 1000);
+		this.liquid.addQ(this.temp * updateInterval / 100);
 	},
 	makeDrawFunc: function(colMin, colDefault, colMax){
 		var pos = this.pos;
