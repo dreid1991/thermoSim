@@ -28,7 +28,7 @@ function Liquid(attrs) {
 	this.updateListenerName = this.type + this.handle;
 	this.setupUpdate(this.spcInfo, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs)
 	
-	//this.setupStd();
+	this.setupStd();
 }
 
 _.extend(Liquid.prototype, objectFuncs, {
@@ -365,8 +365,16 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var vRatio = Math.sqrt((tDot + deltaTDot) / tDot); //inlining vRatio show dot.setTemp so I don't have to sqrt unnecessarily
 		dot.v.mult(vRatio);
 		WallMethods.collideMethods.reflect(dot, wallUV, perpV * vRatio);
-	}
-	
+	},
+	getWallLiq: function() {
+		return this.wallLiq;
+	},
+	getWallGas: function() {
+		return this.wallGas;
+	},
+	addQ: function(q) {
+		this.temp += q / this.Cp;
+	},
 })
 
 Liquid.prototype.Species = function(spcName, count, hVap, cP, spcVol, antoineCoeffs) {

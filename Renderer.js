@@ -107,7 +107,7 @@ Renderer.prototype = {
 			var cmmd = cmmds[cmmdIdx];
 			var func, obj;
 			if (cmmd.type) {
-				obj = this.getCmmdObj(cmmd.type, cmmd.handle);
+				obj = curLevel.selectObj(cmmd.type, cmmd.handle);
 			} else {
 				if (window[cmmd.cmmd]) {
 					obj = window;
@@ -119,13 +119,6 @@ Renderer.prototype = {
 			
 			func ? func.apply(obj, cmmd.args) : console.log('Bad command with type ' + cmmd.type + ', handle ' + cmmd.handle + ', and command ' + cmmd.cmmd);
 		
-		}
-	},
-	getCmmdObj: function(type, handle) {
-		if (/^wall$/i.test(type)) {
-			return walls[handle] || console.log('Bad command wall handle ' + handle);
-		} else {
-			return curLevel[curLevelKey(type, handle)] || console.log('Bad command data: Type ' + type + ' and handle ' + handle);
 		}
 	},
 	getAndEval: function(sceneElem) {

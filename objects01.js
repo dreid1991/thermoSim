@@ -54,10 +54,10 @@ objectFuncs = {
 	},
 	addToCurLevel: function() {
 		
-		curLevel[curLevelKey(this.type, this.handle)] = this;
+		curLevel[curLevel.key(this.type, this.handle)] = this;
 	},
 	removeFromCurLevel: function() {
-		var key = curLevelKey(this.type, this.handle);
+		var key = curLevel.key(this.type, this.handle);
 		if (curLevel[key] == this) {
 			delete curLevel[key];
 		} else {
@@ -1510,7 +1510,9 @@ function Heater(attrs){
 	this.draw = this.makeDrawFunc(colMin, colDefault, colMax);
 	this.wallPts = this.pos.roundedRect(this.dims, .3, 'ccw');
 	this.eAdded=0;
-	
+	if (attrs.liquid) { //liquid invoked using liquid handle
+		this.setupLiquidHeat(attrs.liquid);
+	}
 	this.setupStd();
 	if (this.makeSlider) {
 
@@ -1532,7 +1534,10 @@ _.extend(Heater.prototype, objectFuncs, {
 		this.setTemp(ui.value);
 	},
 	setTemp: function(val){		
-		this.temp = .02*(val-50)*this.tempMax
+		this.temp = .02*(val-50)*this.tempMax;
+		if (this.liquid) {
+			this.liquid.addQ(this.temp / updateInterval);
+		}
 	},
 	makeDrawFunc: function(colMin, colDefault, colMax){
 		var pos = this.pos;
@@ -1644,6 +1649,20 @@ _.extend(Heater.prototype, objectFuncs, {
 			this.eAdded+=eHit;
 			this.wall.q+=eHit;
 		}
+	},
+	setupLiquidHeat: function(liquidData) {
+		var self = this;
+		addListener(curLevel, 'setup', 'addLiq' + this.handle, function() {
+			var handle = liquidData.handle;
+			var type = 'Liquid';
+			var liquid = curLevel.selectObj(type, handle);
+			if (!liquid) console.log('Bad liquid data for heater ' + this.handle + '.  Handle ' + handle);
+			var liqWall = liquid.getWallLiq();
+			liqWall.recordQ();
+			self.liquid = liquid;
+		});
+		
+		
 	},
 	remove: function(){
 		this.removeSlider();

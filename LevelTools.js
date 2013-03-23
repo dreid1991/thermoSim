@@ -15,9 +15,15 @@ LevelTools = {
 		this.dataHandler = dataHandler;
 		this.attracting = false;
 		this.gravitying = false;
-		this.setUpdateRunListener()
+		this.setUpdateRunListener();
+		animText = new AnimText(c);
 		addListener(this, 'data', 'run', this.dataRun, this);
-		
+		addJQueryElems($('button'), 'button');
+		$('#resetExp').click(function(){curLevel.reset()});
+		$('#toSim').click(function(){sceneNavigator.nextPrompt()});
+		$('#toLastStep').click(function(){sceneNavigator.prevPrompt()});
+		$('#previous').click(function(){sceneNavigator.prevPrompt()});
+		$('#next').click(function(){sceneNavigator.nextPrompt()});
 		this.spcs = spcs;
 	},
 	addSceneDataTypes: function() {
@@ -165,7 +171,7 @@ LevelTools = {
 		return function() {
 			self.storeText();
 			//Hey - am not finished making it so you can cleany mix type of questions yet
-			nextPrompt();
+			sceneNavigator.nextPrompt();
 		}	
 	},
 	submitSetValFunc: function() {
@@ -318,7 +324,7 @@ LevelTools = {
 			}
 			question.isAnswered = true;
 			question.correct = button.isCorrect;
-			nextPrompt();		
+			sceneNavigator.nextPrompt();		
 		}
 
 		buttonBind(id, onclickFunc);		
@@ -362,7 +368,7 @@ LevelTools = {
 			question.correct = option.isCorrect;
 			question.isAnswered = true;
 			//do something to accomidate multiple questions at some point.  Not likely to have multiple now
-			nextPrompt();
+			sceneNavigator.nextPrompt();
 		}
 		$('#'+id).click(onclickFunc);
 		$('#'+id).hover(
@@ -584,60 +590,17 @@ LevelTools = {
 			this.graphs[graphName].freeze();
 		}
 	},
-
-/*
-CONVERT THIS STUFF TO RECORD/DISPLAY
-	track: function(handle, label, data, decPlaces, units){
-		decPlaces = defaultTo(1, decPlaces);
-		if(typeof(data)=='Array'){
-			this.readout.addEntry(handle, label, units, data[data.length-1], undefined, decPlaces);
-			addListener(window['curLevel'], 'data', 'track'+handle,
-				function(){
-					this.readout.tick(handle, data[data.length-1]);
-				},
-			this);
-		}else if (typeof(data)=='function'){
-			this.readout.addEntry(handle, label, units, data(), undefined, decPlaces);
-			addListener(window['curLevel'], 'data', 'track'+handle,
-				function(){
-					this.readout.tick(handle, data());
-				},
-			this);		
+	selectObj: function(type, handle) {
+		if (/^wall$/i.test(type)) {
+			return walls[handle] || console.log('Bad command wall handle ' + handle);
+		} else {
+			return this[this.key(type, handle)] || console.log('Bad command data: Type ' + type + ' and handle ' + handle);
 		}
 	},
-	trackStop: function(handle){
-		removeListener(window['curLevel'], 'data', 'track' + handle);
+	key: function(type, handle) {
+		return type.toCamelCase() + handle.toCapitalCamelCase()
 	},
-	trackExtentRxnStart: function(handle, rxnInfo){
-		var spcsLocal = spcs;
-		var NLOCAL = N;
-		var initVals = new Array(rxnInfo.length);
-		this.data['extent' + handle] = [];
-		for (var compIdx=0; compIdx<rxnInfo.length; compIdx++){
-			var compInfo = rxnInfo[compIdx];
-			var initCount = spcsLocal[compInfo.spc].length;
-			compInfo.init = initCount;
 
-		}
-		addListener(window['curLevel'], 'data', 'trackExtentRxn' + handle,
-			function(){
-				var extent = Number.MAX_VALUE;
-				for (var compIdx=0; compIdx<rxnInfo.length; compIdx++){
-					var compInfo = rxnInfo[compIdx];
-					var init = compInfo.init;
-					var cur = spcsLocal[compInfo.spc].length;
-					var coeff = compInfo.coeff;
-					//HEY - coeff MUST BE NEGATIVE IF THING IS BEING CONSUMED
-					extent = Math.min(extent, (cur-init)/(coeff*NLOCAL));
-				}
-				this.data['extent' + handle].push(extent);
-			},
-		this);
-	},
-	trackExtentRxnStop: function(handle){
-		removeListener(window['curLevel'], 'data', 'trackExtentRxn' + handle);
-	},
-	*/
 	makeListenerHolders: function(){
 		this.makeListenerHolder('update');
 		this.makeListenerHolder('wallMove');
@@ -650,6 +613,7 @@ CONVERT THIS STUFF TO RECORD/DISPLAY
 		this.makeListenerHolder('sectionCondition');
 		this.makeListenerHolder('promptCondition');
 		this.makeListenerHolder('sectionCleanUp');
+		this.makeListenerHolder('setup');
 	},
 	makeListenerHolder: function(name) {
 		this[name + 'Listeners'] = {listeners:{}, save:{}};

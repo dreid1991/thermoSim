@@ -1,18 +1,18 @@
 
 canvasHeight = 450;
 $(function(){
-	animText = new AnimText(c);
+	
 	myCanvas.height = canvasHeight;
-	renderer = new Renderer();
+	// renderer = new Renderer();
 	window.curLevel = new TestLevel();
 	curLevel.cutSceneEnd();
 	curLevel.init();
-	addJQueryElems($('button'), 'button');
-	$('#resetExp').click(function(){curLevel.reset()});
-	$('#toSim').click(function(){nextPrompt()});
-	$('#toLastStep').click(function(){prevPrompt()});
-	$('#previous').click(function(){prevPrompt()});
-	$('#next').click(function(){nextPrompt()});
+	// addJQueryElems($('button'), 'button');
+	// $('#resetExp').click(function(){curLevel.reset()});
+	// $('#toSim').click(function(){nextPrompt()});
+	// $('#toLastStep').click(function(){prevPrompt()});
+	// $('#previous').click(function(){prevPrompt()});
+	// $('#next').click(function(){nextPrompt()});
 });
 
 myCanvas.width = $('#main').width();
@@ -36,7 +36,7 @@ _.extend(TestLevel.prototype,
 	init: function() {
 		this.readout = new Readout('mainReadout', 30, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), 'left');
 		$('#mainHeader').html('Level template');
-		showPrompt(0, 0, true);
+		sceneNavigator.showPrompt(0, 0, true);
 	},
 	sections: [
 				{
@@ -52,11 +52,11 @@ _.extend(TestLevel.prototype,
 					{
 						type: 'AuxImage',
 						attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/work/block0Pic1.jpg)'}
-					},
-					{
-						type: 'Liquid',
-						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcInfo: {spc1: {count: 500, spcVol: .5, cP:12.4, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, hVap: 5/*40.65*/}, spc3: {count: 1, spcVol: .7, cP:12.4, antoineCoeffs: {a: 8.20, b: 1642.89, c: 230.3-273.15}, hVap: 3.5}}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
-					}
+					}//,
+					// {
+						// type: 'Liquid',
+						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcInfo: {spc1: {count: 500, spcVol: .5, cP:12.4, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, hVap: 5/*40.65*/}, spc3: {count: 1, spcVol: .7, cP:12.4, antoineCoeffs: {a: 8.20, b: 1642.89, c: 230.3-273.15}, hVap: 3.5}}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
+					// }
 					// {
 						// type: 'DragWeights',
 						// attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 1}], pInit: 1}

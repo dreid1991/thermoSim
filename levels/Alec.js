@@ -5,16 +5,10 @@ canvasHeight = 450;
 $(function(){
 	animText = new AnimText(c);
 	myCanvas.height = canvasHeight;
-	renderer = new Renderer();
 	window.curLevel = new Alec();
 	curLevel.cutSceneEnd();
 	curLevel.init();
-	addJQueryElems($('button'), 'button');
-	$('#resetExp').click(function(){curLevel.reset()});
-	$('#toSim').click(function(){nextPrompt()});
-	$('#toLastStep').click(function(){prevPrompt()});
-	$('#previous').click(function(){prevPrompt()});
-	$('#next').click(function(){nextPrompt()});
+
 });
 
 myCanvas.width = $('#main').width();
