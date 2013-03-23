@@ -152,11 +152,14 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var zeroAttrs = this.zeroAttrs;
 		var calcCp = this.calcCp, calcEquil = this.calcEquil, drawDots = this.drawDots, moveDots = this.moveDots, ejectDots = this.ejectDots;
 		calcCp();
+		var self = this;
 		addListener(curLevel, 'update', listenerName, function() {
+			console.log('startint liq update and temp is ' + self.temp);
 			calcCp();
 			calcEquil();
 			drawDots();
 			moveDots();
+			//MAKE HEATER RECORD THIS WALL'S Q
 			ejectDots();
 			sizeWall();
 		})
@@ -222,7 +225,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 					dotMass = dots[0].m;
 					stepSize = 15 + Math.ceil(Math.random() * 15);
 					for (var groupNum=0; groupNum<stepSize; groupNum++) {
-						var mag = tempToV(dotMass, self.temp);
+						var mag = tempToV(dotMass, self.temp) * .5;
 						var dir = Math.PI * 2 * Math.random();
 						moveVec = V(Math.cos(dir) * mag, Math.sin(dir) * mag);
 						for (var dotIdx=groupNum; dotIdx<len; dotIdx+=stepSize) {
@@ -357,12 +360,25 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var tGas = dataGas.temp[dataGas.temp.length - 1];
 		var tDot = dot.temp();
 		var CGas = dotMgrGas.count * CDot;
-		var tTarget = (tLiq * this.Cp + tGas * CGas) / (this.Cp + CGas);
-		var deltaTDot = Math.max(1.05 * (tTarget - tGas), -tDot + 10);
-		this.temp -= deltaTDot * CDot / this.Cp;
+		var delT = tLiq - tGas;
+		var sign = getSign(delT);
+		
+		var qToDot = Math.max(sign * Math.max(.05, sign * delT), CDot * (10 - tDot)); 
+		
+		if (qToDot < 0) qToDot = Math.max(qToDot, CDot * (10 - tDot));
+			
 		
 		
-		var vRatio = Math.sqrt((tDot + deltaTDot) / tDot); //inlining vRatio show dot.setTemp so I don't have to sqrt unnecessarily
+		var tDotTarget = tDot + qToDot / CDot;//(tLiq * this.Cp + tGas * CGas) / (this.Cp + CGas);
+		//var deltaTDot = Math.max(1.05 * (tTarget - tGas), -tDot + 10);
+		var tempTest = this.temp - qToDot / this.Cp;
+		if (tempTest < 0 || isNaN(tempTest) || tDotTarget < 0 || isNaN(tDotTarget)) {
+			console.log('WE ARE HERE!');
+		}
+		this.temp -= qToDot / this.Cp;
+		
+		
+		var vRatio = Math.sqrt(tDotTarget / tDot); //inlining vRatio show dot.setTemp so I don't have to sqrt unnecessarily
 		dot.v.mult(vRatio);
 		WallMethods.collideMethods.reflect(dot, wallUV, perpV * vRatio);
 	},
@@ -373,7 +389,11 @@ _.extend(Liquid.prototype, objectFuncs, {
 		return this.wallGas;
 	},
 	addQ: function(q) {
-		this.temp += q / this.Cp;
+		var Cp = this.Cp;
+		var temp = this.temp;
+		q = Math.min(Cp * (3000 - temp), Math.max((-temp + 10) * Cp, q));
+		this.temp += q / Cp;
+		this.wallLiq.q += q;
 	},
 })
 

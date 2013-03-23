@@ -1536,8 +1536,16 @@ _.extend(Heater.prototype, objectFuncs, {
 	setTemp: function(val){		
 		this.temp = .02*(val-50)*this.tempMax;
 		if (this.liquid) {
-			this.liquid.addQ(this.temp / updateInterval);
+			if (val != 50) {
+				addListener(curLevel, 'update', 'heatLiquid' + this.handle, this.heatLiq, this);
+			} else {
+				removeListener(curLevel, 'update', 'heatLiquid' + this.handle);
+			}
 		}
+		
+	},
+	heatLiq: function() {
+		this.liquid.addQ(this.temp * updateInterval / 1000);
 	},
 	makeDrawFunc: function(colMin, colDefault, colMax){
 		var pos = this.pos;
