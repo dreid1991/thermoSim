@@ -91,12 +91,26 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 		
 	},
 	impactStd: function(a, b, UVAB, perpAB, perpBA){
-		var perpABRes = (perpAB*(a.m-b.m)+2*b.m*perpBA)/(a.m+b.m);
-		var perpBARes = (perpBA*(b.m-a.m)+2*a.m*perpAB)/(a.m+b.m);
-		a.v.dx += UVAB.dx*(perpABRes-perpAB);
-		a.v.dy += UVAB.dy*(perpABRes-perpAB);
-		b.v.dx += UVAB.dx*(perpBARes-perpBA);
-		b.v.dy += UVAB.dy*(perpBARes-perpBA);
+		var perpABRes = (perpAB * (a.m - b.m) + 2 * b.m * perpBA) / (a.m + b.m);
+		var perpBARes = (perpBA * (b.m - a.m) + 2 * a.m * perpAB) / (a.m + b.m);
+		var aTempO = a.temp();
+		var bTempO = b.temp();
+		a.v.dx += UVAB.dx * (perpABRes - perpAB);
+		a.v.dy += UVAB.dy * (perpABRes - perpAB);
+		b.v.dx += UVAB.dx * (perpBARes - perpBA);
+		b.v.dy += UVAB.dy * (perpBARes - perpBA);
+		
+		var aTempF = a.temp();
+		var bTempF = b.temp();
+		var aTempAdj = aTempO + (aTempF - aTempO) * a.cvKinetic / a.cv;
+		var bTempAdj = bTempO + (bTempF - bTempO) * b.cvKinetic / b.cv;
+	
+		a.v.mult(Math.sqrt(aTempAdj / aTempF));
+		a.internalPotential += (aTempF - aTempAdj) * a.cvKinetic		
+
+		b.v.mult(Math.sqrt(bTempAdj / bTempF));
+		b.internalPotential += (bTempF - bTempAdj) * b.cvKinetic;
+		
 		this.breakUp(a, b, UVAB);
 		return true;
 	},

@@ -1,4 +1,4 @@
-function Dot(x, y, v, mass, radius, spcName, idNum, tag, returnTo){
+function Dot(x, y, v, mass, radius, spcName, idNum, cv, tag, returnTo){
 	this.x = x;
 	this.y = y;
 	this.v = v;
@@ -6,12 +6,15 @@ function Dot(x, y, v, mass, radius, spcName, idNum, tag, returnTo){
 	this.r = radius;
 	this.spcName = spcName;
 	this.idNum = idNum;
+	this.cvKinetic = 1.5 * R / N;
+	this.cv = cv / N;
 	this.tag = tag;
 	this.returnTo = returnTo;
 	this.tConst = tConst;
 	this.pxToE = pxToE;
 	this.pxToMS = pxToMS;
 	this.parentLists = [];
+	this.internalPotential = this.temp() * (this.cv - this.cvKinetic);
 	this.peLast = 0;
 	this.tempLast = 0;
 	this.peCur = 0;
@@ -47,7 +50,7 @@ Species.prototype = {
 			var angle = Math.random()*2*Math.PI;
 			var vx = v * Math.cos(angle);
 			var vy = v * Math.sin(angle);
-			birthList.push(D(placeX, placeY, V(vx, vy), this.m, this.r, this.spcName, this.idNum, tag, returnTo));
+			birthList.push(D(placeX, placeY, V(vx, vy), this.m, this.r, this.spcName, this.idNum, this.cv, tag, returnTo));
 		}
 		dotMgrLocal.add(birthList);
 		//dots gets set in dotManager
@@ -64,12 +67,12 @@ Species.prototype = {
 		var birthList = [];
 		for (var infoIdx=0; infoIdx<dotsInfo.length; infoIdx++) {
 			var info = dotsInfo[infoIdx];
-			birthList.push(D(info.pos.x, info.pos.y, info.dir.copy().mult(tempToV(this.m, info.temp)), this.m, this.r, this.def.spcName, this.def.idNum, info.tag, info.returnTo));
+			birthList.push(D(info.pos.x, info.pos.y, info.dir.copy().mult(tempToV(this.m, info.temp)), this.m, this.r, this.spcName, this.idNum, this.cv, info.tag, info.returnTo));
 		}
 		dotManager.add(birthList);
 	},
 	placeSingle: function(pos, dir, temp, tag, returnTo) {
-		birth = D(pos.x, pos.y, dir.copy().mult(tempToV(this.m, temp)), this.m, this.r, this.def.spcName, this.def.idNum, tag, returnTo);
+		birth = D(pos.x, pos.y, dir.copy().mult(tempToV(this.m, temp)), this.m, this.r, this.spcName, this.idNum, this.cv, tag, returnTo);
 		dotManager.add(birth);
 	}
 }
@@ -89,8 +92,8 @@ function Color(r, g, b){
 }
 
 
-function D(x, y, v, mass, radius, name, idNum, tag, returnTo){
-	return new Dot(x, y, v, mass, radius, name, idNum, tag, returnTo);
+function D(x, y, v, mass, radius, name, idNum, cv, tag, returnTo){
+	return new Dot(x, y, v, mass, radius, name, idNum, cv, tag, returnTo);
 }
 function P(x, y){
 	return new Point(x, y);
@@ -473,6 +476,7 @@ Dot.prototype = {
 		var curTemp = this.temp();
 		//if (curTemp!=0) {
 			this.v.mult(Math.sqrt(newTemp / curTemp));
+			this.internalPotential *= newTemp / curTemp;
 		/*  SHOULD ZERO-TEMP CASE BECOME A THING, USE BELOW,  BUT AT CURRENT I DON'T THINK IT MUST
 		} else {
 			var v = Math.sqrt(2*newTemp/(this.tConst*this.m));
@@ -495,6 +499,7 @@ Dot.prototype = {
 	},
 	adjTemp: function(delta) {
 		var curTemp = this.temp();
+		this.internalPotential += delta * (this.cv - this.cvKinetic) / this.N;
 		this.v.mult(Math.sqrt((curTemp + delta) / curTemp));
 		return this;
 	},

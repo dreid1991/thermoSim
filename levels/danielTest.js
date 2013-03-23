@@ -1,4 +1,3 @@
-
 canvasHeight = 450;
 $(function(){
 	
@@ -32,8 +31,8 @@ _.extend(TestLevel.prototype,
 		sceneNavigator.showPrompt(0, 0, true);
 	},
 	spcDefs: [
-		{spcName: 'spc1', m: 2, r: 1, col: Col(200, 0, 0), cv: 12},
-		{spcName: 'ugly', m: 7, r: 4, col: Col(150, 100, 100), cv: 13},
+		{spcName: 'spc1', m: 2, r: 1, col: Col(200, 0, 0), cv: 2.5 * R},
+		{spcName: 'ugly', m: 7, r: 4, col: Col(150, 100, 100), cv: 2.5 * R},
 		{spcName: 'prod', m: 9, r: 5, col: Col(255, 255, 255), cv: 13}
 	],
 	sections: [
@@ -96,9 +95,9 @@ _.extend(TestLevel.prototype,
 				cmmds: [
 					//{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}
 				],
-				rxns: [
-					{handle: 'rxn1', rctA: 'spc1', rctB: 'ugly', hRxn: -2, activeE: 9, prods: {prod: 1}}
-				]
+				// rxns: [
+					// {handle: 'rxn1', rctA: 'spc1', rctB: 'ugly', hRxn: -2, activeE: 9, prods: {prod: 1}}
+				// ]
 			},
 			prompts: [
 				{
