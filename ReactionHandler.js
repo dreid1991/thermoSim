@@ -43,8 +43,8 @@ ReactionHandler = {
 		this.parent = attrs.parent;
 		this.rctA = attrs.rctA || attrs.rctB; //spcName
 		this.rctB = attrs.rctA && attrs.rctB ? attrs.rctB : undefined; //spcName
-		this.rctADef = this.parent.defs[this.rctA];
-		this.rctBDef = this.parent.defs[this.rctB];
+		this.rctADef = this.parent.spcs[this.rctA];
+		this.rctBDef = this.parent.spcs[this.rctB];
 		this.activeTemp = this.convertToTemp(attrs.activeE);
 		this.hRxn = this.convertToTemp(attrs.hRxn); 
 		
@@ -95,9 +95,9 @@ ReactionHandler = {
 	initDecomp: function(rxn) {
 		var rctA = rxn.rctA;
 		var idA = rxn.rctADef.idNum;
-		for (var rctB in this.defs) {
+		for (var rctB in this.spcs) {
 			var rxnPair = rxn.copy();
-			var rctBDef = this.defs[rctB];
+			var rctBDef = this.spcs[rctB];
 			rxnPair.rctB = rctB;
 			rxnPair.rctBDef = rctBDef;
 			
@@ -188,7 +188,7 @@ ReactionHandler = {
 				var angle = Math.random()*2*Math.PI;
 				var UV = V(Math.sin(angle), Math.cos(angle));
 
-				newDots[countIdx] = D(x+UV.dx*3, y+UV.dy*3, UV, this.defs[name].m, this.defs[name].r, name, this.defs[name].idNum, a.tag, a.returnTo); 
+				newDots[countIdx] = D(x+UV.dx*3, y+UV.dy*3, UV, this.spcs[name].m, this.spcs[name].r, name, this.spcs[name].idNum, a.tag, a.returnTo); 
 				newDots[countIdx].setTemp(prodTemp);
 			}
 			this.dotManager.add(newDots);

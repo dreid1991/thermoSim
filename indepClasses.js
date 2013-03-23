@@ -15,21 +15,22 @@ function Dot(x, y, v, mass, radius, spcName, idNum, tag, returnTo){
 	this.peLast = 0;
 	this.tempLast = 0;
 	this.peCur = 0;
-	var speciesDef = speciesDefs[spcName];
-	this.attractStr = speciesDef.attractStr;
-	this.attractStrs = speciesDef.attractStrs;
-	this.attractRad = speciesDef.attractRad;
+	// var speciesDef = speciesDefs[spcName];
+	// this.attractStr = speciesDef.attractStr;
+	// this.attractStrs = speciesDef.attractStrs;
+	// this.attractRad = speciesDef.attractRad;
 	this.active = true;
 	return this;
 	
 }
-function Species(mass, radius, colors, def){
+function Species(spcName, mass, radius, color, idNum, cv){
+	this.spcName = spcName;
 	this.m = mass;
 	this.r = radius;
-	this.cols = colors;
-	this.def = def;
-	this.idNum = def.idNum
-	this.dots = dotManager.addSpcs(def.spcName);
+	this.col = color;
+	this.idNum = idNum
+	this.cv = cv;
+	this.dots = dotManager.addSpcs(spcName);
 }
 Species.prototype = {
 	populate: function(pos, dims, count, temp, tag, returnTo, dotMgrLocal){
@@ -46,7 +47,7 @@ Species.prototype = {
 			var angle = Math.random()*2*Math.PI;
 			var vx = v * Math.cos(angle);
 			var vy = v * Math.sin(angle);
-			birthList.push(D(placeX, placeY, V(vx, vy), this.m, this.r, this.def.spcName, this.def.idNum, tag, returnTo));
+			birthList.push(D(placeX, placeY, V(vx, vy), this.m, this.r, this.spcName, this.idNum, tag, returnTo));
 		}
 		dotMgrLocal.add(birthList);
 		//dots gets set in dotManager

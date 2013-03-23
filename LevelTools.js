@@ -14,6 +14,8 @@ LevelTools = {
 		dataHandler = new DataHandler();
 		this.dataHandler = dataHandler;
 		this.attracting = false;
+		this.addSpcs(this.spcDefs, window.spcs);
+		collide.setSpcs(window.spcs);
 		this.gravitying = false;
 		this.setUpdateRunListener();
 		animText = new AnimText(c);
@@ -24,7 +26,14 @@ LevelTools = {
 		$('#toLastStep').click(function(){sceneNavigator.prevPrompt()});
 		$('#previous').click(function(){sceneNavigator.prevPrompt()});
 		$('#next').click(function(){sceneNavigator.nextPrompt()});
-		this.spcs = spcs;
+		this.spcs = window.spcs;
+	},
+	addSpcs: function(defs, target) {
+		for (var defIdx=0; defIdx<defs.length; defIdx++) {
+			var def = defs[defIdx];
+			var spc = new Species(def.spcName, def.m, def.r, def.col, defIdx, def.cv);
+			target[def.spcName] = spc;
+		}
 	},
 	addSceneDataTypes: function() {
 		//will still need to add type if you're rendering a function.  

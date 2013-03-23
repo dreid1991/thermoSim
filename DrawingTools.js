@@ -12,7 +12,7 @@ DrawingTools.prototype = {
 	dots: function(){
 		for (var spcName in spcs){
 			var dots = spcs[spcName].dots;
-			c.fillStyle = spcs[spcName].cols.hex;
+			c.fillStyle = spcs[spcName].col.hex;
 			if(dots[0]){
 				var r = dots[0].r;//from 5250ms/500 -> 4975 ms/500.  also don't define dot locally
 			}
@@ -26,7 +26,7 @@ DrawingTools.prototype = {
 	},
 	dotsAsst: function(dots) {
 		for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
-			c.fillStyle = spcs[dots[dotIdx].spcName].cols.hex;
+			c.fillStyle = spcs[dots[dotIdx].spcName].col.hex;
 			c.beginPath();
 			c.arc(dots[dotIdx].x, dots[dotIdx].y, dots[dotIdx].r, 0, Math.PI * 2, true);
 			c.closePath();

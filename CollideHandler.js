@@ -1,17 +1,21 @@
 function CollideHandler(){
 	this.spcs = spcs;
-	this.defs = speciesDefs;
+	//this.defs = speciesDefs;
 	this.tConst = tConst;
 	this.cp = cp;
 	this.cv = cv;
 	this.rxns = {};
-	this.setDefaultHandler({func:this.impactStd, obj:this});
 	this.dotManager = dotManager;
 	//console.log("Made supercollider");
 }
 _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
-	setDefaultHandler: function(handler){
-		var numSpcs = this.getNumSpcs();
+	setSpcs: function(spcs) {
+		this.spcs = spcs;
+		this.setDefaultHandler({func: this.impactStd, obj: this}, this.spcs);
+		this.setup();
+	},
+	setDefaultHandler: function(handler, spcs){
+		var numSpcs = countAttrs(spcs);
 		for (var i=0; i<numSpcs; i++){
 			for (var j=i; j<numSpcs; j++){
 				this[i + '-' + j] = handler; //has func and obj
@@ -21,7 +25,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 	
 	},
 	setHandler: function(aName, bName, handler){
-		var idStr = this.getIdStr(this.defs[aName], this.defs[bName]);
+		var idStr = this.getIdStr(this.spcs[aName], this.spcs[bName]);
 		if (this.isIdStr(idStr)) {
 			this[idStr] = handler;
 		} else {
@@ -37,13 +41,6 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 	},
 	isIdStr: function(idStr) {
 		return /^[0-9]+\-[0-9]+$/.test(idStr)
-	},
-	getNumSpcs: function(){
-		var numSpcs = 0;
-		for (var spcName in speciesDefs){
-			numSpcs++;
-		}
-		return numSpcs;
 	},
 	check: function(){
 		var gridSize = this.gridSize;
