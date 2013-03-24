@@ -37,7 +37,7 @@ ReactionHandler = {
 		}
 	},
 	
-	Reaction: function(attrs) { //prods as {name1: count, name2, count2}  hRxn in kj/mol, activeE in kj/mol
+	Reaction: function(attrs) { //prods as {name1: count, name2, count2}  hRxn in kj/mol, activeE in kj/mol, convert to j/dot
 		this.attrs = attrs;
 		this.handle = attrs.handle;
 		this.parent = attrs.parent;
@@ -45,8 +45,8 @@ ReactionHandler = {
 		this.rctB = attrs.rctA && attrs.rctB ? attrs.rctB : undefined; //spcName
 		this.rctADef = this.parent.spcs[this.rctA];
 		this.rctBDef = this.parent.spcs[this.rctB];
-		this.activeTemp = this.convertToTemp(attrs.activeE);
-		this.hRxn = this.convertToTemp(attrs.hRxn); 
+		this.activeE = attrs.activeE * 1000 / N;
+		this.hRxn = attrs.hRxn * 1000 / N; 
 		
 		if (this.rctA && !this.rctADef) return console.log('reactant a ' + this.rctA + " doesn't exist");
 		if (this.rctB && !this.rctBDef) return console.log('reactant b ' + this.rctB + " doesn't exist");
@@ -103,8 +103,7 @@ ReactionHandler = {
 			
 			var idB = rctBDef.idNum;
 			if (idA == idB) {
-				rxnPair.activeTemp *= 2;
-				rxnPair.hRxn *= 2;
+				rxnPair.activeE *= 2;
 				rxnPair.doubleProds();
 			} else {
 				rxnPair.increaseProd(rctB, 1);
@@ -114,24 +113,23 @@ ReactionHandler = {
 		}
 	},
 
-	hitTemp: function(a, b, perpAB, perpBA){
-		return .5*(Math.abs(perpAB)*perpAB*a.m + Math.abs(perpBA)*perpBA*b.m)*this.tConst;
+	hitE: function(a, b, perpAB, perpBA){
+		return .5*(Math.abs(perpAB)*perpAB*a.m + Math.abs(perpBA)*perpBA*b.m)*this.tConst * (a.cv + b.cv) / 2;
 		//abs will handle dots moving away from other dot
 		//in temperature
 	},
-	probFunc: function(hitTemp, activE) {
-		var x = Math.max(hitTemp/activE - 1, 0);
+	probFunc: function(hitE, activE) {
+		var x = Math.max(hitE/activE - 1, 0);
 		return 2*(x - .5*x*x);//max of 1, min of 0
 	},
 	rctHandlerSinglePair: function(idStr) {
 		var rxn = this.rxns[idStr][0];
-		var activeTemp = rxn.activeTemp;
-		var hRxn = rxn.hRxn;
+		var activeE = rxn.activeE;
 		var prods = rxn.prods;
 		var prodCount = rxn.prodCount;
 		return function(a, b, UVAB, perpAB, perpBA) {
 			var hitTemp = this.hitTemp(a, b, perpAB, -perpBA);
-			if (Math.random() < this.probFunc(hitTemp, activeTemp)) {
+			if (Math.random() < this.probFunc(hitTemp, activeE)) {
 				this.react(a, b, hRxn, prods, prodCount)
 				return false;
 			}
@@ -144,11 +142,11 @@ ReactionHandler = {
 		var rxns = this.rxns[idStr];
 		
 		return function(a, b, UVAB, perpAB, perpBA) {
-			var hitTemp = this.hitTemp(a, b, perpAB, -perpBA);
+			var hitE = this.hitE(a, b, perpAB, -perpBA);
 			var probs = [];
 			var sumProbs = 0;
 			for (var rxnIdx=0; rxnIdx<rxns.length; rxnIdx++) {
-				probs[rxnIdx] = this.probFunc(hitTemp, rxns[rxnIdx].activeTemp);
+				probs[rxnIdx] = this.probFunc(hitE, rxns[rxnIdx].activeE);
 				sumProbs += probs[rxnIdx];
 			}
 			var normalFact = sumProbs > 1 ? 1 / sumProbs : 1;
@@ -177,19 +175,25 @@ ReactionHandler = {
 		return false;
 	},
 	react: function(a, b, hRxn, prods, prodCount) {
-		var prodTemp = (a.temp() + b.temp() - hRxn)/prodCount; 
+		var hRxn = -a.h() - b.h();
+		var sumCp = 0;
+		var prodE = (a.temp() * a.cv + b.temp() * a.cv - hRxn) / prodCount; 
 		this.dotManager.remove([a, b]);
 		var x = .5*(a.x + b.x);
 		var y = .5*(a.y + b.y);
+		var allNewDots = [];
 		for (var prodIdx=0; prodIdx<prods.length; prodIdx++) {
 			var name = prods[prodIdx].name;
 			var newDots = new Array(prods[prodIdx].count);
+			hRxn += this.spcs[name].hF298 * prods[prodIdx].count;
+			sumCp += this.spcs[name].cp * prods[prodIdx].count;
 			for (var countIdx=0; countIdx<prods[prodIdx].count; countIdx++) {
 				var angle = Math.random()*2*Math.PI;
 				var UV = V(Math.sin(angle), Math.cos(angle));
-
-				newDots[countIdx] = D(x+UV.dx*3, y+UV.dy*3, UV, this.spcs[name].m, this.spcs[name].r, name, this.spcs[name].idNum, this.spcs[name].cv, a.tag, a.returnTo); 
-				newDots[countIdx].setTemp(prodTemp);
+				
+				newDots[countIdx] = D(x+UV.dx*3, y+UV.dy*3, UV, name, a.tag, a.returnTo); 
+				allNewDots.push(newDots[newDots.length - 1]);
+				//newDots[countIdx].setTemp(prodTemp);
 			}
 			this.dotManager.add(newDots);
 		}

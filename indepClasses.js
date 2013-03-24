@@ -1,13 +1,18 @@
-function Dot(x, y, v, mass, radius, spcName, idNum, cv, tag, returnTo){
+function Dot(x, y, v, spcName, tag, returnTo) {
+	var def = window.spcs[spcName]
 	this.x = x;
 	this.y = y;
 	this.v = v;
-	this.m = mass;
-	this.r = radius;
+	this.m = def.m;
+	this.r = def.r;
 	this.spcName = spcName;
-	this.idNum = idNum;
+	this.idNum = def.idNum;
+	this.hF298 = def.hF298;
+	this.hVap298 = def.hVap298;
 	this.cvKinetic = 1.5 * R / N;
-	this.cv = cv / N;
+	this.cv = def.cv / N;
+	this.cp = this.cv + R;
+	this.cvLiq = def.cvLiq / N;
 	this.tag = tag;
 	this.returnTo = returnTo;
 	this.tConst = tConst;
@@ -23,16 +28,19 @@ function Dot(x, y, v, mass, radius, spcName, idNum, cv, tag, returnTo){
 	// this.attractStrs = speciesDef.attractStrs;
 	// this.attractRad = speciesDef.attractRad;
 	this.active = true;
-	return this;
-	
 }
-function Species(spcName, mass, radius, color, idNum, cv){
+//{spcName: 'spc1', m: 2, r: 1, col: Col(200, 0, 0), cv: 2.5 * R, hF: -10, hVap: 40, cvLiq: 12},
+function Species(spcName, mass, radius, color, idNum, cv, hF298, hVap298, antoineCoeffs, cvLiq){
 	this.spcName = spcName;
 	this.m = mass;
 	this.r = radius;
 	this.col = color;
 	this.idNum = idNum
 	this.cv = cv;
+	this.hF298 = hF298;
+	this.hVap298 = hVap298;
+	this.antoineCoeffs = antoineCoeffs;
+	this.cvLiq = cvLiq;
 	this.dots = dotManager.addSpcs(spcName);
 }
 Species.prototype = {
@@ -50,7 +58,7 @@ Species.prototype = {
 			var angle = Math.random()*2*Math.PI;
 			var vx = v * Math.cos(angle);
 			var vy = v * Math.sin(angle);
-			birthList.push(D(placeX, placeY, V(vx, vy), this.m, this.r, this.spcName, this.idNum, this.cv, tag, returnTo));
+			birthList.push(D(placeX, placeY, V(vx, vy), this.spcName, tag, returnTo));
 		}
 		dotMgrLocal.add(birthList);
 		//dots gets set in dotManager
@@ -67,12 +75,12 @@ Species.prototype = {
 		var birthList = [];
 		for (var infoIdx=0; infoIdx<dotsInfo.length; infoIdx++) {
 			var info = dotsInfo[infoIdx];
-			birthList.push(D(info.pos.x, info.pos.y, info.dir.copy().mult(tempToV(this.m, info.temp)), this.m, this.r, this.spcName, this.idNum, this.cv, info.tag, info.returnTo));
+			birthList.push(D(info.pos.x, info.pos.y, info.dir.copy().mult(tempToV(this.m, info.temp)), this.spcName, info.tag, info.returnTo));
 		}
 		dotManager.add(birthList);
 	},
 	placeSingle: function(pos, dir, temp, tag, returnTo) {
-		birth = D(pos.x, pos.y, dir.copy().mult(tempToV(this.m, temp)), this.m, this.r, this.spcName, this.idNum, this.cv, tag, returnTo);
+		birth = D(pos.x, pos.y, dir.copy().mult(tempToV(this.m, temp)), this.spcName, tag, returnTo);
 		dotManager.add(birth);
 	}
 }
@@ -92,8 +100,8 @@ function Color(r, g, b){
 }
 
 
-function D(x, y, v, mass, radius, name, idNum, cv, tag, returnTo){
-	return new Dot(x, y, v, mass, radius, name, idNum, cv, tag, returnTo);
+function D(x, y, v, name, tag, returnTo){
+	return new Dot(x, y, v, name, tag, returnTo);
 }
 function P(x, y){
 	return new Point(x, y);
@@ -502,6 +510,9 @@ Dot.prototype = {
 		this.internalPotential += delta * (this.cv - this.cvKinetic) / this.N;
 		this.v.mult(Math.sqrt((curTemp + delta) / curTemp));
 		return this;
+	},
+	h: function() {
+		return this.hF298 + (this.temp() - 298.15) * (this.cv + R);
 	},
 	speed: function(){
 		return this.v.mag()*this.pxToMS;

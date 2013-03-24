@@ -31,9 +31,10 @@ _.extend(TestLevel.prototype,
 		sceneNavigator.showPrompt(0, 0, true);
 	},
 	spcDefs: [
-		{spcName: 'spc1', m: 2, r: 1, col: Col(200, 0, 0), cv: 2.5 * R},
-		{spcName: 'ugly', m: 7, r: 4, col: Col(150, 100, 100), cv: 2.5 * R},
-		{spcName: 'prod', m: 9, r: 5, col: Col(255, 255, 255), cv: 13}
+		//add antoine coefs, cvLiq, hvap
+		{spcName: 'spc1', m: 2, r: 1, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 40, antoineCoeffs: {}, cvLiq: 12}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'ugly', m: 7, r: 4, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 30, antoineCoeffs: {}, cvLiq: 12},
+		{spcName: 'duckling', m: 9, r: 5, col: Col(255, 255, 255), cv: 13, hF298: -10, hVap298: 30, antoineCoeffs: {}, cvLiq: 12}
 	],
 	sections: [
 		// {
@@ -61,8 +62,8 @@ _.extend(TestLevel.prototype,
 					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'staticAdiabatic', handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}} 
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
+					{spcName: 'spc1', pos: P(55, 55), dims: V(200, 200), count: 1, temp: 300, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'ugly', pos: P(55, 55), dims: V(200, 200), count: 1, temp: 200, returnTo: 'wally', tag: 'wally'}
 					//{spcName: 'spc3', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
@@ -95,9 +96,9 @@ _.extend(TestLevel.prototype,
 				cmmds: [
 					//{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}
 				],
-				// rxns: [
-					// {handle: 'rxn1', rctA: 'spc1', rctB: 'ugly', hRxn: -2, activeE: 9, prods: {prod: 1}}
-				// ]
+				rxns: [
+					{handle: 'rxn1', rctA: 'spc1', rctB: 'ugly', activeE: 9, prods: {duckling: 1}}
+				]
 			},
 			prompts: [
 				{

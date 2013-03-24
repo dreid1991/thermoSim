@@ -31,7 +31,7 @@ LevelTools = {
 	addSpcs: function(defs, target) {
 		for (var defIdx=0; defIdx<defs.length; defIdx++) {
 			var def = defs[defIdx];
-			var spc = new Species(def.spcName, def.m, def.r, def.col, defIdx, def.cv);
+			var spc = new Species(def.spcName, def.m, def.r, def.col, defIdx, def.cv, def.hF298, def.hVap298, def.antoineCoeffs, def.cvLiq);
 			target[def.spcName] = spc;
 		}
 	},
