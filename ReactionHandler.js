@@ -45,8 +45,8 @@ ReactionHandler = {
 		this.rctB = attrs.rctA && attrs.rctB ? attrs.rctB : undefined; //spcName
 		this.rctADef = this.parent.spcs[this.rctA];
 		this.rctBDef = this.parent.spcs[this.rctB];
-		this.activeE = attrs.activeE * 1000 / N;
-		this.hRxn = attrs.hRxn * 1000 / N; 
+		this.activeE = attrs.activeE * 1000 / N; // in joules of collision
+		this.hRxn = attrs.hRxn * 1000 / N; //only used if hRxn fixed
 		
 		if (this.rctA && !this.rctADef) return console.log('reactant a ' + this.rctA + " doesn't exist");
 		if (this.rctB && !this.rctBDef) return console.log('reactant b ' + this.rctB + " doesn't exist");
@@ -114,7 +114,7 @@ ReactionHandler = {
 	},
 
 	hitE: function(a, b, perpAB, perpBA){
-		return .5*(Math.abs(perpAB)*perpAB*a.m + Math.abs(perpBA)*perpBA*b.m)*this.tConst * (a.cv + b.cv) / 2;
+		return .5*(Math.abs(perpAB)*perpAB*a.m + Math.abs(perpBA)*perpBA*b.m)*this.tConst * (a.cv + b.cv) // / 2?;
 		//abs will handle dots moving away from other dot
 		//in temperature
 	},
@@ -128,9 +128,11 @@ ReactionHandler = {
 		var prods = rxn.prods;
 		var prodCount = rxn.prodCount;
 		return function(a, b, UVAB, perpAB, perpBA) {
-			var hitTemp = this.hitTemp(a, b, perpAB, -perpBA);
-			if (Math.random() < this.probFunc(hitTemp, activeE)) {
-				this.react(a, b, hRxn, prods, prodCount)
+			var hitE = this.hitE(a, b, perpAB, -perpBA);
+			if (/*Math.random() < this.probFunc(hitE, activeE)*/true) {
+				if (!this.react(a, b, prods, prodCount)) {
+					return this.impactStd(a, b, UVAB, perpAB, perpBA);
+				}
 				return false;
 			}
 			return this.impactStd(a, b, UVAB, perpAB, perpBA);
@@ -155,8 +157,9 @@ ReactionHandler = {
 			
 			if (rxnIdx===false) {
 				return this.impactStd(a, b, UVAB, perpAB, perpBA);
+			} else if (!this.react(a, b, rxns[rxnIdx].hRxn, rxns[rxnIdx].prods, rxns[rxnIdx].prodCount)){
+				return this.impactStd(a, b, UVAB, perpAB, perpBA);
 			} else {
-				this.react(a, b, rxns[rxnIdx].hRxn, rxns[rxnIdx].prods, rxns[rxnIdx].prodCount);
 				return false;
 			}
 		};
@@ -174,28 +177,46 @@ ReactionHandler = {
 		}
 		return false;
 	},
-	react: function(a, b, hRxn, prods, prodCount) {
-		var hRxn = -a.h() - b.h();
-		var sumCp = 0;
-		var prodE = (a.temp() * a.cv + b.temp() * a.cv - hRxn) / prodCount; 
-		this.dotManager.remove([a, b]);
+	//is prodCount arg necessay?
+	react: function(a, b, prods, prodCount) {
+		var hFRct = a.enthalpy() + b.enthalpy();
+		var hF298Prod = 0;
+		var cPProd = 0;
 		var x = .5*(a.x + b.x);
 		var y = .5*(a.y + b.y);
 		var allNewDots = [];
+		var newDotsBySpc = [];
 		for (var prodIdx=0; prodIdx<prods.length; prodIdx++) {
 			var name = prods[prodIdx].name;
-			var newDots = new Array(prods[prodIdx].count);
-			hRxn += this.spcs[name].hF298 * prods[prodIdx].count;
-			sumCp += this.spcs[name].cp * prods[prodIdx].count;
-			for (var countIdx=0; countIdx<prods[prodIdx].count; countIdx++) {
+			var spc = this.spcs[name];
+			var prod = prods[prodIdx];
+			var newDots = [];
+			hF298Prod += spc.hF298 * prod.count;
+			cPProd += this.spcs[name].cp * prod.count;
+			for (var countIdx=0; countIdx<prod.count; countIdx++) {
 				var angle = Math.random()*2*Math.PI;
 				var UV = V(Math.sin(angle), Math.cos(angle));
 				
-				newDots[countIdx] = D(x+UV.dx*3, y+UV.dy*3, UV, name, a.tag, a.returnTo); 
+				newDots.push(D(x+UV.dx*3, y+UV.dy*3, UV, name, a.tag, a.returnTo)); 
 				allNewDots.push(newDots[newDots.length - 1]);
 				//newDots[countIdx].setTemp(prodTemp);
 			}
-			this.dotManager.add(newDots);
+			newDotsBySpc.push(newDots);
+			
+		}
+		hF298Prod *= 1000 / N; //kj/mol -> j/molec;
+		cPProd /= N; //j/mol -> j/molec
+		var tempF = (hFRct - hF298Prod) / cPProd + 298.15;
+		if (tempF > 0) {
+			this.dotManager.remove([a, b]);
+			for (var spcIdx=0; spcIdx<newDotsBySpc.length; spcIdx++) {
+				var spcDots = newDotsBySpc[spcIdx];
+				this.dotManager.add(spcDots);
+				for (var dotIdx=0; dotIdx<spcDots.length; dotIdx++) {
+					spcDots[dotIdx].setTemp(tempF);
+				}
+			}
+			return true;
 		}
 		return false;
 		

@@ -7,8 +7,8 @@ function Dot(x, y, v, spcName, tag, returnTo) {
 	this.r = def.r;
 	this.spcName = spcName;
 	this.idNum = def.idNum;
-	this.hF298 = def.hF298;
-	this.hVap298 = def.hVap298;
+	this.hF298 = def.hF298 * 1000 / N;
+	this.hVap298 = def.hVap298 * 1000 / N;
 	this.cvKinetic = 1.5 * R / N;
 	this.cv = def.cv / N;
 	this.cp = this.cv + R;
@@ -37,6 +37,7 @@ function Species(spcName, mass, radius, color, idNum, cv, hF298, hVap298, antoin
 	this.col = color;
 	this.idNum = idNum
 	this.cv = cv;
+	this.cp = cv + R;
 	this.hF298 = hF298;
 	this.hVap298 = hVap298;
 	this.antoineCoeffs = antoineCoeffs;
@@ -82,7 +83,14 @@ Species.prototype = {
 	placeSingle: function(pos, dir, temp, tag, returnTo) {
 		birth = D(pos.x, pos.y, dir.copy().mult(tempToV(this.m, temp)), this.spcName, tag, returnTo);
 		dotManager.add(birth);
-	}
+	},
+	enthalpy: function(temp) {
+		// j in dot
+		return (this.hF298 * 1000 + (this.cv + R) * (temp - 298.15)) / N;
+	},
+	internalEnergy: function(temp) {
+		return (this.hF198 * 1000 + this.cv * (temp - 298.15)) / N;
+	},
 }
 function Point(x, y){
 	this.x = x;
@@ -511,8 +519,12 @@ Dot.prototype = {
 		this.v.mult(Math.sqrt((curTemp + delta) / curTemp));
 		return this;
 	},
-	h: function() {
-		return this.hF298 + (this.temp() - 298.15) * (this.cv + R);
+	enthalpy: function() {
+		//joules in that dot
+		return (this.hF298 + (this.temp() - 298.15) * (this.cv + R / N));
+	},
+	internalEnergy: function(temp) {
+		return (this.hF298 + (this.temp() - 298.15) * this.cv);
 	},
 	speed: function(){
 		return this.v.mag()*this.pxToMS;
