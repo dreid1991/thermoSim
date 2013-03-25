@@ -13,6 +13,7 @@ function Dot(x, y, v, spcName, tag, returnTo) {
 	this.cv = def.cv / N;
 	this.cp = this.cv + R;
 	this.cvLiq = def.cvLiq / N;
+	this.spcVolLiq = def.spcVolLiq / N; //L/molec
 	this.tag = tag;
 	this.returnTo = returnTo;
 	this.tConst = tConst;
@@ -30,7 +31,7 @@ function Dot(x, y, v, spcName, tag, returnTo) {
 	this.active = true;
 }
 //{spcName: 'spc1', m: 2, r: 1, col: Col(200, 0, 0), cv: 2.5 * R, hF: -10, hVap: 40, cvLiq: 12},
-function Species(spcName, mass, radius, color, idNum, cv, hF298, hVap298, antoineCoeffs, cvLiq){
+function Species(spcName, mass, radius, color, idNum, cv, hF298, hVap298, antoineCoeffs, cpLiq, spcVolLiq){
 	this.spcName = spcName;
 	this.m = mass;
 	this.r = radius;
@@ -41,8 +42,10 @@ function Species(spcName, mass, radius, color, idNum, cv, hF298, hVap298, antoin
 	this.hF298 = hF298;
 	this.hVap298 = hVap298;
 	this.antoineCoeffs = antoineCoeffs;
-	this.cvLiq = cvLiq;
+	this.cpLiq = cpLiq;
+	this.spcVolLiq = spcVolLiq;
 	this.dots = dotManager.addSpcs(spcName);
+	
 }
 Species.prototype = {
 	populate: function(pos, dims, count, temp, tag, returnTo, dotMgrLocal){

@@ -216,25 +216,35 @@ WallMethods.wallDataHandler = {
 		}
 	},
 	recordMoles: function(info) {
+		var dataObj;
 		var dots = this.dotManager.createIfNotExists(info);
 		if (!this.data.moles) this.data.moles = [];
 		//list is okay.  Will use getDataObj func
-		this.data.moles.push(new WallMethods.DataObj());
-		var dataObj = this.data.moles[this.data.moles.length-1];
-		this.setupInfoDataObj(dataObj, 'moles', info);
-		recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function() {return dots.length / N}, this, 'update');
+		if (this.getDataObj('moles', info)) {
+			dataObj = this.getDataObj('moles', info);
+		} else {
+			this.data.moles.push(new WallMethods.DataObj());
+			dataObj = this.data.moles[this.data.moles.length-1];
+			this.setupInfoDataObj(dataObj, 'moles', info);
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function() {return dots.length / N}, this, 'update');
+		}
 		return dataObj;
 	},
 	recordFrac: function(info) {
+		var dataObj;
 		var countList = this.dotManager.createIfNotExists(info);
 		var totalList = this.dotManager.createIfNotExists(info.tag ? {tag: info.tag} : undefined);
 		if (!this.data.frac) this.data.frac = [];
 		//list is okay.  Will use getDataObj func
-		this.data.frac.push(new WallMethods.DataObj());
-		var dataObj = this.data.frac[this.data.frac.length-1];
-		this.setupInfoDataObj(dataObj, 'frac', info);
+		if (this.getDataObj('frac', info)) {
+			dataObj = this.getDataObj('frac', info);
+		} else {
+			this.data.frac.push(new WallMethods.DataObj());
+			dataObj = this.data.frac[this.data.frac.length-1];
+			this.setupInfoDataObj(dataObj, 'frac', info);
 
-		recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function() {return countList.length/totalList.length}, this, 'update');
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function() {return countList.length/totalList.length}, this, 'update');
+		}
 		return dataObj;		
 	},
 	setupStdDataObj: function(dataObj, id) {

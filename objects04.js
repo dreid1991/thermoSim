@@ -12,65 +12,73 @@ function Liquid(attrs) {
 	this.Cp = 0; //to be set each turn/absorption and used in setting temperatures for reflecting dots.  Capital C denotes total heat capacity.
 	var tempInit = attrs.tempInit;
 	this.temp = tempInit;
-	this.spcInfo = this.makeSpcInfo(attrs.spcInfo); //formatted as {spc1: {count: #, spcVol: #, cP: #, antoineCoeffs: {a: #,b: #,c: #}, hVap: #} ... } spcVol in L/mol, hVap in kj/mol
-	this.drivingForce = this.makeDrivingForce(this.spcInfo);
-	this.dotMgrLiq = this.makeDotManager(this.spcInfo);
-	this.wallLiq = this.makeWallLiq(this.spcInfo, this.wallGas, this.wallPtIdxs, this.dotMgrLiq);
-	this.numAbs = this.makeNumAbsorbed(this.spcInfo);
+	var spcCounts = attrs.spcCounts; //{spcA: 100, spcB:200}
+	this.spcDefs = this.getSpcDefs(spcCounts);
+	this.drivingForce = this.makeDrivingForce(this.spcDefs);
+	this.dotMgrLiq = this.makeDotManager(this.spcDefs);
+	this.wallLiq = this.makeWallLiq(this.spcDefs, spcCounts, this.wallGas, this.wallPtIdxs, this.dotMgrLiq);
+	this.numAbs = deepCopy(this.drivingForce);
 	this.numEjt = deepCopy(this.numAbs);
-	this.makeDots(this.wallLiq, this.wallGas, this.wallPtIdxs, this.spcInfo, tempInit, this.dotMgrLiq) && this.deleteCount(this.spcInfo);
-	this.dataGas = this.initData(this.wallGas, this.spcInfo, ['pInt', 'temp']);
-	this.dataLiq = this.initData(this.wallLiq, this.spcInfo);
+	this.makeDots(this.wallLiq, this.wallGas, this.wallPtIdxs, spcCounts, tempInit, this.dotMgrLiq) && this.deleteCount(this.spcDefs);
+	this.dataGas = this.initData(this.wallGas, this.spcDefs, ['pInt', 'temp']);
+	this.dataLiq = this.initData(this.wallLiq, this.spcDefs);
 	this.drawList = this.makeDrawList(this.dotMgrLiq); //need to make draw list in random order otherwise dots drawn on top will look more prominant than they are.
-	this.actCoeffFuncs = this.makeActCoeffFuncs(this.actCoeffType, this.actCoeffInfo, this.spcInfo);
+	this.actCoeffFuncs = this.makeActCoeffFuncs(this.actCoeffType, this.actCoeffInfo, this.spcDefs);
 	this.chanceZeroDf = .4;
 	this.drivingForceSensitivity = 10;//formalize this a bit
 	this.updateListenerName = this.type + this.handle;
-	this.setupUpdate(this.spcInfo, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs)
+	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs)
 	
 	this.setupStd();
 }
 
 _.extend(Liquid.prototype, objectFuncs, {
-	makeActCoeffFuncs: function(type, info, spcInfo) {
+	getSpcDefs: function(counts) {
+		var usedSpcs = {};
+		for (var spc in counts) {
+			usedSpcs[spc] = window.spcs[spc];
+		}
+		return usedSpcs;
+	},
+	makeActCoeffFuncs: function(type, info, spcDefs) {
 		if (type == 'twoSfxMrg') {
 			var coeff = info.a
-			return this.makeTwoSfxMrgFuncs(spcInfo, coeff);
+			return this.makeTwoSfxMrgFuncs(spcDefs, coeff);
 		}
 	},
-	makeTwoSfxMrgFuncs: function(spcInfo, coeff) {
+	makeTwoSfxMrgFuncs: function(spcDefs, coeff) {
 		var funcs = {};
 		var gasConst = R;
-		for (var spcName in spcInfo) {
+		for (var spcName in spcDefs) {
 			funcs[spcName] = function(x, T) {
 				return Math.exp(coeff * x * x / (gasConst * T)); 
 			}
 		}
 		return funcs;
 	},
-	makeWallLiq: function(spcInfo, wallGas, wallPtIdxs, dotMgrLiq, handle) {
-		var vol = this.getLiqWallVol(spcInfo);
+	makeWallLiq: function(defs, counts, wallGas, wallPtIdxs, dotMgrLiq, handle) {
+		var vol = this.getLiqWallVol(defs, counts);
 		//liq wall needs to go in opposite direction of gas wall
 		var pts = this.getWallLiqPts(wallGas, wallPtIdxs, vol);
 		var handler = {func: this.hit, obj: this};
 		return window.walls.addWall({pts:pts, handler:handler, handle: 'liquid' + this.handle.toCapitalCamelCase(), record: false, show: true, dotManager: dotMgrLiq, close: false});
 	},
-	makeNumAbsorbed: function(spcInfo) {
+	makeNumAbsorbed: function(spcDefs) {
 		var nA = {};
-		for (var spcName in spcInfo) {
+		for (var spcName in spcDefs) {
 			nA[spcName] = 0;
 		}
 		return nA;
 	},
-	getLiqWallVol: function(spcInfo, dotMgr) {
+	getLiqWallVol: function(spcDefs, counts, dotMgr) {
 		var vol = 0;
 		if (!dotMgr) {
-			for (var spcName in spcInfo) {
-				vol += spcInfo[spcName].spcVol * spcInfo[spcName].count / N;
+			for (var spcName in spcDefs) {
+				vol += spcDefs[spcName].spcVolLiq * counts[spcName] / N;
 			}
 		} else {
-			for (var spcName in spcInfo) {
-				vol += spcInfo[spcName].spcVol * dotMgr.get({spcName: spcName}).length / N;
+			for (var spcName in spcDefs) {
+				vol += spcDefs[spcName].spcVolLiq * dotMgr.get({spcName: spcName}).length / N;
 			}
 		}
 		return vol;
@@ -86,26 +94,25 @@ _.extend(Liquid.prototype, objectFuncs, {
 		return [topRight, topLeft];
 	},
 	getWallHeight: function(width, vol) {
-		return vol/(vConst*width);
+		return vol/(vConst*width) + 2;
 	},
-	makeDotManager: function(spcInfo) {
+	makeDotManager: function(defs) {
 		var dotMgr = new DotManager();
-		for (var spcName in spcInfo) {
+		for (var spcName in defs) {
 			dotMgr.addSpcs(spcName);
 		}
 		return dotMgr;
 	},
-	makeDots: function(wallLiq, wallGas, wallGasIdxs, makeOrder, temp, dotMgrLiq) {
+	makeDots: function(wallLiq, wallGas, wallGasIdxs, counts, temp, dotMgrLiq) {
 		var pos = wallLiq[1].copy();
 		var b = P(Math.max(wallGas[wallGasIdxs[0]].x, wallGas[wallGasIdxs[1]].x), wallGas[wallGasIdxs[0]].y);
 		var dims = pos.VTo(b);
 		
-		for (var spcName in makeOrder) {
-			var order = makeOrder[spcName]
-			spcs[spcName].populate(pos, dims, order.count, temp, wallLiq.handle, wallLiq.handle, dotMgrLiq); 
+		for (var spcName in counts) {
+			spcs[spcName].populate(pos, dims, counts[spcName], temp, wallLiq.handle, wallLiq.handle, dotMgrLiq); 
 		}
 	},
-	initData: function(wall, spcInfo, extras) {
+	initData: function(wall, spcDefs, extras) {
 		var data = {};
 		if (extras) {
 			for (var extraIdx=0; extraIdx<extras.length; extraIdx++) {
@@ -120,35 +127,27 @@ _.extend(Liquid.prototype, objectFuncs, {
 				}
 			}
 		}
-		for (var spcName in spcInfo) {
+		for (var spcName in spcDefs) {
 			var attrs = {spcName: spcName, tag: wall.handle};
 			wall.recordFrac(attrs)
 			data[spcName] = wall.getDataObj('frac', attrs).src();
 		}
 		return data;
 	},
-	makeSpcInfo: function(spcInfo) {
-		var reformat = {};
-		for (var infolet in spcInfo) {
-			var spc = spcInfo[infolet];
-			reformat[infolet] = new this.Species(infolet, spc.count, spc.hVap, spc.cP, spc.spcVol, spc.antoineCoeffs);
-		}
-		return reformat;
-	},
-	makeDrivingForce: function(spcInfo) {
+	makeDrivingForce: function(spcDefs) {
 		var force = {};
-		for (var spcName in spcInfo) {
+		for (var spcName in spcDefs) {
 			force[spcName] = 0;
 		}
 		return force;
 	},
-	setupUpdate: function(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName, drawList, dotMgrLiq, wallLiq, numAbs, drivingForceSensitivity, numEjt, wallGas, wallGasIdxs) {
-		this.calcCp = this.setupCalcCp(spcInfo, dotMgrLiq);
-		this.calcEquil = this.setupUpdateEquil(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce);
+	setupUpdate: function(spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName, drawList, dotMgrLiq, wallLiq, numAbs, drivingForceSensitivity, numEjt, wallGas, wallGasIdxs) {
+		this.calcCp = this.setupCalcCp(spcDefs, dotMgrLiq);
+		this.calcEquil = this.setupUpdateEquil(spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce);
 		this.drawDots = this.setupDrawDots(drawList);
-		this.moveDots = this.setupMoveDots(dotMgrLiq, spcInfo, wallLiq, wallGas, wallGasIdxs);
-		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcInfo, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt);//you were making the liquid eject if df<0 whether hit or not
-		var sizeWall = this.setupSizeWall(wallLiq, wallGas, spcInfo, dotMgrLiq, wallGasIdxs)
+		this.moveDots = this.setupMoveDots(dotMgrLiq, spcDefs, wallLiq, wallGas, wallGasIdxs);
+		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcDefs, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt);//you were making the liquid eject if df<0 whether hit or not
+		var sizeWall = this.setupSizeWall(wallLiq, wallGas, spcDefs, dotMgrLiq, wallGasIdxs)
 		var zeroAttrs = this.zeroAttrs;
 		var calcCp = this.calcCp, calcEquil = this.calcEquil, drawDots = this.drawDots, moveDots = this.moveDots, ejectDots = this.ejectDots;
 		calcCp();
@@ -158,36 +157,35 @@ _.extend(Liquid.prototype, objectFuncs, {
 			calcEquil();
 			drawDots();
 			moveDots();
-			ejectDots();
+			//ejectDots();
 			sizeWall();
 		})
 	},
-	setupCalcCp: function(spcInfo, dotMgrLiq) {
+	setupCalcCp: function(spcDefs, dotMgrLiq) {
 		var self = this;
+		var dotLists = {};
+		for (var spcName in spcDefs) {
+			dotLists[spcName] = dotMgrLiq.get({spcName: spcName});
+		}
 		return function() {
 			var Cp = 0;
-			for (var spcName in spcInfo) {
-				Cp += spcInfo[spcName].cP * dotMgrLiq.get({spcName: spcName}).length / N; //Cp in J/K  spcInfo given in J/mol-k
+			for (var spcName in spcDefs) {
+				Cp += spcDefs[spcName].cpLiq * dotLists[spcName].length / N; //Cp in J/K  spcDefs given in J/mol-k
 			}
 			self.Cp = Cp;	
 		}
 
 	},
-	zeroAttrs: function(a) {
-		for (var aLet in a) {
-			a[aLet] = 0;
-		}
-	},
-	setupUpdateEquil: function(spcInfo, dataGas, dataLiq, actCoeffFuncs, drivingForce) {
+	setupUpdateEquil: function(spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce) {
 		var self = this;
 		return function() {
-			for (var spcName in spcInfo) {
-				var spc = spcInfo[spcName];
+			for (var spcName in spcDefs) {
+				var spc = spcDefs[spcName];
 				var gasFrac = dataGas[spcName][dataGas[spcName].length - 1];
 				var liqFrac = dataLiq[spcName][dataLiq[spcName].length - 1];
 				var liqTemp = self.temp;
 				var actCoeff = actCoeffFuncs[spcName](liqFrac, liqTemp);
-				var antCoeffs = spcInfo[spcName].antoineCoeffs;
+				var antCoeffs = spcDefs[spcName].antoineCoeffs;
 				var pPure = self.getPPure(antCoeffs.a, antCoeffs.b, antCoeffs.c, liqTemp);
 				var pEq = pPure * actCoeff * liqFrac;
 				var pGas = gasFrac * dataGas.pInt[dataGas.pInt.length - 1];
@@ -200,11 +198,11 @@ _.extend(Liquid.prototype, objectFuncs, {
 			window.draw.dotsAsst(drawList);
 		};
 	},
-	setupMoveDots: function(dotMgr, spcInfo, wallLiq, wallGas, wallGasIdxs) {
+	setupMoveDots: function(dotMgr, spcDefs, wallLiq, wallGas, wallGasIdxs) {
 		var self = this;
 		
 		var dotLists = [];
-		for (var spcName in spcInfo) {
+		for (var spcName in spcDefs) {
 			dotLists.push(dotMgr.get({spcName: spcName}));
 		}
 		return function() {
@@ -237,15 +235,15 @@ _.extend(Liquid.prototype, objectFuncs, {
 
 		
 	},
-	setupEjectDots: function(dotMgrLiq, spcInfo, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt) {
+	setupEjectDots: function(dotMgrLiq, spcDefs, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt) {
 		var self = this;
 		var wallGas = this.wallGas;
 		var dotLists = {};
-		for (var spcName in spcInfo) {
+		for (var spcName in spcDefs) {
 			dotLists[spcName] = dotMgrLiq.get({spcName: spcName});
 		}
 		return function() {
-			for (var spcName in spcInfo) {
+			for (var spcName in spcDefs) {
 				var dF = drivingForce[spcName];
 				var abs = numAbs[spcName];
 				numAbs[spcName] = 0;
@@ -262,25 +260,25 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var flr = Math.floor(numEjt[spcName])
 				
 				if (flr) {
-					self.eject(dotMgrLiq, window.dotManager, spcInfo, spcName, flr, wallGas, drawList, wallLiq);
+					self.eject(dotMgrLiq, window.dotManager, spcDefs, spcName, flr, wallGas, drawList, wallLiq);
 					numEjt[spcName] = 0;
 				}
 			}
 		}
 	},
-	setupSizeWall: function(wallLiq, wallGas, spcInfo, dotMgrLiq, wallGasIdxs) {
+	setupSizeWall: function(wallLiq, wallGas, spcDefs, dotMgrLiq, wallGasIdxs) {
 		var self = this;
 		return function() {
-			var vol = self.getLiqWallVol(spcInfo, dotMgrLiq);
+			var vol = self.getLiqWallVol(spcDefs, undefined, dotMgrLiq);
 			var height = self.getWallHeight(Math.abs(wallGas[wallGasIdxs[0]].x - wallGas[wallGasIdxs[1]].x), vol);
 			wallLiq[0].y = wallGas[wallGasIdxs[0]].y - height;
 			wallLiq[1].y = wallGas[wallGasIdxs[0]].y - height;
 			wallLiq.parent.setupWall(wallLiq.parent.indexOf(wallLiq));
 		}
 	},
-	eject: function(dotMgrLiq, dotMgrGas, spcInfo, spcName, numEject, wallGas, drawList, wallLiq) {
+	eject: function(dotMgrLiq, dotMgrGas, spcDefs, spcName, numEject, wallGas, drawList, wallLiq) {
 		//going to take energy out of ejected dot rather than liquid. 
-		var info = spcInfo[spcName];
+		var info = spcDefs[spcName];
 		var hVapPerDot = info.hVap * 1000 / N; //1000/N = 1, but if I ever change N, I don't want this to be a sneaky problem.
 		var CDot = window.cv / N;
 		var CpOld = this.Cp;
@@ -307,11 +305,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 	getPPure: function(a, b, c, T) {
 		return Math.pow(10, a - b / (T + c)) * MMHGTOBAR; //C is Kelvin
 	},
-	deleteCount: function(spcInfo) {
-		for (var a in spcInfo) {
-			delete spcInfo[a].count;
-		}
-	},
 	makeDrawList: function(dotMgr) {
 		//sacrifial array that I take dots from to make randomly ordered list.  
 		var sacArray = dotMgr.lists.ALLDOTS.concat();
@@ -330,21 +323,21 @@ _.extend(Liquid.prototype, objectFuncs, {
 			var chanceZero = this.chanceZeroDf;
 			var a = chanceZero / (1 - chanceZero);
 			var chanceAbs = a / (a + Math.exp(-dF[dot.spcName] * this.drivingForceSensitivity));
-			if (chanceAbs > Math.random()) {
-				return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcInfo);//need to set Cp in this;
-			}
+			// if (chanceAbs > Math.random()) {
+				// return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcDefs);//need to set Cp in this;
+			// }
 		}
 		this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager);
 		
 		
 	},
-	absorbDot: function(dot, drawList, dotMgrLiq, wallLiq, spcInfo) {
+	absorbDot: function(dot, drawList, dotMgrLiq, wallLiq, spcDefs) {
 		var dotMgrGas = window.dotManager; 
 		dotMgrGas.remove(dot);
 		drawList.splice(Math.floor(Math.random() * drawList.length), 0, dot);
 		dot.setWall(wallLiq.handle);
 		dotMgrLiq.add(dot);
-		var hVap = spcInfo[dot.spcName].hVap; //in kj/mol
+		var hVap = spcDefs[dot.spcName].hVap; //in kj/mol
 		var CpLiqOld = this.Cp;
 		this.calcCp();
 		
@@ -354,7 +347,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 		return false; //returning false isn't used here, but I like to return false when a dot is removed from a dot/wall collision check because it is used in dot collisions.  Feels consistent.  
 	},
 	adjTemps: function(dot, wallUV, perpV, dataGas, dataLiq, tLiq, dotMgrGas) {
-		var CDot = cv / N;
 		var tGas = dataGas.temp[dataGas.temp.length - 1];
 		var tDot = dot.temp();
 		var CGas = dotMgrGas.count * CDot;
@@ -396,11 +388,4 @@ _.extend(Liquid.prototype, objectFuncs, {
 	},
 })
 
-Liquid.prototype.Species = function(spcName, count, hVap, cP, spcVol, antoineCoeffs) {
-	this.spcName = spcName;
-	this.count = count;
-	this.hVap = hVap;
-	this.cP = cP;
-	this.spcVol = spcVol;
-	this.antoineCoeffs = antoineCoeffs;
-}
+

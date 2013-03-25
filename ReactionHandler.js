@@ -176,31 +176,27 @@ ReactionHandler = {
 		}
 		return false;
 	},
-	//is prodCount arg necessay?
-	react: function(a, b, prods, prodCount) {
+	react: function(a, b, prods) {
 		var hFRct = a.enthalpy() + b.enthalpy();
 		var hF298Prod = 0;
 		var cPProd = 0;
 		var x = .5*(a.x + b.x);
 		var y = .5*(a.y + b.y);
-		var allNewDots = [];
 		var newDotsBySpc = [];
 		for (var prodIdx=0; prodIdx<prods.length; prodIdx++) {
 			var name = prods[prodIdx].name;
 			var spc = this.spcs[name];
 			var prod = prods[prodIdx];
-			var newDots = [];
+			var spcDots = [];
 			hF298Prod += spc.hF298 * prod.count;
 			cPProd += this.spcs[name].cp * prod.count;
 			for (var countIdx=0; countIdx<prod.count; countIdx++) {
 				var angle = Math.random()*2*Math.PI;
 				var UV = V(Math.sin(angle), Math.cos(angle));
 				
-				newDots.push(D(x+UV.dx*3, y+UV.dy*3, UV, name, a.tag, a.returnTo)); 
-				allNewDots.push(newDots[newDots.length - 1]);
-				//newDots[countIdx].setTemp(prodTemp);
+				spcDots.push(D(x+UV.dx*3, y+UV.dy*3, UV, name, a.tag, a.returnTo)); 
 			}
-			newDotsBySpc.push(newDots);
+			newDotsBySpc.push(spcDots);
 			
 		}
 		hF298Prod *= 1000 / N; //kj/mol -> j/molec;

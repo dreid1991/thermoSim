@@ -10,3 +10,6 @@ Stuff to do
 
 performance notes - .apply() is trivially slower than just calling the function.  However
 .apply(someVar) is ~ 20% slower.  Same if you just use undefined.  May be lookup time or something.  Still takes trivially little time (400 - 800 ms per million.  ~400 for apply(), ~800 for apply(someVar))
+
+Make slow down time thing by multiplying v by const
+Make buttons smaller

@@ -1,5 +1,6 @@
 function DotManager() {
 	this.lists = {ALLDOTS:[]};
+	this.spcLists = {};
 	this.count = 0;
 }
 
@@ -26,6 +27,7 @@ DotManager.prototype = {
 	},
 	addSpcs: function(name) {
 		this.lists[name] = [];
+		this.spcLists[name] = this.lists[name];
 		return this.lists[name];
 	},
 	removeByInfo: function(info) {
