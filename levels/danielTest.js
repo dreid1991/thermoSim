@@ -32,9 +32,9 @@ _.extend(TestLevel.prototype,
 	},
 	spcDefs: [
 		//add antoine coefs, cvLiq, hvap
-		{spcName: 'spc1', m: 4, r: 1, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 40, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: 1}, //act coeff will depend on mixture - don't put in spcDef
-		{spcName: 'ugly', m: 4, r: 1, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 40, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: 1},
-		{spcName: 'duckling', m: 4, r: 2, col: Col(255, 255, 255), cv: 2.5 * R, hF298: -30, hVap298: 40, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
+		{spcName: 'spc1', m: 4, r: 1, col: Col(200, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'ugly', m: 4, r: 1, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 5 * R, spcVolLiq: .3},
+		{spcName: 'duckling', m: 4, r: 2, col: Col(255, 255, 255), cv: 2.5 * R, hF298: -30, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
 	],
 	sections: [
 		// {
@@ -73,7 +73,7 @@ _.extend(TestLevel.prototype,
 					},
 					{
 						type: 'Liquid',
-						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 298.15, spcCounts: {spc1: 500, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 370.15, spcCounts: {spc1: 500, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
 					}
 					// {
 						// type: 'Heater',
