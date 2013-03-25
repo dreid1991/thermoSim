@@ -26,8 +26,10 @@ DotManager.prototype = {
 		}
 	},
 	addSpcs: function(name) {
-		this.lists[name] = [];
-		this.spcLists[name] = this.lists[name];
+		if (!this.lists[name]) {
+			this.lists[name] = [];
+			this.spcLists[name] = this.lists[name];
+		}
 		return this.lists[name];
 	},
 	removeByInfo: function(info) {

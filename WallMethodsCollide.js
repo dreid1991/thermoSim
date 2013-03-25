@@ -126,15 +126,17 @@ WallMethods.collideMethods ={
 	cVIsothermal: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 		var eAddSign = getSign(this[wallIdx].eToAdd);
 		var inTemp = dot.temp();
-		var eToAddMax = eAddSign*Math.min(1, eAddSign*this[wallIdx].eToAdd);
-		var eToAdd = eAddSign*Math.min(eAddSign*eToAddMax, cv*(inTemp-Math.min(inTemp, 20))/N);
-		this[wallIdx].eToAdd-=eToAdd;
-		var outTemp = inTemp + eToAdd*N/cv;
+		var eToAdd = eAddSign * Math.min(Math.abs(this[wallIdx].eToAdd), dot.cv * 20);
+		if (eToAdd < 0 && inTemp <= 20) eToAdd = (inTemp - 20) * dot.cv;
+
+		this[wallIdx].eToAdd -= eToAdd;
+		var outTemp = inTemp + eToAdd / dot.cv;
 		var spdRatio = Math.sqrt(outTemp/inTemp);
 		var outPerpV = perpV*spdRatio;
 		this.reflect(dot, wallUV, perpV);
 		dot.v.dx*=spdRatio;
 		dot.v.dy*=spdRatio;
+		dot.internalPotential *= outTemp / inTemp;
 		this[wallIdx].forceInternal += dot.m*(Math.abs(perpV) + Math.abs(outPerpV));
 		this[wallIdx].q += eToAdd*JtoKJ;
 	},

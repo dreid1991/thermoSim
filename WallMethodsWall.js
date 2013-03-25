@@ -171,6 +171,14 @@ WallMethods.wall = {
 	setTemp: function(temp){
 		this.tSet = temp;
 	},
+	getCv: function() {
+		var Cv = 0;
+		for (var spcName in window.spcs) {
+			var dots = dotManager.get({tag: this.handle, spcName: spcName});
+			Cv += (dots ? dots.length : 0) * spcs[spcName].cv / N;
+		}
+		return Cv;
+	},
 	isothermalInit: function(){
 		this.eToAdd = 0;
 		var activeDots = dotManager.get({tag: this.handle});
@@ -178,9 +186,10 @@ WallMethods.wall = {
 		if (!this.isothermal) {
 			addListener(curLevel, 'data', 'recordEnergyForIsothermal' + this.handle,
 				function(){
+					
 					var tLast = tempData[tempData.length-1] || this.tSet;
 					var dt = this.tSet - tLast;
-					this.eToAdd = cv*activeDots.length*dt/N;
+					this.eToAdd = this.getCv()*dt;
 				},
 			this);
 			this.recordQ();
