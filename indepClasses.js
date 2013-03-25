@@ -497,7 +497,7 @@ Dot.prototype = {
 	tempVaporize: function(tLiq) { 
 		return (this.cpLiq * (this.temp() - 298.15) - this.hVap298) / this.cv + 298.15;
 	},
-	hVap: function(tLiq) {
+	hVap: function() {
 		return this.hVap298 + (this.temp() - 298.15) * (this.cv - this.cpLiq);
 	},
 	setTemp: function(newTemp) {

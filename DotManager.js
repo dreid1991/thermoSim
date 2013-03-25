@@ -111,7 +111,7 @@ DotManager.prototype = {
 		}
 	},	
 	execAllCombos: function(listFunc, dot) {
-		if (dot instanceof Array) {
+		if (dot instanceof Array && dot.length) {
 			var dots = dot;
 			var info = {spcName: dots[0].spcName, tag: dots[0].tag};
 		} else {
@@ -122,7 +122,7 @@ DotManager.prototype = {
 			for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
 				this.execFuncOnLists(listFunc, lists, dots[dotIdx]);
 			}
-		} else {
+		} else if (dot instanceof Dot) {
 			this.execFuncOnLists(listFunc, lists, dot);
 		}
 	},

@@ -69,7 +69,7 @@ WallMethods.wallDataHandler = {
 				for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
 					sumKE += dots[dotIdx].KE();
 				}
-				return dots.length ? tConst * sumKE / dots.length: 0;
+				return dots.length ? tConst * sumKE / dots.length : 0;
 			}
 			
 			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), tempFunc, this, 'update');

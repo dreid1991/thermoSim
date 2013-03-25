@@ -636,7 +636,7 @@ LevelTools = {
 		}
 	},
 	reset: function(){
-		showPrompt(sectionIdx, promptIdx, true);		
+		sceneNavigator.showPrompt(sectionIdx, promptIdx, true);		
 	},
 	setDefaultPromptVals: function(){
 		for (var sectionIdxLocal=0; sectionIdxLocal<this.sections.length; sectionIdxLocal++) {

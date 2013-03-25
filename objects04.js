@@ -152,6 +152,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var calcCp = this.calcCp, calcEquil = this.calcEquil, drawDots = this.drawDots, moveDots = this.moveDots, ejectDots = this.ejectDots;
 		calcCp();
 		var self = this;
+		console.log(ejectDots);
 		addListener(curLevel, 'update', listenerName, function() {
 			calcCp();
 			calcEquil();
@@ -278,9 +279,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 	},
 	eject: function(dotMgrLiq, dotMgrGas, spcDefs, spcName, numEject, wallGas, drawList, wallLiq) {
 		//going to take energy out of ejected dot rather than liquid. 
-		var info = spcDefs[spcName];
-		var hVapPerDot = info.hVap * 1000 / N; //1000/N = 1, but if I ever change N, I don't want this to be a sneaky problem.
-		var CDot = window.cv / N;
+
 		var CpOld = this.Cp;
 		var dHLiq = 0;
 		var dotList = dotMgrLiq.get({spcName: spcName})
@@ -323,11 +322,11 @@ _.extend(Liquid.prototype, objectFuncs, {
 			var chanceZero = this.chanceZeroDf;
 			var a = chanceZero / (1 - chanceZero);
 			var chanceAbs = a / (a + Math.exp(-dF[dot.spcName] * this.drivingForceSensitivity));
-			// if (chanceAbs > Math.random()) {
-				// return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcDefs);//need to set Cp in this;
-			// }
+			//if (chanceAbs > Math.random()) {
+				return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcDefs);//need to set Cp in this;
+			//}
 		}
-		this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
+		//this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
 		
 		
 	},
@@ -340,7 +339,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var tempDotF = dot.tempCondense();
 		var CpLiqOld = this.Cp;
 		this.calcCp();
-		this.temp = (CpLiqOld * this.temp + dot.cpLiq * tempDotF) / this.Cp;
+		this.temp = (this.temp * CpLiqOld + tempDotF * dot.cpLiq) / this.Cp;
 		this.numAbs[dot.spcName]++;
 		return false; //returning false isn't used here, but I like to return false when a dot is removed from a dot/wall collision check because it is used in dot collisions.  Feels consistent.  
 	},
