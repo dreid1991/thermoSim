@@ -157,7 +157,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			calcEquil();
 			drawDots();
 			moveDots();
-			//ejectDots();
+			ejectDots();
 			sizeWall();
 		})
 	},
@@ -288,19 +288,19 @@ _.extend(Liquid.prototype, objectFuncs, {
 		
 		var toTransfer = dotList.slice(0, sliceIdx);
 		dotMgrLiq.remove(toTransfer);
-		var tempEject = this.temp;
-		//Cpliqo*Tliqo + nVap*hVap = Cpliqf*Tliqf + CgasTgas w/ Tgas = Tliqo
+		//taking energy out of liquid.  If I did from ejecting gas molec, would not be able to vaporize below a temp because tEject would be < 0
 		for (var transIdx=0; transIdx<toTransfer.length; transIdx++) {
 			var dot = toTransfer[transIdx];
-			dot.setTemp(tempEject);
+			dot.setTemp(this.temp);
+			var hVap = dot.hVap();
 			dot.v.dy = -Math.abs(toTransfer[transIdx].v.dy)
 			dot.y = wallLiq[0].y - 1;
 			dot.setWall(wallGas.handle);
 			drawList.splice(drawList.indexOf(dot), 1);
+			this.calcCp();
+			this.temp -= hVap / this.Cp;
 		}
 		dotMgrGas.add(toTransfer);
-		this.calcCp();
-		this.temp = (this.temp * CpOld - numEject * (hVapPerDot + this.temp * CDot)) / this.Cp;
 	},
 	getPPure: function(a, b, c, T) {
 		return Math.pow(10, a - b / (T + c)) * MMHGTOBAR; //C is Kelvin
@@ -327,7 +327,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				// return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcDefs);//need to set Cp in this;
 			// }
 		}
-		this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager);
+		this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
 		
 		
 	},
@@ -337,39 +337,40 @@ _.extend(Liquid.prototype, objectFuncs, {
 		drawList.splice(Math.floor(Math.random() * drawList.length), 0, dot);
 		dot.setWall(wallLiq.handle);
 		dotMgrLiq.add(dot);
-		var hVap = spcDefs[dot.spcName].hVap; //in kj/mol
+		var tempDotF = dot.tempCondense();
 		var CpLiqOld = this.Cp;
 		this.calcCp();
-		
-		var CDot = window.cv / N;
-		this.temp = (CpLiqOld * this.temp + CDot * dot.temp() + hVap * 1000 / N) / this.Cp;
+		this.temp = (CpLiqOld * this.temp + dot.cpLiq * tempDotF) / this.Cp;
 		this.numAbs[dot.spcName]++;
 		return false; //returning false isn't used here, but I like to return false when a dot is removed from a dot/wall collision check because it is used in dot collisions.  Feels consistent.  
 	},
-	adjTemps: function(dot, wallUV, perpV, dataGas, dataLiq, tLiq, dotMgrGas) {
+	adjTemps: function(dot, wallUV, perpV, dataGas, dataLiq, tLiq, gasSpcLists, spcDefs) {
+		
 		var tGas = dataGas.temp[dataGas.temp.length - 1];
 		var tDot = dot.temp();
-		var CGas = dotMgrGas.count * CDot;
+		var CDot = dot.cv;
+		var CGas = 0;
+		for (var spcName in spcDefs) CGas += gasSpcLists[spcName].length * spcDefs[spcName].cv / N;
+		
 		var delT = tLiq - tGas;
 		var sign = getSign(delT);
 		
-		var qToDot = Math.max(sign * Math.max(.05, sign * delT), CDot * (10 - tDot)); 
+		var qToDot = Math.max(sign * Math.max(.05, sign * delT * CDot), CDot * (10 - tDot)); 
 		
 		if (qToDot < 0) qToDot = Math.max(qToDot, CDot * (10 - tDot));
 			
-		
-		
-		var tDotTarget = tDot + qToDot / CDot;//(tLiq * this.Cp + tGas * CGas) / (this.Cp + CGas);
-		//var deltaTDot = Math.max(1.05 * (tTarget - tGas), -tDot + 10);
+		var tDotTarget = tDot + qToDot / CDot;
+
 		var tempTest = this.temp - qToDot / this.Cp;
 		if (tempTest < 0 || isNaN(tempTest) || tDotTarget < 0 || isNaN(tDotTarget)) {
 			console.log('WE ARE HERE!');
 		}
 		this.temp -= qToDot / this.Cp;
 		
-		
+
 		var vRatio = Math.sqrt(tDotTarget / tDot); //inlining vRatio show dot.setTemp so I don't have to sqrt unnecessarily
 		dot.v.mult(vRatio);
+		dot.internalPotential *= tDotTarget / tDot;
 		WallMethods.collideMethods.reflect(dot, wallUV, perpV * vRatio);
 	},
 	getWallLiq: function() {

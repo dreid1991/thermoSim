@@ -12,7 +12,7 @@ function Dot(x, y, v, spcName, tag, returnTo) {
 	this.cvKinetic = 1.5 * R / N;
 	this.cv = def.cv / N;
 	this.cp = this.cv + R;
-	this.cvLiq = def.cvLiq / N;
+	this.cpLiq = def.cpLiq / N;
 	this.spcVolLiq = def.spcVolLiq / N; //L/molec
 	this.tag = tag;
 	this.returnTo = returnTo;
@@ -490,6 +490,15 @@ Dot.prototype = {
 	},
 	temp: function() {
 		return .5*this.m*(this.v.dx*this.v.dx + this.v.dy*this.v.dy)*this.tConst;
+	},
+	tempCondense: function() {
+		return (this.cv * (this.temp() - 298.15) + this.hVap298) / this.cpLiq + 298.15;
+	},
+	tempVaporize: function(tLiq) { 
+		return (this.cpLiq * (this.temp() - 298.15) - this.hVap298) / this.cv + 298.15;
+	},
+	hVap: function(tLiq) {
+		return this.hVap298 + (this.temp() - 298.15) * (this.cv - this.cpLiq);
 	},
 	setTemp: function(newTemp) {
 		var curTemp = this.temp();

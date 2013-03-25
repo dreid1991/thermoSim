@@ -73,7 +73,7 @@ _.extend(TestLevel.prototype,
 					},
 					{
 						type: 'Liquid',
-						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 1, ugly: 1}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 300, spcCounts: {spc1: 500, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
 					}
 					// {
 						// type: 'Heater',
