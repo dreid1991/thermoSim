@@ -32,9 +32,9 @@ _.extend(TestLevel.prototype,
 	},
 	spcDefs: [
 		//add antoine coefs, cvLiq, hvap
-		{spcName: 'spc1', m: 2, r: 4, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 40, antoineCoeffs: {}, cvLiq: 12}, //act coeff will depend on mixture - don't put in spcDef
-		{spcName: 'ugly', m: 7, r: 4, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 30, antoineCoeffs: {}, cvLiq: 12},
-		{spcName: 'duckling', m: 9, r: 2, col: Col(255, 255, 255), cv: 2.5 * R, hF298: -20, hVap298: 30, antoineCoeffs: {}, cvLiq: 12}
+		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 40, antoineCoeffs: {}, cvLiq: 12}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'ugly', m: 4, r: 2, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 30, antoineCoeffs: {}, cvLiq: 12},
+		{spcName: 'duckling', m: 4, r: 2, col: Col(255, 255, 255), cv: 2.5 * R, hF298: -30, hVap298: 30, antoineCoeffs: {}, cvLiq: 12}
 	],
 	sections: [
 		// {
@@ -58,12 +58,12 @@ _.extend(TestLevel.prototype,
 		// },
 		{
 			sceneData: {
-				walls: [//was 350
-					{pts: [P(50, 50), P(400, 50), P(400, 100), P(50, 100)], handler: 'staticAdiabatic', handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}} 
+				walls: [
+					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'staticAdiabatic', handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}} 
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(200, 20), count: 100, temp: 350, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(55, 55), dims: V(200, 20), count: 100, temp: 350, returnTo: 'wally', tag: 'wally'}
+					{spcName: 'spc1', pos: P(55, 55), dims: V(200, 20), count: 100, temp: 298.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'ugly', pos: P(55, 55), dims: V(200, 20), count: 100, temp: 298.15, returnTo: 'wally', tag: 'wally'}
 					//{spcName: 'spc3', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
@@ -90,14 +90,21 @@ _.extend(TestLevel.prototype,
 
 						
 				],
+				dataRecord: [
+					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
+					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugly', tag: 'wally'}}
+				],
 				dataDisplay: [
-					{wallInfo: 'wally', data:'pInt', readout: 'mainReadout'}
+					{wallInfo: 'wally', data:'pInt', readout: 'mainReadout'},
+					{wallInfo: 'wally', data:'frac', readout: 'mainReadout', attrs: {spcName: 'spc1', tag: 'wally'}},
+					{wallInfo: 'wally', data:'frac', readout: 'mainReadout', attrs: {spcName: 'ugly', tag: 'wally'}}
 				],
 				cmmds: [
 					//{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}
 				],
 				rxns: [
-					{handle: 'rxn1', rctA: 'spc1', rctB: 'ugly', activeE: 15, prods: {duckling: 2}}
+					{handle: 'rxn1', rctA: 'spc1', rctB: 'ugly', activeE: 15, prods: {duckling: 1}},
+					{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				]
 			},
 			prompts: [

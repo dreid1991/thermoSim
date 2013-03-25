@@ -126,11 +126,10 @@ ReactionHandler = {
 		var rxn = this.rxns[idStr][0];
 		var activeE = rxn.activeE;
 		var prods = rxn.prods;
-		var prodCount = rxn.prodCount;
 		return function(a, b, UVAB, perpAB, perpBA) {
 			var hitE = this.hitE(a, b, perpAB, -perpBA);
-			if (/*Math.random() < this.probFunc(hitE, activeE)*/true) {
-				if (!this.react(a, b, prods, prodCount)) {
+			if (Math.random() < this.probFunc(hitE, activeE)) {
+				if (!this.react(a, b, prods)) {
 					return this.impactStd(a, b, UVAB, perpAB, perpBA);
 				}
 				return false;
@@ -157,7 +156,7 @@ ReactionHandler = {
 			
 			if (rxnIdx===false) {
 				return this.impactStd(a, b, UVAB, perpAB, perpBA);
-			} else if (!this.react(a, b, rxns[rxnIdx].hRxn, rxns[rxnIdx].prods, rxns[rxnIdx].prodCount)){
+			} else if (!this.react(a, b, rxns[rxnIdx].prods)){
 				return this.impactStd(a, b, UVAB, perpAB, perpBA);
 			} else {
 				return false;
