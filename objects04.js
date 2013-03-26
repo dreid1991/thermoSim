@@ -396,8 +396,8 @@ _.extend(Liquid.prototype, objectFuncs, {
 	remove: function() {
 		removeListener(curLevel, 'update', this.updateListenerName);
 		this.wallGas.removeLiquid(this);
-		if (!this.wallLiq.removed) this.walls.removeWall(this.wallLiq.handle);
-		if (!this.wallGas.removed) this.wallGas.removeSurfAreaAdj(this.handle);
+		if (!this.wallLiq.removed) walls.removeWall(this.wallLiq.handle);
+		if (!this.wallGas.removed) this.wallGas.removeSurfAreaAdjust(this.handle);
 	},
 })
 

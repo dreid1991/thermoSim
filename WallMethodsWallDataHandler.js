@@ -23,7 +23,7 @@ WallMethods.wallDataHandler = {
 		return this.surfAreaAdj[handle];
 	},
 	removeSurfAreaAdjust: function(handle) {
-		delete this.surfAreaAdjust[handle];
+		delete this.surfAreaAdj[handle];
 	},
 	getDataObj: function(type, args, suppressOutput) { //data will be list of DataObjs if it's like fractional conversion where there can be one for each species or tag.  Else is just DataObj
 		if (this.data[type]) {
