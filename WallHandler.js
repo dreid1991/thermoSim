@@ -196,12 +196,15 @@ WallMethods.main = {
 		this[wallIdx].ptsInit = this.copyWallPts(this[wallIdx]);
 		this[wallIdx].g = g;
 		this[wallIdx].pConst = pConst;
+		this[wallIdx].liquids = {};
+		this[wallIdx].liquidTemps = {};
 		this[wallIdx].data = {};
 		this[wallIdx].q = 0;
 		this[wallIdx].pIntLen = 35;
 		this[wallIdx].surfAreaAdj = {};
 		this[wallIdx].eToAdd = 0;
 		this[wallIdx].isothermal = false;
+		this[wallIdx].removed = false;
 		this[wallIdx].tSet = tSet;
 		this[wallIdx].massChunks = {};
 		this[wallIdx].forceInternal = 0;
@@ -270,6 +273,7 @@ WallMethods.main = {
 		this[wallInfo].recordAllStop();
 		this[wallInfo].displayAllStop();
 		this[wallInfo].removeBorder();
+		this[wallInfo].removed = true;
 		var wallIdx = this.idxByInfo(wallInfo);
 		this[this[wallIdx].handle] = undefined;
 		this.splice(wallIdx, 1);

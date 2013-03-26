@@ -186,12 +186,21 @@ WallMethods.wall = {
 		if (!this.isothermal) {
 			addListener(curLevel, 'data', 'recordEnergyForIsothermal' + this.handle,
 				function(){
-					
-					var tLast = tempData[tempData.length-1] || this.tSet;
-					var dt = this.tSet - tLast;
-					this.eToAdd = this.getCv()*dt;
+					var tLastLiq, dt;
+					var tLast = tempData[tempData.length - 1] || this.tSet;
+					dt = this.tSet - tLast;
+					this.eToAdd = this.getCv() * dt;
+					for (var liquidName in this.liquids) {
+						tLastLiq = this.liquidTemps[liquidName][this.liquidTemps[liquidName].length - 1] || this.tSet;
+						var dt = this.tSet - tLastLiq;
+						this.q += (this.tSet - tLastLiq) * this.liquids[liquidName].Cp * JtoKJ;
+						this.liquids[liquidName].temp = this.tSet;
+					}
 				},
 			this);
+			for (var liqHandle in this.liquids) {
+				this.isothermalInitLiquid(this.liquids[liqHandle]);
+			}
 			this.recordQ();
 		}
 		for (var lineIdx=0; lineIdx<this.length; lineIdx++){
@@ -204,7 +213,6 @@ WallMethods.wall = {
 		this.isothermal = false;
 		removeListener(curLevel, 'data', 'recordEnergyForIsothermal' + this.handle);
 	},
-
 	surfArea: function(){
 		var SA=0;
 		for (ptIdx=0; ptIdx<this.length-1; ptIdx++){
@@ -238,7 +246,17 @@ WallMethods.wall = {
 		this.updateMass();
 		return this;
 	},
-
+	addLiquid: function(liquid) {
+		this.liquids[liquid.handle] = liquid;
+		this.liquidTemps[liquid.handle] = liquid.wallLiq.getDataObj('temp').src();
+	},
+	removeLiquid: function(liquid) {
+		if (typeof liquid == 'string') liquid = this.liquids[liquid];
+		if (liquid && liquid.handle) {
+			delete this.liquidTemps[liquid.handle];
+			delete this.liquids[liquid.handle];
+		}
+	},
 	addBorder: function(attrs) {
 		attrs.wall = this;
 		this.border = new WallMethods.Border(attrs);

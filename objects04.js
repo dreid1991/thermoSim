@@ -23,13 +23,14 @@ function Liquid(attrs) {
 	this.makeDots(this.wallLiq, this.wallGas, this.wallPtIdxs, spcCounts, tempInit, this.dotMgrLiq) && this.deleteCount(this.spcDefs);
 	this.dataGas = this.initData(this.wallGas, this.spcDefs, ['pInt', 'temp']);
 	this.dataLiq = this.initData(this.wallLiq, this.spcDefs);
+	this.recordTempLiq(this.wallLiq);
 	this.drawList = this.makeDrawList(this.dotMgrLiq); //need to make draw list in random order otherwise dots drawn on top will look more prominant than they are.
 	this.actCoeffFuncs = this.makeActCoeffFuncs(this.actCoeffType, this.actCoeffInfo, this.spcDefs);
 	this.chanceZeroDf = .4;
 	this.drivingForceSensitivity = 10;//formalize this a bit
 	this.updateListenerName = this.type + this.handle;
 	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs, this.surfAreaObj)
-	
+	this.wallGas.addLiquid(this);
 	this.setupStd();
 }
 
@@ -112,6 +113,12 @@ _.extend(Liquid.prototype, objectFuncs, {
 		for (var spcName in counts) {
 			spcs[spcName].populate(pos, dims, counts[spcName], temp, wallLiq.handle, wallLiq.handle, dotMgrLiq); 
 		}
+	},
+	recordTempLiq: function(wallLiq) {
+		var self = this;
+		wallLiq.recordTemp(function() {
+			return self.temp;
+		})
 	},
 	initData: function(wall, spcDefs, extras) {
 		var data = {};
@@ -385,6 +392,12 @@ _.extend(Liquid.prototype, objectFuncs, {
 		console.log(q/Cp);
 		this.temp += q / Cp;
 		this.wallLiq.q += q;
+	},
+	remove: function() {
+		removeListener(curLevel, 'update', this.updateListenerName);
+		this.wallGas.removeLiquid(this);
+		if (!this.wallLiq.removed) this.walls.removeWall(this.wallLiq.handle);
+		if (!this.wallGas.removed) this.wallGas.removeSurfAreaAdj(this.handle);
 	},
 })
 

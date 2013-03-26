@@ -157,41 +157,6 @@ function boundedStep(cur, setPt, step){
 	setPt*=sign;
 	return sign*Math.min(cur+step, setPt);
 }
-// function addSpecies(toAdd){
-	// var didAdd = false;
-	// if (String(toAdd)===toAdd) {
-		// if (!spcs[toAdd] && toAdd) {
-			// var def = speciesDefs[toAdd];
-			// spcs[toAdd] = new Species(def.m, def.r, def.cols, def);
-			// didAdd = true;
-		// }
-		
-	// } else if (toAdd instanceof Array) {
-		// for (var toAddIdx=0; toAddIdx<toAdd.length; toAddIdx++){
-			// var name = toAdd[toAddIdx];
-			// if (!spcs[name] && name) {
-				// var def = speciesDefs[name];
-				// spcs[name] = new Species(def.m, def.r, def.cols, def);
-				// didAdd = true;
-			// }
-		// }
-	// }
-	// if (didAdd) {
-		// collide.setup();
-	// }
-// }
-// function removeSpecies(toRem){
-	// if (String(toRemove)===toRemove){
-		// spcs[toRemove] = undefined;
-	// } else if(toRem instanceof Array){
-		// for (var toRemIdx=0; toRemIdx<toRem.length; toRemIdx++){
-			// var name = toAdd[toRemIdx];
-			// spcs[name] = undefined
-		// }
-	// }
-	// collide.setup();
-// }
-
 
 function changeTemp(info, newTemp){
 	var dots = dotManager.get(info);

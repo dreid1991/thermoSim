@@ -11,5 +11,4 @@ performance notes - .apply() is trivially slower than just calling the function.
 
 Make slow down time thing by multiplying v by const
 Make buttons smaller
-make wall effect pInt
-make wall isothermal effect container liquid
+

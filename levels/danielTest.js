@@ -59,7 +59,7 @@ _.extend(TestLevel.prototype,
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'staticAdiabatic', handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}} 
+					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'cVIsothermal', temp: 300, handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}} 
 				],
 				dots: [
 					{spcName: 'spc1', pos: P(55, 155), dims: V(200, 20), count: 100, temp: 350, returnTo: 'wally', tag: 'wally'},

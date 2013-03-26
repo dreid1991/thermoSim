@@ -68,20 +68,22 @@ WallMethods.wallDataHandler = {
 		}
 		recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), getTime, this, 'update');
 	},
-	recordTemp: function() {
+	
+	recordTemp: function(tempFunc) {
 		if (!this.data.t || !this.data.t.recording()) {
 			this.data.temp = new WallMethods.DataObj();
 			var dataObj = this.data.temp;
 			this.setupStdDataObj(dataObj, 'temp');
 			var dots = this.dotManager.get({tag: this.handle});
-			var tempFunc = function () {
-				var sumKE = 0;
-				for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
-					sumKE += dots[dotIdx].KE();
+			if (!tempFunc) { 
+				tempFunc = function () {
+					var sumKE = 0;
+					for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
+						sumKE += dots[dotIdx].KE();
+					}
+					return dots.length ? tConst * sumKE / dots.length : 0;
 				}
-				return dots.length ? tConst * sumKE / dots.length : 0;
 			}
-			
 			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), tempFunc, this, 'update');
 		}
 		return this;
