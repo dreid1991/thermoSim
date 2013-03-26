@@ -5,6 +5,9 @@ WallMethods.wallDataHandler = {
 	},
 	pInt: function(){
 		var SA = this.surfArea();
+		for (var SAAdj in this.surfAreaAdj) {
+			SA += this.surfAreaAdj[SAAdj].val;
+		}
 		var pInt = this.pConst*this.forceInternal/((turn-this.pLastRecord)*SA);
 		this.forceInternal = 0;
 		this.pLastRecord = turn;
@@ -14,6 +17,13 @@ WallMethods.wallDataHandler = {
 			this.pIntIdx=0;
 		}
 		return this.pIntList.average();
+	},
+	addSurfAreaAdjust: function(handle) {
+		this.surfAreaAdj[handle] = {val: 0};
+		return this.surfAreaAdj[handle];
+	},
+	removeSurfAreaAdjust: function(handle) {
+		delete this.surfAreaAdjust[handle];
 	},
 	getDataObj: function(type, args, suppressOutput) { //data will be list of DataObjs if it's like fractional conversion where there can be one for each species or tag.  Else is just DataObj
 		if (this.data[type]) {

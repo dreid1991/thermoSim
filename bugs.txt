@@ -4,9 +4,7 @@ attracting is gaining energy in at least cvcp - response: seems stable with ~200
 Stuff to do
 -hypo path
 -loading graphs (command?)
--commands - probably {handle: ,cmmd: , args: }
--Liquid
--Hey, give liquid its own dot manager
+
 
 performance notes - .apply() is trivially slower than just calling the function.  However
 .apply(someVar) is ~ 20% slower.  Same if you just use undefined.  May be lookup time or something.  Still takes trivially little time (400 - 800 ms per million.  ~400 for apply(), ~800 for apply(someVar))
@@ -15,4 +13,3 @@ Make slow down time thing by multiplying v by const
 Make buttons smaller
 make wall effect pInt
 make wall isothermal effect container liquid
-make wall isothermal work with new cvs

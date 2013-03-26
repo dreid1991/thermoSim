@@ -199,6 +199,7 @@ WallMethods.main = {
 		this[wallIdx].data = {};
 		this[wallIdx].q = 0;
 		this[wallIdx].pIntLen = 35;
+		this[wallIdx].surfAreaAdj = {};
 		this[wallIdx].eToAdd = 0;
 		this[wallIdx].isothermal = false;
 		this[wallIdx].tSet = tSet;

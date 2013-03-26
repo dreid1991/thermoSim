@@ -59,7 +59,7 @@ _.extend(TestLevel.prototype,
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'cVIsothermal', handle: 'wally', temp: 300, border: {type: 'open', thickness: 5, yMin: 30}} 
+					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'staticAdiabatic', handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}} 
 				],
 				dots: [
 					{spcName: 'spc1', pos: P(55, 155), dims: V(200, 20), count: 100, temp: 350, returnTo: 'wally', tag: 'wally'},
@@ -70,11 +70,11 @@ _.extend(TestLevel.prototype,
 					{
 						type: 'AuxImage',
 						attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/work/block0Pic1.jpg)'}
+					},
+					{
+						type: 'Liquid',
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 370.15, spcCounts: {spc1: 500, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
 					}
-					// {
-						// type: 'Liquid',
-						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 370.15, spcCounts: {spc1: 500, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
-					// }
 					// {
 						// type: 'Heater',
 						// attrs:{wallInfo: 'wally', tempMax: 20, handle: 'heaty', offset: V(0, 30), liquid: {handle:'swishy'}}

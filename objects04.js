@@ -17,6 +17,7 @@ function Liquid(attrs) {
 	this.drivingForce = this.makeDrivingForce(this.spcDefs);
 	this.dotMgrLiq = this.makeDotManager(this.spcDefs);
 	this.wallLiq = this.makeWallLiq(this.spcDefs, spcCounts, this.wallGas, this.wallPtIdxs, this.dotMgrLiq);
+	this.surfAreaObj = this.wallGas.addSurfAreaAdjust(this.handle);
 	this.numAbs = deepCopy(this.drivingForce);
 	this.numEjt = deepCopy(this.numAbs);
 	this.makeDots(this.wallLiq, this.wallGas, this.wallPtIdxs, spcCounts, tempInit, this.dotMgrLiq) && this.deleteCount(this.spcDefs);
@@ -27,7 +28,7 @@ function Liquid(attrs) {
 	this.chanceZeroDf = .4;
 	this.drivingForceSensitivity = 10;//formalize this a bit
 	this.updateListenerName = this.type + this.handle;
-	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs)
+	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs, this.surfAreaObj)
 	
 	this.setupStd();
 }
@@ -141,18 +142,16 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 		return force;
 	},
-	setupUpdate: function(spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName, drawList, dotMgrLiq, wallLiq, numAbs, drivingForceSensitivity, numEjt, wallGas, wallGasIdxs) {
+	setupUpdate: function(spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName, drawList, dotMgrLiq, wallLiq, numAbs, drivingForceSensitivity, numEjt, wallGas, wallGasIdxs, wallSurfAreaObj) {
 		this.calcCp = this.setupCalcCp(spcDefs, dotMgrLiq);
 		this.calcEquil = this.setupUpdateEquil(spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce);
 		this.drawDots = this.setupDrawDots(drawList);
 		this.moveDots = this.setupMoveDots(dotMgrLiq, spcDefs, wallLiq, wallGas, wallGasIdxs);
 		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcDefs, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt);//you were making the liquid eject if df<0 whether hit or not
-		var sizeWall = this.setupSizeWall(wallLiq, wallGas, spcDefs, dotMgrLiq, wallGasIdxs)
+		var sizeWall = this.setupSizeWall(wallLiq, wallGas, spcDefs, dotMgrLiq, wallGasIdxs, wallSurfAreaObj)
 		var zeroAttrs = this.zeroAttrs;
 		var calcCp = this.calcCp, calcEquil = this.calcEquil, drawDots = this.drawDots, moveDots = this.moveDots, ejectDots = this.ejectDots;
 		calcCp();
-		var self = this;
-		console.log(ejectDots);
 		addListener(curLevel, 'update', listenerName, function() {
 			calcCp();
 			calcEquil();
@@ -267,7 +266,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			}
 		}
 	},
-	setupSizeWall: function(wallLiq, wallGas, spcDefs, dotMgrLiq, wallGasIdxs) {
+	setupSizeWall: function(wallLiq, wallGas, spcDefs, dotMgrLiq, wallGasIdxs, surfAreaObj) {
 		var self = this;
 		return function() {
 			var vol = self.getLiqWallVol(spcDefs, undefined, dotMgrLiq);
@@ -275,6 +274,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			wallLiq[0].y = wallGas[wallGasIdxs[0]].y - height;
 			wallLiq[1].y = wallGas[wallGasIdxs[0]].y - height;
 			wallLiq.parent.setupWall(wallLiq.parent.indexOf(wallLiq));
+			surfAreaObj.val = 2 * height + wallLiq[1].x - wallLiq[0].x;
 		}
 	},
 	eject: function(dotMgrLiq, dotMgrGas, spcDefs, spcName, numEject, wallGas, drawList, wallLiq) {
