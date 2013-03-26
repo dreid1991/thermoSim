@@ -211,6 +211,7 @@ WallMethods.main = {
 		this[wallIdx].pLastRecord = turn;
 		this[wallIdx].mass = 0;
 		this[wallIdx].parent = this;
+		makeListenerHolder(this[wallIdx], 'cleanUp');
 		this[handle] = this[wallIdx];
 		record = defaultTo(true, record);
 		if (record) {	
@@ -272,6 +273,7 @@ WallMethods.main = {
 		this.numWalls-=1;
 		this[wallInfo].recordAllStop();
 		this[wallInfo].displayAllStop();
+		this[wallInfo].cleanUp();
 		this[wallInfo].removeBorder();
 		this[wallInfo].removed = true;
 		var wallIdx = this.idxByInfo(wallInfo);

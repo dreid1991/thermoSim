@@ -24,9 +24,6 @@ WallMethods.wall = {
 		var extendUV = this[2].VTo(this[3]).UV().perp('cw');
 		return this[2].y - height;
 	},
-
-
-
 	changeSetPt: function(dest, compType, speed){
 		if(compType.indexOf('isothermal')!=-1){
 			var wallMoveMethod = 'cVIsothermal';
@@ -352,6 +349,13 @@ WallMethods.wall = {
 			}
 		}
 		 
+	},
+	cleanUp: function() {
+		var listeners = this.cleanUpListeners.listeners;
+		for (var listenerName in listeners) {
+			var listener = listeners[listenerName];
+			listener.func.apply(listener.obj);
+		}
 	}
 	
 }

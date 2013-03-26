@@ -612,28 +612,25 @@ LevelTools = {
 	},
 
 	makeListenerHolders: function(){
-		this.makeListenerHolder('update');
-		this.makeListenerHolder('wallMove');
-		this.makeListenerHolder('data');
-		this.makeListenerHolder('mousedown');
-		this.makeListenerHolder('mouseup');
-		this.makeListenerHolder('mousemove');
-		this.makeListenerHolder('init');
-		this.makeListenerHolder('record');
-		this.makeListenerHolder('sectionCondition');
-		this.makeListenerHolder('promptCondition');
-		this.makeListenerHolder('sectionCleanUp');
-		this.makeListenerHolder('setup');
+		makeListenerHolder(this, 'update');
+		makeListenerHolder(this, 'wallMove');
+		makeListenerHolder(this, 'data');
+		makeListenerHolder(this, 'mousedown');
+		makeListenerHolder(this, 'mouseup');
+		makeListenerHolder(this, 'mousemove');
+		makeListenerHolder(this, 'init');
+		makeListenerHolder(this, 'record');
+		makeListenerHolder(this, 'sectionCondition');
+		makeListenerHolder(this, 'promptCondition');
+		makeListenerHolder(this, 'sectionCleanUp');
+		makeListenerHolder(this, 'setup');
 	},
-	makeListenerHolder: function(name) {
-		this[name + 'Listeners'] = {listeners:{}, save:{}};
-		return this[name + 'Listeners'];
-	},
+	
 	makePromptCleanUpHolders: function(newSectionIdx){
 		var section = this.sections[newSectionIdx];
 		this.promptCleanUpHolders = new Array(section.prompts.length);
 		for (var promptIdx=0; promptIdx<section.prompts.length; promptIdx++) {
-			this.promptCleanUpHolders[promptIdx] = this.makeListenerHolder('prompt' + promptIdx + 'CleanUp');
+			this.promptCleanUpHolders[promptIdx] = makeListenerHolder(this, 'prompt' + promptIdx + 'CleanUp');
 		}
 	},
 	reset: function(){

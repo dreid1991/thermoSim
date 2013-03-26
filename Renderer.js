@@ -20,7 +20,7 @@ Renderer.prototype = {
 			}
 		}
 		if (!curLevel[currentSetupType + 'CleanUp'] && scene.type == 'prompt') {
-			curLevel.makeListenerHolder('prompt' + promptIdx + 'CleanUp');
+			makeListenerHolder(curLevel, 'prompt' + promptIdx + 'CleanUp');
 		}
 		this.renderDots(scene.dots || []);
 		this.renderWalls(scene.walls || [], scene);

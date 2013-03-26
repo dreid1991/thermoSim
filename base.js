@@ -288,6 +288,10 @@ function removeSaveByName(object, typeName, pieceToRemoveBy){
 	}
 	return didDelete
 }
+function makeListenerHolder(obj, name) {
+	obj[name + 'Listeners'] = {listeners:{}, save:{}};
+	return obj[name + 'Listeners'];
+}
 function listenerExists(object, typeName, funcName){
 	return object[typeName + 'Listeners'].listeners[funcName]!==undefined;
 }

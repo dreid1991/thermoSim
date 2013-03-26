@@ -8,7 +8,7 @@ DataDisplayer.prototype = {
 	addEntry: function(attrs) {
 		var self = this;
 		var label = attrs.label;
-		var sigFigs = attrs.sigFigs;
+		var sigFigs = attrs.sigFigs || 2;
 		var handle = attrs.handle;
 		var expr = attrs.expr;
 		var units = attrs.units;
@@ -38,6 +38,16 @@ DataDisplayer.prototype = {
 		}
 	},
 	dataGetFuncs: {
+		tempSmooth: function(wallHandle) {
+			var src = walls[wallHandle].getDataObj('temp').src();
+			var numVals = Math.min(15, src.length);
+			var init = src.length - numVals;
+			var sum = 0;
+			for (i=0; i<numVals; i++) {
+				sum += src[init + i];
+			}
+			return sum / numVals
+		},
 		temp: function(wallHandle) {
 			var src = walls[wallHandle].getDataObj('temp').src();
 			return src[src.length - 1];
@@ -93,7 +103,7 @@ DataDisplayer.prototype = {
 				decHit = true;
 			} else if (hitSig) {
 				sigsHit ++;
-			} else if (token != '0') {
+			} else if (token != '0' && token != '-') {
 				sigsHit ++;
 				hitSig = true;
 			}	
@@ -116,14 +126,6 @@ DataDisplayer.prototype = {
 		var self = this;
 		addListener(curLevel, cleanUpWith + 'CleanUp', 'entry' + dataEntry.handle, function() {
 			dataEntry.remove();
-			// entry.remove();
-			// removeListener(curLevel, 'update', dataEntry.listenerStr);
-			// for (var entryIdx=0; entryIdx<self.entries.length; entryIdx++) {
-				// if (self.entries[entryIdx] == dataEntry) {
-					// self.entries.splice(entryIdx, 1);
-					// break;
-				// }
-			// }
 		})
 	},
 	removeEntry: function(handle) {

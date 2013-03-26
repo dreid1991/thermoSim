@@ -324,203 +324,203 @@ WallMethods.wallDataHandler = {
 		this.q = 0;
 		return this;
 	},
-	displayStd: function(dataObj, readout, label, decPlaces, units, func) {
-		//wrappers will check if data object is recording
-		if (!dataObj.displaying()) {
-			if (inPrompt()) this.setupPromptDisplayStop(dataObj);
-			dataObj.displaying(true);
-			var src = dataObj.src();
-			dataObj.readout(readout);
-			var firstVal = src[src.length-1];
-			if (!validNumber(firstVal)) {
-				firstVal = 0;
-			}
-			var readout = dataObj.readout();
-			var entryHandle = dataObj.id() + dataObj.wallHandle().toCapitalCamelCase();
-			var listenerStr = 'display' + entryHandle.toCapitalCamelCase();
-			readout.addEntry(entryHandle, label, units, firstVal, undefined, decPlaces);
-			if (func) {
-				addListener(curLevel, 'update', listenerStr,
-					function() {func(entryHandle, src)},
-				this);
-			} else {
-				addListener(curLevel, 'update', listenerStr,
-					function() {
-						readout.hardUpdate(entryHandle, src[src.length-1]);
-					},
-				this);
-			}
-			dataObj.displayStop(function() {
-				this.displaying(false);
-				this.readout().removeEntry(entryHandle);
-				removeListener(curLevel, 'update', listenerStr);
-			})
-		} else {
-			console.log('Tried to display ' + dataObj.id() + ' for wall ' + dataObj.wallHandle() + ' while already displaying');
-		}
-	},
-	displayWork: function(attrs) {
-		var readoutHandle = attrs.readout;
-		var label = attrs.label;
-		var decPlaces = attrs.decPlaces;
-		var dataObj = this.getDataObj('work');
-		if (!dataObj || !dataObj.recording()) {
-			dataObj = this.recordTemp();
-		}
-		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-		var units = 'kJ';
-		decPlaces = defaultTo(1, decPlaces);
-		var label = defaultTo('Work:', label);
-		this.displayStd(dataObj, readout, label, decPlaces, units);
-	},
-	displayTemp: function(attrs) {
-		var readoutHandle = attrs.readout;
-		var label = attrs.label;
-		var decPlaces = attrs.decPlaces;
-		var func;
-		var dataObj = this.getDataObj('temp');
-		if (!dataObj || !dataObj.recording()) {
-			dataObj = this.recordTemp();
-		}
-		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-		var units = 'K';
-		decPlaces = defaultTo(0, decPlaces);
-		var label = defaultTo('Temp:', label);
-		if (attrs.smooth) {
-			func = function(entryHandle, src) {
-				var sum = 0;
-				for (var tempIdx=src.length-5; tempIdx<src.length; tempIdx++) {
-					sum += src[tempIdx];
-				}
-				readout.hardUpdate(entryHandle, sum *= .2);
-			}
-		}
-		this.displayStd(dataObj, readout, label, decPlaces, units, func);
-	},
-	displayTempSmooth: function(attrs) {
-		attrs.smooth = true;
-		this.displayTemp(attrs);
-	}, 
-	displayPInt: function(attrs) {
-		var readoutHandle = attrs.readout;
-		var label = attrs.label;
-		var decPlaces = attrs.decPlaces;
-		var dataObj = this.getDataObj('pInt');
-		if (!dataObj || !dataObj.recording()) {
-			dataObj = this.recordPInt();
-		}
-		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-		var units = 'bar';
-		decPlaces = defaultTo(1, decPlaces);
-		var label = defaultTo('P_int:', label);
-		this.displayStd(dataObj, readout, label, decPlaces, units);
+	// displayStd: function(dataObj, readout, label, decPlaces, units, func) {
+		// //wrappers will check if data object is recording
+		// if (!dataObj.displaying()) {
+			// if (inPrompt()) this.setupPromptDisplayStop(dataObj);
+			// dataObj.displaying(true);
+			// var src = dataObj.src();
+			// dataObj.readout(readout);
+			// var firstVal = src[src.length-1];
+			// if (!validNumber(firstVal)) {
+				// firstVal = 0;
+			// }
+			// var readout = dataObj.readout();
+			// var entryHandle = dataObj.id() + dataObj.wallHandle().toCapitalCamelCase();
+			// var listenerStr = 'display' + entryHandle.toCapitalCamelCase();
+			// readout.addEntry(entryHandle, label, units, firstVal, undefined, decPlaces);
+			// if (func) {
+				// addListener(curLevel, 'update', listenerStr,
+					// function() {func(entryHandle, src)},
+				// this);
+			// } else {
+				// addListener(curLevel, 'update', listenerStr,
+					// function() {
+						// readout.hardUpdate(entryHandle, src[src.length-1]);
+					// },
+				// this);
+			// }
+			// dataObj.displayStop(function() {
+				// this.displaying(false);
+				// this.readout().removeEntry(entryHandle);
+				// removeListener(curLevel, 'update', listenerStr);
+			// })
+		// } else {
+			// console.log('Tried to display ' + dataObj.id() + ' for wall ' + dataObj.wallHandle() + ' while already displaying');
+		// }
+	// },
+	// displayWork: function(attrs) {
+		// var readoutHandle = attrs.readout;
+		// var label = attrs.label;
+		// var decPlaces = attrs.decPlaces;
+		// var dataObj = this.getDataObj('work');
+		// if (!dataObj || !dataObj.recording()) {
+			// dataObj = this.recordTemp();
+		// }
+		// var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		// var units = 'kJ';
+		// decPlaces = defaultTo(1, decPlaces);
+		// var label = defaultTo('Work:', label);
+		// this.displayStd(dataObj, readout, label, decPlaces, units);
+	// },
+	// displayTemp: function(attrs) {
+		// var readoutHandle = attrs.readout;
+		// var label = attrs.label;
+		// var decPlaces = attrs.decPlaces;
+		// var func;
+		// var dataObj = this.getDataObj('temp');
+		// if (!dataObj || !dataObj.recording()) {
+			// dataObj = this.recordTemp();
+		// }
+		// var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		// var units = 'K';
+		// decPlaces = defaultTo(0, decPlaces);
+		// var label = defaultTo('Temp:', label);
+		// if (attrs.smooth) {
+			// func = function(entryHandle, src) {
+				// var sum = 0;
+				// for (var tempIdx=src.length-5; tempIdx<src.length; tempIdx++) {
+					// sum += src[tempIdx];
+				// }
+				// readout.hardUpdate(entryHandle, sum *= .2);
+			// }
+		// }
+		// this.displayStd(dataObj, readout, label, decPlaces, units, func);
+	// },
+	// displayTempSmooth: function(attrs) {
+		// attrs.smooth = true;
+		// this.displayTemp(attrs);
+	// }, 
+	// displayPInt: function(attrs) {
+		// var readoutHandle = attrs.readout;
+		// var label = attrs.label;
+		// var decPlaces = attrs.decPlaces;
+		// var dataObj = this.getDataObj('pInt');
+		// if (!dataObj || !dataObj.recording()) {
+			// dataObj = this.recordPInt();
+		// }
+		// var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		// var units = 'bar';
+		// decPlaces = defaultTo(1, decPlaces);
+		// var label = defaultTo('P_int:', label);
+		// this.displayStd(dataObj, readout, label, decPlaces, units);
 	
-	},
-	displayPExt: function(attrs) {
-		var readoutHandle = attrs.readout;
-		var label = attrs.label;
-		var decPlaces = attrs.decPlaces;
-		var dataObj = this.getDataObj('pExt');
-		if (!dataObj || !dataObj.recording()) {
-			dataObj = this.recordPExt();
-		}
-		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-		var units = 'bar';
-		decPlaces = defaultTo(1, decPlaces);
-		var label = defaultTo('P_ext:', label);
-		this.displayStd(dataObj, readout, label, decPlaces, units);
-	},
-	displayVol: function(attrs) {
-		var readoutHandle = attrs.readout;
-		var label = attrs.label;
-		var decPlaces = attrs.decPlaces;
-		var dataObj = this.getDataObj('vol');
-		if (!dataObj || !dataObj.recording()) {
-			dataObj = this.recordVol();
-		}
-		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-		var units = 'L';
-		decPlaces = defaultTo(1, decPlaces);
-		var label = defaultTo('Vol:', label);
-		this.displayStd(dataObj, readout, label, decPlaces, units);
-	},
-	displayMass: function(attrs) {
-		var readoutHandle = attrs.readout;
-		var label = attrs.label;
-		var decPlaces = attrs.decPlaces;
-		var dataObj = this.getDataObj('mass');
-		if (!dataObj || !dataObj.recording()) {
-			dataObj = this.recordMass();
-		}
-		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-		var units = 'kg';
-		decPlaces = defaultTo(1, decPlaces);
-		var label = defaultTo('Mass:', label);
-		this.displayStd(dataObj, readout, label, decPlaces, units);		
-	},
-	displayQ: function(attrs) {
-		var readoutHandle = attrs.readout;
-		var label = attrs.label;
-		var decPlaces = attrs.decPlaces;
-		var dataObj = this.getDataObj('q');
-		if (!dataObj || !dataObj.recording()) {
-			dataObj = this.recordQ();
-		}
-		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-		var units = 'kJ';
-		decPlaces = defaultTo(1, decPlaces);
-		var label = defaultTo('Q:', label);
-		this.displayStd(dataObj, readout, label, decPlaces, units);	
-	},
-	displayRMS: function(attrs) {
-		var readoutHandle = attrs.readout;
-		var label = attrs.label;
-		var decPlaces = attrs.decPlaces;
-		var dataObj = this.getDataObj('RMS');
-		if (!dataObj || !dataObj.recording()) {
-			dataObj = this.recordRMS();
-		}
-		var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-		var units = 'm/s';
-		decPlaces = defaultTo(1, decPlaces);
-		var label = defaultTo('RMS:', label);
-		this.displayStd(dataObj, readout, label, decPlaces, units);		
+	// },
+	// displayPExt: function(attrs) {
+		// var readoutHandle = attrs.readout;
+		// var label = attrs.label;
+		// var decPlaces = attrs.decPlaces;
+		// var dataObj = this.getDataObj('pExt');
+		// if (!dataObj || !dataObj.recording()) {
+			// dataObj = this.recordPExt();
+		// }
+		// var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		// var units = 'bar';
+		// decPlaces = defaultTo(1, decPlaces);
+		// var label = defaultTo('P_ext:', label);
+		// this.displayStd(dataObj, readout, label, decPlaces, units);
+	// },
+	// displayVol: function(attrs) {
+		// var readoutHandle = attrs.readout;
+		// var label = attrs.label;
+		// var decPlaces = attrs.decPlaces;
+		// var dataObj = this.getDataObj('vol');
+		// if (!dataObj || !dataObj.recording()) {
+			// dataObj = this.recordVol();
+		// }
+		// var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		// var units = 'L';
+		// decPlaces = defaultTo(1, decPlaces);
+		// var label = defaultTo('Vol:', label);
+		// this.displayStd(dataObj, readout, label, decPlaces, units);
+	// },
+	// displayMass: function(attrs) {
+		// var readoutHandle = attrs.readout;
+		// var label = attrs.label;
+		// var decPlaces = attrs.decPlaces;
+		// var dataObj = this.getDataObj('mass');
+		// if (!dataObj || !dataObj.recording()) {
+			// dataObj = this.recordMass();
+		// }
+		// var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		// var units = 'kg';
+		// decPlaces = defaultTo(1, decPlaces);
+		// var label = defaultTo('Mass:', label);
+		// this.displayStd(dataObj, readout, label, decPlaces, units);		
+	// },
+	// displayQ: function(attrs) {
+		// var readoutHandle = attrs.readout;
+		// var label = attrs.label;
+		// var decPlaces = attrs.decPlaces;
+		// var dataObj = this.getDataObj('q');
+		// if (!dataObj || !dataObj.recording()) {
+			// dataObj = this.recordQ();
+		// }
+		// var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		// var units = 'kJ';
+		// decPlaces = defaultTo(1, decPlaces);
+		// var label = defaultTo('Q:', label);
+		// this.displayStd(dataObj, readout, label, decPlaces, units);	
+	// },
+	// displayRMS: function(attrs) {
+		// var readoutHandle = attrs.readout;
+		// var label = attrs.label;
+		// var decPlaces = attrs.decPlaces;
+		// var dataObj = this.getDataObj('RMS');
+		// if (!dataObj || !dataObj.recording()) {
+			// dataObj = this.recordRMS();
+		// }
+		// var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+		// var units = 'm/s';
+		// decPlaces = defaultTo(1, decPlaces);
+		// var label = defaultTo('RMS:', label);
+		// this.displayStd(dataObj, readout, label, decPlaces, units);		
 	
-	},
-	displayMoles: function(attrs) {
-		var readoutHandle = attrs.readout;
-		var label = attrs.label;
-		var decPlaces = attrs.decPlaces;
-		var dotAttrs = attrs.attrs;
-		var dataObj = this.getDataObj('moles', dotAttrs);
-		if (!dataObj) {
-			console.log('Not recording for moles');
-			console.log(dotAttrs);
-		} else {
-			var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-			var units = 'Moles';
-			decPlaces = defaultTo(2, decPlaces);
-			var label = defaultTo((dotAttrs.spcName || '') + ':', label);
-			this.displayStd(dataObj, readout, label, decPlaces, units);	
-		}
-	},
-	displayFrac: function(attrs) {
-		var readoutHandle = attrs.readout;
-		var label = attrs.label;
-		var decPlaces = attrs.decPlaces;
-		var dotAttrs = attrs.attrs;
-		var dataObj = this.getDataObj('frac', dotAttrs);
-		if (!dataObj) {
-			console.log('Not recording for frac');
-			console.log(dotAttrs);
-		} else {
-			var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
-			var units = '';
-			decPlaces = defaultTo(2, decPlaces);
-			var label = defaultTo('Mole frac:', label);
-			this.displayStd(dataObj, readout, label, decPlaces, units);	
-		}
-	},		
+	// },
+	// displayMoles: function(attrs) {
+		// var readoutHandle = attrs.readout;
+		// var label = attrs.label;
+		// var decPlaces = attrs.decPlaces;
+		// var dotAttrs = attrs.attrs;
+		// var dataObj = this.getDataObj('moles', dotAttrs);
+		// if (!dataObj) {
+			// console.log('Not recording for moles');
+			// console.log(dotAttrs);
+		// } else {
+			// var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+			// var units = 'Moles';
+			// decPlaces = defaultTo(2, decPlaces);
+			// var label = defaultTo((dotAttrs.spcName || '') + ':', label);
+			// this.displayStd(dataObj, readout, label, decPlaces, units);	
+		// }
+	// },
+	// displayFrac: function(attrs) {
+		// var readoutHandle = attrs.readout;
+		// var label = attrs.label;
+		// var decPlaces = attrs.decPlaces;
+		// var dotAttrs = attrs.attrs;
+		// var dataObj = this.getDataObj('frac', dotAttrs);
+		// if (!dataObj) {
+			// console.log('Not recording for frac');
+			// console.log(dotAttrs);
+		// } else {
+			// var readout = defaultTo(curLevel.readout, curLevel.readouts[readoutHandle]);
+			// var units = '';
+			// decPlaces = defaultTo(2, decPlaces);
+			// var label = defaultTo('Mole frac:', label);
+			// this.displayStd(dataObj, readout, label, decPlaces, units);	
+		// }
+	// },		
 	// I think I will have to abuse the DataObj for the arrows
 	displayQArrowsRate: function(attrs){
 		var threshold = attrs.threshold
@@ -537,11 +537,11 @@ WallMethods.wallDataHandler = {
 			qSrc = this.data.q.src();
 			addListener(curLevel, 'update', listenerStr, function() {self.checkDisplayArrows(qSrc)}, this);
 			this.turnLastArrow = turn;
-			dataObj.displayStop(function() {
-				this.displaying(false);
+			addListener(this, 'cleanUp', 'qArrowsRate', function() {
 				removeListener(curLevel, 'update', listenerStr);
 				removeListenerByName(curLevel, 'update', 'ArrowFly');
-			})
+			});
+
 		} else {
 			console.log('Tried to display q arrowsRate for wall ' + this.handle + ' while not recording or already displaying.  Will not display.');
 			console.trace();
@@ -556,13 +556,20 @@ WallMethods.wallDataHandler = {
 			dataObj.wallHandle(this.handle);
 			dataObj.id('qArrowsAmmt');
 			var wall = this;
-			dataObj.displayStop(function() {
-				this.displaying(false);
+			addListener(this, 'cleanUp', 'qArrowsAmmt', function() {
 				for (var arrowIdx=0; arrowIdx<wall.qArrowsAmmt.length; arrowIdx++) {
 					wall.qArrowsAmmt[arrowIdx].remove();
 				}
-				removeListener(curLevel, 'update', this.wallHandle() + 'updateQAmmtArrows');
+				removeListener(curLevel, 'update', wall.handle + 'updateQAmmtArrows');
+				
 			})
+			// dataObj.displayStop(function() {
+				// this.displaying(false);
+				// for (var arrowIdx=0; arrowIdx<wall.qArrowsAmmt.length; arrowIdx++) {
+					// wall.qArrowsAmmt[arrowIdx].remove();
+				// }
+				// removeListener(curLevel, 'update', this.wallHandle() + 'updateQAmmtArrows');
+			// })
 			this.qArrowsAmmtInit(defaultTo(3, qMax));
 		} else {
 			console.log('Tried to display q arrowsAmmt for wall ' + this.handle + ' while not recording or already displaying.  Will not display.');
@@ -571,19 +578,19 @@ WallMethods.wallDataHandler = {
 		}
 	},
 
-	displayAllStop: function(){
-		for (var dataObjName in this.data) {
-			var dataObj = this.data[dataObjName];
-			if (dataObj instanceof Array) {
-				for (var idx=0; idx<dataObj.length; idx++) {
-					dataObj[idx].displayStop();
-				}
-			} else {
-				dataObj.displayStop();
-			}
-		}
-		return this;
-	},
+	// displayAllStop: function(){
+		// for (var dataObjName in this.data) {
+			// var dataObj = this.data[dataObjName];
+			// if (dataObj instanceof Array) {
+				// for (var idx=0; idx<dataObj.length; idx++) {
+					// dataObj[idx].displayStop();
+				// }
+			// } else {
+				// dataObj.displayStop();
+			// }
+		// }
+		// return this;
+	// },
 	makeDataList: function() {
 		var list = [];
 		list.displaying = false;
