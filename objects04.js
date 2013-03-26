@@ -29,7 +29,7 @@ function Liquid(attrs) {
 	this.chanceZeroDf = .4;
 	this.drivingForceSensitivity = 10;//formalize this a bit
 	this.updateListenerName = this.type + this.handle;
-	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs, this.surfAreaObj)
+	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs, this.surfAreaObj);
 	this.wallGas.addLiquid(this);
 	this.setupStd();
 }
@@ -329,11 +329,11 @@ _.extend(Liquid.prototype, objectFuncs, {
 			var chanceZero = this.chanceZeroDf;
 			var a = chanceZero / (1 - chanceZero);
 			var chanceAbs = a / (a + Math.exp(-dF[dot.spcName] * this.drivingForceSensitivity));
-			//if (chanceAbs > Math.random()) {
+			if (chanceAbs > Math.random()) {
 				return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcDefs);//need to set Cp in this;
-			//}
+			}
 		}
-		//this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
+		this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
 		
 		
 	},
@@ -358,19 +358,16 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var CGas = 0;
 		for (var spcName in spcDefs) CGas += gasSpcLists[spcName].length * spcDefs[spcName].cv / N;
 		
-		var delT = tLiq - tGas;
-		var sign = getSign(delT);
 		
-		var qToDot = Math.max(sign * Math.max(.05, sign * delT * CDot), CDot * (10 - tDot)); 
+		var sign = getSign(tLiq - tGas);
+		var tEq = (this.Cp * tLiq + CGas * tGas) / (this.Cp + CGas);
+		var qMax = Math.abs((tLiq - tEq) * this.Cp);
 		
-		if (qToDot < 0) qToDot = Math.max(qToDot, CDot * (10 - tDot));
-			
+		var qToDot = Math.max(sign * Math.min(qMax, 60 * CDot), (5 - tDot) * CDot);
+		
 		var tDotTarget = tDot + qToDot / CDot;
 
 		var tempTest = this.temp - qToDot / this.Cp;
-		if (tempTest < 0 || isNaN(tempTest) || tDotTarget < 0 || isNaN(tDotTarget)) {
-			console.log('WE ARE HERE!');
-		}
 		this.temp -= qToDot / this.Cp;
 		
 
@@ -389,8 +386,8 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var Cp = this.Cp;
 		var temp = this.temp;
 		q = Math.min(Cp * (3000 - temp), Math.max((-temp + 10) * Cp, q));
-		console.log(q/Cp);
 		this.temp += q / Cp;
+		console.log(q/Cp);
 		this.wallLiq.q += q;
 	},
 	remove: function() {

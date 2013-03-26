@@ -489,7 +489,7 @@ Dot.prototype = {
 		return .5*this.m*(this.v.dx*this.v.dx + this.v.dy*this.v.dy);
 	},
 	temp: function() {
-		return .5*this.m*(this.v.dx*this.v.dx + this.v.dy*this.v.dy)*this.tConst;
+		return .5 * this.m * (this.v.dx*this.v.dx + this.v.dy*this.v.dy) * this.tConst;
 	},
 	tempCondense: function() {
 		return (this.cv * (this.temp() - 298.15) + this.hVap298) / this.cpLiq + 298.15;
@@ -514,6 +514,12 @@ Dot.prototype = {
 		}
 		*/
 		return this;
+	},
+	addEnergy: function(dE) {
+		var curTemp = this.temp();
+		tF = Math.max(1, curTemp + dE / this.cv)
+		this.setTemp(tF);
+		return (tF - curTemp) * this.cv;
 	},
 	setWall: function(wallHandle) {
 		this.setReturnTo(wallHandle);

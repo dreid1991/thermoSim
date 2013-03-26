@@ -32,8 +32,8 @@ _.extend(TestLevel.prototype,
 	},
 	spcDefs: [
 		//add antoine coefs, cvLiq, hvap
-		{spcName: 'spc1', m: 4, r: 1, col: Col(200, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
-		{spcName: 'ugly', m: 4, r: 1, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 5 * R, spcVolLiq: .3},
+		{spcName: 'spc1', m: 4, r: 1, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'ugly', m: 4, r: 1, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'duckling', m: 4, r: 2, col: Col(255, 255, 255), cv: 2.5 * R, hF298: -30, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
 	],
 	sections: [
@@ -59,11 +59,11 @@ _.extend(TestLevel.prototype,
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'cVIsothermal', temp: 300, handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}} 
+					{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'staticAdiabatic', handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}} 
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 155), dims: V(200, 20), count: 100, temp: 350, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(55, 55), dims: V(200, 20), count: 100, temp: 298.15, returnTo: 'wally', tag: 'wally'}
+					{spcName: 'spc1', pos: P(55, 155), dims: V(200, 20), count: 100, temp: 350, returnTo: 'wally', tag: 'wally'}
+					//{spcName: 'ugly', pos: P(55, 55), dims: V(200, 20), count: 0, temp: 300, returnTo: 'wally', tag: 'wally'}
 					//{spcName: 'duckling', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
@@ -73,12 +73,12 @@ _.extend(TestLevel.prototype,
 					},
 					{
 						type: 'Liquid',
-						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 370.15, spcCounts: {spc1: 500, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 500, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
+					},
+					{
+						type: 'Heater',
+						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty', offset: V(0, 30), liquid: {handle:'swishy'}}
 					}
-					// {
-						// type: 'Heater',
-						// attrs:{wallInfo: 'wally', tempMax: 20, handle: 'heaty', offset: V(0, 30), liquid: {handle:'swishy'}}
-					// }
 					// {
 						// type: 'DragWeights',
 						// attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 1}], pInit: 1}
@@ -96,7 +96,8 @@ _.extend(TestLevel.prototype,
 				],
 				dataDisplay: [
 					{wallInfo: 'wally', data:'pInt', readout: 'mainReadout'},
-					{wallInfo: 'wally', data:'frac', readout: 'mainReadout', attrs: {spcName: 'spc1', tag: 'wally'}},
+					//{wallInfo: 'wally', data:'frac', readout: 'mainReadout', attrs: {spcName: 'spc1', tag: 'wally'}},
+					{wallInfo: 'wally', data: 'q', readout: 'mainReadout'},
 					{wallInfo: 'wally', data:'frac', readout: 'mainReadout', attrs: {spcName: 'ugly', tag: 'wally'}}
 				],
 				cmmds: [

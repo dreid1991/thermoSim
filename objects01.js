@@ -1496,9 +1496,9 @@ function Heater(attrs){
 	this.handle = attrs.handle;
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	this.cornerRound = .2;
-	this.temp = defaultTo(0, attrs.init);
-	this.tempMax = defaultTo(35, attrs.max);
-	this.tempMin = -this.tempMax;
+	this.qRate = defaultTo(0, attrs.init);
+	this.qRateMax = defaultTo(1, attrs.max);
+	this.qRateMin = -this.qRateMax;
 	this.rot = defaultTo(0, attrs.rotation);
 
 	this.center = this.pos.copy().movePt(this.dims.copy().mult(.5));
@@ -1529,10 +1529,10 @@ function Heater(attrs){
 
 _.extend(Heater.prototype, objectFuncs, {
 	parseSlider: function(event, ui){
-		this.setTemp(ui.value);
+		this.setQRate(ui.value);
 	},
-	setTemp: function(val){		
-		this.temp = .02*(val-50)*this.tempMax;
+	setQRate: function(val){		
+		this.qRate = .02*(val-50)*this.qRateMax;
 		if (this.liquid) {
 			if (val != 50) {
 				addListener(curLevel, 'update', 'heatLiquid' + this.handle, this.heatLiq, this);
@@ -1543,7 +1543,7 @@ _.extend(Heater.prototype, objectFuncs, {
 		
 	},
 	heatLiq: function() {
-		this.liquid.addQ(this.temp * updateInterval / 100);
+		this.liquid.addQ(.1 * this.qRate * updateInterval);
 	},
 	makeDrawFunc: function(colMin, colDefault, colMax){
 		var pos = this.pos;
@@ -1555,9 +1555,10 @@ _.extend(Heater.prototype, objectFuncs, {
 		var self = this;
 		var pts = this.pts;
 		var drawFunc = function(){
-			var sign = getSign(self.temp);
+			var sign = getSign(self.qRate);
 			var steps = colorSteps[String(sign)];
-			var fracToEnd = sign*self.temp/self.tempMax
+			var fracToEnd = sign*self.qRate/self.qRateMax;
+			
 			var curCol = colDefault.copy().adjust(steps[0]*fracToEnd, steps[1]*fracToEnd, steps[2]*fracToEnd);
 			draw.path(pts, curCol, self.drawCanvas);
 		}
@@ -1638,22 +1639,17 @@ _.extend(Heater.prototype, objectFuncs, {
 	},
 	hit: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){
 		walls.reflect(dot, wallUV, vPerp);
-		if(this.temp!=0){
-			var tempOld = dot.temp();
-			var tempNew = Math.max(tempOld + this.temp, 50);
-			dot.setTemp(tempNew);
-			this.eAdded+=(tempNew-tempOld)*cv/(N*JtoKJ);
+		if (this.qRate) {
+			var dE = dot.addEnergy(this.qRate) * .001;
+			this.eAdded += dE;
 		}
 	},
 	hitAddQToWall: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){
 		walls.reflect(dot, wallUV, vPerp);
-		if(this.temp!=0){
-			var tempOld = dot.temp();
-			var tempNew = Math.max(tempOld + this.temp, 50);
-			dot.setTemp(tempNew);
-			var eHit = (tempNew-tempOld)*cv*JtoKJ/N
-			this.eAdded+=eHit;
-			this.wall.q+=eHit;
+		if (this.qRate) {
+			var dE = dot.addEnergy(this.qRate) * .001;
+			this.eAdded += dE;
+			this.wall.q += dE;
 		}
 	},
 	setupLiquidHeat: function(liquidData) {
