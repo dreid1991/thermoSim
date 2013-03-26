@@ -12,9 +12,9 @@ myCanvas.width = $('#main').width();
 
 
 function TestLevel(){
+	this.readouts = {};
 	this.setStds();
 	this.wallSpeed = 1;
-	this.readouts = {};
 	this.compMode = 'Isothermal';//is this used?
 
 	

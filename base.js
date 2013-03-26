@@ -59,6 +59,7 @@ $(function(){
 	sliderList = [];
 	spcs = {};
 	stored = {};
+	window.dataDisplayer = new DataDisplayer();
 	draw = new DrawingTools();
 	collide = new CollideHandler();
 	attractor = new Attractor();

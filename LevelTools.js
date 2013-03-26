@@ -15,6 +15,7 @@ LevelTools = {
 		this.dataHandler = dataHandler;
 		this.attracting = false;
 		this.addSpcs(this.spcDefs, window.spcs);
+		window.dataDisplayer.setReadouts(this.readouts);
 		collide.setSpcs(window.spcs);
 		this.gravitying = false;
 		this.setUpdateRunListener();
