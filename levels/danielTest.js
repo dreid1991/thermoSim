@@ -154,8 +154,8 @@ _.extend(TestLevel.prototype,
 			},
 			prompts: [
 				{
-					text: 'foo',
-					title: 'goo'
+					title: 'foo',
+					text: 'pre textget("theAnswer", "string") hello people faces'
 				}
 			
 			]

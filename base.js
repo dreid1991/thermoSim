@@ -144,6 +144,9 @@ function gauss(avg, stdev){
 	var numStdev = (Math.random() + Math.random() + Math.random())-1.5;
 	return avg + numStdev*stdev;
 }
+function bound(val, min, max) {
+	return Math.min(Math.max(val, min), max);
+}
 function boundedStep(cur, setPt, step){
 	step = Math.abs(step);
 	var sign = 1;

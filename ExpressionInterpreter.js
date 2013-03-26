@@ -32,69 +32,39 @@ ExpressionInterpreter.prototype = {
 	},
 	addStored: function(text) {
 		var self = this;
-		return text.replace(/get[\s]*\([A-Za-z0-9,\s\-\.]*\)/g, function(subStr, idx) {
-			var args = self.sliceArgs(subStr);
-			var idStr = args[0];
-			var type = args[1];
-			var defVal = args[2];
-			var min = Number(args[3]);
-			var max = Number(args[4]);
-			var isInt = type == 'int';
-			var isFloat = type == 'float';
-			var isNum = isInt || isFloat;
-			var isStr = type == 'string';
-			if (type == 'int' || type == 'float') defVal = Number(defVal);
-			
+		var get = function(idStr, type, defaultVal, min, max) {
 			var gotten = getStore(idStr);
 			var val;
+			var isNum = type == 'int' || type == 'float';
 			if (gotten) {
-				if (isInt) {
+				if (type == 'int') {
 					val = Math.round(parseFloat(gotten));
-				} else if (isFloat) {
+				} else if (type == 'float') {
 					val = parseFloat(gotten);
-				} else if (isStr) {
+				} else if (type == 'string') {
 					val = gotten.sanitize();
 				}
 				if (isNum) {
-					if (min === undefined || isNaN(min)) min = val;
-					if (max === undefined || isNaN(max)) max = val;
-					val = Math.max(min, Math.min(max, val));
+					max = max === undefined || isNaN(max) ? val : max;
+					min = min === undefined || isNaN(min) ? val : min;
+					val = bound(val, min, max)
 				}
 			}
-			
-			if (val === undefined || isNaN(val)) {
-				val = defVal;
+			if (val === undefined || (isNum && isNaN(val))) {
+				val = defaultVal;
 			}
 			return val;
+		}
+		return text.replace(/get[\s]*\([A-Za-z0-9,\s\-\.'"]*\)/g, function(subStr, idx) {
+			return eval(subStr);
 		})	
 	},
 	eval: function(text) {
 		var self = this;
+
 		if (typeof text == 'number') return text;
-		text = text.replace(/eval[\s]*\([0-9\(\)\+\-\*\/\s,\.]*\)/g, function(evalItem, idx) {
-			var args = self.sliceArgs(evalItem);
-			var expr = args[0];
-			var decPlaces = args[1];
-			var def = args[2];
-			var min = args[3];
-			var max = args[4];
-			var val;
-			try {
-				val = eval(expr);
-			} catch(e) {
-				console.log('Bad eval ' + evalItem + ', expr is ' + expr);
-			}
-			
-			val = Math.max(min, Math.min(max, val));
-			if (val === undefined || isNaN(val) && def !== undefined && !isNaN(def)) {
-				val = def;
-			}
-			if (val !== undefined && !isNaN(val)) { //my round doesn't have any error handling, so need to do that here
-				if (min === undefined || isNaN(min)) min = val;
-				if (max === undefined || isNaN(max)) max = val;
-				if (decPlaces > 0 || decPlaces === 0) val = round(val, Math.round(decPlaces));
-			}
-			return val;
+		text = text.replace(/eval[\s]*\([0-9\(\)\+\-\*\/\s,\.'"]*\)/g, function(evalItem, idx) {
+			return eval(evalItem);
 		})
 		var toReturn = Number(text) === text ? Number(text) : text;
 		return toReturn;
