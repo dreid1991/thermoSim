@@ -94,12 +94,12 @@ _.extend(TestLevel.prototype,
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugly', tag: 'wally'}}
 				],
-				dataDisplay: [
-					{wallInfo: 'wally', data:'pInt', readout: 'mainReadout'},
-					//{wallInfo: 'wally', data:'frac', readout: 'mainReadout', attrs: {spcName: 'spc1', tag: 'wally'}},
-					{wallInfo: 'wally', data: 'q', readout: 'mainReadout'},
-					{wallInfo: 'wally', data:'frac', readout: 'mainReadout', attrs: {spcName: 'ugly', tag: 'wally'}}
-				],
+				// dataDisplay: [
+					// {wallInfo: 'wally', data:'pInt', readout: 'mainReadout'},
+					// //{wallInfo: 'wally', data:'frac', readout: 'mainReadout', attrs: {spcName: 'spc1', tag: 'wally'}},
+					// {wallInfo: 'wally', data: 'q', readout: 'mainReadout'},
+					// {wallInfo: 'wally', data:'frac', readout: 'mainReadout', attrs: {spcName: 'ugly', tag: 'wally'}}
+				// ],
 				cmmds: [
 					//{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}
 				],
@@ -123,9 +123,9 @@ _.extend(TestLevel.prototype,
 							// {dataSet: {wallInfo: 'wally', data: 'pExt'}, is: 'equalTo', checkVal: 1, alertUnsatisfied: 'booo', satisfyCmmds: [{type: 'DragWeights', handle: 'draggy', cmmd: 'freeze'}]}
 							
 						// ],
-						dataDisplay: [
-							{wallInfo: "wally", data:'temp', readout: 'mainReadout'}
-						]
+						// dataDisplay: [
+							// {wallInfo: "wally", data:'temp', readout: 'mainReadout'}
+						// ]
 					},
 					quiz: [
 						{

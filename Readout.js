@@ -17,43 +17,40 @@ Readout.prototype = {
 		this.drawCanvas.translate(this.leftBound, this.y);
 		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++){
 			var entry = this.entries[entryIdx];
-			var pos = entry.pos;
-			var decPlaces = entry.decPlaces
-			var text = entry.text+' '+round(entry.val,decPlaces)+' '+entry.units;
-			draw.text(text, pos, this.font, this.fontCol, this.align, 0, this.drawCanvas);
+			window.draw.text(entry.text, entry.pos, this.font, this.fontCol, this.align, 0, this.drawCanvas);
 		}
 		this.drawCanvas.restore();
 	},
-	hardUpdate: function(name, setPt) {
+	update: function(name, setPt) {
 		var entry = byAttr(this.entries, name, 'name');
 		var decPlaces = entry.decPlaces;
 		entry.val = round(setPt, decPlaces);
 	},
-	tick: function(name, setPt) {
-		var entry = byAttr(this.entries, name, 'name');
-		if(isNaN(entry.val)){
-			entry.val = setPt;
-		}
-		var init = entry.val
-		var step = (setPt - init)/10;
-		removeListener(curLevel, 'update', this.handle + entry.name +'tick');
-		if(step!=0){
-			var tickFunc = this.makeTickFunc(entry, step, setPt);
-			addListener(curLevel, 'update', this.handle + entry.name +'tick', tickFunc, this);
+	// tick: function(name, setPt) {
+		// var entry = byAttr(this.entries, name, 'name');
+		// if(isNaN(entry.val)){
+			// entry.val = setPt;
+		// }
+		// var init = entry.val
+		// var step = (setPt - init)/10;
+		// removeListener(curLevel, 'update', this.handle + entry.name +'tick');
+		// if(step!=0){
+			// var tickFunc = this.makeTickFunc(entry, step, setPt);
+			// addListener(curLevel, 'update', this.handle + entry.name +'tick', tickFunc, this);
 			
-		}
-	},
-	makeTickFunc: function(entry, step, setPt) {
-		return function(){
-			entry.val = boundedStep(entry.val, setPt, step);
-			var decPlaces = entry.decPlaces
-			if(round(entry.val,decPlaces+1)==round(setPt,decPlaces+1)){
-				removeListener(curLevel, 'update', this.handle + entry.name + 'tick');
-			}
-		}
-	},
-	addEntry: function(name, text, units, initVal, idx, decPlaces) {
-		var entry = {name:name, text:text, units:units, val: initVal, initVal:initVal, decPlaces:decPlaces};
+		// }
+	// },
+	// makeTickFunc: function(entry, step, setPt) {
+		// return function(){
+			// entry.val = boundedStep(entry.val, setPt, step);
+			// var decPlaces = entry.decPlaces
+			// if(round(entry.val,decPlaces+1)==round(setPt,decPlaces+1)){
+				// removeListener(curLevel, 'update', this.handle + entry.name + 'tick');
+			// }
+		// }
+	// },
+	addEntry: function(handle, idx) {
+		var entry = new this.Entry(handle, '', this);
 		if (idx) {
 			this.entries.splice(idx, 0, entry);
 		} else {
@@ -61,16 +58,17 @@ Readout.prototype = {
 		}
 		this.positionEntries();
 		this.hide().show();
+		return entry;
 	},
-	removeEntry: function(toRemove) {
+	removeEntry: function(handle) {
 		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++) {
-			if (this.entries[entryIdx].name==toRemove) {
+			if (this.entries[entryIdx].handle == handle) {
 				this.entries.splice(entryIdx,1);
 				this.positionEntries();
 				return this;
 			}
 		}
-		console.log('Tried to remove entry that does not exist: ' + toRemove);
+		console.log('Tried to remove entry that does not exist: ' + handle);
 	},
 	entryExists: function(entryName) {
 		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++) {
@@ -153,6 +151,19 @@ Readout.prototype = {
 		delete curLevel.readouts[this.handle];
 		removeListener(curLevel, 'update', 'drawReadout'+this.handle);
 		return this;
-	}
-
+	},
+	Entry: function(handle, text, readout) {
+		this.handle = handle;
+		this.text = text;
+		this.pos = undefined;
+		this.readout = readout;
+	},
+}
+Readout.prototype.Entry.prototype = {
+	setText: function(text) {
+		this.text = text;
+	},
+	remove: function() {
+		this.readout.removeEntry(this.handle);
+	},
 }

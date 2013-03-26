@@ -1,7 +1,6 @@
 function DataDisplayer () {
-	this.entries = [];
+	this.entries = {};
 }
-
 DataDisplayer.prototype = {
 	setReadouts: function(readouts) {
 		this.readouts = readouts;
@@ -10,60 +9,33 @@ DataDisplayer.prototype = {
 		var self = this;
 		var label = attrs.label;
 		var sigFigs = attrs.sigFigs;
+		var handle = attrs.handle;
 		var expr = attrs.expr;
 		var units = attrs.units;
 		var cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 		var readout = this.readouts[attrs.readout];
 		if (!readout) console.log('Bad readout name ' + attrs.readout);
 		var listenerStr = 'display' + label + this.entries.length;
-		
+		var readoutEntry = readout.addEntry(label + handle);
+		var dataEntry = new this.Entry(handle, label, sigFigs, expr, units, listenerStr, this, readoutEntry);
+		this.entries[dataEntry.handle] = dataEntry;
+		this.addCleanUp(cleanUpWith, dataEntry);
 		with (this.dataGetFuncs) {
 			addListener(curLevel, 'update', listenerStr, function() {
 				var displayStr = label;
+				var valStr;
 				var val = eval(expr);
 				if (isNaN(val) || val === undefined) 
-					val = 'err'
+					valStr = ''
 				else
-					val = self.forceSigFigs(val, sigFigs);
+					valStr = self.setSigFigs(val, sigFigs);
+					
+				displayStr += valStr + ' ';
+				displayStr += units;
+				readoutEntry.setText(displayStr);
 			})
 		
 		}
-		/*
-		if (!dataObj.displaying()) {
-			if (inPrompt()) this.setupPromptDisplayStop(dataObj);
-			dataObj.displaying(true);
-			var src = dataObj.src();
-			dataObj.readout(readout);
-			var firstVal = src[src.length-1];
-			if (!validNumber(firstVal)) {
-				firstVal = 0;
-			}
-			var readout = dataObj.readout();
-			var entryHandle = dataObj.id() + dataObj.wallHandle().toCapitalCamelCase();
-			var listenerStr = 'display' + entryHandle.toCapitalCamelCase();
-			readout.addEntry(entryHandle, label, units, firstVal, undefined, decPlaces);
-			if (func) {
-				addListener(curLevel, 'update', listenerStr,
-					function() {func(entryHandle, src)},
-				this);
-			} else {
-				addListener(curLevel, 'update', listenerStr,
-					function() {
-						readout.hardUpdate(entryHandle, src[src.length-1]);
-					},
-				this);
-			}
-			dataObj.displayStop(function() {
-				this.displaying(false);
-				this.readout().removeEntry(entryHandle);
-				removeListener(curLevel, 'update', listenerStr);
-			})
-		} else {
-			console.log('Tried to display ' + dataObj.id() + ' for wall ' + dataObj.wallHandle() + ' while already displaying');
-		}
-*/		
-		
-
 	},
 	dataGetFuncs: {
 		temp: function(wallHandle) {
@@ -107,31 +79,77 @@ DataDisplayer.prototype = {
 			return src[src.length - 1];
 		}
 	},
-	forceSigFigs: function(val, sigFigs) {
-		var str = String(val);
+	setSigFigs: function(val, sigFigs) {
+		//should add rounding and adding zeros to decimal place instead of the digits it has
+		var src = String(val);
+		var toReturn = '';
 		var hitSig = false;
 		var sigsHit = 0;
 		var decHit = false;
-		for (var i=0; i<str.length; i++) {
-			var val = str[i];
-			if (val == '.') {
+		var idx = 0;
+		while ((sigsHit < sigFigs || !decHit) && idx < src.length) {
+			var token = src[idx];
+			if (token == '.') {
 				decHit = true;
 			} else if (hitSig) {
 				sigsHit ++;
-			} else if (val != '0') {
+			} else if (token != '0') {
 				sigsHit ++;
 				hitSig = true;
 			}	
+			toReturn += token;
+			idx ++;
 		}
-		if (sigsHit >= sigFigs) {
-			return Number(val);
+		if (sigsHit == sigFigs) {
+			if (!decHit) toReturn += '.';
+			return toReturn;
 		} else {
-			if (decHit) str += '.';
+			if (!decHit) toReturn += '.';
 			var toAdd = sigFigs - sigsHit;
 			for (var sigAdd=0; sigAdd<toAdd; sigAdd++) {
-				str += '0';
+				toReturn += '0';
 			}
-			return str;
+			return toReturn;
 		}
 	},
+	addCleanUp: function(cleanUpWith, dataEntry) {
+		var self = this;
+		addListener(curLevel, cleanUpWith + 'CleanUp', 'entry' + dataEntry.handle, function() {
+			dataEntry.remove();
+			// entry.remove();
+			// removeListener(curLevel, 'update', dataEntry.listenerStr);
+			// for (var entryIdx=0; entryIdx<self.entries.length; entryIdx++) {
+				// if (self.entries[entryIdx] == dataEntry) {
+					// self.entries.splice(entryIdx, 1);
+					// break;
+				// }
+			// }
+		})
+	},
+	removeEntry: function(handle) {
+		if (this.entries[handle]) {
+			this.entries[handle].remove();
+		}
+	},
+	Entry: function(handle, label, sigFigs, expr, units, listenerStr, dataDisplayer, readoutEntry) {
+		this.handle = handle;
+		this.label = label;
+		this.sigFigs = sigFigs;
+		this.expr = expr;
+		this.units = units;
+		this.listenerStr = listenerStr;
+		this.dataDisplayer = dataDisplayer;
+		this.readoutEntry = readoutEntry;
+		this.removed = false;
+	},
+}
+DataDisplayer.prototype.Entry.prototype = {
+	remove: function() {
+		if (!this.removed) {
+			delete this.dataDisplayer.entries[this.handle];
+			this.readoutEntry.remove();
+			removeListener(curLevel, 'update', this.listenerStr);
+			this.removed = true;
+		}
+	}	
 }
