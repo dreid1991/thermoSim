@@ -281,45 +281,32 @@ GraphBase = {
 			this.drawPtStd(pt, pt.col);
 		}
 	},
-	addPts: function(toAdd, flash, mustRedraw){
+	flushQueues: function(flash, mustRedraw){
 		mustRedraw = defaultTo(false, mustRedraw);
 		flash = defaultTo(true, flash);
-		var val = this.valRange;
-		var oldValRange = {x:{min:val.x.min, max:val.x.max}, y:{min:val.y.min, max:val.y.max}};
+		var oldValRange = this.valRange.copy();
 		var toDraw = {};
-		for (var addIdx=0; addIdx<toAdd.length; addIdx++) {
-			var address = toAdd[addIdx].address;
-			var x = toAdd[addIdx].x;
-			var y = toAdd[addIdx].y;
-			var dataSet = this.data[address]
-			if (!toDraw[address]) {
-				toDraw[address] = [];
-			}
-			if (dataSet.show) {
-				toDraw[address].push(dataSet.x.length);
-			}
-			dataSet.x.push(x);
-			dataSet.y.push(y);
-			this.valRange.x.max = Math.max(this.valRange.x.max, x);
-			this.valRange.x.min = Math.min(this.valRange.x.min, x);		
-			this.valRange.y.max = Math.max(this.valRange.y.max, y);
-			this.valRange.y.min = Math.min(this.valRange.y.min, y);
+		
+		for (var setName in this.data) {
+			var set = this.data[setName];
+			if (set.visibile) set.updateRange(this.valRange);
 		}
-		var old = this.axisRange;
-		var oldAxisRange = {x:{min:old.x.min, max:old.x.max}, y:{min:old.y.min, max:old.y.max}};
+
+		var oldAxisRange = this.axisRange.copy();
 		this.setAxisBounds(oldValRange);
 		if (!this.rangeIsSame(oldAxisRange.x, this.axisRange.x) || !this.rangeIsSame(oldAxisRange.y, this.axisRange.y)) {
 			mustRedraw = true;
 		}
 		
-		if (mustRedraw) {
-			this.drawAllData();
-		} else {
-			this.drawLastData(toDraw);
+		this.drawPts(!mustRedraw);
 
-		}
 		if (flash) {
-			this.flashInit(toDraw);
+			this.flashInit();
+		}
+	},
+	flashInit: function() {
+		for (var setName in this.data) {
+			this.data[setName].flashInit();
 		}
 	},
 	rangeIsSame: function(a, b){
@@ -488,8 +475,8 @@ GraphBase = {
 		this.resetRanges();
 	},	
 	resetRanges: function(){
-		this.axisRange = {x:{min:Number.MAX_VALUE, max:-Number.MAX_VALUE}, y:{min:Number.MAX_VALUE, max:-Number.MAX_VALUE}};
-		this.valRange = {x:{min:Number.MAX_VALUE, max:-Number.MAX_VALUE}, y:{min:Number.MAX_VALUE, max:-Number.MAX_VALUE}};
+		this.axisRange = new GraphBase.Range(Number.MAX_VALUE, -Number.MAX_VALUE, Number.MAX_VALUE, -Number.MAX_VALUE);
+		this.valRange = new GraphBase.Range(Number.MAX_VALUE, -Number.MAX_VALUE, Number.MAX_VALUE, -Number.MAX_VALUE);
 	},
 	makePtDataGrabFunc: function(data){
 		return function(){
@@ -519,88 +506,7 @@ GraphBase = {
 		var y = this.dims.dy - (this.gridSpacing*(this.numGridLines.y-1)*(val.y-this.axisRange.y.min)/rangeY + (1-this.yStart)*this.dims.dy);
 		return P(x,y);
 	},
-	flashInit: function(toDraw){
-		this.flashers = [];
-		for (var address in toDraw) {
-			var newPtIdxs = toDraw[address];
-			var set = this.data[address];
-			for (var ptIdx=0; ptIdx<newPtIdxs.length; ptIdx++) {
-				var newIdx = newPtIdxs[ptIdx];
-				var val = P(set.x[newIdx], set.y[newIdx]);
-				var pos = this.valToCoord(val);
-				var xPt = pos.x;
-				var yPt = pos.y;
-				var pointCol = set.pointCol;
-				var flashCol = set.flashCol;
-				var curCol = Col(flashCol.r, flashCol.g, flashCol.b);
-				var imagePos = P(xPt - this.characLen*this.flashMult-1, yPt - this.characLen*this.flashMult-1);
-				var len = this.characLen*2*this.flashMult+2;
-				var curCharacLen = this.characLen*this.flashMult;
-				var imageData = this.graph.getImageData(imagePos.x, imagePos.y, len, len);
-				this.flashers.push({pos:pos, pointCol:pointCol, flashCol:flashCol, curCol:curCol, curCharacLen:curCharacLen, imagePos:imagePos, imageData:imageData});
-			}
-			if (this.flashers.length>0) {
-				addListener(curLevel, 'update', 'flash'+this.handle, this.flashRun, this);
-			}
-		}
-	},
-	flashRun: function(){
-		this.eraseFlashers();
 
-		for (var flasherIdx=0; flasherIdx<this.flashers.length; flasherIdx++){
-			var flasher = this.flashers[flasherIdx];
-			this.drawPt(flasher.pos, flasher.curCol, flasher.curCharacLen);
-			this.flasherNextStep(flasher);
-		}
-		if (this.doneFlashing()) {
-			
-			removeListener(curLevel, 'update', 'flash'+this.handle);
-			this.eraseFlashers();
-			this.flashers = undefined;
-		}
-	},
-	eraseFlashers: function(){
-		for (var flasherIdx=0; flasherIdx<this.flashers.length; flasherIdx++){
-			var flasher = this.flashers[flasherIdx];
-			this.graph.putImageData(flasher.imageData, flasher.imagePos.x, flasher.imagePos.y);
-		}
-	},
-	flasherNextStep: function(flasher){
-		flasher.curCharacLen = boundedStep(flasher.curCharacLen, this.characLen, -this.characLen*this.flashMult*this.flashRate)
-		var col = flasher.curCol;
-		var newCol = Col(0,0,0);
-		newCol.r = this.flashColStep(flasher, 'r');
-		newCol.g = this.flashColStep(flasher, 'g');
-		newCol.b = this.flashColStep(flasher, 'b');
-		col.set(newCol);
-	},
-	flashColStep: function(flasher, col){
-		var init = flasher.flashCol[col];
-		var cur = flasher.curCol[col];
-		var setPt = flasher.pointCol[col];
-		var diff = setPt - init;
-		var step = diff*this.flashRate;
-		return boundedStep(cur, setPt, step);	
-	},
-	doneFlashing: function(){
-		var amDone = new Boolean();
-		amDone = true;
-		for (var flasherIdx=0; flasherIdx<this.flashers.length; flasherIdx++){
-			var flasher = this.flashers[flasherIdx];
-			var la = flasher.curCharacLen;
-			var lb = this.characLen;
-			var ra = flasher.curCol.r;
-			var rb = flasher.pointCol.r;		
-			var ga = flasher.curCol.g;
-			var gb = flasher.pointCol.g;		
-			var ba = flasher.curCol.b;
-			var bb = flasher.pointCol.b;
-			if(la!=lb || ra!=rb || ga!=gb || ba!=bb){
-				amDone = false;
-			}
-		}
-		return amDone;
-	},
 	checkMark: function(pos, dims, oversize, fillCol, drawCanvas) {
 		var strokeCol = Col(0, 0, 0);
 		pos.x -= oversize;
@@ -612,7 +518,7 @@ GraphBase = {
 	
 }
 
-GraphBase.prototype.LegendEntry = function(graph, set, text, x, y, fontSize, graphDims) {
+GraphBase.LegendEntry = function(graph, set, text, x, y, fontSize, graphDims) {
 	this.graph = graph;
 	this.set = set;
 	this.pos = P(x, y);
@@ -625,7 +531,7 @@ GraphBase.prototype.LegendEntry = function(graph, set, text, x, y, fontSize, gra
 	this.checkMark = graph.checkMark(this.boxPos.copy(), this.boxDims.copy(), graph.checkMarkOversize, graph.toggleCol, graph.graph);
 }
 
-GraphBase.prototype.LegendEntry.prototype = {
+GraphBase.LegendEntry.prototype = {
 	drawCheck: function() {
 		this.checkMark.draw();
 	},
@@ -649,4 +555,13 @@ GraphBase.prototype.LegendEntry.prototype = {
 		removeListener(curLevel, 'mouseup', this.mouseListenerName);
 	}
 }
-GraphBase.prototype.
+GraphBase.Range = function(xMin, xMax, yMin, yMax) {
+	this.x = {min: xMin, max: xMax};
+	this.y = {min: yMin, max: yMax};
+}
+GraphBase.Range.prototype = {
+	copy: function() {
+		return new GraphScatter.Range(this.x.min, this.x.max, this.y.min, this.y.max) 
+	}
+}
+//GraphBase.prototype.
