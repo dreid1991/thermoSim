@@ -21,10 +21,12 @@ DataDisplayer.prototype = {
 		this.entries[dataEntry.handle] = dataEntry;
 		this.addCleanUp(cleanUpWith, dataEntry);
 		with (this.dataGetFuncs) {
+			var func;
+			eval('func = function(){return ' + expr + '}')
 			addListener(curLevel, 'update', listenerStr, function() {
 				var displayStr = label;
 				var valStr;
-				var val = eval(expr);
+				var val = func();
 				if (isNaN(val) || val === undefined) 
 					valStr = ''
 				else
