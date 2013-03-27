@@ -53,39 +53,39 @@ DataDisplayer.prototype = {
 			return src[src.length - 1];
 		},
 		pInt: function(wallHandle) {
-			var src = wall[wallHandle].getDataObj('pInt').src();
+			var src = walls[wallHandle].getDataObj('pInt').src();
 			return src[src.length - 1];
 		},
 		pExt: function(wallHandle) {
-			var src = wall[wallHandle].getDataObj('pExt').src();
+			var src = walls[wallHandle].getDataObj('pExt').src();
 			return src[src.length - 1];
 		},
 		vol: function(wallHandle) {
-			var src = wall[wallHandle].getDataObj('vol').src();
+			var src = walls[wallHandle].getDataObj('vol').src();
 			return src[src.length - 1];
 		},
 		q: function(wallHandle) {
-			var src = wall[wallHandle].getDataObj('q').src();
+			var src = walls[wallHandle].getDataObj('q').src();
 			return src[src.length - 1];
 		},
 		mass: function(wallHandle) {
-			var src = wall[wallHandle].getDataObj('mass').src();
+			var src = walls[wallHandle].getDataObj('mass').src();
 			return src[src.length - 1];
 		},
 		moles: function(wallHandle, args) {
-			var src = wall[wallHandle].getDataObj('mass', args).src();
+			var src = walls[wallHandle].getDataObj('mass', args).src();
 			return src[src.length - 1];
 		},
 		frac: function(wallHandle, args) {
-			var src = wall[wallHandle].getDataObj('frac', args).src();
+			var src = walls[wallHandle].getDataObj('frac', args).src();
 			return src[src.length - 1];
 		},
 		time: function(wallHandle, args) {
-			var src = wall[wallHandle].getDataObj('time', args).src();
+			var src = walls[wallHandle].getDataObj('time', args).src();
 			return src[src.length - 1];
 		},
 		work: function(wallHandle, args) {
-			var src = wall[wallHandle].getDataObj('work', args).src();
+			var src = walls[wallHandle].getDataObj('work', args).src();
 			return src[src.length - 1];
 		}
 	},
