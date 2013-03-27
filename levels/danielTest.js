@@ -77,7 +77,7 @@ _.extend(TestLevel.prototype,
 					// },
 					{
 						type: 'Heater',
-						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty', offset: V(0, 30), liquid: {handle:'swishy'}}
+						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty'}
 					},
 					{
 						type: 'DragWeights',
@@ -105,11 +105,12 @@ _.extend(TestLevel.prototype,
 					// {wallInfo: 'wally', data:'frac', readout: 'mainReadout', attrs: {spcName: 'ugly', tag: 'wally'}}
 				// ],
 				cmmds: [
+					//TEST DISPLAY Q ARROWS
 					//{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}
 				],
-				listeners: [
-					{dataSet: {wallInfo: 'wally', data: 'vol'}, is: 'equalTo', checkVal: 6, alertUnsatisied: 'no', satisfyCmmds: ['dataDisplayer.entries.loopy.remove()']}
-				],
+				// listeners: [
+					// {dataSet: {wallInfo: 'wally', data: 'vol'}, is: 'equalTo', checkVal: 6, alertUnsatisied: 'no', satisfyCmmds: ['dataDisplayer.entries.loopy.remove()']}
+				// ],
 				// rxns: [
 					// {handle: 'rxn1', rctA: 'spc1', rctB: 'ugly', activeE: 15, prods: {duckling: 1}},
 					// {handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}

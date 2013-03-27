@@ -134,9 +134,9 @@ button.ui-button-icons-only.sim { width: 3.7em; }
 
 /*button text element */
 
-.ui-button .ui-button-text.sim { display: block; line-height: 1.4;  }
+.ui-button .ui-button-text.sim { display: block; line-height: 1;  }
 
-.ui-button-text-only .ui-button-text.sim { padding: .4em 1em; }
+.ui-button-text-only .ui-button-text.sim { padding: .3em .5em; }
 
 .ui-button-icon-only .ui-button-text.sim, .ui-button-icons-only .ui-button-text.sim { padding: .4em; text-indent: -9999999px; }
 
@@ -178,6 +178,7 @@ input.ui-button.sim { padding: .4em 1em; }
 
 button.ui-button.sim::-moz-focus-inner { border: 0; padding: 0; } /* reset extra padding in Firefox */
 
+.ui-datepicker.sim { width: 17em; padding: .2em .2em 0; display: none; }
 .ui-datepicker.sim { width: 17em; padding: .2em .2em 0; display: none; }
 
 .ui-datepicker .ui-datepicker-header.sim { position:relative; padding:.2em 0; }
@@ -458,7 +459,7 @@ body .ui-tooltip.sim { border-width: 2px; }
 
 ----------------------------------*/
 
-.ui-widget.sim { font-family: Verdana,Arial,sans-serif; font-size: 1.1em; }
+.ui-widget.sim { font-family: Verdana,Arial,sans-serif; font-size: 1em; }
 
 .ui-widget .ui-widget.sim { font-size: 1em; }
 

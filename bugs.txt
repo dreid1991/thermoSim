@@ -12,4 +12,6 @@ performance notes - .apply() is trivially slower than just calling the function.
 Make slow down time thing by multiplying v (and piston motion, dividing by const for pInt) by const
 Make buttons smaller
 
-Tomorrow: make get&eval and commands be evaled.  Work on making dataDisplay be evaled
+Test q rate/ammt arrows
+
+SUBTRACT HEATER VOL OFF

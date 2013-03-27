@@ -7,11 +7,11 @@ DataDisplayer.prototype = {
 	},
 	addEntry: function(attrs) {
 		var self = this;
-		var label = attrs.label;
+		var label = attrs.label || '';
 		var sigFigs = attrs.sigFigs || 2;
 		var handle = attrs.handle;
-		var expr = attrs.expr;
-		var units = attrs.units;
+		var expr = attrs.expr || '';
+		var units = attrs.units || '';
 		var cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 		var readout = this.readouts[attrs.readout];
 		if (!readout) console.log('Bad readout name ' + attrs.readout);
