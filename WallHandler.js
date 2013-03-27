@@ -272,7 +272,6 @@ WallMethods.main = {
 	removeWall: function(wallInfo){
 		this.numWalls-=1;
 		this[wallInfo].recordAllStop();
-		this[wallInfo].displayAllStop();
 		this[wallInfo].cleanUp();
 		this[wallInfo].removeBorder();
 		this[wallInfo].removed = true;

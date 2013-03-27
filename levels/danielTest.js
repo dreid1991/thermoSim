@@ -94,6 +94,9 @@ _.extend(TestLevel.prototype,
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugly', tag: 'wally'}}
 				],
+				dataReadouts: [
+					{label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', sigFigs: 3, handle: 'someTemp', readout: 'mainReadout'}
+				],
 				// dataDisplay: [
 					// {wallInfo: 'wally', data:'pInt', readout: 'mainReadout'},
 					// //{wallInfo: 'wally', data:'frac', readout: 'mainReadout', attrs: {spcName: 'spc1', tag: 'wally'}},
@@ -139,6 +142,11 @@ _.extend(TestLevel.prototype,
 					],
 					title: 'wooo!',
 					text: 'Hello, my lovelies!'
+				},
+				{
+					sceneData: undefined,
+					text: 'hello',
+					title: 'titley'
 				}
 				
 			]

@@ -26,7 +26,7 @@ Renderer.prototype = {
 		this.renderWalls(scene.walls || [], scene);
 		this.renderObjs(scene.objs || []);
 		this.dataRecord(scene.dataRecord || []);
-		this.dataDisplay(scene.dataDisplay || []);
+		this.dataReadouts(scene.dataReadouts || []);
 		this.addListeners(scene.listeners || []);
 		this.addGraphs(scene.graphs || []);
 		this.addRxns(scene.rxns || []);
@@ -72,10 +72,10 @@ Renderer.prototype = {
 			walls[entry.wallInfo]['record' + entry.data.toCapitalCamelCase()](entry.attrs);
 		}
 	},
-	dataDisplay: function(entries) {
+	dataReadouts: function(entries) {
 		for (var entryIdx=0; entryIdx<entries.length; entryIdx++) {
 			var entry = entries[entryIdx];
-			walls[entry.wallInfo]['display' + entry.data.toCapitalCamelCase()](entry);
+			dataDisplayer.addEntry(entry);
 		}
 	},
 	addListeners: function(listeners) {
