@@ -13,20 +13,22 @@ function GraphScatter(attrs) {
 	this.legendFont = this.legendFontSize+ 'pt calibri';
 	this.axisValFont = this.axisValFontSize+ 'pt calibri';
 	this.borderSpacing = 70;
-	this.xStart = this.borderSpacing/this.dims.dx;
-	this.yStart = 1-this.borderSpacing/this.dims.dy;
+	//this.xStart = this.borderSpacing/this.dims.dx;
+	//this.yStart = 1-this.borderSpacing/this.dims.dy;
 	this.legendWidth = 80;
-	this.xEnd = (this.dims.dx - (this.legendWidth+8))/this.dims.dx;
-	this.yEnd = .05;
+	//this.xEnd = (this.dims.dx - (this.legendWidth+8))/this.dims.dx;
+	//this.yEnd = .05;
+	//Hello.  graphRangeFrac uses applies min and max spatially, not numerically.  yMax is low value but near the top of the screen.
+	this.graphRangeFrac = new this.Range(this.borderSpacing/this.dims.dx, (this.dims.dx - (this.legendWidth+8))/this.dims.dx, 1-this.borderSpacing/this.dims.dy, .05);
 	this.gridSpacing = 40;
 	
 	this.setNumGridLines();
-	this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1)}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1)}};
-	this.axisRange = {x:{min:0, max:0}, y:{min:0, max:0}};
+	this.axisInit = new this.Range(axisInit.x.min, axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1), axisInit.y.min, axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1));
+	this.axisRange = new this.Range(0, 0, 0, 0);
 	this.data = {};
 	this.legend = {};
 	this.resetRanges();
-	this.stepSize = {x:0, y:0};
+	this.stepSize = new this.Coord(0, 0);
 	
 
 	this.setStds();
@@ -37,37 +39,11 @@ function GraphScatter(attrs) {
 _.extend(GraphScatter.prototype, AuxFunctions, GraphBase, 
 	{
 		addSet: function(attrs){//address, label, pointCol, flashCol, data:{x:{wallInfo, data}, y:{same}}){
-			var set = {};
-			set.label = attrs.label;
-			set.x = [];
-			set.y = [];
-			var xData = walls[attrs.data.x.wallInfo].getDataObj(attrs.data.x.data, attrs.data.x.attrs).src();
-			var yData = walls[attrs.data.y.wallInfo].getDataObj(attrs.data.y.data, attrs.data.y.attrs).src();
-			var data = {x: xData, y: yData};
-			set.xInitDataIdx = data.x.length-1;
-			set.yInitDataIdx = data.y.length-1;
-			set.pointCol = attrs.pointCol;
-			set.flashCol = attrs.flashCol;
-			set.fillInPts = defaultTo(true, attrs.fillInPts);
-			set.fillInPtsMin = defaultTo(5, attrs.fillInPtsMin);
-			set.trace = defaultTo(false, attrs.trace);
-			set.getLast = this.makePtDataGrabFunc(data);
-			set.show = true;
-			set.src = data;
+			var set = new this.Set(this, attrs.handle, attrs.label, attrs.data, attrs.pointCol, attrs.flashCol, attrs.fillInPts, attrs.fillInPtsMin, attrs.trace);
+
+			this.data[attrs.handle] = set;
 			
-			
-			this.data[attrs.address] = set;
-			
-			if (set.trace) {
-				set.traceStartX = set.src.x.length; 
-				set.traceStartY = set.src.y.length;
-				set.traceLastX = set.traceStartX;
-				set.traceLastY = set.traceStartY;
-			}
-			set.ptDataIdxs = []; //Form of: [{x:xIdx, y:yIdx}...]
-			
-			
-			this.makeLegendEntry(set, attrs.address);
+			this.makeLegendEntry(set, attrs.handle);
 			this.drawAllBG();
 		},
 		drawAllData: function(){
@@ -96,87 +72,14 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			var toAdd = [];
 			for (var address in this.data){
 				var set = this.data[address];
-				var newPt = set.getLast();
-				newPt.address = address;
-				if (newPt.isValid()) {
-					var newDataIdx = {x:set.src.x.length-1, y:set.src.y.length-1};
-					if (set.x.length>0) {
-						var last = P(set.x[set.x.length-1], set.y[set.y.length-1]);
-						var lastDataIdx = set.ptDataIdxs[set.ptDataIdxs.length-1];
-						if (set.fillInPts) {
-							var turnPtInfo = this.addPtsAtTurns(newPt, newDataIdx, last, lastDataIdx, set, address);
-							toAdd = toAdd.concat(turnPtInfo.newPts);
-							set.ptDataIdxs = set.ptDataIdxs.concat(turnPtInfo.dataIdxs);
-						}
-						
-					}
-					toAdd.push(newPt);
-					set.ptDataIdxs.push(newDataIdx);
-				}
+				toAdd = toAdd.concat(set.getNewPts());
+				//var setPts = set.getNewPts();
+				
 			}
 
 			this.addPts(toAdd);
 		},
-		addPtsAtTurns: function(a, aDataIdx, b, bDataIdx, set, address){
-			var xDataRange = aDataIdx.x-bDataIdx.x;
-			var yDataRange = aDataIdx.y-bDataIdx.y;
-			if (xDataRange!=yDataRange) {
-				return {newPts:[], dataIdxs:[]};//data points must correspond
-			}
-			var aCoord = this.valToCoord(a);
-			var bCoord = this.valToCoord(b);
-			//Input values aren't translated to pixel coordinates at this point.  
-			//Am making conversion scalars so I don't have to call valToCoord for every point
-			if (aCoord.x!=bCoord.x) {
-				var xScale = Math.abs(aCoord.x-bCoord.x)/Math.abs(a.x-b.x);
-			} else {
-				var xScale = 1;
-			}
-			if (aCoord.y!=bCoord.y) {
-				var yScale = Math.abs(aCoord.y-bCoord.y)/Math.abs(a.y-b.y);
-			} else {
-				yScale = 1;
-			}
-			var src = set.src;
-			var perpUV = a.VTo(b).UV().perp();
 
-			for (var dataIdx=xDataRange-1; dataIdx>0; dataIdx--) {
-				var xIdx = bDataIdx.x + dataIdx;
-				var yIdx = bDataIdx.y + dataIdx;
-				var aToData = V(xScale*(src.x[xIdx]-a.x), yScale*(src.y[yIdx]-a.y));
-				var dist = Math.abs(aToData.dotProd(perpUV));
-				if (dist>set.fillInPtsMin) {
-					var ptOverLine = P(src.x[xIdx], src.y[yIdx]);
-					var edgePtInfo = this.getEdgePt({x:xIdx, y:yIdx}, bDataIdx, perpUV, ptOverLine, dist, a, src, xScale, yScale);
-					if (!edgePtInfo) {
-						break;
-					}
-					var edgeDataIdx = edgePtInfo.dataIdx;
-					var edgePt = edgePtInfo.pt;
-					edgePt.address = address;
-					var restOfTurnPts = this.addPtsAtTurns(edgePt, edgeDataIdx, b, bDataIdx, set, address);
-					return {newPts:[edgePt].concat(restOfTurnPts.newPts), dataIdxs:[edgeDataIdx].concat(restOfTurnPts.dataIdxs)};
-				}
-			}
-			return {newPts: [], dataIdxs:[]};
-			
-		},
-		getEdgePt: function(dataIdxsMax, dataIdxsMin, perpUV, lastPt, lastDist, a, src, xScale, yScale) {
-			var dataRange = dataIdxsMax.x - dataIdxsMin.x;
-			for (var dataIdx=dataRange-1; dataIdx>0; dataIdx--) {
-				var xIdx = dataIdxsMin.x+dataIdx;
-				var yIdx = dataIdxsMin.y+dataIdx;
-				var aToData = V(xScale*(src.x[xIdx]-a.x), yScale*(src.y[yIdx]-a.y));
-				var dist = Math.abs(aToData.dotProd(perpUV));
-				if (dist < lastDist) {
-					return {pt:lastPt, dataIdx:{x:xIdx+1, y:yIdx+1}};
-				}
-				lastPt = P(src.x[xIdx], src.y[yIdx]);
-				lastDist = dist;
-				
-			}
-			return undefined;
-		},
 		plotData: function(xVals, yVals, address){
 			if (xVals.length==yVals.length && xVals.length>1){
 				this.data[address].x = xVals;
@@ -239,4 +142,148 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 		},
 	}
 )
+GraphScatter.prototype.Range = function(xMin, xMax, yMin, yMax) {
+	this.x = {min: xMin, max: xMax};
+	this.y = {min: yMin, max: yMax};
+}
+GraphScatter.prototype.Set = function(graph, handle, label, dataExprs, pointCol, flashCol, fillInPts, fillInPtsMin, trace) {
+	this.graph = graph;
+	this.handle = handle;
+	this.label = label;
+	this.data = new this.graph.Data();
+	this.dataFuncs = new this.graph.DataFuncs(this.graph, dataExprs.x, dataExprs.y);
+	this.pointCol = pointCol;
+	this.flashCol = flashCol;
+	this.fillInPts = defaultTo(true, fillInPts);
+	this.fillInPtsMin = defaultTo(5, fillInPtsMin);
+	this.trace = defaultTo(false, trace);
+	this.visible = true;
+	this.recordListenerName = this.graph + this.handle.toCapitalCamelCase() + 'Record';
+	this.dataPtIdxs = []; //to be populated with Coords
+	this.traceLastIdxs = new this.graph.Coord(0, 0);
+	this.flashers = [];
+}
 
+GraphScatter.prototype.Set.prototype = {
+	addVal: function() {
+		this.data.x.push(this.dataFuncs.x());
+		this.data.y.push(this.dataFuncs.y());
+	},
+	recordStart: function() {
+		addListener(curLevel, 'update', this.recordListenerName, this.addVal, this);
+	},
+	recordStop: function() {
+		removeListener(curLevel, 'update', this.recordListenerName);
+	}
+	getNewPts: function() {
+		var last = set.data.pt();
+		//going to try not having address in points
+		//newPt.address = address;
+		if (newPt.isValid()) {
+			var newDataIdx = new this.graph.Coord(this.data.x.length - 1, this.data.y.length - 1);
+			this.dataPtIdxs.push(newDataidx);
+			if (this.fillInPts && this.data.x.length && this.data.y.length) {
+				var last = P(set.x[set.x.length-1], set.y[set.y.length-1]);
+				var lastDataIdx = set.ptDataIdxs[set.ptDataIdxs.length-1];
+	
+				var turnPtInfo = this.addPtsAtTurns(newPt, newDataIdx, last, lastDataIdx, this);
+				toAdd = toAdd.concat(turnPtInfo.newPts);
+				set.ptDataIdxs = set.ptDataIdxs.concat(turnPtInfo.dataIdxs);
+				
+				
+			}
+			toAdd.push(newPt);
+			set.ptDataIdxs.push(newDataIdx);
+		}	
+	},
+	addPtsAtTurns: function(a, aDataIdx, b, bDataIdx, set, address){
+		var xDataRange = aDataIdx.x-bDataIdx.x;
+		var yDataRange = aDataIdx.y-bDataIdx.y;
+		if (xDataRange!=yDataRange) {
+			return {newPts:[], dataIdxs:[]};//data points must correspond
+		}
+		var aCoord = this.valToCoord(a);
+		var bCoord = this.valToCoord(b);
+		//Input values aren't translated to pixel coordinates at this point.  
+		//Am making conversion scalars so I don't have to call valToCoord for every point
+		if (aCoord.x!=bCoord.x) {
+			var xScale = Math.abs(aCoord.x-bCoord.x)/Math.abs(a.x-b.x);
+		} else {
+			var xScale = 1;
+		}
+		if (aCoord.y!=bCoord.y) {
+			var yScale = Math.abs(aCoord.y-bCoord.y)/Math.abs(a.y-b.y);
+		} else {
+			yScale = 1;
+		}
+		var src = set.src;
+		var perpUV = a.VTo(b).UV().perp();
+
+		for (var dataIdx=xDataRange-1; dataIdx>0; dataIdx--) {
+			var xIdx = bDataIdx.x + dataIdx;
+			var yIdx = bDataIdx.y + dataIdx;
+			var aToData = V(xScale*(src.x[xIdx]-a.x), yScale*(src.y[yIdx]-a.y));
+			var dist = Math.abs(aToData.dotProd(perpUV));
+			if (dist>set.fillInPtsMin) {
+				var ptOverLine = P(src.x[xIdx], src.y[yIdx]);
+				var edgePtInfo = this.getEdgePt({x:xIdx, y:yIdx}, bDataIdx, perpUV, ptOverLine, dist, a, src, xScale, yScale);
+				if (!edgePtInfo) {
+					break;
+				}
+				var edgeDataIdx = edgePtInfo.dataIdx;
+				var edgePt = edgePtInfo.pt;
+				edgePt.address = address;
+				var restOfTurnPts = this.addPtsAtTurns(edgePt, edgeDataIdx, b, bDataIdx, set, address);
+				return {newPts:[edgePt].concat(restOfTurnPts.newPts), dataIdxs:[edgeDataIdx].concat(restOfTurnPts.dataIdxs)};
+			}
+		}
+		return {newPts: [], dataIdxs:[]};
+		
+	},
+	getEdgePt: function(dataIdxsMax, dataIdxsMin, perpUV, lastPt, lastDist, a, src, xScale, yScale) {
+		var dataRange = dataIdxsMax.x - dataIdxsMin.x;
+		for (var dataIdx=dataRange-1; dataIdx>0; dataIdx--) {
+			var xIdx = dataIdxsMin.x+dataIdx;
+			var yIdx = dataIdxsMin.y+dataIdx;
+			var aToData = V(xScale*(src.x[xIdx]-a.x), yScale*(src.y[yIdx]-a.y));
+			var dist = Math.abs(aToData.dotProd(perpUV));
+			if (dist < lastDist) {
+				return {pt:lastPt, dataIdx:{x:xIdx+1, y:yIdx+1}};
+			}
+			lastPt = P(src.x[xIdx], src.y[yIdx]);
+			lastDist = dist;
+			
+		}
+		return undefined;
+	},
+}
+
+GraphScatter.prototype.DataFuncs = function(graph, xExpr, yExpr) {
+	this.x = graph.makeDataFunc(xExpr);
+	this.y = graph.makeDataFunc(yExpr);
+}
+GraphScatter.prototype.DataFuncs.prototype = {
+
+}
+GraphScatter.prototype.Data = function() {
+	this.x = [];
+	this.y = [];
+}
+GraphScatter.prototype.Data.prototype = {
+	pt: function(idx) {
+		if (idx === undefined) {
+			return P(this.x[this.x.length - 1], this.y[this.y.length - 1]);
+		}
+		return P(this.x[idx], this.y[idx]);
+	}
+}
+
+GraphScatter.prototype.Coord = function(x, y) {
+	this.x = x;
+	this.y = y;
+}
+GraphScatter.prototype.Coord.prototype = {
+	copy: function() {
+		return new GraphScatter.prototype.Coord(this.x, this.y);
+	}
+}

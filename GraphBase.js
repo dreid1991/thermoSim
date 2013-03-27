@@ -18,6 +18,11 @@ GraphBase = {
 		//characLen, characteristic length, is the radius of the shape being used
 		this.characLen = Math.sqrt(Math.pow(this.rectSideLen, 2)/2);		
 	},
+	makeDataFunc: function(expr) {
+		with(DataDisplayer.prototype.dataGetFuncs) {
+			return eval('function() {return ' + expr + '}');
+		}
+	},
 	setNumGridLines: function() {
 		var numGridLinesX = Math.ceil(this.dims.dx*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing);
 		var numGridLinesY = Math.ceil(this.dims.dy*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
@@ -438,37 +443,13 @@ GraphBase = {
 		var x = this.dims.dx-this.legendWidth+5;
 		var y = 30;
 		for (var entryIdx in this.legend){
-			y+=35;
+			y += 35;
 		}
-		var legendEntry = {};
-		legendEntry.text = {text:set.label, x:x+10, y:y+this.legendFontSize/2};
-		legendEntry.pt = {x:x, y:y, col:set.pointCol}
-		var togglePos = P(this.dims.dx-18, y-5);
-		var toggleDims = V(13, 13);
-		legendEntry.togglePos = togglePos;
-		legendEntry.toggleDims = toggleDims;
-		var self = this;
-		legendEntry.toggle = function(){
-								if (ptInRect(togglePos, toggleDims, mouseOffsetDiv(self.parentDivId))) {
-									if (set.show) {
-										set.show = false;
-										self.flashers = [];
-										removeListener(curLevel, 'update', 'flash'+self.handle);
-										self.drawAllBG();
-										self.drawAllData();
-									} else {
-										set.show = true;
-										self.flashers = [];
-										removeListener(curLevel, 'update', 'flash'+self.handle);
-										self.drawAllBG();
-										self.drawAllData();
-									}
-								}
-							};
-							
-		addListener(curLevel, 'mouseup', 'toggle'+address, legendEntry.toggle, '');
+
+		var legendEntry = new GraphBase.LegendEntry(this, set, set.label, x, y, this.legendFontSize, this.dims, this.toggleCol);
+		legendEntry.toggleActivate();
+		
 		this.legend[address] = legendEntry;
-		this.legend[address]['check'] = this.makeCheck(address, this.legend, this.toggleCol);
 		this.drawAllBG();
 	},
 	getRange: function(axis){
@@ -620,5 +601,52 @@ GraphBase = {
 		}
 		return amDone;
 	},
+	checkMark: function(pos, dims, oversize, fillCol, drawCanvas) {
+		var strokeCol = Col(0, 0, 0);
+		pos.x -= oversize;
+		pos.y -= oversize;
+		dims.dx += 2 * oversize;
+		dims.dy += 2 * oversize;
+		return new CheckMark(pos, dims, fillCol, strokeCol, drawCanvas);
+	}
 	
 }
+
+GraphBase.prototype.LegendEntry = function(graph, set, text, x, y, fontSize, graphDims) {
+	this.graph = graph;
+	this.set = set;
+	this.pos = P(x, y);
+	this.text = text;
+	this.textPos = P(x + 10, y + fontSize / 2);
+	this.fontSize = fontSize;
+	this.boxPos = P(graphDims.dx - 18, y - 5); //whatever, will look at later
+	this.boxDims = V(13, 13);
+	this.mouseListenerName = 'toggle' + this.graph.handle.toCapitalCamelCase() + this.set.handle.toCapitalCamelCase();
+	this.checkMark = graph.checkMark(this.boxPos.copy(), this.boxDims.copy(), graph.checkMarkOversize, graph.toggleCol, graph.graph);
+}
+
+GraphBase.prototype.LegendEntry.prototype = {
+	drawCheck: function() {
+		this.checkMark.draw();
+	},
+	toggle: function() {
+		if (ptInRect(this.togglePos, this.toggleDims, mouseOffsetDiv(this.graph.parentDivId))) {
+			if (this.set.visible) {
+				this.set.visible = false;
+				this.set.killFlashers();//make this
+			} else {
+				this.set.visible = true;
+				this.set.killFlashers();
+			}
+			this.graph.drawAllBG();
+			this.graph.drawAllData();
+		}		
+	},
+	toggleActivate: function() {
+		addListener(curLevel, 'mouseup', this.mouseListenerName, this.toggle, this);
+	},
+	toggleDeactivate: function() {
+		removeListener(curLevel, 'mouseup', this.mouseListenerName);
+	}
+}
+GraphBase.prototype.

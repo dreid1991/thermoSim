@@ -40,6 +40,21 @@ WallMethods.wallDataHandler = {
 		}
 		return false;
 	},
+	getDataSrc: function(type, args, suppressOutput) {
+		if (this.data[type]) {
+			if (this.data[type] instanceof Array) {
+				for (var idx=0; idx<this.data[type].length; idx++) {
+					if (this.data[type][idx].argsMatch(args)) return this.data[type][idx].srcVal;
+				}
+			} else {
+				return this.data[type].srcVal
+			}
+		} else if (!suppressOutput) {
+			console.log('Tried to get bad data type "' + type + '" with args');
+			console.log(args);
+		}
+		return false;	
+	},
 	removeDataObj: function(type, args) { 
 		if (this.data[type]) {
 			if (this.data[type] instanceof Array) {

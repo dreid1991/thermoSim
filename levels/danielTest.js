@@ -67,10 +67,10 @@ _.extend(TestLevel.prototype,
 					//{spcName: 'duckling', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
-					{
-						type: 'AuxImage',
-						attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/work/block0Pic1.jpg)'}
-					},
+					// {
+						// type: 'AuxImage',
+						// attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/work/block0Pic1.jpg)'}
+					// },
 					// {
 						// type: 'Liquid',
 						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 500, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
@@ -115,17 +115,24 @@ _.extend(TestLevel.prototype,
 					// {handle: 'rxn1', rctA: 'spc1', rctB: 'ugly', activeE: 15, prods: {duckling: 1}},
 					// {handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				// ]
+				graphs: [
+					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:2}, y:{min:0, step:4}}, 
+						sets:[
+							{address:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "vol('wally')", y: "temp('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
+						]
+					}
+				],
 			},
 			prompts: [
 				{
 					sceneData: {
-						objs: [
-							{
-								type: 'AuxImage',
-								attrs: {handle: 'piccy', slotNum: 1, imgFunc: 'img(img/refresh.gif)'}
-							}
+						// objs: [
+							// {
+								// type: 'AuxImage',
+								// attrs: {handle: 'piccy', slotNum: 1, imgFunc: 'img(img/refresh.gif)'}
+							// }
 						
-						],
+						// ],
 						// listeners: [
 							
 							// {dataSet: {wallInfo: 'wally', data: 'pExt'}, is: 'equalTo', checkVal: 1, alertUnsatisfied: 'booo', satisfyCmmds: [{type: 'DragWeights', handle: 'draggy', cmmd: 'freeze'}]}

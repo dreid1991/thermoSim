@@ -484,7 +484,7 @@ LevelTools = {
 		}	
 		for (var graphName in this.graphs) {
 			if (this.graphs[graphName].active) {
-				this.graphs[graphName].addLast();
+				this.graphs[graphName].addLast();//Start here
 			}
 		}
 	},
