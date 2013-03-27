@@ -18,7 +18,6 @@ function GraphScatter(attrs) {
 	this.legendWidth = 80;
 	//this.xEnd = (this.dims.dx - (this.legendWidth+8))/this.dims.dx;
 	//this.yEnd = .05;
-	//Hello.  graphRangeFrac uses applies min and max spatially, not numerically.  yMax is low value but near the top of the screen.
 	this.graphRangeFrac = new GraphBase.Range(this.borderSpacing/this.dims.dx, (this.dims.dx - (this.legendWidth+8))/this.dims.dx, 1-this.borderSpacing/this.dims.dy, .05);
 	this.gridSpacing = 40;
 	

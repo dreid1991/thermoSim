@@ -23,9 +23,9 @@ GraphBase = {
 			return eval('function() {return ' + expr + '}');
 		}
 	},
-	setNumGridLines: function() {
-		var numGridLinesX = Math.ceil(this.dims.dx*(Math.abs(this.xEnd-this.xStart))/this.gridSpacing);
-		var numGridLinesY = Math.ceil(this.dims.dy*(Math.abs(this.yEnd-this.yStart))/this.gridSpacing);
+	setNumGridLines: function(graph) {
+		var numGridLinesX = Math.ceil(this.dims.dx*(Math.abs(this.graphRangeFrac.x.max-this.graphRangeFrac.x.min))/this.gridSpacing);
+		var numGridLinesY = Math.ceil(this.dims.dy*(Math.abs(this.graphRangeFrac.y.max-this.graphRangeFrac.y.min))/this.gridSpacing);
 		this.numGridLines = {x:numGridLinesX, y:numGridLinesY};
 	},
 	makeCanvas: function(dims, parentDiv) {
@@ -239,32 +239,32 @@ GraphBase = {
 	},
 	drawGrid: function(){
 		for (var xGridIdx=0; xGridIdx<this.numGridLines.x; xGridIdx++){
-			var x = this.xStart*this.dims.dx + this.gridSpacing*xGridIdx;
-			var yEnd = this.yEnd*this.dims.dy;
-			var yAxis = this.yStart*this.dims.dy + this.hashMarkLen;
+			var x = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing * xGridIdx;
+			var yEnd = this.graphRangeFrac.y.max * this.dims.dy;
+			var yAxis = this.graphRangeFrac.y.min * this.dims.dy + this.hashMarkLen;
 			var p1 = P(x, yAxis);
 			var p2 = P(x, yEnd);
 			draw.line(p1, p2, this.gridCol, this.graph);
 		}
 		for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
-			var y = this.yStart*this.dims.dy - this.gridSpacing*yGridIdx;
-			var xEnd = this.xEnd*this.dims.dx;
-			var xAxis = this.xStart*this.dims.dx - this.hashMarkLen;
+			var y = this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing*yGridIdx;
+			var xEnd = this.graphRangeFrac.x.min * this.dims.dx;
+			var xAxis = this.graphRangeFrac.x.max * this.dims.dx - this.hashMarkLen;
 			var p1 = P(xAxis, y);
 			var p2 = P(xEnd, y);			
 			draw.line(p1, p2, this.gridCol, this.graph);
 		}
 	},
 	drawBounds: function(){
-		var ptOrigin = P(this.xStart*this.dims.dx, this.yStart*this.dims.dy);
-		var width = this.dims.dx*(this.xEnd-this.xStart);
-		var height = this.dims.dy*(this.yEnd - this.yStart);
+		var ptOrigin = P(this.graphRangeFrac.x.min * this.dims.dx, this.graphRangeFrac.y.max * this.dims.dy);
+		var width = this.dims.dx * (this.graphRangeFrac.x.max - this.graphRangeFrac.x.min);
+		var height = this.dims.dy * (this.graphRangeFrac.y.min - this.graphRangeFrac.y.max);
 		var dims = V(width, height);
 		draw.strokeRect(ptOrigin, dims, this.graphBoundCol, this.graph);
 	},
 	drawLabels: function(){
-		var xLabelPos = P(this.dims.dx*(this.xStart+this.xEnd)/2, Math.min(this.dims.dy*this.yStart+50, this.dims.dy-20))
-		var yLabelPos = P(Math.max(this.dims.dx*this.xStart-50, 20),this.dims.dy*(this.yStart+this.yEnd)/2)
+		var xLabelPos = P(this.dims.dx * (this.graphRangeFrac.x.min + this.graphRangeFrac.x.max) / 2, Math.min(this.dims.dy * this.graphRangeFrac.y.min + 50, this.dims.dy-20))
+		var yLabelPos = P(Math.max(this.dims.dx * this.graphRangeFrac.x.min - 50, 20), this.dims.dy * (this.graphRangeFrac.y.min + this.graphRangeFrac.y.max) / 2)
 		xLabelPos.y+=this.labelFontSize/2;
 		yLabelPos.y+=this.labelFontSize/2;
 		draw.text(this.xLabel, xLabelPos, this.labelFont, this.textCol, 'center',  0, this.graph);
@@ -406,14 +406,14 @@ GraphBase = {
 	},
 	drawAxisVals: function(){
 		for (var xGridIdx=0; xGridIdx<this.numGridLines.x; xGridIdx++){
-			var xPos = this.xStart*this.dims.dx + this.gridSpacing*xGridIdx;
-			var yPos = this.yStart*this.dims.dy + this.hashMarkLen + 10 + this.axisValFontSize/2;
-			var text = String(round(this.axisRange.x.min + this.stepSize.x*xGridIdx, 1));
+			var xPos = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing * xGridIdx;
+			var yPos = this.graphRangeFrac.y.min * this.dims.dy + this.hashMarkLen + 10 + this.axisValFontSize/2;
+			var text = String(round(this.axisRange.x.min + this.stepSize.x * xGridIdx, 1));
 			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', 0, this.graph);
 		}
 		for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
-			var yPos = this.yStart*this.dims.dy - this.gridSpacing*yGridIdx;
-			var xPos = this.xStart*this.dims.dx - this.hashMarkLen - 10;
+			var yPos = this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing * yGridIdx;
+			var xPos = this.graphRangeFrac.x.min * this.dims.dx - this.hashMarkLen - 10;
 			var text = String(round(this.axisRange.y.min + this.stepSize.y*yGridIdx,1));
 			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', -Math.PI/2, this.graph);
 		}		
