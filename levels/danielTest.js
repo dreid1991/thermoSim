@@ -96,7 +96,7 @@ _.extend(TestLevel.prototype,
 				],
 				dataReadouts: [
 					{label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', sigFigs: 3, handle: 'someTemp', readout: 'mainReadout'},
-					{label: 'Vol: ', expr: 'vol("wally")', units: 'L', sigFigs: 3, handle: 'loopy', readout: 'mainReadout'}
+					{label: 'Vol: ', expr: 'vol("wally") - vol("heaterHeaty")', units: 'L', sigFigs: 3, handle: 'loopy', readout: 'mainReadout'}
 				],
 				// dataDisplay: [
 					// {wallInfo: 'wally', data:'pInt', readout: 'mainReadout'},

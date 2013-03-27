@@ -52,6 +52,23 @@ WallMethods.wallDataHandler = {
 			}
 		}
 	},
+	createSingleValDataObj: function(dataObjName, valFunc, isArrayMember) {
+		var dataObj = new WallMethods.DataObj();
+		if (isArrayMember) {
+			if (this.data[dataObjName]) {
+				this.data[dataObjName].push(dataObj)
+			} else {
+				this.data[dataObjName] = [dataObj];
+			}
+		} else {
+			this.data[dataObjName] = dataObj;
+		}
+		this.setupStdDataObj(dataObj, dataObjName);
+		dataObj.recordStop(function(){});
+		dataObj.srcVal = [valFunc()];
+		return dataObj;
+		
+	},
 	recordDefaults: function(){
 		this.recordTime();
 		this.recordTemp();
@@ -70,7 +87,7 @@ WallMethods.wallDataHandler = {
 	},
 	
 	recordTemp: function(tempFunc) {
-		if (!this.data.t || !this.data.t.recording()) {
+		if (!this.data.temp || !this.data.temp.recording()) {
 			this.data.temp = new WallMethods.DataObj();
 			var dataObj = this.data.temp;
 			this.setupStdDataObj(dataObj, 'temp');

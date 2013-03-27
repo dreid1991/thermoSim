@@ -1511,6 +1511,7 @@ function Heater(attrs){
 	if (attrs.liquid) { //liquid invoked using liquid handle
 		this.setupLiquidHeat(attrs.liquid);
 	}
+	this.wallHandleHeater = 'heater' + this.handle.toCapitalCamelCase();
 	this.setupStd();
 	if (this.makeSlider) {
 
@@ -1524,7 +1525,7 @@ function Heater(attrs){
 			},		
 			], this.sliderWrapper, this.sliderTitleWrapper);
 	}
-	return this.init();
+	this.init(this.wallHandleHeater);
 }
 
 _.extend(Heater.prototype, objectFuncs, {
@@ -1623,19 +1624,21 @@ _.extend(Heater.prototype, objectFuncs, {
 		steps['1']=up;
 		return steps;
 	},
-	init: function(){
+	init: function(wallHandleHeater){
 		addListener(curLevel, 'update', 'drawHeater'+this.handle, this.draw, '');
-		this.setupWalls()
+		this.setupWalls(wallHandleHeater)
 		this.eAdded=0;
-		return this;
 	},
-	setupWalls: function(){
+	setupWalls: function(wallHandleHeater){
 		if (this.wall) {
 			var handler = {func:this.hitAddQToWall, obj:this};
 		} else {
 			var handler = {func:this.hit, obj:this};
 		}
-		walls.addWall({pts:this.wallPts, handler:handler, handle:'heater' + this.handle, record:false, show:false});
+		walls.addWall({pts:this.wallPts, handler:handler, handle: wallHandleHeater, record:false, show:false});
+		walls[wallHandleHeater].createSingleValDataObj('vol', function() {
+			return walls.wallVolume(wallHandleHeater);
+		})
 	},
 	hit: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){
 		walls.reflect(dot, wallUV, vPerp);
