@@ -64,23 +64,23 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 				//toAdd = toAdd.concat(set.getNewPts());				
 			}
 			//flushQueue or something
-			this.addPts(toAdd);
+			this.flushQueues(true, false);
 		},
 
-		plotData: function(xVals, yVals, address){
-			if (xVals.length==yVals.length && xVals.length>1){
-				this.data[address].x = xVals;
-				this.data[address].y = yVals;
-				this.valRange.x = this.getRange('x');
-				this.valRange.y = this.getRange('y');
-				this.getAxisBounds();
-				this.drawAllData();
-			} else if (xVals.length!=yVals.length){
-				console.log("xVals has ", xVals.length, "entries");
-				console.log("yVals has ", yVals.length, "entries");
-				console.log("UH-OH");
-			};
-		},
+		// plotData: function(xVals, yVals, address){
+			// if (xVals.length==yVals.length && xVals.length>1){
+				// this.data[address].x = xVals;
+				// this.data[address].y = yVals;
+				// this.valRange.x = this.getRange('x');
+				// this.valRange.y = this.getRange('y');
+				// this.getAxisBounds();
+				// this.drawAllData();
+			// } else if (xVals.length!=yVals.length){
+				// console.log("xVals has ", xVals.length, "entries");
+				// console.log("yVals has ", yVals.length, "entries");
+				// console.log("UH-OH");
+			// };
+		// },
 
 		getAxisBounds: function(){
 			this.getXBounds();
@@ -137,19 +137,20 @@ GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol,
 	this.label = label;
 	this.data = new GraphScatter.Data();
 	this.graphedPts = new GraphScatter.Data();
-	this.dataFuncs = new GraphScatter.DataFuncs(this.graph, dataExprs.x, dataExprs.y);
+	this.dataFuncs = new GraphScatter.DataFuncs(graph, dataExprs.x, dataExprs.y);
 	this.pointCol = pointCol;
 	this.flashCol = flashCol;
 	this.fillInPts = defaultTo(true, fillInPts);
 	this.fillInPtsMin = defaultTo(5, fillInPtsMin);
 	this.trace = defaultTo(false, trace);
 	this.visible = true;
-	this.recordListenerName = this.graph + this.handle.toCapitalCamelCase() + 'Record';
+	this.recordListenerName = this.graph.handle + this.handle.toCapitalCamelCase() + 'Record';
 	this.dataPtIdxs = []; //to be populated with Coords
-	this.traceLastIdxs = new this.graph.Coord(0, 0);
+	this.traceLastIdxs = new GraphScatter.Coord(0, 0);
 	this.flashers = [];
 	this.queuePts = [];
 	this.queneIdxs = [];
+	this.recordStart();
 }
 
 GraphScatter.Set.prototype = {
@@ -159,7 +160,7 @@ GraphScatter.Set.prototype = {
 	},
 	recordStart: function() {
 		addListener(curLevel, 'update', this.recordListenerName, function() {
-			if (turn % 5 == 0) this.addVal;
+			if (turn % 5 == 0) this.addVal();
 		}, this);
 	},
 	recordStop: function() {
@@ -172,10 +173,10 @@ GraphScatter.Set.prototype = {
 		//going to try not having address in points
 		//newPt.address = address;
 		if (newPt.isValid()) {
-			var newDataIdx = new this.graph.Coord(this.data.x.length - 1, this.data.y.length - 1);
+			var newDataIdx = new GraphScatter.Coord(this.data.x.length - 1, this.data.y.length - 1);
 			//this.dataPtIdxs.push(newDataidx);
-			if (this.fillInPts && this.data.x.length && this.data.y.length) {
-				var lastDataIdx = set.ptDataIdxs[set.ptDataIdxs.length-1];
+			if (this.fillInPts && this.data.x.length && this.data.y.length && this.dataPtIdxs.length) {
+				var lastDataIdx = this.dataPtIdxs[this.dataPtIdxs.length-1];
 				var lastPt = this.data.pt(lastDataIdx.x, lastDataIdx.y);
 	
 				var filledInPtsInfo = this.fillInPts(newPt, newDataIdx, lastPt, lastDataIdx, this.data);
@@ -186,10 +187,10 @@ GraphScatter.Set.prototype = {
 			}
 			newPts.push(newPt);
 			newDataIdxs.push(newDataIdx);
-			this.dataPtIdxs = this.dataPtIdxs.concat(newDataIdxs);
+			//this.dataPtIdxs = this.dataPtIdxs.concat(newDataIdxs);
 			
 		}
-		this.queuePts = this.queue.concat(newPts);
+		this.queuePts = this.queuePts.concat(newPts);
 		this.queueIdxs = this.queneIdxs.concat(newDataIdxs);
 	},
 	fillInPts: function(a, aDataIdx, b, bDataIdx, data){
@@ -262,7 +263,7 @@ GraphScatter.Set.prototype = {
 		
 	},
 	updateRangeFromData: function(valRange) {
-		var initIdx = this.queueIdxs[0];
+		var initIdx = this.queueIdxs[0].x;
 		for (var i=initIdx; i<this.data.x.length; i++) {
 			var x = this.data.x[i];
 			var y = this.data.y[i];

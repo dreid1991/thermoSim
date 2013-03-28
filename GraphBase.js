@@ -19,8 +19,8 @@ GraphBase = {
 		this.characLen = Math.sqrt(Math.pow(this.rectSideLen, 2)/2);		
 	},
 	makeDataFunc: function(expr) {
-		with(DataDisplayer.prototype.dataGetFuncs) {
-			return eval('function() {return ' + expr + '}');
+		with (DataDisplayer.prototype.dataGetFuncs) {
+			return eval('(function() { return ' + expr + '})');
 		}
 	},
 	setNumGridLines: function(graph) {
@@ -274,11 +274,10 @@ GraphBase = {
 		for (var entryName in this.legend){
 			var entry = this.legend[entryName];
 			var text = entry.text;
-			var pt = entry.pt;
-			this.drawLegendToggle(entryName);
+			this.drawLegendToggle(entry);
 			var font = this.legendFont
-			draw.text(text.text, P(text.x, text.y),  this.legendFont, this.textCol, 'left', 0, this.graph);
-			this.drawPtStd(pt, pt.col);
+			draw.text(text, entry.textPos,  this.legendFont, this.textCol, 'left', 0, this.graph);
+			this.drawPtStd(entry.pos, entry.col);
 		}
 	},
 	flushQueues: function(flash, mustRedraw){
@@ -289,7 +288,7 @@ GraphBase = {
 		
 		for (var setName in this.data) {
 			var set = this.data[setName];
-			if (set.visibile) set.updateRange(this.valRange);
+			if (set.visible) set.updateRange(this.valRange);
 		}
 
 		var oldAxisRange = this.axisRange.copy();
@@ -418,12 +417,11 @@ GraphBase = {
 			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', -Math.PI/2, this.graph);
 		}		
 	},
-	drawLegendToggle: function(entryName){
-		var entry = this.legend[entryName];
-		draw.fillStrokeRect(entry.togglePos, entry.toggleDims, this.gridCol, this.toggleCol, this.graph);
-		var dataSet = this.data[entryName];
-		if (dataSet.show) {
-			this.legend[entryName]['check'].draw();
+	drawLegendToggle: function(entry){
+		draw.fillStrokeRect(entry.boxPos, entry.boxDims, this.gridCol, this.toggleCol, this.graph);
+		var set = entry.set;
+		if (set.visible) {
+			entry.checkMark.draw();
 		}
 	},
 	makeLegendEntry: function(set, address){
@@ -433,7 +431,7 @@ GraphBase = {
 			y += 35;
 		}
 
-		var legendEntry = new GraphBase.LegendEntry(this, set, set.label, x, y, this.legendFontSize, this.dims, this.toggleCol);
+		var legendEntry = new GraphBase.LegendEntry(this, set, set.pointCol, set.label, x, y, this.legendFontSize, this.dims, this.toggleCol);
 		legendEntry.toggleActivate();
 		
 		this.legend[address] = legendEntry;
@@ -518,10 +516,11 @@ GraphBase = {
 	
 }
 
-GraphBase.LegendEntry = function(graph, set, text, x, y, fontSize, graphDims) {
+GraphBase.LegendEntry = function(graph, set, col, text, x, y, fontSize, graphDims) {
 	this.graph = graph;
 	this.set = set;
 	this.pos = P(x, y);
+	this.col = col;
 	this.text = text;
 	this.textPos = P(x + 10, y + fontSize / 2);
 	this.fontSize = fontSize;
@@ -561,7 +560,7 @@ GraphBase.Range = function(xMin, xMax, yMin, yMax) {
 }
 GraphBase.Range.prototype = {
 	copy: function() {
-		return new GraphScatter.Range(this.x.min, this.x.max, this.y.min, this.y.max) 
+		return new GraphBase.Range(this.x.min, this.x.max, this.y.min, this.y.max) 
 	}
 }
 //GraphBase.prototype.
