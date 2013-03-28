@@ -116,7 +116,7 @@ _.extend(TestLevel.prototype,
 					// {handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				// ]
 				graphs: [
-					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:2}, y:{min:0, step:1}}, 
+					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:1}, y:{min:0, step:1}}, 
 						sets:[
 							{handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "vol('wally') - vol('heaterHeaty')", y: "pExt('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]

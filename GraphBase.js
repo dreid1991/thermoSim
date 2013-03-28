@@ -108,6 +108,7 @@ GraphBase = {
 		return this;
 	},
 	freeze: function(){
+		for (var setName in this.data) this.data[setName].recordStop();
 		this.active = false;
 		return this;
 	},
@@ -425,23 +426,8 @@ GraphBase = {
 		return {min:min, max:max};
 	},
 	resetStd: function(){
-		for (var set in this.data){
-			var set = this.data[set];
-			for(var dataBitName in set){
-				var dataBit = set[dataBitName];
-				if(dataBit instanceof Array){
-					set[dataBitName]=[];
-				}
-			}
-			if (set.trace) {
-				set.traceStartX = set.src.x.length;
-				set.traceStartY = set.src.y.length;
-				set.traceLastX = set.traceStartX;
-				set.traceLastY = set.traceStartY;
-				set.ptDataIdxs = [];
-			}
-		}
-		this.flashers = [];
+		for (var setName in this.data) this.data[setName].reset();
+
 		removeListener(curLevel, 'update', 'flash'+this.name);
 		this.graph.putImageData(this.bg, 0, 0);
 		this.resetRanges();

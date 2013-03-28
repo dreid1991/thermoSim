@@ -155,6 +155,13 @@ GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol,
 }
 
 GraphScatter.Set.prototype = {
+	reset: function() {
+		this.graphedPts.splice(0, this.graphedPts.length);
+		this.graphedPtIdxs.splice(0, this.graphedPtIdxs.length);
+		this.flashers.splice(0, this.flashers.length);
+		this.queneIdxs.splice(0, this.queneIdxs.length);
+		this.queuePts.splice(0, this.queuePts.length);
+	},
 	addVal: function() {
 		this.data.x.push(this.dataFuncs.x());
 		this.data.y.push(this.dataFuncs.y());
