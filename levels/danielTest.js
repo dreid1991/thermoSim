@@ -118,7 +118,7 @@ _.extend(TestLevel.prototype,
 				graphs: [
 					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:2}, y:{min:0, step:4}}, 
 						sets:[
-							{handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "vol('wally')", y: "temp('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
+							{handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "vol('wally')", y: "temp('wally')"}, trace: false, fillInPts: false, fillInPtsMin: 5}
 						]
 					}
 				],

@@ -296,12 +296,16 @@ GraphBase = {
 		if (!this.rangeIsSame(oldAxisRange.x, this.axisRange.x) || !this.rangeIsSame(oldAxisRange.y, this.axisRange.y)) {
 			mustRedraw = true;
 		}
-		
-		this.drawPts(!mustRedraw);
+		if (mustRedraw) {
+			this.drawAllData()
+		} else {
+			this.drawPts();
+		}
 
 		if (flash) {
 			this.flashInit();
 		}
+		for (var setName in this.data) this.data[setName].flushQueue();
 	},
 	flashInit: function() {
 		for (var setName in this.data) {
@@ -395,7 +399,7 @@ GraphBase = {
 		} else {
 			newBounds.min = Math.floor(this.valRange.y.min);
 			newStepSize = .2;
-			newBounds.max = this.axisRange.y.min + newStepSize * this.numGridLines.y;	
+			newBounds.max = newBounds.min + newStepSize * this.numGridLines.y;	
 		}
 		if (newBounds.min < this.axisRange.y.min || newBounds.max > this.axisRange.y.max) {
 			this.axisRange.y.min = newBounds.min;
@@ -500,8 +504,8 @@ GraphBase = {
 	valToCoord: function(val){
 		var rangeX = this.axisRange.x.max - this.axisRange.x.min;
 		var rangeY = this.axisRange.y.max - this.axisRange.y.min;
-		var x = this.gridSpacing*(this.numGridLines.x-1)*(val.x-this.axisRange.x.min)/rangeX + this.xStart*this.dims.dx;
-		var y = this.dims.dy - (this.gridSpacing*(this.numGridLines.y-1)*(val.y-this.axisRange.y.min)/rangeY + (1-this.yStart)*this.dims.dy);
+		var x = this.gridSpacing*(this.numGridLines.x-1)*(val.x-this.axisRange.x.min)/rangeX + this.graphRangeFrac.x.min*this.dims.dx;
+		var y = this.dims.dy - (this.gridSpacing*(this.numGridLines.y-1)*(val.y-this.axisRange.y.min)/rangeY + (1-this.graphRangeFrac.y.min)*this.dims.dy);
 		return P(x,y);
 	},
 
@@ -535,7 +539,7 @@ GraphBase.LegendEntry.prototype = {
 		this.checkMark.draw();
 	},
 	toggle: function() {
-		if (ptInRect(this.togglePos, this.toggleDims, mouseOffsetDiv(this.graph.parentDivId))) {
+		if (ptInRect(this.boxPos, this.boxDims, mouseOffsetDiv(this.graph.parentDivId))) {
 			if (this.set.visible) {
 				this.set.visible = false;
 				this.set.killFlashers();//make this

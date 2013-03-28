@@ -48,12 +48,12 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 		drawAllData: function(){
 			this.graph.putImageData(this.bg, 0, 0);
 			this.drawAxisVals();
-			this.graphPts();
+			this.drawPts(false);
 		},
-		drawPts: function(justQueues){
+		drawPts: function(justQueue){
 			for (var setName in this.data) {
 				var set = this.data[setName]
-				set.drawQueue();
+				if (set.visible) set.drawPts(justQueue !== false);
 			}
 		},
 		addLast: function(){
@@ -88,23 +88,23 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 		},
 
 
-		graphPts: function(){
-			for (var setName in this.data) {
-				var set = this.data[setName];
-				if (set.show) {
-					var col = set.pointCol;
-					for (var ptIdx=0; ptIdx<set.x.length; ptIdx++){
-						var xVal = set.x[ptIdx];
-						var yVal = set.y[ptIdx];
-						this.graphPt(xVal, yVal, col);
-						if (set.trace) {
-							this.trace(set, ptIdx);
-						}
-					}
-				}
+		// graphPts: function(){
+			// for (var setName in this.data) {
+				// var set = this.data[setName];
+				// if (set.show) {
+					// var col = set.pointCol;
+					// for (var ptIdx=0; ptIdx<set.x.length; ptIdx++){
+						// var xVal = set.x[ptIdx];
+						// var yVal = set.y[ptIdx];
+						// this.graphPt(xVal, yVal, col);
+						// if (set.trace) {
+							// this.trace(set, ptIdx);
+						// }
+					// }
+				// }
 				
-			}
-		},
+			// }
+		// },
 		graphPt: function(xVal, yVal, col){
 			var pt = this.valToCoord(P(xVal,yVal));
 			this.drawPtStd(pt, col);
@@ -136,7 +136,7 @@ GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol,
 	this.handle = handle;
 	this.label = label;
 	this.data = new GraphScatter.Data();
-	this.graphedPts = new GraphScatter.Data();
+	this.graphedPts = [];
 	this.dataFuncs = new GraphScatter.DataFuncs(graph, dataExprs.x, dataExprs.y);
 	this.pointCol = pointCol;
 	this.flashCol = flashCol;
@@ -258,8 +258,8 @@ GraphScatter.Set.prototype = {
 		} else {
 			this.updateRangeFromPts(valRange);
 		}
-		//this.queuePts.slice(0, this.queuePts.length);
-		//this.queueIdxs.slice(0, this.queueIdxs.length);
+		//this.queuePts.splice(0, this.queuePts.length);
+		//this.queueIdxs.splice(0, this.queueIdxs.length);
 		
 	},
 	updateRangeFromData: function(valRange) {
@@ -299,15 +299,15 @@ GraphScatter.Set.prototype = {
 	flashInit: function(){
 		for (var ptIdx=0; ptIdx<this.queuePts.length; ptIdx++) {
 			var pt = this.queuePts[ptIdx];
-			var pos = this.valToCoord(pt);
+			var pos = this.graph.valToCoord(pt);
 			var xPt = pos.x;
 			var yPt = pos.y;
 			var pointCol = this.pointCol
 			var flashCol = this.flashCol;
 			var curCol = flashCol.copy();
-			var imagePos = P(xPt - this.characLen * this.flashMult - 1, yPt - this.characLen * this.flashMult - 1);
-			var len = this.characLen * 2 * this.flashMust + 2;
-			var curCharacLen = this.characLen * this.flashMult;
+			var imagePos = P(xPt - this.graph.characLen * this.graph.flashMult - 1, yPt - this.graph.characLen * this.graph.flashMult - 1);
+			var len = this.graph.characLen * 2 * this.graph.flashMult + 2;
+			var curCharacLen = this.graph.characLen * this.graph.flashMult;
 			var imageData = this.graph.graph.getImageData(imagePos.x, imagePos.y, len, len);
 			this.flashers.push(new GraphScatter.Flasher(pos, pointCol, flashCol, curCol, curCharacLen, imagePos, imageData));
 		}
@@ -321,24 +321,24 @@ GraphScatter.Set.prototype = {
 
 		for (var flasherIdx=0; flasherIdx<this.flashers.length; flasherIdx++){
 			var flasher = this.flashers[flasherIdx];
-			this.drawPt(flasher.pos, flasher.curCol, flasher.curCharacLen);
+			this.graph.drawPt(flasher.pos, flasher.curCol, flasher.curCharacLen);
 			this.flasherNextStep(flasher);
 		}
 		if (this.doneFlashing()) {
 			
 			removeListener(curLevel, 'update', 'flash'+this.handle);
 			this.eraseFlashers();
-			this.flashers.slice(0, this.flashers.length);
+			this.flashers.splice(0, this.flashers.length);
 		}
 	},
 	eraseFlashers: function(){
 		for (var flasherIdx=0; flasherIdx<this.flashers.length; flasherIdx++){
 			var flasher = this.flashers[flasherIdx];
-			this.graph.putImageData(flasher.imageData, flasher.imagePos.x, flasher.imagePos.y);
+			this.graph.graph.putImageData(flasher.imageData, flasher.imagePos.x, flasher.imagePos.y);
 		}
 	},
 	flasherNextStep: function(flasher){
-		flasher.curCharacLen = boundedStep(flasher.curCharacLen, this.characLen, -this.characLen*this.flashMult*this.flashRate)
+		flasher.curCharacLen = boundedStep(flasher.curCharacLen, this.graph.characLen, -this.graph.characLen*this.graph.flashMult*this.graph.flashRate)
 		var col = flasher.curCol;
 		var newCol = Col(0,0,0);
 		newCol.r = this.flashColStep(flasher, 'r');
@@ -351,32 +351,36 @@ GraphScatter.Set.prototype = {
 		var cur = flasher.curCol[col];
 		var setPt = flasher.pointCol[col];
 		var diff = setPt - init;
-		var step = diff*this.flashRate;
+		var step = diff*this.graph.flashRate;
 		return boundedStep(cur, setPt, step);	
 	},
 	doneFlashing: function(){
-		var amDone = new Boolean();
-		amDone = true;
+		var amDone = true;
 		for (var flasherIdx=0; flasherIdx<this.flashers.length; flasherIdx++){
 			var flasher = this.flashers[flasherIdx];
 			var la = flasher.curCharacLen;
-			var lb = this.characLen;
+			var lb = this.graph.characLen;
 			var ra = flasher.curCol.r;
 			var rb = flasher.pointCol.r;		
 			var ga = flasher.curCol.g;
 			var gb = flasher.pointCol.g;		
 			var ba = flasher.curCol.b;
 			var bb = flasher.pointCol.b;
-			if(la!=lb || ra!=rb || ga!=gb || ba!=bb){
+			if (la!=lb || ra!=rb || ga!=gb || ba!=bb) {
 				amDone = false;
 			}
 		}
 		return amDone;
 	},
+	killFlashers: function() {
+		removeListener(curLevel, 'update', 'flash'+this.handle);
+		this.eraseFlashers();
+		this.flashers.splice(0, this.flashers.length);		
+	},
 	flushQueue: function() {
 		this.graphedPts = this.graphedPts.concat(this.queuePts);
-		this.queuePts.slice(0, this.queuePts.length);
-		this.queueIdxs.slice(0, this.queueIdxs.length);
+		this.queuePts.splice(0, this.queuePts.length);
+		this.queueIdxs.splice(0, this.queueIdxs.length);
 	}
 }
 
