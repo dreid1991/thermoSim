@@ -111,37 +111,7 @@ GraphBase = {
 		this.active = false;
 		return this;
 	},
-	trace: function(set, ptIdx) {
-		if (ptIdx>0) {
-			var ptsToTrace = this.getPtsToTrace(set, ptIdx);
-		}
-	},
-	getPtsToTrace: function(set, ptIdx) {
-		var xDataIdxInit = set.ptDataIdxs[ptIdx-1].x;
-		var xDataIdxFinal = set.ptDataIdxs[ptIdx].x;
-		
-		var yDataIdxInit = set.ptDataIdxs[ptIdx-1].y;
-		var yDataIdxFinal = set.ptDataIdxs[ptIdx].y;
-		
-		if (xDataIdxFinal-xDataIdxInit == yDataIdxFinal-yDataIdxInit) {
-			var numPts = xDataIdxFinal-xDataIdxInit;
-			var tracePts = [this.valToCoord(P(set.src.x[xDataIdxInit], set.src.y[yDataIdxInit]))];
-			for (var ptIdx=1; ptIdx<numPts+1; ptIdx++) {
-				var pt = this.valToCoord(P(set.src.x[xDataIdxInit+ptIdx], set.src.y[yDataIdxInit+ptIdx]));
-				if (!pt.closeTo(tracePts[tracePts.length-1])) {
-					tracePts.push(pt);
-				}
-			}
-			this.drawTrace(set, tracePts);
-		} else {
-			console.log('Data count mismatch for tracing');
-			console.trace();
-		}
-	},
 
-	drawTrace: function(set, tracePts) {
-		draw.path(tracePts, set.pointCol, this.graph);
-	},
 	integrate: function(set){
 		this.data[set].integralPts = this.getIntegralPts(set);
 		this.drawIntegral(set);

@@ -137,6 +137,7 @@ GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol,
 	this.label = label;
 	this.data = new GraphScatter.Data();
 	this.graphedPts = [];
+	this.graphedPtIdxs = [];
 	this.dataFuncs = new GraphScatter.DataFuncs(graph, dataExprs.x, dataExprs.y);
 	this.pointCol = pointCol;
 	this.flashCol = flashCol;
@@ -285,15 +286,29 @@ GraphScatter.Set.prototype = {
 	},
 	drawPts: function(justQueue) {
 		var toDraw;
+		var idxs = [];
 		if (justQueue) {
 			toDraw = this.queuePts;
+			idxs = this.queueIdxs;
+			
 		} else {
 			toDraw = this.graphedPts.concat(this.queuePts); 
+			idxs = this.graphedPtIdxs.concat(this.queueIdxs);
+		}
+		if (this.trace) {
+			if (justQueue) {
+				if (this.graphedPtIdxs.length) {
+					this.drawTrace(this.graphedPtIdxs[this.graphedPtIdxs.length - 1].x, idxs[idxs.length - 1].x, this.graphedPtIdxs[this.graphedPtIdxs.length - 1].y, idxs[idxs.length - 1].y);
+				}
+			} else {
+				this.drawTrace(idxs[0].x, idxs[idxs.length - 1].x, idxs[0].y, idxs[idxs.length - 1].y)
+			}
 		}
 		for (var ptIdx=0; ptIdx<toDraw.length; ptIdx++) {
 			var x = toDraw[ptIdx].x;
 			var y = toDraw[ptIdx].y;
 			this.graph.graphPt(x, y, this.pointCol);
+		
 		}
 	},
 	flashInit: function(){
@@ -379,9 +394,29 @@ GraphScatter.Set.prototype = {
 	},
 	flushQueue: function() {
 		this.graphedPts = this.graphedPts.concat(this.queuePts);
+		this.graphedPtIdxs = this.graphedPtIdxs.concat(this.queueIdxs);
 		this.queuePts.splice(0, this.queuePts.length);
 		this.queueIdxs.splice(0, this.queueIdxs.length);
-	}
+	},
+	drawTrace: function(xMin, xMax, yMin, yMax) {
+		
+		if (xMax-xMin == yMax-yMin && xMin !== undefined && yMin !== undefined) {
+			var numPts = xMax-xMin;
+			var tracePts = [this.graph.valToCoord(P(this.data.x[xMin], this.data.y[yMin]))];
+			for (var ptIdx=1; ptIdx<numPts+1; ptIdx++) {
+				var pt = this.graph.valToCoord(P(this.data.x[xMin+ptIdx], this.data.y[yMin+ptIdx]));
+				if (!pt.closeTo(tracePts[tracePts.length-1])) {
+					tracePts.push(pt);
+				}
+			}
+			draw.path(tracePts, this.pointCol, this.graph.graph);
+		} else {
+			console.log('Data count mismatch for tracing');
+			console.trace();
+		}
+	},
+
+
 }
 
 GraphScatter.DataFuncs = function(graph, xExpr, yExpr) {
