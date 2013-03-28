@@ -347,7 +347,11 @@ function eraseStore (attrName) {
 }
 
 function deepCopy(object){
-	var copy = new object.constructor();
+	try {
+		var copy = new object.constructor();
+	} catch(e) {
+		console.log('hello');
+	}
 	for (var item in object){
 		if (typeof object[item] == 'object') {
 			copy[item] = deepCopy(object[item]);

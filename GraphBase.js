@@ -19,7 +19,7 @@ GraphBase = {
 		this.characLen = Math.sqrt(Math.pow(this.rectSideLen, 2)/2);		
 	},
 	makeDataFunc: function(expr) {
-		with (DataDisplayer.prototype.dataGetFuncs) {
+		with (DataGetFuncs) {
 			return eval('(function() { return ' + expr + '})');
 		}
 	},
@@ -146,18 +146,19 @@ GraphBase = {
 		var saveName = defaultTo('graph'+this.handle, saveName);
 		saveName = unique(saveName, stored);
 		this.dataSave = {};
-		for (var set in this.data){
-			this.dataSave[set] = {pts:{}, src:{}};
-			this.dataSave[set].pts.x = deepCopy(this.data[set].x);
-			this.dataSave[set].pts.y = deepCopy(this.data[set].y);
-			if(this.data[set].xInitDataIdx){
-				this.dataSave[set].src.x = deepCopy(this.data[set].src.x);//.splice(this.data[set].xInitDataIdx, this.data[set].src.x.length);
-			}//THIS DEMANDS ATTENTION.  FIX START IDX
-			if(this.data[set].yInitDataIdx){
-				this.dataSave[set].src.y = deepCopy(this.data[set].src.y);//.splice(this.data[set].yInitDataIdx, this.data[set].src.y.length);
-			}
-		}
-		store(saveName, this);
+		//need to redo this.  Make like a save function for each set.
+		// for (var set in this.data){
+			// this.dataSave[set] = {pts:{}, src:{}};
+			// this.dataSave[set].pts.x = deepCopy(this.data[set].x);
+			// this.dataSave[set].pts.y = deepCopy(this.data[set].y);
+			// if(this.data[set].xInitDataIdx){
+				// this.dataSave[set].src.x = deepCopy(this.data[set].src.x);//.splice(this.data[set].xInitDataIdx, this.data[set].src.x.length);
+			// }//THIS DEMANDS ATTENTION.  FIX START IDX
+			// if(this.data[set].yInitDataIdx){
+				// this.dataSave[set].src.y = deepCopy(this.data[set].src.y);//.splice(this.data[set].yInitDataIdx, this.data[set].src.y.length);
+			// }
+		// }
+		// store(saveName, this);
 		return saveName;
 	},
 	load: function(){

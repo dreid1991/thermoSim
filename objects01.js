@@ -1759,11 +1759,12 @@ function StateListener(attrs){//like dataList... is:'greaterThan', ... checkVal
 	this.handle = attrs.handle;
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.conditionsOn = this.cleanUpWith.killNumbers();
-	var dataInfo = attrs.dataSet;
-	this.dataList = walls[dataInfo.wallInfo].getDataObj(dataInfo.data, dataInfo.attrs).src();
-	this.is = attrs.is
-	this.checkVal = attrs.checkVal;
-	this.tolerance = defaultTo(.05, attrs.tolerance);
+	this.conditionFunc = this.wrapExpr(attrs.expr);
+	//var dataInfo = attrs.dataSet;
+	//this.dataList = walls[dataInfo.wallInfo].getDataObj(dataInfo.data, dataInfo.attrs).src();
+	//this.is = attrs.is
+	//this.checkVal = attrs.checkVal;
+	//this.tolerance = defaultTo(.05, attrs.tolerance);
 	this.checkOn = attrs.checkOn;
 	this.alerts = {true:attrs.alertSatisfied, false:attrs.alertUnsatisfied};
 	
@@ -1772,7 +1773,7 @@ function StateListener(attrs){//like dataList... is:'greaterThan', ... checkVal
 	this.satisfyStore = defaultTo(undefined, attrs.satisfyStore);
 	this.satisfyCmmds = defaultTo(undefined, attrs.satisfyCmmds);
 	this.amSatisfied = false;
-	this.makeConditionFunc();
+	//this.makeConditionFunc();
 	this.setupStd();
 	this.init();
 }
@@ -1785,24 +1786,30 @@ _.extend(StateListener.prototype, objectFuncs, {
 		}
 		
 	},
+	wrapExpr: function(expr) {
+		with (DataGetFuncs) {
+			var func = eval('(function() {return ' + expr + '})')
+		}
+		return func;
+	},
 	initCheckOnConditions: function() {
-		this.handle = unique('StateListener' + this.is, curLevel[this.conditionsOn + 'ConditionListeners'].listeners);
 		addListener(curLevel, this.conditionsOn + 'Condition', this.handle,
 			function(){
-				var didWin = this.condition();
+				var didWin = this.conditionFunc();
 				return {didWin:didWin, alert:this.alerts[didWin], priority:this.priorities[didWin]};
 			},
 		this);		
 	},
 	initCheckOnInterval: function() {
-		this.handle = unique('StateListener' + this.is, curLevel.updateListeners.listeners);
 		addListener(curLevel, 'update', this.handle,
 			function(){
-				if (this.condition()) {
+				if (this.conditionFunc()) {
 					this.amSatisfied = true;
 					this.recordVals();
 					if (this.satisfyCmmds) {
-						renderer.render({cmmds: this.satisfyCmmds})
+						for (var cmmdIdx=0; cmmdIdx<this.satisfyCmmds.length; cmmdIdx++) {
+							eval(this.satisfyCmmds[cmmdIdx]);
+						}
 					}
 					removeListener(curLevel, 'update', this.handle);
 				}
@@ -1827,18 +1834,18 @@ _.extend(StateListener.prototype, objectFuncs, {
 		
 		}		
 	},
-	lessThan: function(val1, val2) {
-		return val1<val2;
-	},
-	greaterThan: function(val1, val2) {
-		return val1>val2;
-	},
-	equalTo: function(val1, val2) {
-		return fracDiff(val1, val2) < this.tolerance;
-	},
-	notEqualTo: function(val1, val2) {
-		return fracDiff(val1, val2) > this.tolerance;
-	},
+	// lessThan: function(val1, val2) {
+		// return val1<val2;
+	// },
+	// greaterThan: function(val1, val2) {
+		// return val1>val2;
+	// },
+	// equalTo: function(val1, val2) {
+		// return fracDiff(val1, val2) < this.tolerance;
+	// },
+	// notEqualTo: function(val1, val2) {
+		// return fracDiff(val1, val2) > this.tolerance;
+	// },
 	recordVals: function(){
 		//storeObj formatted as: {storeAs: str, data: {wallInfo: 'wally', data: 'name', attrs: {stuff}}} //data.data is weird, but trying to be consistant
 		if (this.satisfyStore) {

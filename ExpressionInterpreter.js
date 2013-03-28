@@ -31,37 +31,13 @@ ExpressionInterpreter.prototype = {
 		MathJax.Hub.Queue(['Typeset', MathJax.Hub, div ? $(div).attr('id') : undefined])
 	},
 	addStored: function(text) {
-		var self = this;
-		var get = function(idStr, type, defaultVal, min, max) {
-			var gotten = getStore(idStr);
-			var val;
-			var isNum = type == 'int' || type == 'float';
-			if (gotten) {
-				if (type == 'int') {
-					val = Math.round(parseFloat(gotten));
-				} else if (type == 'float') {
-					val = parseFloat(gotten);
-				} else if (type == 'string') {
-					val = gotten.sanitize();
-				}
-				if (isNum) {
-					max = max === undefined || isNaN(max) ? val : max;
-					min = min === undefined || isNaN(min) ? val : min;
-					val = bound(val, min, max)
-				}
-			}
-			if (val === undefined || (isNum && isNaN(val))) {
-				val = defaultVal;
-			}
-			return val;
-		}
+		var get = DataGetFuncs.get;
+
 		return text.replace(/get[\s]*\([A-Za-z0-9,\s\-\.'"]*\)/g, function(subStr, idx) {
 			return eval(subStr);
 		})	
 	},
 	eval: function(text) {
-		var self = this;
-
 		if (typeof text == 'number') return text;
 		text = text.replace(/eval[\s]*\([0-9\(\)\+\-\*\/\s,\.'"]*\)/g, function(evalItem, idx) {
 			return eval(evalItem);

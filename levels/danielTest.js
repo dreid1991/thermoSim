@@ -37,25 +37,7 @@ _.extend(TestLevel.prototype,
 		{spcName: 'duckling', m: 4, r: 2, col: Col(255, 255, 255), cv: 2.5 * R, hF298: -30, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
 	],
 	sections: [
-		// {
-			// sceneData: undefined,
-			// prompts: [
-				// {
-					// sceneData: undefined,
-					// text: 'I am text',
-					// title: 'I am not a title.',
-					// cutScene: true,
-					// quiz: [
-						// {
-							// type: 'text',
-							// preText: 'woop woop!',
-							// label: 'gi'
-						
-						// }
-					// ]
-				// }
-			// ]
-		// },
+
 		{
 			sceneData: {
 				walls: [
@@ -90,6 +72,9 @@ _.extend(TestLevel.prototype,
 
 						
 				],
+				// listeners: [
+					// {handle: 'trumpet', expr: "pExt('wally') > 3"}
+				// ],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugly', tag: 'wally'}},
