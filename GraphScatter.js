@@ -146,7 +146,7 @@ GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol,
 	this.trace = defaultTo(false, trace);
 	this.visible = true;
 	this.recordListenerName = this.graph.handle + this.handle.toCapitalCamelCase() + 'Record';
-	this.dataPtIdxs = []; //to be populated with Coords
+	//this.dataPtIdxs = []; //to be populated with Coords
 	this.traceLastIdxs = new GraphScatter.Coord(0, 0);
 	this.flashers = [];
 	this.queuePts = [];
@@ -175,14 +175,14 @@ GraphScatter.Set.prototype = {
 		//newPt.address = address;
 		if (newPt.isValid()) {
 			var newDataIdx = new GraphScatter.Coord(this.data.x.length - 1, this.data.y.length - 1);
-			//this.dataPtIdxs.push(newDataidx);
-			if (this.fillInPts && this.data.x.length && this.data.y.length && this.dataPtIdxs.length) {
-				var lastDataIdx = this.dataPtIdxs[this.dataPtIdxs.length-1];
+			//this.graphedPtIdxs.push(newDataidx);
+			if (this.fillInPts && this.data.x.length && this.data.y.length && this.graphedPtIdxs.length) {
+				var lastDataIdx = this.graphedPtIdxs[this.graphedPtIdxs.length-1];
 				var lastPt = this.data.pt(lastDataIdx.x, lastDataIdx.y);
 	
-				var filledInPtsInfo = this.fillInPts(newPt, newDataIdx, lastPt, lastDataIdx, this.data);
-				newPts = newPts.concat(fillInPtsInfo.newPts);
-				newDataIdxs = newDataIdxs.concat(turnPtInfo.dataIdxs);
+				var filledInPtsInfo = this.fillInPtsFunc(newPt, newDataIdx, lastPt, lastDataIdx, this.data);
+				newPts = newPts.concat(filledInPtsInfo.newPts);
+				newDataIdxs = newDataIdxs.concat(filledInPtsInfo.dataIdxs);
 				
 				
 			}
@@ -194,14 +194,14 @@ GraphScatter.Set.prototype = {
 		this.queuePts = this.queuePts.concat(newPts);
 		this.queueIdxs = this.queneIdxs.concat(newDataIdxs);
 	},
-	fillInPts: function(a, aDataIdx, b, bDataIdx, data){
+	fillInPtsFunc: function(a, aDataIdx, b, bDataIdx, data){
 		var xDataRange = aDataIdx.x-bDataIdx.x;
 		var yDataRange = aDataIdx.y-bDataIdx.y;
 		if (xDataRange!=yDataRange) {
 			return {newPts:[], dataIdxs:[]};//data points must correspond
 		}
-		var aCoord = this.valToCoord(a);
-		var bCoord = this.valToCoord(b);
+		var aCoord = this.graph.valToCoord(a);
+		var bCoord = this.graph.valToCoord(b);
 		//Input values aren't translated to pixel coordinates at this point.  
 		//Am making conversion scalars so I don't have to call valToCoord for every point
 		if (aCoord.x!=bCoord.x) {
@@ -221,7 +221,7 @@ GraphScatter.Set.prototype = {
 			var yIdx = bDataIdx.y + dataIdx;
 			var aToData = V(xScale*(data.x[xIdx]-a.x), yScale*(data.y[yIdx]-a.y));
 			var dist = Math.abs(aToData.dotProd(perpUV));
-			if (dist>set.fillInPtsMin) {
+			if (dist>this.fillInPtsMin) {
 				var ptOverLine = P(data.x[xIdx], data.y[yIdx]);
 				var edgePtInfo = this.getEdgePt({x:xIdx, y:yIdx}, bDataIdx, perpUV, ptOverLine, dist, a, data, xScale, yScale);
 				if (!edgePtInfo) {
@@ -229,8 +229,7 @@ GraphScatter.Set.prototype = {
 				}
 				var edgeDataIdx = edgePtInfo.dataIdx;
 				var edgePt = edgePtInfo.pt;
-				edgePt.address = address;
-				var restOfTurnPts = this.addPtsAtTurns(edgePt, edgeDataIdx, b, bDataIdx, set, address);
+				var restOfTurnPts = this.fillInPtsFunc(edgePt, edgeDataIdx, b, bDataIdx, data);
 				return {newPts:[edgePt].concat(restOfTurnPts.newPts), dataIdxs:[edgeDataIdx].concat(restOfTurnPts.dataIdxs)};
 			}
 		}
