@@ -416,7 +416,7 @@ GraphBase = {
 		var min = Number.MAX_VALUE;
 		var max = -Number.MAX_VALUE;
 		for (var set in this.data){
-			var data = this.data[set][axis];
+			var data = this.data[set].data[axis];
 			for (var dataIdx=0; dataIdx<data.length; dataIdx++){
 				var datum = data[dataIdx];
 				min = Math.min(min, datum);

@@ -16,3 +16,4 @@ Test q rate/ammt arrows
 
 SUBTRACT HEATER VOL OFF
 make it so you can generate phase diagrams
+change expressions for state listeners too

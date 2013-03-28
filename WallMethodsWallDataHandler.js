@@ -244,7 +244,7 @@ WallMethods.wallDataHandler = {
 		var dots = this.dotManager.createIfNotExists(info);
 		if (!this.data.vDist) this.data.vDist = [];
 		
-		if (this.getDataObj('vDist', info) == undefined) {
+		if (!this.getDataObj('vDist', info)) {
 			this.data.vDist.push(new WallMethods.DataObj());
 			var dataObj = this.data.vDist[this.data.vDist.length-1];
 			this.setupInfoDataObj(dataObj, 'vDist', info);

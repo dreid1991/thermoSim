@@ -56,55 +56,21 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 				if (set.visible) set.drawPts(justQueue !== false);
 			}
 		},
-		addLast: function(){
+		addLast: function(){ //point of entry
 			var toAdd = [];
 			for (var address in this.data){
 				var set = this.data[address];
 				set.enqueuePts();
-				//toAdd = toAdd.concat(set.getNewPts());				
 			}
-			//flushQueue or something
 			this.flushQueues(true, false);
 		},
 
-		// plotData: function(xVals, yVals, address){
-			// if (xVals.length==yVals.length && xVals.length>1){
-				// this.data[address].x = xVals;
-				// this.data[address].y = yVals;
-				// this.valRange.x = this.getRange('x');
-				// this.valRange.y = this.getRange('y');
-				// this.getAxisBounds();
-				// this.drawAllData();
-			// } else if (xVals.length!=yVals.length){
-				// console.log("xVals has ", xVals.length, "entries");
-				// console.log("yVals has ", yVals.length, "entries");
-				// console.log("UH-OH");
-			// };
-		// },
 
 		getAxisBounds: function(){
 			this.getXBounds();
 			this.getYBounds();
 		},
 
-
-		// graphPts: function(){
-			// for (var setName in this.data) {
-				// var set = this.data[setName];
-				// if (set.show) {
-					// var col = set.pointCol;
-					// for (var ptIdx=0; ptIdx<set.x.length; ptIdx++){
-						// var xVal = set.x[ptIdx];
-						// var yVal = set.y[ptIdx];
-						// this.graphPt(xVal, yVal, col);
-						// if (set.trace) {
-							// this.trace(set, ptIdx);
-						// }
-					// }
-				// }
-				
-			// }
-		// },
 		graphPt: function(xVal, yVal, col){
 			var pt = this.valToCoord(P(xVal,yVal));
 			this.drawPtStd(pt, col);
@@ -168,7 +134,7 @@ GraphScatter.Set.prototype = {
 	},
 	recordStart: function() {
 		addListener(curLevel, 'update', this.recordListenerName, function() {
-			if (turn % 5 == 0) this.addVal();
+			if (turn % 2 == 0) this.addVal();
 		}, this);
 	},
 	recordStop: function() {
@@ -318,22 +284,24 @@ GraphScatter.Set.prototype = {
 		}
 	},
 	flashInit: function(){
-		for (var ptIdx=0; ptIdx<this.queuePts.length; ptIdx++) {
-			var pt = this.queuePts[ptIdx];
-			var pos = this.graph.valToCoord(pt);
-			var xPt = pos.x;
-			var yPt = pos.y;
-			var pointCol = this.pointCol
-			var flashCol = this.flashCol;
-			var curCol = flashCol.copy();
-			var imagePos = P(xPt - this.graph.characLen * this.graph.flashMult - 1, yPt - this.graph.characLen * this.graph.flashMult - 1);
-			var len = this.graph.characLen * 2 * this.graph.flashMult + 2;
-			var curCharacLen = this.graph.characLen * this.graph.flashMult;
-			var imageData = this.graph.graph.getImageData(imagePos.x, imagePos.y, len, len);
-			this.flashers.push(new GraphScatter.Flasher(pos, pointCol, flashCol, curCol, curCharacLen, imagePos, imageData));
-		}
-		if (this.flashers.length > 0) {
-			addListener(curLevel, 'update', 'flash'+this.handle, this.flashRun, this);
+		if (this.visible) {
+			for (var ptIdx=0; ptIdx<this.queuePts.length; ptIdx++) {
+				var pt = this.queuePts[ptIdx];
+				var pos = this.graph.valToCoord(pt);
+				var xPt = pos.x;
+				var yPt = pos.y;
+				var pointCol = this.pointCol
+				var flashCol = this.flashCol;
+				var curCol = flashCol.copy();
+				var imagePos = P(xPt - this.graph.characLen * this.graph.flashMult - 1, yPt - this.graph.characLen * this.graph.flashMult - 1);
+				var len = this.graph.characLen * 2 * this.graph.flashMult + 2;
+				var curCharacLen = this.graph.characLen * this.graph.flashMult;
+				var imageData = this.graph.graph.getImageData(imagePos.x, imagePos.y, len, len);
+				this.flashers.push(new GraphScatter.Flasher(pos, pointCol, flashCol, curCol, curCharacLen, imagePos, imageData));
+			}
+			if (this.flashers.length > 0) {
+				addListener(curLevel, 'update', 'flash'+this.handle, this.flashRun, this);
+			}
 		}
 		
 	},
@@ -429,9 +397,7 @@ GraphScatter.DataFuncs = function(graph, xExpr, yExpr) {
 	this.x = graph.makeDataFunc(xExpr);
 	this.y = graph.makeDataFunc(yExpr);
 }
-GraphScatter.DataFuncs.prototype = {
 
-}
 GraphScatter.Data = function() {
 	this.x = [];
 	this.y = [];

@@ -41,53 +41,57 @@ DataDisplayer.prototype = {
 	},
 	dataGetFuncs: {
 		tempSmooth: function(wallHandle) {
-			var src = walls[wallHandle].getDataObj('temp').src();
+			var src = walls[wallHandle].getDataSrc('temp');
 			var numVals = Math.min(15, src.length);
 			var init = src.length - numVals;
 			var sum = 0;
 			for (i=0; i<numVals; i++) {
 				sum += src[init + i];
 			}
-			return sum / numVals
+			return sum / numVals;
 		},
 		temp: function(wallHandle) {
-			var src = walls[wallHandle].getDataObj('temp').src();
+			var src = walls[wallHandle].getDataSrc('temp');
 			return src[src.length - 1];
 		},
 		pInt: function(wallHandle) {
-			var src = walls[wallHandle].getDataObj('pInt').src();
+			var src = walls[wallHandle].getDataSrc('pInt');
 			return src[src.length - 1];
 		},
 		pExt: function(wallHandle) {
-			var src = walls[wallHandle].getDataObj('pExt').src();
+			var src = walls[wallHandle].getDataSrc('pExt');
 			return src[src.length - 1];
 		},
 		vol: function(wallHandle) {
-			var src = walls[wallHandle].getDataObj('vol').src();
+			var src = walls[wallHandle].getDataSrc('vol');
 			return src[src.length - 1];
 		},
 		q: function(wallHandle) {
-			var src = walls[wallHandle].getDataObj('q').src();
+			var src = walls[wallHandle].getDataSrc('q');
 			return src[src.length - 1];
 		},
 		mass: function(wallHandle) {
-			var src = walls[wallHandle].getDataObj('mass').src();
+			var src = walls[wallHandle].getDataSrc('mass');
 			return src[src.length - 1];
 		},
 		moles: function(wallHandle, args) {
-			var src = walls[wallHandle].getDataObj('mass', args).src();
+			var src = walls[wallHandle].getDataSrc('mass', args);
 			return src[src.length - 1];
 		},
 		frac: function(wallHandle, args) {
-			var src = walls[wallHandle].getDataObj('frac', args).src();
+			var src = walls[wallHandle].getDataSrc('frac', args);
 			return src[src.length - 1];
 		},
 		time: function(wallHandle, args) {
-			var src = walls[wallHandle].getDataObj('time', args).src();
+			var src = walls[wallHandle].getDataSrc('time', args);
 			return src[src.length - 1];
 		},
 		work: function(wallHandle, args) {
-			var src = walls[wallHandle].getDataObj('work', args).src();
+			var src = walls[wallHandle].getDataSrc('work', args);
+			return src[src.length - 1];
+		},
+		vDist: function(wallHandle, args) {
+			var src = walls[wallHandle].getDataSrc('vDist', args);
 			return src[src.length - 1];
 		}
 	},

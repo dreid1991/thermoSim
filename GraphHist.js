@@ -10,17 +10,14 @@ function GraphHist(attrs){
 	this.labelFont = this.labelFontSize+ 'pt calibri';
 	this.axisValFont = this.axisValFontSize+ 'pt calibri';
 	this.borderSpacing = 70;
-	this.xStart = this.borderSpacing/this.dims.dx;
-	this.yStart = 1-this.borderSpacing/this.dims.dy;
-	this.legendWidth = 80;
-	this.xEnd = .95;
-	this.yEnd = .05;
+	this.graphRangeFrac = new GraphBase.Range(this.borderSpacing/this.dims.dx, .95, 1-this.borderSpacing/this.dims.dy, .05);
+	//this.legendWidth = 80;
 	this.gridSpacing = 40;
 	this.numBins = 18;
 	this.setNumGridLines();
-	
-	this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1)}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1)}};
-	this.axisRange = {x:{min:0, max:0}, y:{min:0, max:0}};
+	this.axisInit = new GraphBase.Range(axisInit.x.min, axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1), axisInit.y.min, axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1));
+	//this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1)}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1)}};
+	//this.axisRange = {x:{min:0, max:0}, y:{min:0, max:0}}; done in setStds
 	this.data = {};
 	this.legend = {};
 	this.resetRanges();
@@ -42,13 +39,15 @@ _.extend(GraphHist.prototype, AuxFunctions, GraphBase,
 		addSet: function(attrs){
 			//just using set.x
 			//histogram will curently only accept lists in the data object
-			var xData = walls[attrs.data.x.wallInfo].getDataObj(attrs.data.x.data, attrs.data.x.attrs).src();
-			var set = {};
-			set.x = [];
-			set.y = [];
-			set.barCol = attrs.barCol;
-			set.getLast = this.makeHistDataGrabFunc(xData);
-			this.data.theData = set;
+			//this, attrs.handle, attrs.label, attrs.data, attrs.pointCol, attrs.flashCol, attrs.fillInPts, attrs.fillInPtsMin, attrs.trace
+			var set = new GraphHist.Set(this, attrs.handle, attrs.data, attrs.barCol);
+			// var xData = walls[attrs.data.x.wallInfo].getDataObj(attrs.data.x.data, attrs.data.x.attrs).src();
+			// var set = {};
+			// set.x = [];
+			// set.y = [];
+			// set.barCol = attrs.barCol;
+			// set.getLast = this.makeHistDataGrabFunc(xData);
+			this.data[set.handle] = set;
 			this.drawAllBG();
 		},
 		drawAllData: function(){
@@ -56,45 +55,46 @@ _.extend(GraphHist.prototype, AuxFunctions, GraphBase,
 			this.drawAxisVals();
 			this.graphBins();
 		},
-		drawLastData: function(toAdd){
-			for (var addIdx=0; addIdx<toAdd.length; addIdx++){
-				var dataSet = this.data[toAdd[addIdx].address];
-				if(dataSet.show){
-					var xPt = dataSet.x[dataSet.x.length-1]
-					var yPt = dataSet.y[dataSet.y.length-1]
-					var pointCol = dataSet.pointCol
-					this.graphPt(xPt, yPt, pointCol);
-				}
-			}	
-		},
-		addLast: function(){
+		// drawLastData: function(toAdd){
+			// for (var addIdx=0; addIdx<toAdd.length; addIdx++){
+				// var dataSet = this.data[toAdd[addIdx].address];
+				// if (dataSet.show) {
+					// var xPt = dataSet.x[dataSet.x.length-1]
+					// var yPt = dataSet.y[dataSet.y.length-1]
+					// var pointCol = dataSet.pointCol
+					// this.graphPt(xPt, yPt, pointCol);
+				// }
+			// }	
+		// },
+		addLast: function(){//point of entry 
 			var toAdd = [];
 			var theOnlyAddress = '';
 			var last;
 			for (var address in this.data){
 				theOnlyAddress = address;
-				last = this.data[theOnlyAddress].getLast();
+				
 			}
-			this.data[theOnlyAddress].x = last.data;
-			this.makeBins(theOnlyAddress);
+			var set = this.data[theOnlyAddress];
+			set.addVal();
+			this.makeBins(set);
 		},
 		plotData: function(vals){
 			var theOnlyAddress = '';
 			for(var address in this.data){
 				theOnlyAddress = address;
 			}
-			this.data[theOnlyAddress].x = vals;
-			this.makeBins(theOnlyAddress)
+			this.data[theOnlyAddress].data.x = vals;
+			this.makeBins(this.data[theOnlyAddress])
 		},
 		// getAxisBounds: function(){
 			// this.getXBounds();
 			// this.getYBounds();
 		// },
-		makeBins: function(theOnlyAddress){
+		makeBins: function(set){
 			this.valRange.x = this.getRange('x');
 			this.setAxisBoundsX();
-			this.bins = this.makeBinBlanks(this.data[theOnlyAddress].x);
-			this.populateBins(this.data[theOnlyAddress].x);
+			this.bins = this.makeBinBlanks(set.data.x);
+			this.populateBins(set.data.x);
 			this.setYAxis();
 			this.drawAllData();
 		},
@@ -149,3 +149,24 @@ _.extend(GraphHist.prototype, AuxFunctions, GraphBase,
 	}
 )
 
+GraphHist.Set = function(graph, handle, dataExpr, barCol) {
+	this.graph = graph;
+	this.handle = handle || 'onlyData';
+	this.data = new GraphHist.Data();
+	this.dataFunc = new GraphHist.DataFunc(graph, dataExpr);
+	this.barCol = barCol;
+	this.visible = true;
+}
+GraphHist.Set.prototype = {
+	addVal: function() {
+		this.data.x = this.dataFunc.x();
+	},
+	recordStop: function(){},
+	
+}
+GraphHist.Data = function() {
+	this.x = [];
+}
+GraphHist.DataFunc = function(graph, expr) {
+	this.x = graph.makeDataFunc(expr);
+}

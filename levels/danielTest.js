@@ -92,7 +92,8 @@ _.extend(TestLevel.prototype,
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
-					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugly', tag: 'wally'}}
+					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugly', tag: 'wally'}},
+					{wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}}
 				],
 				dataReadouts: [
 					{label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', sigFigs: 3, handle: 'someTemp', readout: 'mainReadout'},
@@ -116,9 +117,14 @@ _.extend(TestLevel.prototype,
 					// {handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				// ]
 				graphs: [
-					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:1}, y:{min:0, step:1}}, 
+					// {type: 'Scatter', handle: 'PvsVOne', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:1}, y:{min:0, step:1}}, 
+						// sets:[
+							// {handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "vol('wally') - vol('heaterHeaty')", y: "pExt('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
+						// ]
+					// }
+					 {type: 'Hist', handle: 'PvsVOne', xLabel: "xLabel", yLabel: "yLabel", axesInit:{x:{min:0, step:50}, y:{min:0, step:10}}, 
 						sets:[
-							{handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "vol('wally') - vol('heaterHeaty')", y: "pExt('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
+							{handle:'pExt', barCol:Col(255,50,50), data:"vDist('wally', {spcName: 'spc1', tag: 'wally'})"}
 						]
 					}
 				],
