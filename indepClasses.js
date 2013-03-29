@@ -94,6 +94,15 @@ Species.prototype = {
 	internalEnergy: function(temp) {
 		return (this.hF198 * 1000 + this.cv * (temp - 298.15)) / N;
 	},
+	tBoil: function(pressure) { //in bar
+		pressure /= MMHGTOBAR;
+		var coeffs = this.antoineCoeffs;
+		return coeffs.b / (coeffs.a - Math.log10(pressure)) - coeffs.c;
+	},
+	pPure: function(temp) {
+		var coeffs = this.antoineCoeffs;
+		return returh MMHGTOBAR * Math.pow(10, coeffs.a - coeffs.b / (coeffs.c + temp));
+	}
 }
 function Point(x, y){
 	this.x = x;
