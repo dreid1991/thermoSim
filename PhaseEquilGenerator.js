@@ -2,6 +2,7 @@ function PhaseEquilGenerator() {
 	
 }
 PhaseEquilGenerator.prototype = {
+	//make a constT one.  That would be easy.  
 	constP: function(spcA, spcB, actCoeffFuncs, pressure, numPts) {
 		var tBoilA = spcA.tBoil(pressure);
 		var tBoilB = spcB.tBoil(pressure);
@@ -33,7 +34,7 @@ PhaseEquilGenerator.prototype = {
 		var temp = tInit;
 		var pCur = this.solvePTotal(temp, xHeavy, keyLight, keyHeavy, actFuncLight, actFuncHeavy);
 		while (fracDiff(pCur, pSys) > .01) {
-		
+			//Newton method
 			var derivative = this.getDPDT(temp, xHeavy, keyLight, keyHeavy, tBoilLight, tBoilHeavy, actFuncLight, actFuncHeavy);
 			temp += (pSys - pCur) / derivative;
 			temp = bound(temp, tBoilLight, tBoilHeavy);

@@ -38,7 +38,7 @@ function GraphScatter(attrs) {
 _.extend(GraphScatter.prototype, AuxFunctions, GraphBase, 
 	{
 		addSet: function(attrs){//address, label, pointCol, flashCol, data:{x:{wallInfo, data}, y:{same}}){
-			var set = new GraphScatter.Set(this, attrs.handle, attrs.label, attrs.data, attrs.pointCol, attrs.flashCol, attrs.fillInPts, attrs.fillInPtsMin, attrs.trace);
+			var set = new GraphScatter.Set(this, attrs.handle, attrs.label, attrs.data, attrs.pointCol, attrs.flashCol, attrs.fillInPts, attrs.fillInPtsMin, attrs.trace, attrs.recording, attrs.drawPts);
 
 			this.data[attrs.handle] = set;
 			
@@ -53,19 +53,17 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 		drawPts: function(justQueue){
 			for (var setName in this.data) {
 				var set = this.data[setName]
-				if (set.visible) set.drawPts(justQueue !== false);
+				set.drawPts(justQueue !== false);
 			}
 		},
 		addLast: function(){ //point of entry
 			var toAdd = [];
 			for (var address in this.data){
 				var set = this.data[address];
-				set.enqueuePts();
+				if (set.recording) set.enqueuePts();
 			}
 			this.flushQueues(true, false);
 		},
-
-
 		getAxisBounds: function(){
 			this.getXBounds();
 			this.getYBounds();
@@ -97,11 +95,12 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 )
 
 
-GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol, fillInPts, fillInPtsMin, trace) {
+GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol, fillInPts, fillInPtsMin, trace, recording, drawPts) {
 	this.graph = graph;
 	this.handle = handle;
 	this.label = label;
 	this.data = new GraphScatter.Data();
+	this.drawPts = defaultTo(true, drawPts);
 	this.graphedPts = [];
 	this.graphedPtIdxs = [];
 	this.dataFuncs = new GraphScatter.DataFuncs(graph, dataExprs.x, dataExprs.y);
@@ -117,7 +116,9 @@ GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol,
 	this.flashers = [];
 	this.queuePts = [];
 	this.queneIdxs = [];
-	this.recordStart();
+	this.recording = defaultTo(true, recording);
+	if (this.recording) this.recordStart();
+
 }
 
 GraphScatter.Set.prototype = {
@@ -257,34 +258,36 @@ GraphScatter.Set.prototype = {
 		}
 	},
 	drawPts: function(justQueue) {
-		var toDraw;
-		var idxs = [];
-		if (justQueue) {
-			toDraw = this.queuePts;
-			idxs = this.queueIdxs;
-			
-		} else {
-			toDraw = this.graphedPts.concat(this.queuePts); 
-			idxs = this.graphedPtIdxs.concat(this.queueIdxs);
-		}
-		if (this.trace) {
+		if (this.visibile && this.drawPts) {
+			var toDraw;
+			var idxs = [];
 			if (justQueue) {
-				if (this.graphedPtIdxs.length) {
-					this.drawTrace(this.graphedPtIdxs[this.graphedPtIdxs.length - 1].x, idxs[idxs.length - 1].x, this.graphedPtIdxs[this.graphedPtIdxs.length - 1].y, idxs[idxs.length - 1].y);
-				}
+				toDraw = this.queuePts;
+				idxs = this.queueIdxs;
+				
 			} else {
-				this.drawTrace(idxs[0].x, idxs[idxs.length - 1].x, idxs[0].y, idxs[idxs.length - 1].y)
+				toDraw = this.graphedPts.concat(this.queuePts); 
+				idxs = this.graphedPtIdxs.concat(this.queueIdxs);
 			}
-		}
-		for (var ptIdx=0; ptIdx<toDraw.length; ptIdx++) {
-			var x = toDraw[ptIdx].x;
-			var y = toDraw[ptIdx].y;
-			this.graph.graphPt(x, y, this.pointCol);
-		
+			if (this.trace) {
+				if (justQueue) {
+					if (this.graphedPtIdxs.length) {
+						this.drawTrace(this.graphedPtIdxs[this.graphedPtIdxs.length - 1].x, idxs[idxs.length - 1].x, this.graphedPtIdxs[this.graphedPtIdxs.length - 1].y, idxs[idxs.length - 1].y);
+					}
+				} else {
+					this.drawTrace(idxs[0].x, idxs[idxs.length - 1].x, idxs[0].y, idxs[idxs.length - 1].y)
+				}
+			}
+			for (var ptIdx=0; ptIdx<toDraw.length; ptIdx++) {
+				var x = toDraw[ptIdx].x;
+				var y = toDraw[ptIdx].y;
+				this.graph.graphPt(x, y, this.pointCol);
+			
+			}
 		}
 	},
 	flashInit: function(){
-		if (this.visible) {
+		if (this.visible && this.drawPts) {
 			for (var ptIdx=0; ptIdx<this.queuePts.length; ptIdx++) {
 				var pt = this.queuePts[ptIdx];
 				var pos = this.graph.valToCoord(pt);
