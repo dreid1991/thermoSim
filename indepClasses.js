@@ -101,7 +101,7 @@ Species.prototype = {
 	},
 	pPure: function(temp) {
 		var coeffs = this.antoineCoeffs;
-		return returh MMHGTOBAR * Math.pow(10, coeffs.a - coeffs.b / (coeffs.c + temp));
+		return MMHGTOBAR * Math.pow(10, coeffs.a - coeffs.b / (coeffs.c + temp));
 	}
 }
 function Point(x, y){

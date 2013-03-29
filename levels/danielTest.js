@@ -53,14 +53,14 @@ _.extend(TestLevel.prototype,
 						// type: 'AuxImage',
 						// attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/work/block0Pic1.jpg)'}
 					// },
-					// {
-						// type: 'Liquid',
-						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 500, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
-					// },
 					{
-						type: 'Heater',
-						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty'}
+						type: 'Liquid',
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 500, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
 					},
+					// {
+						// type: 'Heater',
+						// attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty'}
+					// },
 					{
 						type: 'DragWeights',
 						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 2}], pInit: 1}
@@ -82,7 +82,7 @@ _.extend(TestLevel.prototype,
 				],
 				dataReadouts: [
 					{label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', sigFigs: 3, handle: 'someTemp', readout: 'mainReadout'},
-					{label: 'Vol: ', expr: 'vol("wally") - vol("heaterHeaty")', units: 'L', sigFigs: 3, handle: 'loopy', readout: 'mainReadout'}
+					{label: 'Vol: ', expr: 'vol("wally")', units: 'L', sigFigs: 3, handle: 'loopy', readout: 'mainReadout'}
 				],
 				// dataDisplay: [
 					// {wallInfo: 'wally', data:'pInt', readout: 'mainReadout'},
@@ -107,11 +107,11 @@ _.extend(TestLevel.prototype,
 							// {handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "vol('wally') - vol('heaterHeaty')", y: "pExt('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						// ]
 					// }
-					 {type: 'Hist', handle: 'PvsVOne', xLabel: "xLabel", yLabel: "yLabel", axesInit:{x:{min:0, step:50}, y:{min:0, step:10}}, 
-						sets:[
-							{handle:'pExt', barCol:Col(255,50,50), data:"vDist('wally', {spcName: 'spc1', tag: 'wally'})"}
-						]
-					}
+					 // {type: 'Hist', handle: 'PvsVOne', xLabel: "xLabel", yLabel: "yLabel", axesInit:{x:{min:0, step:50}, y:{min:0, step:10}}, 
+						// sets:[
+							// {handle:'pExt', barCol:Col(255,50,50), data:"vDist('wally', {spcName: 'spc1', tag: 'wally'})"}
+						// ]
+					// }
 				],
 			},
 			prompts: [

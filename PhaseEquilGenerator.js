@@ -5,32 +5,34 @@ PhaseEquilGenerator.prototype = {
 	constP: function(spcA, spcB, actCoeffFuncs, pressure, numPts) {
 		var tBoilA = spcA.tBoil(pressure);
 		var tBoilB = spcB.tBoil(pressure);
-		var tBoilLight = tBoilA < tBoilB ? tBoilA ; tBoilB;
-		var tBoilHeavy = tBoilA > tBoilB ? tBoilA ; tBoilB;
+		var tBoilLight = tBoilA < tBoilB ? tBoilA : tBoilB;
+		var tBoilHeavy = tBoilA > tBoilB ? tBoilA : tBoilB;
 		var keyLight = tBoilA < tBoilB ? spcA : spcB;
 		var keyHeavy = tBoilA > tBoilB ? spcA : spcB;
-		var actFuncLight = actCoeffFuncs[lightKey.spcName];
-		var actFuncHeavy = actCoeffFuncs[heavyKey.spcName];
+		var actFuncLight = actCoeffFuncs[keyLight.spcName];
+		var actFuncHeavy = actCoeffFuncs[keyHeavy.spcName];
 		var equilData = this.makeConstPEquil(pressure, keyLight, keyHeavy, tBoilLight, tBoilHeavy, actFuncLight, actFuncHeavy, numPts);
-		return PhaseEquilGenerator.EquilData(equilData, keyLight.spcName, keyHeavy,spcName);
+		return new PhaseEquilGenerator.EquilData(equilData, keyLight.spcName, keyHeavy.spcName);
 	},
 	makeConstPEquil: function(pressure, keyLight, keyHeavy, tBoilLight, tBoilHeavy, actFuncLight, actFuncHeavy, numPts) {
 		var equilData = [];
-		var stepSize = 1 / numPts;
-		for (var xHeavy=0; xHeavy<1; xHeavy+=stepSize) {
+		var stepSize = 1 / (numPts - 1);
+		for (var step=0, xHeavy=0; step<numPts; step++) {
 			var tGuess = tBoilLight + (tBoilHeavy - tBoilLight) * xHeavy;
 			var tStep = this.solveTAtStep(tGuess, pressure, xHeavy, keyLight, keyHeavy, tBoilLight, tBoilHeavy, actFuncLight, actFuncHeavy);
 			var pTotal = this.solvePTotal(tStep, xHeavy, keyLight, keyHeavy, actFuncLight, actFuncHeavy);
 			var pLight = this.pSpc(keyLight, tStep, actFuncLight, 1 - xHeavy);
 			
 			equilData.push(new PhaseEquilGenerator.EquilPt(1 - xHeavy, xHeavy, pLight / pTotal, 1 - pLight / pTotal, tStep, pressure));
+			xHeavy += stepSize;
 		}
+		
 		return equilData;
 	},
 	solveTAtStep: function(tInit, pSys, xHeavy, keyLight, keyHeavy, tBoilLight, tBoilHeavy, actFuncLight, actFuncHeavy) {
 		var temp = tInit;
 		var pCur = this.solvePTotal(temp, xHeavy, keyLight, keyHeavy, actFuncLight, actFuncHeavy);
-		while (fracDiff(pCur, pSys) < .01) {
+		while (fracDiff(pCur, pSys) > .01) {
 		
 			var derivative = this.getDPDT(temp, xHeavy, keyLight, keyHeavy, tBoilLight, tBoilHeavy, actFuncLight, actFuncHeavy);
 			temp += (pSys - pCur) / derivative;
@@ -53,7 +55,7 @@ PhaseEquilGenerator.prototype = {
 		return pLight + pHeavy;
 	},
 	pSpc: function(key, tSys, actFunc, x) {
-		return key.pPure(tSys) * actFuncLight(x) * x;
+		return key.pPure(tSys) * actFunc(x, tSys) * x;
 	}
 }
 
