@@ -22,7 +22,7 @@ function GraphScatter(attrs) {
 	this.gridSpacing = 40;
 	
 	this.setNumGridLines();
-	this.axisInit = new GraphBase.Range(axisInit.x.min, axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1), axisInit.y.min, axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1));
+	this.axisInit = new GraphBase.Range(axisInit.x.min, axisInit.x.min + axisInit.x.step*(this.numGridLines.x-1), axisInit.y.min, axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1));
 	//this.axisRange = new this.Range(0, 0, 0, 0);
 	this.data = {};
 	this.legend = {};
@@ -132,6 +132,9 @@ GraphScatter.Set.prototype = {
 	addVal: function() {
 		this.data.x.push(this.dataFuncs.x());
 		this.data.y.push(this.dataFuncs.y());
+	},
+	setData: function(data) {
+		this.data.setData(data);
 	},
 	recordStart: function() {
 		addListener(curLevel, 'update', this.recordListenerName, function() {
@@ -411,7 +414,13 @@ GraphScatter.Data.prototype = {
 			return P(this.x[this.x.length - 1], this.y[this.y.length - 1]);
 		}
 		return P(this.x[idx], this.y[idx]);
-	}
+	},
+	setData: function(data) {//takes list of points
+		for (var i=0; i<data.length; i++) {
+			this.x[i] = data[i].x;
+			this.y[i] = data[i].y;
+		}
+	},
 }
 
 GraphScatter.Coord = function(x, y) {

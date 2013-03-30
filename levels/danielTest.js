@@ -55,7 +55,7 @@ _.extend(TestLevel.prototype,
 					// },
 					{
 						type: 'Liquid',
-						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 500, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}}
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 500, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}, makePhaseDiagram: true}
 					},
 					// {
 						// type: 'Heater',
@@ -112,6 +112,7 @@ _.extend(TestLevel.prototype,
 							// {handle:'pExt', barCol:Col(255,50,50), data:"vDist('wally', {spcName: 'spc1', tag: 'wally'})"}
 						// ]
 					// }
+
 				],
 			},
 			prompts: [

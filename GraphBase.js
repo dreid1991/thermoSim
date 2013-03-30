@@ -140,7 +140,13 @@ GraphBase = {
 		draw.fillPtsAlpha(pts, this.integralCol, this.integralAlpha, this.graph);
 		this.graphPts();
 	},
-
+	setData: function(setHandle, data) {
+		var set = this.data[setHandle];
+		if (set) 
+			set.setData(data);
+		else 
+			console.log('Bad set handle ' + setHandle);
+	},
 	save: function(saveName){
 	
 		var saveName = defaultTo('graph'+this.handle, saveName);

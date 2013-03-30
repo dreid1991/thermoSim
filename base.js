@@ -13,7 +13,8 @@ $(function(){
 	turn = 0;
 	window.Graphs = {
 		Scatter: GraphScatter,
-		Hist: GraphHist
+		Hist: GraphHist,
+		Phase: GraphPhase
 	}
 	$('#canvasDiv').hide();
 	$('#base').hide();

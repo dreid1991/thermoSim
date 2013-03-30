@@ -9,6 +9,7 @@ function Liquid(attrs) {
 	this.cleanUpWith = attrs.cleanUpWith || currentSetupType;
 	this.actCoeffType = attrs.actCoeffType; //twoSfxMrg for two suffix margules, 
 	this.actCoeffInfo = attrs.actCoeffInfo;
+	var makePhaseDiagram = attrs.makePhaseDiagram;
 	this.Cp = 0; //to be set each turn/absorption and used in setting temperatures for reflecting dots.  Capital C denotes total heat capacity.
 	var tempInit = attrs.tempInit;
 	this.temp = tempInit;
@@ -31,6 +32,7 @@ function Liquid(attrs) {
 	this.updateListenerName = this.type + this.handle;
 	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs, this.surfAreaObj);
 	this.wallGas.addLiquid(this);
+	if (makePhaseDiagram) this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, this.handle);
 	this.setupStd();
 }
 
@@ -72,6 +74,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 		return nA;
 	},
+	
 	getLiqWallVol: function(spcDefs, counts, dotMgr) {
 		var vol = 0;
 		if (!dotMgr) {
@@ -389,6 +392,20 @@ _.extend(Liquid.prototype, objectFuncs, {
 		this.temp += q / Cp;
 		console.log(q/Cp);
 		this.wallLiq.q += q;
+	},
+	makePhaseDiagram: function(liquid, spcDefs, actCoeffFuncs, handle) {
+		var spcAName, spcBName
+		var primaryKey = 'Heavy';
+		for (var spcName in spcDefs) {
+			if (!spcAName) {
+				spcAName = spcName;
+			} else {
+				spcBName = spcName;
+			}
+		}
+		var axisInit = {x: {min: 0, max: 1}, y: {min: 200, max: 400});
+		
+		var graph = new GraphPhase({spcAName: spcAName, spcBName: spcBName, axisInit: axisInit, actCoeffFuncs: actCoeffFuncs, handle: handle});
 	},
 	remove: function() {
 		removeListener(curLevel, 'update', this.updateListenerName);
