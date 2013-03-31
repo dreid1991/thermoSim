@@ -22,9 +22,18 @@ GraphBase = {
 		this.parentDiv = this.pickParentDiv('graph');
 		this.parentDivId = $(this.parentDiv).attr('id');
 		var makeReset = defaultTo(true, this.makeReset);
-		var canvasData = this.makeCanvas(this.dims, this.parentDiv, this.handle + 'Graph', makeReset, this.handle + 'Button');
-		this.graphHTMLElement = canvasData.HTMLElement;
-		this.graph = canvasData.canvas;
+		var canvasDisplay = this.makeCanvas(this.dims, this.parentDiv, this.handle + 'Graph', makeReset, this.handle + 'Button');
+		this.graphDisplayHTMLElement = canvasDisplay.HTMLElem;
+		this.graphDisplay = canvasDisplay.canvas;
+		var dataHTML = templater.div({style: {display: 'none'}, attrs: {id: [this.handle + 'Data']}});
+		$(this.parentDiv).append(dataHTML);
+		this.dataDiv = $('#' + this.handle + 'Data');
+		var canvasData = this.makeCanvas(this.dims, this.dataDiv, this.handle + 'DataGraph', false, thoshandle + 'DataButton');
+		this.graphDataHTMLElement = canvasData.HTMLElem;
+		this.graphData = canvasData.canvas;
+		var cur
+		
+		
 	},
 	makeDataFunc: function(expr) {
 		with (DataGetFuncs) {
