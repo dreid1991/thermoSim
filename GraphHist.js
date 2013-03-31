@@ -25,7 +25,7 @@ function GraphHist(attrs){
 	
 	var barCol = Col(255,100,0);
 	this.setStds();
-	var canvasData = this.makeCanvas(this.dims);
+	//var canvasData = this.makeCanvas(this.dims);
 	this.drawAllBG();
 	//this.addSet('only', barCol, data);
 }

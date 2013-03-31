@@ -20,7 +20,7 @@ function GraphScatter(attrs) {
 	//this.yEnd = .05;
 	this.graphRangeFrac = new GraphBase.Range(this.borderSpacing/this.dims.dx, (this.dims.dx - (this.legendWidth+8))/this.dims.dx, 1-this.borderSpacing/this.dims.dy, .05);
 	this.gridSpacing = 40;
-	
+	this.makeReset = attrs.makeReset;
 	this.setNumGridLines();
 	this.axisInit = new GraphBase.Range(axisInit.x.min, axisInit.x.min + axisInit.x.step*(this.numGridLines.x-1), axisInit.y.min, axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1));
 	//this.axisRange = new this.Range(0, 0, 0, 0);
@@ -31,7 +31,7 @@ function GraphScatter(attrs) {
 	
 
 	this.setStds();
-	this.makeCanvas(this.dims);
+	//this.makeCanvas(this.dims);
 	this.drawAllBG();
 	
 }

@@ -12,6 +12,7 @@ function GraphPhase(attrs) {
 	attrs.handle += 'Scatter';
 	attrs.yLabel = 'Temp';
 	attrs.xLabel = 'x' + this.primaryKeyType; // make this a spc name
+	attrs.makeReset = false;
 	this.graph = new GraphScatter(attrs); //passing along axisInit
 	this.equilData;
 	this.updateEquilData(this.pressure);
@@ -22,6 +23,10 @@ function GraphPhase(attrs) {
 }
 
 GraphPhase.prototype = {
+	setPressure: function(pressure) {
+		this.updateEquilData(pressure);
+		this.updateGraph();
+	},
 	updateEquilData: function(pressure) {
 		var phaseData = phaseEquilGenerator.constP(this.spcA, this.spcB, this.actCoeffFuncs, pressure, 20);
 		var liqPts = [];

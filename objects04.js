@@ -406,6 +406,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var axisInit = {x: {min: 0, max: 1}, y: {min: 200, max: 400}};
 		
 		var graph = new GraphPhase({spcAName: spcAName, spcBName: spcBName, axisInit: axisInit, actCoeffFuncs: actCoeffFuncs, handle: handle});
+		return graph;
 	},
 	remove: function() {
 		removeListener(curLevel, 'update', this.updateListenerName);

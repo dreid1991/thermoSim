@@ -16,7 +16,15 @@ GraphBase = {
 		this.ptStroke = Col(0,0,0);
 		this.rectSideLen = 8;
 		//characLen, characteristic length, is the radius of the shape being used
-		this.characLen = Math.sqrt(Math.pow(this.rectSideLen, 2)/2);		
+		this.characLen = Math.sqrt(Math.pow(this.rectSideLen, 2)/2);	
+		this.buttonId = this.handle + 'Reset';
+		this.graphId = this.handle + 'Graph';
+		this.parentDiv = this.pickParentDiv('graph');
+		this.parentDivId = $(this.parentDiv).attr('id');
+		var makeReset = defaultTo(true, this.makeReset);
+		var canvasData = this.makeCanvas(this.dims, this.parentDiv, this.handle + 'Graph', makeReset, this.handle + 'Button');
+		this.graphHTMLElement = canvasData.HTMLElement;
+		this.graph = canvasData.canvas;
 	},
 	makeDataFunc: function(expr) {
 		with (DataGetFuncs) {
@@ -28,74 +36,49 @@ GraphBase = {
 		var numGridLinesY = Math.ceil(this.dims.dy*(Math.abs(this.graphRangeFrac.y.max-this.graphRangeFrac.y.min))/this.gridSpacing);
 		this.numGridLines = {x:numGridLinesX, y:numGridLinesY};
 	},
-	makeCanvas: function(dims, parentDiv) {
+	makeCanvas: function(dims, parentDiv, graphId, makeButton, buttonId) {
 		var self = this;
-		this.buttonId = this.handle + 'reset';
-		if (!parentDiv){
-			this.parentDiv = this.pickParentDiv('graph');
-		} else {
-			this.parentDiv = parentDiv;
-		}
-		this.parentDiv.html('');
-		this.parentDivId = $(this.parentDiv).attr('id');
+		
+		parentDiv.html('');
 		var html = templater.canvas({
 			attrs: {
-				id: [this.handle + 'Graph'],
+				id: [graphId],
 				class: ['noSelect'],
 				width: [dims.dx],
 				height: [dims.dy]
 			},
 		})
-		html += templater.button({
-			attrs: {
-				id: [this.buttonId]
-			},
-			style: {
-				position: 'absolute',
-				right: '.5em',
-				bottom: '.5em'
-			},
-			innerHTML: templater.img({
+		if (makeButton) {
+			html += templater.button({
 				attrs: {
-					src: ['img/refresh.gif']
-				}
-				})
+					id: [buttonId]
+				},
+				style: {
+					position: 'absolute',
+					right: '.5em',
+					bottom: '.5em'
+				},
+				innerHTML: templater.img({
+					attrs: {
+						src: ['img/refresh.gif']
+					}
+					})
 			});
+		}
 			
 		var canvasDiv = $(html);
 		
 		$(this.parentDiv).append(canvasDiv);
-		addJQueryElems($('#' + this.buttonId), 'button');
-		$('#' + this.buttonId).click(function(){self.reset()})
-		this.graphHTMLElement = document.getElementById(this.handle+'Graph');
-		this.graph = this.graphHTMLElement.getContext('2d');
-		
-	},
-	makeCanvasNoReset: function(dims, parentDiv) {
-		var self = this;
-		this.buttonId = this.handle + 'reset';
-		if (!parentDiv){
-			this.parentDiv = this.pickParentDiv('graph');
-		} else {
-			this.parentDiv = parentDiv;
+		if (makeButton) {
+			addJQueryElems($('#' + buttonId), 'button');
+			$('#' + buttonId).click(function(){self.reset()})
 		}
-		this.parentDiv.html('');
-		this.parentDivId = $(this.parentDiv).attr('id');
-		var html = templater.canvas({
-			attrs: {
-				id: [this.handle + 'Graph'],
-				class: ['noSelect'],
-				width: [dims.dx],
-				height: [dims.dy]
-			},
-		})
-		var canvasDiv = $(str);
-		
-		$(this.parentDiv).append(canvasDiv);
-		this.graphHTMLElement = document.getElementById(this.handle+'Graph');
-		this.graph = this.graphHTMLElement.getContext('2d');	
-	},
+		var HTMLElem = document.getElementById(graphId);
+		var canvas =  HTMLElem.getContext('2d');
+		return {HTMLElem: HTMLElem, canvas: canvas};
 
+		
+	},
 	remove: function(){
 		this.freeze();
 		removeListener(curLevel, 'update', 'flash' + this.handle);
