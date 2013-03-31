@@ -67,6 +67,7 @@ $(function(){
 	turnUpdater = setInterval('curLevel.update()', updateInterval);
 	dataUpdater = setInterval('curLevel.updateData()', dataInterval);
 	renderer = new Renderer();
+	phaseEquilGenerator = new PhaseEquilGenerator();
 	sceneNavigator = new SceneNavigator();
 	interpreter = new ExpressionInterpreter();
 	started = false;

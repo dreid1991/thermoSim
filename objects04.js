@@ -403,7 +403,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				spcBName = spcName;
 			}
 		}
-		var axisInit = {x: {min: 0, max: 1}, y: {min: 200, max: 400});
+		var axisInit = {x: {min: 0, max: 1}, y: {min: 200, max: 400}};
 		
 		var graph = new GraphPhase({spcAName: spcAName, spcBName: spcBName, axisInit: axisInit, actCoeffFuncs: actCoeffFuncs, handle: handle});
 	},

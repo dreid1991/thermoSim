@@ -5,7 +5,7 @@ function GraphScatter(attrs) {
 	//this.dims = V(width, height);
 	this.xLabel = attrs.xLabel;
 	this.yLabel = attrs.yLabel;
-	var axisInit = attrs.axesInit;
+	var axisInit = attrs.axesInit || attrs.axisInit;//sorry
 	this.labelFontSize = 15;
 	this.legendFontSize = 12;
 	this.axisValFontSize = 11;
@@ -103,6 +103,7 @@ GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol,
 	this.drawPts = defaultTo(true, drawPts);
 	this.graphedPts = [];
 	this.graphedPtIdxs = [];
+	dataExprs = dataExprs || {};
 	this.dataFuncs = new GraphScatter.DataFuncs(graph, dataExprs.x, dataExprs.y);
 	this.pointCol = pointCol;
 	this.flashCol = flashCol;
@@ -115,7 +116,7 @@ GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol,
 	this.traceLastIdxs = new GraphScatter.Coord(0, 0);
 	this.flashers = [];
 	this.queuePts = [];
-	this.queneIdxs = [];
+	this.queueIdxs = [];
 	this.recording = defaultTo(true, recording);
 	if (this.recording) this.recordStart();
 
@@ -148,11 +149,9 @@ GraphScatter.Set.prototype = {
 		var newPt = this.data.pt();
 		var newPts = [];
 		var newDataIdxs = [];
-		//going to try not having address in points
-		//newPt.address = address;
 		if (newPt.isValid()) {
 			var newDataIdx = new GraphScatter.Coord(this.data.x.length - 1, this.data.y.length - 1);
-			//this.graphedPtIdxs.push(newDataidx);
+
 			if (this.fillInPts && this.data.x.length && this.data.y.length && this.graphedPtIdxs.length) {
 				var lastDataIdx = this.graphedPtIdxs[this.graphedPtIdxs.length-1];
 				var lastPt = this.data.pt(lastDataIdx.x, lastDataIdx.y);
@@ -240,7 +239,7 @@ GraphScatter.Set.prototype = {
 		
 	},
 	updateRangeFromData: function(valRange) {
-		var initIdx = this.queueIdxs[0].x;
+		var initIdx = this.queueIdxs[0] ? this.queueIdxs[0].x : 0;
 		for (var i=initIdx; i<this.data.x.length; i++) {
 			var x = this.data.x[i];
 			var y = this.data.y[i];

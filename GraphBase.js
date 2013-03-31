@@ -258,6 +258,14 @@ GraphBase = {
 			this.drawPtStd(entry.pos, entry.col);
 		}
 	},
+	updateRange: function() {
+		var oldValRange = this.valRange.copy();
+		for (var setName in this.data) {
+			this.data[setName].updateRange(this.valRange);
+		}
+		
+		this.setAxisBounds(oldValRange);
+	},
 	flushQueues: function(flash, mustRedraw){
 		mustRedraw = defaultTo(false, mustRedraw);
 		flash = defaultTo(true, flash);
