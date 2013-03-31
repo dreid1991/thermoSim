@@ -32,7 +32,7 @@ function Liquid(attrs) {
 	this.updateListenerName = this.type + this.handle;
 	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs, this.surfAreaObj);
 	this.wallGas.addLiquid(this);
-	if (makePhaseDiagram) this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, this.handle);
+	//if (makePhaseDiagram) this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, this.handle);
 	this.setupStd();
 }
 
@@ -260,10 +260,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 				//converges to abs as df -> 0
 				
 				if (dF > 0) { 
-					numEjt[spcName] += abs - Math.sqrt(abs * (dF * drivingForceSensitivity + 1));
-					//numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
+					numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
 				} else {
-					numEjt[spcName] += abs + Math.sqrt(abs * (-dF * drivingForceSensitivity + 1));
+					numEjt[spcName] += 1 + Math.sqrt(abs * (-dF * drivingForceSensitivity + 1));
 					numEjt[spcName] += (wallLiq[0].x - wallLiq[1].x) * -dF * drivingForceSensitivity / 2000;
 				}
 				//numEjt[spcName] = 1;

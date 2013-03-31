@@ -46,7 +46,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			this.drawAllBG();
 		},
 		drawAllData: function(){
-			this.graph.putImageData(this.bg, 0, 0);
+			this.graphAssignments.data.putImageData(this.bg, 0, 0);
 			this.drawAxisVals();
 			this.drawPts(false);
 		},
@@ -86,7 +86,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			var pt3 = P(x+len, y);
 			var pt4 = P(x, y+len);
 			var pts = [pt1, pt2, pt3, pt4];
-			draw.fillPtsStroke(pts, col, this.ptStroke, this.graph);
+			draw.fillPtsStroke(pts, col, this.ptStroke, this.graphAssignments.data);
 		},
 		reset: function(){
 			this.resetStd()
