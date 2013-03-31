@@ -260,9 +260,10 @@ _.extend(Liquid.prototype, objectFuncs, {
 				//converges to abs as df -> 0
 				
 				if (dF > 0) { 
-					numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
+					numEjt[spcName] += abs - Math.sqrt(abs * (dF * drivingForceSensitivity + 1));
+					//numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
 				} else {
-					numEjt[spcName] += 1 + Math.sqrt(abs * (-dF * drivingForceSensitivity + 1));
+					numEjt[spcName] += abs + Math.sqrt(abs * (-dF * drivingForceSensitivity + 1));
 					numEjt[spcName] += (wallLiq[0].x - wallLiq[1].x) * -dF * drivingForceSensitivity / 2000;
 				}
 				//numEjt[spcName] = 1;
