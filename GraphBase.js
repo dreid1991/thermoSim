@@ -25,7 +25,7 @@ GraphBase = {
 		var canvasDisplay = this.makeCanvas(this.dims, this.parentDiv, this.handle + 'Graph', makeReset, this.handle + 'Button');
 		this.graphDisplayHTMLElement = canvasDisplay.HTMLElem;
 		this.graphDisplay = canvasDisplay.canvas;
-		var dataHTML = templater.div({style: {display: 'none'}, attrs: {id: [this.handle + 'Data']}});
+		var dataHTML = templater.div({style: {display: 'none', width: 0, height: 0}, attrs: {id: [this.handle + 'Data']}});
 		$(this.parentDiv).append(dataHTML);
 		this.dataDiv = $('#' + this.handle + 'Data');
 		var canvasData = this.makeCanvas(this.dims, this.dataDiv, this.handle + 'DataGraph', false, this.handle + 'DataButton');
@@ -77,7 +77,7 @@ GraphBase = {
 			
 		var canvasDiv = $(html);
 		
-		$(this.parentDiv).append(canvasDiv);
+		$(parentDiv).append(canvasDiv);
 		if (makeButton) {
 			addJQueryElems($('#' + buttonId), 'button');
 			$('#' + buttonId).click(function(){self.reset()})
@@ -183,17 +183,17 @@ GraphBase = {
 		}
 		return pts;
 	},
-	makeCheck: function(address, legend, toggleCol){
-		var entry = legend[address];
-		var oversize = this.checkMarkOversize;
-		var checkPt = entry.togglePos.copy();
-		var checkDims = entry.toggleDims.copy();
-		checkPt.x-=oversize;
-		checkPt.y-=oversize;
-		checkDims.dx+=2*oversize;
-		checkDims.dy+=2*oversize;	
-		return new CheckMark(checkPt, checkDims, toggleCol, Col(0,0,0), this.graphAssignments.data);
-	},
+	// makeCheck: function(address, legend, toggleCol){
+		// var entry = legend[address];
+		// var oversize = this.checkMarkOversize;
+		// var checkPt = entry.togglePos.copy();
+		// var checkDims = entry.toggleDims.copy();
+		// checkPt.x-=oversize;
+		// checkPt.y-=oversize;
+		// checkDims.dx+=2*oversize;
+		// checkDims.dy+=2*oversize;	
+		// return new CheckMark(checkPt, checkDims, toggleCol, Col(0,0,0), this.graphAssignments.data);
+	// },
 	drawAllBG: function(){
 		this.drawBGRect();
 		this.drawGrid();
@@ -503,7 +503,7 @@ GraphBase.LegendEntry = function(graph, set, col, text, x, y, fontSize, graphDim
 	this.boxPos = P(graphDims.dx - 18, y - 5); //whatever, will look at later
 	this.boxDims = V(13, 13);
 	this.mouseListenerName = 'toggle' + this.graph.handle.toCapitalCamelCase() + this.set.handle.toCapitalCamelCase();
-	this.checkMark = graph.checkMark(this.boxPos.copy(), this.boxDims.copy(), graph.checkMarkOversize, graph.toggleCol, graph.graph);
+	this.checkMark = graph.checkMark(this.boxPos.copy(), this.boxDims.copy(), graph.checkMarkOversize, graph.toggleCol, graph.graphAssignments.data);
 }
 
 GraphBase.LegendEntry.prototype = {

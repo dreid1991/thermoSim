@@ -317,7 +317,7 @@ GraphScatter.Set.prototype = {
 				var imagePos = P(xPt - this.graph.characLen * this.graph.flashMult - 1, yPt - this.graph.characLen * this.graph.flashMult - 1);
 				var len = this.graph.characLen * 2 * this.graph.flashMult + 2;
 				var curCharacLen = this.graph.characLen * this.graph.flashMult;
-				var imageData = this.graph.graph.getImageData(imagePos.x, imagePos.y, len, len);
+				var imageData = this.graph.graphAssignments.data.getImageData(imagePos.x, imagePos.y, len, len);
 				this.flashers.push(new GraphScatter.Flasher(pos, pointCol, flashCol, curCol, curCharacLen, imagePos, imageData));
 			}
 			if (this.flashers.length > 0) {
@@ -344,7 +344,7 @@ GraphScatter.Set.prototype = {
 	eraseFlashers: function(){
 		for (var flasherIdx=0; flasherIdx<this.flashers.length; flasherIdx++){
 			var flasher = this.flashers[flasherIdx];
-			this.graph.graph.putImageData(flasher.imageData, flasher.imagePos.x, flasher.imagePos.y);
+			this.graph.graphAssignments.data.putImageData(flasher.imageData, flasher.imagePos.x, flasher.imagePos.y);
 		}
 	},
 	flasherNextStep: function(flasher){
@@ -404,7 +404,7 @@ GraphScatter.Set.prototype = {
 					tracePts.push(pt);
 				}
 			}
-			draw.path(tracePts, this.pointCol, this.graph.graph);
+			draw.path(tracePts, this.pointCol, this.graph.graphAssignments.data);
 		} else {
 			console.log('Data count mismatch for tracing');
 			console.trace();
