@@ -104,7 +104,7 @@ _.extend(TestLevel.prototype,
 				graphs: [
 					// {type: 'Scatter', handle: 'PvsVOne', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:1}, y:{min:0, step:1}}, 
 						// sets:[
-							// {handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "vol('wally') - vol('heaterHeaty')", y: "pExt('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
+							// {handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "vol('wally')", y: "pExt('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						// ]
 					// }
 					 // {type: 'Hist', handle: 'PvsVOne', xLabel: "xLabel", yLabel: "yLabel", axesInit:{x:{min:0, step:50}, y:{min:0, step:10}}, 

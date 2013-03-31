@@ -16,7 +16,7 @@ function GraphPhase(attrs) {
 	this.equilData;
 	this.updateEquilData(this.pressure);
 	this.equilDataHandle = this.handle + 'PhaseData';
-	this.graph.addSet({handle: this.equilDataHandle, label: 'Phase\nData', pointCol: Col(255, 255, 255), flashCol: Col(0, 0, 0), trace: true, recording: false, drawPts: false});
+	this.graph.addSet({handle: this.equilDataHandle, label: 'Phase\nData', pointCol: Col(255, 255, 255), flashCol: Col(0, 0, 0), trace: true, recording: false, showPts: false});
 	this.updateGraph();
 	
 }
@@ -45,7 +45,8 @@ GraphPhase.prototype = {
 		
 	},
 	updateGraph: function() {
-		this.graph.setData(this.equilDataHandle, this.equilData);
+		this.graph.clearData(this.equilDataHandle, false);
+		this.graph.enqueueData(this.equilDataHandle, this.equilData);
 		this.graph.updateRange();
 		this.graph.drawAllData();
 	},

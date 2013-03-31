@@ -258,6 +258,15 @@ GraphBase = {
 			this.drawPtStd(entry.pos, entry.col);
 		}
 	},
+	clearData: function(setHandle, redraw) {
+		var set = this.data[setHandle];
+		if (set) set.clearData();
+		if (redraw) this.drawAllData();
+	},
+	enqueueData: function(setHandle, data) {
+		var set = this.data[setHandle];
+		if (set) set.enqueueData(data);
+	},
 	updateRange: function() {
 		var oldValRange = this.valRange.copy();
 		for (var setName in this.data) {

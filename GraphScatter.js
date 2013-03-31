@@ -38,7 +38,7 @@ function GraphScatter(attrs) {
 _.extend(GraphScatter.prototype, AuxFunctions, GraphBase, 
 	{
 		addSet: function(attrs){//address, label, pointCol, flashCol, data:{x:{wallInfo, data}, y:{same}}){
-			var set = new GraphScatter.Set(this, attrs.handle, attrs.label, attrs.data, attrs.pointCol, attrs.flashCol, attrs.fillInPts, attrs.fillInPtsMin, attrs.trace, attrs.recording, attrs.drawPts);
+			var set = new GraphScatter.Set(this, attrs.handle, attrs.label, attrs.data, attrs.pointCol, attrs.flashCol, attrs.fillInPts, attrs.fillInPtsMin, attrs.trace, attrs.recording, attrs.showPts);
 
 			this.data[attrs.handle] = set;
 			
@@ -95,12 +95,12 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 )
 
 
-GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol, fillInPts, fillInPtsMin, trace, recording, drawPts) {
+GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol, fillInPts, fillInPtsMin, trace, recording, showPts) {
 	this.graph = graph;
 	this.handle = handle;
 	this.label = label;
 	this.data = new GraphScatter.Data();
-	this.drawPts = defaultTo(true, drawPts);
+	this.showPts = defaultTo(true, showPts);
 	this.graphedPts = [];
 	this.graphedPtIdxs = [];
 	dataExprs = dataExprs || {};
@@ -127,15 +127,30 @@ GraphScatter.Set.prototype = {
 		this.graphedPts.splice(0, this.graphedPts.length);
 		this.graphedPtIdxs.splice(0, this.graphedPtIdxs.length);
 		this.flashers.splice(0, this.flashers.length);
-		this.queneIdxs.splice(0, this.queneIdxs.length);
+		this.queueIdxs.splice(0, this.queueIdxs.length);
 		this.queuePts.splice(0, this.queuePts.length);
 	},
 	addVal: function() {
 		this.data.x.push(this.dataFuncs.x());
 		this.data.y.push(this.dataFuncs.y());
 	},
-	setData: function(data) {
-		this.data.setData(data);
+	clearData: function() {
+		this.queuePts.splice(0, this.queuePts.length);
+		this.queueIdxs.splice(0, this.queueIdxs.length);
+		this.data.clear();
+	},
+	enqueueData: function(data) {
+		var initDataIdx = this.data.x.length;
+		this.queuePts = this.queuePts.concat(data);
+		this.addData(data);
+		for (var i=initDataIdx; i<this.data.x.length; i++) {
+			this.queueIdxs.push(P(i, i));
+		}
+		
+	},
+	addData: function(data) {
+		this.data.addData(data);
+		
 	},
 	recordStart: function() {
 		addListener(curLevel, 'update', this.recordListenerName, function() {
@@ -164,11 +179,10 @@ GraphScatter.Set.prototype = {
 			}
 			newPts.push(newPt);
 			newDataIdxs.push(newDataIdx);
-			//this.dataPtIdxs = this.dataPtIdxs.concat(newDataIdxs);
-			
+		
 		}
 		this.queuePts = this.queuePts.concat(newPts);
-		this.queueIdxs = this.queneIdxs.concat(newDataIdxs);
+		this.queueIdxs = this.queueIdxs.concat(newDataIdxs);
 	},
 	fillInPtsFunc: function(a, aDataIdx, b, bDataIdx, data){
 		var xDataRange = aDataIdx.x-bDataIdx.x;
@@ -260,7 +274,7 @@ GraphScatter.Set.prototype = {
 		}
 	},
 	drawPts: function(justQueue) {
-		if (this.visibile && this.drawPts) {
+		if (this.visible && (this.showPts || this.trace)) {
 			var toDraw;
 			var idxs = [];
 			if (justQueue) {
@@ -270,7 +284,7 @@ GraphScatter.Set.prototype = {
 			} else {
 				toDraw = this.graphedPts.concat(this.queuePts); 
 				idxs = this.graphedPtIdxs.concat(this.queueIdxs);
-			}
+			} 
 			if (this.trace) {
 				if (justQueue) {
 					if (this.graphedPtIdxs.length) {
@@ -280,16 +294,18 @@ GraphScatter.Set.prototype = {
 					this.drawTrace(idxs[0].x, idxs[idxs.length - 1].x, idxs[0].y, idxs[idxs.length - 1].y)
 				}
 			}
-			for (var ptIdx=0; ptIdx<toDraw.length; ptIdx++) {
-				var x = toDraw[ptIdx].x;
-				var y = toDraw[ptIdx].y;
-				this.graph.graphPt(x, y, this.pointCol);
-			
+			if (this.showPts) {
+				for (var ptIdx=0; ptIdx<toDraw.length; ptIdx++) {
+					var x = toDraw[ptIdx].x;
+					var y = toDraw[ptIdx].y;
+					this.graph.graphPt(x, y, this.pointCol);
+				
+				}
 			}
 		}
 	},
 	flashInit: function(){
-		if (this.visible && this.drawPts) {
+		if (this.visible && this.showPts) {
 			for (var ptIdx=0; ptIdx<this.queuePts.length; ptIdx++) {
 				var pt = this.queuePts[ptIdx];
 				var pos = this.graph.valToCoord(pt);
@@ -414,12 +430,22 @@ GraphScatter.Data.prototype = {
 		}
 		return P(this.x[idx], this.y[idx]);
 	},
-	setData: function(data) {//takes list of points
+	addData: function(data) {//takes list of points
 		for (var i=0; i<data.length; i++) {
-			this.x[i] = data[i].x;
-			this.y[i] = data[i].y;
+			this.x.push(data[i].x)
+			this.y.push(data[i].y)
 		}
 	},
+	toPts: function() {
+		var pts = [];
+		for (var i=0; i<this.x.length; i++) pts.push(this.x[i], this.y[i]);
+		return pts;
+	},
+	clear: function() {
+		this.x.splice(0, this.x.length);
+		this.y.splice(0, this.y.length);
+	
+	}
 }
 
 GraphScatter.Coord = function(x, y) {
