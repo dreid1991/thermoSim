@@ -366,7 +366,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var tEq = (this.Cp * tLiq + CGas * tGas) / (this.Cp + CGas);
 		var qMax = Math.abs((tLiq - tEq) * this.Cp);
 		
-		var qToDot = Math.max(sign * Math.min(qMax, 60 * CDot), (5 - tDot) * CDot);
+		var qToDot = Math.max(sign * Math.min(qMax, 100 * CDot), (5 - tDot) * CDot);
 		
 		var tDotTarget = tDot + qToDot / CDot;
 
