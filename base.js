@@ -304,8 +304,8 @@ function emptySave(object, typeName){
 	object[typeName + 'Listeners'].save = {};
 }
 function getListenerByName(object, typeName, pieceName){
-	for (thisFuncName in object[typeName + 'Listeners'].listeners){
-		if(thisFuncName.indexOf(pieceName)!=-1){
+	for (thisFuncName in object[typeName + 'Listeners'].listeners) {
+		if (thisFuncName.indexOf(pieceName)!=-1) {
 			return thisFuncName;
 		}
 	}

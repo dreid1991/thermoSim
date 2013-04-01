@@ -313,9 +313,6 @@ GraphScatter.Set.prototype = {
 		if (this.visible && this.showPts) {
 			for (var ptIdx=0; ptIdx<this.queuePts.length; ptIdx++) {
 				var pt = this.queuePts[ptIdx];
-				//var pos = this.graph.valToCoord(pt);
-				//var xPt = pos.x;
-				//var yPt = pos.y;
 				var pointCol = this.pointCol
 				var flashCol = this.flashCol;
 				var curCol = flashCol.copy();
@@ -415,21 +412,19 @@ GraphScatter.Flasher = function(pt, pointCol, flashCol, curCol, curCharacLen, im
 	this.graph = graph;
 	this.coordLast = this.graph.valToCoord(this.pt);
 	this.advanceListenerHandle = this.addAdvanceListener();
+	this.lifetime = (this.curCharacLen - this.finalCharacLen) / (this.finalCharacLen * this.flashMult * this.flashRate);
+	this.age = 0;
 	layers.addItem('flasher', this);
 }
 
 GraphScatter.Flasher.prototype = {
 	addAdvanceListener: function() {
-		var handle = 'flash' + this.pt.x + this.pt.y
-		addListener(curLevel, 'update', handle, function() {
+		var handle = 'flashAdvance' + this.graph.handle + this.pt.x + this.pt.y
+		addListener(curLevel, 'update', handle, function() { //handle needs 'flashAdvance' + this.graph.handle for removing
 			this.advance();
 		}, this)
 		return handle;
 	},
-	// getImgCorner: function() {
-		// var pos = this.graph.valToCoord(this.pt);
-		// return pos.movePt(V(-this.imgCharacLen / 2, -this.imgCharacLen / 2));
-	// },
 	erase: function() {
 		var imgData = this.graphData.getImageData(this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2, this.imgCharacLen, this.imgCharacLen);	
 		this.graphDisplay.putImageData(imgData, this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2);
@@ -452,7 +447,8 @@ GraphScatter.Flasher.prototype = {
 		newCol.g = this.colStep('g');
 		newCol.b = this.colStep('b');
 		col.set(newCol);	
-		if (this.doneFlashing()) this.remove();
+		if (this.age > this.lifetime) this.remove();
+		this.age ++;
 	},
 
 	colStep: function(col){
@@ -463,20 +459,20 @@ GraphScatter.Flasher.prototype = {
 		var step = diff*this.graph.flashRate;
 		return boundedStep(cur, setPt, step);	
 	},
-	doneFlashing: function(){
-		var amDone = true;
-		var la = this.curCharacLen;
-		var lb = this.finalCharacLen;
-		var ra = this.curCol.r;
-		var rb = this.pointCol.r;		
-		var ga = this.curCol.g;
-		var gb = this.pointCol.g;		
-		var ba = this.curCol.b;
-		var bb = this.pointCol.b;
-		if (la!=lb || ra!=rb || ga!=gb || ba!=bb) {
-			amDone = false;
-		}
+	// doneFlashing: function(){
+		// var amDone = true;
+		// var la = this.curCharacLen;
+		// var lb = this.finalCharacLen;
+		// var ra = this.curCol.r;
+		// var rb = this.pointCol.r;		
+		// var ga = this.curCol.g;
+		// var gb = this.pointCol.g;		
+		// var ba = this.curCol.b;
+		// var bb = this.pointCol.b;
+		// if (la!=lb || ra!=rb || ga!=gb || ba!=bb) {
+			// amDone = false;
+		// }
 		
-		return amDone;
-	},
+		// return amDone;
+	// },
 }
