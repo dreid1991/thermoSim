@@ -6,7 +6,9 @@ GraphBase = {
 		this.bgCol = curLevel.bgCol;
 		this.gridCol = Col(72,72,72);
 		this.toggleCol = Col(255,255,255);
-		
+		this.data = {};
+		this.legend = {};
+		this.markers = {};
 		this.textCol = Col(255, 255, 255);
 		this.flashMult = 1.5;
 		this.flashRate = .1;
@@ -183,17 +185,6 @@ GraphBase = {
 		}
 		return pts;
 	},
-	// makeCheck: function(address, legend, toggleCol){
-		// var entry = legend[address];
-		// var oversize = this.checkMarkOversize;
-		// var checkPt = entry.togglePos.copy();
-		// var checkDims = entry.toggleDims.copy();
-		// checkPt.x-=oversize;
-		// checkPt.y-=oversize;
-		// checkDims.dx+=2*oversize;
-		// checkDims.dy+=2*oversize;	
-		// return new CheckMark(checkPt, checkDims, toggleCol, Col(0,0,0), this.graphAssignments.data);
-	// },
 	drawAllBG: function(){
 		this.drawBGRect();
 		this.drawGrid();
@@ -249,6 +240,14 @@ GraphBase = {
 			draw.text(text, entry.textPos,  this.legendFont, this.textCol, 'left', 0, this.graphAssignments.data);
 			this.drawPtStd(entry.pos, entry.col);
 		}
+	},
+	
+	checkForCanvasMigrate: function() {
+		if (this.graphAssignments.data != this.graphDisplay) {
+			var dataImg = this.graphData.getImageData(0, 0, this.dims.dx, this.dims.dy);
+			this.graphDisplay.putImageData(dataImg, 0, 0);
+		}
+		//this.drawMarkers();
 	},
 	clearData: function(setHandle, redraw) {
 		var set = this.data[setHandle];
@@ -488,7 +487,19 @@ GraphBase = {
 		dims.dx += 2 * oversize;
 		dims.dy += 2 * oversize;
 		return new CheckMark(pos, dims, fillCol, strokeCol, drawCanvas);
-	}
+	},
+	
+	addMarker: function(attrs){
+		if (attrs.handle) {
+			this.graphAssignments.data = this.graphData;
+			this.graphAssignments.display = this.graphDisplay;
+			attrs.drawCanvas = this.graphDisplay;
+			attrs.graph = this;
+			this.markers[attrs.handle] = new GraphBase.marker(attrs);
+		} else {
+			console.log('Tried to add a graph marker for ' + this.handle + ' with no handle.  Add a handle.');
+		}
+	},
 	
 }
 
@@ -537,6 +548,39 @@ GraphBase.Range = function(xMin, xMax, yMin, yMax) {
 GraphBase.Range.prototype = {
 	copy: function() {
 		return new GraphBase.Range(this.x.min, this.x.max, this.y.min, this.y.max) 
+	}
+}
+
+GraphBase.Marker = function(attrs) {
+	this.handle = attrs.handle;
+	this.dataX = this.wrapInDataGet(attrs.x);
+	this.dataY = this.wrapInDataGet(attrs.y);
+	this.markerType = attrs.markerType;
+	this.graph = attrs.graph;
+	this.drawCanvas = attrs.drawCanvas;
+	this.col = attrs.col;
+	if (this.drawFuncs[this.markerType]) {
+		this.drawFunc = this.drawFuncs[this.markerType];
+	} else {
+		console.log('Bad marker type ' + this.markerType + '.  Choices include ');
+		for (var name in this.drawFuncs) console.log(name);
+	}
+}
+
+GraphBase.Marker.prototype = {
+	wrapInDataGet: function(expr) {
+		var func;
+		with (DataGetFuncs) {
+			func = eval('(function(){return ' + expr + '})');
+		}
+		return func;
+	},
+	drawFuncs: {
+		bullseye: function() {
+			var dataPt = P(this.dataX(), this.dataY());
+			var coord = this.graph.valToCoord(dataPt);
+			
+		}
 	}
 }
 //GraphBase.prototype.

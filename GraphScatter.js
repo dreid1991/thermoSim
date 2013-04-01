@@ -24,8 +24,7 @@ function GraphScatter(attrs) {
 	this.setNumGridLines();
 	this.axisInit = new GraphBase.Range(axisInit.x.min, axisInit.x.min + axisInit.x.step*(this.numGridLines.x-1), axisInit.y.min, axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1));
 	//this.axisRange = new this.Range(0, 0, 0, 0);
-	this.data = {};
-	this.legend = {};
+
 	this.resetRanges(); //val & axis ranges set in here
 	this.stepSize = new GraphScatter.Coord(0, 0);
 	
@@ -63,6 +62,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 				if (set.recording) set.enqueuePts();
 			}
 			this.flushQueues(true, false);
+			this.checkForCanvasMigrate();
 		},
 		getAxisBounds: function(){
 			this.getXBounds();

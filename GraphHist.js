@@ -18,8 +18,6 @@ function GraphHist(attrs){
 	this.axisInit = new GraphBase.Range(axisInit.x.min, axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1), axisInit.y.min, axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1));
 	//this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1)}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1)}};
 	//this.axisRange = {x:{min:0, max:0}, y:{min:0, max:0}}; done in setStds
-	this.data = {};
-	this.legend = {};
 	this.resetRanges();
 	this.stepSize = {x:0, y:0};
 	
@@ -37,16 +35,7 @@ and leaving open possibility of multiple sets (though that would probably look c
 _.extend(GraphHist.prototype, AuxFunctions, GraphBase, 
 	{
 		addSet: function(attrs){
-			//just using set.x
-			//histogram will curently only accept lists in the data object
-			//this, attrs.handle, attrs.label, attrs.data, attrs.pointCol, attrs.flashCol, attrs.fillInPts, attrs.fillInPtsMin, attrs.trace
 			var set = new GraphHist.Set(this, attrs.handle, attrs.data, attrs.barCol);
-			// var xData = walls[attrs.data.x.wallInfo].getDataObj(attrs.data.x.data, attrs.data.x.attrs).src();
-			// var set = {};
-			// set.x = [];
-			// set.y = [];
-			// set.barCol = attrs.barCol;
-			// set.getLast = this.makeHistDataGrabFunc(xData);
 			this.data[set.handle] = set;
 			this.drawAllBG();
 		},
@@ -55,17 +44,6 @@ _.extend(GraphHist.prototype, AuxFunctions, GraphBase,
 			this.drawAxisVals();
 			this.graphBins();
 		},
-		// drawLastData: function(toAdd){
-			// for (var addIdx=0; addIdx<toAdd.length; addIdx++){
-				// var dataSet = this.data[toAdd[addIdx].address];
-				// if (dataSet.show) {
-					// var xPt = dataSet.x[dataSet.x.length-1]
-					// var yPt = dataSet.y[dataSet.y.length-1]
-					// var pointCol = dataSet.pointCol
-					// this.graphPt(xPt, yPt, pointCol);
-				// }
-			// }	
-		// },
 		addLast: function(){//point of entry 
 			var toAdd = [];
 			var theOnlyAddress = '';
@@ -77,6 +55,7 @@ _.extend(GraphHist.prototype, AuxFunctions, GraphBase,
 			var set = this.data[theOnlyAddress];
 			set.addVal();
 			this.makeBins(set);
+			this.checkForCanvasMigrate();
 		},
 		plotData: function(vals){
 			var theOnlyAddress = '';
@@ -86,10 +65,6 @@ _.extend(GraphHist.prototype, AuxFunctions, GraphBase,
 			this.data[theOnlyAddress].data.x = vals;
 			this.makeBins(this.data[theOnlyAddress])
 		},
-		// getAxisBounds: function(){
-			// this.getXBounds();
-			// this.getYBounds();
-		// },
 		makeBins: function(set){
 			this.valRange.x = this.getRange('x');
 			this.setAxisBoundsX();
@@ -103,8 +78,6 @@ _.extend(GraphHist.prototype, AuxFunctions, GraphBase,
 			this.binWidth = round((this.valRange.x.max - this.valRange.x.min)/(this.numBins-1), 1);
 			for (var binIdx=0; binIdx<this.numBins; binIdx++) {
 				bins.push(0);
-				//min = this.valRange.x.min + this.binWidth*binIdx;
-				//bins[String(min)] = 0; 
 			}
 			return bins;
 		},
@@ -140,7 +113,7 @@ _.extend(GraphHist.prototype, AuxFunctions, GraphBase,
 				var LRCoord = this.valToCoord(P(xLRPt,yLRPt));
 				var dims = ULCoord.VTo(LRCoord);
 				
-				draw.fillStrokeRect(ULCoord, dims, barCol, this.bgCol, this.graph);
+				draw.fillStrokeRect(ULCoord, dims, barCol, this.bgCol, this.graphAssignments.data);
 			}
 		},
 		clear: function(){

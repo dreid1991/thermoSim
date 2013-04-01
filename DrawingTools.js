@@ -18,7 +18,7 @@ DrawingTools.prototype = {
 			}
 			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
 				c.beginPath();
-				c.arc(dots[dotIdx].x,dots[dotIdx].y,r,0,Math.PI*2,true);
+				c.arc(dots[dotIdx].x, dots[dotIdx].y, r, 0, Math.PI*2, true);
 				c.closePath();
 				c.fill();	
 			}
@@ -47,6 +47,20 @@ DrawingTools.prototype = {
 				c.closePath();
 				c.stroke();
 			}
+		}
+	},
+	circle: function(pos, r, col, fill, drawCanvas) {
+
+		
+		drawCanvas.beginPath();
+		drawCanvas.arc(pos.x, pos.y, r, 0, Math.PI*2, true);
+		drawCanvas.closePath();
+		if (fill) {
+			drawCanvas.fillStyle = col.hex;
+			drawCanvas.fill();	
+		} else {
+			drawCanvas.strokeStyle = col.hex;
+			drawCanvas.stroke();
 		}
 	},
 	fillPts: function(pts, col, drawCanvas){
