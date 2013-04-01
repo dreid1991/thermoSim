@@ -600,12 +600,23 @@ GraphBase.Range.prototype = {
 
 GraphBase.Marker = function(attrs) {
 	this.handle = attrs.handle;
-	this.dataX = this.wrapInDataGet(attrs.x);
-	this.dataY = this.wrapInDataGet(attrs.y);
+	if (typeof attrs.x == 'function')
+		this.dataX = attrs.x;
+	else 
+		this.dataX = this.wrapInDataGet(attrs.x);
+	if (typeof attrs.y =='function')
+		this.dataY = attrs.y;
+	else
+		this.dataY = this.wrapInDataGet(attrs.y);
+		
 	this.graph = attrs.graph;
 	this.graphDisplay = attrs.graphDisplay;
 	this.graphData = attrs.graphData;
-	this.coordLast = this.graph.valToCoord(P(this.dataX(), this.dataY()));
+	if (validNumber(this.dataX()) && validNumber(this.dataY())) 
+		this.coordLast = this.graph.valToCoord(P(this.dataX(), this.dataY()));
+	else 
+		this.coordLast = undefined;
+
 	this.markerType = attrs.markerType;
 	this.col = attrs.col;
 	this.layers = attrs.layers;
@@ -629,8 +640,10 @@ GraphBase.Marker.prototype = {
 		return func;
 	},
 	erase: function() {
-		var imgData = this.graphData.getImageData(this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2, this.imgCharacLen, this.imgCharacLen);	
-		this.graphDisplay.putImageData(imgData, this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2);
+		if (this.coordLast) {
+			var imgData = this.graphData.getImageData(this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2, this.imgCharacLen, this.imgCharacLen);	
+			this.graphDisplay.putImageData(imgData, this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2);
+		}
 	},		
 	drawFuncs: {
 		bullseye: function() {

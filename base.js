@@ -210,7 +210,7 @@ function defaultTo(defaultVal, inputVal){
 	return inputVal === undefined ? defaultVal : inputVal;
 } 
 function validNumber(num){
-	return isNaN(num) ? false : num;
+	return isNaN(num) || num === undefined ? false : num;
 }
 function round(val, dec){
 	var pow = Math.pow(10,dec);

@@ -32,7 +32,7 @@ function Liquid(attrs) {
 	this.updateListenerName = this.type + this.handle;
 	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs, this.surfAreaObj);
 	this.wallGas.addLiquid(this);
-	//if (makePhaseDiagram) this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, this.handle);
+	if (makePhaseDiagram) this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, this.handle, attrs.primaryKey);
 	this.setupStd();
 }
 
@@ -393,9 +393,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 		console.log(q/Cp);
 		this.wallLiq.q += q;
 	},
-	makePhaseDiagram: function(liquid, spcDefs, actCoeffFuncs, handle) {
+	makePhaseDiagram: function(liquid, spcDefs, actCoeffFuncs, handle, primaryKey) {
 		var spcAName, spcBName
-		var primaryKey = 'Heavy';
+		//var primaryKey = 'Heavy';
 		for (var spcName in spcDefs) {
 			if (!spcAName) {
 				spcAName = spcName;
@@ -405,7 +405,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 		var axisInit = {x: {min: 0, max: 1}, y: {min: 200, max: 400}};
 		
-		var graph = new GraphPhase({spcAName: spcAName, spcBName: spcBName, axisInit: axisInit, actCoeffFuncs: actCoeffFuncs, handle: handle});
+		var graph = new GraphPhase({spcAName: spcAName, spcBName: spcBName, axisInit: axisInit, actCoeffFuncs: actCoeffFuncs, handle: handle, primaryKey: primaryKey, liquid: this, wallGas: this.wallGas});
 		return graph;
 	},
 	remove: function() {
