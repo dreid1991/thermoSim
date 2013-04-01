@@ -34,11 +34,9 @@ GraphBase = {
 		this.graphDataHTMLElement = canvasData.HTMLElem;
 		this.graphData = canvasData.canvas;
 		this.layers = new GraphBase.Layers();
+		addListener(curLevel, 'update', 'drawLayers' + this.handle, this.drawLayers, this);
 		
 		//this.graphAssignments = {data: this.graphDisplay, display: this.graphDisplay}; //will set display to graphDisplay when adding a marker. 
-		this.dataImg = undefined;
-		
-		
 	},
 	makeDataFunc: function(expr) {
 		with (DataGetFuncs) {
@@ -291,7 +289,7 @@ GraphBase = {
 			mustRedraw = true;
 		}
 		if (mustRedraw) {
-			this.drawAllData()
+			this.drawAllData();
 		} else {
 			this.drawPts();
 		}
@@ -300,6 +298,11 @@ GraphBase = {
 			this.flashInit();
 		}
 		for (var setName in this.data) this.data[setName].flushQueue();
+		this.drawLayers();
+	},
+	dataToDisplay: function() {
+		var imgData = this.graphData.getImageData(0, 0, this.dims.dx, this.dims.dy);
+		this.graphDisplay.putImageData(imgData, 0, 0);
 	},
 	flashInit: function() {
 		for (var setName in this.data) {
@@ -449,14 +452,14 @@ GraphBase = {
 		return {min:min, max:max};
 	},
 	drawLayers: function() {
-		for (var layerIdx=0; layerIdx<this.layers.length; layerIdx++) {
-			var layer = this.layers[layerIdx].layers;
+		for (var layerIdx=0; layerIdx<this.layers.layers.length; layerIdx++) {
+			var layer = this.layers.layers[layerIdx];
 			for (var itemIdx=0; itemIdx<layer.length; itemIdx++) {
 				layer[itemIdx].erase();
 			}
 		}
-		for (var layerIdx=0; layerIdx<this.layers.length; layerIdx++) {
-			var layer = this.layers[layerIdx].layers;
+		for (var layerIdx=0; layerIdx<this.layers.layers.length; layerIdx++) {
+			var layer = this.layers.layers[layerIdx];
 			for (var itemIdx=0; itemIdx<layer.length; itemIdx++) {
 				layer[itemIdx].draw();
 			}
@@ -646,8 +649,8 @@ GraphBase.Layers = function() {
 }
 GraphBase.Layers.prototype = {
 	addLayer: function(handle) {
-		this.data.push([]);
-		this.handleIdxPairs[handle] = this.data.length - 1;
+		this.layers.push([]);
+		this.handleIdxPairs[handle] = this.layers.length - 1;
 	},
 	removeLayer: function(handle) {
 		var spliceIdx = this.handleIdxPairs[handle];
@@ -655,12 +658,12 @@ GraphBase.Layers.prototype = {
 			var idx = this.handleIdxPairs[handle];
 			if (idx > spliceIdx) this.handleIdxPairs[handle] --;
 		}
-		this.data.splice(spliceIdx, 1);
+		this.layers.splice(spliceIdx, 1);
 		delete this.handleIdxPairs[handle];
 	},
 	addItem: function(handle, obj) {
 		this.layers[this.handleIdxPairs[handle]].push(obj);
-	}
+	},
 	removeItem: function(handle, obj) {
 		var idx = this.layers[this.handleIdxPairs[handle]].indexOf(obj);
 		this.layers[this.handleIdxPairs[handle]].splice(idx, 1);
