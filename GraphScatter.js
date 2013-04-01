@@ -62,6 +62,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 				if (set.recording) set.enqueuePts();
 			}
 			this.flushQueues(true, false);
+			this.dataImg = this.graphData.getImageData(0, 0, this.dims.dx, this.dims.dy);
 			this.checkForCanvasMigrate();
 		},
 		getAxisBounds: function(){
@@ -77,7 +78,8 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 		drawPtStd: function(pt, col){
 			this.drawPt(pt, col, this.characLen);
 		},
-		drawPt: function(pt, col, characLen){
+		drawPt: function(pt, col, characLen, canvas){
+			canvas = canvas || this.graphAssignments.data;
 			var x = pt.x;
 			var y = pt.y;
 			var len = characLen;
@@ -86,7 +88,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			var pt3 = P(x+len, y);
 			var pt4 = P(x, y+len);
 			var pts = [pt1, pt2, pt3, pt4];
-			draw.fillPtsStroke(pts, col, this.ptStroke, this.graphAssignments.data);
+			draw.fillPtsStroke(pts, col, this.ptStroke, canvas);
 		},
 		reset: function(){
 			this.resetStd()
@@ -331,7 +333,7 @@ GraphScatter.Set.prototype = {
 
 		for (var flasherIdx=0; flasherIdx<this.flashers.length; flasherIdx++){
 			var flasher = this.flashers[flasherIdx];
-			this.graph.drawPt(flasher.pos, flasher.curCol, flasher.curCharacLen);
+			this.graph.drawPt(flasher.pos, flasher.curCol, flasher.curCharacLen, this.graph.graphAssignments.display);
 			this.flasherNextStep(flasher);
 		}
 		if (this.doneFlashing()) {
@@ -344,7 +346,7 @@ GraphScatter.Set.prototype = {
 	eraseFlashers: function(){
 		for (var flasherIdx=0; flasherIdx<this.flashers.length; flasherIdx++){
 			var flasher = this.flashers[flasherIdx];
-			this.graph.graphAssignments.data.putImageData(flasher.imageData, flasher.imagePos.x, flasher.imagePos.y);
+			this.graph.graphAssignments.display.putImageData(flasher.imageData, flasher.imagePos.x, flasher.imagePos.y);
 		}
 	},
 	flasherNextStep: function(flasher){

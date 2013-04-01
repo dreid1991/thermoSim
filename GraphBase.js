@@ -34,6 +34,7 @@ GraphBase = {
 		this.graphDataHTMLElement = canvasData.HTMLElem;
 		this.graphData = canvasData.canvas;
 		this.graphAssignments = {data: this.graphDisplay, display: this.graphDisplay}; //will set display to graphDisplay when adding a marker. 
+		this.dataImg = undefined;
 		
 		
 	},
@@ -247,7 +248,12 @@ GraphBase = {
 			var dataImg = this.graphData.getImageData(0, 0, this.dims.dx, this.dims.dy);
 			this.graphDisplay.putImageData(dataImg, 0, 0);
 		}
-		//this.drawMarkers();
+		this.drawMarkers();
+	},
+	drawMarkers: function() {
+		for (var markerName in this.markers) {
+			this.markers[markerName].draw();
+		}
 	},
 	clearData: function(setHandle, redraw) {
 		var set = this.data[setHandle];
@@ -491,14 +497,41 @@ GraphBase = {
 	
 	addMarker: function(attrs){
 		if (attrs.handle) {
+			//oops, need to draw with update
 			this.graphAssignments.data = this.graphData;
 			this.graphAssignments.display = this.graphDisplay;
+			this.drawAllData();
 			attrs.drawCanvas = this.graphDisplay;
 			attrs.graph = this;
-			this.markers[attrs.handle] = new GraphBase.marker(attrs);
+			this.markers[attrs.handle] = new GraphBase.Marker(attrs);
+			if (countAttrs(this.markers) == 1) {
+				this.setupDrawMarkers();
+			}
 		} else {
 			console.log('Tried to add a graph marker for ' + this.handle + ' with no handle.  Add a handle.');
 		}
+	},
+	setupDrawMarkers: function() {
+		addListener(curLevel, 'update', 'drawMarkers' + this.handle, function() {
+			for (var markerName in this.markers) {
+				var marker = this.markers[markerName];
+				var dataLast = marker.dataLast;
+				var dataCur = P(marker.dataX(), marker.dataY());
+				
+				if (dataCur.x != dataLast.x || dataCur.y != dataLast.y) {
+					if (coordLast.x != -1) {
+						var coordLast = this.valToCoord(dataLast);
+						pasteData = this.graphData.getImageData(coordLast.x - marker.characLen, coordLast.y - marker.characLen, 2 * marker.characLen, 2 * marker.characLen);
+						this.graphDisplay.putImageData(pasteData, coorLsst.x - marker.characLenb, coordLast.y - marker.characLen);
+					}
+				
+				}
+				marker.dataLast = dataCur;
+			}
+			for (var markerName in this.markers) {
+				this.markers[markerName].draw();
+			}
+		}, this);
 	},
 	
 }
@@ -555,16 +588,18 @@ GraphBase.Marker = function(attrs) {
 	this.handle = attrs.handle;
 	this.dataX = this.wrapInDataGet(attrs.x);
 	this.dataY = this.wrapInDataGet(attrs.y);
+	this.dataLast = P(-1, -1);
 	this.markerType = attrs.markerType;
 	this.graph = attrs.graph;
 	this.drawCanvas = attrs.drawCanvas;
 	this.col = attrs.col;
 	if (this.drawFuncs[this.markerType]) {
-		this.drawFunc = this.drawFuncs[this.markerType];
+		this.draw = this.drawFuncs[this.markerType];
 	} else {
 		console.log('Bad marker type ' + this.markerType + '.  Choices include ');
 		for (var name in this.drawFuncs) console.log(name);
 	}
+	this.characLen = 10;
 }
 
 GraphBase.Marker.prototype = {
@@ -577,8 +612,14 @@ GraphBase.Marker.prototype = {
 	},
 	drawFuncs: {
 		bullseye: function() {
+			var cLen = this.characLen;
 			var dataPt = P(this.dataX(), this.dataY());
 			var coord = this.graph.valToCoord(dataPt);
+			window.draw.circle(coord, .3 * cLen, this.col, true, this.drawCanvas);
+			window.draw.line(coord.copy().movePt(V(-cLen, 0)), coord.copy().movePt(V(cLen, 0)), this.col, this.drawCanvas);
+			window.draw.line(coord.copy().movePt(V(0, -cLen)), coord.copy().movePt(V(0, cLen)), this.col, this.drawCanvas);
+			//maybe set alpha lower for outer circle
+			window.draw.circle(coord, .6 * cLen, this.col, false, this.drawCanvas);
 			
 		}
 	}
