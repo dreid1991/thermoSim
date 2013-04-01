@@ -30,6 +30,8 @@ function GraphScatter(attrs) {
 	
 
 	this.setStds();
+	this.layers.addLayer('flasher');
+	this.layers.addLayer('marker');
 	//this.makeCanvas(this.dims);
 	this.drawAllBG();
 	
@@ -310,17 +312,18 @@ GraphScatter.Set.prototype = {
 		if (this.visible && this.showPts) {
 			for (var ptIdx=0; ptIdx<this.queuePts.length; ptIdx++) {
 				var pt = this.queuePts[ptIdx];
-				var pos = this.graph.valToCoord(pt);
+				//var pos = this.graph.valToCoord(pt);
 				var xPt = pos.x;
 				var yPt = pos.y;
 				var pointCol = this.pointCol
 				var flashCol = this.flashCol;
 				var curCol = flashCol.copy();
+				var imgCharacLen = this.graph.characLen * this.graph.flashMult + 2;
 				var imagePos = P(xPt - this.graph.characLen * this.graph.flashMult - 1, yPt - this.graph.characLen * this.graph.flashMult - 1);
 				var len = this.graph.characLen * 2 * this.graph.flashMult + 2;
 				var curCharacLen = this.graph.characLen * this.graph.flashMult;
-				var imageData = this.graph.graphAssignments.data.getImageData(imagePos.x, imagePos.y, len, len);
-				this.flashers.push(new GraphScatter.Flasher(pos, pointCol, flashCol, curCol, curCharacLen, imagePos, imageData));
+				//var imageData = this.graph.graphAssignments.data.getImageData(imagePos.x, imagePos.y, len, len);
+				new GraphScatter.Flasher(pt, pointCol, flashCol, curCol, curCharacLen, imgCharacLen, this.graph.characLen, this.graph.flashMult, this.graph.flashRate, this.graph.graphData, this.graph.graphDisplay, this.graph.layers, this.graph));
 			}
 			if (this.flashers.length > 0) {
 				addListener(curLevel, 'update', 'flash'+this.handle, this.flashRun, this);
@@ -459,12 +462,86 @@ GraphScatter.Coord.prototype = {
 		return new GraphScatter.prototype.Coord(this.x, this.y);
 	}
 }
-GraphScatter.Flasher = function(pos, pointCol, flashCol, curCol, curCharacLen, imagePos, imageData) {
-	this.pos = pos;
+//pt, pointCol, flashCol, curCol, curCharacLen, imgCharacLen
+
+GraphScatter.Flasher = function(pt, pointCol, flashCol, curCol, curCharacLen, imgCharacLen, finalCharacLen, flashMult, flashRate, graphData, graphDisplay, layers, graph) {
+	this.pt = pt;
 	this.pointCol = pointCol;
 	this.flashCol = flashCol;
 	this.curCol = curCol;
 	this.curCharacLen = curCharacLen;
-	this.imagePos = imagePos;
-	this.imageData = imageData;
+	this.imgCharacLen = imgCharacLen;
+	this.finalCharacLen = finalCharacLen;
+	this.flashMult = flashMult;
+	this.flashRate = flashRate;
+	this.graphData = graphData;
+	this.graphDisplay = graphDisplay;
+	this.layers = layers;
+	this.graph = graph;
+	this.coordLast = this.getImgCorner();
+	this.advanceListenerHandle = this.addAdvanceListener();
+	layers.addItem('flasher', this);
+}
+
+GraphScatter.Flasher.prototype = {
+	addAdvanceListener: function() {
+		var handle = 'flash' + this.pt.x + this.pt.y
+		addListener(curLevel, 'update', handle, function() {
+			this.advance();
+		}, this)
+		return handle;
+	},
+	getImgCorner: function() {
+		var pos = this.graph.valToCoord(this.pt);
+		return pos.movePt(V(-this.imgCharacLen, -this.imgCharacLen));
+	},
+	erase: function() {
+		var imgData = this.graphData.getImageData(this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2, this.imgCharacLen, this.imgCharacLen);	
+		this.graphDisplay.putImageData(imgData, this.coordLast.x, this.coordLast.y);
+	},
+	draw: function() {
+		this.coordLast = this.graph.valToCoord(this.pt);
+		this.graph.drawPt(this.coordLast, this.curCol, this.curCharacLen, this.graphDisplay);		
+	},
+	remove: function() {
+		this.erase();
+		this.layers.removeItem('flasher', this);
+		removeListener(curLevel, 'update', this.advanceListenerHandle);
+	},
+	advance: function() {
+
+		this.curCharacLen = boundedStep(this.curCharacLen, this.finalCharacLen, -this.finalCharacLen * this.flashMult * this.flashRate)
+		var col = this.curCol;
+		var newCol = Col(0,0,0);
+		newCol.r = this.colStep('r');
+		newCol.g = this.colStep('g');
+		newCol.b = this.colStep('b');
+		col.set(newCol);	
+		if (this.doneFlashing()) this.remove();
+	}
+
+	colStep: function(col){
+		var init = this.flashCol[col];
+		var cur = this.curCol[col];
+		var setPt = this.pointCol[col];
+		var diff = setPt - init;
+		var step = diff*this.graph.flashRate;
+		return boundedStep(cur, setPt, step);	
+	},
+	doneFlashing: function(){
+		var amDone = true;
+		var la = this.curCharacLen;
+		var lb = this.finalCharacLen;
+		var ra = this.curCol.r;
+		var rb = this.pointCol.r;		
+		var ga = this.curCol.g;
+		var gb = this.pointCol.g;		
+		var ba = this.curCol.b;
+		var bb = this.pointCol.b;
+		if (la!=lb || ra!=rb || ga!=gb || ba!=bb) {
+			amDone = false;
+		}
+		
+		return amDone;
+	},
 }

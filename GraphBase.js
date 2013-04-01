@@ -33,7 +33,9 @@ GraphBase = {
 		var canvasData = this.makeCanvas(this.dims, this.dataDiv, this.handle + 'DataGraph', false, this.handle + 'DataButton');
 		this.graphDataHTMLElement = canvasData.HTMLElem;
 		this.graphData = canvasData.canvas;
-		this.graphAssignments = {data: this.graphDisplay, display: this.graphDisplay}; //will set display to graphDisplay when adding a marker. 
+		this.layers = new GraphBase.Layers();
+		
+		//this.graphAssignments = {data: this.graphDisplay, display: this.graphDisplay}; //will set display to graphDisplay when adding a marker. 
 		this.dataImg = undefined;
 		
 		
@@ -130,11 +132,11 @@ GraphBase = {
 		return integralPts;
 		
 	},
-	drawIntegral: function(set){
-		var pts = this.data[set].integralPts;
-		draw.fillPtsAlpha(pts, this.integralCol, this.integralAlpha, this.graphAssignments.display);
-		this.graphPts();
-	},
+	// drawIntegral: function(set){
+		// var pts = this.data[set].integralPts;
+		// draw.fillPtsAlpha(pts, this.integralCol, this.integralAlpha, this.graphAssignments.display);
+		// this.graphPts();
+	// },
 	setData: function(setHandle, data) {
 		var set = this.data[setHandle];
 		if (set) 
@@ -194,10 +196,10 @@ GraphBase = {
 			this.drawLegend();
 		}
 		this.drawLabels();
-		this.bg = this.graphAssignments.data.getImageData(0, 0, this.dims.dx, this.dims.dy);
+		this.bg = this.graphData.getImageData(0, 0, this.dims.dx, this.dims.dy);
 	},	
 	drawBGRect: function(){
-		draw.roundedRect(P(0,0), V(this.dims.dx, this.dims.dy), 20, this.bgCol, this.graphAssignments.data); 
+		draw.roundedRect(P(0,0), V(this.dims.dx, this.dims.dy), 20, this.bgCol, this.graphData); 
 	},
 	drawGrid: function(){
 		for (var xGridIdx=0; xGridIdx<this.numGridLines.x; xGridIdx++){
@@ -206,7 +208,7 @@ GraphBase = {
 			var yAxis = this.graphRangeFrac.y.min * this.dims.dy + this.hashMarkLen;
 			var p1 = P(x, yAxis);
 			var p2 = P(x, yEnd);
-			draw.line(p1, p2, this.gridCol, this.graphAssignments.data);
+			draw.line(p1, p2, this.gridCol, this.graphData);
 		}
 		for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
 			var y = this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing*yGridIdx;
@@ -214,7 +216,7 @@ GraphBase = {
 			var xAxis = this.graphRangeFrac.x.max * this.dims.dx - this.hashMarkLen;
 			var p1 = P(xAxis, y);
 			var p2 = P(xEnd, y);			
-			draw.line(p1, p2, this.gridCol, this.graphAssignments.data);
+			draw.line(p1, p2, this.gridCol, this.graphData);
 		}
 	},
 	drawBounds: function(){
@@ -222,15 +224,15 @@ GraphBase = {
 		var width = this.dims.dx * (this.graphRangeFrac.x.max - this.graphRangeFrac.x.min);
 		var height = this.dims.dy * (this.graphRangeFrac.y.min - this.graphRangeFrac.y.max);
 		var dims = V(width, height);
-		draw.strokeRect(ptOrigin, dims, this.graphBoundCol, this.graphAssignments.data);
+		draw.strokeRect(ptOrigin, dims, this.graphBoundCol, this.graphData);
 	},
 	drawLabels: function(){
 		var xLabelPos = P(this.dims.dx * (this.graphRangeFrac.x.min + this.graphRangeFrac.x.max) / 2, Math.min(this.dims.dy * this.graphRangeFrac.y.min + 50, this.dims.dy-20))
 		var yLabelPos = P(Math.max(this.dims.dx * this.graphRangeFrac.x.min - 50, 20), this.dims.dy * (this.graphRangeFrac.y.min + this.graphRangeFrac.y.max) / 2)
 		xLabelPos.y+=this.labelFontSize/2;
 		yLabelPos.y+=this.labelFontSize/2;
-		draw.text(this.xLabel, xLabelPos, this.labelFont, this.textCol, 'center',  0, this.graphAssignments.data);
-		draw.text(this.yLabel, yLabelPos, this.labelFont, this.textCol, 'center', -Math.PI/2, this.graphAssignments.data);
+		draw.text(this.xLabel, xLabelPos, this.labelFont, this.textCol, 'center',  0, this.graphData);
+		draw.text(this.yLabel, yLabelPos, this.labelFont, this.textCol, 'center', -Math.PI/2, this.graphData);
 	},
 	drawLegend: function(){
 		for (var entryName in this.legend){
@@ -238,7 +240,7 @@ GraphBase = {
 			var text = entry.text;
 			this.drawLegendToggle(entry);
 			var font = this.legendFont
-			draw.text(text, entry.textPos,  this.legendFont, this.textCol, 'left', 0, this.graphAssignments.data);
+			draw.text(text, entry.textPos,  this.legendFont, this.textCol, 'left', 0, this.graphData);
 			this.drawPtStd(entry.pos, entry.col);
 		}
 	},
@@ -404,17 +406,17 @@ GraphBase = {
 			var xPos = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing * xGridIdx;
 			var yPos = this.graphRangeFrac.y.min * this.dims.dy + this.hashMarkLen + 10 + this.axisValFontSize/2;
 			var text = String(round(this.axisRange.x.min + this.stepSize.x * xGridIdx, 1));
-			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', 0, this.graphAssignments.data);
+			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', 0, this.graphData);
 		}
 		for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
 			var yPos = this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing * yGridIdx;
 			var xPos = this.graphRangeFrac.x.min * this.dims.dx - this.hashMarkLen - 10;
 			var text = String(round(this.axisRange.y.min + this.stepSize.y*yGridIdx,1));
-			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', -Math.PI/2, this.graphAssignments.data);
+			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', -Math.PI/2, this.graphData);
 		}		
 	},
 	drawLegendToggle: function(entry){
-		draw.fillStrokeRect(entry.boxPos, entry.boxDims, this.gridCol, this.toggleCol, this.graphAssignments.data);
+		draw.fillStrokeRect(entry.boxPos, entry.boxDims, this.gridCol, this.toggleCol, this.graphData);
 		var set = entry.set;
 		if (set.visible) {
 			entry.checkMark.draw();
@@ -446,11 +448,25 @@ GraphBase = {
 		}
 		return {min:min, max:max};
 	},
+	drawLayers: function() {
+		for (var layerIdx=0; layerIdx<this.layers.length; layerIdx++) {
+			var layer = this.layers[layerIdx].layers;
+			for (var itemIdx=0; itemIdx<layer.length; itemIdx++) {
+				layer[itemIdx].erase();
+			}
+		}
+		for (var layerIdx=0; layerIdx<this.layers.length; layerIdx++) {
+			var layer = this.layers[layerIdx].layers;
+			for (var itemIdx=0; itemIdx<layer.length; itemIdx++) {
+				layer[itemIdx].draw();
+			}
+		}
+	},
 	resetStd: function(){
 		for (var setName in this.data) this.data[setName].reset();
 
 		removeListener(curLevel, 'update', 'flash'+this.name);
-		this.graphAssignments.data.putImageData(this.bg, 0, 0);
+		this.graphData.putImageData(this.bg, 0, 0);
 		this.resetRanges();
 	},	
 	resetRanges: function(){
@@ -547,7 +563,7 @@ GraphBase.LegendEntry = function(graph, set, col, text, x, y, fontSize, graphDim
 	this.boxPos = P(graphDims.dx - 18, y - 5); //whatever, will look at later
 	this.boxDims = V(13, 13);
 	this.mouseListenerName = 'toggle' + this.graph.handle.toCapitalCamelCase() + this.set.handle.toCapitalCamelCase();
-	this.checkMark = graph.checkMark(this.boxPos.copy(), this.boxDims.copy(), graph.checkMarkOversize, graph.toggleCol, graph.graphAssignments.data);
+	this.checkMark = graph.checkMark(this.boxPos.copy(), this.boxDims.copy(), graph.checkMarkOversize, graph.toggleCol, graph.graphData);
 }
 
 GraphBase.LegendEntry.prototype = {
@@ -622,6 +638,32 @@ GraphBase.Marker.prototype = {
 			window.draw.circle(coord, .6 * cLen, this.col, false, this.drawCanvas);
 			
 		}
+	}
+}
+GraphBase.Layers = function() {
+	this.layers = [];
+	this.handleIdxPairs = {};
+}
+GraphBase.Layers.prototype = {
+	addLayer: function(handle) {
+		this.data.push([]);
+		this.handleIdxPairs[handle] = this.data.length - 1;
+	},
+	removeLayer: function(handle) {
+		var spliceIdx = this.handleIdxPairs[handle];
+		for (var handle in this.handleIdxPairs) {
+			var idx = this.handleIdxPairs[handle];
+			if (idx > spliceIdx) this.handleIdxPairs[handle] --;
+		}
+		this.data.splice(spliceIdx, 1);
+		delete this.handleIdxPairs[handle];
+	},
+	addItem: function(handle, obj) {
+		this.layers[this.handleIdxPairs[handle]].push(obj);
+	}
+	removeItem: function(handle, obj) {
+		var idx = this.layers[this.handleIdxPairs[handle]].indexOf(obj);
+		this.layers[this.handleIdxPairs[handle]].splice(idx, 1);
 	}
 }
 //GraphBase.prototype.
