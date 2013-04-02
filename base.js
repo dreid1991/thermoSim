@@ -510,7 +510,7 @@ function hideSliders(){
 	}
 }
 function S(newSectionIdx, newPromptIdx, forceReset) {
-	showPrompt(newSectionIdx, newPromptIdx, forceReset)
+	sceneNavigator.showPrompt(newSectionIdx, newPromptIdx, forceReset)
 }
 
 function alertValid(str) {

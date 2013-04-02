@@ -95,7 +95,7 @@ _.extend(TestLevel.prototype,
 					//{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}
 				],
 				listeners: [
-					{handle: 'checky', expr: 'vol("wally") < 9', alertUnsatisied: 'no', satisfyStore: [{storeAs: 'foo', expr: 'vol("wally") * 10'}], satisfyCmmds: ['console.log("lol")']}
+					{handle: 'checky', expr: 'fracDiff(vol("wally"), 9) < .05', alertUnsatisied: 'no', satisfyStore: [{storeAs: 'foo', expr: 'vol("wally") * 10'}], satisfyCmmds: ['console.log("lol")']}
 				],
 				// rxns: [
 					// {handle: 'rxn1', rctA: 'spc1', rctB: 'ugly', activeE: 15, prods: {duckling: 1}},
@@ -104,7 +104,7 @@ _.extend(TestLevel.prototype,
 				graphs: [
 					// {type: 'Scatter', handle: 'PvsVOne', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:1}, y:{min:0, step:1}}, 
 						// sets:[
-							// {handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "vol('wally')", y: "pExt('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
+							// {handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'vol("wally")' y: "pExt('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						// ]
 					// }
 					 // {type: 'Hist', handle: 'PvsVOne', xLabel: "xLabel", yLabel: "yLabel", axesInit:{x:{min:0, step:50}, y:{min:0, step:10}}, 
@@ -167,7 +167,7 @@ _.extend(TestLevel.prototype,
 			prompts: [
 				{
 					title: 'foo',
-					text: 'pre textget("theAnswer", "string") hello people faces'
+					text: 'pre text eval(get("theAnswer", "int") * 2) hello people faces'
 				}
 			
 			]
