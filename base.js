@@ -642,10 +642,12 @@ function rms(vals) {
 }
 globalMousePos = P(0,0);
 function mouseOffset(curCanvas) {
-	return P(globalMousePos.x - curCanvas.offsetLeft, globalMousePos.y - curCanvas.offsetTop);
+	var offset = $(curCanvas).offset();
+	return P(globalMousePos.x - offset.left, globalMousePos.y - offset.top);
 }
 function mouseOffsetDiv(divId) {
-	return P(globalMousePos.x - $('#'+divId).offset().left, globalMousePos.y - $('#'+divId).offset().top);
+	var offset = $('#' + divId).offset();
+	return P(globalMousePos.x - offset.left, globalMousePos.y - offset.top);
 }
 $(document).mousemove(function(e) {
 	globalMousePos.x = e.pageX;
