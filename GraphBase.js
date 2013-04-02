@@ -95,6 +95,7 @@ GraphBase = {
 		this.freeze();
 		removeListener(curLevel, 'update', 'drawLayers' + this.handle);
 		removeListenerByName(curLevel, 'update', 'flashAdvance' + this.handle);
+		this.layers.removeAll();
 		this.cleanUpParent();
 		return this;
 	},
@@ -666,6 +667,14 @@ GraphBase.Layers.prototype = {
 	removeItem: function(handle, obj) {
 		var idx = this.layers[this.handleIdxPairs[handle]].indexOf(obj);
 		this.layers[this.handleIdxPairs[handle]].splice(idx, 1);
+	},
+	removeAll: function() {
+		for (var i=0; i<this.layers.length; i++) {
+			var layer = this.layers[i];
+			for (var j=0; j<layer.length; j++) {
+				layer[j].remove();
+			}
+		}
 	}
 }
 //GraphBase.prototype.

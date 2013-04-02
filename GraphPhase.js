@@ -30,7 +30,7 @@ function GraphPhase(attrs) {
 	this.xFunc = this.makeFracFunc(this.wallGas, this.keyNamePairs[this.primaryKeyType]);
 	this.yFunc = this.makeFracFunc(this.liquid.wallLiq, this.keyNamePairs[this.primaryKeyType]);
 	this.updateGraph();
-	
+	this.active = false;
 	this.graph.addMarker({handle: 'liquid', col: Col(200, 0, 0), markerType: 'bullseye', x: this.xFunc, y: this.liqTempFunc});
 	this.graph.addMarker({handle: 'gas', col: Col(0, 200, 0), markerType: 'bullseye', x: this.yFunc, y: this.gasTempFunc});
 	
@@ -51,6 +51,18 @@ GraphPhase.prototype = {
 		return function() {
 			return fracData[fracData.length - 1];
 		}		
+	},
+	freeze: function() {
+		this.graph.freeze();
+	},
+	save: function() {
+		return undefined;
+	},
+	addLast: function() {
+		this.graph.addLast();
+	},
+	remove: function() {
+		this.graph.remove();
 	},
 	setPressure: function(pressure) {
 		this.updateEquilData(pressure);

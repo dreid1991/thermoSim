@@ -32,7 +32,10 @@ function Liquid(attrs) {
 	this.updateListenerName = this.type + this.handle;
 	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs, this.surfAreaObj);
 	this.wallGas.addLiquid(this);
-	if (makePhaseDiagram) this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, this.handle, attrs.primaryKey);
+	if (makePhaseDiagram) {
+		this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, this.handle, attrs.primaryKey);
+		curLevel.graphs[this.phaseDiagram.handle] = this.phaseDiagram;
+	}
 	this.setupStd();
 }
 
