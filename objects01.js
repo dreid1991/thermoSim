@@ -1834,28 +1834,16 @@ _.extend(StateListener.prototype, objectFuncs, {
 		
 		}		
 	},
-	// lessThan: function(val1, val2) {
-		// return val1<val2;
-	// },
-	// greaterThan: function(val1, val2) {
-		// return val1>val2;
-	// },
-	// equalTo: function(val1, val2) {
-		// return fracDiff(val1, val2) < this.tolerance;
-	// },
-	// notEqualTo: function(val1, val2) {
-		// return fracDiff(val1, val2) > this.tolerance;
-	// },
 	recordVals: function(){
-		//storeObj formatted as: {storeAs: str, data: {wallInfo: 'wally', data: 'name', attrs: {stuff}}} //data.data is weird, but trying to be consistant
-		if (this.satisfyStore) {
-			for (var storeIdx=0; storeIdx<this.satisfyStore.length; storeIdx++) {
-				var storeObj = this.satisfyStore[storeIdx];
-				var storeAs = storeObj.storeAs;
-				var data = storeObj.data;
-				var dataSet = walls[data.wallInfo].getDataObj(data.data, data.attrs).src();
-				var value = dataSet[dataSet.length - 1];
-				store(storeAs, value);
+		with (DataGetFuncs) {
+			if (this.satisfyStore) {
+				for (var storeIdx=0; storeIdx<this.satisfyStore.length; storeIdx++) {
+					var storeObj = this.satisfyStore[storeIdx];
+					var storeAs = storeObj.storeAs;
+					var expr = storeObj.expr;
+					var value = eval(expr);
+					store(storeAs, value);
+				}
 			}
 		}
 	},
@@ -1866,5 +1854,4 @@ _.extend(StateListener.prototype, objectFuncs, {
 		removeListener(curLevel, this.conditionsOn + 'Condition', this.handle);
 		removeListener(curLevel, 'update', this.handle);
 	},
-}
-)
+})

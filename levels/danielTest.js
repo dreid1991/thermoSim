@@ -145,7 +145,7 @@ _.extend(TestLevel.prototype,
 						}
 					],
 					title: 'wooo!',
-					text: 'Hello, my lovelies!'
+					text: 'Hello, img("img/cvcp/eq1.gif") my lovelies!'
 				},
 				{
 					sceneData: undefined,

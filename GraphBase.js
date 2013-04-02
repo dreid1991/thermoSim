@@ -304,6 +304,20 @@ GraphBase = {
 		var imgData = this.graphData.getImageData(0, 0, this.dims.dx, this.dims.dy);
 		this.graphDisplay.putImageData(imgData, 0, 0);
 	},
+	drawLayers: function() {
+		for (var layerIdx=0; layerIdx<this.layers.layers.length; layerIdx++) {
+			var layer = this.layers.layers[layerIdx];
+			for (var itemIdx=0; itemIdx<layer.length; itemIdx++) {
+				layer[itemIdx].erase();
+			}
+		}
+		for (var layerIdx=0; layerIdx<this.layers.layers.length; layerIdx++) {
+			var layer = this.layers.layers[layerIdx];
+			for (var itemIdx=0; itemIdx<layer.length; itemIdx++) {
+				layer[itemIdx].draw();
+			}
+		}
+	},
 	flashInit: function() {
 		for (var setName in this.data) {
 			this.data[setName].flashInit();
@@ -451,20 +465,7 @@ GraphBase = {
 		}
 		return {min:min, max:max};
 	},
-	drawLayers: function() {
-		for (var layerIdx=0; layerIdx<this.layers.layers.length; layerIdx++) {
-			var layer = this.layers.layers[layerIdx];
-			for (var itemIdx=0; itemIdx<layer.length; itemIdx++) {
-				layer[itemIdx].erase();
-			}
-		}
-		for (var layerIdx=0; layerIdx<this.layers.layers.length; layerIdx++) {
-			var layer = this.layers.layers[layerIdx];
-			for (var itemIdx=0; itemIdx<layer.length; itemIdx++) {
-				layer[itemIdx].draw();
-			}
-		}
-	},
+
 	resetStd: function(){
 		for (var setName in this.data) this.data[setName].reset();
 
@@ -525,28 +526,7 @@ GraphBase = {
 			console.log('Tried to add a graph marker for ' + this.handle + ' with no handle.  Add a handle.');
 		}
 	},
-	// setupDrawMarkers: function() {
-		// addListener(curLevel, 'update', 'drawMarkers' + this.handle, function() {
-			// for (var markerName in this.markers) {
-				// var marker = this.markers[markerName];
-				// var dataLast = marker.dataLast;
-				// var dataCur = P(marker.dataX(), marker.dataY());
-				
-				// if (dataCur.x != dataLast.x || dataCur.y != dataLast.y) {
-					// if (coordLast.x != -1) {
-						// var coordLast = this.valToCoord(dataLast);
-						// pasteData = this.graphData.getImageData(coordLast.x - marker.characLen, coordLast.y - marker.characLen, 2 * marker.characLen, 2 * marker.characLen);
-						// this.graphDisplay.putImageData(pasteData, coorLsst.x - marker.characLenb, coordLast.y - marker.characLen);
-					// }
-				
-				// }
-				// marker.dataLast = dataCur;
-			// }
-			// for (var markerName in this.markers) {
-				// this.markers[markerName].draw();
-			// }
-		// }, this);
-	// },
+
 	
 }
 

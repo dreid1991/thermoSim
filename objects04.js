@@ -162,13 +162,26 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var zeroAttrs = this.zeroAttrs;
 		var calcCp = this.calcCp, calcEquil = this.calcEquil, drawDots = this.drawDots, moveDots = this.moveDots, ejectDots = this.ejectDots;
 		calcCp();
+		var turns = 0;
 		addListener(curLevel, 'update', listenerName, function() {
-			calcCp();
-			calcEquil();
-			drawDots();
-			moveDots();
-			ejectDots();
-			sizeWall();
+			if (turns == 5) {
+				removeListener(curLevel, 'update', listenerName);
+				addListener(curLevel, 'update', listenerName, function() {
+					calcCp();
+					calcEquil();
+					drawDots();
+					moveDots();
+					ejectDots();
+					sizeWall();
+				})
+				
+			} else {
+				calcCp();
+				calcEquil();
+				drawDots();
+				moveDots();
+				sizeWall();			
+			}
 		})
 	},
 	setupCalcCp: function(spcDefs, dotMgrLiq) {

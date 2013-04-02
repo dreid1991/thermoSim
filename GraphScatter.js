@@ -459,20 +459,5 @@ GraphScatter.Flasher.prototype = {
 		var step = diff*this.graph.flashRate;
 		return boundedStep(cur, setPt, step);	
 	},
-	// doneFlashing: function(){
-		// var amDone = true;
-		// var la = this.curCharacLen;
-		// var lb = this.finalCharacLen;
-		// var ra = this.curCol.r;
-		// var rb = this.pointCol.r;		
-		// var ga = this.curCol.g;
-		// var gb = this.pointCol.g;		
-		// var ba = this.curCol.b;
-		// var bb = this.pointCol.b;
-		// if (la!=lb || ra!=rb || ga!=gb || ba!=bb) {
-			// amDone = false;
-		// }
-		
-		// return amDone;
-	// },
+
 }

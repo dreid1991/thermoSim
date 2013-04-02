@@ -61,13 +61,13 @@ ExpressionInterpreter.prototype = {
 		return args;	
 	},
 	finishAppend: function() {
-		this.div = undefined;
+		this.div = undefined; 
 		this.addedMath = false;
 	},
 	addImgs: function (text, asObj){
-		var self = this;
-		return text.replace(/img[\s]*\([A-Za-z0-9\+\-\*\/\s,\.]*\)/g, function(imgFunc, idx) {
-			return self.parseImgFunc(imgFunc);
+		var img = DataGetFuncs.img;
+		return text.replace(/img[\s]*\([A-Za-z0-9\+\-\*\/\s,\.'"]*\)/g, function(imgExpr, idx) {
+			return eval(imgExpr);
 		})
 	},
 	
@@ -87,7 +87,7 @@ ExpressionInterpreter.prototype = {
 			var imgHTML = templater.img({attrs: {src: [path]}});
 			
 			if (center) {
-				imgHTML = templater.center({innerHTML: ingHTML});
+				imgHTML = templater.center({innerHTML: imgHTML});
 			}
 			if (breakStyle == 'br') {
 				imgHTML = templater.br() + imgHTML + templater.br();

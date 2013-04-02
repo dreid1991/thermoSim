@@ -41,12 +41,12 @@ DataGetFuncs = {
 		var src = walls[wallHandle].getDataSrc('frac', args);
 		return src[src.length - 1];
 	},
-	time: function(wallHandle, args) {
-		var src = walls[wallHandle].getDataSrc('time', args);
+	time: function(wallHandle) {
+		var src = walls[wallHandle].getDataSrc('time');
 		return src[src.length - 1];
 	},
-	work: function(wallHandle, args) {
-		var src = walls[wallHandle].getDataSrc('work', args);
+	work: function(wallHandle) {
+		var src = walls[wallHandle].getDataSrc('work');
 		return src[src.length - 1];
 	},
 	vDist: function(wallHandle, args) {
@@ -75,5 +75,26 @@ DataGetFuncs = {
 			val = defaultVal;
 		}
 		return val;
+	},
+
+	img: function(path, breakStyle, center, asObj) {
+		if (asObj) {
+			//HEY - as obj currently only return image, no p, br, or centering.  
+			//It is they way because of AuxPicture.  Look into that before making changes here
+			return {attrs: {src: [path]}};
+	
+		} else {
+			var imgHTML = templater.img({attrs: {src: [path]}});
+			
+			if (center) {
+				imgHTML = templater.center({innerHTML: imgHTML});
+			}
+			if (breakStyle == 'br') {
+				imgHTML = templater.br() + imgHTML + templater.br();
+			} else if (breakStyle == 'p') {
+				imgHTML = templater.p({innerHTML: imgHTML});
+			}
+			return imgHTML;	
+		}	
 	}
 }
