@@ -12,8 +12,12 @@ performance notes - .apply() is trivially slower than just calling the function.
 Make slow down time thing by multiplying v (and piston motion, dividing by const for pInt) by const
 Make buttons smaller
 
-Test q rate/ammt arrows
 
-SUBTRACT HEATER VOL OFF
-make it so you can generate phase diagrams
-change expressions for state listeners too
+
+do some gridding on graphs to make each layer item have its erase and draw closer together
+
+do something in liquid update to update phase diagram if pressure changed
+
+make it so you can fix axes more precisely.  Maybe have {min step max} and set num grid lines based on that
+
+make custom button column

@@ -69,25 +69,16 @@ GraphPhase.prototype = {
 		var liqPts = [];
 		var gasPts = [];
 		
-		if (this.primaryKeyType == 'Light') {
-			for (var phaseIdx=0; phaseIdx<phaseData.data.length; phaseIdx++) {
-				var phaseDatum = phaseData.data[phaseIdx];
-				var temp = phaseDatum.temp;
-				var x = 1 - phaseDatum['x' + this.primaryKeyType];
-				var y = 1 - phaseDatum['y' + this.primaryKeyType];
-				liqPts.push(P(x, temp));
-				gasPts.push(P(y, temp));
-			}	
-		} else {
-			for (var phaseIdx=0; phaseIdx<phaseData.data.length; phaseIdx++) {
-				var phaseDatum = phaseData.data[phaseIdx];
-				var temp = phaseDatum.temp;
-				var x = phaseDatum['x' + this.primaryKeyType];
-				var y = phaseDatum['y' + this.primaryKeyType];
-				liqPts.push(P(x, temp));
-				gasPts.push(P(y, temp));
-			}		
-		}
+
+		for (var phaseIdx=0; phaseIdx<phaseData.data.length; phaseIdx++) {
+			var phaseDatum = phaseData.data[phaseIdx];
+			var temp = phaseDatum.temp;
+			var x = phaseDatum['x' + this.primaryKeyType];
+			var y = phaseDatum['y' + this.primaryKeyType];
+			liqPts.push(P(x, temp));
+			gasPts.push(P(y, temp));
+		}	
+
 		this.equilData = liqPts.concat(gasPts.reverse());
 		
 	},
