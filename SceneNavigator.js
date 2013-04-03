@@ -20,7 +20,7 @@ SceneNavigator.prototype = {
 		}
 		if (changedSection || forceReset) {
 			curLevel.saveAllGraphs();
-			curLevel.freezeAllGraphs();
+			curLevel.disableAllGraphs();
 			curLevel.removeAllGraphs();
 			dotManager.clearAll();		
 

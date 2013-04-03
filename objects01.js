@@ -232,7 +232,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 			this.draw = this.drawNoText;
 		}
 		addListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo, this.draw, this);
-		this.unfreeze();
+		this.enable();
 		this.wall.moveInit();
 		this.dropAllIntoBins('instant');
 		delete this.tempWeightDefs;
@@ -736,10 +736,10 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	mass: function(){
 		return this.mass;
 	},
-	freeze: function() {
+	disable: function() {
 		removeListener(curLevel, 'mousedown', 'weights' +this.wallInfo);
 	},
-	unfreeze: function() {
+	enable: function() {
 		addListener(curLevel, 'mousedown', 'weights' + this.wallInfo, this.mousedown, this);
 	},
 })
@@ -1546,11 +1546,11 @@ _.extend(Heater.prototype, objectFuncs, {
 	heatLiq: function() {
 		this.liquid.addQ(.1 * this.qRate * updateInterval);
 	},
-	freeze: function() {
+	disable: function() {
 		var slider = $('#' + this.sliderId);
 		if (slider.length) $(slider).slider('disable');
 	},
-	unfreeze: function() {
+	enable: function() {
 		var slider = $('#' + this.sliderId);
 		if (slider.length) $(slider).slider('enable');
 	},

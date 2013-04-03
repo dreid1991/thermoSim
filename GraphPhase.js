@@ -52,8 +52,8 @@ GraphPhase.prototype = {
 			return fracData[fracData.length - 1];
 		}		
 	},
-	freeze: function() {
-		this.graph.freeze();
+	disable: function() {
+		this.graph.disable();
 	},
 	save: function() {
 		return undefined;

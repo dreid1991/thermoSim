@@ -92,18 +92,19 @@ GraphBase = {
 		
 	},
 	remove: function(){
-		this.freeze();
+		this.disable();
 		removeListener(curLevel, 'update', 'drawLayers' + this.handle);
 		removeListenerByName(curLevel, 'update', 'flashAdvance' + this.handle);
 		this.layers.removeAll();
 		this.cleanUpParent();
 		return this;
 	},
-	unfreeze: function(){
+	enable: function(){
+		for (var setName in this.data) this.data[setName].recordStart();
 		this.active = true;
 		return this;
 	},
-	freeze: function(){
+	disable: function(){
 		for (var setName in this.data) this.data[setName].recordStop();
 		this.active = false;
 		return this;

@@ -595,9 +595,9 @@ LevelTools = {
 			this.graphs[graphName].save(saveName);
 		}
 	},
-	freezeAllGraphs: function(){
+	disableAllGraphs: function(){
 		for(var graphName in this.graphs){
-			this.graphs[graphName].freeze();
+			this.graphs[graphName].disable();
 		}
 	},
 	selectObj: function(type, handle) {
