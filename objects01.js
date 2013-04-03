@@ -1546,6 +1546,14 @@ _.extend(Heater.prototype, objectFuncs, {
 	heatLiq: function() {
 		this.liquid.addQ(.1 * this.qRate * updateInterval);
 	},
+	freeze: function() {
+		var slider = $('#' + this.sliderId);
+		if (slider.length) $(slider).slider('disable');
+	},
+	unfreeze: function() {
+		var slider = $('#' + this.sliderId);
+		if (slider.length) $(slider).slider('enable');
+	},
 	makeDrawFunc: function(colMin, colDefault, colMax){
 		var pos = this.pos;
 		var dims = this.dims;
