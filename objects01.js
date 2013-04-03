@@ -29,7 +29,7 @@ compressorFuncs = {
 
 objectFuncs = {
 	setupStd: function() {
-		this.toggleState = 'on';
+		this.enabled = true;
 		this.removed = false;
 		this.addCleanUp();
 		if (this.handle) this.addToCurLevel();
@@ -159,13 +159,11 @@ objectFuncs = {
 	massToPressure: function(mass) {
 		return mass*pConst*g/(this.wall[1].x-this.wall[0].x);
 	},
-	toggle: function(set) {
-		if (set == 'on') {
-			this.toggleOn();
-			this.toggleState = 'on';
-		} else if (set == 'off') {
-			this.toggleOff();
-			this.toggleState = 'off';
+	toggle: function() {
+		if (this.enabled) {
+			this.disable();
+		} else {
+			this.enable();
 		}
 	}
 }
@@ -738,9 +736,11 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	},
 	disable: function() {
 		removeListener(curLevel, 'mousedown', 'weights' +this.wallInfo);
+		this.enabled = false;
 	},
 	enable: function() {
 		addListener(curLevel, 'mousedown', 'weights' + this.wallInfo, this.mousedown, this);
+		this.enabled = true;
 	},
 })
 //////////////////////////////////////////////////////////////////////////
@@ -1285,12 +1285,14 @@ _.extend(CompArrow.prototype, objectFuncs, {
 			return new DragArrow(pos, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds).show();
 		}
 	},
-	toggleOn: function() {
+	enable: function() {
 		this.dragArrow.setPos(this.wall[1].copy());
 		this.dragArrow.show();
+		this.enabled = true;
 	},
-	toggleOff: function() {
-		this.dragArrow.hide()
+	disable: function() {
+		this.dragArrow.hide();
+		this.enabled = false;
 	}
 }
 )
@@ -1415,19 +1417,21 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		dims.adjust(0,1);
 		return {pos:pos, dims:dims, col:col};
 	},
-	toggleOn: function() {
+	enable: function() {
 		if (this.slider) {
 			this.slider.slider('option', 'disabled', false);
 		}
 		this.setMass(this.massStore);
 		delete this.massStore;
+		this.enabled = true;
 	},
-	toggleOff: function() {
+	disable: function() {
 		if (this.slider) {
 			this.slider.slider('option', 'disabled', true);
 		}
 		this.massStore = this.mass;
 		this.setMass(0);
+		this.enabled = false;
 	},
 	show: function(){
 		addListener(curLevel, 'update', 'drawPiston'+this.handle, this.draw, '');
@@ -1549,10 +1553,12 @@ _.extend(Heater.prototype, objectFuncs, {
 	disable: function() {
 		var slider = $('#' + this.sliderId);
 		if (slider.length) $(slider).slider('disable');
+		this.enabled = false;
 	},
 	enable: function() {
 		var slider = $('#' + this.sliderId);
 		if (slider.length) $(slider).slider('enable');
+		this.enabled = true;
 	},
 	makeDrawFunc: function(colMin, colDefault, colMax){
 		var pos = this.pos;

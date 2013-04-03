@@ -1,19 +1,36 @@
 .sim.wrapper{
 	display:inline-block;
+	padding:0px;
+	height:575px;
 }
 .sim.main{
 	width:550px;
-	float:left;
-	/*display:inline-block;*/
+
+}
+
+td.padLeft {
+	padding-left:1em;
+}
+td.floatTop{
+	vertical-align:top;
+}
+.sim.buttonManager {
+	height:575px;
+	background-color:#ff0000;
+	/*padding-left: 1em;*/
+
 }
 
 .sim.auxSlots{
-	margin-left:570px;
+	float:top;
+	/*padding-left: 1em;*/
 }
 
 .sim.aux{
 	position:relative;
 }
+
+
 
 .sim.noSelect{
 	-moz-user-select: none; 
@@ -61,7 +78,7 @@
 	border-bottom:3px solid;
 	border-color:#b3b2b1;	
 }
-.sim.displayText, table, tr, td{
+.sim.displayText, table.displayText{
 	font-family:Verdana, garamond;/*WHAT IS GARAMOND?  SHOULD GET OTHER FALLBACKS.*/
 	font-size:medium;
 	color:white;
@@ -126,7 +143,7 @@
 }
 */
 .sim.base{
-	padding-top:10px;
+	padding-top:1em;
 	display:inline-block;
 	width:750px;
 }
