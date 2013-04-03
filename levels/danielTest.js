@@ -96,7 +96,7 @@ _.extend(TestLevel.prototype,
 					//{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}
 				],
 				listeners: [
-					{handle: 'checky', expr: 'fracDiff(vol("wally"), 9) < .05', alertUnsatisied: 'no', satisfyStore: [{storeAs: 'foo', expr: 'vol("wally") * 10'}], satisfyCmmds: ['console.log("lol")']}
+					//{handle: 'checky', expr: 'fracDiff(vol("wally"), 9) < .05', alertUnsatisied: 'no', satisfyStore: [{storeAs: 'foo', expr: 'vol("wally") * 10'}], satisfyCmmds: ['console.log("lol")']}
 				],
 				// rxns: [
 					// {handle: 'rxn1', rctA: 'spc1', rctB: 'ugly', activeE: 15, prods: {duckling: 1}},

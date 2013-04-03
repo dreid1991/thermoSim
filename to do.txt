@@ -21,3 +21,5 @@ do something in liquid update to update phase diagram if pressure changed
 make it so you can fix axes more precisely.  Maybe have {min step max} and set num grid lines based on that
 
 make custom button column
+
+many activity coeffs more flexible
