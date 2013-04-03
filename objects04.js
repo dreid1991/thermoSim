@@ -35,6 +35,8 @@ function Liquid(attrs) {
 	if (makePhaseDiagram) {
 		this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, this.handle, attrs.primaryKey);
 		curLevel.graphs[this.phaseDiagram.handle] = this.phaseDiagram;
+		this.phasePressure = attrs.phasePressure;
+		if (this.phasePressure) this.phaseDiagram.setPressure(this.phasePressure);
 	}
 	this.setupStd();
 }
@@ -163,11 +165,19 @@ _.extend(Liquid.prototype, objectFuncs, {
 		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcDefs, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt);//you were making the liquid eject if df<0 whether hit or not
 		var sizeWall = this.setupSizeWall(wallLiq, wallGas, spcDefs, dotMgrLiq, wallGasIdxs, wallSurfAreaObj)
 		var zeroAttrs = this.zeroAttrs;
+		if (this.phasePressure) {
+			this.checkUpdatePhase = function() {};
+		} 
+		
 		var calcCp = this.calcCp, calcEquil = this.calcEquil, drawDots = this.drawDots, moveDots = this.moveDots, ejectDots = this.ejectDots;
 		calcCp();
 		var turns = 0;
+		var self = this;
 		addListener(curLevel, 'update', listenerName, function() {
 			if (turns == 5) {
+				if (!self.checkUpdatePhase) 
+					self.checkUpdatePhase = self.setupCheckUpdatePhase(self.phaseDiagram, self.wallGas.getDataSrc('pExt'), self.wallGas.getDataSrc('pInt'));
+				var checkUpdatePhase = self.checkUpdatePhase;	
 				removeListener(curLevel, 'update', listenerName);
 				addListener(curLevel, 'update', listenerName, function() {
 					calcCp();
@@ -176,6 +186,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 					moveDots();
 					ejectDots();
 					sizeWall();
+					checkUpdatePhase();
 				})
 				
 			} else {
@@ -183,7 +194,8 @@ _.extend(Liquid.prototype, objectFuncs, {
 				calcEquil();
 				drawDots();
 				moveDots();
-				sizeWall();			
+				sizeWall();	
+				turns ++;
 			}
 		})
 	},
@@ -301,6 +313,19 @@ _.extend(Liquid.prototype, objectFuncs, {
 			wallLiq[1].y = wallGas[wallGasIdxs[0]].y - height;
 			wallLiq.parent.setupWall(wallLiq.parent.indexOf(wallLiq));
 			surfAreaObj.val = 2 * height + wallLiq[1].x - wallLiq[0].x;
+		}
+	},
+	setupCheckUpdatePhase: function(phaseDiagram, srcA, srcB) {
+		var src = srcA ? srcA : srcB;
+		var turnsDiff = 0;
+		return function() {
+			if (src[src.length - 1] != phaseDiagram.pressure) {
+				turnsDiff ++;
+			}
+			if (turnsDiff > 15) {
+				phaseDiagram.setPressure(src[src.length - 1]);
+				turnsDiff = 0;
+			}
 		}
 	},
 	eject: function(dotMgrLiq, dotMgrGas, spcDefs, spcName, numEject, wallGas, drawList, wallLiq) {

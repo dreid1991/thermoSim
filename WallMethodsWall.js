@@ -264,7 +264,6 @@ WallMethods.wall = {
 	removeLiquid: function(liquid) {
 		if (typeof liquid == 'string') liquid = this.liquids[liquid];
 		if (liquid && liquid.handle) {
-			delete this.liquidTemps[liquid.handle];
 			delete this.liquids[liquid.handle];
 		}
 	},

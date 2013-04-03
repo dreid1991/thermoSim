@@ -9,7 +9,7 @@ function GraphPhase(attrs) {
 	this.primaryKeyType = /light/i.test(attrs.primaryKey) ? 'Light' : 'Heavy';
 	this.handle = attrs.handle;
 	this.actCoeffFuncs = attrs.actCoeffFuncs;
-	this.pressure = 5; //Make this be specified or grab values from the wall or something//attrs.pressure;
+	this.pressure = attrs.pressure || 1;
 	this.keyNamePairs = this.getKeyNamePairs(this.spcA, this.spcB, this.pressure);
 	//this.primarySpcName = this.getPrimarySpcName(this.spcA, this.spcB, this.primaryKeyType, this.pressure);
 	if (!(this.spcA && this.spcB)) console.log('Bad species data for phase diagram ' + this.spcAName + ' ' + this.spcBName);
@@ -67,6 +67,7 @@ GraphPhase.prototype = {
 	setPressure: function(pressure) {
 		this.updateEquilData(pressure);
 		this.updateGraph();
+		this.pressure = pressure;
 	},
 	getKeyNamePairs: function(spcA, spcB, pressure) {
 		if (spcA.tBoil(pressure) < spcB.tBoil(pressure)) {
