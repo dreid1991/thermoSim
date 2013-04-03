@@ -42,7 +42,7 @@ Readout.prototype = {
 	// },
 	// makeTickFunc: function(entry, step, setPt) {
 		// return function(){
-			// entry.val = boundedStep(entry.val, setPt, step);
+			// entry.val = stepTowards(entry.val, setPt, step);
 			// var decPlaces = entry.decPlaces
 			// if(round(entry.val,decPlaces+1)==round(setPt,decPlaces+1)){
 				// removeListener(curLevel, 'update', this.handle + entry.name + 'tick');

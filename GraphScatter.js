@@ -440,7 +440,7 @@ GraphScatter.Flasher.prototype = {
 	},
 	advance: function() {
 
-		this.curCharacLen = boundedStep(this.curCharacLen, this.finalCharacLen, -this.finalCharacLen * this.flashMult * this.flashRate)
+		this.curCharacLen = stepTowards(this.curCharacLen, this.finalCharacLen, -this.finalCharacLen * this.flashMult * this.flashRate)
 		var col = this.curCol;
 		var newCol = Col(0,0,0);
 		newCol.r = this.colStep('r');
@@ -457,7 +457,7 @@ GraphScatter.Flasher.prototype = {
 		var setPt = this.pointCol[col];
 		var diff = setPt - init;
 		var step = diff*this.graph.flashRate;
-		return boundedStep(cur, setPt, step);	
+		return stepTowards(cur, setPt, step);	
 	},
 
 }

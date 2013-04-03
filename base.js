@@ -150,19 +150,16 @@ function gauss(avg, stdev){
 function bound(val, min, max) {
 	return Math.min(Math.max(val, min), max);
 }
-function boundedStep(cur, setPt, step){
+function stepTowards(cur, setPt, step){
 	step = Math.abs(step);
-	var sign = 1;
-	if (cur==setPt) {
-		return cur;
+	if (cur < setPt) {
+		return Math.min(setPt, cur + step);
 	} else {
-		var dist = setPt-cur;
-		sign = Math.abs(dist)/dist;
+		return Math.max(setPt, cur - step);
 	}
-	cur*=sign;
-	setPt*=sign;
-	return sign*Math.min(cur+step, setPt);
 }
+
+
 
 function changeTemp(info, newTemp){
 	var dots = dotManager.get(info);

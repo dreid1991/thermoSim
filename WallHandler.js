@@ -197,7 +197,6 @@ WallMethods.main = {
 		this[wallIdx].g = g;
 		this[wallIdx].pConst = pConst;
 		this[wallIdx].liquids = {};
-		this[wallIdx].liquidTemps = {};
 		this[wallIdx].data = {};
 		this[wallIdx].q = 0;
 		this[wallIdx].pIntLen = 35;

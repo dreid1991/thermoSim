@@ -45,7 +45,7 @@ WallMethods.wall = {
 			addListener(curLevel, 'wallMove', 'cV' + this.handle,
 				function(){
 					var y = this[0].y
-					setY.apply(this, [boundedStep(y, dest, this.v)])
+					setY.apply(this, [stepTowards(y, dest, this.v)])
 					this.parent.setupWall(this.handle);
 					if(round(y,2)==round(dest,2)){
 						removeListener(curLevel, 'wallMove', 'cV' + this.handle);
@@ -180,6 +180,7 @@ WallMethods.wall = {
 		this.eToAdd = 0;
 		var activeDots = dotManager.get({tag: this.handle});
 		var tempData = this.data.temp.src();
+		//hey - this is called for each wall that is isothermal, but that's okay, it only inits once.  The listener would over overwritten anyway
 		if (!this.isothermal) {
 			addListener(curLevel, 'data', 'recordEnergyForIsothermal' + this.handle,
 				function(){
@@ -188,16 +189,30 @@ WallMethods.wall = {
 					dt = this.tSet - tLast;
 					this.eToAdd = this.getCv() * dt;
 					for (var liquidName in this.liquids) {
-						tLastLiq = this.liquidTemps[liquidName][this.liquidTemps[liquidName].length - 1] || this.tSet;
-						var dt = this.tSet - tLastLiq;
-						this.q += (this.tSet - tLastLiq) * this.liquids[liquidName].Cp * JtoKJ;
-						this.liquids[liquidName].temp = this.tSet;
+						var liquid = this.liquids[liquidName];
+						var listenerName = 'setT' + liquid.handle;
+						removeListener(curLevel, 'update', listenerName);
+						var tSet = this.tSet;
+						var dT = tSet - liquid.temp;
+						if (Math.abs(dT) > 1) {
+							var dtTurn = dT / 15;
+							addListener(curLevel, 'update', listenerName, function() {
+								var tNew = stepTowards(liquid.temp, tSet, dtTurn);
+								this.q += (tNew - liquid.temp) * liquid.Cp * JtoKJ;
+								liquid.temp = tNew;
+								if (tNew == tSet) removeListener(curLevel, 'update', listenerName);
+									
+
+							}, this)
+						}
+						
+
 					}
 				},
 			this);
-			for (var liqHandle in this.liquids) {
-				this.isothermalInitLiquid(this.liquids[liqHandle]);
-			}
+			// for (var liqHandle in this.liquids) {
+				// this.isothermalInitLiquid(this.liquids[liqHandle]);
+			// }
 			this.recordQ();
 		}
 		for (var lineIdx=0; lineIdx<this.length; lineIdx++){
@@ -245,7 +260,6 @@ WallMethods.wall = {
 	},
 	addLiquid: function(liquid) {
 		this.liquids[liquid.handle] = liquid;
-		this.liquidTemps[liquid.handle] = liquid.wallLiq.getDataObj('temp').src();
 	},
 	removeLiquid: function(liquid) {
 		if (typeof liquid == 'string') liquid = this.liquids[liquid];
