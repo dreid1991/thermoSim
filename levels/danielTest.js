@@ -49,14 +49,14 @@ _.extend(TestLevel.prototype,
 					//{spcName: 'duckling', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
-					// {
-						// type: 'AuxImage',
-						// attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/work/block0Pic1.jpg)'}
-					// },
-					// {
-						// type: 'Liquid',
-						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 700}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}, makePhaseDiagram: true}
-					// },
+					{
+						type: 'AuxImage',
+						attrs: {handle: 'picci', slotNum: 1, imgFunc: 'img(img/work/block0Pic1.jpg)'}
+					},
+					{
+						type: 'Liquid',
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 700}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}, makePhaseDiagram: true}
+					},
 					// {
 						// type: 'Heater',
 						// attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty'}
@@ -83,6 +83,7 @@ _.extend(TestLevel.prototype,
 				dataReadouts: [
 					{label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', sigFigs: 3, handle: 'someTemp', readout: 'mainReadout'},
 					{label: 'Vol: ', expr: 'vol("wally")', units: 'L', sigFigs: 3, handle: 'loopy', readout: 'mainReadout'}
+					//{label: 'RCT: ', expr: 'frac("wally", {spcName: "spc1", tag: "wally"}) + frac("wally", {spcName: "ugly", tag: "wally"})', sigFigs: 2, handle: 'coalseamgas', readout: 'mainReadout'}
 				],
 				// dataDisplay: [
 					// {wallInfo: 'wally', data:'pInt', readout: 'mainReadout'},
@@ -100,7 +101,7 @@ _.extend(TestLevel.prototype,
 				// rxns: [
 					// {handle: 'rxn1', rctA: 'spc1', rctB: 'ugly', activeE: 15, prods: {duckling: 1}},
 					// {handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
-				// ]
+				// ],
 				graphs: [
 					// {type: 'Scatter', handle: 'PvsVOne', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:1}, y:{min:0, step:1}}, 
 						// sets:[

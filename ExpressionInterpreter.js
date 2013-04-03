@@ -78,6 +78,7 @@ ExpressionInterpreter.prototype = {
 		var path = args[0];
 		var breakStyle = args[1];
 		var center = args[2];
+		path = path.replace(/['"]/g, '');
 		if (asObj) {
 			//HEY - as obj currently only return image, no p, br, or centering.  
 			//It is they way because of AuxPicture.  Look into that before making changes here

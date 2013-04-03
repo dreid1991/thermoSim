@@ -19,7 +19,8 @@ _.extend(AuxImage.prototype, AuxFunctions, objectFuncs, {//CONSISTANT PLEASE - F
 	},
 	addImage: function(imgPath) {
 		var self = this;
-		var imgObj = interpreter.parseImgFunc(imgPath, undefined, undefined, true);
+		var imgObj;
+		var imgObj = interpreter.parseImgFunc(imgPath, true);
 		if (!imgObj.attrs) imgObj.attrs = {};
 		imgObj.attrs.id = [this.type + this.handle];
 		$(this.parentDiv).append(templater.img(imgObj));
