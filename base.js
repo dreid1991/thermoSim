@@ -347,18 +347,41 @@ function eraseStore (attrName) {
 }
 
 function deepCopy(object){
-	try {
-		var copy = new object.constructor();
-	} catch(e) {
-		console.log('hello');
-	}
-	for (var item in object){
+	var copy = new object.constructor();
+
+	for (var item in object) {
 		if (typeof object[item] == 'object') {
 			copy[item] = deepCopy(object[item]);
 		} else {
 			copy[item] = object[item];
 		}
 	} 
+	return copy;
+}
+
+
+function deepCopySafe(object) {
+	var stack = [object];
+	var copies = [];
+	return deepCopyStep(object, stack, copies);
+}
+
+function deepCopyStep(object, stack, copies) {
+	var copy = new object.constructor();
+	copies.push(copy);
+	for (var item in object) {
+		if (typeof object[item] == 'object') {
+			var idx = stack.indexOf(object);
+			if (idx == -1 ){
+				copy[item] = deepCopyStep(object[item], stack.concat().push(object[item]), copies.concat());
+			} else {
+				copy[item] = copies[idx];
+			}
+			
+		} else {
+			copy[item] = object[item];
+		}
+	}
 	return copy;
 }
 
