@@ -20,7 +20,7 @@ ButtonManager.prototype = {
 	cleanUp: function(type) {
 		for (var grpIdx=this.groups.length - 1; grpIdx>=0; grpIdx--) {
 			if (this.groups[grpIdx].cleanUpWith == type) {
-				var grp = this.groups[groupIdx];
+				var grp = this.groups[grpIdx];
 				var div = this.getGroupDiv(grp);
 				div.remove();
 				this.groups.splice(grpIdx, 1);

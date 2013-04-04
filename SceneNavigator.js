@@ -75,6 +75,7 @@ SceneNavigator.prototype = {
 		interpreter.renderMath();
 		buttonManager.arrangeGroupWrappers();
 		buttonManager.arrangeAllGroups();
+		buttonManager.setButtonWidth();
 
 	},
 	getpromptIdxsToClean: function(newSectionIdx, newPromptIdx) {
