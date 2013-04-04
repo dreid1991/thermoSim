@@ -16,11 +16,25 @@ td.floatTop{
 }
 .sim.buttonManager {
 	height:575px;
-	background-color:#ff0000;
-	/*padding-left: 1em;*/
+	background-color:#05111a;
+	border-radius: 20px;
 
 }
+/* Make it pad the outside of groups */
+
+.sim.buttonGroupPadder{
+	padding: 0.5em;
+}
+.sim.buttonGroupWrapper{
+	padding: 0.5em;
+	border: 3px solid;
+	border-radius: 10px;
+	border-color:#b3b2b1;
+}
 .sim.buttonGroup {
+	padding-left: 0.5em;
+}
+.sim.buttonManagerButton{
 
 }
 

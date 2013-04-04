@@ -4,23 +4,77 @@ function ButtonManager(wrapperDiv) {
 	this.groups = [];
 	
 }
-
+//should add clean up with stuff
 ButtonManager.prototype = {
 	addGroup: function(handle, label, prefIdx) {
 		var groupId = 'group' + handle;
 		var wrapperId = groupId + 'Wrapper';
+		var padderId = groupId + 'Padder';
 		var groupButtonWrapperHTML = templater.div({attrs: {id: [groupId], class: ['buttonGroup']}});
 		var wrapperInner = label + templater.br() + groupButtonWrapperHTML;
-		var groupWrapperHTML = templater.div({attrs: {id: [wrapperId], groupHandle: [handle], class: ['displayText']}, innerHTML: wrapperInner});
-		this.wrapperDiv.append(groupWrapperHTML);
+		var groupWrapperHTML = templater.div({attrs: {id: [wrapperId], handle: [handle], class: ['buttonManagerElem', 'displayText', 'buttonGroupWrapper']}, innerHTML: wrapperInner});
+		var groupPadderHTML = templater.div({attrs: {id: [padderId], handle: [handle], class: ['buttonManagerElem', 'buttonGroupPadder']}, innerHTML: groupWrapperHTML});
+		this.wrapperDiv.append(groupPadderHTML);
 		this.groups.push(new ButtonManager.Group(this.wrapperDiv, groupId, handle, label, prefIdx));
-		//need to arrange at some point
+	},
+	arrangeGroupWrappers: function() {
+		//all elements must be buttonManagerElems because I'm going to be treating the div pretty roughly.  Other stuff will be rearranged badly.
+		var arrangement = this.arrangeObjs(this.groups);
+		this.arrangeHTML(this.wrapperDiv, arrangement);
+		
+	},
+	setButtonWidth: function() {
+		var buttons = $('button.buttonManagerElem');
+		var max = 100;
+		for (var i=0; i<buttons.length; i++) {
+			var button = buttons[i];
+			max = Math.max(max, $(button).width());
+		}
+		for (var i=0; i<buttons.length; i++) {
+			var button = buttons[i];
+			$(button).css('width', max);
+		}
+	},
+	arrangeGroup: function(groupHandle) {
+		var group = this.getGroup(groupHandle);
+		
+		if (group) {
+			var arrangement = this.arrangeObjs(group.buttons);
+			this.arrangeHTML($('#' + group.groupId), arrangement);
+		} else {
+			console.log('Bad group name ' + groupHandle);
+		}
+	},
+	arrangeHTML: function(parent, arrangement) {
+		var divs = parent.children();
+		var mustArrange = false;
+		for (var i=0; i<divs.length; i++) {
+			var div = divs[i];
+			var arrangementItem = arrangement[i];
+			var divHandle = $(div).attr('handle');
+			mustArrange = Math.max(mustArrange, divHandle != arrangementItem.handle);
+			if (mustArrange) break;
+		}
+		if (mustArrange) {
+			var clones = {};
+			for (var i=0; i<divs.length; i++) {
+				var div = divs[i];
+				clones[$(div).attr('handle')] = $(div).clone(true);
+			}
+			parent.html('');
+			for (var arrIdx=0; arrIdx<arrangement.length; arrIdx++) {
+				var arr = arrangement[arrIdx];
+				var clone = clones[arr.handle];
+				parent.append(clone);
+			}
+		}
 	},
 	addButton: function(groupHandle, handle, label, exprs, prefIdx) {
 		var group = this.getGroup(groupHandle);
-		if (group) {
+		if (group)
 			group.addButton(handle, label, exprs, prefIdx);
-		}
+		else
+			console.log('Bad group handle ' + groupHandle); 
 	},
 	getGroup: function(groupHandle) {
 		for (var i=0; i<this.groups.length; i++) 
@@ -94,7 +148,11 @@ function blorg() {
 	foo.addGroup('3141b','sdafasd',0);
 	foo.addGroup('3141c','sdafasd',3);
 	foo.addGroup('af', 'dsfdsa', undefined);
-	foo.addButton('3141c', 'glorp', 'Label!', function(){console.log('hi')}, 0);
+	foo.addButton('3141c', 'glorp', 'Label!', function(){console.log('hi')}, 1);
+	foo.addButton('3141c', 'num2', 'me first', function(){}, 0);
+	foo.arrangeGroup('3141c');
+	foo.arrangeGroupWrappers();
+	foo.setButtonWidth();
 }
 //groupHandle, handle, label, exprs, prefIdx
 ButtonManager.Group = function(mgrDiv, groupId, handle, label, prefIdx) {
@@ -108,17 +166,22 @@ ButtonManager.Group = function(mgrDiv, groupId, handle, label, prefIdx) {
 
 ButtonManager.Group.prototype = {
 	addButton: function(handle, label, exprs, prefIdx) {
-		this.buttons.push(new ButtonManager.Button(handle, label, exprs, prefIdx));
-		var buttonHTML = templater.button({innerHTML: label, attrs: {id: [handle], handle: [handle]}});
-		$('#' + this.groupId).append(buttonHTML);
-		var buttonJQ = $('button#' + handle);
+		var buttonId = handle + 'Button';
+		var wrapperId = handle + 'Wrapper';
+		this.buttons.push(new ButtonManager.Button(handle, buttonId, wrapperId, label, exprs, prefIdx));
+		var buttonHTML = templater.button({innerHTML: label, attrs: {id: [buttonId], class: ['buttonManagerElem', 'buttonManagerButton'], handle: [handle]}});
+		var buttonWrapper = templater.div({innerHTML: buttonHTML, attrs: {id: [wrapperId], class:['buttonManagerElem', 'buttonWrapper'], handle: [handle]}});
+		$('#' + this.groupId).append(buttonWrapper);
+		var buttonJQ = $('button#' + buttonId);
 		addJQueryElems(buttonJQ, 'button');
 		$(buttonJQ).click(this.buttons[this.buttons.length - 1].cb);
 	}
 }
 
-ButtonManager.Button = function(handle, label, exprs, prefIdx) {
+ButtonManager.Button = function(handle, buttonId, wrapperId, label, exprs, prefIdx) {
 	this.handle = handle;
+	this.buttonId = buttonId;
+	this.wrapperId = wrapperId;
 	this.label = label;
 	if (typeof exprs == 'function') {
 		this.cb = exprs;
