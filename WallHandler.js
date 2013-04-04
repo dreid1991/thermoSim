@@ -77,27 +77,7 @@ WallMethods.main = {
 		}
 		
 	},
-	doInitHandlers: function(handlers){
-		
-		if (handlers instanceof Array){//NOTE - HANDLERS HAD BETTER BE THE SAME LENGTH AT walls.pts.  I AM ASSUMING IT IS.
-			for (var handlerIdx=0; handlerIdx<handlers.length; handlerIdx++){
-				if(handlers[handlerIdx] instanceof Array){
-					var handlerArray = handlers[handlerIdx];
-					for (var subHandlerIdx=0; subHandlerIdx<handlerArray.length; subHandlerIdx++){
-						var subHandler = handlerArray[subHandlerIdx]
-						this.setSubWallHandler(handlerIdx, subHandlerIdx, subHandler);
-					}
-				}else if(typeof handlers[handlerIdx] == 'string'){
-					var handler = handlers[handlerIdx];
-					this.setWallHandler(handlerIdx, handler)
-				}
-			}
-		} else if(typeof handlers == 'string' || typeof handlers=='object'){
-			this.setAllHandler(handlers);
-		}else{
-			console.log('YOU SEND POOR WALL HANDLERS.  THEY ARE NEITHER STRING NOR ARRAY NOR OBJECT');
-		}
-	},
+
 	setAllHandler: function(handler){
 		for(var wallIdx=0; wallIdx<this.length; wallIdx++){
 			this.setWallHandler(wallIdx, handler);
@@ -105,28 +85,28 @@ WallMethods.main = {
 	},
 	setWallHandler: function(wallInfo, handler){
 		var wallIdx = this.idxByInfo(wallInfo);
+		if (/isothermal/i.test(handler)) {
+			this[wallIdx].isothermalInit()
+		}
 		for (var subWallIdx=0; subWallIdx<this[wallIdx].length; subWallIdx++){
-			this.setSubWallHandler(wallIdx, subWallIdx, handler);
+			var subWall = this[wallIdx][subWallIdx];
+			if (typeof handler == 'string') {
+				this[wallIdx + '-' + subWallIdx] = {obj: this, func: this[handler]};
+			} else if (typeof handler == 'object') {
+				this[wallIdx + '-' + subWallIdx] = handler;
+			}
+			//this.setSubWallHandler(wallIdx, subWallIdx, handler);
 		}
 	},		
-	setSubWallHandler: function(wallInfo, subWallIdx, handler){
-		var wallIdx = this.idxByInfo(wallInfo)
-		if(typeof handler == 'string'){
-			this[wallIdx + '-' + subWallIdx] = {obj:this, func:this[handler]};
-			if(handler.toLowerCase().indexOf('isothermal')!=-1){
-				this[wallIdx].isothermalInit();
-			} else {
-				this[wallIdx][subWallIdx].isothermal = false;
-			}
-		}else if(typeof handler=='object'){
+	setSubWallHandler: function(wallInfo, subWallIdx, handler) {
+		var wallIdx = this.idxByInfo(wallInfo);
+		if (typeof handler == 'string') {
+			this[wallIdx][subWallIdx].isothermal = /isothermal/i.test(handler); 
+			
+			this[wallIdx + '-' + subWallIdx] = {obj: this, func: this[handler]};
+		} else if (typeof handler == 'object') {
 			this[wallIdx + '-' + subWallIdx] = handler;
-			if(handler.isothermal){
-				this[wallIdx].isothermalInit();
-			} else {
-				this[wallIdx][subWallIdx].isothermal = false;
-			}
-		}
-		
+		}		
 	},
 	getSubWallHandler: function(wallInfo, subWallIdx) {
 		var wallIdx = this.idxByInfo(wallInfo);

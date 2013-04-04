@@ -23,3 +23,5 @@ make it so you can fix axes more precisely.  Maybe have {min step max} and set n
 make custom button column
 
 many activity coeffs more flexible
+
+get rid of 'hit mode' (32 vs std) thing

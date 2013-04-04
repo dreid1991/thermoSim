@@ -124,21 +124,25 @@ WallMethods.collideMethods ={
 		this[wallIdx].forceInternal += 2*dot.m*Math.abs(perpV);
 	},
 	cVIsothermal: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
-		var eAddSign = getSign(this[wallIdx].eToAdd);
-		var inTemp = dot.temp();
-		var eToAdd = eAddSign * Math.min(Math.abs(this[wallIdx].eToAdd), dot.cv * 20);
-		if (eToAdd < 0 && inTemp <= 20) eToAdd = (inTemp - 20) * dot.cv;
+		if (this[wallIdx].eToAdd) {
+			var eAddSign = getSign(this[wallIdx].eToAdd);
+			var inTemp = dot.temp();
+			var eToAdd = eAddSign * Math.min(Math.abs(this[wallIdx].eToAdd), dot.cv * 20);
+			if (eToAdd < 0 && inTemp <= 20) eToAdd = (inTemp - 20) * dot.cv;
 
-		this[wallIdx].eToAdd -= eToAdd;
-		var outTemp = inTemp + eToAdd / dot.cv;
-		var spdRatio = Math.sqrt(outTemp/inTemp);
-		var outPerpV = perpV*spdRatio;
-		this.reflect(dot, wallUV, perpV);
-		dot.v.dx*=spdRatio;
-		dot.v.dy*=spdRatio;
-		dot.internalPotential *= outTemp / inTemp;
-		this[wallIdx].forceInternal += dot.m*(Math.abs(perpV) + Math.abs(outPerpV));
-		this[wallIdx].q += eToAdd*JtoKJ;
+			this[wallIdx].eToAdd -= eToAdd;
+			var outTemp = inTemp + eToAdd / dot.cv;
+			var spdRatio = Math.sqrt(outTemp/inTemp);
+			var outPerpV = perpV*spdRatio;
+			this.reflect(dot, wallUV, perpV);
+			dot.v.dx*=spdRatio;
+			dot.v.dy*=spdRatio;
+			dot.internalPotential *= outTemp / inTemp;
+			this[wallIdx].forceInternal += dot.m*(Math.abs(perpV) + Math.abs(outPerpV));
+			this[wallIdx].q += eToAdd*JtoKJ;
+		} else {
+			this.reflect(dot, wallUV, perpV);
+		}
 	},
 	//cVIsothermal32 defined in init function
 	cVAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){

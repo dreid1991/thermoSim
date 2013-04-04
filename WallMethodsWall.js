@@ -176,7 +176,9 @@ WallMethods.wall = {
 		}
 		return Cv;
 	},
-	isothermalInit: function(){
+
+	isothermalInit: function(temp){
+		if (temp) this.tSet = temp;
 		this.eToAdd = 0;
 		var activeDots = dotManager.get({tag: this.handle});
 		var tempData = this.data.temp.src();

@@ -367,19 +367,25 @@ function deepCopySafe(object) {
 }
 
 function deepCopyStep(object, stack, copies) {
-	var copy = new object.constructor();
+	var copy;
+	try {
+		copy = new object.constructor();
+	} catch(e) {
+		copy = {};
+	}
 	copies.push(copy);
-	for (var item in object) {
-		if (typeof object[item] == 'object') {
-			var idx = stack.indexOf(object);
+	for (var key in object) {
+		var val = object[key]; 
+		if (typeof val == 'object') {
+			var idx = stack.indexOf(val);
 			if (idx == -1 ){
-				copy[item] = deepCopyStep(object[item], stack.concat().push(object[item]), copies.concat());
+				copy[key] = deepCopyStep(val, stack.concat([val]), copies.concat());
 			} else {
-				copy[item] = copies[idx];
+				copy[key] = copies[idx];
 			}
 			
 		} else {
-			copy[item] = object[item];
+			copy[key] = val;
 		}
 	}
 	return copy;

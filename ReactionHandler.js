@@ -1,16 +1,19 @@
 ReactionHandler = {
 	addReaction: function(attrs){ //rctA, rctB, hRxn, activeE, prods)
 		attrs.parent = this;
-		var rxn = new this.Reaction(attrs);
+		var rxn = new ReactionHandler.Reaction(attrs);
 		
-		if (rxn.rctA && rxn.rctB) {
-			this.initPair(rxn)
-		} else if (rxn.rctA) {
-			this.initDecomp(rxn);
-		} else {
-			console.log('Bad reaction names');
-			console.log(attrs);
-			console.trace();
+		this.initRxn(rxn);
+
+	},
+	disableRxn: function(handle) {
+		this.removeRxn(handle);
+	},
+	enableRxn: function(handle) {
+		var rxn = this.getRxn(this.pausedRxns, handle);
+		if (rxn) {
+			this.pausedRxns.splice(this.pausedRxns.indexOf(rxn), 1);
+			this.initRxn(rxn);
 		}
 	},
 	removeRxn: function(handle) {
@@ -20,40 +23,40 @@ ReactionHandler = {
 			for (var spcRxnIdx=0; spcRxnIdx<spcRxns.length; spcRxnIdx++) {
 				var spcRxn = spcRxns[spcRxnIdx];
 				if (spcRxn.handle == handle) {
-					spcRxn.splice(spcRxnIdx, 1);
+					spcRxns.splice(spcRxnIdx, 1);
 					removedRxn = true;
 				
 				}
 			
 			}
 			if (removedRxn) {
-				if (spcRxn.length == 0) {
+				if (spcRxns.length == 0) {
 					this.setHandlerByIdStr(rxnId, {func:this.impactStd, obj:this})
-				} else if (spcRxn.length ==1) {
+				} else if (spcRxns.length ==1) {
 					var rxn = spcRxns[0];
 					this.initPair(rxn, true);
 				}
 			}
 		}
+		var rxn = this.getRxn(this.activeRxns, handle);
+		if (rxn) {
+			this.activeRxns.splice(this.activeRxns.indexOf(rxn), 1);
+			this.pausedRxns.push(rxn);
+		}
 	},
-	
-	Reaction: function(attrs) { //prods as {name1: count, name2, count2}  hRxn in kj/mol, activeE in kj/mol, convert to j/dot
-		this.attrs = attrs;
-		this.handle = attrs.handle;
-		this.parent = attrs.parent;
-		this.rctA = attrs.rctA || attrs.rctB; //spcName
-		this.rctB = attrs.rctA && attrs.rctB ? attrs.rctB : undefined; //spcName
-		this.rctADef = this.parent.spcs[this.rctA];
-		this.rctBDef = this.parent.spcs[this.rctB];
-		this.activeE = attrs.activeE * 1000 / N; // in joules of collision
-		this.hRxn = attrs.hRxn * 1000 / N; //only used if hRxn fixed
+	getRxn: function(rxns, handle) {
+		for (var i=0; i<rxns.length; i++) {
+			if (handle == rxns[i].handle) return rxns[i];
+		}
+	},
+	initRxn: function(rxn) {
+		if (rxn.rctA && rxn.rctB) {
+			this.initPair(rxn)
+		} else if (rxn.rctA) {
+			this.initDecomp(rxn);
+		}
+		this.activeRxns.push(rxn);
 		
-		if (this.rctA && !this.rctADef) return console.log('reactant a ' + this.rctA + " doesn't exist");
-		if (this.rctB && !this.rctBDef) return console.log('reactant b ' + this.rctB + " doesn't exist");
-		
-		this.prods = this.reformatProds(attrs.prods);
-		this.prodCount = this.countProds(this.prods);
-
 	},
 	
 
@@ -67,12 +70,12 @@ ReactionHandler = {
 	},
 	//end public
 	//maybe automatically adding reverse should reverse activE be specified
-	initPair: function(rxn, reIniting) {
+	initPair: function(rxn) {
 		//rctA, rctB, rctDefA, rctDefB, activeTemp, hRxn, prods
 		
 		var idStr = this.getIdStr(rxn.rctADef, rxn.rctBDef);
 		
-		if (!reIniting) this.rxns[idStr] ? this.rxns[idStr].push(rxn) : this.rxns[idStr] = [rxn];
+		this.rxns[idStr] ? this.rxns[idStr].push(rxn) : this.rxns[idStr] = [rxn];
 		
 		var isMultiple = this.rxns[idStr].length > 1;
 
@@ -218,6 +221,25 @@ ReactionHandler = {
 	}
 }
 
+ReactionHandler.Reaction = function(attrs) { //prods as {name1: count, name2, count2}  hRxn in kj/mol, activeE in kj/mol, convert to j/dot
+		this.attrs = attrs;
+		this.handle = attrs.handle;
+		this.parent = attrs.parent;
+		this.rctA = attrs.rctA || attrs.rctB; //spcName
+		this.rctB = attrs.rctA && attrs.rctB ? attrs.rctB : undefined; //spcName
+		this.rctADef = this.parent.spcs[this.rctA];
+		this.rctBDef = this.parent.spcs[this.rctB];
+		this.activeE = attrs.activeE * 1000 / N; // in joules of collision
+		//this.hRxn = attrs.hRxn * 1000 / N; //only used if hRxn fixed
+		
+		if (this.rctA && !this.rctADef) return console.log('reactant a ' + this.rctA + " doesn't exist");
+		if (this.rctB && !this.rctBDef) return console.log('reactant b ' + this.rctB + " doesn't exist");
+		
+		this.prods = this.reformatProds(attrs.prods);
+		this.prodCount = this.countProds(this.prods);
+
+	},
+
 ReactionHandler.Reaction.prototype = {
 	copy: function() {
 		var copy = new this.parent.Reaction(this.attrs);
@@ -258,7 +280,7 @@ ReactionHandler.Reaction.prototype = {
 		}
 		return count;
 	},
-	convertToTemp: function(enthalpy) { //in kj
-		return enthalpy / (cv * JtoKJ);
-	}
+	// convertToTemp: function(enthalpy) { //in kj
+		// return enthalpy / (cv * JtoKJ);
+	// }
 }

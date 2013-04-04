@@ -6,6 +6,8 @@ function CollideHandler(){
 	this.cv = cv;
 	this.rxns = {};
 	this.dotManager = dotManager;
+	this.activeRxns = [];
+	this.pausedRxns = [];
 	//console.log("Made supercollider");
 }
 _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
@@ -32,7 +34,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 			console.log('bad spc names ' + aName + ' ' + bName);
 		}
 	},
-	setHandleByIdStr: function(idStr, handler) {
+	setHandlerByIdStr: function(idStr, handler) {
 		if (this.isIdStr(idStr)) {
 			this[idStr] = handler;
 		} else {
