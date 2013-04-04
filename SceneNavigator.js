@@ -8,8 +8,9 @@ SceneNavigator.prototype = {
 		var changedSection = newSectionIdx!=sectionIdx;
 		var promptIdxsToClean = this.getpromptIdxsToClean(newSectionIdx, newPromptIdx);
 		
-		promptIdxsToClean.map(function(value, idx){
-			curLevel.promptCleanUp(idx);
+		promptIdxsToClean.map(function(value){
+			curLevel.promptCleanUp(value);
+			buttonManager.cleanUp('prompt' + value);
 		})
 		
 		
@@ -25,7 +26,7 @@ SceneNavigator.prototype = {
 			dotManager.clearAll();		
 
 			curLevel.sectionCleanUp();
-			
+			buttonManager.cleanUp('section');
 			emptyListener(curLevel, 'sectionCleanUp');
 			emptyListener(curLevel, 'sectionCondition');
 			//attn - once setup is out of use, remove the condition that checks for it
@@ -72,7 +73,8 @@ SceneNavigator.prototype = {
 		this.execListeners(curLevel.setupListeners.listeners);
 		emptyListener(curLevel, 'setup');
 		interpreter.renderMath();
-
+		buttonManager.arrangeGroupWrappers();
+		buttonManager.arrangeAllGroups();
 
 	},
 	getpromptIdxsToClean: function(newSectionIdx, newPromptIdx) {

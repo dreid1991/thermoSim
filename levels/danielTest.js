@@ -85,12 +85,13 @@ _.extend(TestLevel.prototype,
 					{label: 'Vol: ', expr: 'vol("wally")', units: 'L', sigFigs: 3, handle: 'loopy', readout: 'mainReadout'}
 					//{label: 'RCT: ', expr: 'frac("wally", {spcName: "spc1", tag: "wally"}) + frac("wally", {spcName: "ugly", tag: "wally"})', sigFigs: 2, handle: 'coalseamgas', readout: 'mainReadout'}
 				],
-				// dataDisplay: [
-					// {wallInfo: 'wally', data:'pInt', readout: 'mainReadout'},
-					// //{wallInfo: 'wally', data:'frac', readout: 'mainReadout', attrs: {spcName: 'spc1', tag: 'wally'}},
-					// {wallInfo: 'wally', data: 'q', readout: 'mainReadout'},
-					// {wallInfo: 'wally', data:'frac', readout: 'mainReadout', attrs: {spcName: 'ugly', tag: 'wally'}}
-				// ],
+				buttonGroups: [
+					{handle: 'wok', label: 'bwok'},
+					{handle: 'tor', label: 'rot'}
+				],
+				buttons: [
+					{groupHandle: 'wok', handle: 'bark', label: 'me', exprs: ['console.log("hello me")']}
+				],
 				cmmds: [
 					//TEST DISPLAY Q ARROWS
 					//{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}

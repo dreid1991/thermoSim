@@ -70,6 +70,7 @@ $(function(){
 	phaseEquilGenerator = new PhaseEquilGenerator();
 	sceneNavigator = new SceneNavigator();
 	interpreter = new ExpressionInterpreter();
+	buttonManager = new ButtonManager($('#buttonManager'));
 	started = false;
 	counted = 0;
 	total = 0;

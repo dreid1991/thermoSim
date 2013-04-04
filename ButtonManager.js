@@ -6,7 +6,7 @@ function ButtonManager(wrapperDiv) {
 }
 //should add clean up with stuff
 ButtonManager.prototype = {
-	addGroup: function(handle, label, prefIdx) {
+	addGroup: function(handle, label, prefIdx, cleanUpWith) {
 		var groupId = 'group' + handle;
 		var wrapperId = groupId + 'Wrapper';
 		var padderId = groupId + 'Padder';
@@ -15,13 +15,46 @@ ButtonManager.prototype = {
 		var groupWrapperHTML = templater.div({attrs: {id: [wrapperId], handle: [handle], class: ['buttonManagerElem', 'displayText', 'buttonGroupWrapper']}, innerHTML: wrapperInner});
 		var groupPadderHTML = templater.div({attrs: {id: [padderId], handle: [handle], class: ['buttonManagerElem', 'buttonGroupPadder']}, innerHTML: groupWrapperHTML});
 		this.wrapperDiv.append(groupPadderHTML);
-		this.groups.push(new ButtonManager.Group(this.wrapperDiv, groupId, handle, label, prefIdx));
+		this.groups.push(new ButtonManager.Group(this.wrapperDiv, groupId, handle, label, prefIdx, cleanUpWith));
+	},
+	cleanUp: function(type) {
+		for (var grpIdx=this.groups.length - 1; grpIdx>=0; grpIdx--) {
+			if (this.groups[grpIdx].cleanUpWith == type) {
+				var grp = this.groups[groupIdx];
+				var div = this.getGroupDiv(grp);
+				div.remove();
+				this.groups.splice(grpIdx, 1);
+			} else {
+				this.groups[grpIdx].cleanUp(type);
+			}
+		}
+	},
+	getGroupDiv: function(group) {
+		var children = this.wrapperDiv.children();
+		for (var i=0; i<children.length; i++) {
+			if ($(children[i]).attr('handle') == group.handle) 
+				return $(children[i]);
+		}
 	},
 	arrangeGroupWrappers: function() {
 		//all elements must be buttonManagerElems because I'm going to be treating the div pretty roughly.  Other stuff will be rearranged badly.
 		var arrangement = this.arrangeObjs(this.groups);
 		this.arrangeHTML(this.wrapperDiv, arrangement);
 		
+	},
+	arrangeAllGroups: function() {
+		for (var i=0; i<this.groups.length; i++) 
+			this.arrangeGroup(this.groups[i].handle);
+	},
+	arrangeGroup: function(groupHandle) {
+		var group = this.getGroup(groupHandle);
+		
+		if (group) {
+			var arrangement = this.arrangeObjs(group.buttons);
+			this.arrangeHTML($('#' + group.groupId), arrangement);
+		} else {
+			console.log('Bad group name ' + groupHandle);
+		}
 	},
 	setButtonWidth: function() {
 		var buttons = $('button.buttonManagerElem');
@@ -35,16 +68,7 @@ ButtonManager.prototype = {
 			$(button).css('width', max);
 		}
 	},
-	arrangeGroup: function(groupHandle) {
-		var group = this.getGroup(groupHandle);
-		
-		if (group) {
-			var arrangement = this.arrangeObjs(group.buttons);
-			this.arrangeHTML($('#' + group.groupId), arrangement);
-		} else {
-			console.log('Bad group name ' + groupHandle);
-		}
-	},
+
 	arrangeHTML: function(parent, arrangement) {
 		var divs = parent.children();
 		var mustArrange = false;
@@ -69,10 +93,10 @@ ButtonManager.prototype = {
 			}
 		}
 	},
-	addButton: function(groupHandle, handle, label, exprs, prefIdx) {
+	addButton: function(groupHandle, handle, label, exprs, prefIdx, cleanUpWith) {
 		var group = this.getGroup(groupHandle);
 		if (group)
-			group.addButton(handle, label, exprs, prefIdx);
+			group.addButton(handle, label, exprs, prefIdx, cleanUpWith);
 		else
 			console.log('Bad group handle ' + groupHandle); 
 	},
@@ -155,30 +179,48 @@ function blorg() {
 	foo.setButtonWidth();
 }
 //groupHandle, handle, label, exprs, prefIdx
-ButtonManager.Group = function(mgrDiv, groupId, handle, label, prefIdx) {
+ButtonManager.Group = function(mgrDiv, groupId, handle, label, prefIdx, cleanUpWith) {
 	this.mgrDiv = mgrDiv;
 	this.groupId = groupId;
 	this.handle = handle;
 	this.label = label;
 	this.prefIdx = prefIdx;
 	this.buttons = [];
+	this.cleanUpWith = cleanUpWith || currentSetupType;
 }
 
 ButtonManager.Group.prototype = {
-	addButton: function(handle, label, exprs, prefIdx) {
+	addButton: function(handle, label, exprs, prefIdx, cleanUpWith) {
 		var buttonId = handle + 'Button';
 		var wrapperId = handle + 'Wrapper';
-		this.buttons.push(new ButtonManager.Button(handle, buttonId, wrapperId, label, exprs, prefIdx));
+		this.buttons.push(new ButtonManager.Button(handle, buttonId, wrapperId, label, exprs, prefIdx, cleanUpWith));
 		var buttonHTML = templater.button({innerHTML: label, attrs: {id: [buttonId], class: ['buttonManagerElem', 'buttonManagerButton'], handle: [handle]}});
 		var buttonWrapper = templater.div({innerHTML: buttonHTML, attrs: {id: [wrapperId], class:['buttonManagerElem', 'buttonWrapper'], handle: [handle]}});
 		$('#' + this.groupId).append(buttonWrapper);
 		var buttonJQ = $('button#' + buttonId);
 		addJQueryElems(buttonJQ, 'button');
 		$(buttonJQ).click(this.buttons[this.buttons.length - 1].cb);
+	},
+	cleanUp: function(type) {
+		for (var buttonIdx=this.buttons.length - 1; buttonIdx>=0; buttonIdx--) {
+			var button = this.buttons[buttonIdx];
+			if (button.cleanUpWith == type) {
+				var div = this.getButtonDiv(button);
+				div.remove();
+				this.buttons.splice(buttonIdx, 1);
+			}
+		}
+	},
+	getButtonDiv: function(button) {
+		var children = $('#' + this.groupId).children();
+		for (var i=0; i<children.length; i++) {
+			if ($(children[i]).attr('handle') == button.handle) 
+				return $(children[i]);
+		}
 	}
 }
 
-ButtonManager.Button = function(handle, buttonId, wrapperId, label, exprs, prefIdx) {
+ButtonManager.Button = function(handle, buttonId, wrapperId, label, exprs, prefIdx, cleanUpWith) {
 	this.handle = handle;
 	this.buttonId = buttonId;
 	this.wrapperId = wrapperId;
@@ -189,6 +231,7 @@ ButtonManager.Button = function(handle, buttonId, wrapperId, label, exprs, prefI
 		this.cb = this.wrapExprs(exprs);
 	}
 	this.prefIdx = prefIdx;
+	this.cleanUpWith = cleanUpWith || currentSetupType;
 }
 
 ButtonManager.Button.prototype = {

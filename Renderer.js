@@ -31,6 +31,8 @@ Renderer.prototype = {
 		this.addGraphs(scene.graphs || []);
 		this.addRxns(scene.rxns || []);
 		this.doCommands(scene.cmmds || []);
+		this.addButtonGrps(scene.buttonGroups || []);
+		this.addButtons(scene.buttons || []);
 		
 
 		
@@ -104,6 +106,18 @@ Renderer.prototype = {
 		for (var cmmdIdx=0; cmmdIdx<cmmds.length; cmmdIdx++) {
 			var cmmd = cmmds[cmmdIdx];
 			eval(cmmd);		
+		}
+	},
+	addButtonGrps: function(grps) {
+		for (var grpIdx=0; grpIdx<grps.length; grpIdx++) {
+			var grp = grps[grpIdx];
+			buttonManager.addGroup(grp.handle, grp.label, grp.prefIdx, grp.cleanUpWith);
+		}
+	},
+	addButtons: function(buttons) {
+		for (var buttonIdx=0; buttonIdx<buttons.length; buttonIdx++) {
+			var button = buttons[buttonIdx];
+			buttonManager.addButton(button.groupHandle, button.handle, button.label, button.exprs, button.prefIdx, button.cleanUpWith);
 		}
 	},
 	getAndEval: function(sceneElem) {
