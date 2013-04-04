@@ -199,7 +199,6 @@ WallMethods.wallDataHandler = {
 			var JTOKJLOCAL = JtoKJ;
 			var trackPt = this[0];
 
-			var heightLast = trackPt.y;
 			//Attention - at some point, employ some trickyness to first add a listener for first turn that records zero, then add real listener that uses func below. 
 			//this will work after first turn since volume is _always_ recorded before work (vol is added as default to wall, work is added later by objects)
 			var self = this;
@@ -381,36 +380,7 @@ WallMethods.wallDataHandler = {
 			console.trace();
 		}
 	},
-	displayQArrowsAmmt: function(attrs) {
-		var qMax = attrs.qMax;
-		if (this.data.q.recording() && !(this.data.qArrowsRate && this.data.qArrowsRate.recording()) && !(this.data.qArrowsAmmt && this.data.qArrowsAmmt.recording())) {
-			this.data.qArrowsAmmt = new WallMethods.DataObj();
-			var dataObj = this.data.qArrowsAmmt;
-			dataObj.displaying(true);
-			dataObj.wallHandle(this.handle);
-			dataObj.id('qArrowsAmmt');
-			var wall = this;
-			addListener(this, 'cleanUp', 'qArrowsAmmt', function() {
-				for (var arrowIdx=0; arrowIdx<wall.qArrowsAmmt.length; arrowIdx++) {
-					wall.qArrowsAmmt[arrowIdx].remove();
-				}
-				removeListener(curLevel, 'update', wall.handle + 'updateQAmmtArrows');
-				
-			})
-			// dataObj.displayStop(function() {
-				// this.displaying(false);
-				// for (var arrowIdx=0; arrowIdx<wall.qArrowsAmmt.length; arrowIdx++) {
-					// wall.qArrowsAmmt[arrowIdx].remove();
-				// }
-				// removeListener(curLevel, 'update', this.wallHandle() + 'updateQAmmtArrows');
-			// })
-			this.qArrowsAmmtInit(defaultTo(3, qMax));
-		} else {
-			console.log('Tried to display q arrowsAmmt for wall ' + this.handle + ' while not recording or already displaying.  Will not display.');
-			console.trace();	
-			
-		}
-	},
+
 	makeDataList: function() {
 		var list = [];
 		list.displaying = false;
@@ -427,72 +397,7 @@ WallMethods.wallDataHandler = {
 	resetWork: function() {
 		this.work = 0;
 	},
-	qArrowsAmmtInit: function(qMax) {
-		this.qArrowAmmtMax = qMax;
-		var lengthMin = 15;
-		var lengthMax = 80;
-		var widthMin = 70
-		var widthMax = 90;
-		var col = Col(175, 0, 0);
-		var width = 40;
-		var fracFromEdge = .25;
-		var startingDims = V(30, 10);
-		var pos1 = this[3].copy().fracMoveTo(this[2], fracFromEdge);
-		var pos2 = this[3].copy().fracMoveTo(this[2], 1-fracFromEdge);
-		var UV = pos2.VTo(pos1).perp('cw').UV();
-		pos1.movePt(UV.copy().mult(5));
-		pos2.movePt(UV.copy().mult(5));
-		var arrow1 = new ArrowStatic({pos:pos1, dims:startingDims, fill: Col(175,0,0), stroke: Col(0,0,0), label:'Q', UV:UV});
-		var arrow2 = new ArrowStatic({pos:pos2, dims:startingDims, fill: Col(175,0,0), stroke: Col(0,0,0), label:'Q', UV:UV});
 
-		var redrawThreshold = qMax/(lengthMax-lengthMin);
-		this.qArrowsAmmt = [arrow1, arrow2];
-		var dirLast = 'out';
-		qLast = this.q;
-		this.setAmmtArrowDims(this.qArrowsAmmt, lengthMin, lengthMax, widthMin, widthMax, this.q, qMax);
-		if (this.q>=0) {
-			dirLast = 'in';
-			this.flipAmmtArrows(this.qArrowsAmmt);
-		}
-		addListener(curLevel, 'update', this.handle + 'updateQAmmtArrows', 
-			function() {
-				if (Math.abs(this.q - qLast) > redrawThreshold) {
-					if (this.q<0) {
-						dir = 'out';
-					} else {
-						dir = 'in';
-					}
-					this.setAmmtArrowDims(this.qArrowsAmmt, lengthMin, lengthMax, widthMin, widthMax, this.q, qMax);
-					if (dirLast != dir) {
-						this.flipAmmtArrows(this.qArrowsAmmt);
-						dirLast = dir;
-					}
-					qLast = this.q;
-				}
-			},
-		this);
-	},
-	flipAmmtArrows: function(arrows) {
-		for (var arrowIdx=0; arrowIdx<arrows.length; arrowIdx++) {
-			var arrow = arrows[arrowIdx];
-			var UV = angleToUV(arrow.getAngle()).mult(1);
-			arrow.move(UV.mult(arrow.getDims().dx));
-			arrow.rotate(Math.PI);
-		}
-	},
-	setAmmtArrowDims: function(arrows, lMin, lMax, wMin, wMax, q, qMax) {
-		for (var arrowIdx=0; arrowIdx<arrows.length; arrowIdx++) {
-			var arrow = arrows[arrowIdx];
-			var dimso = arrow.getDims();
-			var percent = Math.abs(this.q)/qMax;
-			var l = lMin + (lMax-lMin)*percent;
-			var w = wMin + (wMax-wMin)*percent;
-			arrow.size(V(l, w));
-			if (q>0) {
-				arrow.move(V(0, l-dimso.dx));
-			}
-		}
-	},
 	checkDisplayArrows: function(q){
 		var dQ = q[q.length-1] - q[this.turnLastArrow];
 		if (Math.abs(dQ)>this.qArrowThreshold) {

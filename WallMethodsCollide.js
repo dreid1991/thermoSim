@@ -141,6 +141,7 @@ WallMethods.collideMethods ={
 			this[wallIdx].forceInternal += dot.m*(Math.abs(perpV) + Math.abs(outPerpV));
 			this[wallIdx].q += eToAdd*JtoKJ;
 		} else {
+			this[wallIdx].forceInternal += 2 * dot.m * Math.abs(perpV);
 			this.reflect(dot, wallUV, perpV);
 		}
 	},
@@ -154,7 +155,7 @@ WallMethods.collideMethods ={
 		var KEo = .5*dot.m*(dot.v.dx*dot.v.dx + dot.v.dy*dot.v.dy);
 		var v = dot.v;
 		v.dy = -v.dy + 2*walls[wallIdx].v;
-		this[wallIdx].forceInternal += dot.m*(perpV + v.dy);
+		this[wallIdx].forceInternal += 2 * dot.m * perpV;
 		var KEf = .5*dot.m*(dot.v.dx*dot.v.dx + dot.v.dy*dot.v.dy);
 		var ratio = Math.sqrt((KEo + 2*(KEf - KEo)/3)/KEf);
 		dot.v.dx*=ratio;

@@ -82,15 +82,25 @@ _.extend(TestLevel.prototype,
 				],
 				dataReadouts: [
 					{label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', sigFigs: 3, handle: 'someTemp', readout: 'mainReadout'},
-					{label: 'Vol: ', expr: 'vol("wally")', units: 'L', sigFigs: 3, handle: 'loopy', readout: 'mainReadout'}
+					{label: 'Vol: ', expr: 'vol("wally")', units: 'L', sigFigs: 3, handle: 'loopy', readout: 'mainReadout'},
+					{label: 'pInt: ', expr: 'pInt("wally")', units: 'bar', sigFigs: 3, handle: 'intintnit', readout: 'mainReadout'},
+					{label: 'pExt: ', expr: 'pExt("wally")', units: 'bar', sigFigs: 3, handle: 'extextext', readout: 'mainReadout'}
 					//{label: 'RCT: ', expr: 'frac("wally", {spcName: "spc1", tag: "wally"}) + frac("wally", {spcName: "ugly", tag: "wally"})', sigFigs: 2, handle: 'coalseamgas', readout: 'mainReadout'}
 				],
 				buttonGroups: [
-					{handle: 'wok', label: 'bwok'},
-					{handle: 'tor', label: 'rot'}
+					{handle: 'heaterState', label: 'Heater', prefIdx: 1},
+					{handle: 'tempControl', label: 'Temp control'},
+					{handle: 'rxnControl', label: 'Rxn control'}
 				],
 				buttons: [
-					{groupHandle: 'wok', handle: 'bark', label: 'me', exprs: ['console.log("hello me")']}
+					{groupHandle: 'heaterState', handle: 'on', label: 'On', exprs: ['curLevel.heaterHeaty.enable()']},
+					{groupHandle: 'heaterState', handle: 'off', label: 'Off', exprs: ['curLevel.heaterHeaty.disable()']},
+					{groupHandle: 'tempControl', handle: 'adiabatic', label: 'Adiabatic', exprs: ['walls.wally.isothermalStop()']},
+					{groupHandle: 'tempControl', handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']},
+					{groupHandle: 'rxnControl', handle: 'rxn1On', label: 'Forward on', exprs: ['collide.enableRxn("rxn1")']},
+					{groupHandle: 'rxnControl', handle: 'rxn1Off', label: 'Forward off', exprs: ['collide.disableRxn("rxn1")']},
+					{groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.enableRxn("rxn2")']},
+					{groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.disableRxn("rxn2")']},
 				],
 				cmmds: [
 					//TEST DISPLAY Q ARROWS
