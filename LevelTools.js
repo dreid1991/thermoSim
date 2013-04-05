@@ -405,7 +405,7 @@ LevelTools = {
 		if (question.storeAs) textareaAttrs.storeAs = [question.storeAs];
 		textareaHTML = templater.textarea({attrs: textareaAttrs});
 		
-		var textBoxHTML = (question.preText === undefined ? '' : (question.preText + templater.br())) + templater.table({attrs: {'class': ['niceFont', 'whiteFont']}, innerHTML:
+		var textBoxHTML = (question.preText === undefined ? '' : (interpreter.interp(question.preText) + templater.br())) + templater.table({attrs: {'class': ['niceFont', 'whiteFont']}, innerHTML:
 			templater.tr({innerHTML:
 				templater.td({innerHTML:
 					question.label
