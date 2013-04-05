@@ -122,21 +122,22 @@ WallMethods.wallDataHandler = {
 	},
 
 	recordRMS: function() {
-		if (!this.data.RMS || !this.data.RMS.recording()) {
-			this.data.RMS = new WallMethods.DataObj();
-			var dataObj = this.data.RMS;
-			this.setupStdDataObj(dataObj, 'RMS');
-			//HEY - I AM ASSUMING THAT IF YOU GET RMS, IT IS OF ONE TYPE OF MOLECULE
+		//broken
+		// if (!this.data.RMS || !this.data.RMS.recording()) {
+			// this.data.RMS = new WallMethods.DataObj();
+			// var dataObj = this.data.RMS;
+			// this.setupStdDataObj(dataObj, 'RMS');
+			// //HEY - I AM ASSUMING THAT IF YOU GET RMS, IT IS OF ONE TYPE OF MOLECULE
 				
-			var mass = this.getRMSMass(this.handle);
-			var RMSFunc = function() {
-				var temp = this.data.t[this.data.t.length-1];
-				return Math.sqrt(3000*KB*temp*ACTUALN/mass)
-			}
-			//figure out RMS at some point
-			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), RMSFunc, this, 'update');
-		}
-		return this;
+			// var mass = this.getRMSMass(this.handle);
+			// var RMSFunc = function() {
+				// var temp = this.data.t[this.data.t.length-1];
+				// return Math.sqrt(3000*KB*temp*ACTUALN/mass); //KB has been converted to sim units
+			// }
+			// //figure out RMS at some point
+			// recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), RMSFunc, this, 'update');
+		// }
+		// return this;
 	},
 	getRMSMass: function(tag) {
 		if (tag) {

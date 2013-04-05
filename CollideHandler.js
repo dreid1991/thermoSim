@@ -108,10 +108,10 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 		var bTempAdj = bTempO + (bTempF - bTempO) * b.cvKinetic / b.cv;
 	
 		a.v.mult(Math.sqrt(aTempAdj / aTempF));
-		a.internalPotential += (aTempF - aTempAdj) * a.cvKinetic		
+		a.internalPotential *= aTempAdj / aTempO;//(aTempF - aTempAdj) * (a.cv - a.cvKinetic);
 
 		b.v.mult(Math.sqrt(bTempAdj / bTempF));
-		b.internalPotential += (bTempF - bTempAdj) * b.cvKinetic;
+		b.internalPotential *= bTempAdj / bTempO; //(bTempF - bTempAdj) * (b.cv - b.cvKinetic);
 		
 		this.breakUp(a, b, UVAB);
 		return true;

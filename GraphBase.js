@@ -461,6 +461,7 @@ GraphBase = {
 		removeListener(curLevel, 'update', 'flash'+this.name);
 		this.drawAllBG();
 		this.resetRanges();
+		this.hasData = false;
 	},	
 	resetRanges: function(){
 		this.axisRange = new GraphBase.Range(Number.MAX_VALUE, -Number.MAX_VALUE, Number.MAX_VALUE, -Number.MAX_VALUE);

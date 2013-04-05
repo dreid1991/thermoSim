@@ -41,7 +41,7 @@ WallMethods.wall = {
 		if (dist!=0) {
 			var sign = getSign(dist);
 			this.v = speed*sign;
-			this.parent.setSubWallHandler(this.handle, 0, wallMoveMethod + compAdj);
+			this.parent.setSubWallHandler(this.handle, 0, wallMoveMethod);
 			addListener(curLevel, 'wallMove', 'cV' + this.handle,
 				function(){
 					var y = this[0].y

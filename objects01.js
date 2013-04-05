@@ -182,7 +182,7 @@ function DragWeights(attrs){
 	this.zeroY = 				defaultTo(this.wall[2].y, attrs.min);
 	this.pistonPt =				defaultTo(this.wall[0], attrs.pistonPt); //this will not work with just data based levels.  If I want this, will need to store as {wallInfo, ptIdx}
 	this.pistonOffset =			defaultTo(undefined, attrs.pistonOffset);
-	this.wallHandler = 			defaultTo('cPAdiabaticDamped', attrs.compMode) + compAdj;
+	this.wallHandler = 			defaultTo('cPAdiabaticDamped', attrs.compMode);
 	this.binY = 				defaultTo(myCanvas.height-15, attrs.binY);
 	this.blockCol = 			defaultTo(Col(224, 165, 75), attrs.blockCol);
 	this.binCol = 				defaultTo(Col(150, 150, 150), attrs.binCol);
@@ -772,7 +772,7 @@ function Pool(attrs){
 	this.wall.setMass(this.massChunkName, this.mass);	
 	this.wall.recordPExt();
 	this.wall.recordWork();
-	this.wallHandler = defaultTo('cPAdiabaticDamped', attrs.compMode) + compAdj;	
+	this.wallHandler = defaultTo('cPAdiabaticDamped', attrs.compMode);	
 	walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);	
 	
 		
@@ -1245,7 +1245,6 @@ function CompArrow(attrs){
 	var wallInfo = defaultTo(0, attrs.wallInfo);
 	var speed = defaultTo(1.5, attrs.speed);
 	var compMode = defaultTo('adiabatic', attrs.compMode);
-	compMode += compAdj;
 	var makeStops = defaultTo(true, attrs.stops);
 	var bounds = defaultTo({y:{min:30, max:350}}, attrs.bounds);
 	this.wall = walls[wallInfo];

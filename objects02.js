@@ -42,7 +42,7 @@ function Sandbox(attrs){
 	this.wall.setMass(this.massChunkName, this.mass);	
 	this.wall.recordPExt();
 	this.wall.recordWork();
-	this.wallHandler = defaultTo('cPAdiabaticDamped', attrs.compMode) + compAdj;	
+	this.wallHandler = defaultTo('cPAdiabaticDamped', attrs.compMode);	
 	walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);	
 	
 	this.wallPt = this.wall[0];

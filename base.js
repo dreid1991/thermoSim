@@ -26,11 +26,13 @@ $(function(){
 	$('#intText').hide();
 	canvas = document.getElementById("myCanvas");
 	c = canvas.getContext("2d");	
+	N = 1000;//Avagadro's number
 	R = 8.314;
+	KB = R / N;
 	//set compAdj to '' have collisions for cv of R, cp of 2R
 	cv = 1.5*R;
 	cp = 2.5*R;
-	compAdj = '32';
+	//compAdj = '32';
 	extraIntervals = {};
 	vConst = 1/10000;
 	//pConst = 16.1423; //for atm
@@ -42,10 +44,8 @@ $(function(){
 	PUNITTOPA = BARTOPA; //current pressure unit to pascals
 	MMHGTOBAR = .0013332237;
 	JtoKJ = .001;
-	N = 1000;//Avagadro's number
 	//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
 	pxToE = Math.sqrt(tConst); //gotten for a dot... T = 1/2*m*(v*pxToE)^2.  For energy conservation in attraction. 
-	KB = 1.38*Math.pow(10,-23)
 	ACTUALN = 6.022e23;
 	g = 1.75;
 	gInternal = .01;

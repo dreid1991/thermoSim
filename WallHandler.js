@@ -7,7 +7,6 @@ function WallHandler(attrs){//pts, handlers, handles, bounds, includes, vols, sh
 	}
 	_.extend(newWall, WallMethods.main, WallMethods.collideMethods);
 	addListener(curLevel, 'sectionCleanUp', 'walls', newWall.remove, newWall)
-	newWall.cVIsothermal32 = newWall.cVIsothermal;
 	newWall.defaultCol = Col(255, 255, 255);
 	if (attrs) {//Yo yo, you can just do new WallHander() and then add walls
 		newWall.assemble(attrs);//pts, handles, bounds, includes, vols, shows, records)
