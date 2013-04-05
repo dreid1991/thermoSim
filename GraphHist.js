@@ -23,9 +23,7 @@ function GraphHist(attrs){
 	
 	var barCol = Col(255,100,0);
 	this.setStds();
-	//var canvasData = this.makeCanvas(this.dims);
 	this.drawAllBG();
-	//this.addSet('only', barCol, data);
 }
 /*
 Good evening:  I am keeping histogram data in data.someName, not just data, even though there is only one for now.
@@ -40,9 +38,11 @@ _.extend(GraphHist.prototype, AuxFunctions, GraphBase,
 			this.drawAllBG();
 		},
 		drawAllData: function(){
-			this.graph.putImageData(this.bg, 0, 0);
-			this.drawAxisVals();
-			this.graphBins();
+			this.drawAllBG();
+			if (this.bins) {
+				this.drawAxisVals();
+				this.graphBins();
+			}
 		},
 		addLast: function(){//point of entry 
 			var toAdd = [];
@@ -55,7 +55,7 @@ _.extend(GraphHist.prototype, AuxFunctions, GraphBase,
 			var set = this.data[theOnlyAddress];
 			set.addVal();
 			this.makeBins(set);
-			this.checkForCanvasMigrate();
+			this.hasData = true;
 		},
 		plotData: function(vals){
 			var theOnlyAddress = '';
@@ -113,7 +113,7 @@ _.extend(GraphHist.prototype, AuxFunctions, GraphBase,
 				var LRCoord = this.valToCoord(P(xLRPt,yLRPt));
 				var dims = ULCoord.VTo(LRCoord);
 				
-				draw.fillStrokeRect(ULCoord, dims, barCol, this.bgCol, this.graphAssignments.data);
+				draw.fillStrokeRect(ULCoord, dims, barCol, this.bgCol, this.graphDisplay);
 			}
 		},
 		clear: function(){

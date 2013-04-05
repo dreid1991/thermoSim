@@ -35,7 +35,7 @@ GraphBase = {
 		// this.graphData = canvasData.canvas;
 		this.layers = new GraphBase.Layers();
 		addListener(curLevel, 'update', 'drawLayers' + this.handle, this.drawLayers, this);
-		
+		this.hasData = false;
 		//this.graphAssignments = {data: this.graphDisplay, display: this.graphDisplay}; //will set display to graphDisplay when adding a marker. 
 	},
 	makeDataFunc: function(expr) {
@@ -244,13 +244,6 @@ GraphBase = {
 		}
 	},
 	
-	checkForCanvasMigrate: function() {
-		if (this.graphAssignments.data != this.graphDisplay) {
-			var dataImg = this.graphDisplay.getImageData(0, 0, this.dims.dx, this.dims.dy);
-			this.graphDisplay.putImageData(dataImg, 0, 0);
-		}
-		this.drawMarkers();
-	},
 	drawMarkers: function() {
 		for (var markerName in this.markers) {
 			this.markers[markerName].draw();
@@ -301,19 +294,11 @@ GraphBase = {
 		for (var setName in this.data) this.data[setName].flushQueue();
 		this.drawLayers();
 	},
-	// dataToDisplay: function() {
-		// var imgData = this.graphDisplay.getImageData(0, 0, this.dims.dx, this.dims.dy);
-		// this.graphDisplay.putImageData(imgData, 0, 0);
-	// },
+
 	drawLayers: function() {
-		if (turn % 2) {
+		//redrawing all data is hugely faster than erasing flashers with get/put image data.  get/put took ~25% of a core for two markers.  Redrawing is fast.
+		if (turn % 2 && this.hasData && this.layers.count) {
 			this.drawAllData();
-			// for (var layerIdx=0; layerIdx<this.layers.layers.length; layerIdx++) {
-				// var layer = this.layers.layers[layerIdx];
-				// for (var itemIdx=0; itemIdx<layer.length; itemIdx++) {
-					// layer[itemIdx].erase();
-				// }
-			// }
 			for (var layerIdx=0; layerIdx<this.layers.layers.length; layerIdx++) {
 				var layer = this.layers.layers[layerIdx];
 				for (var itemIdx=0; itemIdx<layer.length; itemIdx++) {
@@ -623,12 +608,6 @@ GraphBase.Marker.prototype = {
 		}
 		return func;
 	},
-	// erase: function() {
-		// if (this.coordLast) {
-			// var imgData = this.graphData.getImageData(this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2, this.imgCharacLen, this.imgCharacLen);	
-			// this.graphDisplay.putImageData(imgData, this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2);
-		// }
-	// },		
 	drawFuncs: {
 		bullseye: function() {
 			var cLen = this.characLen;
@@ -649,6 +628,7 @@ GraphBase.Marker.prototype = {
 GraphBase.Layers = function() {
 	this.layers = [];
 	this.handleIdxPairs = {};
+	this.count = 0;
 }
 GraphBase.Layers.prototype = {
 	addLayer: function(handle) {
@@ -661,15 +641,18 @@ GraphBase.Layers.prototype = {
 			var idx = this.handleIdxPairs[handle];
 			if (idx > spliceIdx) this.handleIdxPairs[handle] --;
 		}
+		this.count -= this.layers[spliceIdx].length;
 		this.layers.splice(spliceIdx, 1);
 		delete this.handleIdxPairs[handle];
 	},
 	addItem: function(handle, obj) {
 		this.layers[this.handleIdxPairs[handle]].push(obj);
+		this.count ++;
 	},
 	removeItem: function(handle, obj) {
 		var idx = this.layers[this.handleIdxPairs[handle]].indexOf(obj);
 		this.layers[this.handleIdxPairs[handle]].splice(idx, 1);
+		this.count --;
 	},
 	removeAll: function() {
 		for (var i=0; i<this.layers.length; i++) {

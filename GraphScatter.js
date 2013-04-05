@@ -65,6 +65,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 				if (set.recording) set.enqueuePts();
 			}
 			this.flushQueues(true, false);
+			this.hasData = true;
 		},
 		getAxisBounds: function(){
 			this.getXBounds();
@@ -409,7 +410,7 @@ GraphScatter.Flasher = function(pt, pointCol, flashCol, curCol, curCharacLen, im
 	this.graph = graph;
 	this.coordLast = this.graph.valToCoord(this.pt);
 	this.advanceListenerHandle = this.addAdvanceListener();
-	this.lifetime = (this.curCharacLen - this.finalCharacLen) / (this.finalCharacLen * this.flashMult * this.flashRate);
+	this.lifetime = 1 / this.flashRate;
 	this.age = 0;
 	layers.addItem('flasher', this);
 }
@@ -422,16 +423,11 @@ GraphScatter.Flasher.prototype = {
 		}, this)
 		return handle;
 	},
-	// erase: function() {
-		// var imgData = this.graphData.getImageData(this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2, this.imgCharacLen, this.imgCharacLen);	
-		// this.graphDisplay.putImageData(imgData, this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2);
-	// },
 	draw: function() {
 		this.coordLast = this.graph.valToCoord(this.pt);
 		this.graph.drawPt(this.coordLast, this.curCol, this.curCharacLen, this.graphDisplay);		
 	},
 	remove: function() {
-		//this.erase();
 		this.layers.removeItem('flasher', this);
 		removeListener(curLevel, 'update', this.advanceListenerHandle);
 	},
@@ -444,7 +440,7 @@ GraphScatter.Flasher.prototype = {
 		newCol.g = this.colStep('g');
 		newCol.b = this.colStep('b');
 		col.set(newCol);	
-		if (this.age > this.lifetime) this.remove();
+		if (this.age > this.lifetime + 1) this.remove();
 		this.age ++;
 	},
 
