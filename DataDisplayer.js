@@ -53,40 +53,20 @@ DataDisplayer.prototype = {
 			var roundFactor = Number('1e' + decPlaces);
 			var unround = Number(src.slice(0, decIdx + decPlaces + 2));
 			var round = String(Math.round(roundFactor * unround) / roundFactor);
+			var decIdx = round.indexOf('.');
+			var zerosToAdd;
+			if (decIdx == -1) {
+				round += '.';
+				zerosToAdd = decPlaces;
+			} else {
+				zerosToAdd = decIdx + decPlaces - round.length + 1;
+			}
+			for (var i=0; i<zerosToAdd; i++) {
+				round += '0';
+			}
 			return round;
 		}
 		
-		
-		// var src = String(val);
-		// var toReturn = '';
-		// var hitSig = false;
-		// var sigsHit = 0;
-		// var decHit = false;
-		// var idx = 0;
-		// while ((sigsHit < sigFigs || !decHit) && idx < src.length) {
-			// var token = src[idx];
-			// if (token == '.') {
-				// decHit = true;
-			// } else if (hitSig) {
-				// sigsHit ++;
-			// } else if (token != '0' && token != '-') {
-				// sigsHit ++;
-				// hitSig = true;
-			// }	
-			// toReturn += token;
-			// idx ++;
-		// }
-		// if (sigsHit == sigFigs) {
-			// if (!decHit) toReturn += '.';
-			// return toReturn;
-		// } else {
-			// if (!decHit) toReturn += '.';
-			// var toAdd = sigFigs - sigsHit;
-			// for (var sigAdd=0; sigAdd<toAdd; sigAdd++) {
-				// toReturn += '0';
-			// }
-			// return toReturn;
-		// }
 	},
 	addCleanUp: function(cleanUpWith, dataEntry) {
 		var self = this;
