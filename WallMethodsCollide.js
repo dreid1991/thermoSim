@@ -99,7 +99,7 @@ WallMethods.collideMethods ={
 			dot.y = pt.y+dot.r;			
 		}
 		var tempUnAdj = tConst * .5 * dot.m * (dot.v.dx*dot.v.dx + dotVyF*dotVyF); //with cv = R
-		dot.setTemp(tempO + (tempUnAdj - tempO) * KB / dot.cv);
+		dot.setTemp(tempO + (tempUnAdj - tempO) * dot.cvKinetic / dot.cv);
 		if (dot.v.dy * dotVyF < 0) dot.v.dy *= -1;
 		// var ratio = Math.sqrt((KEo + 2*(KEf - KEo)/3)/KEf);
 		// dot.v.dx*=ratio;
@@ -120,7 +120,8 @@ WallMethods.collideMethods ={
 		// wall.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
 	// },
 	cPAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
-		var KEo = .5*dot.m*(dot.v.dx*dot.v.dx + dot.v.dy*dot.v.dy);
+		var tempO = dot.temp();
+		var dotVyF;
 		var wall = this[wallIdx];
 		var vo = dot.v.copy();
 		var vo1 = dot.v.dy;
@@ -128,14 +129,13 @@ WallMethods.collideMethods ={
 		var m1 = dot.m;
 		var m2 = wall.mass;
 		var pt = wall[subWallIdx];
-		dot.v.dy = (vo1*(m1-m2)+2*m2*vo2)/(dot.m+m2);
+		dotVyF = (vo1*(m1-m2)+2*m2*vo2)/(dot.m+m2);
 		wall.v = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
 		dot.y = pt.y+dot.r;		
+		var tempUnAdj = tConst * .5 * dot.m * (dot.v.dx*dot.v.dx + dotVyF*dotVyF); //with cv = R
+		dot.setTemp(tempO + (tempUnAdj - tempO) * dot.cvKinetic / dot.cv);
+		if (dot.v.dy * dotVyF < 0) dot.v.dy *= -1;
 		wall.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
-		var KEf = .5*dot.m*(dot.v.dx*dot.v.dx + dot.v.dy*dot.v.dy);
-		var ratio = Math.sqrt((KEo + 2*(KEf - KEo)/3)/KEf);
-		dot.v.dx*=ratio;
-		dot.v.dy*=ratio;
 	},
 	staticAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 		this.reflect(dot, wallUV, perpV);
@@ -168,16 +168,16 @@ WallMethods.collideMethods ={
 		// v.dy = -v.dy + 2*walls[wallIdx].v;
 		// this[wallIdx].forceInternal += dot.m*(perpV + v.dy);
 	// },
-	cVAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
-		var KEo = .5*dot.m*(dot.v.dx*dot.v.dx + dot.v.dy*dot.v.dy);
-		var v = dot.v;
-		v.dy = -v.dy + 2*walls[wallIdx].v;
-		this[wallIdx].forceInternal += 2 * dot.m * perpV;
-		var KEf = .5*dot.m*(dot.v.dx*dot.v.dx + dot.v.dy*dot.v.dy);
-		var ratio = Math.sqrt((KEo + 2*(KEf - KEo)/3)/KEf);
-		dot.v.dx*=ratio;
-		dot.v.dy*=ratio;
-	},
+	// cVAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
+		// var KEo = .5*dot.m*(dot.v.dx*dot.v.dx + dot.v.dy*dot.v.dy);
+		// var v = dot.v;
+		// v.dy = -v.dy + 2*walls[wallIdx].v;
+		// this[wallIdx].forceInternal += 2 * dot.m * perpV;
+		// var KEf = .5*dot.m*(dot.v.dx*dot.v.dx + dot.v.dy*dot.v.dy);
+		// var ratio = Math.sqrt((KEo + 2*(KEf - KEo)/3)/KEf);
+		// dot.v.dx*=ratio;
+		// dot.v.dy*=ratio;
+	// },
 	reflect: function(dot, wallUV, perpV){
 		dot.v.dx -= 2*wallUV.dy*perpV;
 		dot.v.dy += 2*wallUV.dx*perpV;
