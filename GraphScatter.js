@@ -34,7 +34,6 @@ function GraphScatter(attrs) {
 	this.layers.addLayer('marker');
 	//this.makeCanvas(this.dims);
 	this.drawAllBG();
-	this.dataToDisplay();
 	
 }
 _.extend(GraphScatter.prototype, AuxFunctions, GraphBase, 
@@ -48,17 +47,16 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			this.drawAllBG();
 		},
 		drawAllData: function(){
-			this.graphData.putImageData(this.bg, 0, 0);
+			//redrawing the background is twice as fast as pasting it in
+			this.drawAllBG();
 			this.drawAxisVals();
 			this.drawPts(false);
-			this.dataToDisplay();
 		},
 		drawPts: function(justQueue){
 			for (var setName in this.data) {
 				var set = this.data[setName]
 				set.drawPts(justQueue !== false);
 			}
-			this.dataToDisplay();
 		},
 		addLast: function(){ //point of entry
 			var toAdd = [];
@@ -82,7 +80,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			this.drawPt(pt, col, this.characLen);
 		},
 		drawPt: function(pt, col, characLen, canvas){
-			canvas = canvas || this.graphData;
+			canvas = canvas || this.graphDisplay;
 			var x = pt.x;
 			var y = pt.y;
 			var len = characLen;
@@ -319,7 +317,7 @@ GraphScatter.Set.prototype = {
 				var imgCharacLen = 2 * this.graph.characLen * this.graph.flashMult;
 				var len = this.graph.characLen * 2 * this.graph.flashMult + 2;
 				var curCharacLen = this.graph.characLen * this.graph.flashMult;
-				new GraphScatter.Flasher(pt, pointCol, flashCol, curCol, curCharacLen, imgCharacLen, this.graph.characLen, this.graph.flashMult, this.graph.flashRate, this.graph.graphData, this.graph.graphDisplay, this.graph.layers, this.graph);
+				new GraphScatter.Flasher(pt, pointCol, flashCol, curCol, curCharacLen, imgCharacLen, this.graph.characLen, this.graph.flashMult, this.graph.flashRate, this.graph.graphDisplay, this.graph.layers, this.graph);
 			}
 		}
 		
@@ -342,7 +340,7 @@ GraphScatter.Set.prototype = {
 					tracePts.push(pt);
 				}
 			}
-			draw.path(tracePts, this.pointCol, this.graph.graphData);
+			draw.path(tracePts, this.pointCol, this.graph.graphDisplay);
 		} else {
 			console.log('Data count mismatch for tracing');
 			console.trace();
@@ -396,7 +394,7 @@ GraphScatter.Coord.prototype = {
 	}
 }
 
-GraphScatter.Flasher = function(pt, pointCol, flashCol, curCol, curCharacLen, imgCharacLen, finalCharacLen, flashMult, flashRate, graphData, graphDisplay, layers, graph) {
+GraphScatter.Flasher = function(pt, pointCol, flashCol, curCol, curCharacLen, imgCharacLen, finalCharacLen, flashMult, flashRate, graphDisplay, layers, graph) {
 	this.pt = pt;
 	this.pointCol = pointCol;
 	this.flashCol = flashCol;
@@ -406,7 +404,6 @@ GraphScatter.Flasher = function(pt, pointCol, flashCol, curCol, curCharacLen, im
 	this.finalCharacLen = finalCharacLen;
 	this.flashMult = flashMult;
 	this.flashRate = flashRate;
-	this.graphData = graphData;
 	this.graphDisplay = graphDisplay;
 	this.layers = layers;
 	this.graph = graph;
@@ -425,16 +422,16 @@ GraphScatter.Flasher.prototype = {
 		}, this)
 		return handle;
 	},
-	erase: function() {
-		var imgData = this.graphData.getImageData(this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2, this.imgCharacLen, this.imgCharacLen);	
-		this.graphDisplay.putImageData(imgData, this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2);
-	},
+	// erase: function() {
+		// var imgData = this.graphData.getImageData(this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2, this.imgCharacLen, this.imgCharacLen);	
+		// this.graphDisplay.putImageData(imgData, this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2);
+	// },
 	draw: function() {
 		this.coordLast = this.graph.valToCoord(this.pt);
 		this.graph.drawPt(this.coordLast, this.curCol, this.curCharacLen, this.graphDisplay);		
 	},
 	remove: function() {
-		this.erase();
+		//this.erase();
 		this.layers.removeItem('flasher', this);
 		removeListener(curLevel, 'update', this.advanceListenerHandle);
 	},

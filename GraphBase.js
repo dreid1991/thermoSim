@@ -27,12 +27,12 @@ GraphBase = {
 		var canvasDisplay = this.makeCanvas(this.dims, this.parentDiv, this.handle + 'Graph', makeReset, this.handle + 'Button');
 		this.graphDisplayHTMLElement = canvasDisplay.HTMLElem;
 		this.graphDisplay = canvasDisplay.canvas;
-		var dataHTML = templater.div({style: {display: 'none', width: 0, height: 0}, attrs: {id: [this.handle + 'Data']}});
-		$(this.parentDiv).append(dataHTML);
-		this.dataDiv = $('#' + this.handle + 'Data');
-		var canvasData = this.makeCanvas(this.dims, this.dataDiv, this.handle + 'DataGraph', false, this.handle + 'DataButton');
-		this.graphDataHTMLElement = canvasData.HTMLElem;
-		this.graphData = canvasData.canvas;
+		// var dataHTML = templater.div({style: {display: 'none', width: 0, height: 0}, attrs: {id: [this.handle + 'Data']}});
+		// $(this.parentDiv).append(dataHTML);
+		// this.dataDiv = $('#' + this.handle + 'Data');
+		// var canvasData = this.makeCanvas(this.dims, this.dataDiv, this.handle + 'DataGraph', false, this.handle + 'DataButton');
+		// this.graphDataHTMLElement = canvasData.HTMLElem;
+		// this.graphData = canvasData.canvas;
 		this.layers = new GraphBase.Layers();
 		addListener(curLevel, 'update', 'drawLayers' + this.handle, this.drawLayers, this);
 		
@@ -196,10 +196,9 @@ GraphBase = {
 			this.drawLegend();
 		}
 		this.drawLabels();
-		this.bg = this.graphData.getImageData(0, 0, this.dims.dx, this.dims.dy);
 	},	
 	drawBGRect: function(){
-		draw.roundedRect(P(0,0), V(this.dims.dx, this.dims.dy), 20, this.bgCol, this.graphData); 
+		draw.roundedRect(P(0,0), V(this.dims.dx, this.dims.dy), 20, this.bgCol, this.graphDisplay); 
 	},
 	drawGrid: function(){
 		for (var xGridIdx=0; xGridIdx<this.numGridLines.x; xGridIdx++){
@@ -208,7 +207,7 @@ GraphBase = {
 			var yAxis = this.graphRangeFrac.y.min * this.dims.dy + this.hashMarkLen;
 			var p1 = P(x, yAxis);
 			var p2 = P(x, yEnd);
-			draw.line(p1, p2, this.gridCol, this.graphData);
+			draw.line(p1, p2, this.gridCol, this.graphDisplay);
 		}
 		for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
 			var y = this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing*yGridIdx;
@@ -216,7 +215,7 @@ GraphBase = {
 			var xAxis = this.graphRangeFrac.x.max * this.dims.dx - this.hashMarkLen;
 			var p1 = P(xAxis, y);
 			var p2 = P(xEnd, y);			
-			draw.line(p1, p2, this.gridCol, this.graphData);
+			draw.line(p1, p2, this.gridCol, this.graphDisplay);
 		}
 	},
 	drawBounds: function(){
@@ -224,15 +223,15 @@ GraphBase = {
 		var width = this.dims.dx * (this.graphRangeFrac.x.max - this.graphRangeFrac.x.min);
 		var height = this.dims.dy * (this.graphRangeFrac.y.min - this.graphRangeFrac.y.max);
 		var dims = V(width, height);
-		draw.strokeRect(ptOrigin, dims, this.graphBoundCol, this.graphData);
+		draw.strokeRect(ptOrigin, dims, this.graphBoundCol, this.graphDisplay);
 	},
 	drawLabels: function(){
 		var xLabelPos = P(this.dims.dx * (this.graphRangeFrac.x.min + this.graphRangeFrac.x.max) / 2, Math.min(this.dims.dy * this.graphRangeFrac.y.min + 50, this.dims.dy-20))
 		var yLabelPos = P(Math.max(this.dims.dx * this.graphRangeFrac.x.min - 50, 20), this.dims.dy * (this.graphRangeFrac.y.min + this.graphRangeFrac.y.max) / 2)
 		xLabelPos.y+=this.labelFontSize/2;
 		yLabelPos.y+=this.labelFontSize/2;
-		draw.text(this.xLabel, xLabelPos, this.labelFont, this.textCol, 'center',  0, this.graphData);
-		draw.text(this.yLabel, yLabelPos, this.labelFont, this.textCol, 'center', -Math.PI/2, this.graphData);
+		draw.text(this.xLabel, xLabelPos, this.labelFont, this.textCol, 'center',  0, this.graphDisplay);
+		draw.text(this.yLabel, yLabelPos, this.labelFont, this.textCol, 'center', -Math.PI/2, this.graphDisplay);
 	},
 	drawLegend: function(){
 		for (var entryName in this.legend){
@@ -240,14 +239,14 @@ GraphBase = {
 			var text = entry.text;
 			this.drawLegendToggle(entry);
 			var font = this.legendFont
-			draw.text(text, entry.textPos,  this.legendFont, this.textCol, 'left', 0, this.graphData);
+			draw.text(text, entry.textPos,  this.legendFont, this.textCol, 'left', 0, this.graphDisplay);
 			this.drawPtStd(entry.pos, entry.col);
 		}
 	},
 	
 	checkForCanvasMigrate: function() {
 		if (this.graphAssignments.data != this.graphDisplay) {
-			var dataImg = this.graphData.getImageData(0, 0, this.dims.dx, this.dims.dy);
+			var dataImg = this.graphDisplay.getImageData(0, 0, this.dims.dx, this.dims.dy);
 			this.graphDisplay.putImageData(dataImg, 0, 0);
 		}
 		this.drawMarkers();
@@ -302,21 +301,24 @@ GraphBase = {
 		for (var setName in this.data) this.data[setName].flushQueue();
 		this.drawLayers();
 	},
-	dataToDisplay: function() {
-		var imgData = this.graphData.getImageData(0, 0, this.dims.dx, this.dims.dy);
-		this.graphDisplay.putImageData(imgData, 0, 0);
-	},
+	// dataToDisplay: function() {
+		// var imgData = this.graphDisplay.getImageData(0, 0, this.dims.dx, this.dims.dy);
+		// this.graphDisplay.putImageData(imgData, 0, 0);
+	// },
 	drawLayers: function() {
-		for (var layerIdx=0; layerIdx<this.layers.layers.length; layerIdx++) {
-			var layer = this.layers.layers[layerIdx];
-			for (var itemIdx=0; itemIdx<layer.length; itemIdx++) {
-				layer[itemIdx].erase();
-			}
-		}
-		for (var layerIdx=0; layerIdx<this.layers.layers.length; layerIdx++) {
-			var layer = this.layers.layers[layerIdx];
-			for (var itemIdx=0; itemIdx<layer.length; itemIdx++) {
-				layer[itemIdx].draw();
+		if (turn % 2) {
+			this.drawAllData();
+			// for (var layerIdx=0; layerIdx<this.layers.layers.length; layerIdx++) {
+				// var layer = this.layers.layers[layerIdx];
+				// for (var itemIdx=0; itemIdx<layer.length; itemIdx++) {
+					// layer[itemIdx].erase();
+				// }
+			// }
+			for (var layerIdx=0; layerIdx<this.layers.layers.length; layerIdx++) {
+				var layer = this.layers.layers[layerIdx];
+				for (var itemIdx=0; itemIdx<layer.length; itemIdx++) {
+					layer[itemIdx].draw();
+				}
 			}
 		}
 	},
@@ -425,17 +427,17 @@ GraphBase = {
 			var xPos = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing * xGridIdx;
 			var yPos = this.graphRangeFrac.y.min * this.dims.dy + this.hashMarkLen + 10 + this.axisValFontSize/2;
 			var text = String(round(this.axisRange.x.min + this.stepSize.x * xGridIdx, 1));
-			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', 0, this.graphData);
+			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', 0, this.graphDisplay);
 		}
 		for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
 			var yPos = this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing * yGridIdx;
 			var xPos = this.graphRangeFrac.x.min * this.dims.dx - this.hashMarkLen - 10;
 			var text = String(round(this.axisRange.y.min + this.stepSize.y*yGridIdx,1));
-			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', -Math.PI/2, this.graphData);
+			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', -Math.PI/2, this.graphDisplay);
 		}		
 	},
 	drawLegendToggle: function(entry){
-		draw.fillStrokeRect(entry.boxPos, entry.boxDims, this.gridCol, this.toggleCol, this.graphData);
+		draw.fillStrokeRect(entry.boxPos, entry.boxDims, this.gridCol, this.toggleCol, this.graphDisplay);
 		var set = entry.set;
 		if (set.visible) {
 			entry.checkMark.draw();
@@ -472,7 +474,7 @@ GraphBase = {
 		for (var setName in this.data) this.data[setName].reset();
 
 		removeListener(curLevel, 'update', 'flash'+this.name);
-		this.graphData.putImageData(this.bg, 0, 0);
+		this.drawAllBG();
 		this.resetRanges();
 	},	
 	resetRanges: function(){
@@ -520,7 +522,7 @@ GraphBase = {
 	addMarker: function(attrs){
 		if (attrs.handle) {
 			attrs.graphDisplay = this.graphDisplay;
-			attrs.graphData = this.graphData
+			//attrs.graphData = this.graphData
 			attrs.graph = this;
 			attrs.layers = this.layers;
 			this.markers[attrs.handle] = new GraphBase.Marker(attrs);
@@ -543,7 +545,7 @@ GraphBase.LegendEntry = function(graph, set, col, text, x, y, fontSize, graphDim
 	this.boxPos = P(graphDims.dx - 18, y - 5); //whatever, will look at later
 	this.boxDims = V(13, 13);
 	this.mouseListenerName = 'toggle' + this.graph.handle.toCapitalCamelCase() + this.set.handle.toCapitalCamelCase();
-	this.checkMark = graph.checkMark(this.boxPos.copy(), this.boxDims.copy(), graph.checkMarkOversize, graph.toggleCol, graph.graphData);
+	this.checkMark = graph.checkMark(this.boxPos.copy(), this.boxDims.copy(), graph.checkMarkOversize, graph.toggleCol, graph.graphDisplay);
 }
 
 GraphBase.LegendEntry.prototype = {
@@ -593,7 +595,7 @@ GraphBase.Marker = function(attrs) {
 		
 	this.graph = attrs.graph;
 	this.graphDisplay = attrs.graphDisplay;
-	this.graphData = attrs.graphData;
+	//this.graphDisplay = attrs.graphDisplay;
 	if (validNumber(this.dataX()) && validNumber(this.dataY())) 
 		this.coordLast = this.graph.valToCoord(P(this.dataX(), this.dataY()));
 	else 
@@ -621,12 +623,12 @@ GraphBase.Marker.prototype = {
 		}
 		return func;
 	},
-	erase: function() {
-		if (this.coordLast) {
-			var imgData = this.graphData.getImageData(this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2, this.imgCharacLen, this.imgCharacLen);	
-			this.graphDisplay.putImageData(imgData, this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2);
-		}
-	},		
+	// erase: function() {
+		// if (this.coordLast) {
+			// var imgData = this.graphData.getImageData(this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2, this.imgCharacLen, this.imgCharacLen);	
+			// this.graphDisplay.putImageData(imgData, this.coordLast.x - this.imgCharacLen / 2, this.coordLast.y - this.imgCharacLen / 2);
+		// }
+	// },		
 	drawFuncs: {
 		bullseye: function() {
 			var cLen = this.characLen;
