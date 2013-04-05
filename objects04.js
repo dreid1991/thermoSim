@@ -410,14 +410,16 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var qToDot = Math.max(sign * Math.min(qMax, 100 * CDot), (5 - tDot) * CDot);
 		
 		var tDotTarget = tDot + qToDot / CDot;
-
+		var vRatio = 1;
 		var tempTest = this.temp - qToDot / this.Cp;
-		this.temp -= qToDot / this.Cp;
-		
+		if (tempTest > 0) {
+			this.temp -= qToDot / this.Cp;
+			
 
-		var vRatio = Math.sqrt(tDotTarget / tDot); //inlining vRatio show dot.setTemp so I don't have to sqrt unnecessarily
-		dot.v.mult(vRatio);
-		dot.internalPotential *= tDotTarget / tDot;
+			vRatio = Math.sqrt(tDotTarget / tDot); //inlining vRatio show dot.setTemp so I don't have to sqrt unnecessarily
+			dot.v.mult(vRatio);
+			dot.internalPotential *= tDotTarget / tDot;
+		}
 		WallMethods.collideMethods.reflect(dot, wallUV, perpV * vRatio);
 	},
 	getWallLiq: function() {

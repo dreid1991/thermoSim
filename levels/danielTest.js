@@ -53,10 +53,10 @@ _.extend(TestLevel.prototype,
 						type: 'AuxImage',
 						attrs: {handle: 'picci', slotNum: 0, imgFunc: 'img("img/work/block0Pic1.jpg")'}
 					},
-					// {
-						// type: 'Liquid',
-						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 700}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}, makePhaseDiagram: true}
-					// },
+					{
+						type: 'Liquid',
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 700}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}, makePhaseDiagram: true}
+					},
 					{
 						type: 'Heater',
 						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty'}
@@ -113,10 +113,10 @@ _.extend(TestLevel.prototype,
 				listeners: [
 					//{handle: 'checky', expr: 'fracDiff(vol("wally"), 9) < .05', alertUnsatisied: 'no', satisfyStore: [{storeAs: 'foo', expr: 'vol("wally") * 10'}], satisfyCmmds: ['console.log("lol")']}
 				],
-				rxns: [
-					{handle: 'rxn1', rctA: 'spc1', rctB: 'ugly', activeE: 15, prods: {duckling: 1}},
-					{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
-				],
+				// rxns: [
+					// {handle: 'rxn1', rctA: 'spc1', rctB: 'ugly', activeE: 15, prods: {duckling: 1}},
+					// {handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
+				// ],
 				graphs: [
 					// {type: 'Scatter', handle: 'PvsVOne', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:1}, y:{min:0, step:1}}, 
 						// sets:[
