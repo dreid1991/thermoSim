@@ -65,6 +65,10 @@ _.extend(TestLevel.prototype,
 						type: 'DragWeights',
 						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 2}], pInit: 3}
 					},
+					{
+						type: 'QArrowsAmmt',
+						attrs: {handle: 'arrowy', wallInfo: 'wally'}
+					}
 					// {
 						// type: 'Piston',
 						// attrs: {handle: 'pistony', wallInfo: 'wally', min: 2, init: 4, max: 6}

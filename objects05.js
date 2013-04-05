@@ -1,13 +1,13 @@
 function QArrowsAmmt(attrs) {
-	this.wallHandle = attrs.wallHandle;
+	this.type = 'QArrowsAmmt';
+	this.wallHandle = attrs.wallInfo;
 	this.wall = walls[this.wallHandle];
-	this.cleanUpWith = attrs.cleanUpWith;
+	this.cleanUpWith = attrs.cleanUpWith || currentSetupType;
 	this.handle = attrs.handle;
 	var wall = this.wall;
 	wall.recordQ();
-	this.qArrowAmmtMax = defaultTo(3, attrs.qMax);
+	this.qArrowAmmtMax = defaultTo(3, (1 / attrs.scale) * 3);
 		
-	var wall = this;
 	addListener(wall, 'cleanUp', 'qArrowsAmmt', function() {
 		for (var arrowIdx=0; arrowIdx<wall.qArrowsAmmt.length; arrowIdx++) {
 			wall.qArrowsAmmt[arrowIdx].remove();
@@ -21,7 +21,7 @@ function QArrowsAmmt(attrs) {
 	this.setupStd();
 }
 
-QArrowsAmmt.prototype = {
+_.extend(QArrowsAmmt.prototype, objectFuncs, {
 	init: function(wall, qMax) {
 		var lengthMin = 15;
 		var lengthMax = 80;
@@ -81,7 +81,7 @@ QArrowsAmmt.prototype = {
 		for (var arrowIdx=0; arrowIdx<arrows.length; arrowIdx++) {
 			var arrow = arrows[arrowIdx];
 			var dimso = arrow.getDims();
-			var percent = Math.abs(this.q)/qMax;
+			var percent = Math.abs(q)/qMax;
 			var l = lMin + (lMax-lMin)*percent;
 			var w = wMin + (wMax-wMin)*percent;
 			arrow.size(V(l, w));
@@ -89,8 +89,6 @@ QArrowsAmmt.prototype = {
 				arrow.move(V(0, l-dimso.dx));
 			}
 		}
-	},
-	
-	displayQArrowsAmmt: function(attrs) {
+	}
 
-	},
+})
