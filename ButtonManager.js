@@ -17,13 +17,29 @@ ButtonManager.prototype = {
 		this.wrapperDiv.append(groupPadderHTML);
 		this.groups.push(new ButtonManager.Group(this.wrapperDiv, groupId, handle, label, prefIdx, cleanUpWith));
 	},
+	removeGroup: function(groupHandle) {
+		var group = this.getGroup(groupHandle);
+		if (group) {
+			var idx = this.groups.indexOf(group);
+			var div = this.getGroupDiv(group);
+			this.groups.splice(idx, 1);
+			div.remove();
+		} else {
+			console.log('Bad group handle ' + groupHandle);
+		}
+	},
+	removeButton: function(groupHandle, buttonHandle) {
+		var group = this.getGroup(groupHandle);
+		if (group) {
+			group.removeButton(buttonHandle);
+		} else {
+			console.log('Bad group handle ' + groupHandle);
+		}
+	},
 	cleanUp: function(type) {
 		for (var grpIdx=this.groups.length - 1; grpIdx>=0; grpIdx--) {
 			if (this.groups[grpIdx].cleanUpWith == type) {
-				var grp = this.groups[grpIdx];
-				var div = this.getGroupDiv(grp);
-				div.remove();
-				this.groups.splice(grpIdx, 1);
+				this.removeGroup(this.groups[grpIdx].handle);
 			} else {
 				this.groups[grpIdx].cleanUp(type);
 			}
@@ -165,20 +181,7 @@ ButtonManager.prototype = {
 	}
 	
 }
-function blorg() {
-	var foo = new ButtonManager($('#buttonManager'));
-	foo.addGroup('3141a','sdafasd',1);
-	foo.addGroup('dsafsd','faewasd', 0);
-	foo.addGroup('3141b','sdafasd',0);
-	foo.addGroup('3141c','sdafasd',3);
-	foo.addGroup('af', 'dsfdsa', undefined);
-	foo.addButton('3141c', 'glorp', 'Label!', function(){console.log('hi')}, 1);
-	foo.addButton('3141c', 'num2', 'me first', function(){}, 0);
-	foo.arrangeGroup('3141c');
-	foo.arrangeGroupWrappers();
-	foo.setButtonWidth();
-}
-//groupHandle, handle, label, exprs, prefIdx
+
 ButtonManager.Group = function(mgrDiv, groupId, handle, label, prefIdx, cleanUpWith) {
 	this.mgrDiv = mgrDiv;
 	this.groupId = groupId;
@@ -201,13 +204,25 @@ ButtonManager.Group.prototype = {
 		addJQueryElems(buttonJQ, 'button');
 		$(buttonJQ).click(this.buttons[this.buttons.length - 1].cb);
 	},
+	removeButton: function(buttonHandle) {
+		var button = this.getButton(buttonHandle);
+		var div = this.getButtonDiv(button);
+		div.remove();
+		this.buttons.splice(this.buttons.indexOf(button), 1);		
+	},
+	getButton: function(handle) {
+		for (var i=0; i<this.buttons.length; i++) {
+			if (this.buttons[i].handle == handle) {
+				return this.buttons[i];
+			} 
+		}
+		console.log('Bad button handle ' + handle);
+	},
 	cleanUp: function(type) {
 		for (var buttonIdx=this.buttons.length - 1; buttonIdx>=0; buttonIdx--) {
 			var button = this.buttons[buttonIdx];
 			if (button.cleanUpWith == type) {
-				var div = this.getButtonDiv(button);
-				div.remove();
-				this.buttons.splice(buttonIdx, 1);
+				this.removeButton(button.handle);
 			}
 		}
 	},
