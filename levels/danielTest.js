@@ -67,7 +67,7 @@ _.extend(TestLevel.prototype,
 					},
 					{
 						type: 'QArrowsAmmt',
-						attrs: {handle: 'arrowy', wallInfo: 'wally'}
+						attrs: {handle: 'arrowy', wallInfo: 'wally', scale: 1}
 					}
 					// {
 						// type: 'Piston',
@@ -85,10 +85,10 @@ _.extend(TestLevel.prototype,
 					{wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}}
 				],
 				dataReadouts: [
-					{label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', sigFigs: 3, handle: 'someTemp', readout: 'mainReadout'},
-					{label: 'Vol: ', expr: 'vol("wally")', units: 'L', sigFigs: 3, handle: 'loopy', readout: 'mainReadout'},
-					{label: 'pInt: ', expr: 'pInt("wally")', units: 'bar', sigFigs: 3, handle: 'intintnit', readout: 'mainReadout'},
-					{label: 'pExt: ', expr: 'pExt("wally")', units: 'bar', sigFigs: 3, handle: 'extextext', readout: 'mainReadout'}
+					{label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},
+					{label: 'pInt: ', expr: 'pInt("wally")', units: 'bar', decPlaces: 3, handle: 'intintnit', readout: 'mainReadout'},
+					{label: 'pExt: ', expr: 'pExt("wally")', units: 'bar', decPlaces: 3, handle: 'extextext', readout: 'mainReadout'}
 					//{label: 'RCT: ', expr: 'frac("wally", {spcName: "spc1", tag: "wally"}) + frac("wally", {spcName: "ugly", tag: "wally"})', sigFigs: 2, handle: 'coalseamgas', readout: 'mainReadout'}
 				],
 				buttonGroups: [

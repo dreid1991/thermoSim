@@ -25,3 +25,5 @@ make custom button column
 many activity coeffs more flexible
 
 get rid of 'hit mode' (32 vs std) thing
+
+make q ammt arrows clean up correctly

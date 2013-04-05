@@ -6,15 +6,17 @@ function QArrowsAmmt(attrs) {
 	this.handle = attrs.handle;
 	var wall = this.wall;
 	wall.recordQ();
+	var qMax = (1 / attrs.scale) * 3;
+	this.qArrowAmmtMax = isNaN(qMax) ? 3 : qMax;
 	this.qArrowAmmtMax = defaultTo(3, (1 / attrs.scale) * 3);
-		
+
 	addListener(wall, 'cleanUp', 'qArrowsAmmt', function() {
-		for (var arrowIdx=0; arrowIdx<wall.qArrowsAmmt.length; arrowIdx++) {
-			wall.qArrowsAmmt[arrowIdx].remove();
+		for (var arrowIdx=0; arrowIdx<this.qArrowsAmmt.length; arrowIdx++) {
+			this.qArrowsAmmt[arrowIdx].remove();
 		}
-		removeListener(curLevel, 'update', wall.handle + 'updateQAmmtArrows');
+		removeListener(curLevel, 'update', this.listenerName);
 		
-	})
+	}, this)
 
 	this.init(this.wall, this.qArrowAmmtMax);
 	
@@ -48,7 +50,8 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 			dirLast = 'in';
 			this.flipAmmtArrows(this.qArrowsAmmt);
 		}
-		addListener(curLevel, 'update', this.handle + 'updateQAmmtArrows', 
+		this.listenerName = this.handle + 'updateQAmmtArrows';
+		addListener(curLevel, 'update', this.listenerName, 
 			function() {
 				if (Math.abs(wall.q - qLast) > redrawThreshold) {
 					if (wall.q < 0) {
@@ -89,6 +92,9 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 				arrow.move(V(0, l-dimso.dx));
 			}
 		}
-	}
+	},
+	remove: function() {
+		removeListener(curLevel, 'update', this.listenerName);
+	},
 
 })
