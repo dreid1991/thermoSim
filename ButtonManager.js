@@ -6,7 +6,7 @@ function ButtonManager(wrapperDiv) {
 }
 //should add clean up with stuff
 ButtonManager.prototype = {
-	addGroup: function(handle, label, prefIdx, isRadio, cleanUpWith) {
+	addGroup: function(handle, label, prefIdx, isRadio, isToggle, cleanUpWith) {
 		var groupId = 'group' + handle;
 		var wrapperId = groupId + 'Wrapper';
 		var padderId = groupId + 'Padder';
@@ -15,7 +15,7 @@ ButtonManager.prototype = {
 		var groupWrapperHTML = templater.div({attrs: {id: [wrapperId], handle: [handle], class: ['buttonManagerElem', 'displayText', 'buttonGroupWrapper']}, innerHTML: wrapperInner});
 		var groupPadderHTML = templater.div({attrs: {id: [padderId], handle: [handle], class: ['buttonManagerElem', 'buttonGroupPadder']}, innerHTML: groupWrapperHTML});
 		this.wrapperDiv.append(groupPadderHTML);
-		this.groups.push(new ButtonManager.Group(this.wrapperDiv, groupId, handle, label, prefIdx, isRadio, cleanUpWith));
+		this.groups.push(new ButtonManager.Group(this.wrapperDiv, groupId, handle, label, prefIdx, isRadio, isToggle, cleanUpWith));
 	},
 	removeGroup: function(groupHandle) {
 		var group = this.getGroup(groupHandle);
@@ -182,7 +182,7 @@ ButtonManager.prototype = {
 	
 }
 
-ButtonManager.Group = function(mgrDiv, groupId, handle, label, prefIdx, isRadio, cleanUpWith) {
+ButtonManager.Group = function(mgrDiv, groupId, handle, label, prefIdx, isRadio, isToggle, cleanUpWith) {
 	this.mgrDiv = mgrDiv;
 	this.groupId = groupId;
 	this.handle = handle;
@@ -190,6 +190,7 @@ ButtonManager.Group = function(mgrDiv, groupId, handle, label, prefIdx, isRadio,
 	this.prefIdx = prefIdx;
 	this.buttons = [];
 	this.isRadio = isRadio;
+	this.isToggle = isToggle && !isRadio;
 	this.cleanUpWith = cleanUpWith || currentSetupType;
 }
 
@@ -205,8 +206,16 @@ ButtonManager.Group.prototype = {
 		addJQueryElems(buttonJQ, 'button');
 		var button = this.buttons[this.buttons.length - 1];
 		var cb = button.cb;
-		if (this.isRadio) cb = this.wrapInRadio(button, cb);
-		if (isDown && this.isRadio) this.pushDownButton(button);
+		if (this.isRadio) {
+			cb = this.wrapInRadio(button, cb);
+		} else if (this.isToggle) {
+			cb = this.wrapInToggle(button, cb);
+		}
+		if (isDown && this.isRadio) {
+			this.pushRadio(button);
+		} else if (isDown && this.isToggle) {
+			this.toggleButton(button);
+		}
 		$(buttonJQ).click(cb);
 	},
 	removeButton: function(buttonHandle) {
@@ -219,18 +228,35 @@ ButtonManager.Group.prototype = {
 		var cbOld = cb;
 		var self = this;
 		cb = function() {
-			self.pushDownButton(clickedButton);
+			self.pushRadio(clickedButton);
 			cbOld();
 		}
 		return cb;
 	},
-	pushDownButton: function(clicked) {
+	wrapInToggle: function(clickedButton, cb) {
+		var cbOld = cb;
+		var self = this;
+		cb = function() {
+			self.toggleButton(clickedButton);
+			cbOld();
+		}
+		return cb;
+	},
+	pushRadio: function(clicked) {
 		for (var i=0; i<this.buttons.length; i++) {
 			var button = this.buttons[i];
 			var JQElem = $('#' + button.buttonId);
 			JQElem.removeClass('ui-button-as-radio-selected');
 		}
 		$('#' + clicked.buttonId).addClass('ui-button-as-radio-selected');	
+	},
+	toggleButton: function(clicked) {
+		var JQElem = $('#' + clicked.buttonId);
+		if (JQElem.hasClass('ui-button-as-radio-selected')) {
+			JQElem.removeClass('ui-button-as-radio-selected');
+		} else {
+			JQElem.addClass('ui-button-as-radio-selected');
+		}
 	},
 	getButton: function(handle) {
 		for (var i=0; i<this.buttons.length; i++) {

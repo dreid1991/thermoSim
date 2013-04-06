@@ -94,7 +94,7 @@ _.extend(TestLevel.prototype,
 				buttonGroups: [
 					{handle: 'heaterState', label: 'Heater', prefIdx: 1, isRadio: true},
 					{handle: 'tempControl', label: 'Temp control', isRadio: true},
-					{handle: 'rxnControl', label: 'Rxn control'}
+					{handle: 'rxnControl', label: 'Rxn control', isToggle: true}
 				],
 				buttons: [
 					{groupHandle: 'heaterState', handle: 'on', label: 'On', isDown: true, exprs: ['curLevel.heaterHeaty.enable()']},

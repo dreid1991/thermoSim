@@ -112,7 +112,7 @@ Renderer.prototype = {
 	addButtonGrps: function(grps) {
 		for (var grpIdx=0; grpIdx<grps.length; grpIdx++) {
 			var grp = grps[grpIdx];
-			buttonManager.addGroup(grp.handle, grp.label, grp.prefIdx, grp.isRadio, grp.cleanUpWith);
+			buttonManager.addGroup(grp.handle, grp.label, grp.prefIdx, grp.isRadio, grp.isToggle, grp.cleanUpWith);
 		}
 	},
 	addButtons: function(buttons) {
