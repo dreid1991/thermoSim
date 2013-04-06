@@ -6,7 +6,7 @@ function ButtonManager(wrapperDiv) {
 }
 //should add clean up with stuff
 ButtonManager.prototype = {
-	addGroup: function(handle, label, prefIdx, cleanUpWith) {
+	addGroup: function(handle, label, prefIdx, isRadio, cleanUpWith) {
 		var groupId = 'group' + handle;
 		var wrapperId = groupId + 'Wrapper';
 		var padderId = groupId + 'Padder';
@@ -15,7 +15,7 @@ ButtonManager.prototype = {
 		var groupWrapperHTML = templater.div({attrs: {id: [wrapperId], handle: [handle], class: ['buttonManagerElem', 'displayText', 'buttonGroupWrapper']}, innerHTML: wrapperInner});
 		var groupPadderHTML = templater.div({attrs: {id: [padderId], handle: [handle], class: ['buttonManagerElem', 'buttonGroupPadder']}, innerHTML: groupWrapperHTML});
 		this.wrapperDiv.append(groupPadderHTML);
-		this.groups.push(new ButtonManager.Group(this.wrapperDiv, groupId, handle, label, prefIdx, cleanUpWith));
+		this.groups.push(new ButtonManager.Group(this.wrapperDiv, groupId, handle, label, prefIdx, isRadio, cleanUpWith));
 	},
 	removeGroup: function(groupHandle) {
 		var group = this.getGroup(groupHandle);
@@ -109,10 +109,10 @@ ButtonManager.prototype = {
 			}
 		}
 	},
-	addButton: function(groupHandle, handle, label, exprs, prefIdx, cleanUpWith) {
+	addButton: function(groupHandle, handle, label, exprs, prefIdx, isDown, cleanUpWith) {
 		var group = this.getGroup(groupHandle);
 		if (group)
-			group.addButton(handle, label, exprs, prefIdx, cleanUpWith);
+			group.addButton(handle, label, exprs, prefIdx, isDown, cleanUpWith);
 		else
 			console.log('Bad group handle ' + groupHandle); 
 	},
@@ -182,18 +182,19 @@ ButtonManager.prototype = {
 	
 }
 
-ButtonManager.Group = function(mgrDiv, groupId, handle, label, prefIdx, cleanUpWith) {
+ButtonManager.Group = function(mgrDiv, groupId, handle, label, prefIdx, isRadio, cleanUpWith) {
 	this.mgrDiv = mgrDiv;
 	this.groupId = groupId;
 	this.handle = handle;
 	this.label = label;
 	this.prefIdx = prefIdx;
 	this.buttons = [];
+	this.isRadio = isRadio;
 	this.cleanUpWith = cleanUpWith || currentSetupType;
 }
 
 ButtonManager.Group.prototype = {
-	addButton: function(handle, label, exprs, prefIdx, cleanUpWith) {
+	addButton: function(handle, label, exprs, prefIdx, isDown, cleanUpWith) {
 		var buttonId = handle + 'Button';
 		var wrapperId = handle + 'Wrapper';
 		this.buttons.push(new ButtonManager.Button(handle, buttonId, wrapperId, label, exprs, prefIdx, cleanUpWith));
@@ -202,13 +203,34 @@ ButtonManager.Group.prototype = {
 		$('#' + this.groupId).append(buttonWrapper);
 		var buttonJQ = $('button#' + buttonId);
 		addJQueryElems(buttonJQ, 'button');
-		$(buttonJQ).click(this.buttons[this.buttons.length - 1].cb);
+		var button = this.buttons[this.buttons.length - 1];
+		var cb = button.cb;
+		if (this.isRadio) cb = this.wrapInRadio(button, cb);
+		if (isDown && this.isRadio) this.pushDownButton(button);
+		$(buttonJQ).click(cb);
 	},
 	removeButton: function(buttonHandle) {
 		var button = this.getButton(buttonHandle);
 		var div = this.getButtonDiv(button);
 		div.remove();
 		this.buttons.splice(this.buttons.indexOf(button), 1);		
+	},
+	wrapInRadio: function(clickedButton, cb) {
+		var cbOld = cb;
+		var self = this;
+		cb = function() {
+			self.pushDownButton(clickedButton);
+			cbOld();
+		}
+		return cb;
+	},
+	pushDownButton: function(clicked) {
+		for (var i=0; i<this.buttons.length; i++) {
+			var button = this.buttons[i];
+			var JQElem = $('#' + button.buttonId);
+			JQElem.removeClass('ui-button-as-radio-selected');
+		}
+		$('#' + clicked.buttonId).addClass('ui-button-as-radio-selected');	
 	},
 	getButton: function(handle) {
 		for (var i=0; i<this.buttons.length; i++) {
@@ -252,8 +274,13 @@ ButtonManager.Button = function(handle, buttonId, wrapperId, label, exprs, prefI
 ButtonManager.Button.prototype = {
 	wrapExprs: function(exprs) {
 		exprStr = exprs.join(';') + ';';
-		return eval('(function() {return ' + exprStr + '})');
+		var func;
+		with (DataGetFuncs) {
+			func = eval('(function() {return ' + exprStr + '})');
+		}
+		return func;
 	},
+
 
 }
 

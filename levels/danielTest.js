@@ -57,10 +57,10 @@ _.extend(TestLevel.prototype,
 						// type: 'Liquid',
 						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 700}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}, makePhaseDiagram: true}
 					// },
-					// {
-						// type: 'Heater',
-						// attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty'}
-					// },
+					{
+						type: 'Heater',
+						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty'}
+					},
 					{
 						type: 'DragWeights',
 						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 2}], pInit: 3}
@@ -92,12 +92,12 @@ _.extend(TestLevel.prototype,
 					//{label: 'RCT: ', expr: 'frac("wally", {spcName: "spc1", tag: "wally"}) + frac("wally", {spcName: "ugly", tag: "wally"})', sigFigs: 2, handle: 'coalseamgas', readout: 'mainReadout'}
 				],
 				buttonGroups: [
-					{handle: 'heaterState', label: 'Heater', prefIdx: 1},
-					{handle: 'tempControl', label: 'Temp control'},
+					{handle: 'heaterState', label: 'Heater', prefIdx: 1, isRadio: true},
+					{handle: 'tempControl', label: 'Temp control', isRadio: true},
 					{handle: 'rxnControl', label: 'Rxn control'}
 				],
 				buttons: [
-					{groupHandle: 'heaterState', handle: 'on', label: 'On', exprs: ['curLevel.heaterHeaty.enable()']},
+					{groupHandle: 'heaterState', handle: 'on', label: 'On', isDown: true, exprs: ['curLevel.heaterHeaty.enable()']},
 					{groupHandle: 'heaterState', handle: 'off', label: 'Off', exprs: ['curLevel.heaterHeaty.disable()']},
 					{groupHandle: 'tempControl', handle: 'adiabatic', label: 'Adiabatic', exprs: ['walls.wally.isothermalStop()']},
 					{groupHandle: 'tempControl', handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']},
