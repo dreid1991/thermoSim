@@ -1,35 +1,21 @@
-canvasHeight = 450;
-$(function(){
-	
-	myCanvas.height = canvasHeight;
-	window.curLevel = new TestLevel();
-	curLevel.cutSceneEnd();
-	curLevel.init();
-});
+// function LevelData(){
+	// //this.readouts = {};
+	// this.setStds();
+	// this.wallSpeed = 1;
 
-myCanvas.width = $('#main').width();
+	// this.yMin = 30;
+	// this.yMax = 350;
+// }
+// _.extend(LevelData, 
+			// LevelTools, 
 
-
-
-function TestLevel(){
-	this.readouts = {};
-	this.setStds();
-	this.wallSpeed = 1;
-	this.compMode = 'Isothermal';//is this used?
-
-	
-	//addSpecies(['spc1', 'spc2', 'spc3', 'spc4', 'spc5', 'spc6']);
-	this.yMin = 30;
-	this.yMax = 350;
-}
-_.extend(TestLevel.prototype, 
-			LevelTools, 
-{
-	init: function() {
-		this.readout = new Readout('mainReadout', 30, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), 'left');
-		$('#mainHeader').html('Level template');
-		sceneNavigator.showPrompt(0, 0, true);
-	},
+LevelData = {
+	levelTitle: 'Level template',
+	// init: function() {
+		// this.readout = new Readout('mainReadout', 30, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), 'left');
+		// $('#mainHeader').html('Level template');
+		// sceneNavigator.showPrompt(0, 0, true);
+	// },
 	spcDefs: [
 		//add antoine coefs, cvLiq, hvap
 		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
@@ -201,4 +187,3 @@ _.extend(TestLevel.prototype,
 	]
 
 }
-)

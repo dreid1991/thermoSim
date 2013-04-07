@@ -1,33 +1,64 @@
 LevelTools = {
 	setStds: function(){
-		this.addSceneDataTypes();
-		this.addImgs();
-		this.setDefaultPromptVals()
 		this.graphs = {};
 		this.makePromptCleanUpHolders(0);
-		this.eUnits = 'kJ';
 		this.bgCol = Col(5, 17, 26);
 		this.wallCol = Col(255,255,255);
 		this.numUpdates = 0;
 		this.wallSpeed = defaultTo(1, this.wallSpeed);
 		this.makeListenerHolders();
-		dataHandler = new DataHandler();
+		
 		this.dataHandler = dataHandler;
 		this.attracting = false;
-		this.addSpcs(this.spcDefs, window.spcs);
+		
 		window.dataDisplayer.setReadouts(this.readouts);
 		collide.setSpcs(window.spcs);
 		this.gravitying = false;
 		this.setUpdateRunListener();
-		animText = new AnimText(c);
+		
 		addListener(this, 'data', 'run', this.dataRun, this);
-		addJQueryElems($('button'), 'button');
-		$('#resetExp').click(function(){curLevel.reset()});
-		$('#toSim').click(function(){sceneNavigator.nextPrompt()});
-		$('#toLastStep').click(function(){sceneNavigator.prevPrompt()});
-		$('#previous').click(function(){sceneNavigator.prevPrompt()});
-		$('#next').click(function(){sceneNavigator.nextPrompt()});
+
 		this.spcs = window.spcs;
+	},
+	addImgs: function(levelData) {
+		for (var sectionIdx=0; sectionIdx<levelData.sections.length; sectionIdx++) {
+			var section = levelData.sections[sectionIdx];
+			if (!section.prompts) console.log('Section ' + sectionIdx + ' has no prompts!  Sections must have at least one prompt.');
+			if (var promptIdx=0; promptIdx<section.prompts.length; promptIdx++) {
+				var title = prompt.title;
+				var text = prompt.text;
+				var quiz = prompt.quiz;
+				if (title) prompt.title = interpreter.interpImgs(title);
+				if (text) prompt.text = interpreter.interpImgs(title);
+				if (quiz) {
+					for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
+						var question = quiz[questionIdx];
+						if (question.options) {
+							for (optionIdx=0; optionIdx<question.options.length; optionIdx++) {
+								var option = question.options[optionIdx];
+								for (optionElement in option) {
+									var element = option[optionElement];
+									if (typeof(element) == 'string') {
+										option[optionElement] = interpreter.interpImgs(element);
+									}						
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	setDefaultPromptVals: function(levelData){
+		for (var sectionIdxLocal=0; sectionIdxLocal<levelData.sections.length; sectionIdxLocal++) {
+			var section = levelData.sections[sectionIdxLocal];
+			for (var promptIdxLocal=0; promptIdxLocal<section.prompts.length; promptIdxLocal++) {
+				var prompt = section.prompts[promptIdxLocal];
+				prompt.finished = false;
+				prompt.title = defaultTo('', prompt.title);
+				prompt.text = defaultTo('', prompt.text);	
+			}
+		}
 	},
 	addSpcs: function(defs, target) {
 		for (var defIdx=0; defIdx<defs.length; defIdx++) {
@@ -48,36 +79,6 @@ LevelTools = {
 			}
 		}
 	},
-	addImgs: function(){
-		for (var sectionIdxLocal=0; sectionIdxLocal<this.sections.length; sectionIdxLocal++) {
-			var section = this.sections[sectionIdxLocal];
-			for (var promptIdxLocal=0; promptIdxLocal<section.prompts.length; promptIdxLocal++) {
-				var prompt = section.prompts[promptIdxLocal];
-				var title = prompt.title;
-				var text = prompt.text;
-				var quiz = prompt.quiz;
-				if (title) prompt.title = interpreter.interpImgs(title);
-				if (text) prompt.text = interpreter.interpImgs(text);
-				if (quiz) {
-					for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
-						var question = quiz[questionIdx];
-						if (question.options) {
-							for (optionIdx=0; optionIdx<question.options.length; optionIdx++) {
-								var option = question.options[optionIdx];
-								for (optionElement in option) {
-									var element = option[optionElement];
-									if (typeof(element) == 'string') {
-										option[optionElement] = interpreter.interpImgs(element);
-									}						
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-
 	move: function(){
 		var spcLocal = this.spcs;
 		for (var spcName in spcLocal) {
@@ -636,17 +637,7 @@ LevelTools = {
 	reset: function(){
 		sceneNavigator.showPrompt(sectionIdx, promptIdx, true);		
 	},
-	setDefaultPromptVals: function(){
-		for (var sectionIdxLocal=0; sectionIdxLocal<this.sections.length; sectionIdxLocal++) {
-			var section = this.sections[sectionIdxLocal];
-			for (var promptIdxLocal=0; promptIdxLocal<section.prompts.length; promptIdxLocal++) {
-				var prompt = section.prompts[promptIdxLocal];
-				prompt.finished = false;
-				prompt.title = defaultTo('', prompt.title);
-				prompt.text = defaultTo('', prompt.text);	
-			}
-		}
-	},
+
 
 	sectionConditions: function(){
 		//ALERT NOT BUBBLING UP CORRECTLY.  IT GETS TO THIS FUNCTION FROM STATE LISTENERS BUT IS NOT RETURNED
