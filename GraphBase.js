@@ -99,9 +99,13 @@ GraphBase = {
 		this.cleanUpParent();
 		return this;
 	},
-	enable: function(){
+	enable: function(addPt){
 		for (var setName in this.data) this.data[setName].recordStart();
 		this.active = true;
+		if (addPt) {
+			for (var setName in this.data) this.data[setName].addVal();
+			this.addLast();
+		}
 		return this;
 	},
 	disable: function(){

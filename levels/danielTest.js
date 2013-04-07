@@ -123,7 +123,7 @@ _.extend(TestLevel.prototype,
 							{handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'vol("wally")', y: "pExt('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]
 					},
-					{type: 'Scatter', handle: 'TvsV', xLabel: "Volume (L)", yLabel: "Temp (K)", axesInit:{x:{min:6, step:1}, y:{min:0, step:60}}, 
+					{type: 'Scatter', handle: 'TvsV', xLabel: "Volume (L)", yLabel: "Temp (K)", axesInit:{x:{min:6, step:1}, y:{min:300, step:60}}, 
 						sets:[
 							{handle:'temp', label:'temp', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'vol("wally")', y: "temp('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]
