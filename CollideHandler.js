@@ -8,7 +8,12 @@ function CollideHandler(){
 	this.dotManager = dotManager;
 	this.activeRxns = [];
 	this.pausedRxns = [];
-	//console.log("Made supercollider");
+	this.numHits = 0;
+	this.hitsPerTurn = [];
+	this.checkStore = this.check;
+	this.breakUpStore = this.breakUp;
+	this.recordingHits = false;
+	this.recordCleanUpListenerName = 'recordCollideHits';
 }
 _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 	setSpcs: function(spcs) {
@@ -16,6 +21,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 		this.setDefaultHandler({func: this.impactStd, obj: this}, this.spcs);
 		this.setup();
 	},
+	
 	setDefaultHandler: function(handler, spcs){
 		var numSpcs = countAttrs(spcs);
 		for (var i=0; i<numSpcs; i++){
@@ -43,6 +49,18 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 	},
 	isIdStr: function(idStr) {
 		return /^[0-9]+\-[0-9]+$/.test(idStr)
+	},
+	recordCollisions: function() {
+		this.check = this.checkRecord;
+		this.breakUp = this.breakUpRecord;
+		this.recordingCollisions = true;
+		addListener(curLevel, 'sectionCleanUp', this.recordCleanUpListenerName, this.recordCollisionsStop, this);
+	},
+	recordCollisionsStop: function() {
+		this.check = this.checkStore;
+		this.breakUp = this.breakUpStore;
+		this.recordingCollisions = false;
+		removeListener(curLevel, 'sectionCleanUp', this.recordCleanUpListenerName);
 	},
 	check: function(){
 		var gridSize = this.gridSize;
@@ -72,7 +90,54 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 							if (dx*dx+dy*dy<=(dot.r+neighbor.r)*(dot.r+neighbor.r)) {
 								var handler = this[Math.min(dot.idNum, neighbor.idNum) + '-' + Math.max(dot.idNum, neighbor.idNum)];
 								var UVAB = V(neighbor.x-dot.x, neighbor.y-dot.y).UV();
-								//YO YO - TRY INLINING ALL  OF THESE FUNCTIONS (THE VECTOR MATH) AND SEE IF IT MAKES IT FASTER.  
+								if (handler.func.apply(handler.obj, [dot, neighbor, UVAB, dot.v.dotProd(UVAB), neighbor.v.dotProd(UVAB)])===false) {
+									doAdd = false;
+									grid[x][y].splice(neighborIdx, 1);
+									break gridLoop;
+								}
+							}
+						}
+					}
+				}
+				
+			if (gridX>=0 && gridY>=0 && gridX<this.numCols && gridY<this.numRows) {
+				doAdd && grid[gridX][gridY].push(dot);
+			} else {
+				returnEscapist(dot);
+				console.log("ball out of bounds");		
+			}
+		}
+		
+	},
+	checkRecord: function(){
+		var gridSize = this.gridSize;
+		var xSpan = this.xSpan;
+		var ySpan = this.ySpan;
+		this.grid = this.makeGrid();
+		var grid = this.grid;
+		this.hitsPerTurn.push(this.numHits);
+		this.numHits = 0;
+		//defining grid locally speeds up by ~250ms/500runs (1000->750)
+		var dots = dotManager.lists.ALLDOTS;
+		
+		for (var dotIdx=dots.length - 1; dotIdx>-1; dotIdx--) {
+	
+			var dot = dots[dotIdx];
+			var gridX = Math.floor(dot.x/gridSize);
+			var gridY = Math.floor(dot.y/gridSize);
+			var doAdd = true;
+			//hey - define x & y mins so I don't have to call each time?
+			//In optimizing, DO NOT define min and max locally.  It slows things down a lot.
+			gridLoop:
+				for (var x=Math.max(gridX-1, 0), xCeil=Math.min(gridX+1, xSpan)+1; x<xCeil; x++){
+					for (var y=Math.max(gridY-1, 0), yCeil=Math.min(gridY+1, ySpan)+1; y<yCeil; y++){
+						for (var neighborIdx=grid[x][y].length-1; neighborIdx>-1; neighborIdx--){
+							var neighbor = grid[x][y][neighborIdx];
+							var dx = dot.x-neighbor.x;
+							var dy = dot.y-neighbor.y;
+							if (dx*dx+dy*dy<=(dot.r+neighbor.r)*(dot.r+neighbor.r)) {
+								var handler = this[Math.min(dot.idNum, neighbor.idNum) + '-' + Math.max(dot.idNum, neighbor.idNum)];
+								var UVAB = V(neighbor.x-dot.x, neighbor.y-dot.y).UV();
 								if (handler.func.apply(handler.obj, [dot, neighbor, UVAB, dot.v.dotProd(UVAB), neighbor.v.dotProd(UVAB)])===false) {
 									doAdd = false;
 									grid[x][y].splice(neighborIdx, 1);
@@ -117,6 +182,16 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 		return true;
 	},
 	breakUp: function(a, b, UVAB){
+		var sumR = a.r+b.r;
+		var aXNew = b.x - UVAB.dx*sumR;
+		var aYNew = b.y - UVAB.dy*sumR;
+		b.x = a.x + UVAB.dx*sumR;
+		b.y = a.y + UVAB.dy*sumR;
+		a.x = aXNew;
+		a.y = aYNew;
+	},
+	breakUpRecord: function(a, b, UVAB){
+		this.numHits ++;
 		var sumR = a.r+b.r;
 		var aXNew = b.x - UVAB.dx*sumR;
 		var aYNew = b.y - UVAB.dy*sumR;

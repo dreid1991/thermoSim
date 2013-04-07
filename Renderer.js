@@ -71,7 +71,11 @@ Renderer.prototype = {
 	dataRecord: function(data) {
 		for (var dataIdx=0; dataIdx<data.length; dataIdx++) {
 			var entry = data[dataIdx];
-			walls[entry.wallInfo]['record' + entry.data.toCapitalCamelCase()](entry.attrs);
+			if (/collisions/i.test(entry.data)) {
+				collide.recordCollisions();
+			} else {
+				walls[entry.wallInfo]['record' + entry.data.toCapitalCamelCase()](entry.attrs);
+			}
 		}
 	},
 	dataReadouts: function(entries) {

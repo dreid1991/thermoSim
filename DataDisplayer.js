@@ -8,7 +8,7 @@ DataDisplayer.prototype = {
 	addEntry: function(attrs) {
 		var self = this;
 		var label = attrs.label || '';
-		var decPlaces = attrs.decPlaces || 1;
+		var decPlaces = defaultTo(1, attrs.decPlaces);
 		var handle = attrs.handle;
 		var expr = attrs.expr || '';
 		var units = attrs.units || '';

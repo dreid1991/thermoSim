@@ -4,10 +4,20 @@ DataGetFuncs = {
 		var numVals = Math.min(15, src.length);
 		var init = src.length - numVals;
 		var sum = 0;
-		for (i=0; i<numVals; i++) {
+		for (var i=0; i<numVals; i++) {
 			sum += src[init + i];
 		}
 		return sum / numVals;
+	},
+	collisions: function() {
+		var src = collide.hitsPerTurn;
+		var numVals = Math.min(15, src.length);
+		var init = src.length - numVals;
+		var sum = 0;
+		for (var i=0; i<numVals; i++) {
+			sum += src[init + i];
+		}
+		return sum * 1000 / numVals / updateInterval;
 	},
 	temp: function(wallHandle) {
 		var src = walls[wallHandle].getDataSrc('temp');
