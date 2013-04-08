@@ -9,6 +9,8 @@
 // _.extend(LevelData, 
 			// LevelTools, 
 
+
+R = 8.314;
 LevelData = {
 	levelTitle: 'Level template',
 	// init: function() {

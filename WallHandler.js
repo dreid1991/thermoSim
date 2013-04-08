@@ -6,7 +6,7 @@ function WallHandler(attrs){//pts, handlers, handles, bounds, includes, vols, sh
 		var newWall = new Array();
 	}
 	_.extend(newWall, WallMethods.main, WallMethods.collideMethods);
-	addListener(curLevel, 'sectionCleanUp', 'walls', newWall.remove, newWall)
+	//addListener(curLevel, 'sectionCleanUp', 'walls', newWall.remove, newWall)
 	newWall.defaultCol = Col(255, 255, 255);
 	if (attrs) {//Yo yo, you can just do new WallHander() and then add walls
 		newWall.assemble(attrs);//pts, handles, bounds, includes, vols, shows, records)

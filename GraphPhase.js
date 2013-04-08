@@ -33,7 +33,7 @@ function GraphPhase(attrs) {
 	this.active = false;
 	this.graph.addMarker({handle: 'liquid', col: Col(200, 0, 0), markerType: 'bullseye', x: this.xFunc, y: this.liqTempFunc});
 	this.graph.addMarker({handle: 'gas', col: Col(0, 200, 0), markerType: 'bullseye', x: this.yFunc, y: this.gasTempFunc});
-	
+	this.graph.hasData = true;
 }
 
 GraphPhase.prototype = {

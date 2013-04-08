@@ -1,4 +1,4 @@
-function Readout(handle, leftBound, rightBound, y, font, fontCol, align){
+function Readout(handle, leftBound, rightBound, y, font, fontCol, align, level){
 	this.handle = handle;
 	this.align = defaultTo('left', align);
 	this.drawCanvas = c;
@@ -8,7 +8,7 @@ function Readout(handle, leftBound, rightBound, y, font, fontCol, align){
 	this.width = rightBound - leftBound;
 	this.y = y;
 	this.entries = [];
-	curLevel.readouts[handle] = this; //global readouts 
+	level.readouts[handle] = this;
 }
 Readout.prototype = {
 

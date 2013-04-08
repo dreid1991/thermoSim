@@ -51,9 +51,9 @@ Renderer.prototype = {
 	},
 	renderWalls: function(newWalls, scene) {
 		if (newWalls.length) {
-			if (scene['type'] == 'section') {
-				window['walls'] = new WallHandler();
-			}
+			// if (scene['type'] == 'section') {
+				// window['walls'] = new WallHandler();
+			// }
 			for (var wallIdx=0; wallIdx<newWalls.length; wallIdx++) {
 				var newWall = newWalls[wallIdx];
 				walls.addWall(newWall);

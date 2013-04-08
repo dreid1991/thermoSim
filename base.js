@@ -1,5 +1,5 @@
 //shared startup stuff
-R = 8.314; //this is here so it can be used in level data files
+
 
 /*
 function checkIdeality(){

@@ -61,7 +61,7 @@ $(function(){
 	stored = {};
 	//window.dataDisplayer = new DataDisplayer(); FE in
 	draw = new DrawingTools();
-	collide = new CollideHandler();
+	//collide = new CollideHandler(); FE
 	attractor = new Attractor();
 	turnUpdater = setInterval('curLevel.update()', updateInterval);
 	dataUpdater = setInterval('curLevel.updateData()', dataInterval);
@@ -81,7 +81,7 @@ $(function(){
 	
 	LevelTools.addImgs(LevelData);
 	LevelTools.setDefaultPromptVals(LevelData);
-	
+	LevelTools.showRunDivs();
 	addJQueryElems($('button'), 'button');
 	$('#resetExp').click(function(){curLevel.reset()});
 	$('#toSim').click(function(){sceneNavigator.nextPrompt()});
@@ -89,8 +89,10 @@ $(function(){
 	$('#previous').click(function(){sceneNavigator.prevPrompt()});
 	$('#next').click(function(){sceneNavigator.nextPrompt()});	
 	for (var sectionIdx=0; sectionIdx<LevelData.sections.length; sectionIdx++) {
-		timeline.pushSection(LeveData.sections[sectionIdx];
+		timeline.pushSection(LevelData.sections[sectionIdx]);
 	}
+	window.currentSetupType = 'section'; //to be depricated
+	timeline.showSection(0);
 	//window.curLevel = new LevelData();
 	//curLevel.cutSceneEnd();
 	//curLevel.init();

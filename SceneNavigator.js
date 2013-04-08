@@ -20,43 +20,43 @@ SceneNavigator.prototype = {
 			curLevel.makePromptCleanUpHolders(newSectionIdx);
 		}
 		if (changedSection || forceReset) {
-			curLevel.saveAllGraphs();
-			curLevel.disableAllGraphs();
-			curLevel.removeAllGraphs();
-			dotManager.clearAll();		
+			curLevel.saveAllGraphs();//no
+			curLevel.disableAllGraphs();//no
+			curLevel.removeAllGraphs();//maybe
+			dotManager.clearAll();//no
 
-			curLevel.sectionCleanUp();
-			buttonManager.cleanUp('section');
-			emptyListener(curLevel, 'sectionCleanUp');
-			emptyListener(curLevel, 'sectionCondition');
+			curLevel.sectionCleanUp(); //no
+			buttonManager.cleanUp('section'); //no
+			emptyListener(curLevel, 'sectionCleanUp'); //no
+			emptyListener(curLevel, 'sectionCondition'); //no
 			//attn - once setup is out of use, remove the condition that checks for it
-			if (newSection.setup) {
+			if (newSection.setup) { //get rid of having both
 				renderer.render(newSection.setup);
 			} else {
 				renderer.render(newSection.sceneData);
 			}
 
 			
-			addListener(curLevel, 'sectionCleanUp', 'removeArrowAndText',
+			addListener(curLevel, 'sectionCleanUp', 'removeArrowAndText', //no
 				function(){
 					removeListenerByName(curLevel, 'update', 'drawArrow');
 					removeListenerByName(curLevel, 'update', 'animText');
 				},
 			this);
-			curLevel.delayGraphs();
+			curLevel.delayGraphs(); //I *think* so
 		}
-		if (newPrompt.setup) {
+		if (newPrompt.setup) {//yes, but different
 			renderer.render(newPrompt.setup);
 		} else {
 			renderer.render(newPrompt.sceneData);
 		}
 		
-		if (!newPrompt.quiz) {
+		if (!newPrompt.quiz) { //yes, but different
 			$('#nextPrevDiv').show();
 		}
 		sectionIdx = newSectionIdx;
 		promptIdx = newPromptIdx;
-		var renderText = interpreter.interp(newPrompt.text);
+		var renderText = interpreter.interp(newPrompt.text); //yes
 		if (newPrompt.cutScene) {	
 			window.curLevel.cutSceneStart(renderText, newPrompt.cutScene, newPrompt.quiz)
 		} else {

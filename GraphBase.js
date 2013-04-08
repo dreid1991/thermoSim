@@ -27,16 +27,9 @@ GraphBase = {
 		var canvasDisplay = this.makeCanvas(this.dims, this.parentDiv, this.handle + 'Graph', makeReset, this.handle + 'Button');
 		this.graphDisplayHTMLElement = canvasDisplay.HTMLElem;
 		this.graphDisplay = canvasDisplay.canvas;
-		// var dataHTML = templater.div({style: {display: 'none', width: 0, height: 0}, attrs: {id: [this.handle + 'Data']}});
-		// $(this.parentDiv).append(dataHTML);
-		// this.dataDiv = $('#' + this.handle + 'Data');
-		// var canvasData = this.makeCanvas(this.dims, this.dataDiv, this.handle + 'DataGraph', false, this.handle + 'DataButton');
-		// this.graphDataHTMLElement = canvasData.HTMLElem;
-		// this.graphData = canvasData.canvas;
 		this.layers = new GraphBase.Layers();
 		addListener(curLevel, 'update', 'drawLayers' + this.handle, this.drawLayers, this);
 		this.hasData = false;
-		//this.graphAssignments = {data: this.graphDisplay, display: this.graphDisplay}; //will set display to graphDisplay when adding a marker. 
 	},
 	makeDataFunc: function(expr) {
 		with (DataGetFuncs) {
@@ -90,6 +83,12 @@ GraphBase = {
 		return {HTMLElem: HTMLElem, canvas: canvas};
 
 		
+	},
+	clearHTML: function() {
+		this.cleanUpParent();
+	},
+	restoreHTML: function() {
+		//write this... some time
 	},
 	remove: function(){
 		this.disable();

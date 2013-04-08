@@ -1333,12 +1333,12 @@ function Piston(attrs){
 	var readoutY = this.pistonBottom.pos.y-2+this.pistonPt.y;
 	var readoutFont = '12pt calibri';
 	var readoutFontCol = Col(255, 255, 255);
-	this.readout = new Readout('pistonReadout' + this.handle.toCapitalCamelCase(), readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, 'center');
+	this.readout = new Readout('pistonReadout' + this.handle.toCapitalCamelCase(), readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, 'center', curLevel);
 	this.wall.moveInit();
 	
 	this.wall.recordPExt();
 	this.wall.recordWork();
-	this.wallHandler = defaultTo('cPAdiabaticDamped', attrs.compMode) + compAdj;	
+	this.wallHandler = defaultTo('cPAdiabaticDamped', attrs.compMode);
 	walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);		
 	//this.wall.setDefaultReadout(this.readout);
 	if (this.makeSlider) {

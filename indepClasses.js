@@ -31,7 +31,7 @@ function Dot(x, y, v, spcName, tag, returnTo) {
 	this.active = true;
 }
 //{spcName: 'spc1', m: 2, r: 1, col: Col(200, 0, 0), cv: 2.5 * R, hF: -10, hVap: 40, cvLiq: 12},
-function Species(spcName, mass, radius, color, idNum, cv, hF298, hVap298, antoineCoeffs, cpLiq, spcVolLiq){
+function Species(spcName, mass, radius, color, idNum, cv, hF298, hVap298, antoineCoeffs, cpLiq, spcVolLiq, dotManager){
 	this.spcName = spcName;
 	this.m = mass;
 	this.r = radius;

@@ -1,30 +1,26 @@
 LevelTools = {
 	setStds: function(){
 		this.graphs = {};
-		this.makePromptCleanUpHolders(0);
+		//this.makePromptCleanUpHolders(0);
 		this.bgCol = Col(5, 17, 26);
 		this.wallCol = Col(255,255,255);
 		this.numUpdates = 0;
 		this.wallSpeed = defaultTo(1, this.wallSpeed);
 		this.makeListenerHolders();
 		
-		this.dataHandler = dataHandler;
 		this.attracting = false;
 		
-		window.dataDisplayer.setReadouts(this.readouts);
-		collide.setSpcs(window.spcs);
 		this.gravitying = false;
 		this.setUpdateRunListener();
 		
 		addListener(this, 'data', 'run', this.dataRun, this);
 
-		this.spcs = window.spcs;
 	},
 	addImgs: function(levelData) {
 		for (var sectionIdx=0; sectionIdx<levelData.sections.length; sectionIdx++) {
 			var section = levelData.sections[sectionIdx];
 			if (!section.prompts) console.log('Section ' + sectionIdx + ' has no prompts!  Sections must have at least one prompt.');
-			if (var promptIdx=0; promptIdx<section.prompts.length; promptIdx++) {
+			for (var promptIdx=0; promptIdx<section.prompts.length; promptIdx++) {
 				var title = prompt.title;
 				var text = prompt.text;
 				var quiz = prompt.quiz;
@@ -60,10 +56,10 @@ LevelTools = {
 			}
 		}
 	},
-	addSpcs: function(defs, target) {
+	addSpcs: function(defs, target, dotManager) {
 		for (var defIdx=0; defIdx<defs.length; defIdx++) {
 			var def = defs[defIdx];
-			var spc = new Species(def.spcName, def.m, def.r, def.col, defIdx, def.cv, def.hF298, def.hVap298, def.antoineCoeffs, def.cpLiq, def.spcVolLiq);
+			var spc = new Species(def.spcName, def.m, def.r, def.col, defIdx, def.cv, def.hF298, def.hVap298, def.antoineCoeffs, def.cpLiq, def.spcVolLiq, dotManager);
 			target[def.spcName] = spc;
 		}
 	},
@@ -246,9 +242,7 @@ LevelTools = {
 	cutSceneText: function(text){
 		$('#intText').html(text);
 	},
-	cutSceneEnd: function(){
-		this.inCutScene = false;
-		this.resume();
+	showRunDivs: function() {
 		$('#intText').html('');
 		$('#dashRun').show();
 		$('#dashOutro').hide();
@@ -259,6 +253,11 @@ LevelTools = {
 		$('#canvasDiv').show();
 		$('#display').hide();
 		$('#intText').hide();	
+	},
+	cutSceneEnd: function(){
+		this.inCutScene = false;
+		this.resume();
+		this.showRunDivs();
 	},
 	pause: function(){
 		saveListener(this, 'update');

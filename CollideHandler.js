@@ -1,6 +1,4 @@
 function CollideHandler(){
-	this.spcs = spcs;
-	//this.defs = speciesDefs;
 	this.tConst = tConst;
 	this.cp = cp;
 	this.cv = cv;
@@ -19,7 +17,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 	setSpcs: function(spcs) {
 		this.spcs = spcs;
 		this.setDefaultHandler({func: this.impactStd, obj: this}, this.spcs);
-		this.setup();
+		this.setup(this.spcs);
 	},
 	
 	setDefaultHandler: function(handler, spcs){
@@ -200,15 +198,15 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 		a.x = aXNew;
 		a.y = aYNew;
 	},
-	setup: function(){
-		this.gridSize = 2*this.getMaxR();
+	setup: function(spcs){
+		this.gridSize = 2*this.getMaxR(spcs);
 		this.numCols = Math.ceil(myCanvas.width/this.gridSize+1);
 		this.numRows = Math.ceil(myCanvas.height/this.gridSize+1);
 		this.xSpan = Math.floor(myCanvas.width/this.gridSize);
 		this.ySpan = Math.floor(myCanvas.height/this.gridSize);
 	},
 
-	getMaxR: function(){
+	getMaxR: function(spcs){
 		var maxR = 0;
 		for (var spcName in spcs){
 			var spc = spcs[spcName];

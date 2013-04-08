@@ -1,4 +1,5 @@
-function LevelInstance(readout) {
-	this.readouts = {mainReadout: readout};
+function LevelInstance() {
+	this.readouts = {};
+	this.setStds();
 }
-_.extend(LevelInstance.prototype, LevelTools)
+_.extend(LevelInstance.prototype, LevelTools);
