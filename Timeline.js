@@ -52,6 +52,8 @@ Timeline.Section.prototype = {
 				renderer.render(this.sectionData.prompts[promptIdx].sceneData);
 			}
 		}
+		var prompt = this.sectionData.prompts[this.promptIdx];
+		
 		
 	},
 	pushToGlobal: function() {
