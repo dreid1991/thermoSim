@@ -613,6 +613,9 @@ CheckMark.prototype = {
 	draw: function(){
 		draw.fillPtsStroke(this.pts, this.col, this.stroke, this.drawCanvas);
 	},
+	setCanvas: function(canvas) {
+		this.drawCanvas = canvas;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

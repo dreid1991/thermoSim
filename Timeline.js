@@ -68,7 +68,9 @@ Timeline.Section.prototype = {
 			if (this.sectionData.prompts[promptIdx].sceneData) {
 				renderer.render(this.sectionData.prompts[promptIdx].sceneData);
 			}
-		} 
+		} else {
+			this.restoreGraphs();
+		}
 	},
 	showPrompt: function(promptIdx) {
 		//going to go with rendering everything for now
@@ -110,6 +112,13 @@ Timeline.Section.prototype = {
 		window.buttonManager = this.buttonManager;
 		window.dataHandler = this.dataHandler;
 		
+	},
+	restoreGraphs: function() {
+		for (var graphName in this.level.graphs) {
+			var graph = this.level.graphs[graphName];
+			graph.restoreHTML();
+			graph.drawAllData();
+		}
 	},
 	clear: function() {
 		$('#prompt').html('');

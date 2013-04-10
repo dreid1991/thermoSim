@@ -23,11 +23,12 @@ GraphBase = {
 		this.graphId = this.handle + 'Graph';
 		this.parentDiv = this.pickParentDiv('graph');
 		this.parentDivId = $(this.parentDiv).attr('id');
-		var makeReset = defaultTo(true, this.makeReset);
-		var canvasDisplay = this.makeCanvas(this.dims, this.parentDiv, this.handle + 'Graph', makeReset, this.handle + 'Button');
+		this.makeReset = defaultTo(true, this.makeReset);
+		var canvasDisplay = this.makeCanvas(this.dims, this.parentDiv, this.handle + 'Graph', this.makeReset, this.handle + 'Button');
 		this.graphDisplayHTMLElement = canvasDisplay.HTMLElem;
 		this.graphDisplay = canvasDisplay.canvas;
 		this.layers = new GraphBase.Layers();
+		this.wrapperId;
 		addListener(curLevel, 'update', 'drawLayers' + this.handle, this.drawLayers, this);
 		this.hasData = false;
 	},
@@ -84,11 +85,18 @@ GraphBase = {
 
 		
 	},
+	restoreHTML: function() {
+		var canvasDisplay = this.makeCanvas(this.dims, this.parentDiv, this.handle + 'Graph', this.makeReset, this.handle + 'Button');
+		this.graphDisplayHTMLElement = canvasDisplay.HTMLElem;
+		this.graphDisplay = canvasDisplay.canvas;	
+		if (this.legend) {
+			for (var legendEntry in this.legend) {
+				this.legend[legendEntry].setCheckMarkCanvas(this.graphDisplay);
+			}
+		}
+	},
 	clearHTML: function() {
 		this.cleanUpParent();
-	},
-	restoreHTML: function() {
-		//write this... some time
 	},
 	remove: function(){
 		this.disable();
@@ -559,6 +567,9 @@ GraphBase.LegendEntry.prototype = {
 	},
 	toggleDeactivate: function() {
 		removeListener(curLevel, 'mouseup', this.mouseListenerName);
+	},
+	setCheckMarkCanvas: function(canvas) {
+		this.checkMark.setCanvas(canvas);
 	}
 }
 GraphBase.Range = function(xMin, xMax, yMin, yMax) {
