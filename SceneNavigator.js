@@ -70,7 +70,7 @@ SceneNavigator.prototype = {
 			}
 		}
 		$('#baseHeader').html(newPrompt.title);
-		this.execListeners(curLevel.setupListeners.listeners);
+		execListeners(curLevel.setupListeners.listeners);
 		emptyListener(curLevel, 'setup');
 		interpreter.renderMath();
 		buttonManager.arrangeGroupWrappers();
@@ -92,12 +92,7 @@ SceneNavigator.prototype = {
 			return [promptIdx];
 		}
 	},
-	execListeners: function(listeners) {
-		for (var name in listeners) {
-			var listener = listeners[name];
-			listener.func.apply(listener.obj);
-		}
-	},
+
 
 	nextPrompt: function(forceAdvance){
 		//the entry point for the submit button is submitAdvanceFunc in LevelTools

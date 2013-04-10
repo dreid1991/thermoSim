@@ -325,6 +325,13 @@ function grabAttrs(obj, attrs) {
 	return newObj;
 }
 
+function execListeners(listeners) {
+	for (var name in listeners) {
+		var listener = listeners[name];
+		listener.func.apply(listener.obj);
+	}
+}
+
 function makeSlider(titleWrapperDiv, sliderWrapperDiv, sliderDivId, title, attrs, handlers, initVisibility){
 	// var wrapperDiv = $('#' + wrapperDivId);
 	var titleHTML = '';

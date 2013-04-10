@@ -15,10 +15,11 @@ $(function(){
 		Hist: GraphHist,
 		Phase: GraphPhase
 	}
+	//why are we even doing all this hiding?
 	$('#canvasDiv').hide();
 	$('#base').hide();
 	$('#dashIntro').hide();
-	$('#dashRun').hide();
+	//$('#dashRun').hide();
 	$('#dashOutro').hide();
 	$('#dashCutScene').hide();
 	$('#display').hide();
@@ -60,6 +61,7 @@ $(function(){
 	//spcs = {};  FE
 	stored = {};
 	//window.dataDisplayer = new DataDisplayer(); FE in
+	addJQueryElems($('button'), 'button');
 	draw = new DrawingTools();
 	//collide = new CollideHandler(); FE
 	attractor = new Attractor();
@@ -82,7 +84,6 @@ $(function(){
 	LevelTools.addImgs(LevelData);
 	LevelTools.setDefaultPromptVals(LevelData);
 	LevelTools.showRunDivs();
-	addJQueryElems($('button'), 'button');
 	$('#resetExp').click(function(){curLevel.reset()});
 	$('#toSim').click(function(){sceneNavigator.nextPrompt()});
 	$('#toLastStep').click(function(){sceneNavigator.prevPrompt()});
@@ -92,7 +93,7 @@ $(function(){
 		timeline.pushSection(LevelData.sections[sectionIdx]);
 	}
 	window.currentSetupType = 'section'; //to be depricated
-	timeline.showSection(0);
+	timeline.showSection(0, 0);
 	//window.curLevel = new LevelData();
 	//curLevel.cutSceneEnd();
 	//curLevel.init();
