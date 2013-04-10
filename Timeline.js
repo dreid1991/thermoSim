@@ -15,7 +15,7 @@ Timeline.prototype = {
 		if (this.sectionIdx !== undefined) 
 			this.sections[this.sectionIdx].clear()
 	},
-	showSection: function(sectionIdx, promptIdx, forceRefresh) {
+	show: function(sectionIdx, promptIdx, forceRefresh) {
 		var changingSection = this.sectionIdx != sectionIdx;
 		var changingPrompt = changingSection || promptIdx != this.sections[sectionIdx].promptIdx;
 		if (changingSection || forceRefresh) {
@@ -43,7 +43,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	this.dotManager = new DotManager();
 	this.dataHandler = new DataHandler();
 	this.dataDisplayer = new DataDisplayer();
-	this.buttonManager = new ButtonManager($('#buttonManager'));
+	this.buttonManager = new ButtonManager('buttonManager');
 	this.spcs = {};
 	LevelTools.addSpcs(LevelData.spcDefs, this.spcs, this.dotManager);
 	this.sliderList = [];

@@ -1,5 +1,6 @@
-function ButtonManager(wrapperDiv) {
-	this.wrapperDiv = wrapperDiv;
+function ButtonManager(wrapperDivId) {
+	//optional
+	this.wrapperDivId = wrapperDivId;
 
 	this.groups = [];
 	
@@ -7,6 +8,7 @@ function ButtonManager(wrapperDiv) {
 //should add clean up with stuff
 ButtonManager.prototype = {
 	addGroup: function(handle, label, prefIdx, isRadio, isToggle, cleanUpWith) {
+		var mgrWrapper = $('#' + this.wrapperDivId);
 		var groupId = 'group' + handle;
 		var wrapperId = groupId + 'Wrapper';
 		var padderId = groupId + 'Padder';
@@ -14,8 +16,8 @@ ButtonManager.prototype = {
 		var wrapperInner = label + templater.br() + groupButtonWrapperHTML;
 		var groupWrapperHTML = templater.div({attrs: {id: [wrapperId], handle: [handle], class: ['buttonManagerElem', 'displayText', 'buttonGroupWrapper']}, innerHTML: wrapperInner});
 		var groupPadderHTML = templater.div({attrs: {id: [padderId], handle: [handle], class: ['buttonManagerElem', 'buttonGroupPadder']}, innerHTML: groupWrapperHTML});
-		this.wrapperDiv.append(groupPadderHTML);
-		this.groups.push(new ButtonManager.Group(this.wrapperDiv, groupId, handle, label, prefIdx, isRadio, isToggle, cleanUpWith));
+		mgrWrapper.append(groupPadderHTML);
+		this.groups.push(new ButtonManager.Group(mgrWrapper, groupId, handle, label, prefIdx, isRadio, isToggle, cleanUpWith));
 	},
 	removeGroup: function(groupHandle) {
 		var group = this.getGroup(groupHandle);
@@ -46,7 +48,7 @@ ButtonManager.prototype = {
 		}
 	},
 	getGroupDiv: function(group) {
-		var children = this.wrapperDiv.children();
+		var children = $('#' + this.wrapperDivId).children();
 		for (var i=0; i<children.length; i++) {
 			if ($(children[i]).attr('handle') == group.handle) 
 				return $(children[i]);
@@ -55,7 +57,7 @@ ButtonManager.prototype = {
 	arrangeGroupWrappers: function() {
 		//all elements must be buttonManagerElems because I'm going to be treating the div pretty roughly.  Other stuff will be rearranged badly.
 		var arrangement = this.arrangeObjs(this.groups);
-		this.arrangeHTML(this.wrapperDiv, arrangement);
+		this.arrangeHTML($('#' + this.wrapperDivId), arrangement);
 		
 	},
 	arrangeAllGroups: function() {

@@ -93,7 +93,7 @@ $(function(){
 		timeline.pushSection(LevelData.sections[sectionIdx]);
 	}
 	window.currentSetupType = 'section'; //to be depricated
-	timeline.showSection(0, 0);
+	timeline.show(0, 0);
 	//window.curLevel = new LevelData();
 	//curLevel.cutSceneEnd();
 	//curLevel.init();
