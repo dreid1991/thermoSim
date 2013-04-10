@@ -118,8 +118,8 @@ SceneNavigator.prototype = {
 		var newSectionIdx = timeline.sectionIdx;
 		var curSection = timeline.curSection();
 		var newPromptIdx = curSection.promptIdx;
-		if (promptIdx+1==curSection.sectionData.prompts.length) {
-			if (sectionIdx+1 < timeline.sections.length) {
+		if (newPromptIdx+1==curSection.sectionData.prompts.length) {
+			if (newSectionIdx+1 < timeline.sections.length) {
 				newSectionIdx++;
 				newPromptIdx=0;
 			}
@@ -130,13 +130,15 @@ SceneNavigator.prototype = {
 	},
 
 	getPrevIdxs: function() {
-		var newSectionIdx = timeline.sectionIdx;
+		var curSectionIdx = timeline.sectionIdx;
+		var newSectionIdx = curSectionIdx;
 		var curSection = timeline.curSection();
-		var newPromptIdx = curSection.promptIdx;
-		if (promptIdx==0) {
-			if (sectionIdx>0) {
+		var curPromptIdx = curSection.promptIdx;
+		var newPromptIdx = curPromptIdx;
+		if (curPromptIdx==0) {
+			if (curSectionIdx>0) {
 				newSectionIdx--;
-				newPromptIdx = timeline.curSection().sectionData.prompts.length - 1;
+				newPromptIdx = timeline.sections[newSectionIdx].sectionData.prompts.length - 1;
 			}
 		} else {
 			newPromptIdx--;

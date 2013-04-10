@@ -46,13 +46,14 @@ LevelData = {
 						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 700}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}, makePhaseDiagram: true}
 					// },
 					{
-						type: 'Heater',
-						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty'}
+						type: 'DragWeights',
+						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 2}], pInit: 3}
 					},
 					{
-						type: 'DragWeights',
-						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 2}], pInit: 3, cleanUpWith: 'prompt0'}
-					},
+						type: 'Heater',
+						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty'}
+					}
+
 					// {
 						// type: 'QArrowsAmmt',
 						// attrs: {handle: 'arrowy', wallInfo: 'wally', scale: 1}
@@ -64,9 +65,9 @@ LevelData = {
 
 						
 				],
-				// listeners: [
-					// {handle: 'trumpet', expr: "pExt('wally') > 3"}
-				// ],
+				triggers: [
+					{handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: false}
+				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugly', tag: 'wally'}},
@@ -100,9 +101,6 @@ LevelData = {
 					//TEST DISPLAY Q ARROWS
 					//{type: 'DragWeights', handle: 'draggy', cmmd: 'dropAllOntoPiston', args: ['instant']}
 				],
-				listeners: [
-					//{handle: 'checky', expr: 'fracDiff(vol("wally"), 9) < .05', alertUnsatisied: 'no', satisfyStore: [{storeAs: 'foo', expr: 'vol("wally") * 10'}], satisfyCmmds: ['console.log("lol")']}
-				],
 				// rxns: [
 					// {handle: 'rxn1', rctA: 'spc1', rctB: 'ugly', activeE: 15, prods: {duckling: 1}},
 					// {handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
@@ -129,6 +127,9 @@ LevelData = {
 			prompts: [
 				{
 					sceneData: {
+						objs: [
+			
+						]
 						// objs: [
 							// {
 								// type: 'AuxImage',

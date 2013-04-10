@@ -27,7 +27,7 @@ Renderer.prototype = {
 		this.renderObjs(scene.objs || []);
 		this.dataRecord(scene.dataRecord || []);
 		this.dataReadouts(scene.dataReadouts || []);
-		this.addListeners(scene.listeners || []);
+		this.addTriggers(scene.triggers || []);
 		this.addGraphs(scene.graphs || []);
 		this.addRxns(scene.rxns || []);
 		this.doCommands(scene.cmmds || []);
@@ -84,10 +84,10 @@ Renderer.prototype = {
 			dataDisplayer.addEntry(entry);
 		}
 	},
-	addListeners: function(listeners) {
-		for (var listenerIdx=0; listenerIdx<listeners.length; listenerIdx++) {
-			var listener = listeners[listenerIdx];
-			var foo = new StateListener(listener); 
+	addTriggers: function(triggers) {
+		for (var triggerIdx=0; triggerIdx<triggers.length; triggerIdx++) {
+			var trigger = triggers[triggerIdx];
+			new Trigger(trigger); 
 			//I don't think state listeners are ever referenced through curLevel., so I don't have to name them as keys in curLevel
 		}
 	},

@@ -1,6 +1,7 @@
 function Timeline() {
-	this.buttonManagerBlank = $('#buttonManager').clone(true);
-	this.dashRunBlank = $('#dashRun').clone(true);
+	//cloning return jquery reference rather than deepcopy if done before page fully loaded
+	this.buttonManagerBlank = document.getElementById('buttonManager').outerHTML;
+	this.dashRunBlank = document.getElementById('dashRun').outerHTML;
 	
 	this.sections = [];
 	this.sectionIdx = undefined;
@@ -79,12 +80,14 @@ Timeline.Section.prototype = {
 			if (this.sectionData.prompts[promptIdx].sceneData) {
 				renderer.render(this.sectionData.prompts[promptIdx].sceneData);
 			}
+			this.inited = true;
 		} else {
 			this.restoreGraphs();
 		}
 	},
 	showPrompt: function(promptIdx) {
 		//going to go with rendering everything for now
+		this.promptIdx = promptIdx;
 		var prompt = this.sectionData.prompts[promptIdx];
 		if (prompt.sceneData)
 			renderer.render(prompt.sceneData);
@@ -104,7 +107,7 @@ Timeline.Section.prototype = {
 		interpreter.renderMath();
 		buttonManager.arrangeGroupWrappers();
 		buttonManager.arrangeAllGroups();
-		buttonManager.setButtonWidth();		
+		buttonManager.setButtonWidth();	
 		
 	},
 	cleanUpPrompt: function() {

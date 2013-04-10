@@ -7,7 +7,7 @@ Contains:
 	Piston
 	Heater
 	Stops
-	StateListener
+	Trigger
 in that order
 */
 compressorFuncs = {
@@ -58,11 +58,12 @@ objectFuncs = {
 	},
 	removeFromCurLevel: function() {
 		var key = curLevel.key(this.type, this.handle);
-		if (curLevel[key] == this) {
+		//removing 'safties'.  This will be replaced soon anyway
+		// if (curLevel[key] == this) {
 			delete curLevel[key];
-		} else {
-			console.log("Trying to remove " + key + " but handle doesn't belong to this object");
-		}
+		// } else {
+			// console.log("Trying to remove " + key + " but handle doesn't belong to this object");
+		// }
 	},
 	removeCleanUp: function(){
 		removeListener(curLevel, this.cleanUpWith + 'CleanUp', this.cleanUpListenerName);
@@ -1765,32 +1766,26 @@ _.extend(Stops.prototype, objectFuncs, {
 }
 )
 //////////////////////////////////////////////////////////////////////////
-//STATE LISTENER
+//Trigger
 //////////////////////////////////////////////////////////////////////////
-function StateListener(attrs){//like dataList... is:'greaterThan', ... checkVal
-	this.type = 'StateListener';
+function Trigger(attrs){//like dataList... is:'greaterThan', ... checkVal
+	this.type = 'Trigger';
 	this.handle = attrs.handle;
 	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.conditionsOn = this.cleanUpWith.killNumbers();
 	this.conditionFunc = this.wrapExpr(attrs.expr);
-	//var dataInfo = attrs.dataSet;
-	//this.dataList = walls[dataInfo.wallInfo].getDataObj(dataInfo.data, dataInfo.attrs).src();
-	//this.is = attrs.is
-	//this.checkVal = attrs.checkVal;
-	//this.tolerance = defaultTo(.05, attrs.tolerance);
+
 	this.checkOn = attrs.checkOn;
 	this.alerts = {true:attrs.alertSatisfied, false:attrs.alertUnsatisfied};
-	
+	this.requiredForAdvance = defaultTo(true, attrs.requiredForAdvance);
 	this.priorities = {true:defaultTo(0, attrs.prioritySatisfied), false:defaultTo(0, attrs.priorityUnsatisfied)};
-	
 	this.satisfyStore = defaultTo(undefined, attrs.satisfyStore);
 	this.satisfyCmmds = defaultTo(undefined, attrs.satisfyCmmds);
 	this.amSatisfied = false;
-	//this.makeConditionFunc();
 	this.setupStd();
 	this.init();
 }
-_.extend(StateListener.prototype, objectFuncs, {
+_.extend(Trigger.prototype, objectFuncs, {
 	init: function(){
 		if (this.checkOn == 'conditions') {
 			this.initCheckOnConditions(); //check if condition is met when curLevel goes to see if its conditions are met
@@ -1806,12 +1801,14 @@ _.extend(StateListener.prototype, objectFuncs, {
 		return func;
 	},
 	initCheckOnConditions: function() {
-		addListener(curLevel, this.conditionsOn + 'Condition', this.handle,
-			function(){
-				var didWin = this.conditionFunc();
-				return {didWin:didWin, alert:this.alerts[didWin], priority:this.priorities[didWin]};
-			},
-		this);		
+		if (this.requiredForAdvance) {
+			addListener(curLevel, this.conditionsOn + 'Condition', this.handle,
+				function(){
+					var didWin = this.conditionFunc();
+					return {didWin:didWin, alert:this.alerts[didWin], priority:this.priorities[didWin]};
+				},
+			this);
+		}
 	},
 	initCheckOnInterval: function() {
 		addListener(curLevel, 'update', this.handle,
@@ -1828,24 +1825,13 @@ _.extend(StateListener.prototype, objectFuncs, {
 				}
 			},
 		this);
-		
-		addListener(curLevel, this.conditionsOn + 'Condition', this.handle,
-			function(){
-				return {didWin: this.amSatisfied, alert:this.alerts[this.amSatisfied], priority:this.priorities[this.amSatisfied]};
-			},
-		this);	
-	},
-	makeConditionFunc: function(){
-		if (this.checkVal instanceof Array) {
-			this.condition = function() {
-				return this[this.is](this.dataList[this.dataList.length-1], this.checkVal[this.checkVal.length-1]);
-			}
-		} else {
-			this.condition = function() {
-				return this[this.is](this.dataList[this.dataList.length-1], this.checkVal);
-			}
-		
-		}		
+		if (this.requiredForAdvance) {
+			addListener(curLevel, this.conditionsOn + 'Condition', this.handle,
+				function(){
+					return {didWin: this.amSatisfied, alert:this.alerts[this.amSatisfied], priority:this.priorities[this.amSatisfied]};
+				},
+			this);	
+		}
 	},
 	recordVals: function(){
 		with (DataGetFuncs) {
