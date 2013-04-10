@@ -3,81 +3,83 @@ function SceneNavigator() {
 }
 SceneNavigator.prototype = {
 	showPrompt: function(newSectionIdx, newPromptIdx, forceReset){
-		var newSection = window['curLevel'].sections[newSectionIdx];
-		var newPrompt = newSection.prompts[newPromptIdx];
-		var changedSection = newSectionIdx!=sectionIdx;
-		var promptIdxsToClean = this.getpromptIdxsToClean(newSectionIdx, newPromptIdx);
+		timeline.show(newSectionIdx, newPromptIdx, forceReset);
+		// var newSection = window['curLevel'].sections[newSectionIdx];
+		// var newPrompt = newSection.prompts[newPromptIdx];
+		// var changedSection = newSectionIdx!=sectionIdx;
+		// var promptIdxsToClean = this.getpromptIdxsToClean(newSectionIdx, newPromptIdx);
 		
-		promptIdxsToClean.map(function(value){
-			curLevel.promptCleanUp(value);
-			buttonManager.cleanUp('prompt' + value);
-		})
+		// promptIdxsToClean.map(function(value){
+			// curLevel.promptCleanUp(value);
+			// buttonManager.cleanUp('prompt' + value);
+		// })
 		
 		
-		//emptyListener(curLevel, 'promptCleanUp');
-		emptyListener(curLevel, 'promptCondition');
-		if (changedSection) {
-			curLevel.makePromptCleanUpHolders(newSectionIdx);
-		}
-		if (changedSection || forceReset) {
-			curLevel.saveAllGraphs();//no
-			curLevel.disableAllGraphs();//no
-			curLevel.removeAllGraphs();//maybe
-			dotManager.clearAll();//no
+		// //emptyListener(curLevel, 'promptCleanUp');
+		// emptyListener(curLevel, 'promptCondition');
+		// if (changedSection) {
+			// curLevel.makePromptCleanUpHolders(newSectionIdx);
+		// }
+		// if (changedSection || forceReset) {
+			// curLevel.saveAllGraphs();//no
+			// curLevel.disableAllGraphs();//no
+			// curLevel.removeAllGraphs();//maybe
+			// dotManager.clearAll();//no
 
-			curLevel.sectionCleanUp(); //no
-			buttonManager.cleanUp('section'); //no
-			emptyListener(curLevel, 'sectionCleanUp'); //no
-			emptyListener(curLevel, 'sectionCondition'); //no
-			//attn - once setup is out of use, remove the condition that checks for it
-			if (newSection.setup) { //get rid of having both
-				renderer.render(newSection.setup);
-			} else {
-				renderer.render(newSection.sceneData);
-			}
+			// curLevel.sectionCleanUp(); //no
+			// buttonManager.cleanUp('section'); //no
+			// emptyListener(curLevel, 'sectionCleanUp'); //no
+			// emptyListener(curLevel, 'sectionCondition'); //no
+			// //attn - once setup is out of use, remove the condition that checks for it
+			// if (newSection.setup) { //get rid of having both
+				// renderer.render(newSection.setup);
+			// } else {
+				// renderer.render(newSection.sceneData);
+			// }
 
 			
-			addListener(curLevel, 'sectionCleanUp', 'removeArrowAndText', //no
-				function(){
-					removeListenerByName(curLevel, 'update', 'drawArrow');
-					removeListenerByName(curLevel, 'update', 'animText');
-				},
-			this);
-			curLevel.delayGraphs(); //I *think* so
-		}
-		if (newPrompt.setup) {//yes, but different
-			renderer.render(newPrompt.setup);
-		} else {
-			renderer.render(newPrompt.sceneData);
-		}
+			// addListener(curLevel, 'sectionCleanUp', 'removeArrowAndText', //no
+				// function(){
+					// removeListenerByName(curLevel, 'update', 'drawArrow');
+					// removeListenerByName(curLevel, 'update', 'animText');
+				// },
+			// this);
+			// curLevel.delayGraphs(); //I *think* so
+		// }
+		// if (newPrompt.setup) {//yes, but different
+			// renderer.render(newPrompt.setup);
+		// } else {
+			// renderer.render(newPrompt.sceneData);
+		// }
 		
-		if (!newPrompt.quiz) { //yes, but different
-			$('#nextPrevDiv').show();
-		}
-		sectionIdx = newSectionIdx;
-		promptIdx = newPromptIdx;
-		var renderText = interpreter.interp(newPrompt.text); //yes
-		if (newPrompt.cutScene) {	
-			window.curLevel.cutSceneStart(renderText, newPrompt.cutScene, newPrompt.quiz)
-		} else {
-			if (newPrompt.quiz) {
-				var quiz = newPrompt.quiz;
-				//$('#nextPrevDiv').hide();
-				$('#prompt').html(defaultTo('', templater.div({innerHTML: renderText})));
-				window['curLevel'].appendQuiz(newPrompt.quiz, $('#prompt'))
-			} else {
-				$('#prompt').html(templater.div({innerHTML: renderText}));
-			}
-		}
-		$('#baseHeader').html(newPrompt.title);
-		execListeners(curLevel.setupListeners.listeners);
-		emptyListener(curLevel, 'setup');
-		interpreter.renderMath();
-		buttonManager.arrangeGroupWrappers();
-		buttonManager.arrangeAllGroups();
-		buttonManager.setButtonWidth();
+		// if (!newPrompt.quiz) { //yes, but different
+			// $('#nextPrevDiv').show();
+		// }
+		// sectionIdx = newSectionIdx;
+		// promptIdx = newPromptIdx;
+		// var renderText = interpreter.interp(newPrompt.text); //yes
+		// if (newPrompt.cutScene) {	
+			// window.curLevel.cutSceneStart(renderText, newPrompt.cutScene, newPrompt.quiz)
+		// } else {
+			// if (newPrompt.quiz) {
+				// var quiz = newPrompt.quiz;
+				// //$('#nextPrevDiv').hide();
+				// $('#prompt').html(defaultTo('', templater.div({innerHTML: renderText})));
+				// window['curLevel'].appendQuiz(newPrompt.quiz, $('#prompt'))
+			// } else {
+				// $('#prompt').html(templater.div({innerHTML: renderText}));
+			// }
+		// }
+		// $('#baseHeader').html(newPrompt.title);
+		// execListeners(curLevel.setupListeners.listeners);
+		// emptyListener(curLevel, 'setup');
+		// interpreter.renderMath();
+		// buttonManager.arrangeGroupWrappers();
+		// buttonManager.arrangeAllGroups();
+		// buttonManager.setButtonWidth();
 
 	},
+	//make it clean prompts for fun
 	getpromptIdxsToClean: function(newSectionIdx, newPromptIdx) {
 				//attn please - this only works for going forwards
 		//would need to make like an 'added by' tag for backwards to work
@@ -96,8 +98,8 @@ SceneNavigator.prototype = {
 
 	nextPrompt: function(forceAdvance){
 		//the entry point for the submit button is submitAdvanceFunc in LevelTools
-		var curSection = window['curLevel'].sections[sectionIdx];
-		var curPrompt = defaultTo({}, curSection.prompts[promptIdx]);
+		var curSection = timeline.curSection();
+		var curPrompt = timeline.curPrompt();
 		var willAdvance = forceAdvance || this.checkWillAdvance();
 
 		if (willAdvance) {
@@ -113,11 +115,11 @@ SceneNavigator.prototype = {
 	},
 
 	getNextIdxs: function() {
-		var newSectionIdx = sectionIdx;
-		var newPromptIdx = promptIdx;
-		var curSection = window['curLevel'].sections[sectionIdx];
-		if (promptIdx+1==curSection.prompts.length) {
-			if (sectionIdx+1 < window['curLevel'].sections.length) {
+		var newSectionIdx = timeline.sectionIdx;
+		var curSection = timeline.curSection();
+		var newPromptIdx = curSection.promptIdx;
+		if (promptIdx+1==curSection.sectionData.prompts.length) {
+			if (sectionIdx+1 < timeline.sections.length) {
 				newSectionIdx++;
 				newPromptIdx=0;
 			}
@@ -128,12 +130,13 @@ SceneNavigator.prototype = {
 	},
 
 	getPrevIdxs: function() {
-		var newSectionIdx = sectionIdx;
-		var newPromptIdx = promptIdx;
+		var newSectionIdx = timeline.sectionIdx;
+		var curSection = timeline.curSection();
+		var newPromptIdx = curSection.promptIdx;
 		if (promptIdx==0) {
 			if (sectionIdx>0) {
 				newSectionIdx--;
-				newPromptIdx=window['curLevel'].sections[newSectionIdx].prompts.length-1;
+				newPromptIdx = timeline.curSection().sectionData.prompts.length - 1;
 			}
 		} else {
 			newPromptIdx--;
@@ -155,9 +158,9 @@ SceneNavigator.prototype = {
 
 	checkWillAdvanceConditions: function(newSectionIdx, newPromptIdx){
 
-		var changingSection = sectionIdx!=newSectionIdx;
+		var changingSection = timeline.sectionIdx!=newSectionIdx;
 		var conditionsMet = 0;
-		var curPrompt = defaultTo({}, curLevel.sections[sectionIdx].prompts[promptIdx]);
+		var curPrompt = timeline.curPrompt();
 		var curFinished = defaultTo(false, curPrompt.finished);
 		
 		conditionsMet = Math.max(conditionsMet, curFinished);

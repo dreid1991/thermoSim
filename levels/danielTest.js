@@ -51,7 +51,7 @@ LevelData = {
 					},
 					{
 						type: 'DragWeights',
-						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 2}], pInit: 3}
+						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 2}], pInit: 3, cleanUpWith: 'prompt0'}
 					},
 					// {
 						// type: 'QArrowsAmmt',

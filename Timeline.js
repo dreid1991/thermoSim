@@ -8,6 +8,12 @@ function Timeline() {
 }
 
 Timeline.prototype = {
+	curSection: function() {
+		return this.sections[this.sectionIdx];
+	},
+	curPrompt:function() {
+		return this.sections[this.sectionIdx].curPrompt();
+	},
 	pushSection: function(sectionData) {
 		this.sections.push(new Timeline.Section(this, sectionData, this.buttonManagerBlank, this.dashRunBlank));
 	},
@@ -18,6 +24,9 @@ Timeline.prototype = {
 	show: function(sectionIdx, promptIdx, forceRefresh) {
 		var changingSection = this.sectionIdx != sectionIdx;
 		var changingPrompt = changingSection || promptIdx != this.sections[sectionIdx].promptIdx;
+		if (changingPrompt || forceRefresh) {
+			this.sections[sectionIdx].cleanUpPrompt();
+		}
 		if (changingSection || forceRefresh) {
 			this.clearCurrentSection();
 			this.sectionIdx = sectionIdx;
@@ -34,7 +43,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 //need to make clean up listeners still
 	this.timeline = timeline;
 	this.inited = false
-	this.promptIdx = 0;
+	this.promptIdx;
 	this.sectionData = sectionData;
 	this.level = new LevelInstance();
 	this.mainReadout = new Readout('mainReadout', 30, myCanvas.width-125, 25, '13pt calibri', Col(255,255,255), 'left', this.level);
@@ -64,6 +73,8 @@ Timeline.Section.prototype = {
 		this.pushToGlobal();
 		
 		if (!this.inited) { //worry about force reset later
+			this.promptIdx = 0;
+			this.level.makePromptCleanUpHolders(this.sectionData); //to be depracated
 			renderer.render(this.sectionData.sceneData);
 			if (this.sectionData.prompts[promptIdx].sceneData) {
 				renderer.render(this.sectionData.prompts[promptIdx].sceneData);
@@ -95,6 +106,15 @@ Timeline.Section.prototype = {
 		buttonManager.arrangeAllGroups();
 		buttonManager.setButtonWidth();		
 		
+	},
+	cleanUpPrompt: function() {
+		if (this.promptIdx !== undefined) {
+			var listeners = this.level['prompt' + this.promptIdx + 'CleanUpListeners'].listeners;
+			execListeners(listeners);
+		}
+	},
+	curPrompt: function() {
+		return this.sectionData.prompts[this.promptIdx];
 	},
 	replaceDiv: function(wrapper, current, clone) {
 		if (current.length) 

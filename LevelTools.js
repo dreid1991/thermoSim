@@ -626,10 +626,9 @@ LevelTools = {
 		makeListenerHolder(this, 'setup');
 	},
 	
-	makePromptCleanUpHolders: function(newSectionIdx){
-		var section = this.sections[newSectionIdx];
-		this.promptCleanUpHolders = new Array(section.prompts.length);
-		for (var promptIdx=0; promptIdx<section.prompts.length; promptIdx++) {
+	makePromptCleanUpHolders: function(sectionData){
+		this.promptCleanUpHolders = new Array(sectionData.prompts.length);
+		for (var promptIdx=0; promptIdx<sectionData.prompts.length; promptIdx++) {
 			this.promptCleanUpHolders[promptIdx] = makeListenerHolder(this, 'prompt' + promptIdx + 'CleanUp');
 		}
 	},
