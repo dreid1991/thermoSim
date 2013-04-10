@@ -72,6 +72,11 @@ $(function(){
 	phaseEquilGenerator = new PhaseEquilGenerator();
 	sceneNavigator = new SceneNavigator();
 	interpreter = new ExpressionInterpreter();
+	$('#resetExp').click(function(){sceneNavigator.refresh()});
+	$('#toSim').click(function(){sceneNavigator.nextPrompt()});
+	$('#toLastStep').click(function(){sceneNavigator.prevPrompt()});
+	$('#previous').click(function(){sceneNavigator.prevPrompt()});
+	$('#next').click(function(){sceneNavigator.nextPrompt()});	
 	timeline = new Timeline();
 	//buttonManager = new ButtonManager($('#buttonManager')); FE
 	//dataHandler = new DataHandler(); FE
@@ -84,11 +89,7 @@ $(function(){
 	LevelTools.addImgs(LevelData);
 	LevelTools.setDefaultPromptVals(LevelData);
 	LevelTools.showRunDivs();
-	$('#resetExp').click(function(){curLevel.reset()});
-	$('#toSim').click(function(){sceneNavigator.nextPrompt()});
-	$('#toLastStep').click(function(){sceneNavigator.prevPrompt()});
-	$('#previous').click(function(){sceneNavigator.prevPrompt()});
-	$('#next').click(function(){sceneNavigator.nextPrompt()});	
+
 	for (var sectionIdx=0; sectionIdx<LevelData.sections.length; sectionIdx++) {
 		timeline.pushSection(LevelData.sections[sectionIdx]);
 	}

@@ -79,6 +79,9 @@ SceneNavigator.prototype = {
 		// buttonManager.setButtonWidth();
 
 	},
+	refresh: function() {
+		timeline.refresh();
+	},
 	//make it clean prompts for fun
 	getpromptIdxsToClean: function(newSectionIdx, newPromptIdx) {
 				//attn please - this only works for going forwards

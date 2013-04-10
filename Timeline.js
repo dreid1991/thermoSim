@@ -37,6 +37,15 @@ Timeline.prototype = {
 		if (changingPrompt || forceRefresh) {
 			this.sections[sectionIdx].showPrompt(promptIdx);
 		}
+	},
+	refresh: function() {
+		var curPromptIdx = this.sections[this.sectionIdx].promptIdx;
+		var curSection = this.sections[this.sectionIdx];
+		var newSectionInstance = new Timeline.Section(this, curSection.sectionData, this.buttonManagerBlank, this.dashRunBlank);
+		curSection.cleanUpPrompt();
+		curSection.clear();
+		this.sections.splice(this.sectionIdx, 1, newSectionInstance);
+		this.show(this.sectionIdx, curPromptIdx, true);
 	}
 }
 
@@ -111,7 +120,7 @@ Timeline.Section.prototype = {
 		
 	},
 	cleanUpPrompt: function() {
-		if (this.promptIdx !== undefined) {
+		if (this.promptIdx !== undefined && this.inited) {
 			var listeners = this.level['prompt' + this.promptIdx + 'CleanUpListeners'].listeners;
 			execListeners(listeners);
 		}
@@ -144,13 +153,15 @@ Timeline.Section.prototype = {
 		}
 	},
 	clear: function() {
-		$('#prompt').html('');
-		$('#buttonManager').html('');
-		this.dashRunClone = $('#dashRun').clone(true);
-		$('#dashRun').remove();
-		for (var graphName in this.level.graphs) {
-			var graph = this.level.graphs[graphName];
-			graph.clearHTML();
+		if (this.inited) {
+			$('#prompt').html('');
+			$('#buttonManager').html('');
+			this.dashRunClone = $('#dashRun').clone(true);
+			$('#dashRun').remove();
+			for (var graphName in this.level.graphs) {
+				var graph = this.level.graphs[graphName];
+				graph.clearHTML();
+			}
 		}
 	}
 }

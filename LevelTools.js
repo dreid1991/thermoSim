@@ -97,7 +97,7 @@ LevelTools = {
 		text = defaultTo('',text);
 		
 		this.pause();
-		$('#dashRun').hide();
+		$('#dashRunWrapper').hide();
 		if (mode===true && !quiz) {
 			$('#dashCutScene').show();
 			this.cutSceneText(text);
@@ -244,6 +244,7 @@ LevelTools = {
 	},
 	showRunDivs: function() {
 		$('#intText').html('');
+		$('#dashRunWrapper').show();
 		$('#dashRun').show();
 		$('#dashOutro').hide();
 		$('#dashIntro').hide();
@@ -429,7 +430,7 @@ LevelTools = {
 	},
 	hideDash: function(){
 		$('#dashIntro').hide();
-		$('#dashRun').hide();
+		$('#dashRunWrapper').hide();
 		$('#dashOutro').hide();
 		$('#dashCutScene').hide();
 	},
@@ -632,11 +633,6 @@ LevelTools = {
 			this.promptCleanUpHolders[promptIdx] = makeListenerHolder(this, 'prompt' + promptIdx + 'CleanUp');
 		}
 	},
-	reset: function(){
-		sceneNavigator.showPrompt(sectionIdx, promptIdx, true);		
-	},
-
-
 	sectionConditions: function(){
 		//ALERT NOT BUBBLING UP CORRECTLY.  IT GETS TO THIS FUNCTION FROM STATE LISTENERS BUT IS NOT RETURNED
 		var didWin = 1;
