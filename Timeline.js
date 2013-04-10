@@ -22,19 +22,19 @@ Timeline.prototype = {
 		if (this.sectionIdx !== undefined) 
 			this.sections[this.sectionIdx].clear()
 	},
-	show: function(sectionIdx, promptIdx, forceRefresh) {
+	show: function(sectionIdx, promptIdx, refreshing) {
 		var changingSection = this.sectionIdx != sectionIdx;
 		var changingPrompt = changingSection || promptIdx != this.sections[sectionIdx].promptIdx;
-		if (changingPrompt || forceRefresh) {
+		if (changingPrompt || refreshing) {
 			this.sections[sectionIdx].cleanUpPrompt();
 		}
-		if (changingSection || forceRefresh) {
+		if (changingSection || refreshing) {
 			this.clearCurrentSection();
 			this.sectionIdx = sectionIdx;
 			//going to assume prompts are shown in sequential order for now
 			this.sections[sectionIdx].showSection(this.sectionIdx);
 		}
-		if (changingPrompt || forceRefresh) {
+		if (changingPrompt || refreshing) {
 			this.sections[sectionIdx].showPrompt(promptIdx);
 		}
 	},

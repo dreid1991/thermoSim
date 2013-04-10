@@ -90,8 +90,8 @@ $(function(){
 	LevelTools.setDefaultPromptVals(LevelData);
 	LevelTools.showRunDivs();
 
-	for (var sectionIdx=0; sectionIdx<LevelData.sections.length; sectionIdx++) {
-		timeline.pushSection(LevelData.sections[sectionIdx]);
+	for (var sectionIdx=0; sectionIdx<LevelData.mainSequence.length; sectionIdx++) {
+		timeline.pushSection(LevelData.mainSequence[sectionIdx]);
 	}
 	window.currentSetupType = 'section'; //to be depricated
 	timeline.show(0, 0);

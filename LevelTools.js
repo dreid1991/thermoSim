@@ -17,8 +17,8 @@ LevelTools = {
 
 	},
 	addImgs: function(levelData) {
-		for (var sectionIdx=0; sectionIdx<levelData.sections.length; sectionIdx++) {
-			var section = levelData.sections[sectionIdx];
+		for (var sectionIdx=0; sectionIdx<levelData.mainSequence.length; sectionIdx++) {
+			var section = levelData.mainSequence[sectionIdx];
 			if (!section.prompts) console.log('Section ' + sectionIdx + ' has no prompts!  Sections must have at least one prompt.');
 			for (var promptIdx=0; promptIdx<section.prompts.length; promptIdx++) {
 				var title = prompt.title;
@@ -46,8 +46,8 @@ LevelTools = {
 		}
 	},
 	setDefaultPromptVals: function(levelData){
-		for (var sectionIdxLocal=0; sectionIdxLocal<levelData.sections.length; sectionIdxLocal++) {
-			var section = levelData.sections[sectionIdxLocal];
+		for (var sectionIdxLocal=0; sectionIdxLocal<levelData.mainSequence.length; sectionIdxLocal++) {
+			var section = levelData.mainSequence[sectionIdxLocal];
 			for (var promptIdxLocal=0; promptIdxLocal<section.prompts.length; promptIdxLocal++) {
 				var prompt = section.prompts[promptIdxLocal];
 				prompt.finished = false;
@@ -65,8 +65,8 @@ LevelTools = {
 	},
 	addSceneDataTypes: function() {
 		//will still need to add type if you're rendering a function.  
-		for (var sIdx=0; sIdx<this.sections.length; sIdx++) {
-			var section = this.sections[sIdx];
+		for (var sIdx=0; sIdx<this.mainSequence.length; sIdx++) {
+			var section = this.mainSequence[sIdx];
 			if (section.sceneData) section.sceneData.type = 'section';
 			if (!section.prompts) console.log('Section ' + sIdx + ' has no prompts!  Sections must have at least one prompt.');
 			for (var pIdx=0; pIdx<section.prompts.length; pIdx++) {

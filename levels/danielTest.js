@@ -1,30 +1,15 @@
-// function LevelData(){
-	// //this.readouts = {};
-	// this.setStds();
-	// this.wallSpeed = 1;
 
-	// this.yMin = 30;
-	// this.yMax = 350;
-// }
-// _.extend(LevelData, 
-			// LevelTools, 
-
-
-R = 8.314;
+//R = 8.314; // does this need to be here?
 LevelData = {
 	levelTitle: 'Level template',
-	// init: function() {
-		// this.readout = new Readout('mainReadout', 30, myCanvas.width-130, 25, '13pt calibri', Col(255,255,255), 'left');
-		// $('#mainHeader').html('Level template');
-		// sceneNavigator.showPrompt(0, 0, true);
-	// },
+
 	spcDefs: [
 		//add antoine coefs, cvLiq, hvap
 		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
 		{spcName: 'ugly', m: 4, r: 1, col: Col(150, 100, 100), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'duckling', m: 4, r: 2, col: Col(255, 255, 255), cv: 2.5 * R, hF298: -30, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
 	],
-	sections: [
+	mainSequence: [
 
 		{
 			sceneData: {
@@ -77,7 +62,7 @@ LevelData = {
 				dataReadouts: [
 					{label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 					{label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},
-					{label: 'Coll/sec: ', expr: 'collisions()', units: '/sec', decPlaces: 0, handle: 'lala', readout: 'mainReadout'}
+					{label: 'Coll/sec: ', expr: 'collisions()', units: '', decPlaces: 0, handle: 'lala', readout: 'mainReadout'}
 					//{label: 'pInt: ', expr: 'pInt("wally")', units: 'bar', decPlaces: 1, handle: 'intintnit', readout: 'mainReadout'},
 					//{label: 'pExt: ', expr: 'pExt("wally")', units: 'bar', decPlaces: 1, handle: 'extextext', readout: 'mainReadout'}
 					//{label: 'RCT: ', expr: 'frac("wally", {spcName: "spc1", tag: "wally"}) + frac("wally", {spcName: "ugly", tag: "wally"})', sigFigs: 2, handle: 'coalseamgas', readout: 'mainReadout'}
@@ -157,7 +142,7 @@ LevelData = {
 						}
 					],
 					title: 'wooo!',
-					text: 'Hello, img("img/cvcp/eq1.gif") my lovelies!'
+					text: 'Woink.'
 				},
 				{
 					sceneData: undefined,
@@ -178,8 +163,8 @@ LevelData = {
 			},
 			prompts: [
 				{
-					title: 'foo',
-					text: 'pre text eval(get("theAnswer", "int") * 2) hello people faces'
+					title: 'section 1',
+					text: 'eval(get("theAnswer", "int") * 2) hello people faces'
 				}
 			
 			]
