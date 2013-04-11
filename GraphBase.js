@@ -356,30 +356,30 @@ GraphBase = {
 	setAxisBoundsX: function(oldRange){
 		var a = this.axisInit;
 		var b = this.valRange;	
-		if(!(a.x.min<b.x.min && a.x.max>b.x.max)){
-			if(oldRange){
-				if(!this.rangeIsSame(oldRange.x, this.valRange.x)){
+		if (!(a.x.min<b.x.min && a.x.max>b.x.max) && !this.axesFixed.x) {
+			if (oldRange) {
+				if (!this.rangeIsSame(oldRange.x, this.valRange.x)) {
 					this.getXBounds();
 				}
-			} else{
+			} else {
 				this.getXBounds();
 			}
-		} else{
+		} else {
 			this.setAxisToInit('x');
 		}
 	},
 	setAxisBoundsY: function(oldRange){
 		var a = this.axisInit;
 		var b = this.valRange;	
-		if(!(a.y.min<b.y.min && a.y.max>b.y.max)){
-			if(oldRange){
-				if(!this.rangeIsSame(oldRange.y, this.valRange.y)){
+		if (!(a.y.min<b.y.min && a.y.max>b.y.max) && !this.axesFixed.y) {
+			if (oldRange) {
+				if (!this.rangeIsSame(oldRange.y, this.valRange.y)) {
 					this.getYBounds();
 				}
-			} else{
+			} else {
 				this.getYBounds();
 			}
-		} else{
+		} else {
 			this.setAxisToInit('y');
 		}		
 	},

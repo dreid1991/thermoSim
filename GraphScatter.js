@@ -15,14 +15,10 @@ function GraphScatter(attrs) {
 	this.borderSpacing = 70;
 
 	this.legendWidth = 80;
-
+	this.axesFixed = {x: defaultTo(false, attrs.axesFixed.x), y: defaultTo(false, attrs.axesFixed.y)}
 	this.graphRangeFrac = new GraphBase.Range(this.borderSpacing/this.dims.dx, (this.dims.dx - (this.legendWidth+8))/this.dims.dx, 1-this.borderSpacing/this.dims.dy, .05);
 	this.makeReset = attrs.makeReset;
 	this.setNumGridLinesAndSpacing(attrs.numGridLines); 
-	// this.setNumGridLines(attrs.numGridLines);
-	// this.gridSpacing = P(0, 0);
-	// this.gridSpacing.x = this.getGridSpacing(this.numGridLines.x, this.graphRangeFrac.x, this.dims.dx);
-	// this.gridSpacing.y = this.getGridSpacing(this.numGridLines.x, this.graphRangeFrac.y, this.dims.dy);
 	this.axisInit = new GraphBase.Range(axisInit.x.min, axisInit.x.min + axisInit.x.step*(this.numGridLines.x-1), axisInit.y.min, axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1));
 
 

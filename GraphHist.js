@@ -12,12 +12,11 @@ function GraphHist(attrs){
 	this.borderSpacing = 70;
 	this.graphRangeFrac = new GraphBase.Range(this.borderSpacing/this.dims.dx, .95, 1-this.borderSpacing/this.dims.dy, .05);
 	//this.legendWidth = 80;
-	this.gridSpacing = 40;
 	this.numBins = 18;
-	this.setNumGridLines(attrs.numGridLines);
+	this.axesFixed = {x: defaultTo(false, attrs.axesFixed.x), y: defaultTo(false, attrs.axesFixed.y)}
+	this.setNumGridLinesAndSpacing(attrs.numGridLines); 
 	this.axisInit = new GraphBase.Range(axisInit.x.min, axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1), axisInit.y.min, axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1));
-	//this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1)}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1)}};
-	//this.axisRange = {x:{min:0, max:0}, y:{min:0, max:0}}; done in setStds
+
 	this.resetRanges();
 	this.stepSize = {x:0, y:0};
 	
