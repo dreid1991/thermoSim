@@ -62,6 +62,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	this.dotManager = new DotManager();
 	this.dataHandler = new DataHandler();
 	this.dataDisplayer = new DataDisplayer();
+	this.thresholdEnergySpcChanger = new ThresholdEnergySpcChanger(this.collide);
 	this.buttonManager = new ButtonManager('buttonManager');
 	this.spcs = {};
 	LevelTools.addSpcs(LevelData.spcDefs, this.spcs, this.dotManager);
@@ -144,6 +145,7 @@ Timeline.Section.prototype = {
 		window.sliderList = this.sliderList;
 		window.buttonManager = this.buttonManager;
 		window.dataHandler = this.dataHandler;
+		window.thresholdEnergySpcChanger = this.thresholdEnergySpcChanger;
 		
 	},
 	restoreGraphs: function() {

@@ -98,3 +98,26 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 	},
 
 })
+
+function ThresholdEnergyPair(attrs) {
+	if (spcs[attrs.spcNameLow] && spcs[attrs.spcNameHigh]) {
+		this.spcNameLow = attrs.spcNameLow;
+		this.spcNameHigh = attrs.spcNameHigh;
+		this.spcDefLow = spcs[this.spcNameLow];
+		this.spcDefHigh = spcs[this.spcNameHigh];
+		this.thresholdEnergy = attrs.thresholdEnergy;
+		this.addToChanger();
+		this.setupStd();
+	} else {
+		console.log('One of the species names in threshold energy pair is bad');
+		console.log('The names are ' + attrs.spcNameLow + ' and ' + attrs.spcNameHigh);
+	}
+}
+ThresholdEnergyPair.prototype = {
+	addToChanger: function() {
+		thresholdEnergySpcChanger.addPair(this);
+	},
+	remove: function() {
+		thresholdEnergySpcChanger.removePair(this);
+	}
+}

@@ -524,6 +524,13 @@ Dot.prototype = {
 		*/
 		return this;
 	},
+	setTempNoReference: function(temp) {
+		var dir = this.v.UV();
+		var vMag = Math.sqrt(2 * temp / (this.m * this.tConst));
+		this.v.dx = dir.dx * vMag;
+		this.v.dy = dir.dy * vMag;
+		this.internalPotential = temp * (this.cv - this.cvKinetic);
+	},
 	addEnergy: function(dE) {
 		var curTemp = this.temp();
 		tF = Math.max(1, curTemp + dE / this.cv)

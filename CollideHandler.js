@@ -81,7 +81,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 			gridLoop:
 				for (var x=Math.max(gridX-1, 0), xCeil=Math.min(gridX+1, xSpan)+1; x<xCeil; x++){
 					for (var y=Math.max(gridY-1, 0), yCeil=Math.min(gridY+1, ySpan)+1; y<yCeil; y++){
-						for (var neighborIdx=grid[x][y].length-1; neighborIdx>-1; neighborIdx--){
+						for (var neighborIdx=grid[x][y].length-1; neighborIdx>=0; neighborIdx--){
 							var neighbor = grid[x][y][neighborIdx];
 							var dx = dot.x-neighbor.x;
 							var dy = dot.y-neighbor.y;
@@ -179,6 +179,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 		this.breakUp(a, b, UVAB);
 		return true;
 	},
+	//HEY - threshold energy change and hit counting are NOT going to play nicely together.  Also, the breakUp function for thresholdEnergy is yoinked in enternally.  Sorry for the inconsistancy, I just wanted to have the spc changer be local
 	breakUp: function(a, b, UVAB){
 		var sumR = a.r+b.r;
 		var aXNew = b.x - UVAB.dx*sumR;
@@ -198,6 +199,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 		a.x = aXNew;
 		a.y = aYNew;
 	},
+
 	setup: function(spcs){
 		this.gridSize = 2*this.getMaxR(spcs);
 		this.numCols = Math.ceil(myCanvas.width/this.gridSize+1);
