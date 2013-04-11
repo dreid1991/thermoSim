@@ -2,6 +2,7 @@ function ThresholdEnergySpcChanger(collideHandler) {
 	this.collideHandler = collideHandler;
 	this.pairs = {}; //map of spcName to the threshold data, which is high/low
 	this.active = false;
+	this.standardBreakUp = this.collideHandler.breakUp;
 	this.breakUpFunc = this.makeBreakUpFunc();
 }
 // the pair object is not an attribute of the changer to make this fit into the object framework
@@ -15,15 +16,22 @@ ThresholdEnergySpcChanger.prototype = {
 		} else {
 			this.replaceCollideBreak
 		}
-			
+		if (!this.active) 
+			this.initBreakUp();
 	},
 	removePair: function(pairObj) {
 		delete this.pairs[pairObj.spcNameLow];
 		delete this.pairs[pairObj.spcNameHigh];
 		if (!countAttrs(this.pairs)) {
 			this.active = false;
-			this.restoreCollide();
+			this.restoreBreakUp();
 		}
+	},
+	initBreakUp: function() {
+		this.collideHandler.breakUp = this.breakUpFunc;
+	},
+	restoreBreakUp: function() {
+		this.collideHandler.breakUp = this.standardBreakUp;
 	},
 	makeBreakUpFunc: function() {
 		var self = this;
@@ -47,6 +55,7 @@ ThresholdEnergySpcChanger.prototype = {
 					dotManager.changeDotSpc([b], pairB.spcNameLow);
 				}			
 			}
+			self.standardBreakUp(a, b, UVAB);
 		}
 	}
 }

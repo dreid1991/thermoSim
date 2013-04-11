@@ -26,7 +26,7 @@ DotManager.prototype = {
 		}
 	},
 	changeDotSpc: function(dots, newSpcName) {//can send as list or single dot
-		if (!dots instanceof Array) dots = [dots];
+		if (!(dots instanceof Array)) dots = [dots];
 		var def = spcs[newSpcName];
 		for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
 			var dot = dots[dotIdx];
@@ -34,11 +34,6 @@ DotManager.prototype = {
 				dot.parentLists[parentListIdx].splice(dot.parentLists[parentListIdx].indexOf(dot), 1);
 			}
 			dot.parentLists = [];
-			var newLists = this.getRelevantLists(dot);
-			for (var newListIdx=0; newListIdx<newLists.length; newListIdx++) {
-				dot.parentLists.push(newLists[newListIdx]);
-				dot.parentLists[dot.parentLists.length - 1].push(dot);
-			}
 			var tempF = (dot.hF298 - (def.hF298 * 1000 / N) + dot.cv * (dot.temp() - 298.15)) / (def.cv / N) + 298.15;
 			dot.m = def.m;
 			dot.r = def.r;
@@ -53,6 +48,12 @@ DotManager.prototype = {
 			dot.cpLiq = def.cpLiq / N;
 			dot.spcVolLiq = def.spcVolLiq / N;
 			dot.setTempNoReference(tempF);
+			
+			var newLists = this.getRelevantLists(dot);
+			for (var newListIdx=0; newListIdx<newLists.length; newListIdx++) {
+				dot.parentLists.push(newLists[newListIdx]);
+				dot.parentLists[dot.parentLists.length - 1].push(dot);
+			}
 		}
 		
 		
