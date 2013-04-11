@@ -86,11 +86,11 @@ LevelTools = {
 		}
 	},
 	cutSceneStart: function(text, mode, quiz) {
-		addListener(window['curLevel'], 'prompt' + promptIdx + 'CleanUp', 'endCutScene',
-			function() {
-				this.cutSceneEnd()
-			},
-		this);
+		// addListener(window['curLevel'], 'prompt' + promptIdx + 'CleanUp', 'endCutScene',
+			// function() {
+				// this.cutSceneEnd()
+			// },
+		// this);
 		
 		this.inCutScene = true;
 		$('#intText').html('');

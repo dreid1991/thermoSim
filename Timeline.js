@@ -109,6 +109,7 @@ Timeline.Section.prototype = {
 			$('#prompt').html(defaultTo('', templater.div({innerHTML: interpedText})));
 			if (prompt.quiz) 
 				this.level.appendQuiz(prompt.quiz, $('#prompt'));
+			this.level.cutSceneEnd();
 		}
 		$('#baseHeader').html(prompt.title);
 		execListeners(this.level.setupListeners.listener);

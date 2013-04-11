@@ -168,16 +168,16 @@ WallMethods.collideMethods ={
 		// v.dy = -v.dy + 2*walls[wallIdx].v;
 		// this[wallIdx].forceInternal += dot.m*(perpV + v.dy);
 	// },
-	// cVAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
-		// var KEo = .5*dot.m*(dot.v.dx*dot.v.dx + dot.v.dy*dot.v.dy);
-		// var v = dot.v;
-		// v.dy = -v.dy + 2*walls[wallIdx].v;
-		// this[wallIdx].forceInternal += 2 * dot.m * perpV;
-		// var KEf = .5*dot.m*(dot.v.dx*dot.v.dx + dot.v.dy*dot.v.dy);
-		// var ratio = Math.sqrt((KEo + 2*(KEf - KEo)/3)/KEf);
-		// dot.v.dx*=ratio;
-		// dot.v.dy*=ratio;
-	// },
+	cVAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
+		var KEo = .5*dot.m*(dot.v.dx*dot.v.dx + dot.v.dy*dot.v.dy);
+		var v = dot.v;
+		v.dy = -v.dy + 2*walls[wallIdx].v;
+		this[wallIdx].forceInternal += 2 * dot.m * perpV;
+		var KEf = .5*dot.m*(dot.v.dx*dot.v.dx + dot.v.dy*dot.v.dy);
+		var ratio = Math.sqrt((KEo + 2*(KEf - KEo)/3)/KEf);
+		dot.v.dx*=ratio;
+		dot.v.dy*=ratio;
+	},
 	reflect: function(dot, wallUV, perpV){
 		dot.v.dx -= 2*wallUV.dy*perpV;
 		dot.v.dy += 2*wallUV.dx*perpV;
