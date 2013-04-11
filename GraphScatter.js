@@ -2,7 +2,7 @@ function GraphScatter(attrs) {
 	this.active = true;
 	this.handle = attrs.handle;
 	this.dims = this.getDims();
-	//this.dims = V(width, height);
+
 	this.xLabel = attrs.xLabel;
 	this.yLabel = attrs.yLabel;
 	var axisInit = attrs.axesInit || attrs.axisInit;//sorry
@@ -13,17 +13,18 @@ function GraphScatter(attrs) {
 	this.legendFont = this.legendFontSize+ 'pt calibri';
 	this.axisValFont = this.axisValFontSize+ 'pt calibri';
 	this.borderSpacing = 70;
-	//this.xStart = this.borderSpacing/this.dims.dx;
-	//this.yStart = 1-this.borderSpacing/this.dims.dy;
+
 	this.legendWidth = 80;
-	//this.xEnd = (this.dims.dx - (this.legendWidth+8))/this.dims.dx;
-	//this.yEnd = .05;
+
 	this.graphRangeFrac = new GraphBase.Range(this.borderSpacing/this.dims.dx, (this.dims.dx - (this.legendWidth+8))/this.dims.dx, 1-this.borderSpacing/this.dims.dy, .05);
-	this.gridSpacing = 40;
 	this.makeReset = attrs.makeReset;
-	this.setNumGridLines();
+	this.setNumGridLinesAndSpacing(attrs.numGridLines); 
+	// this.setNumGridLines(attrs.numGridLines);
+	// this.gridSpacing = P(0, 0);
+	// this.gridSpacing.x = this.getGridSpacing(this.numGridLines.x, this.graphRangeFrac.x, this.dims.dx);
+	// this.gridSpacing.y = this.getGridSpacing(this.numGridLines.x, this.graphRangeFrac.y, this.dims.dy);
 	this.axisInit = new GraphBase.Range(axisInit.x.min, axisInit.x.min + axisInit.x.step*(this.numGridLines.x-1), axisInit.y.min, axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1));
-	//this.axisRange = new this.Range(0, 0, 0, 0);
+
 
 	this.resetRanges(); //val & axis ranges set in here
 	this.stepSize = new GraphScatter.Coord(0, 0);
@@ -32,7 +33,7 @@ function GraphScatter(attrs) {
 	this.setStds();
 	this.layers.addLayer('flasher');
 	this.layers.addLayer('marker');
-	//this.makeCanvas(this.dims);
+
 	this.drawAllBG();
 	
 }

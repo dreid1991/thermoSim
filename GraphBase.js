@@ -37,10 +37,26 @@ GraphBase = {
 			return eval('(function() { return ' + expr + '})');
 		}
 	},
-	setNumGridLines: function(graph) {
-		var numGridLinesX = Math.ceil(this.dims.dx*(Math.abs(this.graphRangeFrac.x.max-this.graphRangeFrac.x.min))/this.gridSpacing);
-		var numGridLinesY = Math.ceil(this.dims.dy*(Math.abs(this.graphRangeFrac.y.max-this.graphRangeFrac.y.min))/this.gridSpacing);
-		this.numGridLines = {x:numGridLinesX, y:numGridLinesY};
+	setNumGridLinesAndSpacing: function(numGridLines) {
+		var numLinesX, numLinesY, spacingX, spacingY;
+		numGridLines = numGridLines ? numGridLines : {};
+		if (numGridLines.x) {
+			numLinesX = numGridLines.x;
+			spacingX = this.getGridSpacing(numLinesX, this.graphRangeFrac.x, this.dims.dx)
+		} else {
+			spacingX = 40;
+			numLinesX = Math.ceil(this.dims.dx*(Math.abs(this.graphRangeFrac.x.max-this.graphRangeFrac.x.min))/spacingX)
+		}
+		if (numGridLines.y) {
+			numLinesY = numGridLines.y;
+			spacingY = this.getGridSpacing(numLinesY, this.graphRangeFrac.y, this.dims.dy);
+		} else {
+			spacingY = 40;
+			numLinesY = Math.ceil(this.dims.dy*(Math.abs(this.graphRangeFrac.y.max-this.graphRangeFrac.y.min))/spacingY);
+		}
+		this.numGridLines = P(numLinesX, numLinesY);
+		this.gridSpacing = P(spacingX, spacingY);
+		
 	},
 	makeCanvas: function(dims, parentDiv, graphId, makeButton, buttonId) {
 		var self = this;
@@ -213,7 +229,7 @@ GraphBase = {
 	},
 	drawGrid: function(){
 		for (var xGridIdx=0; xGridIdx<this.numGridLines.x; xGridIdx++){
-			var x = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing * xGridIdx;
+			var x = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing.x * xGridIdx;
 			var yEnd = this.graphRangeFrac.y.max * this.dims.dy;
 			var yAxis = this.graphRangeFrac.y.min * this.dims.dy + this.hashMarkLen;
 			var p1 = P(x, yAxis);
@@ -221,7 +237,7 @@ GraphBase = {
 			draw.line(p1, p2, this.gridCol, this.graphDisplay);
 		}
 		for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
-			var y = this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing*yGridIdx;
+			var y = this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing.y *yGridIdx;
 			var xEnd = this.graphRangeFrac.x.min * this.dims.dx;
 			var xAxis = this.graphRangeFrac.x.max * this.dims.dx - this.hashMarkLen;
 			var p1 = P(xAxis, y);
@@ -326,6 +342,13 @@ GraphBase = {
 	rangeIsSame: function(a, b){
 		return !(a.max!=b.max || a.min!=b.min);
 	},
+	getGridSpacing: function(numGridLines, bounds, canvasDim) {
+		var graphDim = canvasDim * Math.abs(bounds.max - bounds.min);
+		var spacing = 20;
+		graphDim -= spacing;
+		return graphDim / (numGridLines - 1);
+		
+	},
 	setAxisBounds: function(oldRange){
 		this.setAxisBoundsX(oldRange);
 		this.setAxisBoundsY(oldRange);
@@ -420,13 +443,13 @@ GraphBase = {
 	},
 	drawAxisVals: function(){
 		for (var xGridIdx=0; xGridIdx<this.numGridLines.x; xGridIdx++){
-			var xPos = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing * xGridIdx;
+			var xPos = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing.x * xGridIdx;
 			var yPos = this.graphRangeFrac.y.min * this.dims.dy + this.hashMarkLen + 10 + this.axisValFontSize/2;
 			var text = String(round(this.axisRange.x.min + this.stepSize.x * xGridIdx, 1));
 			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', 0, this.graphDisplay);
 		}
 		for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
-			var yPos = this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing * yGridIdx;
+			var yPos = this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing.y * yGridIdx;
 			var xPos = this.graphRangeFrac.x.min * this.dims.dx - this.hashMarkLen - 10;
 			var text = String(round(this.axisRange.y.min + this.stepSize.y*yGridIdx,1));
 			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', -Math.PI/2, this.graphDisplay);
@@ -502,8 +525,8 @@ GraphBase = {
 	valToCoord: function(val){
 		var rangeX = this.axisRange.x.max - this.axisRange.x.min;
 		var rangeY = this.axisRange.y.max - this.axisRange.y.min;
-		var x = this.gridSpacing*(this.numGridLines.x-1)*(val.x-this.axisRange.x.min)/rangeX + this.graphRangeFrac.x.min*this.dims.dx;
-		var y = this.dims.dy - (this.gridSpacing*(this.numGridLines.y-1)*(val.y-this.axisRange.y.min)/rangeY + (1-this.graphRangeFrac.y.min)*this.dims.dy);
+		var x = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing.x * (this.numGridLines.x - 1) * (val.x - this.axisRange.x.min) / rangeX; 
+		var y = this.dims.dy - (this.gridSpacing.y * (this.numGridLines.y - 1) * (val.y - this.axisRange.y.min) / rangeY + (1 - this.graphRangeFrac.y.min) * this.dims.dy);
 		return P(x,y);
 	},
 

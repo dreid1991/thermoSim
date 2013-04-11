@@ -14,7 +14,7 @@ function GraphHist(attrs){
 	//this.legendWidth = 80;
 	this.gridSpacing = 40;
 	this.numBins = 18;
-	this.setNumGridLines();
+	this.setNumGridLines(attrs.numGridLines);
 	this.axisInit = new GraphBase.Range(axisInit.x.min, axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1), axisInit.y.min, axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1));
 	//this.axisInit = {x:{min:axisInit.x.min, max:axisInit.x.min+ axisInit.x.step*(this.numGridLines.x-1)}, y:{min:axisInit.y.min, max:axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1)}};
 	//this.axisRange = {x:{min:0, max:0}, y:{min:0, max:0}}; done in setStds
