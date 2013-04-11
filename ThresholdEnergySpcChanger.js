@@ -14,10 +14,11 @@ ThresholdEnergySpcChanger.prototype = {
 		if (this.pairs[nameLow] || this.pairs[nameHigh]) {
 			console.log('Trying to add another energy threshold to either ' + nameLow + ' or ' + nameHigh); 
 		} else {
-			this.replaceCollideBreak
+			this.pairs[pairObj.spcNameLow] = pairObj;
+			this.pairs[pairObj.spcNameHigh] = pairObj;
+			if (!this.active) this.addThresholdBreakUp();
 		}
-		if (!this.active) 
-			this.initBreakUp();
+		
 	},
 	removePair: function(pairObj) {
 		delete this.pairs[pairObj.spcNameLow];
@@ -27,7 +28,7 @@ ThresholdEnergySpcChanger.prototype = {
 			this.restoreBreakUp();
 		}
 	},
-	initBreakUp: function() {
+	addThresholdBreakUp: function() {
 		this.collideHandler.breakUp = this.breakUpFunc;
 	},
 	restoreBreakUp: function() {
@@ -41,18 +42,18 @@ ThresholdEnergySpcChanger.prototype = {
 			var pairB = self.pairs[b.spcName];
 			if (pairA) {
 				internalEnergy = a.internalEnergy();
-				if (pairA.thresholdEnergy >= internalEnergy && a.spcName == pairA.spcNameLow) {
-					dotManager.changeDotSpc([a], pairA.spcNameHigh);
-				} else if (pairA.thresholdEnergy < internalEnergy && a.spcName == pairA.spcNameHigh) {
+				if (pairA.thresholdEnergy >= internalEnergy && a.spcName == pairA.spcNameHigh) {
 					dotManager.changeDotSpc([a], pairA.spcNameLow);
+				} else if (pairA.thresholdEnergy < internalEnergy && a.spcName == pairA.spcNameLow) {
+					dotManager.changeDotSpc([a], pairA.spcNameHigh);
 				}
 			}
 			if (pairB) {
 				internalEnergy = b.internalEnergy();
-				if (pairB.thresholdEnergy >= internalEnergy && b.spcName == pairB.spcNameLow) {
-					dotManager.changeDotSpc([b], pairB.spcNameHigh);
-				} else if (pairB.thresholdEnergy < internalEnergy && b.spcName == pairB.spcNameHigh) {
+				if (pairB.thresholdEnergy >= internalEnergy && b.spcName == pairB.spcNameHigh) {
 					dotManager.changeDotSpc([b], pairB.spcNameLow);
+				} else if (pairB.thresholdEnergy < internalEnergy && b.spcName == pairB.spcNameLow) {
+					dotManager.changeDotSpc([b], pairB.spcNameHigh);
 				}			
 			}
 			self.standardBreakUp(a, b, UVAB);

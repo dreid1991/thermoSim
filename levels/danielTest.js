@@ -6,8 +6,8 @@ LevelData = {
 	spcDefs: [
 		//add antoine coefs, cvLiq, hvap
 		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
-		{spcName: 'ugly', m: 4, r: 1, col: Col(150, 100, 100), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
-		{spcName: 'uglier', m: 2, r: 1, col: Col(250, 200, 200), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
+		{spcName: 'ugly', m: 4, r: 2, col: Col(150, 100, 100), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
+		{spcName: 'uglier', m: 4, r: 2, col: Col(250, 250, 250), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'duckling', m: 4, r: 2, col: Col(255, 255, 255), cv: 2.5 * R, hF298: -30, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
 	],
 	mainSequence: [
@@ -19,7 +19,7 @@ LevelData = {
 				],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 1, temp: 350, returnTo: 'wally', tag: 'wally'}
+					{spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 600, temp: 10, returnTo: 'wally', tag: 'wally'}
 					//{spcName: 'duckling', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
@@ -35,6 +35,10 @@ LevelData = {
 						// type: 'DragWeights',
 						// attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 2}], pInit: 3}
 					// },
+					{
+						type: 'ThresholdEnergyPair',
+						attrs: {spcNameLow: 'ugly', spcNameHigh: 'uglier', thresholdEnergy: -7}
+					},
 					{
 						type: 'Heater',
 						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty'}
@@ -56,9 +60,9 @@ LevelData = {
 				],
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
-					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugly', tag: 'wally'}},
+					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'uglier', tag: 'wally'}}
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
-					{data: 'collisions'}
+					//{data: 'collisions'}
 				],
 				dataReadouts: [
 					// {label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
@@ -92,14 +96,14 @@ LevelData = {
 					// {handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				// ],
 				graphs: [
-					// {type: 'Scatter', handle: 'PvsVOne', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:1}, y:{min:0, step:1}}, 
+					{type: 'Scatter', handle: 'PvsVOne', xLabel: "temp (K)", yLabel: "frac hot spc", axesInit:{x:{min:0, step:80}, y:{min:0, step:.2}}, 
+						sets:[
+							{handle:'frac', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'temp("wally")', y: "frac('wally', {spcName: 'uglier', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
+						]
+					},
+					// {type: 'Scatter', handle: 'tempvstime', xLabel: "time", yLabel: "Temp (K)", axesInit:{x:{min:0, step:20}, y:{min:300, step:60}}, 
 						// sets:[
-							// {handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'vol("wally")', y: "pExt('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
-						// ]
-					// },
-					// {type: 'Scatter', handle: 'TvsV', xLabel: "Volume (L)", yLabel: "Temp (K)", axesInit:{x:{min:6, step:1}, y:{min:300, step:60}}, 
-						// sets:[
-							// {handle:'temp', label:'temp', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'vol("wally")', y: "temp('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
+							// {handle:'temp', label:'temp', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "temp('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5, showPts: false}
 						// ]
 					// }
 					 // {type: 'Hist', handle: 'PvsVOne', xLabel: "xLabel", yLabel: "yLabel", axesInit:{x:{min:0, step:50}, y:{min:0, step:10}}, 

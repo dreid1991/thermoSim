@@ -30,29 +30,31 @@ DotManager.prototype = {
 		var def = spcs[newSpcName];
 		for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
 			var dot = dots[dotIdx];
-			for (var parentListIdx=0; parentListIdx<dot.parentLists.length; parentListIdx++) {
-				dot.parentLists[parentListIdx].splice(dot.parentLists[parentListIdx].indexOf(dot), 1);
-			}
-			dot.parentLists = [];
 			var tempF = (dot.hF298 - (def.hF298 * 1000 / N) + dot.cv * (dot.temp() - 298.15)) / (def.cv / N) + 298.15;
-			dot.m = def.m;
-			dot.r = def.r;
-			dot.col = def.col;
-			dot.spcName = def.spcName;
-			dot.hF298 = def.hF298 * 1000 / N;
-			dot.hVap298 = def.hVap298 * 1000 / N;
-			dot.idNum = def.idNum;
-			dot.cvKinetic = 1.5 * R / N;
-			dot.cv = def.cv / N;
-			dot.cp = dot.cv + R;
-			dot.cpLiq = def.cpLiq / N;
-			dot.spcVolLiq = def.spcVolLiq / N;
-			dot.setTempNoReference(tempF);
-			
-			var newLists = this.getRelevantLists(dot);
-			for (var newListIdx=0; newListIdx<newLists.length; newListIdx++) {
-				dot.parentLists.push(newLists[newListIdx]);
-				dot.parentLists[dot.parentLists.length - 1].push(dot);
+			if (tempF > 0) {
+				for (var parentListIdx=0; parentListIdx<dot.parentLists.length; parentListIdx++) {
+					dot.parentLists[parentListIdx].splice(dot.parentLists[parentListIdx].indexOf(dot), 1);
+				}
+				dot.parentLists = [];
+				dot.m = def.m;
+				dot.r = def.r;
+				dot.col = def.col;
+				dot.spcName = def.spcName;
+				dot.hF298 = def.hF298 * 1000 / N;
+				dot.hVap298 = def.hVap298 * 1000 / N;
+				dot.idNum = def.idNum;
+				dot.cvKinetic = 1.5 * R / N;
+				dot.cv = def.cv / N;
+				dot.cp = dot.cv + R;
+				dot.cpLiq = def.cpLiq / N;
+				dot.spcVolLiq = def.spcVolLiq / N;
+				dot.setTempNoReference(tempF);
+				
+				var newLists = this.getRelevantLists(dot);
+				for (var newListIdx=0; newListIdx<newLists.length; newListIdx++) {
+					dot.parentLists.push(newLists[newListIdx]);
+					dot.parentLists[dot.parentLists.length - 1].push(dot);
+				}
 			}
 		}
 		
