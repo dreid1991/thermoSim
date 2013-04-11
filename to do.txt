@@ -26,3 +26,6 @@ many activity coeffs more flexible
 
 get rid of 'hit mode' (32 vs std) thing
 
+fix cVAdiabatic for variable heat capacity
+
+make isothermal init make option to hold at current temp
