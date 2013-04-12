@@ -3,7 +3,7 @@
 //COLLIDE METHODS
 //////////////////////////////////////////////////////////////////////////
 WallMethods.collideMethods ={
-//32 denotes converting from cv of R to 3/2 R
+//32 denotes converting from cv of R to 3/2 R NOT ANYMORE IT DOESN'T!
 	// cPAdiabaticDamped: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 		// /*
 		// To dampen wall speed , doing:
@@ -169,14 +169,14 @@ WallMethods.collideMethods ={
 		// this[wallIdx].forceInternal += dot.m*(perpV + v.dy);
 	// },
 	cVAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
-		var KEo = .5*dot.m*(dot.v.dx*dot.v.dx + dot.v.dy*dot.v.dy);
+		var tempO = dot.temp();
 		var v = dot.v;
-		v.dy = -v.dy + 2*walls[wallIdx].v;
+		var dotVyF = -v.dy + 2*walls[wallIdx].v;
 		this[wallIdx].forceInternal += 2 * dot.m * perpV;
-		var KEf = .5*dot.m*(dot.v.dx*dot.v.dx + dot.v.dy*dot.v.dy);
-		var ratio = Math.sqrt((KEo + 2*(KEf - KEo)/3)/KEf);
-		dot.v.dx*=ratio;
-		dot.v.dy*=ratio;
+		var tempUnAdj = tConst * .5 * dot.m * (dot.v.dx*dot.v.dx + dotVyF*dotVyF); //with cv = R
+		dot.setTemp(tempO + (tempUnAdj - tempO) * dot.cvKinetic / dot.cv);
+		if (dot.v.dy * dotVyF < 0) dot.v.dy *= -1;
+
 	},
 	reflect: function(dot, wallUV, perpV){
 		dot.v.dx -= 2*wallUV.dy*perpV;
