@@ -439,14 +439,7 @@ function addButton(id, text, divId){
 	addJQueryElems(button, 'button');
 	return button;
 }
-function removeButton(id) {
-	$('#'+id).remove();
-}
-function buttonBind(id, func){
-	var button = $('#'+id);
-	button.click(func);
-	return button;
-}
+
 
 function hideSliders(){
 	for (var handleIdx=0; handleIdx<sliderList.length; idIdx++){
@@ -469,6 +462,7 @@ function fillEmptyGraphDivs() {
 		fillEmptyGraphDiv($('#'+graphHolderDivs[divIdx]));
 	}
 }
+
 
 function fillEmptyGraphDiv(div) {
 	if ($(div).attr('filledWith')=="empty") {

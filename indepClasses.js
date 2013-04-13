@@ -1,4 +1,4 @@
-function Dot(x, y, v, spcName, tag, returnTo) {
+function Dot(x, y, v, spcName, tag, elemId, returnTo) {
 	var def = window.spcs[spcName]
 	this.x = x;
 	this.y = y;
@@ -6,6 +6,7 @@ function Dot(x, y, v, spcName, tag, returnTo) {
 	this.m = def.m;
 	this.r = def.r;
 	this.spcName = spcName;
+	this.elemId = elemId; //timeline element
 	this.idNum = def.idNum;
 	this.hF298 = def.hF298 * 1000 / N;
 	this.hVap298 = def.hVap298 * 1000 / N;
@@ -48,7 +49,7 @@ function Species(spcName, mass, radius, color, idNum, cv, hF298, hVap298, antoin
 	
 }
 Species.prototype = {
-	populate: function(pos, dims, count, temp, tag, returnTo, dotMgrLocal){
+	populate: function(pos, dims, count, temp, tag, elemId, returnTo, dotMgrLocal){
 		dotMgrLocal = dotMgrLocal || dotManager;
 		var x = pos.x;
 		var y = pos.y;
@@ -62,7 +63,7 @@ Species.prototype = {
 			var angle = Math.random()*2*Math.PI;
 			var vx = v * Math.cos(angle);
 			var vy = v * Math.sin(angle);
-			birthList.push(D(placeX, placeY, V(vx, vy), this.spcName, tag, returnTo));
+			birthList.push(D(placeX, placeY, V(vx, vy), this.spcName, tag, elemId, returnTo));
 		}
 		dotMgrLocal.add(birthList);
 		//dots gets set in dotManager
@@ -79,12 +80,12 @@ Species.prototype = {
 		var birthList = [];
 		for (var infoIdx=0; infoIdx<dotsInfo.length; infoIdx++) {
 			var info = dotsInfo[infoIdx];
-			birthList.push(D(info.pos.x, info.pos.y, info.dir.copy().mult(tempToV(this.m, info.temp)), this.spcName, info.tag, info.returnTo));
+			birthList.push(D(info.pos.x, info.pos.y, info.dir.copy().mult(tempToV(this.m, info.temp)), this.spcName, info.tag, undefined, info.returnTo));
 		}
 		dotManager.add(birthList);
 	},
 	placeSingle: function(pos, dir, temp, tag, returnTo) {
-		birth = D(pos.x, pos.y, dir.copy().mult(tempToV(this.m, temp)), this.spcName, tag, returnTo);
+		birth = D(pos.x, pos.y, dir.copy().mult(tempToV(this.m, temp)), this.spcName, tag, undefined, returnTo);
 		dotManager.add(birth);
 	},
 	enthalpy: function(temp) {
@@ -120,8 +121,8 @@ function Color(r, g, b){
 }
 
 
-function D(x, y, v, name, tag, returnTo){
-	return new Dot(x, y, v, name, tag, returnTo);
+function D(x, y, v, name, tag, elemId, returnTo){
+	return new Dot(x, y, v, name, tag, elemId, returnTo);
 }
 function P(x, y){
 	return new Point(x, y);

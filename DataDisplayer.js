@@ -38,6 +38,7 @@ DataDisplayer.prototype = {
 			})
 		
 		}
+		return dataEntry;
 	},
 
 	setDecPlaces: function(val, decPlaces) {

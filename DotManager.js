@@ -25,6 +25,12 @@ DotManager.prototype = {
 			dot.kill();
 		}
 	},
+	removeByAttr: function(attr, val) {
+		var dots = this.lists.ALLDOTS;
+		for (var i=dots.length; i>=0; i--) {
+			if (dots[i][attr] == val) dots[i].kill();
+		}
+	},
 	changeDotSpc: function(dots, newSpcName) {//can send as list or single dot
 		if (!(dots instanceof Array)) dots = [dots];
 		var def = spcs[newSpcName];

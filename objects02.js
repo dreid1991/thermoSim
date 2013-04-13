@@ -83,8 +83,8 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		//$('#'+this.buttonRemoveId).mouseup(function(){self.buttonRemoveUp()});
 	},
 	removeButtons: function(){
-		removeButton(this.buttonAddId);
-		removeButton(this.buttonRemoveId);
+		$('#' + this.buttonAddId).remove();
+		$('#' + this.buttonRemoveId).remove();
 	},
 	draw: function(){
 		this.drawCanvas.save();

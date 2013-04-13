@@ -170,7 +170,7 @@ LevelTools = {
 		var idButton = 'textAreaSubmit';
 		var submitHTML = templater.button({attrs:{id: [idButton]}, style: {'float': 'right'}, innerHTML: text});
 		$(appendTo).append(submitHTML);
-		buttonBind(idButton, onclickSubmit);
+		$('#' + idButton).click(onclickSubmit);
 		addJQueryElems($('#' + idButton), 'button');
 	},
 	submitAdvanceFunc: function() {
@@ -337,8 +337,7 @@ LevelTools = {
 			question.correct = button.isCorrect;
 			sceneNavigator.nextPrompt();		
 		}
-
-		buttonBind(id, onclickFunc);		
+		$('#' + id).click(onclickFunc);
 	},
 	/*
 	type: 'multChoice'

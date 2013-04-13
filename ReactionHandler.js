@@ -4,6 +4,7 @@ ReactionHandler = {
 		var rxn = new ReactionHandler.Reaction(attrs);
 		
 		this.initRxn(rxn);
+		return rxn;
 
 	},
 	disableRxn: function(handle) {
@@ -197,7 +198,7 @@ ReactionHandler = {
 				var angle = Math.random()*2*Math.PI;
 				var UV = V(Math.sin(angle), Math.cos(angle));
 				
-				spcDots.push(D(x+UV.dx*3, y+UV.dy*3, UV, name, a.tag, a.returnTo)); 
+				spcDots.push(D(x+UV.dx*3, y+UV.dy*3, UV, name, a.tag, a.elemId, a.returnTo)); 
 			}
 			newDotsBySpc.push(spcDots);
 			
@@ -280,6 +281,9 @@ ReactionHandler.Reaction.prototype = {
 		}
 		return count;
 	},
+	remove: function() {
+		this.parent.removeRxn(this.handle);
+	}
 	// convertToTemp: function(enthalpy) { //in kj
 		// return enthalpy / (cv * JtoKJ);
 	// }

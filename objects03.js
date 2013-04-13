@@ -83,7 +83,7 @@ _.extend(Clamps.prototype, objectFuncs, {
 	makeReleaseButton: function() {
 		var self = this;
 		addButton(this.buttonId, 'Release');
-		buttonBind(this.buttonId, function() {self.release()});
+		$('#' + this.buttonId).click(function() {self.release()});
 	},
 	removeReleaseButton: function() {
 		removeButton(this.buttonId);
