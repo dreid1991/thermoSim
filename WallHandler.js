@@ -248,15 +248,17 @@ WallMethods.main = {
 		emptyListener(curLevel, 'wallMove');
 	},
 	removeWall: function(wallInfo){
-		this.numWalls-=1;
-		this[wallInfo].recordAllStop();
-		this[wallInfo].cleanUp();
-		this[wallInfo].removeBorder();
-		this[wallInfo].removed = true;
-		var wallIdx = this.idxByInfo(wallInfo);
-		this[this[wallIdx].handle] = undefined;
-		this.splice(wallIdx, 1);
-		this.removeHandlers(wallIdx);
+		if (this[wallInfo]) {
+			this.numWalls-=1;
+			this[wallInfo].recordAllStop();
+			this[wallInfo].cleanUp();
+			this[wallInfo].removeBorder();
+			this[wallInfo].removed = true;
+			var wallIdx = this.idxByInfo(wallInfo);
+			this[this[wallIdx].handle] = undefined;
+			this.splice(wallIdx, 1);
+			this.removeHandlers(wallIdx);
+		}
 	},
 	removeHandlers: function(wallIdx){
 		for (var itemName in this){

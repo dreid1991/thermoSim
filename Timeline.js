@@ -49,8 +49,8 @@ Timeline.prototype = {
 		this.show(this.sectionIdx, curPromptIdx, true);
 	},
 	takeNumber: function() {
-		var id = this.id;
-		this.id ++;
+		var id = this.curId;
+		this.curId ++;
 		return id;
 	},
 }
@@ -62,7 +62,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	this.promptIdx;
 	this.sectionData = sectionData;
 	this.moments = [];
-	this.populateMoments(timeline, this.moments, this.sectionData);
+	this.populateMoments(timeline, timeline.elems, this.moments, this.sectionData);
 	//sort moments here
 	this.level = new LevelInstance();
 	this.mainReadout = new Readout('mainReadout', 30, myCanvas.width-125, 25, '13pt calibri', Col(255,255,255), 'left', this.level);
@@ -176,22 +176,69 @@ Timeline.Section.prototype = {
 			}
 		}
 	},
-	populateMoments: function(timeline, moments, sectionData) {
+	populateMoments: function(timeline, elems, moments, sectionData) {
 		moments.push(new Timeline.Moment(-2)); //dummy moment to start on
 
-		this.addSceneDataToMoments(timeline, moments, sectionData.sceneData, -1, undefined);
+		this.addSceneDataToMoments(timeline, elems, moments, sectionData.sceneData, -1, undefined);
 	},
-	applySceneDataToMoments: function(moments, sceneData, timestamp, cutScene) {
-		var moment = this.createMomentIfNotExists(moments, timestamp);
+	addSceneDataToMoments: function(timeline, elems, moments, sceneData, timestamp, cutScene) {
+		var moment = this.getOrCreateMoment(moments, timestamp);
 		if (sceneData) {
-			
+			this.applyWallsToMoments(timeline, moments, elems, sceneData.walls, 'walls', timestamp);
 		
 		}
 		if (cutScene) {
 			
 		}
-	}
-	createMomentIfNotExists: function(moments, timestamp) {
+	},
+	
+	applyWallsToMoments: function(timeline, moments, elems, wallData, eventClass, timestampHead) {
+		wallData = wallData ? wallData : [];
+		for (var i=0; i<wallData.length; i++) {
+			var id = timeline.takeNumber();
+			var wallDatum = wallData[i];
+			var cleanUpWith = wallDatum.cleanUpWith;
+			var timestampTail = this.getTimestampTail(timestampHead, cleanUpWith);
+			//to be called in context of the Event
+			var spawn = function() {
+				elems[this.id] = timeline.walls.addWall(wallDatum);
+			}
+			var remove = function() {
+				var wall = elems[this.id];
+				timeline.walls.removeWall(wall.handle);
+				elems[this.id] = undefined;
+			}
+			//type (?), spawn, remove, id, boundType
+			var eventHead = new Timeline.Event.Span(spawn, remove, id, 'head');
+			var eventTail = new Timeline.Event.Span(spawn, remove, id, 'tail');
+			var momentHead = this.getOrCreateMoment(moments, timestampHead);
+			var momentTail = this.getOrCreateMoment(moments, timestampTail);
+			
+			momentHead.events.walls.push(eventHead);
+			momentTail.events.walls.push(eventTail);
+			
+		}
+	},
+	getTimestampTail: function(timestamp, cleanUpWith) {
+		if (cleanUpWith == undefined) {
+			if (timestamp == -1) {
+				return Infinity;
+			} else {
+				return timestamp + .9;
+			}
+		
+		} else if (/section/i.test(cleanUpWith)) {
+			return Infinity;
+		} else if (/prompt/i.test(cleanUpWith)) {
+			var idxToCleanWith = /[0-9]+/.exec(cleanUpWith)[0];
+			if (idxToCleanWith !== '') {
+				return Number(idxToCleanWith) + .9;
+			} else {
+				console.log('Bad clean up with ' + cleanUpWith);
+			}
+		}
+	},
+	getOrCreateMoment: function(moments, timestamp) {
 		for (var i=0; i<moments.length; i++) {
 			if (moments[i].timestamp == timestamp) return moments[i];
 		}
@@ -229,8 +276,11 @@ Timeline.eventClassHolder = function() {
 }
 
 Timeline.Event = {
-	Span: function(  ) {
-	
+	Span: function(spawn, remove, id, boundType) {
+		this.spawn = spawn;
+		this.remove = remove;
+		this.id = id;
+		this.boundType = boundType;
 	},
 	Point: function(  ) {
 	
