@@ -108,11 +108,11 @@ Renderer.prototype = {
 		}
 	},
 	doCommands: function(cmmds) {
-		for (var cmmdIdx=0; cmmdIdx<cmmds.length; cmmdIdx++) {
-			var cmmd = cmmds[cmmdIdx];
-			typeof cmmd == 'string' ? eval(cmmd) : cmmd();
+		// for (var cmmdIdx=0; cmmdIdx<cmmds.length; cmmdIdx++) {
+			// var cmmd = cmmds[cmmdIdx];
+			// typeof cmmd == 'string' ? eval(cmmd) : cmmd();
 
-		}
+		// }
 	},
 	addButtonGrps: function(grps) {
 		for (var grpIdx=0; grpIdx<grps.length; grpIdx++) {

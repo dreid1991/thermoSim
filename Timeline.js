@@ -62,6 +62,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	this.sectionData = sectionData;
 	this.moments = [];
 	this.populateMoments(timeline, timeline.elems, this.moments, this.sectionData);
+	this.moments = _.sortBy(this.moments, function(moment) {return moment.timestamp});
 	//sort moments here
 	this.level = new LevelInstance();
 	this.mainReadout = new Readout('mainReadout', 30, myCanvas.width-125, 25, '13pt calibri', Col(255,255,255), 'left', this.level);
@@ -216,11 +217,13 @@ Timeline.Section.prototype = {
 		}
 	},
 	applyCmmdsToMoments: function(timeline, moments, timelineElems, cmmds, eventClass, timestampHead) {
+		cmmds = cmmds ? cmmds : [];
 		for (var i=0; i<cmmds.length; i++) {
 			var cmmd = cmmds[i];
-			if (cmmd instanceof 'string') {
-				//assume point
-			} else if (/span/i.test(cmmd.type)) {
+			if (typeof cmmd == 'string' || typeof cmmd == 'function') {
+				cmmd = {type: 'point', oneWay: true, spawn: cmmd}
+			}
+			if (/span/i.test(cmmd.type)) {
 				this.applyCmmdSpan(timeline, moments, timelineElems, cmmd, eventClass, timestampHead);
 			} else if (/point/i.test(cmmd.type)) {
 				this.applyCmmdPoint(timeline, moments, timelineElems, cmmd, eventClass, timestampHead);
@@ -248,7 +251,7 @@ Timeline.Section.prototype = {
 		var spawn = this.wrapCmmdSpawn(this.exprToFunc(cmmd.spawn));
 		var oneWay = defaultTo(true, cmmd.oneWay);
 		this.pushPoint(timeline, moments, timelineElems, id, cmmd, spawn, oneWay, eventClass, timestamp, 'cmmds');
-	}
+	},
 	applyCmmdOnce: function(timeline, moments, timelineElems, cmmd, eventClass, timestamp) {
 		var id = timeline.takeNumber();
 		var spawn = this.wrapCmmdSpawn(this.exprToFunc(cmmd.spawn));
@@ -267,8 +270,15 @@ Timeline.Section.prototype = {
 		}
 	},
 	exprToFunc: function(expr) {
-		//make this deal with list of expressions too
-		return typeof expr == 'function' ? expr : eval('(function(){ ' + expr + ';})');
+		if (typeof expr == 'function') {
+			return expr;
+		} else if (typeof expr == 'string') {
+			return eval('(function() { ' + expr + ';})');
+		} else if (expr instanceof 'Array') {
+			return eval('(function() { ' + expr.join(';') + ';})');
+		}
+		console.log('Bad command.  Must be function, evaluatable string, or array or evaluatable strings');
+		console.log(expr);
 	},
 	pushSpan: function(timeline, timelineElems, elemDatum, spawn, remove, id, moments, timestampHead, timestampTail, eventClass) {
 		var eventHead = new Timeline.Event.Span(timeline, timelineElems, elemDatum, spawn, remove, id, 'head');
@@ -474,7 +484,7 @@ Timeline.Event = {
 		this.id = id;
 		this.boundType = boundType;
 	},
-	Point: function(timeline, timeElems, elemDatum, spawn, id, oneWay) {
+	Point: function(timeline, timelineElems, elemDatum, spawn, id, oneWay) {
 		this.timeline = timeline;
 		this.timelineElems = timelineElems;
 		this.elemDatum = elemDatum;
