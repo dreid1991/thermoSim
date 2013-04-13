@@ -2,9 +2,10 @@ function Timeline() {
 	//cloning return jquery reference rather than deepcopy if done before page fully loaded
 	this.buttonManagerBlank = document.getElementById('buttonManager').outerHTML;
 	this.dashRunBlank = document.getElementById('dashRun').outerHTML;
-	
 	this.sections = [];
 	this.sectionIdx = undefined;
+	this.curId = 0;
+	this.elems = [];
 	
 }
 
@@ -46,7 +47,12 @@ Timeline.prototype = {
 		curSection.clear();
 		this.sections.splice(this.sectionIdx, 1, newSectionInstance);
 		this.show(this.sectionIdx, curPromptIdx, true);
-	}
+	},
+	takeNumber: function() {
+		var id = this.id;
+		this.id ++;
+		return id;
+	},
 }
 
 Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBlank) {
@@ -55,6 +61,9 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	this.inited = false
 	this.promptIdx;
 	this.sectionData = sectionData;
+	this.moments = [];
+	this.populateMoments(timeline, this.moments, this.sectionData);
+	//sort moments here
 	this.level = new LevelInstance();
 	this.mainReadout = new Readout('mainReadout', 30, myCanvas.width-125, 25, '13pt calibri', Col(255,255,255), 'left', this.level);
 	this.collide = new CollideHandler();
@@ -166,5 +175,67 @@ Timeline.Section.prototype = {
 				graph.clearHTML();
 			}
 		}
+	},
+	populateMoments: function(timeline, moments, sectionData) {
+		moments.push(new Timeline.Moment(-2)); //dummy moment to start on
+
+		this.addSceneDataToMoments(timeline, moments, sectionData.sceneData, -1, undefined);
+	},
+	applySceneDataToMoments: function(moments, sceneData, timestamp, cutScene) {
+		var moment = this.createMomentIfNotExists(moments, timestamp);
+		if (sceneData) {
+			
+		
+		}
+		if (cutScene) {
+			
+		}
+	}
+	createMomentIfNotExists: function(moments, timestamp) {
+		for (var i=0; i<moments.length; i++) {
+			if (moments[i].timestamp == timestamp) return moments[i];
+		}
+		moments.push(new Timeline.Moment(timestamp));
+		return moments[moments.length - 1];
+	},
+}
+// can have one-time, point, and span commands, I guess
+// point should only apply when going forward 
+Timeline.Moment = function(timestamp) {
+	this.timestamp = timestamp;
+	this.events = new Timeline.eventClassHolder();
+	//I *think* we can group it into walls, generics, cmmds, setups .
+	//setups may be able to be rolled into commands.  Setup will be like linking two objects that are added in an unknown order.  Not necessary for linking objects to walls since order is known.  
+		//A point command would probably work.
+	//Generics include any objects, listeners, graphs, etc.  Anything that will have spawn/remove.  If there are interdependancies, 
+}
+
+Timeline.Moment.prototype = {
+	addEvent: function(eventClass, event) {
+		if (this.events[eventClass]) {
+			this.events[eventClass].push(event);
+		} else {
+			console.log('Bad event class ' + eventClass);
+		}
+	},
+	
+}
+
+Timeline.eventClassHolder = function() {
+	this.walls = [];
+	this.objs = [];
+	this.cmmds = [];
+
+}
+
+Timeline.Event = {
+	Span: function(  ) {
+	
+	},
+	Point: function(  ) {
+	
+	},
+	Once: function( ) {
+	
 	}
 }
