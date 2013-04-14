@@ -1671,17 +1671,15 @@ _.extend(Heater.prototype, objectFuncs, {
 	},
 	setupLiquidHeat: function(liquidData) {
 		var self = this;
-		addListener(curLevel, 'setup', 'addLiq' + this.handle, function() {
+		timeline.addEvent('now', 'now', 'setup', 'cmmds', function() {
 			var handle = liquidData.handle;
 			var type = 'Liquid';
 			var liquid = curLevel.selectObj(type, handle);
 			if (!liquid) console.log('Bad liquid data for heater ' + this.handle + '.  Handle ' + handle);
 			var liqWall = liquid.getWallLiq();
 			liqWall.recordQ();
-			self.liquid = liquid;
-		});
-		
-		
+			self.liquid = liquid;		
+		})
 	},
 	remove: function(){
 		this.removeSlider();

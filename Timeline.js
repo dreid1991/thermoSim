@@ -40,6 +40,11 @@ Timeline.prototype = {
 			this.sections[sectionIdx].showPrompt(promptIdx);
 		}
 	},
+	addOnce: function(sectionIdx, promptIdx, when, eventClass, func) {
+		sectionIdx = sectionIdx == 'now' ? this.sectionIdx : sectionIdx;
+		this.sections[sectionIdx].addOnce(promptIdx, when, eventClass, func);
+		
+	},
 	refresh: function() {
 		var curPromptIdx = this.sections[this.sectionIdx].promptIdx;
 		var curSection = this.sections[this.sectionIdx];
@@ -176,6 +181,14 @@ Timeline.Section.prototype = {
 			}
 		}
 	},
+	addOnce: function(promptIdx, when, eventClass, func) { //public func.  Test settings a heater's liquid
+		promptIdx = prompt == 'now' ? this.promptIdx : promptIdx;
+		var id = this.timeline.takeNumber();
+		var timestamp = this.getTimestamp(promptIdx, 'setup');
+		var cmmd = {type: 'once', spawn: func}
+		this.pushOnce(this.timeline, this.moments, this.timeline.elems, id, cmmd, func, eventClass, timestamp);
+		
+	},
 	populateMoments: function(timeline, elems, moments, sectionData) {
 		moments.push(new Timeline.Moment(-2)); //dummy moment to start on
 
@@ -202,14 +215,13 @@ Timeline.Section.prototype = {
 			
 		}
 	},
-	//HEY - generalize apply by making it take event class and like 'spawn' class, so the function branches at the point where it makes the add and remove functions
 	applySpanToMoments: function(timeline, moments, timelineElems, elemData, eventClass, timestampHead, spawnFunc, removeFunc) {
 		elemData = elemData ? elemData : [];
 		for (var i=0; i<elemData.length; i++) {
 			var id = timeline.takeNumber();
 			var elemDatum = elemData[i];
 			var cleanUpWith = elemDatum.cleanUpWith;
-			var timestampTail = this.getTimestampTail(timestampHead, cleanUpWith);
+			var timestampTail = this.getTimestamp(cleanUpWith || timestampHead, 'tail');
 
 			this.pushSpan(timeline, timelineElems, elemDatum, spawnFunc, removeFunc, id, moments, timestampHead, timestampTail, eventClass);
 
@@ -242,7 +254,7 @@ Timeline.Section.prototype = {
 		var spawn = this.wrapCmmdSpawn(this.exprToFunc(cmmd.spawn));
 		var remove = this.wrapCmmdRemove(this.exprToFunc(cmmd.remove));
 		var cleanUpWith = cmmd.cleanUpWith;
-		var timestampTail = this.getTimestampTail(timestampHead, cleanUpWith);
+		var timestampTail = this.getTimestamp(cleanUpWith || timestampHead, 'tail');
 		
 		this.pushSpan(timeline, timelineElems, cmmd, spawn, remove, id, moments, timestampHead, timestampTail, 'cmmds');
 	},
@@ -250,12 +262,12 @@ Timeline.Section.prototype = {
 		var id = timeline.takeNumber();
 		var spawn = this.wrapCmmdSpawn(this.exprToFunc(cmmd.spawn));
 		var oneWay = defaultTo(true, cmmd.oneWay);
-		this.pushPoint(timeline, moments, timelineElems, id, cmmd, spawn, oneWay, eventClass, timestamp, 'cmmds');
+		this.pushPoint(timeline, moments, timelineElems, id, cmmd, spawn, oneWay, eventClass, timestamp);
 	},
 	applyCmmdOnce: function(timeline, moments, timelineElems, cmmd, eventClass, timestamp) {
 		var id = timeline.takeNumber();
 		var spawn = this.wrapCmmdSpawn(this.exprToFunc(cmmd.spawn));
-		this.pushOnce(timeline, moments, timelineElems, id, cmmd, spawn, eventClass, timestamp, 'cmmds');
+		this.pushOnce(timeline, moments, timelineElems, id, cmmd, spawn, eventClass, timestamp);
 	},
 	wrapCmmdSpawn: function(spawnFunc) {
 		return function(timeline, elems, id) {
@@ -290,34 +302,50 @@ Timeline.Section.prototype = {
 		momentTail.events[eventClass].push(eventTail);		
 	},
 
-	pushPoint: function(timeline, moments, timelineElems, id, elemDatum, spawn, oneWay, eventClass, timestamp, eventClass) {
+	pushPoint: function(timeline, moments, timelineElems, id, elemDatum, spawn, oneWay, eventClass, timestamp) {
 		var event = new Timeline.Event.Point(timeline, timelineElems, elemDatum, spawn, id, oneWay);
 		var moment = this.getOrCreateMoment(moments, timestamp);
 		moment.events[eventClass].push(event);
 	},
-	pushOnce: function(timeline, moment, timelineElems, id, elemDatum, spawn, eventClass, timestamp, eventClass) {
+	pushOnce: function(timeline, moment, timelineElems, id, elemDatum, spawn, eventClass, timestamp) {
 		var event = new Timeline.Event.Once(timeline, timelineElems, elemDatum, spawn, id);
 		var moment = this.getOrCreateMoment(moments, timestamp);
 		moment.events[eventClass].push(event);
 	},
-	getTimestampTail: function(timestamp, cleanUpWith) {
-		if (cleanUpWith == undefined) {
-			if (timestamp == -1) {
-				return Infinity;
-			} else {
-				return timestamp + .9;
-			}
-		
-		} else if (/section/i.test(cleanUpWith)) {
-			return Infinity;
-		} else if (/prompt/i.test(cleanUpWith)) {
-			var idxToCleanWith = /[0-9]+/.exec(cleanUpWith)[0];
-			if (idxToCleanWith !== '') {
-				return Number(idxToCleanWith) + .9;
-			} else {
-				console.log('Bad clean up with ' + cleanUpWith);
-			}
+	getTimestamp: function(time, when) {
+		var timeAdj;
+		if (/tail/i.test(when)) {
+			timeAdj = .9;
+		} else if (/setup/i.test(when)) {
+			timeAdj = .1;
+		} else {
+			timeAdj = 0;
 		}
+		
+		var idx = this.parseIntegerTimeIdx(time);
+		
+		if (idx == -1 && when == 'tail') {
+			return Infinity;
+		} else {
+			return idx + timeAdj;
+		
+		}
+	},
+	parseIntegerTimeIdx: function(time) {
+		if (typeof time == 'string') {
+			if (/section/i.test(time)) {
+				return -1;
+			} else {
+				var str = /[0-9]+/.exec(time);
+				if (str !== '') {
+					return Number(str);
+				} else {
+					console.log('Bad time code: ' + time);
+				}
+			}
+		} else {
+			return time;
+		}	
 	},
 	getOrCreateMoment: function(moments, timestamp) {
 		for (var i=0; i<moments.length; i++) {
