@@ -55,8 +55,8 @@ $(function(){
 	borderCol = Col(155,155,155);
 	pxToMS = 19.33821;
 	auxHolderDivs = ['aux1', 'aux2'];
-	promptIdx = 0;
-	sectionIdx = 0;
+	promptIdx = 0; //get rid of this as soon as possible
+	sectionIdx = 0; //and this
 	//sliderList = [];  FE
 	//spcs = {};  FE
 	stored = {};

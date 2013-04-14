@@ -1,5 +1,4 @@
-//should make a 'spew timeline' function that prints out everything.  Would be le handy for debugging
-//will want to step up to x.1 to include setup.  If x.1 doesn't exist, it will stop at x
+//need to interp all this stuff before rendering, yo
 function Timeline() {
 	//cloning return jquery reference rather than deepcopy if done before page fully loaded
 	this.buttonManagerBlank = document.getElementById('buttonManager').outerHTML;
@@ -114,8 +113,9 @@ Timeline.Section.prototype = {
 	},
 	showPrompt: function(promptIdx) {
 		//should all be rolled into moments now
-		var dest = this.getTimestamp(promptIdx, 'headHTML');
-		this.stepTo(dest);
+		var destTime = this.getTimestamp(promptIdx, 'headHTML');
+		this.promptIdx = promptIdx;
+		this.stepTo(destTime);
 		// this.promptIdx = promptIdx;
 		// var prompt = this.sectionData.prompts[promptIdx];
 		// if (prompt.sceneData)
@@ -146,6 +146,7 @@ Timeline.Section.prototype = {
 			var curMom = this.momentAt(this.time);
 			curMom.fire(this.time, dest);
 			while (dest != this.time) {
+			//nah dawg, make it get a path to take
 				var nextMom = this.nextMoment(this.time, dest);
 				if (!nextMom) break;
 				nextMom.fire(this.time, nextMom.timestamp);
@@ -236,22 +237,22 @@ Timeline.Section.prototype = {
 		for (var promptIdx=0; promptIdx<prompts.length; promptIdx++) {
 			var prompt = prompts[promptIdx];
 			var timestampHead = this.getTimestamp(promptIdx, 'headHTML');
-			this.populatePromptHTML(prompt, timestampHead, timeline, elems, moments);
+			this.populatePromptHTML(prompt, timestampHead, timeline, elems, moments, promptIdx);
 		}
 	},
-	populatePromptHTML: function(prompt, timestampHead, timeline, elems, moments) {
+	populatePromptHTML: function(prompt, timestampHead, timeline, elems, moments, promptIdx) {
 		var section = this;
 		var timestampTail, id, spawnFunc, removeFunc, cmmd;
 		if (prompt.cutScene) {
 			id = timeline.takeNumber();
 			spawnFunc = function() {
 				var interpedText = interpreter.interp(prompt.text);
-				$('#nextPrevDiv').hide();
+				//$('#nextPrevDiv').hide();
 				section.level.cutSceneStart(interpedText, prompt.curScene, prompt.quiz)
 			};
 			removeFunc = function() {
 				section.level.cutSceneEnd()
-				$('#nextPrevDiv').show();
+				//$('#nextPrevDiv').show();
 			};
 			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
@@ -271,7 +272,14 @@ Timeline.Section.prototype = {
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
 			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');
 		}
-		
+		if (prompt.quiz) { //this may need work.  Can be overruled by setVals quiz, which is probably fine, but just check over it sometime
+			id = timeline.takeNumber();
+			spawnFunc = function() {$('#nextPrevDiv').hide();};
+			removeFunc = function() {$('#nextPrevDiv').show();};
+			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
+			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
+			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');
+		}
 		if (prompt.title) {
 			id = timeline.takeNumber();
 			spawnFunc = function() {$('#baseHeader').html(prompt.title)};
@@ -448,9 +456,11 @@ Timeline.stateFuncs = {
 	dots: {
 		spawn: function(section, elems, id, datum) {
 			section.spcs[datum.spcName].populate(datum.pos, datum.dims, datum.count, datum.temp, datum.tag, id, datum.returnTo);
+			elems[id] = 'dots';
 		},
 		remove: function(section, elems, id) {
 			section.dotManager.removeByAttr('elemId', id);
+			elems[id] = undefined;
 		}
 	},
 	objs: {
@@ -630,7 +640,7 @@ Timeline.Moment.prototype = {
 		} else if (span.boundType == 'tail') {
 			if (to > from) {
 				span.remove(span.section, span.timelineElems, span.id);
-			} else if (from < to) {
+			} else if (from > to) {
 				span.spawn(span.section, span.timelineElems, span.id, span.elemDatum);
 			}
 		}

@@ -79,7 +79,7 @@ ButtonManager.prototype = {
 		var max = 100;
 		for (var i=0; i<buttons.length; i++) {
 			var button = buttons[i];
-			max = Math.max(max, $(button).width());
+			max = Math.max(max, $(button).outerWidth());
 		}
 		for (var i=0; i<buttons.length; i++) {
 			var button = buttons[i];
@@ -124,7 +124,7 @@ ButtonManager.prototype = {
 	},
 	arrangeObjs: function(unarranged) {
 		var assignments = [];
-		var sortedObjs = this.sortObjs(unarranged).concat();
+		var sortedObjs = this.sortObjs(unarranged.concat());
 		var assignedPrefs = this.slicePrefs(sortedObjs);
 		var unassignedPrefs = this.sliceNoPrefs(sortedObjs);
 		for (var i=0; i<assignedPrefs.length; i++) {
