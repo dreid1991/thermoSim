@@ -64,6 +64,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	this.timeline = timeline;
 	this.inited = false
 	this.promptIdx;
+	this.time = -2;
 	this.sectionData = sectionData;
 	this.moments = [];
 	this.populateMoments(timeline, timeline.elems, this.moments, this.sectionData);
@@ -135,6 +136,27 @@ Timeline.Section.prototype = {
 		buttonManager.setButtonWidth();	
 		
 	},
+	stepToTime: function(dest) {
+		var moments = this.moments;
+		while (this.time != dest) {
+			var moment = this.nextMoment(this.time, dest);
+			this.fireMoment(moment);
+		}
+	},
+	nextMoment: function(cur, dest) {
+		var curMoment = this.momentAt(cur);
+		var idx = this.moments.indexOf(curMoment);
+		dest < cur ? idx -- : idx ++;
+		return this.moments[idx];
+	},
+	momentAt: function(time) {
+		for (var i=0; i<this.moments.length; i++) {
+			if (this.moments[i].timestamp == time) return this.moments[i];
+		}
+	},
+	fireMoment: function() {
+		
+	},
 	cleanUpPrompt: function() {
 		if (this.promptIdx !== undefined && this.inited) {
 			var listeners = this.level['prompt' + this.promptIdx + 'CleanUpListeners'].listeners;
@@ -187,7 +209,6 @@ Timeline.Section.prototype = {
 		var timestamp = this.getTimestamp(promptIdx, 'setup');
 		var cmmd = {type: 'once', spawn: func}
 		this.pushOnce(this.timeline, this.moments, this.timeline.elems, id, cmmd, func, eventClass, timestamp);
-		
 	},
 	populateMoments: function(timeline, elems, moments, sectionData) {
 		moments.push(new Timeline.Moment(-2)); //dummy moment to start on
@@ -293,23 +314,23 @@ Timeline.Section.prototype = {
 		console.log(expr);
 	},
 	pushSpan: function(timeline, timelineElems, elemDatum, spawn, remove, id, moments, timestampHead, timestampTail, eventClass) {
-		var eventHead = new Timeline.Event.Span(timeline, timelineElems, elemDatum, spawn, remove, id, 'head');
-		var eventTail = new Timeline.Event.Span(timeline, timelineElems, elemDatum, spawn, remove, id, 'tail');
 		var momentHead = this.getOrCreateMoment(moments, timestampHead);
 		var momentTail = this.getOrCreateMoment(moments, timestampTail);
+		var eventHead = new Timeline.Event.Span(timeline, timelineElems, elemDatum, spawn, remove, id, 'head', momentHead);
+		var eventTail = new Timeline.Event.Span(timeline, timelineElems, elemDatum, spawn, remove, id, 'tail', momentTail);
 		
 		momentHead.events[eventClass].push(eventHead);
 		momentTail.events[eventClass].push(eventTail);		
 	},
 
 	pushPoint: function(timeline, moments, timelineElems, id, elemDatum, spawn, oneWay, eventClass, timestamp) {
-		var event = new Timeline.Event.Point(timeline, timelineElems, elemDatum, spawn, id, oneWay);
 		var moment = this.getOrCreateMoment(moments, timestamp);
+		var event = new Timeline.Event.Point(timeline, timelineElems, elemDatum, spawn, id, oneWay, moment);
 		moment.events[eventClass].push(event);
 	},
 	pushOnce: function(timeline, moment, timelineElems, id, elemDatum, spawn, eventClass, timestamp) {
-		var event = new Timeline.Event.Once(timeline, timelineElems, elemDatum, spawn, id);
 		var moment = this.getOrCreateMoment(moments, timestamp);
+		var event = new Timeline.Event.Once(timeline, timelineElems, elemDatum, spawn, id, moment);
 		moment.events[eventClass].push(event);
 	},
 	getTimestamp: function(time, when) {
@@ -503,7 +524,7 @@ Timeline.EventClassHolder = function() {
 }
 
 Timeline.Event = {
-	Span: function(timeline, timelineElems, elemDatum, spawn, remove, id, boundType) {
+	Span: function(timeline, timelineElems, elemDatum, spawn, remove, id, boundType, moment) {
 		this.timeline = timeline;
 		this.timelineElems = timelineElems;
 		this.elemDatum = elemDatum;
@@ -511,21 +532,50 @@ Timeline.Event = {
 		this.remove = remove;
 		this.id = id;
 		this.boundType = boundType;
+		this.moment = moment;
 	},
-	Point: function(timeline, timelineElems, elemDatum, spawn, id, oneWay) {
+	Point: function(timeline, timelineElems, elemDatum, spawn, id, oneWay, moment) {
 		this.timeline = timeline;
 		this.timelineElems = timelineElems;
 		this.elemDatum = elemDatum;
 		this.spawn = spawn;
 		this.id = id;
 		this.oneWay = oneWay;
+		this.moment = moment;
 	},
-	Once: function(timeline, timeElems, elemDatum, spawn, id) {
+	Once: function(timeline, timeElems, elemDatum, spawn, id, moment) {
 		this.timeline = timeline;
 		this.timelineElems = timelineElems;
 		this.elemDatum = elemDatum;
 		this.spawn = spawn;
 		this.id = id;
 		this.fired = false;
+		this.moment = moment;
+	}
+}
+
+Timeline.Event.Span.prototype = {
+	fire: function(timeFrom) {
+		if ((this.boundType == 'head' && timeFrom < this.moment.timestamp) || (this.boundType == 'tail' && timeFrom > this.moment.timestamp)) {
+			this.spawn(this.timeline, this.elems, this.id, this.elemDatum);
+		} else if ((this.boundType == 'tail' && timeFrom < this.moment.timestamp) || (this.boundType == 'head' && timeFrom > this.moment.timestamp)) {
+			this.remove(this.timeline, this.elems, this.id);
+		}
+	}
+}
+
+Timeline.Event.Point.prototype = {
+	fire: function(timeFrom) {
+		if (!(timeFrom > this.moment.timestamp && this.oneWay)) {
+			this.spawn(this.timeline, this.elems, this.id, this.elemDatum);
+		}
+	}
+}
+
+Timeline.Event.Once.prototype = {
+	fire: function(timeFrom) {
+		if (!this.fired) {
+			this.spawn(this.timeline, this.elems, this.id, this.elemDatum);
+		}
 	}
 }
