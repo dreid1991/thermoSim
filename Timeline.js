@@ -1,4 +1,5 @@
 //should make a 'spew timeline' function that prints out everything.  Would be le handy for debugging
+//will want to step up to x.1 to include setup.  If x.1 doesn't exist, it will stop at x
 function Timeline() {
 	//cloning return jquery reference rather than deepcopy if done before page fully loaded
 	this.buttonManagerBlank = document.getElementById('buttonManager').outerHTML;
@@ -147,7 +148,11 @@ Timeline.Section.prototype = {
 		var curMoment = this.momentAt(cur);
 		var idx = this.moments.indexOf(curMoment);
 		dest < cur ? idx -- : idx ++;
-		return this.moments[idx];
+		var nextMoment = this.moments[idx];
+		if (nextMoment && Math.abs(nextMoment.timestamp - cur) <= Math.abs(dest - cur)) {
+			return this.moments[idx];
+		}
+		return undefined;
 	},
 	momentAt: function(time) {
 		for (var i=0; i<this.moments.length; i++) {
@@ -214,8 +219,63 @@ Timeline.Section.prototype = {
 		moments.push(new Timeline.Moment(-2)); //dummy moment to start on
 
 		this.addSceneDataToMoments(timeline, elems, moments, sectionData.sceneData, -1, undefined);
+		var prompts = sectionData.prompts;
+		for (var promptIdx=0; promptIdx<prompts.length; promptIdx++) {
+			if (prompts[promptIdx].sceneData) this.addSceneDataToMoments(timeline, elems, moments, prompts[promptIdx].sceneData, promptIdx);
+		}
+		this.populateHTMLMoments(timeline, elems, moments, sectionData);
 	},
-	addSceneDataToMoments: function(timeline, elems, moments, sceneData, timestamp, cutScene) {
+	populateHTMLMoments: function(timeline, elems, moments, sectionData) {
+		var prompts = sectionData.prompts;
+		for (var promptIdx=0; promptIdx<prompts.length; promptIdx++) {
+			var prompt = prompts[promptIdx];
+			var timestampHead = this.getTimestamp(promptIdx, 'headHTML');
+			this.populatePromptHTML(prompt, timestampHead, timeline, elems, moments);
+		}
+	},
+	populatePromptHTML: function(prompt, timestampHead, timeline, elems, moments) {
+		var timestampTail, id, spawnFunc, removeFunc, cmmd;
+		if (prompt.cutScene) {
+			id = timeline.takeNumber();
+			spawnFunc = function() {
+				var interpedText = interpreter.interp(prompt.text);
+				$('#nextPrevDiv').hide();
+				timeline.level.cutSceneStart(interpedText, prompt.curScene, prompt.quiz)
+			};
+			removeFunc = function() {
+				timeline.level.cutSceneEnd()
+				$('#nextPrevDiv').show();
+			};
+			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
+			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
+			this.pushSpan(timeline, elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');
+		} else {
+			id = timeline.takeNumber();
+			spawnFunc = function() {
+				var interpedText = interpreter.interp(prompt.text);
+				$('#prompt').html(defaultTo('', templater.div({innerHTML: interpedText})));
+				if (prompt.quiz) 
+					timeline.level.appendQuiz(prompt.quiz, $('#prompt'));		
+			}
+			removeFunc = function() {
+				$('#prompt').html('');
+			}
+			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
+			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
+			this.pushSpan(timeline, elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');
+		}
+		
+		if (prompt.title) {
+			id = timeline.takeNumber();
+			spawnFunc = function() {$('#baseHeader').html(prompt.title)};
+			removeFunc = function() {$('#baseHeader').html('')};
+			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
+			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
+			this.pushSpan(timeline, elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');			
+		}
+		
+	},
+	addSceneDataToMoments: function(timeline, elems, moments, sceneData, timestamp) {
 		var moment = this.getOrCreateMoment(moments, timestamp);
 		if (sceneData) {
 			//will be able to interp all of these data nuggets before rendering
@@ -230,9 +290,6 @@ Timeline.Section.prototype = {
 			this.applySpanToMoments(timeline, moments, elems, sceneData.buttonGroups, 'objs', timestamp, Timeline.stateFuncs.buttonGrps.spawn, Timeline.stateFuncs.buttonGrps.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.buttons, 'objs', timestamp, Timeline.stateFuncs.buttons.spawn, Timeline.stateFuncs.buttons.remove);
 			this.applyCmmdsToMoments(timeline, moments, elems, sceneData.cmmds, 'cmmds', timestamp);
-			
-		}
-		if (cutScene) {
 			
 		}
 	},
@@ -250,11 +307,13 @@ Timeline.Section.prototype = {
 		}
 	},
 	applyCmmdsToMoments: function(timeline, moments, timelineElems, cmmds, eventClass, timestampHead) {
+		var cmmd;
 		cmmds = cmmds ? cmmds : [];
 		for (var i=0; i<cmmds.length; i++) {
-			var cmmd = cmmds[i];
 			if (typeof cmmd == 'string' || typeof cmmd == 'function') {
-				cmmd = {type: 'point', oneWay: true, spawn: cmmd}
+				cmmd = new Timeline.Command('point', cmmd, undefined, true);
+			} else {
+				cmmd = new Timeline.Command(cmmds[i].type, cmmds[i].spawn, cmmds[i].remove, cmmds[i].oneWay);
 			}
 			if (/span/i.test(cmmd.type)) {
 				this.applyCmmdSpan(timeline, moments, timelineElems, cmmd, eventClass, timestampHead);
@@ -270,10 +329,9 @@ Timeline.Section.prototype = {
 		}
 	},
 	applyCmmdSpan: function(timeline, moments, timelineElems, cmmd, eventClass, timestampHead) {
-
 		var id = timeline.takeNumber();
-		var spawn = this.wrapCmmdSpawn(this.exprToFunc(cmmd.spawn));
-		var remove = this.wrapCmmdRemove(this.exprToFunc(cmmd.remove));
+		var spawn = Timeline.stateFuncs.cmmds.spawn;
+		var remove = Timeline.stateFuncs.cmmds.remove;
 		var cleanUpWith = cmmd.cleanUpWith;
 		var timestampTail = this.getTimestamp(cleanUpWith || timestampHead, 'tail');
 		
@@ -281,38 +339,26 @@ Timeline.Section.prototype = {
 	},
 	applyCmmdPoint: function(timeline, moments, timelineElems, cmmd, eventClass, timestamp) {
 		var id = timeline.takeNumber();
-		var spawn = this.wrapCmmdSpawn(this.exprToFunc(cmmd.spawn));
+		var spawn = Timeline.stateFuncs.cmmds.spawn;
 		var oneWay = defaultTo(true, cmmd.oneWay);
 		this.pushPoint(timeline, moments, timelineElems, id, cmmd, spawn, oneWay, eventClass, timestamp);
 	},
 	applyCmmdOnce: function(timeline, moments, timelineElems, cmmd, eventClass, timestamp) {
 		var id = timeline.takeNumber();
-		var spawn = this.wrapCmmdSpawn(this.exprToFunc(cmmd.spawn));
+		var spawn = Timeline.stateFuncs.cmmds.spawn;
 		this.pushOnce(timeline, moments, timelineElems, id, cmmd, spawn, eventClass, timestamp);
 	},
-	wrapCmmdSpawn: function(spawnFunc) {
-		return function(timeline, elems, id) {
-			elems[id] = spawnFunc;
-			spawnFunc()
-		}
-	},
-	wrapCmmdRemove: function(removFunc) {
-		return function(timeline, elems, id) {
-			elems[id] = undefined;
-			removeFunc();
-		}
-	},
-	exprToFunc: function(expr) {
-		if (typeof expr == 'function') {
-			return expr;
-		} else if (typeof expr == 'string') {
-			return eval('(function() { ' + expr + ';})');
-		} else if (expr instanceof 'Array') {
-			return eval('(function() { ' + expr.join(';') + ';})');
-		}
-		console.log('Bad command.  Must be function, evaluatable string, or array or evaluatable strings');
-		console.log(expr);
-	},
+	// exprToFunc: function(expr) {
+		// if (typeof expr == 'function') {
+			// return expr;
+		// } else if (typeof expr == 'string') {
+			// return eval('(function() { ' + expr + ';})');
+		// } else if (expr instanceof 'Array') {
+			// return eval('(function() { ' + expr.join(';') + ';})');
+		// }
+		// console.log('Bad command.  Must be function, evaluatable string, or array or evaluatable strings');
+		// console.log(expr);
+	// },
 	pushSpan: function(timeline, timelineElems, elemDatum, spawn, remove, id, moments, timestampHead, timestampTail, eventClass) {
 		var momentHead = this.getOrCreateMoment(moments, timestampHead);
 		var momentTail = this.getOrCreateMoment(moments, timestampTail);
@@ -335,11 +381,15 @@ Timeline.Section.prototype = {
 	},
 	getTimestamp: function(time, when) {
 		var timeAdj;
-		if (/tail/i.test(when)) {
+		if (/tailhtml/i.test(when)) {
+			timeAdj = .8;
+		} else if (/tail/i.test(when)) {
 			timeAdj = .9;
 		} else if (/setup/i.test(when)) {
 			timeAdj = .1;
-		} else {
+		} else if (/headhtml/i.test(when)) {
+			timeAdj = .2;
+		} else if (/head/.test(when)) {
 			timeAdj = 0;
 		}
 		
@@ -512,7 +562,49 @@ Timeline.stateFuncs = {
 			elems[id] = undefined;
 		}
 	},	
+	cmmds: {
+		spawn: function(timeline, elems, id, cmmd) {
+			var spawnExpr = cmmd.spawn;
+			elems[id] = cmmd;
+			if (spawnExpr) {
+				with (DataGetFuncs) {
+					if (typeof spawnExpr == 'function') {
+						spawnExpr();
+					} else if (typeof spawnExpr == 'string') {
+						eval('(' + spawnExpr + ')');	
+					} else if (spawnExpr instanceof Array) {
+						var expr = spawnExpr.join(';') + ';';
+						eval('(' + expr + ')');
+					}
+				}
+			}
+		},
+		remove: function(timeline, elems, id) {
+			var cmmd = elems[id];
+			elems[id] = undefined;
+			var removeExpr = cmmd.remove;
+			if (removeExpr) {
+				with (DataGetFuncs) {
+					if (typeof removeExpr == 'function') {
+						removeExpr();
+					} else if (typeof removeExpr == 'string') {
+						eval('(' + removeExpr + ')');	
+					} else if (removeExpr instanceof Array) {
+						var expr = removeExpr.join(';') + ';';
+						eval('(' + expr + ')');
+					}
+				}
+			}			
+		}
+	}
 
+}
+
+Timeline.Command = function(type, spawn, remove, oneWay) {
+	this.type = type;
+	this.spawn = spawn;
+	this.remove = remove;
+	this.oneWay = oneWay;
 }
 
 Timeline.EventClassHolder = function() {
