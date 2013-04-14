@@ -19,7 +19,8 @@ LevelData = {
 				],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 600, temp: 100, returnTo: 'wally', tag: 'wally'}
+					{spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 600, temp: 100, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 6, temp: 100, returnTo: 'wally', tag: 'wally', cleanUpWith: 'prompt0'},
 					//{spcName: 'duckling', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
@@ -31,16 +32,17 @@ LevelData = {
 						// type: 'Liquid',
 						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 700}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}, makePhaseDiagram: true}
 					// },
-					// {
-						// type: 'DragWeights',
-						// attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 2}], pInit: 3}
-					// },
+					{
+						type: 'DragWeights',
+						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 2}], pInit: 3}
+					},
 					{
 						type: 'ThresholdEnergyPair',
 						attrs: {spcNameLow: 'ugly', spcNameHigh: 'uglier', thresholdEnergy: -7}
 					},
 					{
 						type: 'Heater',
+						cleanUpWith: 'prompt1',
 						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty'}
 					}
 
@@ -153,6 +155,11 @@ LevelData = {
 					sceneData: undefined,
 					text: 'hello',
 					title: 'titley'
+				},
+				{
+					sceneData: undefined,
+					text: 'can we do another?',
+					title: 'titleynext'
 				}
 				
 			]

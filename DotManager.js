@@ -27,7 +27,7 @@ DotManager.prototype = {
 	},
 	removeByAttr: function(attr, val) {
 		var dots = this.lists.ALLDOTS;
-		for (var i=dots.length; i>=0; i--) {
+		for (var i=dots.length-1; i>=0; i--) {
 			if (dots[i][attr] == val) dots[i].kill();
 		}
 	},

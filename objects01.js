@@ -1685,7 +1685,7 @@ _.extend(Heater.prototype, objectFuncs, {
 		this.removeSlider();
 		removeListener(curLevel, 'update', 'drawHeater'+this.handle);
 		if (window.walls && !walls.removed) {
-			walls.removeWall('heater' + this.handle);
+			walls.removeWall(this.wallHandleHeater);
 		}
 	}
 }
