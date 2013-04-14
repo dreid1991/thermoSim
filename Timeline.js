@@ -100,48 +100,52 @@ Timeline.Section.prototype = {
 		this.pushToGlobal();
 		
 		if (!this.inited) {
-			this.promptIdx = 0;
-			this.level.makePromptCleanUpHolders(this.sectionData); //to be depracated
-			renderer.render(this.sectionData.sceneData);
-			if (this.sectionData.prompts[promptIdx].sceneData) {
-				renderer.render(this.sectionData.prompts[promptIdx].sceneData);
-			}
-			this.inited = true;
+			this.promptIdx = 0; // just make time idx
+			this.stepTo(-1);
+			// this.level.makePromptCleanUpHolders(this.sectionData); //to be depracated
+			// renderer.render(this.sectionData.sceneData);
+			// if (this.sectionData.prompts[promptIdx].sceneData) {
+				// renderer.render(this.sectionData.prompts[promptIdx].sceneData);
+			// }
+			// this.inited = true;
 		} else {
 			this.restoreGraphs();
 		}
 	},
 	showPrompt: function(promptIdx) {
-		//going to go with rendering everything for now
-		this.promptIdx = promptIdx;
-		var prompt = this.sectionData.prompts[promptIdx];
-		if (prompt.sceneData)
-			renderer.render(prompt.sceneData);
-		if (!prompt.quiz)
-			$('#nextPrevDiv').show();
-		var interpedText = interpreter.interp(prompt.text);
-		if (prompt.cutScene) {
-			this.level.cutSceneStart(interpedText, prompt.cutScene, prompt.quiz);
-		} else {
-			$('#prompt').html(defaultTo('', templater.div({innerHTML: interpedText})));
-			if (prompt.quiz) 
-				this.level.appendQuiz(prompt.quiz, $('#prompt'));
-			this.level.cutSceneEnd();
-		}
-		$('#baseHeader').html(prompt.title);
-		execListeners(this.level.setupListeners.listener);
-		emptyListener(this.level, 'setup');
-		interpreter.renderMath();
-		buttonManager.arrangeGroupWrappers();
-		buttonManager.arrangeAllGroups();
-		buttonManager.setButtonWidth();	
+		//should all be rolled into moments now
+		var dest = this.getTimeStamp(promptIdx, 'headHTML');
+		this.stepTo(dest);
+		// this.promptIdx = promptIdx;
+		// var prompt = this.sectionData.prompts[promptIdx];
+		// if (prompt.sceneData)
+			// renderer.render(prompt.sceneData);
+		// if (!prompt.quiz)
+			// $('#nextPrevDiv').show();
+		// var interpedText = interpreter.interp(prompt.text);
+		// if (prompt.cutScene) {
+			// this.level.cutSceneStart(interpedText, prompt.cutScene, prompt.quiz);
+		// } else {
+			// $('#prompt').html(defaultTo('', templater.div({innerHTML: interpedText})));
+			// if (prompt.quiz) 
+				// this.level.appendQuiz(prompt.quiz, $('#prompt'));
+			// this.level.cutSceneEnd();
+		// }
+		// $('#baseHeader').html(prompt.title);
+		// execListeners(this.level.setupListeners.listener);
+		// emptyListener(this.level, 'setup');
+		// interpreter.renderMath();
+		// buttonManager.arrangeGroupWrappers();
+		// buttonManager.arrangeAllGroups();
+		// buttonManager.setButtonWidth();	
 		
 	},
-	stepToTime: function(dest) {
+	stepTo: function(dest) {
 		var moments = this.moments;
 		while (this.time != dest) {
 			var moment = this.nextMoment(this.time, dest);
-			this.fireMoment(moment);
+			moment.fire(this.time);
+			this.time = moment.timestamp;
 		}
 	},
 	nextMoment: function(cur, dest) {
@@ -158,9 +162,6 @@ Timeline.Section.prototype = {
 		for (var i=0; i<this.moments.length; i++) {
 			if (this.moments[i].timestamp == time) return this.moments[i];
 		}
-	},
-	fireMoment: function() {
-		
 	},
 	cleanUpPrompt: function() {
 		if (this.promptIdx !== undefined && this.inited) {
@@ -246,7 +247,7 @@ Timeline.Section.prototype = {
 				timeline.level.cutSceneEnd()
 				$('#nextPrevDiv').show();
 			};
-			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
+			cmmd = new Timeline.Command(timeline, elems, 'span', spawnFunc, removeFunc);
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
 			this.pushSpan(timeline, elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');
 		} else {
@@ -273,6 +274,16 @@ Timeline.Section.prototype = {
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
 			this.pushSpan(timeline, elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');			
 		}
+		var arrangeHTMLSpawn = function() {
+			interpreter.renderMath();
+			timeline.buttonManager.arrangeGroupWrappers();
+			timeline.buttonManager.arrangeAllGroups();
+			timeline.buttonManager.setButtonWidth();			
+		}
+		var arrangeHTMLCmmd = new Timeline.Command('point', arrangeHTMLSpawn, undefined, true);
+	
+		this.pushPoint(timeline, moments, elems, timeline.takeNumber(), arrangeHTMLCmmd, Timeline.stateFuncs.cmmds.spawn, true, 'cmmds', timestampHead);
+
 		
 	},
 	addSceneDataToMoments: function(timeline, elems, moments, sceneData, timestamp) {
@@ -310,10 +321,11 @@ Timeline.Section.prototype = {
 		var cmmd;
 		cmmds = cmmds ? cmmds : [];
 		for (var i=0; i<cmmds.length; i++) {
-			if (typeof cmmd == 'string' || typeof cmmd == 'function') {
-				cmmd = new Timeline.Command('point', cmmd, undefined, true);
+			var cmmdInput = cmmds[i];
+			if (typeof cmmdInput == 'string' || typeof cmmdInput == 'function') {
+				cmmd = new Timeline.Command('point', cmmdInput, undefined, true);
 			} else {
-				cmmd = new Timeline.Command(cmmds[i].type, cmmds[i].spawn, cmmds[i].remove, cmmds[i].oneWay);
+				cmmd = new Timeline.Command(cmmdInput.type, cmmdInput.spawn, cmmdInput.remove, cmmdInput.oneWay);
 			}
 			if (/span/i.test(cmmd.type)) {
 				this.applyCmmdSpan(timeline, moments, timelineElems, cmmd, eventClass, timestampHead);
@@ -348,17 +360,6 @@ Timeline.Section.prototype = {
 		var spawn = Timeline.stateFuncs.cmmds.spawn;
 		this.pushOnce(timeline, moments, timelineElems, id, cmmd, spawn, eventClass, timestamp);
 	},
-	// exprToFunc: function(expr) {
-		// if (typeof expr == 'function') {
-			// return expr;
-		// } else if (typeof expr == 'string') {
-			// return eval('(function() { ' + expr + ';})');
-		// } else if (expr instanceof 'Array') {
-			// return eval('(function() { ' + expr.join(';') + ';})');
-		// }
-		// console.log('Bad command.  Must be function, evaluatable string, or array or evaluatable strings');
-		// console.log(expr);
-	// },
 	pushSpan: function(timeline, timelineElems, elemDatum, spawn, remove, id, moments, timestampHead, timestampTail, eventClass) {
 		var momentHead = this.getOrCreateMoment(moments, timestampHead);
 		var momentTail = this.getOrCreateMoment(moments, timestampTail);
@@ -368,7 +369,6 @@ Timeline.Section.prototype = {
 		momentHead.events[eventClass].push(eventHead);
 		momentTail.events[eventClass].push(eventTail);		
 	},
-
 	pushPoint: function(timeline, moments, timelineElems, id, elemDatum, spawn, oneWay, eventClass, timestamp) {
 		var moment = this.getOrCreateMoment(moments, timestamp);
 		var event = new Timeline.Event.Point(timeline, timelineElems, elemDatum, spawn, id, oneWay, moment);
@@ -426,21 +426,7 @@ Timeline.Section.prototype = {
 		return moments[moments.length - 1];
 	},
 }
-// can have one-time, point, and span commands, I guess
-// point should only apply when going forward 
-Timeline.Moment = function(timestamp) {
-	this.timestamp = timestamp;
-	this.events = new Timeline.EventClassHolder();
-	//I *think* we can group it into walls, generics, cmmds, setups .
-	//setups may be able to be rolled into commands.  Setup will be like linking two objects that are added in an unknown order.  Not necessary for linking objects to walls since order is known.  
-		//A point command would probably work.
-	//Generics include any objects, listeners, graphs, etc.  Anything that will have spawn/remove.  If there are interdependancies, 
-}
 
-Timeline.Moment.prototype = {
-
-	
-}
 
 Timeline.stateFuncs = {
 	walls: {
@@ -600,6 +586,70 @@ Timeline.stateFuncs = {
 
 }
 
+// can have one-time, point, and span commands, I guess
+// point should only apply when going forward 
+Timeline.Moment = function(timestamp) {
+	this.timestamp = timestamp;
+	this.events = new Timeline.EventClassHolder();
+	//I *think* we can group it into walls, generics, cmmds, setups .
+	//setups may be able to be rolled into commands.  Setup will be like linking two objects that are added in an unknown order.  Not necessary for linking objects to walls since order is known.  
+		//A point command would probably work.
+	//Generics include any objects, listeners, graphs, etc.  Anything that will have spawn/remove.  If there are interdependancies, 
+}
+
+Timeline.Moment.prototype = {
+	fire: function(from, to) {
+		this.fireSpans(this.events.walls, from, to);
+		this.fireSpans(this.events.dots, from, to);
+		this.fireSpans(this.events.objs, from, to);
+		this.fireCmmds(this.events.cmmds, from, to);
+	},
+	fireSpans: function(spans, from, to) {
+		if (to == this.timestamp) {
+			this.fireSpansEntering(spans, from);
+		} else if (from == this.timestamp) {
+			this.fireSpansExiting(spans, to);
+		}
+	},
+	fireSpansEntering: function(spans, from) {
+		for (var i=0; i<spans.length; i++) {
+			var span = spans[i];
+			if (span.boundType == 'head') {
+				span.spawn(span.timeline, span.timelineElems, span.id, span.elemDatum);
+			} else if (span.boundType == 'tail') {
+				span.remove(span.timeline, span.timelineElems, span.id);
+			}
+		}
+	},
+	fireSpansExiting: function(spans, to) {
+		for (var i=0; i<spans.length; i++) {
+			var span = spans[i];
+			if (span.boundType == 'tail') {
+				span.spawn(span.timeline, span.timelineElems, span.id, span.elemDatum);
+			} else if (span.boundType == 'head') {
+				span.remove(span.timeline, span.timelineElems, span.id);
+			}
+		}		
+	},
+	fireCmmds: function(cmmds, from, to) {
+		for (var i=0; i<cmmds.length; i++) {
+			var event = cmmds[i];
+			if (event instanceof Timeline.Event.Span) {
+				this.fireSpans([event], from, to)
+			} else if (event instanceof Timeline.Event.Point) {
+				if (to == this.timestamp && event.elemDatum.oneWay ? from < to : true) {
+					event.spawn(event.timeline, event.timelineElems, event.id, event.elemDatum);
+				}
+			} else if (event instanceof Timeline.Event.Once) {
+				if (!event.fired) {
+					event.spawn(event.timeline, event.timelineElems, event.id, event.elemDatum);
+					event.fired = true;
+				}
+			}
+		}
+	}
+}
+
 Timeline.Command = function(type, spawn, remove, oneWay) {
 	this.type = type;
 	this.spawn = spawn;
@@ -646,28 +696,3 @@ Timeline.Event = {
 	}
 }
 
-Timeline.Event.Span.prototype = {
-	fire: function(timeFrom) {
-		if ((this.boundType == 'head' && timeFrom < this.moment.timestamp) || (this.boundType == 'tail' && timeFrom > this.moment.timestamp)) {
-			this.spawn(this.timeline, this.elems, this.id, this.elemDatum);
-		} else if ((this.boundType == 'tail' && timeFrom < this.moment.timestamp) || (this.boundType == 'head' && timeFrom > this.moment.timestamp)) {
-			this.remove(this.timeline, this.elems, this.id);
-		}
-	}
-}
-
-Timeline.Event.Point.prototype = {
-	fire: function(timeFrom) {
-		if (!(timeFrom > this.moment.timestamp && this.oneWay)) {
-			this.spawn(this.timeline, this.elems, this.id, this.elemDatum);
-		}
-	}
-}
-
-Timeline.Event.Once.prototype = {
-	fire: function(timeFrom) {
-		if (!this.fired) {
-			this.spawn(this.timeline, this.elems, this.id, this.elemDatum);
-		}
-	}
-}
