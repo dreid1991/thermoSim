@@ -27,9 +27,13 @@ Timeline.prototype = {
 	show: function(sectionIdx, promptIdx, refreshing) {
 		var changingSection = this.sectionIdx != sectionIdx;
 		var changingPrompt = changingSection || promptIdx != this.sections[sectionIdx].promptIdx;
-		if (changingPrompt || refreshing) {
-			this.sections[sectionIdx].cleanUpPrompt();
+		// if (changingPrompt || refreshing) {
+			// this.sections[sectionIdx].cleanUpPrompt();
+		// }
+		if (changingSection && this.sectionIdx !== undefined) {
+			this.sections[this.sectionIdx].stepToBound(sectionIdx > this.sectionIdx);
 		}
+		
 		if (changingSection || refreshing) {
 			this.clearCurrentSection();
 			this.sectionIdx = sectionIdx;
@@ -49,7 +53,7 @@ Timeline.prototype = {
 		var curPromptIdx = this.sections[this.sectionIdx].promptIdx;
 		var curSection = this.sections[this.sectionIdx];
 		var newSectionInstance = new Timeline.Section(this, curSection.sectionData, this.buttonManagerBlank, this.dashRunBlank);
-		curSection.cleanUpPrompt();
+		//curSection.cleanUpPrompt();
 		curSection.clear();
 		this.sections.splice(this.sectionIdx, 1, newSectionInstance);
 		this.show(this.sectionIdx, curPromptIdx, true);
@@ -101,12 +105,7 @@ Timeline.Section.prototype = {
 		if (!this.inited) {
 			this.promptIdx = 0; // just make time idx
 			this.stepTo(-1);
-			// this.level.makePromptCleanUpHolders(this.sectionData); //to be depracated
-			// renderer.render(this.sectionData.sceneData);
-			// if (this.sectionData.prompts[promptIdx].sceneData) {
-				// renderer.render(this.sectionData.prompts[promptIdx].sceneData);
-			// }
-			// this.inited = true;
+			this.inited = true;
 		} else {
 			this.restoreGraphs();
 		}
@@ -116,51 +115,94 @@ Timeline.Section.prototype = {
 		var destTime = this.getTimestamp(promptIdx, 'headHTML');
 		this.promptIdx = promptIdx;
 		this.stepTo(destTime);
-		// this.promptIdx = promptIdx;
-		// var prompt = this.sectionData.prompts[promptIdx];
-		// if (prompt.sceneData)
-			// renderer.render(prompt.sceneData);
-		// if (!prompt.quiz)
-			// $('#nextPrevDiv').show();
-		// var interpedText = interpreter.interp(prompt.text);
-		// if (prompt.cutScene) {
-			// this.level.cutSceneStart(interpedText, prompt.cutScene, prompt.quiz);
-		// } else {
-			// $('#prompt').html(defaultTo('', templater.div({innerHTML: interpedText})));
-			// if (prompt.quiz) 
-				// this.level.appendQuiz(prompt.quiz, $('#prompt'));
-			// this.level.cutSceneEnd();
-		// }
-		// $('#baseHeader').html(prompt.title);
-		// execListeners(this.level.setupListeners.listener);
-		// emptyListener(this.level, 'setup');
-		// interpreter.renderMath();
-		// buttonManager.arrangeGroupWrappers();
-		// buttonManager.arrangeAllGroups();
-		// buttonManager.setButtonWidth();	
 		
 	},
 	stepTo: function(dest) {
 		var moments = this.moments;
-		if (dest != this.time) {
+		//I am assuming that one only jumps to .2's
+		if (dest > this.time || Math.floor(this.time) == Math.floor(dest)) {
 			var curMom = this.momentAt(this.time);
-			curMom.fire(this.time, dest);
+			if (curMom) curMom.fire(this.time, dest);
 			while (dest != this.time) {
 			//nah dawg, make it get a path to take
-				var nextMom = this.nextMoment(this.time, dest);
+				var nextMom = this.nextTowardsDest(this.time, dest);
 				if (!nextMom) break;
 				nextMom.fire(this.time, nextMom.timestamp);
 				this.time = nextMom.timestamp;
 			}
+		} else if (dest < this.time) {
+			//step back to (dest).9
+			//then jump to (dest).1 for setup, then (dest).2 for html
+			//avoids frivolous cutscene entering/exiting
+			var curMom = this.momentAt(this.time);
+			if (curMom) curMom.fire(this.time, dest);
+			var reAddElemsDest = this.getTimestamp(Math.floor(dest), 'tail');
+			while (reAddElemsDest != this.time) {
+				var nextMom = this.nextTowardsDest(this.time, reAddElemsDest);
+				if (!nextMom) break;
+				nextMom.fire(this.time, nextMom.timestamp);
+				this.time = nextMom.timestamp;
+				
+			}
+			this.time = this.getTimestamp(Math.floor(dest), 'setup') - 1e-4;
+			while (dest != this.time) {
+				var nextMom = this.nextMoment(this.time);
+				if (!nextMom) break;
+				nextMom.fire(this.time, nextMom.timestamp);
+				this.time = nextMom.timestamp;
+			}			
+		}
+		
+	},
+	stepToBound: function(up) {
+		if (up) {
+			this.stepTo(this.sectionData.prompts.length);
+			this.time = this.sectionData.prompts.length
+		} else {
+			this.stepTo(0);
+			this.time = 0;
 		}
 	},
-	nextMoment: function(cur, dest) {
+	nextTowardsDest: function(cur, dest) {
 		var curMoment = this.momentAt(cur);
-		var idx = this.moments.indexOf(curMoment);
-		dest < cur ? idx -- : idx ++;
-		var nextMoment = this.moments[idx];
-		if (nextMoment && Math.abs(nextMoment.timestamp - cur) <= Math.abs(dest - cur)) {
-			return this.moments[idx];
+		if (curMoment) {
+			var idx = this.moments.indexOf(curMoment);
+			dest < cur ? idx -- : idx ++;
+			var nextMoment = this.moments[idx];
+			if (nextMoment && Math.abs(nextMoment.timestamp - cur) <= Math.abs(dest - cur)) {
+				return this.moments[idx];
+			}
+		} else {
+			if (cur < dest) {
+				for (var i=0; i<this.moments.length; i++) {
+					var moment = this.moments[i];
+					if (moment.timestamp > cur) {
+						if (moment.timestamp <= dest) {
+							return moment;
+						}
+						break;
+					}
+				
+				}
+			} else if (dest < cur) {
+				for (var i=this.moments.length-1; i>=0; i--) {
+					var moment = this.moments[i];
+					if (moment.timestamp < cur) {
+						if (moment.timestamp >= dest) {
+							return moment;
+						}
+						break;
+					}
+				}	
+			}
+		}
+		
+		return undefined;
+	},
+	nextMoment: function(cur) {
+		//cur need not be on moment
+		for (var i=0; i<this.moments.length; i++) {
+			if (this.moments[i].timestamp > cur) return this.moments[i];
 		}
 		return undefined;
 	},
@@ -170,10 +212,14 @@ Timeline.Section.prototype = {
 		}
 	},
 	cleanUpPrompt: function() {
-		if (this.promptIdx !== undefined && this.inited) {
-			var listeners = this.level['prompt' + this.promptIdx + 'CleanUpListeners'].listeners;
-			execListeners(listeners);
-		}
+		//only to be called when leaving a section;
+		var destTime = this.getTimestamp(this.sectionData.prompts.length - 1, 'tail');
+		this.stepTo(destTime);
+		this.time = destTime;
+		// if (this.promptIdx !== undefined && this.inited) {
+			// var listeners = this.level['prompt' + this.promptIdx + 'CleanUpListeners'].listeners;
+			// execListeners(listeners);
+		// }
 	},
 	curPrompt: function() {
 		return this.sectionData.prompts[this.promptIdx];
@@ -207,6 +253,7 @@ Timeline.Section.prototype = {
 		if (this.inited) {
 			$('#prompt').html('');
 			$('#buttonManager').html('');
+			$('#baseHeader').html('')
 			this.dashRunClone = $('#dashRun').clone(true);
 			$('#dashRun').remove();
 			for (var graphName in this.level.graphs) {
