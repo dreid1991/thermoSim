@@ -116,7 +116,7 @@ function returnEscapist(dot){
 	dot.y = y;
 }
 function defaultTo(defaultVal, inputVal){
-	return inputVal === undefined || isNaN(inputVal) ? defaultVal : inputVal;
+	return inputVal === undefined ? defaultVal : inputVal;
 } 
 function validNumber(num){
 	return isNaN(num) || num === undefined ? false : num;
@@ -307,11 +307,11 @@ function deepCopyStep(object, stack, copies) {
 function recordData(handle, list, func, obj, listenerType){
 	var listenerType = defaultTo('record', listenerType)
 	store('record' + handle, listenerType);
-	addListener(window['curLevel'], listenerType, handle, function(){list.push(func.apply(obj))}, obj); //was pushnumber.  Changed away so I could push lists. 
+	addListener(curLevel, listenerType, handle, function(){list.push(func.apply(obj))}, obj); //was pushnumber.  Changed away so I could push lists. 
 }
 function recordDataStop(handle){
 	var listenerType = getStore('record' + handle);
-	removeListener(window['curLevel'], listenerType, handle);
+	removeListener(curLevel, listenerType, handle);
 }
 
 function grabAttrs(obj, attrs) {
