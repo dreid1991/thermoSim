@@ -27,13 +27,9 @@ Timeline.prototype = {
 	show: function(sectionIdx, promptIdx, refreshing) {
 		var changingSection = this.sectionIdx != sectionIdx;
 		var changingPrompt = changingSection || promptIdx != this.sections[sectionIdx].promptIdx;
-		// if (changingPrompt || refreshing) {
-			// this.sections[sectionIdx].cleanUpPrompt();
-		// }
-		if (changingSection && this.sectionIdx !== undefined) {
-			this.sections[this.sectionIdx].stepToBound(sectionIdx > this.sectionIdx);
+		if (changingPrompt || refreshing) {
+			this.sections[sectionIdx].cleanUpPrompt();
 		}
-		
 		if (changingSection || refreshing) {
 			this.clearCurrentSection();
 			this.sectionIdx = sectionIdx;
@@ -53,7 +49,7 @@ Timeline.prototype = {
 		var curPromptIdx = this.sections[this.sectionIdx].promptIdx;
 		var curSection = this.sections[this.sectionIdx];
 		var newSectionInstance = new Timeline.Section(this, curSection.sectionData, this.buttonManagerBlank, this.dashRunBlank);
-		//curSection.cleanUpPrompt();
+		curSection.cleanUpPrompt();
 		curSection.clear();
 		this.sections.splice(this.sectionIdx, 1, newSectionInstance);
 		this.show(this.sectionIdx, curPromptIdx, true);
@@ -105,7 +101,12 @@ Timeline.Section.prototype = {
 		if (!this.inited) {
 			this.promptIdx = 0; // just make time idx
 			this.stepTo(-1);
-			this.inited = true;
+			// this.level.makePromptCleanUpHolders(this.sectionData); //to be depracated
+			// renderer.render(this.sectionData.sceneData);
+			// if (this.sectionData.prompts[promptIdx].sceneData) {
+				// renderer.render(this.sectionData.prompts[promptIdx].sceneData);
+			// }
+			// this.inited = true;
 		} else {
 			this.restoreGraphs();
 		}
@@ -115,94 +116,51 @@ Timeline.Section.prototype = {
 		var destTime = this.getTimestamp(promptIdx, 'headHTML');
 		this.promptIdx = promptIdx;
 		this.stepTo(destTime);
+		// this.promptIdx = promptIdx;
+		// var prompt = this.sectionData.prompts[promptIdx];
+		// if (prompt.sceneData)
+			// renderer.render(prompt.sceneData);
+		// if (!prompt.quiz)
+			// $('#nextPrevDiv').show();
+		// var interpedText = interpreter.interp(prompt.text);
+		// if (prompt.cutScene) {
+			// this.level.cutSceneStart(interpedText, prompt.cutScene, prompt.quiz);
+		// } else {
+			// $('#prompt').html(defaultTo('', templater.div({innerHTML: interpedText})));
+			// if (prompt.quiz) 
+				// this.level.appendQuiz(prompt.quiz, $('#prompt'));
+			// this.level.cutSceneEnd();
+		// }
+		// $('#baseHeader').html(prompt.title);
+		// execListeners(this.level.setupListeners.listener);
+		// emptyListener(this.level, 'setup');
+		// interpreter.renderMath();
+		// buttonManager.arrangeGroupWrappers();
+		// buttonManager.arrangeAllGroups();
+		// buttonManager.setButtonWidth();	
 		
 	},
 	stepTo: function(dest) {
 		var moments = this.moments;
-		//I am assuming that one only jumps to .2's
-		if (dest > this.time || Math.floor(this.time) == Math.floor(dest)) {
+		if (dest != this.time) {
 			var curMom = this.momentAt(this.time);
-			if (curMom) curMom.fire(this.time, dest);
+			curMom.fire(this.time, dest);
 			while (dest != this.time) {
 			//nah dawg, make it get a path to take
-				var nextMom = this.nextTowardsDest(this.time, dest);
+				var nextMom = this.nextMoment(this.time, dest);
 				if (!nextMom) break;
 				nextMom.fire(this.time, nextMom.timestamp);
 				this.time = nextMom.timestamp;
 			}
-		} else if (dest < this.time) {
-			//step back to (dest).9
-			//then jump to (dest).1 for setup, then (dest).2 for html
-			//avoids frivolous cutscene entering/exiting
-			var curMom = this.momentAt(this.time);
-			if (curMom) curMom.fire(this.time, dest);
-			var reAddElemsDest = this.getTimestamp(Math.floor(dest), 'tail');
-			while (reAddElemsDest != this.time) {
-				var nextMom = this.nextTowardsDest(this.time, reAddElemsDest);
-				if (!nextMom) break;
-				nextMom.fire(this.time, nextMom.timestamp);
-				this.time = nextMom.timestamp;
-				
-			}
-			this.time = this.getTimestamp(Math.floor(dest), 'setup') - 1e-4;
-			while (dest != this.time) {
-				var nextMom = this.nextMoment(this.time);
-				if (!nextMom) break;
-				nextMom.fire(this.time, nextMom.timestamp);
-				this.time = nextMom.timestamp;
-			}			
-		}
-		
-	},
-	stepToBound: function(up) {
-		if (up) {
-			this.stepTo(this.sectionData.prompts.length);
-			this.time = this.sectionData.prompts.length
-		} else {
-			this.stepTo(0);
-			this.time = 0;
 		}
 	},
-	nextTowardsDest: function(cur, dest) {
+	nextMoment: function(cur, dest) {
 		var curMoment = this.momentAt(cur);
-		if (curMoment) {
-			var idx = this.moments.indexOf(curMoment);
-			dest < cur ? idx -- : idx ++;
-			var nextMoment = this.moments[idx];
-			if (nextMoment && Math.abs(nextMoment.timestamp - cur) <= Math.abs(dest - cur)) {
-				return this.moments[idx];
-			}
-		} else {
-			if (cur < dest) {
-				for (var i=0; i<this.moments.length; i++) {
-					var moment = this.moments[i];
-					if (moment.timestamp > cur) {
-						if (moment.timestamp <= dest) {
-							return moment;
-						}
-						break;
-					}
-				
-				}
-			} else if (dest < cur) {
-				for (var i=this.moments.length-1; i>=0; i--) {
-					var moment = this.moments[i];
-					if (moment.timestamp < cur) {
-						if (moment.timestamp >= dest) {
-							return moment;
-						}
-						break;
-					}
-				}	
-			}
-		}
-		
-		return undefined;
-	},
-	nextMoment: function(cur) {
-		//cur need not be on moment
-		for (var i=0; i<this.moments.length; i++) {
-			if (this.moments[i].timestamp > cur) return this.moments[i];
+		var idx = this.moments.indexOf(curMoment);
+		dest < cur ? idx -- : idx ++;
+		var nextMoment = this.moments[idx];
+		if (nextMoment && Math.abs(nextMoment.timestamp - cur) <= Math.abs(dest - cur)) {
+			return this.moments[idx];
 		}
 		return undefined;
 	},
@@ -212,14 +170,10 @@ Timeline.Section.prototype = {
 		}
 	},
 	cleanUpPrompt: function() {
-		//only to be called when leaving a section;
-		var destTime = this.getTimestamp(this.sectionData.prompts.length - 1, 'tail');
-		this.stepTo(destTime);
-		this.time = destTime;
-		// if (this.promptIdx !== undefined && this.inited) {
-			// var listeners = this.level['prompt' + this.promptIdx + 'CleanUpListeners'].listeners;
-			// execListeners(listeners);
-		// }
+		if (this.promptIdx !== undefined && this.inited) {
+			var listeners = this.level['prompt' + this.promptIdx + 'CleanUpListeners'].listeners;
+			execListeners(listeners);
+		}
 	},
 	curPrompt: function() {
 		return this.sectionData.prompts[this.promptIdx];
@@ -253,7 +207,6 @@ Timeline.Section.prototype = {
 		if (this.inited) {
 			$('#prompt').html('');
 			$('#buttonManager').html('');
-			$('#baseHeader').html('')
 			this.dashRunClone = $('#dashRun').clone(true);
 			$('#dashRun').remove();
 			for (var graphName in this.level.graphs) {
@@ -352,16 +305,16 @@ Timeline.Section.prototype = {
 		if (sceneData) {
 			//will be able to interp all of these data nuggets before rendering
 			this.applySpanToMoments(timeline, moments, elems, sceneData.walls, 'walls', timestamp, Timeline.stateFuncs.walls.spawn, Timeline.stateFuncs.walls.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.dots, 'dots', timestamp, Timeline.stateFuncs.dots.spawn, Timeline.stateFuncs.dots.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.objs, 'objs', timestamp, Timeline.stateFuncs.objs.spawn, Timeline.stateFuncs.objs.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.dataRecord, 'objs', timestamp, Timeline.stateFuncs.dataRecord.spawn, Timeline.stateFuncs.dataRecord.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.dataReadouts, 'objs', timestamp, Timeline.stateFuncs.dataReadouts.spawn, Timeline.stateFuncs.dataReadouts.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.triggers, 'objs', timestamp, Timeline.stateFuncs.triggers.spawn, Timeline.stateFuncs.triggers.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.graphs, 'objs', timestamp, Timeline.stateFuncs.graphs.spawn, Timeline.stateFuncs.graphs.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.rxns, 'objs', timestamp, Timeline.stateFuncs.rxns.spawn, Timeline.stateFuncs.rxns.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.buttonGroups, 'objs', timestamp, Timeline.stateFuncs.buttonGrps.spawn, Timeline.stateFuncs.buttonGrps.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.buttons, 'objs', timestamp, Timeline.stateFuncs.buttons.spawn, Timeline.stateFuncs.buttons.remove);
-			this.applyCmmdsToMoments(timeline, moments, elems, sceneData.cmmds, 'cmmds', timestamp);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.walls, 'dots', timestamp, Timeline.stateFuncs.dots.spawn, Timeline.stateFuncs.dots.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.walls, 'objs', timestamp, Timeline.stateFuncs.objs.spawn, Timeline.stateFuncs.objs.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.walls, 'objs', timestamp, Timeline.stateFuncs.dataRecord.spawn, Timeline.stateFuncs.dataRecord.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.walls, 'objs', timestamp, Timeline.stateFuncs.dataReadouts.spawn, Timeline.stateFuncs.dataReadouts.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.walls, 'objs', timestamp, Timeline.stateFuncs.triggers.spawn, Timeline.stateFuncs.triggers.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.walls, 'objs', timestamp, Timeline.stateFuncs.graphs.spawn, Timeline.stateFuncs.graphs.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.walls, 'objs', timestamp, Timeline.stateFuncs.rxns.spawn, Timeline.stateFuncs.rxns.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.walls, 'objs', timestamp, Timeline.stateFuncs.buttonGrps.spawn, Timeline.stateFuncs.buttonGrps.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.walls, 'objs', timestamp, Timeline.stateFuncs.buttons.spawn, Timeline.stateFuncs.buttons.remove);
+			//commands are not necessarily spans.  Handle them differently, yo
 			
 		}
 	},
@@ -378,6 +331,7 @@ Timeline.Section.prototype = {
 			
 		}
 	},
+<<<<<<< HEAD
 	applyCmmdsToMoments: function(timeline, moments, timelineElems, cmmds, eventClass, timestampHead) {
 		var cmmd;
 		cmmds = cmmds ? cmmds : [];
@@ -422,6 +376,12 @@ Timeline.Section.prototype = {
 		this.pushOnce(moments, timelineElems, id, cmmd, spawn, eventClass, timestamp);
 	},
 	pushSpan: function(timelineElems, elemDatum, spawn, remove, id, moments, timestampHead, timestampTail, eventClass) {
+=======
+
+	pushSpan: function(timeline, timelineElems, elemDatum, spawn, remove, id, moments, timestampHead, timestampTail, eventClass) {
+		var eventHead = new Timeline.Event.Span(timeline, timelineElems, elemDatum, spawn, remove, id, 'head');
+		var eventTail = new Timeline.Event.Span(timeline, timelineElems, elemDatum, spawn, remove, id, 'tail');
+>>>>>>> parent of 8818836... cmmd populating in, needs testing
 		var momentHead = this.getOrCreateMoment(moments, timestampHead);
 		var momentTail = this.getOrCreateMoment(moments, timestampTail);
 		var eventHead = new Timeline.Event.Span(this, timelineElems, elemDatum, spawn, remove, id, 'head', momentHead);
@@ -430,6 +390,7 @@ Timeline.Section.prototype = {
 		momentHead.events[eventClass].push(eventHead);
 		momentTail.events[eventClass].push(eventTail);		
 	},
+<<<<<<< HEAD
 	pushPoint: function(moments, timelineElems, id, elemDatum, spawn, oneWay, eventClass, timestamp) {
 		var moment = this.getOrCreateMoment(moments, timestamp);
 		var event = new Timeline.Event.Point(this, timelineElems, elemDatum, spawn, id, oneWay, moment);
@@ -455,6 +416,16 @@ Timeline.Section.prototype = {
 		}
 		
 		var idx = this.parseIntegerTimeIdx(time);
+=======
+
+	getTimestampTail: function(timestamp, cleanUpWith) {
+		if (cleanUpWith == undefined) {
+			if (timestamp == -1) {
+				return Infinity;
+			} else {
+				return timestamp + .9;
+			}
+>>>>>>> parent of 8818836... cmmd populating in, needs testing
 		
 		if (idx == -1 && when == 'tail') {
 			return Infinity;
@@ -489,7 +460,7 @@ Timeline.Section.prototype = {
 }
 
 
-Timeline.stateFuncs = {
+Timline.stateFuncs = {
 	walls: {
 		spawn: function(section, elems, id, datum) {
 			elems[id] = section.walls.addWall(datum);
@@ -509,7 +480,7 @@ Timeline.stateFuncs = {
 			section.dotManager.removeByAttr('elemId', id);
 			elems[id] = undefined;
 		}
-	},
+	}
 	objs: {
 		spawn: function(section, elems, id, datum) {
 			var objFunc = window[datum.type];
@@ -540,10 +511,17 @@ Timeline.stateFuncs = {
 			}
 			elems[id] = undefined;
 		}
+<<<<<<< HEAD
 	},
 	dataReadouts: {
 		spawn: function(section, elems, id, datum) {
 			var displayEntry = section.dataDisplayer.addEntry(datum);
+=======
+	}
+	dataDisplay: {
+		spawn: function(timeline, elems, id, datum) {
+			var displayEntry = timeline.dataDisplayer.addEntry(datum);
+>>>>>>> parent of 8818836... cmmd populating in, needs testing
 			elems[id] = displayEntry;
 		},
 		remove: function(section, elems, id) {
@@ -551,7 +529,7 @@ Timeline.stateFuncs = {
 			displayEntry.remove();
 			elems[id] = undefined;
 		}
-	},
+	}
 	triggers: {
 		spawn: function(section, elems, id, datum) {
 			elems[id] = new window.Trigger(datum);
@@ -577,7 +555,7 @@ Timeline.stateFuncs = {
 			graph.remove();
 			elems[id] = undefined;
 		}		
-	},
+	}
 	rxns: {
 		spawn: function(section, elems, id, rxnDatum) {
 			var rxn = section.collide.addReaction(rxnDatum);
@@ -601,6 +579,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	buttons: {
+<<<<<<< HEAD
 		spawn: function(section, elems, id, btnDatum) {
 			section.buttonManager.addButton(btnDatum.groupHandle, btnDatum.handle, btnDatum.label, btnDatum.exprs, btnDatum.prefIdx, btnDatum.isDown, btnDatum.cleanUpWith);
 			elems[id] = btnDatum;
@@ -608,6 +587,15 @@ Timeline.stateFuncs = {
 		remove: function(section, elems, id) {
 			var btnDatum = elems[id];
 			section.buttonManager.removeButton(btnDatum.groupHandle, btnDatum.handle);
+=======
+		spawn: function(timeline, elems, id, grpDatum) {
+			timeline.buttonManager.addGroup(grpDatum.handle, grpDatum.label, grpDatum.prefIdx, grpDatum.isRadio, grpDatum.isToggle, grpDatum.cleanUpWith);
+			elems[id] = grpDatum;
+		},
+		remove: function(timeline, elems, id) {
+			var grpDatum = elems[id];
+			timeline.buttonManager.removeGroup(grpDatum.handle);
+>>>>>>> parent of 8818836... cmmd populating in, needs testing
 			elems[id] = undefined;
 		}
 	},	
@@ -757,6 +745,7 @@ Timeline.Event = {
 		this.boundType = boundType;
 		this.moment = moment;
 	},
+<<<<<<< HEAD
 	Point: function(section, timelineElems, elemDatum, spawn, id, oneWay, moment) {
 		this.section = section;
 		this.timelineElems = timelineElems;
@@ -774,6 +763,13 @@ Timeline.Event = {
 		this.id = id;
 		this.fired = false;
 		this.moment = moment;
+=======
+	Point: function(  ) {
+	
+	},
+	Once: function( ) {
+	
+>>>>>>> parent of 8818836... cmmd populating in, needs testing
 	}
 }
 
