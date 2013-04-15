@@ -1769,7 +1769,7 @@ _.extend(Stops.prototype, objectFuncs, {
 function Trigger(attrs){//like dataList... is:'greaterThan', ... checkVal
 	this.type = 'Trigger';
 	this.handle = attrs.handle;
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
+	this.cleanUpWith = defaultTo(timeline.currentSetupType, attrs.cleanUpWith);
 	this.conditionsOn = this.cleanUpWith.killNumbers();
 	this.conditionFunc = this.wrapExpr(attrs.expr);
 

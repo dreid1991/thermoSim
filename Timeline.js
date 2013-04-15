@@ -7,7 +7,6 @@ function Timeline() {
 	this.sectionIdx = undefined;
 	this.curId = 0;
 	this.elems = [];
-
 }
 
 Timeline.prototype = {

@@ -9,7 +9,6 @@ LevelTools = {
 		this.makeListenerHolders();
 		
 		this.attracting = false;
-		
 		this.gravitying = false;
 		this.setUpdateRunListener();
 		addListener(this, 'data', 'run', this.dataRun, this);
@@ -264,38 +263,10 @@ LevelTools = {
 		this.updateDataStore = this.updateData;
 		this.update = function(){};
 		this.updateData = function(){};
-		// window.clearInterval(this.turnUpdater);
-		// window.clearInterval(this.dataUpdater);
-		// saveListener(this, 'update');
-		// saveListener(this, 'data');
-		// saveListener(this, 'wallMove');
-		// saveListener(this, 'mousedown');
-		// saveListener(this, 'mouseup');
-		// saveListener(this, 'mousemove');
-		// emptyListener(this, "update");
-		// emptyListener(this, "data");
-		// emptyListener(this, 'wallMove');
-		// emptyListener(this, 'mousedown');
-		// emptyListener(this, 'mouseup');
-		// emptyListener(this, 'mousemove');
-	},//COULD ALSO DO LIKE 'SAVE/LOAD BY TYPE' FOR ANIM TEXT, ARROW
+	},
 	resume: function(){
 		if (this.updateStore) this.update = this.updateStore;
 		if (this.updateDataStore) this.updateData = this.updateDataStore;
-		// this.turnUpdater = setInterval('curLevel.update()', updateInterval);
-		// this.dataUpdater = setInterval('curLevel.updateData()', dataInterval);
-		// loadListener(this, 'update');
-		// loadListener(this, 'data');
-		// loadListener(this, 'wallMove');
-		// loadListener(this, 'mousedown');
-		// loadListener(this, 'mouseup');
-		// loadListener(this, 'mousemove');
-		// emptySave(this, 'update');
-		// emptySave(this, 'data');
-		// emptySave(this, 'wallMove');
-		// emptySave(this, 'mousedown');
-		// emptySave(this, 'mouseup');
-		// emptySave(this, 'mousemove');
 	},
 	questionIsCorrect: function() {
 		return this.correct;
@@ -452,6 +423,7 @@ LevelTools = {
 	update: function(){
 		this.numUpdates++;
 		turn++;
+		this.updateRun();
 		for (var updateListener in this.updateListeners.listeners){
 			var listener = this.updateListeners.listeners[updateListener];
 			listener.func.apply(listener.obj);
@@ -499,13 +471,13 @@ LevelTools = {
 	},
 	setUpdateRunListener: function() {
 		if (this.attracting && this.gravitying) {
-			addListener(this, 'update', 'run', this.updateRunAttractAndGravity, this);
+			this.updateRun = this.updateRunAttractAndGravity;
 		} else if (this.attracting) {
-			addListener(this, 'update', 'run', this.updateRunAttract, this);
+			this.updateRun = this.updateRunAttract;
 		} else if (this.gravitying) {
-			addListener(this, 'update', 'run', this.updateRunGravity, this);
+			this.updateRun = this.updateRunGravity;
 		} else { 
-			addListener(this, 'update', 'run', this.updateRunBasic, this);
+			this.updateRun = this.updateRunBasic;
 		}
 	},
 	gravity: function(attrs) {
