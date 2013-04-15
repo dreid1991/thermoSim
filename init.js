@@ -64,9 +64,9 @@ $(function(){
 	addJQueryElems($('button'), 'button');
 	draw = new DrawingTools();
 	//collide = new CollideHandler(); FE
-	attractor = new Attractor();
 	turnUpdater = setInterval('curLevel.update()', updateInterval);
 	dataUpdater = setInterval('curLevel.updateData()', dataInterval);
+	attractor = new Attractor();
 	animText = new AnimText(c);
 	renderer = new Renderer();
 	phaseEquilGenerator = new PhaseEquilGenerator();

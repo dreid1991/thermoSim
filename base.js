@@ -116,7 +116,7 @@ function returnEscapist(dot){
 	dot.y = y;
 }
 function defaultTo(defaultVal, inputVal){
-	return inputVal === undefined ? defaultVal : inputVal;
+	return inputVal === undefined || isNaN(inputVal) ? defaultVal : inputVal;
 } 
 function validNumber(num){
 	return isNaN(num) || num === undefined ? false : num;

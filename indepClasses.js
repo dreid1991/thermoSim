@@ -6,15 +6,16 @@ function Dot(x, y, v, spcName, tag, elemId, returnTo) {
 	this.m = def.m;
 	this.r = def.r;
 	this.spcName = spcName;
-	this.elemId = elemId; //timeline element
+	this.elemId = defaultTo(-1, elemId); //timeline element
 	this.idNum = def.idNum;
-	this.hF298 = def.hF298 * 1000 / N;
-	this.hVap298 = def.hVap298 * 1000 / N;
+	//btdubs, try to be type-safe with members so V8 can optimize dot
+	this.hF298 = defaultTo(0, def.hF298 * 1000 / N);
+	this.hVap298 = defaultTo(0, def.hVap298 * 1000 / N);
 	this.cvKinetic = 1.5 * R / N;
 	this.cv = def.cv / N;
 	this.cp = this.cv + R;
-	this.cpLiq = def.cpLiq / N;
-	this.spcVolLiq = def.spcVolLiq / N; //L/molec
+	this.cpLiq = defaultTo(this.cv, def.cpLiq / N);
+	this.spcVolLiq = defaultTo(1e-3, def.spcVolLiq / N); //L/molec
 	this.tag = tag;
 	this.returnTo = returnTo;
 	this.tConst = tConst;

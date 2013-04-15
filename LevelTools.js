@@ -12,7 +12,8 @@ LevelTools = {
 		
 		this.gravitying = false;
 		this.setUpdateRunListener();
-		
+		// this.turnUpdater = setInterval('curLevel.update()', updateInterval);
+		// this.dataUpdater = setInterval('curLevel.updateData()', dataInterval);
 		addListener(this, 'data', 'run', this.dataRun, this);
 
 	},
@@ -261,32 +262,36 @@ LevelTools = {
 		this.showRunDivs();
 	},
 	pause: function(){
-		saveListener(this, 'update');
-		saveListener(this, 'data');
-		saveListener(this, 'wallMove');
-		saveListener(this, 'mousedown');
-		saveListener(this, 'mouseup');
-		saveListener(this, 'mousemove');
-		emptyListener(this, "update");
-		emptyListener(this, "data");
-		emptyListener(this, 'wallMove');
-		emptyListener(this, 'mousedown');
-		emptyListener(this, 'mouseup');
-		emptyListener(this, 'mousemove');
+		window.clearInterval(this.turnUpdater);
+		window.clearInterval(this.dataUpdater);
+		// saveListener(this, 'update');
+		// saveListener(this, 'data');
+		// saveListener(this, 'wallMove');
+		// saveListener(this, 'mousedown');
+		// saveListener(this, 'mouseup');
+		// saveListener(this, 'mousemove');
+		// emptyListener(this, "update");
+		// emptyListener(this, "data");
+		// emptyListener(this, 'wallMove');
+		// emptyListener(this, 'mousedown');
+		// emptyListener(this, 'mouseup');
+		// emptyListener(this, 'mousemove');
 	},//COULD ALSO DO LIKE 'SAVE/LOAD BY TYPE' FOR ANIM TEXT, ARROW
 	resume: function(){
-		loadListener(this, 'update');
-		loadListener(this, 'data');
-		loadListener(this, 'wallMove');
-		loadListener(this, 'mousedown');
-		loadListener(this, 'mouseup');
-		loadListener(this, 'mousemove');
-		emptySave(this, 'update');
-		emptySave(this, 'data');
-		emptySave(this, 'wallMove');
-		emptySave(this, 'mousedown');
-		emptySave(this, 'mouseup');
-		emptySave(this, 'mousemove');
+		this.turnUpdater = setInterval('curLevel.update()', updateInterval);
+		this.dataUpdater = setInterval('curLevel.updateData()', dataInterval);
+		// loadListener(this, 'update');
+		// loadListener(this, 'data');
+		// loadListener(this, 'wallMove');
+		// loadListener(this, 'mousedown');
+		// loadListener(this, 'mouseup');
+		// loadListener(this, 'mousemove');
+		// emptySave(this, 'update');
+		// emptySave(this, 'data');
+		// emptySave(this, 'wallMove');
+		// emptySave(this, 'mousedown');
+		// emptySave(this, 'mouseup');
+		// emptySave(this, 'mousemove');
 	},
 	questionIsCorrect: function() {
 		return this.correct;
