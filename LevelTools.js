@@ -12,8 +12,6 @@ LevelTools = {
 		
 		this.gravitying = false;
 		this.setUpdateRunListener();
-		// this.turnUpdater = setInterval('curLevel.update()', updateInterval);
-		// this.dataUpdater = setInterval('curLevel.updateData()', dataInterval);
 		addListener(this, 'data', 'run', this.dataRun, this);
 
 	},
@@ -262,8 +260,12 @@ LevelTools = {
 		this.showRunDivs();
 	},
 	pause: function(){
-		window.clearInterval(this.turnUpdater);
-		window.clearInterval(this.dataUpdater);
+		this.updateStore = this.update;
+		this.updateDataStore = this.updateData;
+		this.update = function(){};
+		this.updateData = function(){};
+		// window.clearInterval(this.turnUpdater);
+		// window.clearInterval(this.dataUpdater);
 		// saveListener(this, 'update');
 		// saveListener(this, 'data');
 		// saveListener(this, 'wallMove');
@@ -278,8 +280,10 @@ LevelTools = {
 		// emptyListener(this, 'mousemove');
 	},//COULD ALSO DO LIKE 'SAVE/LOAD BY TYPE' FOR ANIM TEXT, ARROW
 	resume: function(){
-		this.turnUpdater = setInterval('curLevel.update()', updateInterval);
-		this.dataUpdater = setInterval('curLevel.updateData()', dataInterval);
+		if (this.updateStore) this.update = this.updateStore;
+		if (this.updateDataStore) this.updateData = this.updateDataStore;
+		// this.turnUpdater = setInterval('curLevel.update()', updateInterval);
+		// this.dataUpdater = setInterval('curLevel.updateData()', dataInterval);
 		// loadListener(this, 'update');
 		// loadListener(this, 'data');
 		// loadListener(this, 'wallMove');
