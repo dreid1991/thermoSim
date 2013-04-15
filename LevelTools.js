@@ -96,6 +96,7 @@ LevelTools = {
 		
 		this.pause();
 		$('#dashRunWrapper').hide();
+		$('#buttonManager').hide();
 		if (mode===true && !quiz) {
 			$('#dashCutScene').show();
 			this.cutSceneText(text);
@@ -121,6 +122,7 @@ LevelTools = {
 		
 	},
 	appendQuiz: function(quiz, appendTo) {
+		$(appendTo).append(templater.br());
 		var wrapperHTML = templater.div({attrs: {id: ['quizWrapper']}, style: {display: 'inline-block'}});
 		var contentHTML = templater.div({attrs: {id: ['quizContent'], 'class': ['niceFont', 'whiteFont']}});
 		var footerHTML = templater.div({attrs: {id: ['quizFooter']}});
@@ -243,6 +245,7 @@ LevelTools = {
 	showRunDivs: function() {
 		$('#intText').html('');
 		$('#dashRunWrapper').show();
+		$('#buttonManager').show();
 		$('#dashRun').show();
 		$('#dashOutro').hide();
 		$('#dashIntro').hide();

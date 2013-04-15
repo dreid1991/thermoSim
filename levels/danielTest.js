@@ -57,9 +57,9 @@ LevelData = {
 
 						
 				],
-				triggers: [
-					{handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: true}
-				],
+				// triggers: [
+					// {handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: true}
+				// ],
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'uglier', tag: 'wally'}}
@@ -155,6 +155,25 @@ LevelData = {
 					sceneData: undefined,
 					text: 'hello',
 					title: 'titley'
+				},
+				{
+					sceneData: undefined,
+					cutScene: true,
+					title: 'hello',
+					text: ' checll I am the true lorf of winterfell and they will fear me I think.',
+				
+					quiz: [
+						{
+							type: 'textSmall',
+							label: 'foo',
+							text: 'hello',
+							messageWrong: 'hello',
+							storeAs: 'theAnswer'
+						
+						}
+					],
+					
+					
 				},
 				{
 					sceneData: undefined,

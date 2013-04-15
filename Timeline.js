@@ -294,7 +294,7 @@ Timeline.Section.prototype = {
 			spawnFunc = function() {
 				var interpedText = interpreter.interp(prompt.text);
 				//$('#nextPrevDiv').hide();
-				section.level.cutSceneStart(interpedText, prompt.curScene, prompt.quiz)
+				section.level.cutSceneStart(interpedText, prompt.cutScene, prompt.quiz)
 			};
 			removeFunc = function() {
 				section.level.cutSceneEnd()
