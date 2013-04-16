@@ -15,6 +15,7 @@ LevelTools = {
 
 	},
 	addImgs: function(levelData) {
+		var questionId = 0;
 		for (var sectionIdx=0; sectionIdx<levelData.mainSequence.length; sectionIdx++) {
 			var section = levelData.mainSequence[sectionIdx];
 			if (!section.prompts) console.log('Section ' + sectionIdx + ' has no prompts!  Sections must have at least one prompt.');
@@ -27,6 +28,8 @@ LevelTools = {
 				if (quiz) {
 					for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
 						var question = quiz[questionIdx];
+						if (!question.storeAs) question.storeAs = 'storeAs' + questionId;
+						questionId ++;
 						if (question.options) {
 							for (optionIdx=0; optionIdx<question.options.length; optionIdx++) {
 								var option = question.options[optionIdx];
@@ -189,36 +192,36 @@ LevelTools = {
 		}
 	},
 	storeText: function() {
-		for (var questionIdx=0; questionIdx<this.quiz.length; questionIdx++) {
-			var question = this.quiz[questionIdx];
-			if (question.type=='text' || question.type=='textSmall' || question.type == 'setVals') {
-				var id = this.getTextAreaId(questionIdx);
-				var storeAs = $('#' + id).attr('storeAs');
-				var submitted = $('#' + id).val();
-				if (submitted.killWhiteSpace() != '') {
-					if (storeAs === undefined) storeAs = 'ansS'+sectionIdx+'P'+promptIdx+'Q'+questionIdx;
-					store(storeAs, submitted);
-					question.answerText(submitted);
-					question.isAnswered = true;
-					if (question.answer) {
-						if (fracDiff(parseFloat(question.answer), parseFloat(submitted))<.05){
-							question.correct = true;
-						} else {
-							if (question.messageWrong) {
-								alert(interpreter.interpInput(question.messageWrong));
-							}
-							question.correct = false;
-						}
-					} else {
-						question.correct = true;
-					}
-				} else {
-					question.correct = false;
-					question.isAnswered = false
-				}
-			}
+		// for (var questionIdx=0; questionIdx<this.quiz.length; questionIdx++) {
+			// var question = this.quiz[questionIdx];
+			// if (question.type=='text' || question.type=='textSmall' || question.type == 'setVals') {
+				// var id = this.getTextAreaId(questionIdx);
+				// var storeAs = $('#' + id).attr('storeAs');
+				// var submitted = $('#' + id).val();
+				// if (submitted.killWhiteSpace() != '') {
+					// if (storeAs === undefined) storeAs = 'ansS'+sectionIdx+'P'+promptIdx+'Q'+questionIdx;
+					// store(storeAs, submitted);
+					// //question.answerText(submitted);
+					// question.isAnswered = true;
+					// if (question.answer) {
+						// if (fracDiff(parseFloat(question.answer), parseFloat(submitted))<.05){
+							// question.correct = true;
+						// } else {
+							// if (question.messageWrong) {
+								// alert(interpreter.interpInput(question.messageWrong));
+							// }
+							// question.correct = false;
+						// }
+					// } else {
+						// question.correct = true;
+					// }
+				// } else {
+					// question.correct = false;
+					// question.isAnswered = false
+				// }
+			// }
 		
-		}	
+		// }	
 	},
 	appendQuestion: function(question, appendTo, questionIdx){
 		question.answered = false;
@@ -373,19 +376,20 @@ LevelTools = {
 	type: 'text'
 	can have:			text, messageRight, messageWrong, answer, units
 	*/
-	appendTextBox: function(question, appendTo, rows, cols, units, questionIdx){
+	appendTextBox: function(question, appendTo, rows, cols, units, questionIdx) {
 		var textBoxHTML = '';
 		question.answerIs = false;
-		question.answerText = function(text) {
-			question.answerTextSubmitted = text;
-		}
+		// question.answerText = function(text) {
+			// question.answerTextSubmitted = text;
+		// }
 		question.isCorrect = this.questionIsCorrect;
 		question.label = defaultTo('', question.label);
 		var idText = this.getTextAreaId(questionIdx);
 		var boxText = defaultTo('Type your answer here.', question.text);
 		
 		var textareaAttrs = {id: [idText], rows: [rows], cols: [cols] , placeholder: [boxText]};
-		if (question.storeAs) textareaAttrs.storeAs = [question.storeAs];
+
+		textareaAttrs.storeAs = [question.storeAs];
 		textareaHTML = templater.textarea({attrs: textareaAttrs});
 		
 		var textBoxHTML = (question.preText === undefined ? '' : (interpreter.interp(question.preText) + templater.br())) + templater.table({attrs: {'class': ['niceFont', 'whiteFont']}, innerHTML:
@@ -406,6 +410,32 @@ LevelTools = {
 		})
 
 		$(appendTo).append(textBoxHTML);
+		if (getStore(question.storeAs)) {
+			$('#' + idText).html(getStore(question.storeAs));
+			//question.isAnswered should already be set if coming back
+		}
+		$('#' + idText).change(function() {
+			var answer = $('#' + idText).val();
+			if (answer != '') {
+				store(question.storeAs, answer);
+				question.isAnswered = true;
+				if (question.answer) {
+					if (fracDiff(parseFloat(question.answer), parseFloat(val))<.05){
+						question.correct = true;
+					} else {
+						// if (question.messageWrong) {
+							// alert(interpreter.interpInput(question.messageWrong));
+						// }
+						question.correct = false;
+					}
+				} else {
+					question.correct = true;
+				}
+				question.
+			}
+				
+			
+		});
 	},
 	getTextAreaId: function(idx) {
 		return 'textArea' + idx;
@@ -460,7 +490,7 @@ LevelTools = {
 			//this.data[datum].pushNumber(recordInfo.func.apply(recordInfo.obj));
 		}			
 	},
-	dataRun: function(){
+	dataRun: function() {
 		for (var datum in this.recordListeners.listeners){
 			var recordInfo = this.recordListeners.listeners[datum];
 			recordInfo.func.apply(recordInfo.obj);

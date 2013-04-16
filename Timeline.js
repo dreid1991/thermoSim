@@ -335,7 +335,7 @@ Timeline.Section.prototype = {
 			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');			
 		}
 		var arrangeHTMLSpawn = function() {
-			interpreter.renderMath();
+			//interpreter.renderMath();
 			section.buttonManager.arrangeGroupWrappers();
 			section.buttonManager.arrangeAllGroups();
 			section.buttonManager.setButtonWidth();			

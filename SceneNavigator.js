@@ -198,7 +198,7 @@ SceneNavigator.prototype = {
 		var allCorrect = 1;
 		var quiz = curLevel.quiz;
 		if (quiz && quiz.length>0) {
-			if (!quiz.allAnswered()) {
+			if (!quiz.allAnswered()) {//what the shit is this?
 				alert("You haven't answered all the questions");
 				return 0;
 			} else {

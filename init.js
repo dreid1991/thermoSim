@@ -1,6 +1,6 @@
 $(function(){
 	//R is defined at the top of base so it can be used in level data
-	MathJax.Hub.Config({tex2jax: {inlineMath: [['##','##'], ['\\(','\\)']], displayMath: [['$$', '$$']]}});
+//	MathJax.Hub.Config({tex2jax: {inlineMath: [['##','##'], ['\\(','\\)']], displayMath: [['$$', '$$']]}});
 	_.extend(Array.prototype, toInherit.ArrayExtenders);
 	_.extend(Math, toInherit.MathExtenders);
 	_.extend(String.prototype, toInherit.StringExtenders);
