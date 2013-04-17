@@ -60,6 +60,7 @@ Timeline.prototype = {
 	takeNumber: function() {
 		return this.curId ++;
 	},
+
 }
 
 Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBlank) {
@@ -300,9 +301,11 @@ Timeline.Section.prototype = {
 			};
 			if (prompt.quiz) {
 				spawnFunc = extend(spawnFunc, function() {
+					$('#base').hide();
 					section.level.quiz = quizRenderer.render(prompt.quiz, $('#intText'));
 				});
 				removeFunc = extend(removeFunc, function() {
+					$('#base').show();
 					section.level.quiz = undefined;
 				});
 			}
@@ -684,9 +687,10 @@ Timeline.Moment.prototype = {
 		}
 	},
 	fireSpan: function(span, from, to) {
+		var elemDatum = getAndEval(span.elemDatum);
 		if (span.boundType == 'head') {
 			if (to == this.timestamp && from < to) {
-				span.spawn(span.section, span.timelineElems, span.id, span.elemDatum);
+				span.spawn(span.section, span.timelineElems, span.id, elemDatum);
 			} else if (from == this.timestamp && to < from) {
 				span.remove(span.section, span.timelineElems, span.id);
 			}
@@ -694,22 +698,25 @@ Timeline.Moment.prototype = {
 			if (to > from) {
 				span.remove(span.section, span.timelineElems, span.id);
 			} else if (from > to) {
-				span.spawn(span.section, span.timelineElems, span.id, span.elemDatum);
+				span.spawn(span.section, span.timelineElems, span.id, elemDatum);
 			}
 		}
 	},
 	fireCmmds: function(cmmds, from, to) {
+		var elemDatum;
 		for (var i=0; i<cmmds.length; i++) {
 			var event = cmmds[i];
 			if (event instanceof Timeline.Event.Span) {
 				this.fireSpans([event], from, to)
 			} else if (event instanceof Timeline.Event.Point) {
 				if (to == this.timestamp && event.elemDatum.oneWay ? from < to : true) {
-					event.spawn(event.section, event.timelineElems, event.id, event.elemDatum);
+					elemDatum = getAndEval(event.elemDatum);
+					event.spawn(event.section, event.timelineElems, event.id, elemDatum);
 				}
 			} else if (event instanceof Timeline.Event.Once) {
 				if (!event.fired) {
-					event.spawn(event.section, event.timelineElems, event.id, event.elemDatum);
+					elemDatum = getAndEval(event.elemDatum);
+					event.spawn(event.section, event.timelineElems, event.id, elemDatum);
 					event.fired = true;
 				}
 			}

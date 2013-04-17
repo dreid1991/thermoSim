@@ -257,6 +257,43 @@ function eraseStore (attrName) {
 	}
 }
 
+function getAndEval(sceneElem) {
+	if (typeof sceneElem == 'number') {
+		return sceneElem;
+	} else if (typeof sceneElem == 'string') {
+		return interpreter.interpInput(sceneElem);
+	} else if (typeof sceneElem == 'boolean') {
+		return sceneElem;
+	} else if (sceneElem instanceof Point) {
+		var x = this.getAndEval(sceneElem.x);
+		var y = this.getAndEval(sceneElem.y);
+		return P(x, y);
+	} else if (sceneElem instanceof Vector) {
+		var dx = this.getAndEval(sceneElem.dx);
+		var dy = this.getAndEval(sceneElem.dy);
+		return V(dx, dy);
+	} else if (sceneElem instanceof Color) {
+		var r = this.getAndEval(sceneElem.r);
+		var g = this.getAndEval(sceneElem.g);
+		var b = this.getAndEval(sceneElem.b);
+		return Col(r, g, b);
+	} else if (sceneElem instanceof Array) {
+		var newArr = [];
+		for (var idx=0; idx<sceneElem.length; idx++) {
+			newArr.push(this.getAndEval(sceneElem[idx]));
+		}
+		return newArr = newArr;
+	} else if (typeof sceneElem == 'function') {
+		return sceneElem;
+	} else if (sceneElem instanceof Object) {
+		var newObj = {};
+		for (var name in sceneElem) {
+			newObj[name] = this.getAndEval(sceneElem[name])
+		}
+		return newObj;
+	}
+}
+
 function deepCopy(object){
 	var copy = new object.constructor();
 

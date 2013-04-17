@@ -117,45 +117,45 @@ LevelData = {
 				],
 			},
 			prompts: [
-				// {
-					// sceneData: {
-						// objs: [
+				{
+					sceneData: {
+						objs: [
 			
+						]
+						// objs: [
+							// {
+								// type: 'AuxImage',
+								// attrs: {handle: 'piccy', slotNum: 1, imgFunc: 'img(img/refresh.gif)'}
+							// }
+						
+						// ],
+						// listeners: [
+							
+							// {dataSet: {wallInfo: 'wally', data: 'pExt'}, is: 'equalTo', checkVal: 1, alertUnsatisfied: 'booo', satisfyCmmds: [{type: 'DragWeights', handle: 'draggy', cmmd: 'freeze'}]}
+							
+						// ],
+						// dataDisplay: [
+							// {wallInfo: "wally", data:'temp', readout: 'mainReadout'}
 						// ]
-						// // objs: [
-							// // {
-								// // type: 'AuxImage',
-								// // attrs: {handle: 'piccy', slotNum: 1, imgFunc: 'img(img/refresh.gif)'}
-							// // }
+					},
+					quiz: [
+						{
+							type: 'textSmall',
+							label: 'foo',
+							text: 'hello',
+							messageWrong: 'hello',
+							storeAs: 'theAnswer'
 						
-						// // ],
-						// // listeners: [
-							
-							// // {dataSet: {wallInfo: 'wally', data: 'pExt'}, is: 'equalTo', checkVal: 1, alertUnsatisfied: 'booo', satisfyCmmds: [{type: 'DragWeights', handle: 'draggy', cmmd: 'freeze'}]}
-							
-						// // ],
-						// // dataDisplay: [
-							// // {wallInfo: "wally", data:'temp', readout: 'mainReadout'}
-						// // ]
-					// },
-					// quiz: [
-						// {
-							// type: 'textSmall',
-							// label: 'foo',
-							// text: 'hello',
-							// messageWrong: 'hello',
-							// storeAs: 'theAnswer'
-						
-						// }
-					// ],
-					// title: 'wooo!',
-					// text: 'Woink.'
-				// },
-				// {
-					// sceneData: undefined,
-					// text: 'hello',
-					// title: 'titley'
-				// },
+						}
+					],
+					title: 'wooo!',
+					text: 'Woink.'
+				},
+				{
+					sceneData: undefined,
+					text: 'hello',
+					title: 'titley'
+				},
 				{
 					sceneData: undefined,
 					cutScene: true,
