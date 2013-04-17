@@ -118,12 +118,10 @@ Timeline.Section.prototype = {
 	},
 	stepTo: function(dest) {
 		var moments = this.moments;
-		//I am assuming that one only jumps to .2's
 		if (dest > this.time || Math.floor(this.time) == Math.floor(dest)) {
 			var curMom = this.momentAt(this.time);
 			if (curMom) curMom.fire(this.time, dest);
 			while (dest != this.time) {
-			//nah dawg, make it get a path to take
 				var nextMom = this.nextTowardsDest(this.time, dest);
 				if (!nextMom) break;
 				nextMom.fire(this.time, nextMom.timestamp);
@@ -132,7 +130,7 @@ Timeline.Section.prototype = {
 		} else if (dest < this.time) {
 			//step back to (dest).9
 			//then jump to (dest).1 for setup, then (dest).2 for html
-			//avoids frivolous cutscene entering/exiting
+			//avoids unnecessary cutscene entering/exiting
 			var curMom = this.momentAt(this.time);
 			if (curMom) curMom.fire(this.time, dest);
 			var reAddElemsDest = this.getTimestamp(Math.floor(dest), 'tail');
@@ -291,15 +289,23 @@ Timeline.Section.prototype = {
 		var timestampTail, id, spawnFunc, removeFunc, cmmd;
 		if (prompt.cutScene) {
 			id = timeline.takeNumber();
+		
 			spawnFunc = function() {
 				var interpedText = interpreter.interp(prompt.text);
-				//$('#nextPrevDiv').hide();
-				section.level.cutSceneStart(interpedText, prompt.cutScene, prompt.quiz)
+				section.level.cutSceneStart(interpedText, prompt.cutScene)
 			};
 			removeFunc = function() {
 				section.level.cutSceneEnd()
 				//$('#nextPrevDiv').show();
 			};
+			if (prompt.quiz) {
+				spawnFunc = extend(spawnFunc, function() {
+					section.level.quiz = quizRenderer.render(prompt.quiz, $('#intText'));
+				});
+				removeFunc = extend(removeFunc, function() {
+					section.level.quiz = undefined;
+				});
+			}
 			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
 			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');
@@ -309,19 +315,25 @@ Timeline.Section.prototype = {
 				var interpedText = interpreter.interp(prompt.text);
 				$('#prompt').html(defaultTo('', templater.div({innerHTML: interpedText})));
 				if (prompt.quiz) 
-					section.level.appendQuiz(prompt.quiz, $('#prompt'));		
-			}
+					section.level.quiz = quizRenderer.render(prompt.quiz, $('#prompt'));	
+			};
 			removeFunc = function() {
 				$('#prompt').html('');
-			}
+				section.level.quiz = undefined;
+			};
+		
+			
+			
 			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
 			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');
 		}
-		if (prompt.quiz) { //this may need work.  Can be overruled by setVals quiz, which is probably fine, but just check over it sometime
+		if (prompt.quiz) { 
+			var spawnFunc, removeFunc;
 			id = timeline.takeNumber();
 			spawnFunc = function() {$('#nextPrevDiv').hide();};
 			removeFunc = function() {$('#nextPrevDiv').show();};
+			
 			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
 			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');
@@ -335,7 +347,7 @@ Timeline.Section.prototype = {
 			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');			
 		}
 		var arrangeHTMLSpawn = function() {
-			//interpreter.renderMath();
+			interpreter.renderMath();
 			section.buttonManager.arrangeGroupWrappers();
 			section.buttonManager.arrangeAllGroups();
 			section.buttonManager.setButtonWidth();			
@@ -670,11 +682,6 @@ Timeline.Moment.prototype = {
 		for (var i=0; i<spans.length; i++) {
 			this.fireSpan(spans[i], from, to);
 		}
-		// if (to == this.timestamp) {
-			// this.fireSpansArriving(spans, to, from);
-		// } else if (from == this.timestamp) {
-			// this.fireSpansLeaving(spans, to, from);
-		// }
 	},
 	fireSpan: function(span, from, to) {
 		if (span.boundType == 'head') {
@@ -691,26 +698,6 @@ Timeline.Moment.prototype = {
 			}
 		}
 	},
-	// fireSpansArriving: function(spans, to, from) {
-		// for (var i=0; i<spans.length; i++) {
-			// var span = spans[i];
-			// if (span.boundType == 'head' && from < to) {
-				// span.spawn(span.section, span.timelineElems, span.id, span.elemDatum);
-			// } else if (span.boundType == 'tail' && to < from) {
-				// span.spawn(span.section, span.timelineElems, span.id, span.elemDatum);
-			// }
-		// }
-	// },
-	// fireSpansLeaving: function(spans, to, from) {
-		// for (var i=0; i<spans.length; i++) {
-			// var span = spans[i];
-			// if (span.boundType == 'tail' && to > from) {
-				// span.remove(span.section, span.timelineElems, span.id);
-			// } else if (span.boundType == 'head' && to < from) {
-				// span.remove(span.section, span.timelineElems, span.id);
-			// }
-		// }		
-	// },
 	fireCmmds: function(cmmds, from, to) {
 		for (var i=0; i<cmmds.length; i++) {
 			var event = cmmds[i];

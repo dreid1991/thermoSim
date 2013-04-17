@@ -1,11 +1,10 @@
 $(function(){
 	//R is defined at the top of base so it can be used in level data
-//	MathJax.Hub.Config({tex2jax: {inlineMath: [['##','##'], ['\\(','\\)']], displayMath: [['$$', '$$']]}});
+	MathJax.Hub.Config({tex2jax: {inlineMath: [['##','##'], ['\\(','\\)']], displayMath: [['$$', '$$']]}});
 	_.extend(Array.prototype, toInherit.ArrayExtenders);
 	_.extend(Math, toInherit.MathExtenders);
 	_.extend(String.prototype, toInherit.StringExtenders);
 	templater = new Templater();
-	//String.prototype.killWhiteSpace = StringExtenders.killWhiteSpace;
 	globalHTMLClass = 'sim';
 	//hoverCol = Col(0, 81, 117); defined in quiz renderer
 	dotManager = new DotManager();
@@ -29,7 +28,6 @@ $(function(){
 	N = 1000;//Avagadro's number
 	R = 8.314;
 	KB = R / N;
-	//set compAdj to '' have collisions for cv of R, cp of 2R
 	cv = 1.5*R;
 	cp = 2.5*R;
 	//compAdj = '32';
@@ -68,8 +66,8 @@ $(function(){
 	dataUpdater = setInterval('curLevel.updateData()', dataInterval);
 	attractor = new Attractor();
 	animText = new AnimText(c);
-	renderer = new Renderer();
 	phaseEquilGenerator = new PhaseEquilGenerator();
+	quizRenderer = new QuizRenderer();
 	sceneNavigator = new SceneNavigator();
 	interpreter = new ExpressionInterpreter();
 	$('#resetExp').click(function(){sceneNavigator.refresh()});

@@ -5,7 +5,7 @@ function QuizRenderer() {
 
 QuizRenderer.prototype = {
 	render: function(questions, appendTo) {
-		var quiz = new Quiz(questions);
+		var quiz = new QuizRenderer.Quiz(questions);
 		if (this.checkQuizTyping(quiz)) {
 			$(appendTo).append(templater.br());
 			var wrapperHTML = templater.div({attrs: {id: ['quizWrapper']}, style: {display: 'inline-block'}});
@@ -22,14 +22,16 @@ QuizRenderer.prototype = {
 			for (var i=0; i<quiz.questions.length; i++) {
 				this.renderQuestion(quiz.questions[i], content);
 			}
+			if (questions[0] && questions[0].type == 'setVals') {
+				this.appendButtons(footer, function(){ sceneNavigator.prevPrompt()}, function(){ sceneNavigator.refresh()}, 'Back', 'Set values');
+			} else {
+				this.appendButtons(footer, function(){ sceneNavigator.prevPrompt()}, function(){ sceneNavigator.nextPrompt()}, 'Back', 'Submit');
+			}
 			//always make submit button because we're making mult choice be click choice, then submit.  Deals with multiple questions better.
 			return quiz;
 		}
-	}
-}
-
-QuizRenderer.prototype = {
-	checkTyping: function(quiz) {
+	},
+	checkQuizTyping: function(quiz) {
 		var questions = quiz.questions;
 		var hasSetVals = false;
 		var hasNotSetVals = false;
@@ -71,7 +73,7 @@ QuizRenderer.prototype = {
 			option.div = $('#' + question.storeAs + String(i));
 		}
 		this.bindMultChoiceQuestion(question);
-	}
+	},
 	bindMultChoiceQuestion: function(question) {
 		for (var i=0; i<question.options.length; i++) 
 			this.bindMultChoiceOption(question, question.options, question.options[i]);
@@ -86,7 +88,17 @@ QuizRenderer.prototype = {
 						options[i].selected = false;
 					}
 				}
+				
 				option.selected = true;
+				if (question.hasCorrectAnswer()) {
+					if (option.correct) {
+						question.correct = true;
+					} else {
+						question.correct = false;
+					}
+				} else {
+					question.correct = true;
+				}
 				this.css('background-color', renderer.selectedCol.hex);
 			}
 		}
@@ -103,7 +115,7 @@ QuizRenderer.prototype = {
 		option.div.click(click);
 		option.div.hover(hoverIn, hoverOut);
 	},
-	renderTextBox: function(question, appendTo, row, cols) {
+	renderTextBox: function(question, appendTo, rows, cols) {
 		var textAreaId = question.storeAs;
 		var boxText = defaultTo('Type your answer here.', question.text);
 		var textareaAttrs = {id: [textAreaId], rows: [rows], cols: [cols] , placeholder: [boxText]};
@@ -127,17 +139,12 @@ QuizRenderer.prototype = {
 		appendTo.append(textBoxHTML);
 		
 		question.div = $('#' + textAreaId);
-		
-		if (getStore(question.storeAs)) {
-			question.div.html(getStore(question.storeAs));
-		}
-		
-		question.div.change(function() {
-			var answer = question.div.val();
+		var changeFunc = function(inputAns) {
+			var answer = inputAns !== undefined ? inputAns : question.div.val();
 			if (answer != '') {
 				store(question.storeAs, answer);
 				question.answered = true;
-				if (question.answer !== undefined) {
+				if (question.hasCorrectAnswer()) {
 					if (fracDiff(parseFloat(question.answer), parseFloat(val))<.05){
 						question.correct = true;
 					} else {
@@ -147,13 +154,31 @@ QuizRenderer.prototype = {
 					question.correct = true;
 				}
 			}		
-		})
+		}
+		if (getStore(question.storeAs)) {
+			changeFunc(getStore(question.storeAs));
+			question.div.html(getStore(question.storeAs));
+		}
+		
+		question.div.change(function() {changeFunc()})
 		
 	},
+	appendButtons: function(appendTo, leftFunc, rightFunc, leftLabel, rightLabel) {
+		var wrapperId = 'quizSubmitWrapper';
+		var leftId = 'quizButtonLeft';
+		var rightId = 'quizButtonRight';
+		var buttonHTML = templater.button({attrs:{id: [leftId]}, innerHTML: leftLabel}) + templater.button({attrs:{id: [rightId]}, innerHTML: rightLabel});
+		var wrapper = templater.div({attrs: {id: [wrapperId]}, style: {'float': 'right'}, innerHTML: buttonHTML});
+		$(appendTo).append(wrapper);
+		$('#' + leftId).click(leftFunc);
+		$('#' + rightId).click(rightFunc);
+		addJQueryElems($('#' + leftId), 'button');
+		addJQueryElems($('#' + rightId), 'button');
+	}
 }
 
 
-function QuizRenderer.Quiz(questions) {
+QuizRenderer.Quiz = function (questions) {
 	this.questions = [];
 	for (var i=0; i<questions.length; i++) {
 		this.questions.push(new QuizRenderer.Question(questions[i]));
@@ -168,6 +193,13 @@ QuizRenderer.Quiz.prototype = {
 		}
 		return true;
 	},
+	allCorrect: function() {
+		for (var i=0; i<this.questions.length; i++) {
+			var question = this.questions[i];
+			if (!question.correct) return false;
+		}
+		return true;
+	},
 	fireAlertWrong: function() {
 		for (var i=0; i<this.questions.length; i++) {
 			var question = this.questions[i];
@@ -179,7 +211,7 @@ QuizRenderer.Quiz.prototype = {
 	}
 }
 
-function QuizRenederer.Question(questionData) {
+QuizRenderer.Question = function(questionData) {
 	this.type = questionData.type;
 	this.label = questionData.label;
 	this.text = questionData.text;
@@ -194,19 +226,31 @@ function QuizRenederer.Question(questionData) {
 	this.div = undefined;
 }
 
+
+
 QuizRenderer.Question.prototype = {
 	makeOptions: function(options) {
 		if (!options) return undefined;
 		var procdOptions = []
 		for (var i=0; i<options.length; i++) {
-			var procdOptions.push(new QuizRenderer.MultChoiceOption(options[i]));
+			procdOptions.push(new QuizRenderer.MultChoiceOption(options[i]));
 		}
 		return procdOptions;
+	},
+	hasCorrectAnswer: function() {
+		if ((this.type == 'text' || this.type == 'textSmall' || this.type == 'setVals') && this.answer !== undefined) {
+			return true
+		} else if (this.type == 'multChoice') {
+			for (var i=0; i<this.options.length; i++) {
+				if (this.options[i].correct) return true;
+			}
+		}
+		return false;
 	}
 }
 
-function QuizRenderer.MultChoiceOption = function(option) {
-	this.isCorrect = option.isCorrect;
+QuizRenderer.MultChoiceOption = function(option) {
+	this.correct = option.correct || false;
 	this.text = option.text;
 	this.selected = false;
 	this.alert = option.alert;

@@ -194,24 +194,20 @@ SceneNavigator.prototype = {
 
 
 	checkWillAdvanceQuiz: function(){
-		//isCorrect will alert for wrong answers and maybe for no answer (if text box, I guess)
-		var allCorrect = 1;
 		var quiz = curLevel.quiz;
-		if (quiz && quiz.length>0) {
-			if (!quiz.allAnswered()) {//what the shit is this?
-				alert("You haven't answered all the questions");
-				return 0;
+		if (quiz) {
+			if (!quiz.allAnswered()) {
+				alert("You haven't answered all the questions.");
+				return false;
+			} else if (!quiz.allCorrect()) {
+				quiz.fireAlertWrong();
+				return false;
 			} else {
-				for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
-					var question = quiz[questionIdx];
-					allCorrect = Math.min(allCorrect, question.isCorrect());
-				}
-				return allCorrect;
+				return true;
 			}
 		} else {
-			return allCorrect;
-		}	
-		
+			return true;
+		}
 	},
 
 	prevPrompt: function(){
