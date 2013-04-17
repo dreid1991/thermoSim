@@ -7,7 +7,7 @@ $(function(){
 	templater = new Templater();
 	//String.prototype.killWhiteSpace = StringExtenders.killWhiteSpace;
 	globalHTMLClass = 'sim';
-	hoverCol = Col(0, 81, 117);
+	//hoverCol = Col(0, 81, 117); defined in quiz renderer
 	dotManager = new DotManager();
 	turn = 0;
 	window.Graphs = {

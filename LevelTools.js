@@ -431,7 +431,7 @@ LevelTools = {
 				} else {
 					question.correct = true;
 				}
-				question.
+				question.correct = true;
 			}
 				
 			
@@ -446,6 +446,7 @@ LevelTools = {
 		$('#dashOutro').hide();
 		$('#dashCutScene').hide();
 	},
+	//is this used?
 	borderStd: function(info){
 		info = defaultTo({}, info);
 		var wall = defaultTo(0, info.wallInfo);
