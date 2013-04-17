@@ -43,7 +43,7 @@ LevelData = {
 					{
 						type: 'Heater',
 						cleanUpWith: 'prompt1',
-						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty'}
+						attrs:{wallInfo: 'wally', max: 1, handle: 'heaty'}
 					}
 
 					// {
@@ -117,45 +117,45 @@ LevelData = {
 				],
 			},
 			prompts: [
-				{
-					sceneData: {
-						objs: [
-			
-						]
+				// {
+					// sceneData: {
 						// objs: [
-							// {
-								// type: 'AuxImage',
-								// attrs: {handle: 'piccy', slotNum: 1, imgFunc: 'img(img/refresh.gif)'}
-							// }
-						
-						// ],
-						// listeners: [
-							
-							// {dataSet: {wallInfo: 'wally', data: 'pExt'}, is: 'equalTo', checkVal: 1, alertUnsatisfied: 'booo', satisfyCmmds: [{type: 'DragWeights', handle: 'draggy', cmmd: 'freeze'}]}
-							
-						// ],
-						// dataDisplay: [
-							// {wallInfo: "wally", data:'temp', readout: 'mainReadout'}
+			
 						// ]
-					},
-					quiz: [
-						{
-							type: 'textSmall',
-							label: 'foo',
-							text: 'hello',
-							messageWrong: 'hello',
-							storeAs: 'theAnswer'
+						// // objs: [
+							// // {
+								// // type: 'AuxImage',
+								// // attrs: {handle: 'piccy', slotNum: 1, imgFunc: 'img(img/refresh.gif)'}
+							// // }
 						
-						}
-					],
-					title: 'wooo!',
-					text: 'Woink.'
-				},
-				{
-					sceneData: undefined,
-					text: 'hello',
-					title: 'titley'
-				},
+						// // ],
+						// // listeners: [
+							
+							// // {dataSet: {wallInfo: 'wally', data: 'pExt'}, is: 'equalTo', checkVal: 1, alertUnsatisfied: 'booo', satisfyCmmds: [{type: 'DragWeights', handle: 'draggy', cmmd: 'freeze'}]}
+							
+						// // ],
+						// // dataDisplay: [
+							// // {wallInfo: "wally", data:'temp', readout: 'mainReadout'}
+						// // ]
+					// },
+					// quiz: [
+						// {
+							// type: 'textSmall',
+							// label: 'foo',
+							// text: 'hello',
+							// messageWrong: 'hello',
+							// storeAs: 'theAnswer'
+						
+						// }
+					// ],
+					// title: 'wooo!',
+					// text: 'Woink.'
+				// },
+				// {
+					// sceneData: undefined,
+					// text: 'hello',
+					// title: 'titley'
+				// },
 				{
 					sceneData: undefined,
 					cutScene: true,
@@ -163,15 +163,23 @@ LevelData = {
 					text: ' checll I am the true lorf of winterfell and they will fear me I think.',
 				
 					quiz: [
-						{
-							type: 'textSmall',
-							label: 'foo',
-							text: 'hello',
-							messageWrong: 'hello',
-							storeAs: 'theAnswer'
-						
+						{type: 'multChoice',
+							options:[
+								{text:"## W = -\\int_{V_{1}}^{V_{2}}P_{sys}dV ##", correct: false, messageWrong:"That's not correct"},
+								{text:"## W = - V\\Delta P_{ext} ##", correct: false, messageWrong:"That's not correct"},
+								{text:"## W = -P_{ext}\\Delta V ##", correct: true},
+								{text:"## W = -T\\Delta V ##", correct: false, messageWrong:"That's not correct"}
+							]
+						},
+						{type: 'multChoice',
+							options:[
+								{text:"fawe", messageWrong:"That's not correct"},
+								{text:"## W = - V\\Delta P_{ext} ##", messageWrong:"That's not correct"},
+								{text:"## W = -P_{ext}\\Delta V ##"},
+								{text:"## W = -T\\Delta V ##", messageWrong:"That's not correct"}
+							]
 						}
-					],
+					]
 					
 					
 				},

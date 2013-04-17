@@ -75,12 +75,11 @@ QuizRenderer.prototype = {
 		this.bindMultChoiceQuestion(question);
 	},
 	bindMultChoiceQuestion: function(question) {
-		for (var i=0; i<question.options.length; i++) 
-			this.bindMultChoiceOption(question, question.options, question.options[i]);
-	},
-	bindMultChoiceOption: function(question, options, option) {
 		var renderer = this;
-		var click = function() {
+		var options = question.options;
+		var click = function(idx) {
+			var option = options[idx];
+			question.answered = true;
 			if (!option.selected) {
 				for (var i=0; i<options.length; i++) {
 					if (options[i] != option) {
@@ -90,6 +89,7 @@ QuizRenderer.prototype = {
 				}
 				
 				option.selected = true;
+				store(question.storeAs, idx);
 				if (question.hasCorrectAnswer()) {
 					if (option.correct) {
 						question.correct = true;
@@ -99,20 +99,31 @@ QuizRenderer.prototype = {
 				} else {
 					question.correct = true;
 				}
-				this.css('background-color', renderer.selectedCol.hex);
-			}
+				$(option.div).css('background-color', renderer.selectedCol.hex);
+			}			
+		}
+		if (getStore(question.storeAs) !== undefined) {
+			click(getStore(question.storeAs));
+		}
+		for (var i=0; i<question.options.length; i++) 
+			this.bindMultChoiceOption(question, click, question.options, question.options[i]);
+	},
+	bindMultChoiceOption: function(question, clickFunc, options, option) {
+		var renderer = this;
+		var click = function() {
+
 		}
 		var hoverIn = function() {
 			if (!option.selected) {
-				this.css('background-color', renderer.hoverCol.hex);
+				$(this).css('background-color', renderer.hoverCol.hex);
 			}
 		}
 		var hoverOut = function() {
 			if (!option.selected) {
-				this.css('backgroud-color', 'transparent');
+				$(this).css('background-color', 'transparent');
 			}
 		}
-		option.div.click(click);
+		option.div.click(function() {clickFunc(options.indexOf(option))});
 		option.div.hover(hoverIn, hoverOut);
 	},
 	renderTextBox: function(question, appendTo, rows, cols) {
@@ -203,9 +214,20 @@ QuizRenderer.Quiz.prototype = {
 	fireAlertWrong: function() {
 		for (var i=0; i<this.questions.length; i++) {
 			var question = this.questions[i];
-			if (question.answer !== undefined && !question.correct && question.messageWrong) {
-				alert(question.messageWrong);
-				return;
+	
+			if (question.hasCorrectAnswer() && !question.correct) {
+				if (question.type == 'multChoice') {
+					for (var j=0; j<question.options.length; j++) {
+						if (question.options[j].selected && question.options[j].messageWrong) {
+							alert(question.options[j].messageWrong);
+							return;
+						}
+					}
+				} else if (question.messageWrong) {
+					alert(question.messageWrong);
+					return;
+				}
+			
 			}
 		}
 	}
@@ -253,6 +275,6 @@ QuizRenderer.MultChoiceOption = function(option) {
 	this.correct = option.correct || false;
 	this.text = option.text;
 	this.selected = false;
-	this.alert = option.alert;
+	this.messageWrong = option.messageWrong;
 	this.div = undefined;
 }

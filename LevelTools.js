@@ -14,6 +14,24 @@ LevelTools = {
 		addListener(this, 'data', 'run', this.dataRun, this);
 
 	},
+	addStoreAs: function(levelData) {
+		var storeAs=0;
+		for (var sectionIdx=0; sectionIdx<levelData.mainSequence.length; sectionIdx++) {
+			var section = levelData.mainSequence[sectionIdx];
+			for (var promptIdx=0; promptIdx<section.prompts.length; promptIdx++) {
+				var prompt = section.prompts[promptIdx];
+				if (prompt.quiz) {
+					for (var questionIdx=0; questionIdx<prompt.quiz.length; questionIdx++) {
+						var question = prompt.quiz[questionIdx];
+						if (question.storeAs === undefined) {
+							question.storeAs = 'questionAnswer' + String(storeAs);
+						}
+						storeAs ++;
+					}
+				}
+			}
+		}
+	},
 	addImgs: function(levelData) {
 		var questionId = 0;
 		for (var sectionIdx=0; sectionIdx<levelData.mainSequence.length; sectionIdx++) {
@@ -87,12 +105,6 @@ LevelTools = {
 		}
 	},
 	cutSceneStart: function(text, mode, quiz) {
-		// addListener(window['curLevel'], 'prompt' + promptIdx + 'CleanUp', 'endCutScene',
-			// function() {
-				// this.cutSceneEnd()
-			// },
-		// this);
-		
 		this.inCutScene = true;
 		$('#intText').html('');
 		text = defaultTo('',text);
@@ -112,134 +124,14 @@ LevelTools = {
 			$('#dashOutro').show();
 			$('#base').hide();
 			this.cutSceneText(text);
-		} //moving quiz out of cut scene init
-		// else if (quiz) {
-			// $('#dashCutScene').show();
-			// $('#base').hide();
-			// this.cutSceneText(text);
-			// this.appendQuiz(quiz, $('#intText'));
-		// }
+		}
+
 		$('#canvasDiv').hide();
 		$('#display').show();
 
 		this.cutSceneDivShow();
 		
 	},
-	// appendQuiz: function(quiz, appendTo) {
-		// $(appendTo).append(templater.br());
-		// var wrapperHTML = templater.div({attrs: {id: ['quizWrapper']}, style: {display: 'inline-block'}});
-		// var contentHTML = templater.div({attrs: {id: ['quizContent'], 'class': ['niceFont', 'whiteFont']}});
-		// var footerHTML = templater.div({attrs: {id: ['quizFooter']}});
-
-		// $(appendTo).append(wrapperHTML);
-		// var wrapper = $('#quizWrapper');
-		// $(quizWrapper).append(contentHTML);
-		// $(quizWrapper).append(footerHTML);
-		
-		// var content = $('#quizContent');
-		// var footer = $('#quizFooter');
-		
-		// var makeSubmitButton = false;
-		// this.quiz = new Array(quiz.length);
-		// this.quiz.allAnswered = function() {
-			// for (var qIdx=0; qIdx<this.length; qIdx++) {
-				// if (!this[qIdx].isAnswered) {
-					// return 0;
-				// }
-			// }
-			// return 1;
-		// }
-		// var hideDir = true;
-		// for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
-			// var question = quiz[questionIdx];
-			// if (question.type == 'text' || question.type == 'textSmall') {
-				// var submitAdvance = true;
-			// } else if (question.type == 'setVals') {
-				// var submitSetVal = true;
-				// hideDir = false;
-			// }
-			// this.appendQuestion(question, content, questionIdx);
-		// }
-		// //Okay, this quiz structure needs work
-		// hideDir ? $('#nextPrevDiv').hide() : $('#nextPrevDiv').show()
-		// if (submitAdvance) {
-			// this.makeSubmitButton(footer, this.submitAdvanceFunc(), 'Submit');
-		// } else if (submitSetVal) {
-			// this.makeSubmitButton(footer, this.submitSetValFunc(), 'Set values');
-		// }
-	// },
-	// makeSubmitButton: function(appendTo, func, text) {
-		// var self = this;
-		// var onclickSubmit = func;
-		// var idButton = 'textAreaSubmit';
-		// var submitHTML = templater.button({attrs:{id: [idButton]}, style: {'float': 'right'}, innerHTML: text});
-		// $(appendTo).append(submitHTML);
-		// $('#' + idButton).click(onclickSubmit);
-		// addJQueryElems($('#' + idButton), 'button');
-	// },
-	// submitAdvanceFunc: function() {
-		// var self = this;
-		// return function() {
-			// self.storeText();
-			// //Hey - am not finished making it so you can cleany mix type of questions yet
-			// sceneNavigator.nextPrompt();
-		// }	
-	// },
-	// submitSetValFunc: function() {
-		// var self = this;
-		// return function() {
-			// self.storeText();
-			// S(sectionIdx, promptIdx, true);
-		// }
-	// },
-	// storeText: function() {
-		// // for (var questionIdx=0; questionIdx<this.quiz.length; questionIdx++) {
-			// // var question = this.quiz[questionIdx];
-			// // if (question.type=='text' || question.type=='textSmall' || question.type == 'setVals') {
-				// // var id = this.getTextAreaId(questionIdx);
-				// // var storeAs = $('#' + id).attr('storeAs');
-				// // var submitted = $('#' + id).val();
-				// // if (submitted.killWhiteSpace() != '') {
-					// // if (storeAs === undefined) storeAs = 'ansS'+sectionIdx+'P'+promptIdx+'Q'+questionIdx;
-					// // store(storeAs, submitted);
-					// // //question.answerText(submitted);
-					// // question.isAnswered = true;
-					// // if (question.answer) {
-						// // if (fracDiff(parseFloat(question.answer), parseFloat(submitted))<.05){
-							// // question.correct = true;
-						// // } else {
-							// // if (question.messageWrong) {
-								// // alert(interpreter.interpInput(question.messageWrong));
-							// // }
-							// // question.correct = false;
-						// // }
-					// // } else {
-						// // question.correct = true;
-					// // }
-				// // } else {
-					// // question.correct = false;
-					// // question.isAnswered = false
-				// // }
-			// // }
-		
-		// // }	
-	// },
-	// appendQuestion: function(question, appendTo, questionIdx){
-		// question.answered = false;
-		// question.correct = false;
-		// if (question.type == 'buttons') {
-			// this.appendButtons(question, appendTo, questionIdx);
-		// } else if (question.type == 'multChoice') {
-			// this.appendMultChoice(question, appendTo, questionIdx);
-		// } else if (question.type == 'text') {
-			// this.appendTextBox(question, appendTo, 3, 50, question.units, questionIdx);
-		// } else if (question.type == 'textSmall') {
-			// this.appendTextBox(question, appendTo, 1, 10, question.units, questionIdx);
-		// } else if (question.type == 'setVals') {
-			// this.appendTextBox(question, appendTo, 1, 10, question.units, questionIdx);
-		// }
-		// this.quiz[questionIdx] = question;
-	// },
 	cutSceneDivShow: function() {
 		$('#intText').show();
 	},
@@ -276,172 +168,7 @@ LevelTools = {
 		if (this.updateStore) this.update = this.updateStore;
 		if (this.updateDataStore) this.updateData = this.updateDataStore;
 	},
-	// questionIsCorrect: function() {
-		// return this.correct;
-	// },
-	/*
-	type: 'buttons'
-	options:list of buttons with: 	buttonId, text, isCorrect
-			can have: 				func, message
-	*/
-	// appendButtons: function(question, appendTo, questionIdx){
-		// var buttonHTML = '';
-		// //Hey - you are setting attrs of the question object.  This will alter the thing the sections declaration.  I think that is okay, just letting you know
-		// question.isAnswered = false;
-		// question.isCorrect = this.questionIsCorrect;//function() {
-			// //return question.correct;
-		// //}
-		// var buttons = question.options;
-		// buttonHTML += "<br><center><table border='0'><tr>";
-		// var ids = new Array(buttons.length);
-		// for (var buttonIdx=0; buttonIdx<buttons.length; buttonIdx++){
-			// var button = buttons[buttonIdx];
-			// ids[buttonIdx] = defaultTo('question' + questionIdx + 'option' + buttonIdx, button.buttonId);
-			// buttonHTML += "<td>" + templater.button({attrs:{id: [ids[buttonIdx]]}, innerHTML:button.text}) + "</td>";
-		// }
-		// buttonHTML += "</tr></table></center>";
-		// $(appendTo).append(buttonHTML);
-		// this.bindButtonListeners(question, buttons, ids);
-	// },
-	// bindButtonListeners: function(question, buttons, ids){
-		// for (var buttonIdx=0; buttonIdx<buttons.length; buttonIdx++){
-			// var button = buttons[buttonIdx];
-			// this.bindButtonListener(question, button, ids[buttonIdx]);
 
-		// }		
-	// },
-	// bindButtonListener: function(question, button, id){
-		// var onclickFunc = function() {
-			// if (button.message) {
-				// alert(button.message);
-			// }
-			// if (button.response) {
-				// store('B'+sectionIdx+'P'+promptIdx + 'Response', button.response);
-			// }
-			// if (button.func) {
-				// button.func();
-			// }
-			// question.isAnswered = true;
-			// question.correct = button.isCorrect;
-			// sceneNavigator.nextPrompt();		
-		// }
-		// $('#' + id).click(onclickFunc);
-	// },
-	/*
-	type: 'multChoice'
-	list of options with:	 text, isCorrect
-	each option can have:	 message
-	*/
-	// appendMultChoice: function(question, appendTo, questionIdx){
-		// question.answerIs = false;
-		// question.isCorrect = this.questionIsCorrect;//function() {
-			// //return question.correct;
-		// //}		
-		// var options = question.options
-		// var multChoiceHTML = "";
-		// multChoiceHTML += "<br><table width=100%<tr><td width=10%></td><td>";
-		// var ids = new Array(options.length);
-		// for (var optionIdx=0; optionIdx<options.length; optionIdx++){
-			// var option = options[optionIdx];
-			// var divId = optionIdx;
-			// ids[optionIdx] = 'question' + questionIdx + 'option' + optionIdx;
-			// multChoiceHTML += templater.div({attrs: {id: [ids[optionIdx]], class: ['multChoiceBlock']}, innerHTML: option.text})
-		// }
-		// $(appendTo).append(multChoiceHTML);
-		// this.bindMultChoiceFuncs(question, options, ids);
-	// },
-	// bindMultChoiceFuncs: function(question, options, ids){
-		// for (var optionIdx=0; optionIdx<options.length; optionIdx++) {
-			// this.bindMultChoiceFunc(question, options[optionIdx], ids[optionIdx]);
-		// }
-	// },
-	// bindMultChoiceFunc: function(question, option, id){
-		// var onclickFunc = function() {
-			// if (option.message) {
-				// alert(option.message);
-			// }
-			// if (option.response) {
-				// store('B'+sectionIdx+'P'+promptIdx + 'Response', option.response);
-			// }
-			// question.correct = option.isCorrect;
-			// question.isAnswered = true;
-			// //do something to accomidate multiple questions at some point.  Not likely to have multiple now
-			// sceneNavigator.nextPrompt();
-		// }
-		// $('#'+id).click(onclickFunc);
-		// $('#'+id).hover(
-			// function(){$(this).css('background-color', hoverCol.hex)}, 
-			// function(){$(this).css('background-color', 'transparent')}
-		// );
-	// },
-	/*
-	type: 'text'
-	can have:			text, messageRight, messageWrong, answer, units
-	*/
-	// appendTextBox: function(question, appendTo, rows, cols, units, questionIdx) {
-		// var textBoxHTML = '';
-		// question.answerIs = false;
-		// // question.answerText = function(text) {
-			// // question.answerTextSubmitted = text;
-		// // }
-		// question.isCorrect = this.questionIsCorrect;
-		// question.label = defaultTo('', question.label);
-		// var idText = this.getTextAreaId(questionIdx);
-		// var boxText = defaultTo('Type your answer here.', question.text);
-		
-		// var textareaAttrs = {id: [idText], rows: [rows], cols: [cols] , placeholder: [boxText]};
-
-		// textareaAttrs.storeAs = [question.storeAs];
-		// textareaHTML = templater.textarea({attrs: textareaAttrs});
-		
-		// var textBoxHTML = (question.preText === undefined ? '' : (interpreter.interp(question.preText) + templater.br())) + templater.table({attrs: {'class': ['niceFont', 'whiteFont']}, innerHTML:
-			// templater.tr({innerHTML:
-				// templater.td({innerHTML:
-					// question.label
-				// }) +
-				// templater.td({innerHTML:
-					// '&#32;&#32;'
-				// }) +
-				// templater.td({innerHTML:
-					// textareaHTML
-				// }) +
-				// templater.td({innerHTML:
-					// question.units || ''
-				// })
-			// })
-		// })
-
-		// $(appendTo).append(textBoxHTML);
-		// if (getStore(question.storeAs)) {
-			// $('#' + idText).html(getStore(question.storeAs));
-			// //question.isAnswered should already be set if coming back
-		// }
-		// $('#' + idText).change(function() {
-			// var answer = $('#' + idText).val();
-			// if (answer != '') {
-				// store(question.storeAs, answer);
-				// question.isAnswered = true;
-				// if (question.answer) {
-					// if (fracDiff(parseFloat(question.answer), parseFloat(val))<.05){
-						// question.correct = true;
-					// } else {
-						// // if (question.messageWrong) {
-							// // alert(interpreter.interpInput(question.messageWrong));
-						// // }
-						// question.correct = false;
-					// }
-				// } else {
-					// question.correct = true;
-				// }
-				// question.correct = true;
-			// }
-				
-			
-		// });
-	// },
-	// getTextAreaId: function(idx) {
-		// return 'textArea' + idx;
-	// },
 	hideDash: function(){
 		$('#dashIntro').hide();
 		$('#dashRunWrapper').hide();

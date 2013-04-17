@@ -86,6 +86,7 @@ $(function(){
 	
 	LevelTools.addImgs(LevelData);
 	LevelTools.setDefaultPromptVals(LevelData);
+	LevelTools.addStoreAs(LevelData);
 	LevelTools.showRunDivs();
 
 	for (var sectionIdx=0; sectionIdx<LevelData.mainSequence.length; sectionIdx++) {
