@@ -75,7 +75,7 @@ LevelData = {
 					//{label: 'RCT: ', expr: 'frac("wally", {spcName: "spc1", tag: "wally"}) + frac("wally", {spcName: "ugly", tag: "wally"})', sigFigs: 2, handle: 'coalseamgas', readout: 'mainReadout'}
 				],
 				buttonGroups: [
-					{handle: 'heaterState', label: 'Heater', prefIdx: 1, isRadio: true},
+					{handle: 'heaterState', label: 'Heater', prefIdx: 1, isRadio: true, cleanUpWith: 'prompt1'},
 					{handle: 'tempControl', label: 'Temp control', isRadio: true},
 					{handle: 'rxnControl', label: 'Rxn control', isToggle: true}
 				],

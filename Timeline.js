@@ -155,7 +155,7 @@ Timeline.Section.prototype = {
 	stepToBound: function(up) {
 		if (up) {
 			this.stepTo(this.sectionData.prompts.length);
-			this.time = this.sectionData.prompts.length
+			this.time = this.sectionData.prompts.length;
 		} else {
 			this.stepTo(0);
 			this.time = 0;
@@ -214,10 +214,6 @@ Timeline.Section.prototype = {
 		var destTime = this.getTimestamp(this.sectionData.prompts.length - 1, 'tail');
 		this.stepTo(destTime);
 		this.time = destTime;
-		// if (this.promptIdx !== undefined && this.inited) {
-			// var listeners = this.level['prompt' + this.promptIdx + 'CleanUpListeners'].listeners;
-			// execListeners(listeners);
-		// }
 	},
 	curPrompt: function() {
 		return this.sectionData.prompts[this.promptIdx];
@@ -260,12 +256,29 @@ Timeline.Section.prototype = {
 			}
 		}
 	},
-	addOnce: function(promptIdx, when, eventClass, func) { //public func.  Test settings a heater's liquid
-		promptIdx = prompt == 'now' ? this.promptIdx : promptIdx;
+	addCmmdSpan: function(prompt, cmmdInput) {
+		promptIdx = prompt == 'now' ? this.promptIdx : prompt;
+		var timestampHead = this.getTimestamp(promptIdx, 'setup');
 		var id = this.timeline.takeNumber();
-		var timestamp = this.getTimestamp(promptIdx, 'setup');
-		var cmmd = {type: 'once', spawn: func}
-		this.pushOnce(this.moments, this.timeline.elems, id, cmmd, func, eventClass, timestamp);
+		
+		if (typeof cmmdInput == 'string' || typeof cmmdInput == 'function') {
+			cmmd = new Timeline.Command('span', cmmdInput, undefined, true, false);
+		} else {
+			cmmd = new Timeline.Command('span', cmmdInput.spawn, cmmdInput.remove, false, cmmdInput.once, cmmdInput.cleanUpWith);
+		}
+		this.timeline.elems[id] = cmmd;
+		this.applyCmmdSpan(this.timeline, this.moments, this.timeline.elems, cmmd, 'cmmds', cmmd.once, timestampHead, id);
+
+	},
+
+	addCmmdPoint: function(prompt, when, func, oneWay, once) { //public func.  Test settings a heater's liquid
+		//make this be point with once argument
+		promptIdx = prompt == 'now' ? this.promptIdx : prompt;
+		var id = this.timeline.takeNumber();
+		var timestamp = this.getTimestamp(promptIdx, when || 'setup');
+		var cmmd = new Timeline.Command('point', func, undefined, oneWay, once);
+		this.timeline.elems[id] = cmmd;
+		this.applyCmmdPoint(this.timeline, this.moments, this.timeline.elems, cmmd, 'cmmds', once, timestamp, id);
 	},
 	populateMoments: function(timeline, elems, moments, sectionData) {
 		moments.push(new Timeline.Moment(-2)); //dummy moment to start on
@@ -311,7 +324,7 @@ Timeline.Section.prototype = {
 			}
 			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
-			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');
+			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');
 		} else {
 			id = timeline.takeNumber();
 			spawnFunc = function() {
@@ -329,7 +342,7 @@ Timeline.Section.prototype = {
 			
 			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
-			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');
+			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');
 		}
 		if (prompt.quiz) { 
 			var spawnFunc, removeFunc;
@@ -339,7 +352,7 @@ Timeline.Section.prototype = {
 			
 			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
-			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');
+			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');
 		}
 		if (prompt.title) {
 			id = timeline.takeNumber();
@@ -347,7 +360,7 @@ Timeline.Section.prototype = {
 			removeFunc = function() {$('#baseHeader').html('')};
 			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
-			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, 'cmmds');			
+			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');			
 		}
 		var arrangeHTMLSpawn = function() {
 			interpreter.renderMath();
@@ -357,7 +370,7 @@ Timeline.Section.prototype = {
 		}
 		var arrangeHTMLCmmd = new Timeline.Command('point', arrangeHTMLSpawn, undefined, true);
 
-		this.pushPoint(moments, elems, timeline.takeNumber(), arrangeHTMLCmmd, Timeline.stateFuncs.cmmds.spawn, true, 'cmmds', timestampHead);
+		this.pushPoint(moments, elems, timeline.takeNumber(), arrangeHTMLCmmd, Timeline.stateFuncs.cmmds.spawn, true, 'cmmds', false, timestampHead);
 
 
 	},
@@ -387,7 +400,7 @@ Timeline.Section.prototype = {
 			var cleanUpWith = elemDatum.cleanUpWith;
 			var timestampTail = this.getTimestamp(cleanUpWith || timestampHead, 'tail');
 
-			this.pushSpan(timelineElems, elemDatum, spawnFunc, removeFunc, id, moments, timestampHead, timestampTail, eventClass);
+			this.pushSpan(timelineElems, elemDatum, spawnFunc, removeFunc, id, moments, timestampHead, timestampTail, false, eventClass);
 
 
 		}
@@ -398,62 +411,59 @@ Timeline.Section.prototype = {
 		for (var i=0; i<cmmds.length; i++) {
 			var cmmdInput = cmmds[i];
 			if (typeof cmmdInput == 'string' || typeof cmmdInput == 'function') {
-				cmmd = new Timeline.Command('point', cmmdInput, undefined, true);
+			
+				cmmd = new Timeline.Command('point', cmmdInput, undefined, true, false);
 			} else {
-				cmmd = new Timeline.Command(cmmdInput.type, cmmdInput.spawn, cmmdInput.remove, cmmdInput.oneWay);
+				cmmd = new Timeline.Command(cmmdInput.type, cmmdInput.spawn, cmmdInput.remove, cmmdInput.oneWay, cmmdInput.once);
 			}
 			if (/span/i.test(cmmd.type)) {
-				this.applyCmmdSpan(timeline, moments, timelineElems, cmmd, eventClass, timestampHead);
+				this.applyCmmdSpan(timeline, moments, timelineElems, cmmd, eventClass, cmmd.once, timestampHead);
 			} else if (/point/i.test(cmmd.type)) {
-				this.applyCmmdPoint(timeline, moments, timelineElems, cmmd, eventClass, timestampHead);
-			} else if (/once/i.test(cmmd.type)) {
-				this.applyCmmdOnce(timeline, moments, timelineElems, cmmd, eventClass, timestampHead);
+				this.applyCmmdPoint(timeline, moments, timelineElems, cmmd, eventClass, cmmd.once, timestampHead);
 			} else {
 				console.log('Bad command')
 				console.log(cmmd);
-				console.log('Must be string or have type of "span", "point", or "once"');
+				console.log('Must be string or have type of "span" or "point"');
 			}
 		}
 	},
-	applyCmmdSpan: function(timeline, moments, timelineElems, cmmd, eventClass, timestampHead) {
-		var id = timeline.takeNumber();
+	applyCmmdSpan: function(timeline, moments, timelineElems, cmmd, eventClass, once, timestampHead, id) {
+		var id = id === undefined ? timeline.takeNumber() : id;
 		var spawn = Timeline.stateFuncs.cmmds.spawn;
 		var remove = Timeline.stateFuncs.cmmds.remove;
 		var cleanUpWith = cmmd.cleanUpWith;
 		var timestampTail = this.getTimestamp(cleanUpWith || timestampHead, 'tail');
 
-		this.pushSpan(timelineElems, cmmd, spawn, remove, id, moments, timestampHead, timestampTail, 'cmmds');
+		this.pushSpan(timelineElems, cmmd, spawn, remove, id, moments, timestampHead, timestampTail, once, 'cmmds');
 	},
-	applyCmmdPoint: function(timeline, moments, timelineElems, cmmd, eventClass, timestamp) {
-		var id = timeline.takeNumber();
+	applyCmmdPoint: function(timeline, moments, timelineElems, cmmd, eventClass, once, timestamp, id) {
+		var id = id === undefined ? timeline.takeNumber() : id;
 		var spawn = Timeline.stateFuncs.cmmds.spawn;
 		var oneWay = defaultTo(true, cmmd.oneWay);
-		this.pushPoint(moments, timelineElems, id, cmmd, spawn, oneWay, eventClass, timestamp);
+		this.pushPoint(moments, timelineElems, id, cmmd, spawn, oneWay, eventClass, once, timestamp);
 	},
-	applyCmmdOnce: function(timeline, moments, timelineElems, cmmd, eventClass, timestamp) {
-		var id = timeline.takeNumber();
-		var spawn = Timeline.stateFuncs.cmmds.spawn;
-		this.pushOnce(moments, timelineElems, id, cmmd, spawn, eventClass, timestamp);
-	},
-	pushSpan: function(timelineElems, elemDatum, spawn, remove, id, moments, timestampHead, timestampTail, eventClass) {
+	pushSpan: function(timelineElems, elemDatum, spawn, remove, id, moments, timestampHead, timestampTail, once, eventClass) {
 		var momentHead = this.getOrCreateMoment(moments, timestampHead);
 		var momentTail = this.getOrCreateMoment(moments, timestampTail);
-		var eventHead = new Timeline.Event.Span(this, timelineElems, elemDatum, spawn, remove, id, 'head', momentHead);
-		var eventTail = new Timeline.Event.Span(this, timelineElems, elemDatum, spawn, remove, id, 'tail', momentTail);
+		//need to disable partner
+		var eventHead = new Timeline.Event.Span(this, timelineElems, elemDatum, spawn, remove, id, 'head', once, momentHead);
+		var eventTail = new Timeline.Event.Span(this, timelineElems, elemDatum, spawn, remove, id, 'tail', once, momentTail);
+		eventHead.partner = eventTail;
+		eventTail.partner = eventHead;
 
 		momentHead.events[eventClass].push(eventHead);
 		momentTail.events[eventClass].push(eventTail);		
 	},
-	pushPoint: function(moments, timelineElems, id, elemDatum, spawn, oneWay, eventClass, timestamp) {
+	pushPoint: function(moments, timelineElems, id, elemDatum, spawn, oneWay, eventClass, once, timestamp) {
 		var moment = this.getOrCreateMoment(moments, timestamp);
-		var event = new Timeline.Event.Point(this, timelineElems, elemDatum, spawn, id, oneWay, moment);
+		var event = new Timeline.Event.Point(this, timelineElems, elemDatum, spawn, id, oneWay, once, moment);
 		moment.events[eventClass].push(event);
 	},
-	pushOnce: function(moment, timelineElems, id, elemDatum, spawn, eventClass, timestamp) {
-		var moment = this.getOrCreateMoment(moments, timestamp);
-		var event = new Timeline.Event.Once(this, timelineElems, elemDatum, spawn, id, moment);
-		moment.events[eventClass].push(event);
-	},
+	// pushOnce: function(moment, timelineElems, id, elemDatum, spawn, eventClass, timestamp) {
+		// var moment = this.getOrCreateMoment(moments, timestamp);
+		// var event = new Timeline.Event.Point(this, timelineElems, elemDatum, spawn, id, moment);
+		// moment.events[eventClass].push(event);
+	// },
 	getTimestamp: function(time, when) {
 		var timeAdj;
 		if (/tailhtml/i.test(when)) {
@@ -687,18 +697,26 @@ Timeline.Moment.prototype = {
 		}
 	},
 	fireSpan: function(span, from, to) {
-		var elemDatum = getAndEval(span.elemDatum);
-		if (span.boundType == 'head') {
-			if (to == this.timestamp && from < to) {
-				span.spawn(span.section, span.timelineElems, span.id, elemDatum);
-			} else if (from == this.timestamp && to < from) {
-				span.remove(span.section, span.timelineElems, span.id);
-			}
-		} else if (span.boundType == 'tail') {
-			if (to > from) {
-				span.remove(span.section, span.timelineElems, span.id);
-			} else if (from > to) {
-				span.spawn(span.section, span.timelineElems, span.id, elemDatum);
+		if (span.active) {
+			var elemDatum = getAndEval(span.elemDatum);
+			if (span.boundType == 'head') {
+				if (to == this.timestamp && from < to) {
+					span.spawn(span.section, span.timelineElems, span.id, elemDatum);
+				} else if (from == this.timestamp && to < from) {
+					span.remove(span.section, span.timelineElems, span.id);
+					if (span.once) {
+						span.active = false;
+						span.partner.active = false;
+					}
+				}
+			} else if (span.boundType == 'tail') {
+				if (to > from) {
+					span.remove(span.section, span.timelineElems, span.id);
+					if (span.once) 
+						span.active = false;
+				} else if (from > to) {
+					span.spawn(span.section, span.timelineElems, span.id, elemDatum);
+				}
 			}
 		}
 	},
@@ -709,26 +727,32 @@ Timeline.Moment.prototype = {
 			if (event instanceof Timeline.Event.Span) {
 				this.fireSpans([event], from, to)
 			} else if (event instanceof Timeline.Event.Point) {
-				if (to == this.timestamp && event.elemDatum.oneWay ? from < to : true) {
+				if (to == this.timestamp && (event.elemDatum.oneWay ? from < to : true) && event.active) {
 					elemDatum = getAndEval(event.elemDatum);
 					event.spawn(event.section, event.timelineElems, event.id, elemDatum);
-				}
-			} else if (event instanceof Timeline.Event.Once) {
-				if (!event.fired) {
-					elemDatum = getAndEval(event.elemDatum);
-					event.spawn(event.section, event.timelineElems, event.id, elemDatum);
-					event.fired = true;
+					if (event.once) {
+						event.active = false;
+					}
 				}
 			}
+			// else if (event instanceof Timeline.Event.Once) {
+				// if (!event.fired) {
+					// elemDatum = getAndEval(event.elemDatum);
+					// event.spawn(event.section, event.timelineElems, event.id, elemDatum);
+					// event.fired = true;
+				// }
+			// }
 		}
 	}
 }
 
-Timeline.Command = function(type, spawn, remove, oneWay) {
+Timeline.Command = function(type, spawn, remove, oneWay, once, cleanUpWith) {
 	this.type = type;
 	this.spawn = spawn;
 	this.remove = remove;
 	this.oneWay = oneWay;
+	this.once = once;
+	this.cleanUpWith = cleanUpWith;
 }
 
 Timeline.EventClassHolder = function() {
@@ -740,7 +764,7 @@ Timeline.EventClassHolder = function() {
 }
 
 Timeline.Event = {
-	Span: function(section, timelineElems, elemDatum, spawn, remove, id, boundType, moment) {
+	Span: function(section, timelineElems, elemDatum, spawn, remove, id, boundType, once, moment) {
 		this.section = section;
 		this.timelineElems = timelineElems;
 		this.elemDatum = elemDatum;
@@ -749,8 +773,11 @@ Timeline.Event = {
 		this.id = id;
 		this.boundType = boundType;
 		this.moment = moment;
+		this.once = once;
+		this.active = true;
+		this.parnter;
 	},
-	Point: function(section, timelineElems, elemDatum, spawn, id, oneWay, moment) {
+	Point: function(section, timelineElems, elemDatum, spawn, id, oneWay, once, moment) {
 		this.section = section;
 		this.timelineElems = timelineElems;
 		this.elemDatum = elemDatum;
@@ -758,14 +785,17 @@ Timeline.Event = {
 		this.id = id;
 		this.oneWay = oneWay;
 		this.moment = moment;
+		this.once = once;
+		this.active = true;
 	},
-	Once: function(section, timeElems, elemDatum, spawn, id, moment) {
-		this.section = section;
-		this.timelineElems = timelineElems;
-		this.elemDatum = elemDatum;
-		this.spawn = spawn;
-		this.id = id;
-		this.fired = false;
-		this.moment = moment;
-	}
+	//get rid of
+	// Once: function(section, timeElems, elemDatum, spawn, id, moment) {
+		// this.section = section;
+		// this.timelineElems = timelineElems;
+		// this.elemDatum = elemDatum;
+		// this.spawn = spawn;
+		// this.id = id;
+		// this.fired = false;
+		// this.moment = moment;
+	// }
 }

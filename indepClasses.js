@@ -426,7 +426,7 @@ Point.prototype = {
 		}
 
 		this.trackListenerId = unique(this.x+','+this.y+'tracksWithUniqueId', curLevel.updateListeners.listeners);
-		if (this.trackListenerId.indexOf('NaN')!=-1) {
+		if (isNaN(this.x) || isNaN(this.y)) {
 			console.log('Trying to track NaN!');
 			console.trace();
 		}

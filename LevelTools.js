@@ -1,7 +1,6 @@
 LevelTools = {
 	setStds: function(){
 		this.graphs = {};
-		//this.makePromptCleanUpHolders(0);
 		this.bgCol = Col(5, 17, 26);
 		this.wallCol = Col(255,255,255);
 		this.numUpdates = 0;
@@ -246,15 +245,12 @@ LevelTools = {
 	gravity: function(attrs) {
 	
 		this.gravitying = true;
-		cleanUpWith = defaultTo('section', attrs.cleanUpWith);
-		//YO YO - MAKE IT CLEAN UP
-		//Problem with hitting wall, slowly loses energy.  Would need to do something similar to wall hitting its bounds
 		for (var wallIdx=0; wallIdx<walls.length; wallIdx++) {
 			walls[wallIdx].setHitMode('Gravity');
 		}
 		this.setUpdateRunListener();
 
-		addListener(window['curLevel'], cleanUpWith + 'CleanUp', 'gravityStop', this.gravityStop, this);
+		//need to make add this as a span with gravityStop as the remove func
 	},
 	gravityStop: function() {
 		this.gravitying = false;
@@ -272,12 +268,11 @@ LevelTools = {
 		}
 	},
 	attract: function(attrs) {
+		//need to make add this as a span with gravityStop as the remove func
 		this.attracting = true;
-		cleanUpWith = defaultTo('section', attrs.cleanUpWith);
 		attractor.setup();
 		attractor.assignELastAll();
 		this.setUpdateRunListener();
-		addListener(window['curLevel'], cleanUpWith + 'CleanUp', 'attractStop', this.attractStop, this);
 	},
 	attractStop: function() {
 		this.attracting = false;
@@ -366,16 +361,9 @@ LevelTools = {
 		makeListenerHolder(this, 'record');
 		makeListenerHolder(this, 'sectionCondition');
 		makeListenerHolder(this, 'promptCondition');
-		makeListenerHolder(this, 'sectionCleanUp');
 		makeListenerHolder(this, 'setup');
 	},
 	
-	makePromptCleanUpHolders: function(sectionData){
-		this.promptCleanUpHolders = new Array(sectionData.prompts.length);
-		for (var promptIdx=0; promptIdx<sectionData.prompts.length; promptIdx++) {
-			this.promptCleanUpHolders[promptIdx] = makeListenerHolder(this, 'prompt' + promptIdx + 'CleanUp');
-		}
-	},
 	sectionConditions: function(){
 		//ALERT NOT BUBBLING UP CORRECTLY.  IT GETS TO THIS FUNCTION FROM STATE LISTENERS BUT IS NOT RETURNED
 		var didWin = 1;
@@ -413,18 +401,5 @@ LevelTools = {
 		}	
 		return {didWin:didWin, alert:alerts[didWin]};
 	},
-	sectionCleanUp: function(){
-		var listeners = this.sectionCleanUpListeners.listeners;
-		for (var listenerName in listeners) {
-			var listener = listeners[listenerName];
-			listener.func.apply(listener.obj);
-		}
-	},
-	promptCleanUp: function(idx){
-		var listeners = this['prompt' + idx + 'CleanUpListeners'].listeners;
-		for (var listenerName in listeners) {
-			var listener = listeners[listenerName];
-			listener.func.apply(listener.obj);
-		}
-	},
+
 }

@@ -31,24 +31,14 @@ objectFuncs = {
 	setupStd: function() {
 		this.enabled = true;
 		this.removed = false;
-		this.addCleanUp();
 		if (this.handle) this.addToCurLevel();
 		this.wrapRemove();
-	},
-	addCleanUp: function(){
-		this.cleanUpListenerName = unique(this.type + defaultTo('', this.handle), curLevel[this.cleanUpWith + 'CleanUpListeners'].listeners);
-		addListener(curLevel, this.cleanUpWith + 'CleanUp', this.cleanUpListenerName, function(){
-															this.remove();
-															removeListener(curLevel, this.cleanUpWith + 'CleanUp', this.cleanUpListenerName)
-														},
-														this);
 	},
 	wrapRemove: function() {
 		var removeOld = this.remove;
 		this.remove = function() {
 			this.removed = true;
 			if (this.handle) this.removeFromCurLevel();
-			this.removeCleanUp();
 			removeOld.apply(this);
 		}
 	},
@@ -64,9 +54,6 @@ objectFuncs = {
 		// } else {
 			// console.log("Trying to remove " + key + " but handle doesn't belong to this object");
 		// }
-	},
-	removeCleanUp: function(){
-		removeListener(curLevel, this.cleanUpWith + 'CleanUp', this.cleanUpListenerName);
 	},
 	pickSliderPos: function(){
 		var xPos;
@@ -624,7 +611,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	},
 	putOnPiston: function(weight, slot){
 		this.weightsOnPiston.push(weight);
-		weight.pos.track({pt:slot.pos, noTrack:'x', cleanUpWith:this.cleanUpWith});
+		weight.pos.track({pt:slot.pos, noTrack:'x', cleanUpWith: this.cleanUpWith});
 		weight.status = 'piston';
 		this.mass = this.getPistonMass();
 		this.wall.setMass(this.massChunkName, this.mass);
