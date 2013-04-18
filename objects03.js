@@ -16,7 +16,6 @@ function Clamps(attrs) {
 	this.handle = attrs.handle;
 	this.draw = defaultTo(false, attrs.draw);
 	this.releaseWith = defaultTo('button', attrs.releaseWith);
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.currentClamper = undefined;
 	this.clamps = attrs.clamps;
 	this.wall = walls[attrs.wallInfo];
@@ -143,7 +142,6 @@ function sillyArrow(){
 					dims:V(100,50),
 					dimsFinal:V(50,100),
 					lifespan:5000,
-					cleanUpWith:'section',
 				});
 }
 
@@ -160,7 +158,6 @@ function sillierArrow() {
 
 function ArrowStatic(attrs) {
 	this.type = 'ArrowStatic';
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.pos = attrs.pos.copy();
 	this.dims = attrs.dims.copy();
 	this.handle = attrs.handle;
@@ -275,6 +272,7 @@ var flowFuncs = {
 		this.pts = this.getPts(a, b, UV, this.perp, this.fracOffset);
 	},
 	addArrows: function(UV, type) {
+		var arrows = [];
 		var width = this.width;
 		var arrowCount = this.width > 30 ? 2 : 1;
 		var pos = this.pts[1].copy();
@@ -283,8 +281,9 @@ var flowFuncs = {
 		var stepAdvance = ptVec.copy().UV().copy().mult(ptVec.mag()/(arrowCount + 1));
 		for (var ctIdx=0; ctIdx<arrowCount; ctIdx++) {
 			pos.movePt(stepAdvance);
-			new ArrowStatic({pos: pos, dims: this.arrowDims, UV: UV.copy(), fill: this.arrowFill, stroke: this.arrowStroke, cleanUpWith: this.cleanUpWith})
+			arrows.push(new ArrowStatic({pos: pos, dims: this.arrowDims, UV: UV.copy(), fill: this.arrowFill, stroke: this.arrowStroke, cleanUpWith: this.cleanUpWith}));
 		}
+		return arrows;
 	}
 }
 
@@ -296,7 +295,6 @@ function Inlet (attrs) {
 	this.arrowStroke = Col(100, 100, 100);
 	this.type = 'Inlet';
 	this.handle = attrs.handle;
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.width = defaultTo(30, attrs.width);
 	this.depth = defaultTo(20, attrs.depth);
 	this.fracOpen = defaultTo(1, attrs.fracOpen);
@@ -312,6 +310,7 @@ function Inlet (attrs) {
 		this.sliderId = this.addSlider('Flow rate', {value: this.fracOpen*100}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
 	}
 	this.setupStd();
+	this.arrows = [];
 	this.init();
 	
 }
@@ -326,7 +325,7 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 			this.wall.addPts(this.ptIdxs[1], this.pts);
 		}
 		var inletLine = {pos: this.pts[1].copy(), vec: this.pts[1].VTo(this.pts[2]), dir: this.perp.copy()};
-		this.addArrows(this.pts[1].VTo(this.pts[2]).UV().perp('ccw'));
+		this.arrows = this.addArrows(this.pts[1].VTo(this.pts[2]).UV().perp('ccw'));
 		this.makeInlet(inletLine, this.flows);
 	},
 
@@ -373,6 +372,7 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 		if (this.sliderId) {
 			this.removeSlider();
 		}
+		this.arrows.map(function(arrow){arrow.remove()});
 		removeListener(curLevel, 'update', this.type + this.handle);
 	
 	}
@@ -385,7 +385,6 @@ function Outlet(attrs) {
 	this.arrowStroke = Col(100, 100, 100);
 	this.type = 'Outlet';
 	this.handle = attrs.handle;
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	//if depth is 0, just have it not add any pointsa
 	this.width = defaultTo(30, attrs.height);
 	this.depth = defaultTo(20, attrs.depth) || 20; //can't be zero, need to set a wall handler
@@ -395,6 +394,7 @@ function Outlet(attrs) {
 	this.wall = walls[this.wallInfo];
 	this.ptIdxs = attrs.ptIdxs;
 	this.fracOffset = defaultTo(.5, attrs.fracOffset);
+	this.arrows = [];
 	this.init();
 }
 
@@ -405,9 +405,12 @@ _.extend(Outlet.prototype, flowFuncs, objectFuncs, {
 			this.wall.addPts(this.ptIdxs[1], this.pts);
 		}
 		var subWallIdx = Math.min(this.ptIdxs[0], this.ptIdxs[1]) + 2;
-		this.addArrows(this.pts[1].VTo(this.pts[2]).UV().perp('cw'));
+		this.arrows = this.addArrows(this.pts[1].VTo(this.pts[2]).UV().perp('cw'));
 		walls.setSubWallHandler(this.wallInfo, subWallIdx, 'outlet');
-	}		
+	},
+	remove: function() {
+		this.arrows.map(function(arrow) {arrow.remove()});
+	},
 })
 
 
@@ -415,7 +418,6 @@ function Tracer(attrs) {
 	this.handle = attrs.handle;
 	this.type = 'Tracer';
 	this.info = attrs.info;
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.col = defaultTo(Col(175, 175, 175), attrs.col);
 	this.lifespan = Math.round(1000/updateInterval * defaultTo(5, attrs.lifespan));
 	this.listenerHandle = this.type + this.handle + 'Draw';
@@ -463,128 +465,3 @@ _.extend(Tracer.prototype, objectFuncs, {
 	},
 })
 
-function HypoPath(attrs) {
-	var promptDiv = $('#dashRun');
-	var pistonAttrs = attrs.pistonAttrs || {};
-	var heaterAttrs = attrs.heaterAttrs || {};
-	var compArrowAttrs = attrs.compArrowAttrs || {};
-		//need to deal with sliders.
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
-	this.UIx = 4;
-	this.UIy = 2;
-	this.wallInfo = attrs.wallInfo;
-	this.handle = attrs.handle;
-	this.UIWrapper = this.genUIWrapper(promptDiv);
-	this.appendUIGrid(this.UIWrapper, this.UIx, this.UIy);
-	// UIGrid formatted as col, row
-	this.UIGrid = this.selectUIGrid(this.UIx, this.UIy);
-	this.appendRadios(this.UIGrid, P(0, 0), P(1, 0), P(0, 1), P(1, 1));
-	//need to make min & max const for piston and comp arrow
-	//this.piston = this.genPiston(pistonAttrs, this.wallInfo, this.handle);
-	//this.heater = this.genHeater(heaterAttrs, this.wallInfo, this.handle);
-	//this.compArrow = this.genCompArrow(compArrowAttrs, this.wallInfo, this.handle);
-	//at const P, can change temp & add drag weights
-	//at constant V, can change temp & move vol slider (maybe vol slider w/ no temp change?)
-	//at const 
-}
-
-_.extend(HypoPath.prototype, objectFuncs, {
-	genPiston: function(attrs, wallInfo, handle) {
-		attrs.wallInfo = wallInfo;
-		attrs.handle = handle + 'Piston';
-		attrs.makeSlider = true; //maybe not
-		return new Piston(attrs);
-	},
-	genHeater: function(attrs, wallInfo, handle) {
-		attrs.wallInfo = wallInfo;
-		attrs.handle = handle + 'Heater';
-		return new Heater(attrs);
-	},
-	genCompArrow: function(attrs, wallInfo, handle) {
-		attrs.wallInfo = wallInfo;
-		attrs.handle = handle + 'CompArrow';
-		return new CompArrow(attrs);
-	},
-	genUIWrapper: function(promptDiv) {
-		var wrapperId = this.handle + 'Wrapper';
-		$(promptDiv).append(templater.div({attrs: {id: [wrapperId]}}));
-		return $('#' + wrapperId);
-		// this.appendTitledRadio(wrapperDiv, 'ToggleComp', 'Compression mode', 1, [
-			// {text: '##c_{V}##', id: 'toggleCv', cb: function() {}},
-			// {text: '##c_{P}##', id: 'toggleCp', cb: function() {}}
-		// ])		
-		// this.appendTitledRadio(wrapperDiv, 'ToggleIso', 'Isothermal', 1, [
-			// {text: 'On', id: 'isoOn', cb: function() {}},
-			// {text: 'Off', id: 'isoOff', cb: function() {}}
-		// ])
-
-	},
-	appendUIGrid: function(div, x, y) {
-		//grid as cow, row, so I can use point notation
-		var classes = {td: ['middle']};
-		var styles = {};
-		var HTMLGrid = [];
-		for (var j=0; j<y; j++) {
-			var col = [];
-			for (var i=0; i<x; i++) {
-				var id = this.tableGridId(i, j);
-				col.push(templater.div({attrs: {id: [id]}}));
-			}
-			HTMLGrid.push(col);
-		}
-		$(div).append(templater.tableFromArray(HTMLGrid, classes, styles));
-	},
-	tableGridId: function(x, y) {
-		return this.handle + 'x' + x + 'y' + y;
-	},
-	selectUIGrid: function(x, y) {
-		var divs = [];
-		for (var i=0; i<x; i++) {
-			var row = [];
-			for (var j=0; j<y; j++) {
-				row.push($('#' + this.tableGridId(i, j)));	
-			}
-			divs.push(row);
-		}
-		return divs;
-	},
-	appendRadios: function(UIGrid, title1, radioWrapper1, title2, radioWrapper2) {
-		$(UIGrid[title1.x][title1.y]).html('Comp type: ');
-		$(UIGrid[title2.x][title2.y]).html('Isothermal: ');
-		templater.appendRadio(UIGrid[radioWrapper1.x][radioWrapper1.y], 
-			[
-				{text: 'c<sub>V</sub>', id: this.handle + 'cvRadio', cb: function() {}},
-				{text: 'c<sub>P</sub>', id: this.handle + 'cpRadio', cb: function() {}}
-			],
-			1, this.handle + 'CompType'
-		);
-		templater.appendRadio(UIGrid[radioWrapper2.x][radioWrapper2.y], 
-			[
-				{text: 'No', id: this.handle + 'IsoOff', cb: function() {}},
-				{text: 'Yes', id: this.handle + 'IsoOn', cb: function() {}}
-			],
-			1, this.handle + 'IsIso'
-		);
-	},
-	//should throw this into templater...  Once I finished writing it I will organize.
-	appendTitledRadio: function(appendTo, groupName, title, defaultIdx, items) {
-		var wrapperId = this.handle + groupName;
-		$(appendTo).append(templater.div({attrs: {id: [wrapperId]}}))
-		var wrapperDiv = $('#' + wrapperId);
-		
-		tableHTML = templater.table({attrs: {cellspacing: [0], border: [0]}, innerHTML:
-			templater.tr({innerHTML: 
-				templater.td({innerHTML: title}) + //need to have spaces and headerHTML in different td or it offsets the content down a little bit
-				templater.td({innerHTML: '&nbsp;&nbsp;'}) + 
-				templater.td({innerHTML:  templater.div({attrs: {id: [wrapperId + 'buttons']}})})
-			})
-		})
-
-		$(wrapperDiv).append(tableHTML);
-		var buttonWrapper = $('#' + wrapperId + 'buttons');
-		templater.appendRadio(buttonWrapper, items, defaultIdx, groupName);
-		
-	}
-	
-
-})

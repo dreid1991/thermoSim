@@ -6,7 +6,6 @@ function Liquid(attrs) {
 	this.wallGas = walls[this.wallInfo];
 	this.wallPtIdxs = attrs.wallPts || [this.wallGas.length - 2, this.wallGas.length - 3];
 	this.handle = attrs.handle;
-	this.cleanUpWith = attrs.cleanUpWith || currentSetupType;
 	this.actCoeffType = attrs.actCoeffType; //twoSfxMrg for two suffix margules, 
 	this.actCoeffInfo = attrs.actCoeffInfo;
 	var makePhaseDiagram = attrs.makePhaseDiagram;

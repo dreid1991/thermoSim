@@ -161,7 +161,6 @@ objectFuncs = {
 function DragWeights(attrs){
 	//Can probably remove energy bar stuff
 	this.type = 'DragWeights';
-	this.cleanUpWith = 			defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.handle = 				attrs.handle;
 	this.tempWeightDefs = 		attrs.weightDefs;
 	this.wallInfo = 			defaultTo(0, attrs.wallInfo);
@@ -332,9 +331,9 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		var bin = {};
 		if (this.pistonOffset) {
 			var xOffset = this.pistonOffset.dx
-			bin.pos = P(posX - this.pistonBinWidth/2, 0).movePt({dx:xOffset}).track({pt:this.pistonPt, noTrack:'x', offset:{dy:this.pistonOffset.dy}, cleanUpWith:this.cleanUpWith});
+			bin.pos = P(posX - this.pistonBinWidth/2, 0).movePt({dx:xOffset}).track({pt:this.pistonPt, noTrack:'x', offset:{dy:this.pistonOffset.dy}});
 		} else {
-			bin.pos = P(posX - this.pistonBinWidth/2, 0).track({pt:this.pistonPt, noTrack:'x', cleanUpWith:this.cleanUpWith});
+			bin.pos = P(posX - this.pistonBinWidth/2, 0).track({pt:this.pistonPt, noTrack:'x'});
 		}
 		this.trackingPts.push(bin.pos);
 		bin.slots = this.getPistonBinSlots(bin.pos, weightGroup);
@@ -953,7 +952,6 @@ DragArrow.prototype = {
 //////////////////////////////////////////////////////////////////////////
 function CompArrow(attrs){
 	this.type = 'CompArrow';
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	var wallInfo = defaultTo(0, attrs.wallInfo);
 	var speed = defaultTo(1.5, attrs.speed);
 	var compMode = defaultTo('adiabatic', attrs.compMode);
@@ -1015,7 +1013,6 @@ _.extend(CompArrow.prototype, objectFuncs, {
 function Piston(attrs){
 	this.type = 'Piston';
 	this.handle = attrs.handle;
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.wall = walls[this.wallInfo];
 	this.min = defaultTo(2, attrs.min);
@@ -1192,7 +1189,6 @@ Still records its energy flow
 */
 function Heater(attrs){
 	this.type = 'Heater';
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	/*
 	dims.dx corresponds to long side w/ wires
 	dims.dy corresponds to short side
@@ -1406,7 +1402,6 @@ _.extend(Heater.prototype, objectFuncs, {
 //////////////////////////////////////////////////////////////////////////
 function Stops(attrs){
 	this.type = 'Stops';
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	//assumes canvas of c.  I mean, where else would they be?
 	this.handle = attrs.handle;
 	this.stopWidth = 20;

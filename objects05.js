@@ -2,7 +2,6 @@ function QArrowsAmmt(attrs) {
 	this.type = 'QArrowsAmmt';
 	this.wallHandle = attrs.wallInfo;
 	this.wall = walls[this.wallHandle];
-	this.cleanUpWith = attrs.cleanUpWith || currentSetupType;
 	this.handle = attrs.handle;
 	var wall = this.wall;
 	wall.recordQ();
@@ -101,7 +100,6 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 
 function ThresholdEnergyPair(attrs) {
 	this.type = 'ThresholdEnergyPair';
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	if (spcs[attrs.spcNameLow] && spcs[attrs.spcNameHigh]) {
 		this.spcNameLow = attrs.spcNameLow;
 		this.spcNameHigh = attrs.spcNameHigh;

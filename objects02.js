@@ -19,7 +19,6 @@ function Sandbox(attrs){
 	this.type = 'Sandbox';
 	this.handle = attrs.handle;
 	this.emitterNum = 0;
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	var self = this;
 	attrs = defaultTo({}, attrs);
 	this.bin = {};
@@ -218,7 +217,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		var centerPos = (this.wall[0].x + this.wall[1].x)/2;
 		var dist = this.wall[0].y;
 		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:this.width, dist:dist, dir:dir, col:col,
-											onRemove:onRemove, parentList:this.emitters, onGenerate:onGenerate, cleanUpWith:this.cleanUpWith, handle: emitterHandle});
+											onRemove:onRemove, parentList:this.emitters, onGenerate:onGenerate, handle: emitterHandle});
 		newEmitter.removing = true;
 		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners)
 		var wallPt = this.wall[0];
@@ -285,7 +284,6 @@ Optional
 */
 function ParticleEmitter(attrs){
 	this.type = 'ParticleEmitter';
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.pos = attrs.pos;
 	this.handle = attrs.handle;
 	this.dir = attrs.dir;
@@ -407,7 +405,6 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 			this.parentList.splice(_.indexOf(this.parentList, this), 1);
 		}
 		removeListener(curLevel, 'update', this.runListenerName);
-		removeListener(curLevel, this.cleanUpWith + 'CleanUp', this.cleanUpListenerName);
 		this.removed = true;
 	},
 
@@ -438,7 +435,6 @@ Optional
 
 function ArrowFly(attrs){
 	this.type = 'ArrowFly';
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.pos = attrs.pos.copy();
 	if (attrs.posFinal) {
 		this.posFinal = attrs.posFinal;
@@ -686,7 +682,6 @@ ArrowLine.prototype = {
 //////////////////////////////////////////////////////////////////////////
 function TempChanger(attrs) {
 	this.type = 'tempChanger';
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.info = attrs.info;
 	this.min = defaultTo(100, attrs.min);
 	this.val = dataHandler.temp(this.info);
@@ -720,7 +715,6 @@ _.extend(TempChanger.prototype, objectFuncs, {
 //////////////////////////////////////////////////////////////////////////
 function RMSChanger(attrs) {
 	this.type = 'RMSChanger';
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.info = attrs.info;
 	this.min = defaultTo(1, attrs.min);
 	this.val = dataHandler.RMS(this.info);
