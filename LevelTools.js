@@ -186,19 +186,19 @@ LevelTools = {
 		this.numUpdates++;
 		turn++;
 		this.updateRun();
-		for (var updateListener in this.updateListeners.listeners){
-			var listener = this.updateListeners.listeners[updateListener];
+		for (var updateListener in this.updateListeners){
+			var listener = this.updateListeners[updateListener];
 			listener.func.apply(listener.obj);
 		}
-		for (var wallMoveListener in this.wallMoveListeners.listeners){
-			var listener = this.wallMoveListeners.listeners[wallMoveListener];
+		for (var wallMoveListener in this.wallMoveListeners){
+			var listener = this.wallMoveListeners[wallMoveListener];
 			listener.func.apply(listener.obj);
 		}
 	},
 	updateData: function(){
 
-		for (var dataListener in this.dataListeners.listeners){
-			var listener = this.dataListeners.listeners[dataListener];
+		for (var dataListener in this.dataListeners){
+			var listener = this.dataListeners[dataListener];
 			listener.func.apply(listener.obj);
 		}
 
@@ -213,15 +213,15 @@ LevelTools = {
 		}, 250);
 	},
 	dataRunNoGraphs: function() {
-		for (var datum in this.recordListeners.listeners){
-			var recordInfo = this.recordListeners.listeners[datum];
+		for (var datum in this.recordListeners){
+			var recordInfo = this.recordListeners[datum];
 			recordInfo.func.apply(recordInfo.obj);
 			//this.data[datum].pushNumber(recordInfo.func.apply(recordInfo.obj));
 		}			
 	},
 	dataRun: function() {
-		for (var datum in this.recordListeners.listeners){
-			var recordInfo = this.recordListeners.listeners[datum];
+		for (var datum in this.recordListeners){
+			var recordInfo = this.recordListeners[datum];
 			recordInfo.func.apply(recordInfo.obj);
 			//this.data[datum].pushNumber(recordInfo.func.apply(recordInfo.obj));
 		}	
@@ -369,7 +369,7 @@ LevelTools = {
 		var didWin = 1;
 		var alerts = {1:undefined, 0:undefined};
 		var priorities = {1:0, 0:0};
-		var conditions = this.sectionConditionListeners.listeners
+		var conditions = this.sectionConditionListeners
 		for (var conditionName in conditions) {
 			var condition = conditions[conditionName]
 			winResults = condition.func.apply(condition.obj); //returns didWin, alert, priority (high takes precidence);
@@ -387,7 +387,7 @@ LevelTools = {
 		var didWin = 1;
 		var alerts = {1:undefined, 0:undefined};
 		var priorities = {1:0, 0:0};
-		var conditions = this.promptConditionListeners.listeners;
+		var conditions = this.promptConditionListeners;
 		for (var conditionName in conditions) {
 			var condition = conditions[conditionName]
 			winResults = condition.func.apply(condition.obj); //returns didWin, alert, priority (high takes precidence);

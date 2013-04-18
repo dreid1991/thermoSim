@@ -44,7 +44,7 @@ function Sandbox(attrs){
 	this.wall.recordWork();
 	this.wallHandler = defaultTo('cPAdiabaticDamped', attrs.compMode);	
 	walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);	
-	
+	this.trackingPts = [];
 	this.wallPt = this.wall[0];
 	
 	this.emitters = new Array();
@@ -54,8 +54,8 @@ function Sandbox(attrs){
 	this.spcVol = 70; //specific volume
 	this.sand.col = defaultTo(Col(224, 165, 75), attrs.sandCol);
 	this.sand.pts = this.getSandPts();
-	this.sand.pos = P(this.binX, this.wall[0].y).track({pt:this.wallPt, noTrack:'x', cleanUpWith:this.cleanUpWith});
-
+	this.sand.pos = P(this.binX, this.wall[0].y).track({pt:this.wallPt, noTrack:'x'});
+	this.trackingPts.push(this.sand.pos);
 	this.pistonPt = this.wall[0].y;
 	
 	this.setupStd();
@@ -65,7 +65,7 @@ function Sandbox(attrs){
 _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 {
 	init: function(){	
-		this.drawListenerName = unique('drawSand' + this.handle, curLevel.updateListeners.listeners);
+		this.drawListenerName = unique('drawSand' + this.handle, curLevel.updateListeners);
 		addListener(curLevel, 'update', this.drawListenerName, this.draw, this);
 		this.wall.moveInit();
 		this.wall.recordMass();
@@ -132,7 +132,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 	},
 	boundUpper: function(){
 		var listenerName = this.handle + 'BoundUpper'
-		if (!curLevel.updateListeners.listeners[listenerName]) {
+		if (!curLevel.updateListeners[listenerName]) {
 			addListener(curLevel, 'update', listenerName,
 				function(){
 					if (this.mass > this.massMax) {
@@ -145,7 +145,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 	},
 	boundLower: function(){
 		var listenerName = this.handle + 'BoundLower'
-		if(!curLevel.updateListeners.listeners[listenerName]){
+		if(!curLevel.updateListeners[listenerName]){
 			addListener(curLevel, 'update', listenerName,
 				function(){
 					if(this.mass < this.massMin){
@@ -194,7 +194,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:this.width, dist:dist, dir:dir, col:col,
 											onRemove:onRemove, parentList:this.emitters, onArrive:onArrive, handle: emitterHandle});
 		newEmitter.adding = true;
-		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners.listeners)
+		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners)
 		addListener(curLevel, 'update', moveListenerName, 
 			function(){
 				newEmitter.adjust({dist:this.wallPt.y, width:this.width});
@@ -220,7 +220,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		var newEmitter = new ParticleEmitter({pos:P(centerPos, 0), width:this.width, dist:dist, dir:dir, col:col,
 											onRemove:onRemove, parentList:this.emitters, onGenerate:onGenerate, cleanUpWith:this.cleanUpWith, handle: emitterHandle});
 		newEmitter.removing = true;
-		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners.listeners)
+		moveListenerName = unique('adjustEmitter' + emitterIdx, curLevel.updateListeners)
 		var wallPt = this.wall[0];
 		addListener(curLevel, 'update', moveListenerName, 
 			function(){
@@ -248,7 +248,8 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 			this.emitters[emitterIdx].remove();
 		}
 		this.emitters = [];
-		this.sand.pos.trackStop();
+		this.trackingPts.map(function(pt) {pt.trackStop()});
+		this.trackingPts.splice(0, this.trackingPts.length);
 		this.removeButtons();
 		removeListener(curLevel, 'update', this.drawListenerName);
 		removeListener(curLevel, 'data', this.cleanUpEmittersListenerName);	
@@ -312,7 +313,7 @@ function ParticleEmitter(attrs){
 }
 _.extend(ParticleEmitter.prototype, objectFuncs, {
 	init: function(){
-		this.runListenerName = unique('particle' + this.handle, curLevel.updateListeners.listeners);
+		this.runListenerName = unique('particle' + this.handle, curLevel.updateListeners);
 		addListener(curLevel, 'update', this.runListenerName, this.run, this);
 		return this;
 	},
@@ -509,7 +510,7 @@ _.extend(ArrowFly.prototype, objectFuncs, toInherit.ArrowFuncs, {
 	},
 
 	init: function(){
-		this.updateListenerName = unique(this.type + defaultTo('', this.handle), curLevel.updateListeners.listeners);
+		this.updateListenerName = unique(this.type + defaultTo('', this.handle), curLevel.updateListeners);
 		addListener(curLevel, 'update', this.updateListenerName, this.run, this);
 		this.setupStd();
 		return this;
@@ -530,7 +531,7 @@ _.extend(ArrowFly.prototype, objectFuncs, toInherit.ArrowFuncs, {
 			if (this.fade) {
 				this.alphaStep = -this.alpha/this.fadeTurns;
 				this.remove();
-				this.updateListenerName = unique(this.type + defaultTo('', this.handle) + 'fade', curLevel.updateListeners.listeners);
+				this.updateListenerName = unique(this.type + defaultTo('', this.handle) + 'fade', curLevel.updateListeners);
 				addListener(curLevel, 'update', this.updateListenerName, this.runFade, this);
 				this.addCleanUp();
 			} else {

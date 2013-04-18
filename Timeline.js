@@ -246,6 +246,7 @@ Timeline.Section.prototype = {
 	clear: function() {
 		if (this.inited) {
 			$('#prompt').html('');
+			this.buttonManagerClone = $('#buttonManager').clone(true);
 			$('#buttonManager').html('');
 			$('#baseHeader').html('')
 			this.dashRunClone = $('#dashRun').clone(true);
@@ -256,6 +257,7 @@ Timeline.Section.prototype = {
 			}
 		}
 	},
+	//MAKE THESE ACCESSABLE IN TIMELINE
 	addCmmdSpan: function(prompt, cmmdInput) {
 		promptIdx = prompt == 'now' ? this.promptIdx : prompt;
 		var timestampHead = this.getTimestamp(promptIdx, 'setup');
@@ -387,7 +389,7 @@ Timeline.Section.prototype = {
 			this.applySpanToMoments(timeline, moments, elems, sceneData.graphs, 'objs', timestamp, Timeline.stateFuncs.graphs.spawn, Timeline.stateFuncs.graphs.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.rxns, 'objs', timestamp, Timeline.stateFuncs.rxns.spawn, Timeline.stateFuncs.rxns.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.buttonGroups, 'objs', timestamp, Timeline.stateFuncs.buttonGrps.spawn, Timeline.stateFuncs.buttonGrps.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.buttons, 'objs', timestamp, Timeline.stateFuncs.buttons.spawn, Timeline.stateFuncs.buttons.remove);
+			//this.applySpanToMoments(timeline, moments, elems, sceneData.buttons, 'objs', timestamp, Timeline.stateFuncs.buttons.spawn, Timeline.stateFuncs.buttons.remove);
 			this.applyCmmdsToMoments(timeline, moments, elems, sceneData.cmmds, 'cmmds', timestamp);
 
 		}
@@ -615,7 +617,11 @@ Timeline.stateFuncs = {
 	},
 	buttonGrps: {
 		spawn: function(section, elems, id, grpDatum) {
-			section.buttonManager.addGroup(grpDatum.handle, grpDatum.label, grpDatum.prefIdx, grpDatum.isRadio, grpDatum.isToggle, grpDatum.cleanUpWith);
+			section.buttonManager.addGroup(grpDatum.handle, grpDatum.label, grpDatum.prefIdx, grpDatum.isRadio, grpDatum.isToggle);
+			for (var i=0; i<grpDatum.buttons.length; i++) {
+				var buttonDatum = grpDatum.buttons[i];
+				section.buttonManager.addButton(grpDatum.handle, buttonDatum.handle, buttonDatum.label, buttonDatum.exprs, buttonDatum.prefIdx, buttonDatum.isDown);
+			}
 			elems[id] = grpDatum;
 		},
 		remove: function(section, elems, id) {
@@ -624,17 +630,17 @@ Timeline.stateFuncs = {
 			elems[id] = undefined;
 		}
 	},
-	buttons: {
-		spawn: function(section, elems, id, btnDatum) {
-			section.buttonManager.addButton(btnDatum.groupHandle, btnDatum.handle, btnDatum.label, btnDatum.exprs, btnDatum.prefIdx, btnDatum.isDown, btnDatum.cleanUpWith);
-			elems[id] = btnDatum;
-		},
-		remove: function(section, elems, id) {
-			var btnDatum = elems[id];
-			section.buttonManager.removeButton(btnDatum.groupHandle, btnDatum.handle);
-			elems[id] = undefined;
-		}
-	},	
+	// buttons: {
+		// spawn: function(section, elems, id, btnDatum) {
+			// section.buttonManager.addButton(btnDatum.groupHandle, btnDatum.handle, btnDatum.label, btnDatum.exprs, btnDatum.prefIdx, btnDatum.isDown, btnDatum.cleanUpWith);
+			// elems[id] = btnDatum;
+		// },
+		// remove: function(section, elems, id) {
+			// var btnDatum = elems[id];
+			// section.buttonManager.removeButton(btnDatum.groupHandle, btnDatum.handle);
+			// elems[id] = undefined;
+		// }
+	// },	
 	cmmds: {
 		spawn: function(section, elems, id, cmmd) {
 			var spawnExpr = cmmd.spawn;

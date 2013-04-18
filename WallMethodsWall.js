@@ -366,7 +366,8 @@ WallMethods.wall = {
 		 
 	},
 	cleanUp: function() {
-		var listeners = this.cleanUpListeners.listeners;
+		//HEY - I AM NOT SURE THIS EVEN EXISTS
+		var listeners = this.cleanUpListeners;
 		for (var listenerName in listeners) {
 			var listener = listeners[listenerName];
 			listener.func.apply(listener.obj);

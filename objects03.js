@@ -184,7 +184,7 @@ function ArrowStatic(attrs) {
 }
 _.extend(ArrowStatic.prototype, objectFuncs, toInherit.ArrowFuncs, {
 	init: function() {
-		this.updateListenerName = unique(this.type + defaultTo('', this.handle), curLevel.updateListeners.listeners);
+		this.updateListenerName = unique(this.type + defaultTo('', this.handle), curLevel.updateListeners);
 		if (this.label) {
 				addListener(curLevel, 'update', this.updateListenerName, this.runLabel, this);
 			} else {

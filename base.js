@@ -151,19 +151,16 @@ function unique(name, obj){
 }
 
 function addListener(object, typeName, funcName, func, destObj){
-	try{
-	object[typeName + 'Listeners'].listeners[funcName] = {func:func, obj:destObj};
-	}catch(e){
-	console.trace()
-	}
+	object[typeName + 'Listeners'][funcName] = {func:func, obj:destObj};
+
 }
 function addListenerOnce(object, typeName, funcName, func, destObj){
 	var removeFunc = function(){
 		removeListener(object, typeName, funcName);
 		removeListener(object, typeName, funcName+'Remove');
 	}
-	object[typeName + 'Listeners'].listeners[funcName] = {func:func, obj:destObj};
-	object[typeName + 'Listeners'].listeners[funcName + 'Remove'] = {func:removeFunc, obj:''};
+	object[typeName + 'Listeners'][funcName] = {func:func, obj:destObj};
+	object[typeName + 'Listeners'][funcName + 'Remove'] = {func:removeFunc, obj:''};
 }
 function addInterval(funcHandle, func, destObj, interval) {
 	extraIntervals[funcHandle] = window.setInterval(function(){func.apply(destObj)}, interval);
@@ -175,76 +172,42 @@ function removeInterval(funcHandle) {
 	}
 }
 function removeListener(object, typeName, funcName){
-	delete object[typeName + 'Listeners'].listeners[funcName];
+	delete object[typeName + 'Listeners'][funcName];
 }
 
-function removeSave(object, typeName, funcName){
-	delete object[typeName + 'Listeners'].save[funcName];
-}
+
 function removeListenerByName(object, typeName, pieceToRemoveBy){
 	var didDelete = false;
 	var funcName = getListenerByName(object, typeName, pieceToRemoveBy);
 	while (funcName!==undefined){
 		didDelete = true;
-		delete object[typeName+'Listeners'].listeners[funcName];
+		delete object[typeName+'Listeners'][funcName];
 		funcName = getListenerByName(object, typeName, pieceToRemoveBy);
 	}
 	return didDelete
 }
-function removeSaveByName(object, typeName, pieceToRemoveBy){
-	var didDelete = false;
-	var funcName = getSaveByName(object, typeName, pieceToRemoveBy);
-	while (funcName!==undefined){
-		didDelete = true;
-		delete object[typeName+'Listeners'].save[funcName];
-		funcName = getSaveByName(object, typeName, pieceToRemoveBy);
-	}
-	return didDelete
-}
+
 function makeListenerHolder(obj, name) {
-	obj[name + 'Listeners'] = {listeners:{}, save:{}};
+	//obj[name + 'Listeners'] = {listeners:{}, save:{}};
+	obj[name + 'Listeners'] = {};
 	return obj[name + 'Listeners'];
 }
 function listenerExists(object, typeName, funcName){
-	return object[typeName + 'Listeners'].listeners[funcName]!==undefined;
+	return object[typeName + 'Listeners'][funcName]!==undefined;
 }
 function emptyListener(object, typeName){
-	object[typeName + 'Listeners'].listeners = {};
+	object[typeName + 'Listeners'] = {};
 }
-function emptySave(object, typeName){
-	object[typeName + 'Listeners'].save = {};
-}
+
 function getListenerByName(object, typeName, pieceName){
-	for (thisFuncName in object[typeName + 'Listeners'].listeners) {
+	for (thisFuncName in object[typeName + 'Listeners']) {
 		if (thisFuncName.indexOf(pieceName)!=-1) {
 			return thisFuncName;
 		}
 	}
 }
-function getSaveByName(object, typeName, pieceName){
-	for (thisFuncName in object[typeName + 'Listeners'].save){
-		if(thisFuncName.indexOf(pieceName)!=-1){
-			return thisFuncName;
-		}
-	}
-}
-function saveListener(object, typeName){
-	var listener = object[typeName+'Listeners']
-	var save = listener.save;
-	var listeners = listener.listeners;
-	for (var listenerName in listeners){
-		save[listenerName] = listeners[listenerName];
-	}
-}
-function loadListener(object, typeName){
-	var listener = object[typeName+'Listeners']
-	var save = listener.save;
-	var listeners = listener.listeners;
-	for (var saveName in save){
-		listeners[saveName] = save[saveName];
-	}
-	
-}
+
+
 function store (attrName, val) {
 	stored[attrName] = val;
 }
@@ -630,20 +593,20 @@ function mouseOffsetDiv(divId) {
 $(document).mousemove(function(e) {
 	globalMousePos.x = e.pageX;
 	globalMousePos.y = e.pageY;
-	for (var mousemoveListener in curLevel.mousemoveListeners.listeners){
-		var listener = curLevel.mousemoveListeners.listeners[mousemoveListener]
+	for (var mousemoveListener in curLevel.mousemoveListeners){
+		var listener = curLevel.mousemoveListeners[mousemoveListener]
 		listener.func.apply(listener.obj);
 	}	
 })
 $(document).mousedown(function(e) {
-	for (var mousedownListener in curLevel.mousedownListeners.listeners){
-		var listener = curLevel.mousedownListeners.listeners[mousedownListener]
+	for (var mousedownListener in curLevel.mousedownListeners){
+		var listener = curLevel.mousedownListeners[mousedownListener]
 		listener.func.apply(listener.obj);
 	}		
 })
 $(document).mouseup(function(e) {
-	for (var mouseupListener in curLevel.mouseupListeners.listeners){
-		var listener = curLevel.mouseupListeners.listeners[mouseupListener]
+	for (var mouseupListener in curLevel.mouseupListeners){
+		var listener = curLevel.mouseupListeners[mouseupListener]
 		listener.func.apply(listener.obj);
 	}	
 })

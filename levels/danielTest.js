@@ -34,6 +34,7 @@ LevelData = {
 					// },
 					{
 						type: 'DragWeights',
+						cleanUpWith: 'prompt0',
 						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 2}], pInit: 3}
 					},
 					{
@@ -75,19 +76,26 @@ LevelData = {
 					//{label: 'RCT: ', expr: 'frac("wally", {spcName: "spc1", tag: "wally"}) + frac("wally", {spcName: "ugly", tag: "wally"})', sigFigs: 2, handle: 'coalseamgas', readout: 'mainReadout'}
 				],
 				buttonGroups: [
-					{handle: 'heaterState', label: 'Heater', prefIdx: 1, isRadio: true, cleanUpWith: 'prompt1'},
-					{handle: 'tempControl', label: 'Temp control', isRadio: true},
-					{handle: 'rxnControl', label: 'Rxn control', isToggle: true}
-				],
-				buttons: [
-					{groupHandle: 'heaterState', handle: 'on', label: 'On', isDown: true, exprs: ['curLevel.heaterHeaty.enable()']},
-					{groupHandle: 'heaterState', handle: 'off', label: 'Off', exprs: ['curLevel.heaterHeaty.disable()']},
-					{groupHandle: 'tempControl', handle: 'adiabatic', label: 'Adiabatic', exprs: ['walls.wally.isothermalStop()']},
-					{groupHandle: 'tempControl', handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']},
-					{groupHandle: 'rxnControl', handle: 'rxn1On', label: 'Forward on', exprs: ['collide.enableRxn("rxn1")']},
-					{groupHandle: 'rxnControl', handle: 'rxn1Off', label: 'Forward off', exprs: ['collide.disableRxn("rxn1")']},
-					{groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.enableRxn("rxn2")']},
-					{groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.disableRxn("rxn2")']},
+					{handle: 'heaterState', label: 'Heater', prefIdx: 1, isRadio: true, cleanUpWith: 'prompt1', 
+						buttons: [
+							{handle: 'on', label: 'On', isDown: true, exprs: ['curLevel.heaterHeaty.enable()']},
+							{handle: 'off', label: 'Off', exprs: ['curLevel.heaterHeaty.disable()']}
+						]
+					},
+					{handle: 'tempControl', label: 'Temp control', isRadio: true,
+						buttons: [
+							{handle: 'adiabatic', label: 'Adiabatic', exprs: ['walls.wally.isothermalStop()']},
+							{handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}			
+						]
+					},
+					{handle: 'rxnControl', label: 'Rxn control', isToggle: true,
+						buttons: [
+							{handle: 'rxn1On', label: 'Forward on', exprs: ['collide.enableRxn("rxn1")']},
+							{handle: 'rxn1Off', label: 'Forward off', exprs: ['collide.disableRxn("rxn1")']},
+							{handle: 'rxn2On', label: 'Backward on', exprs: ['collide.enableRxn("rxn2")']},
+							{handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.disableRxn("rxn2")']}
+						]
+					}
 				],
 				cmmds: [
 					'walls.wally.isothermalStop()',

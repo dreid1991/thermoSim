@@ -425,7 +425,7 @@ Point.prototype = {
 			var noTrackY = noTrack.indexOf('y')+1;
 		}
 
-		this.trackListenerId = unique(this.x+','+this.y+'tracksWithUniqueId', curLevel.updateListeners.listeners);
+		this.trackListenerId = unique(this.x+','+this.y+'tracksWithUniqueId', curLevel.updateListeners);
 		if (isNaN(this.x) || isNaN(this.y)) {
 			console.log('Trying to track NaN!');
 			console.trace();
@@ -473,11 +473,12 @@ Point.prototype = {
 				}
 			}		
 		}
-		if (trackFunc) {
-			addListener(curLevel, 'update', this.trackListenerId, trackFunc, this);
-			this.cleanUpWith = defaultTo(currentSetupType, trackData.cleanUpWith)
-			addListener(curLevel, this.cleanUpWith + 'CleanUp', this.trackListenerId, this.trackStop, this);
-		} else {
+		// if (trackFunc) {
+		addListener(curLevel, 'update', this.trackListenerId, trackFunc, this);
+			// this.cleanUpWith = defaultTo(currentSetupType, trackData.cleanUpWith)
+			// addListener(curLevel, this.cleanUpWith + 'CleanUp', this.trackListenerId, this.trackStop, this);
+		// } else {
+		if (!trackFunc) {
 			console.log('tried to track ' + this.trackListenerId + " but input wasn't right");
 			console.trace();
 		}
@@ -487,9 +488,9 @@ Point.prototype = {
 	trackStop: function() {
 		if (this.tracking) {
 			removeListener(curLevel, 'update', this.trackListenerId);
-			removeListener(curLevel, this.cleanUpWith + 'CleanUp', this.trackListenerId);
+			//removeListener(curLevel, this.cleanUpWith + 'CleanUp', this.trackListenerId);
 			this.trackListenerId = undefined;
-			this.cleanUpWith = undefined;
+			//this.cleanUpWith = undefined;
 			this.tracking = false;
 		}
 		return this;

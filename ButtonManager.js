@@ -38,15 +38,15 @@ ButtonManager.prototype = {
 			console.log('Bad group handle ' + groupHandle);
 		}
 	},
-	cleanUp: function(type) {
-		for (var grpIdx=this.groups.length - 1; grpIdx>=0; grpIdx--) {
-			if (this.groups[grpIdx].cleanUpWith == type) {
-				this.removeGroup(this.groups[grpIdx].handle);
-			} else {
-				this.groups[grpIdx].cleanUp(type);
-			}
-		}
-	},
+	// cleanUp: function(type) {
+		// for (var grpIdx=this.groups.length - 1; grpIdx>=0; grpIdx--) {
+			// if (this.groups[grpIdx].cleanUpWith == type) {
+				// this.removeGroup(this.groups[grpIdx].handle);
+			// } else {
+				// this.groups[grpIdx].cleanUp(type);
+			// }
+		// }
+	// },
 	getGroupDiv: function(group) {
 		var children = $('#' + this.wrapperDivId).children();
 		for (var i=0; i<children.length; i++) {
@@ -111,10 +111,10 @@ ButtonManager.prototype = {
 			}
 		}
 	},
-	addButton: function(groupHandle, handle, label, exprs, prefIdx, isDown, cleanUpWith) {
+	addButton: function(groupHandle, handle, label, exprs, prefIdx, isDown) {
 		var group = this.getGroup(groupHandle);
 		if (group)
-			group.addButton(handle, label, exprs, prefIdx, isDown, cleanUpWith);
+			group.addButton(handle, label, exprs, prefIdx, isDown);
 		else
 			console.log('Bad group handle ' + groupHandle); 
 	},
@@ -184,7 +184,7 @@ ButtonManager.prototype = {
 	
 }
 
-ButtonManager.Group = function(mgrDiv, groupId, handle, label, prefIdx, isRadio, isToggle, cleanUpWith) {
+ButtonManager.Group = function(mgrDiv, groupId, handle, label, prefIdx, isRadio, isToggle) {
 	this.mgrDiv = mgrDiv;
 	this.groupId = groupId;
 	this.handle = handle;
@@ -193,7 +193,6 @@ ButtonManager.Group = function(mgrDiv, groupId, handle, label, prefIdx, isRadio,
 	this.buttons = [];
 	this.isRadio = isRadio;
 	this.isToggle = isToggle && !isRadio;
-	this.cleanUpWith = cleanUpWith || currentSetupType;
 }
 
 ButtonManager.Group.prototype = {
@@ -268,14 +267,14 @@ ButtonManager.Group.prototype = {
 		}
 		console.log('Bad button handle ' + handle);
 	},
-	cleanUp: function(type) {
-		for (var buttonIdx=this.buttons.length - 1; buttonIdx>=0; buttonIdx--) {
-			var button = this.buttons[buttonIdx];
-			if (button.cleanUpWith == type) {
-				this.removeButton(button.handle);
-			}
-		}
-	},
+	// cleanUp: function(type) {
+		// for (var buttonIdx=this.buttons.length - 1; buttonIdx>=0; buttonIdx--) {
+			// var button = this.buttons[buttonIdx];
+			// if (button.cleanUpWith == type) {
+				// this.removeButton(button.handle);
+			// }
+		// }
+	// },
 	getButtonDiv: function(button) {
 		var children = $('#' + this.groupId).children();
 		for (var i=0; i<children.length; i++) {

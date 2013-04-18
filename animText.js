@@ -4,7 +4,7 @@ function AnimText(drawCanvas){
 AnimText.prototype = {
 	newAnim: function(init, dest, attrs){
 		
-		var animName = unique('animText', curLevel.updateListeners.listeners);
+		var animName = unique('animText', curLevel.updateListeners);
 		//font, text, align, time
 		var text = attrs.text;
 		var moving = new Boolean();
