@@ -218,13 +218,13 @@ QuizRenderer.Quiz.prototype = {
 			if (question.hasCorrectAnswer() && !question.correct) {
 				if (question.type == 'multChoice') {
 					for (var j=0; j<question.options.length; j++) {
-						if (question.options[j].selected && question.options[j].messageWrong) {
-							alert(question.options[j].messageWrong);
+						if (question.options[j].selected && question.options[j].message) {
+							alert(question.options[j].message);
 							return;
 						}
 					}
-				} else if (question.messageWrong) {
-					alert(question.messageWrong);
+				} else if (question.message) {
+					alert(question.message);
 					return;
 				}
 			
@@ -239,7 +239,7 @@ QuizRenderer.Question = function(questionData) {
 	this.text = questionData.text;
 	this.preText = questionData.preText;
 	this.unit = questionData.units;
-	this.messageWrong = questionData.messageWrong;
+	this.message = questionData.message;
 	this.storeAs = questionData.storeAs;
 	this.options = this.makeOptions(questionData.options);
 	this.answered = false;
@@ -275,6 +275,6 @@ QuizRenderer.MultChoiceOption = function(option) {
 	this.correct = option.correct || false;
 	this.text = option.text;
 	this.selected = false;
-	this.messageWrong = option.messageWrong;
+	this.message = option.message;
 	this.div = undefined;
 }

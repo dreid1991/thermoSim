@@ -85,6 +85,15 @@ DotManager.prototype = {
 			console.trace();
 		}
 	},
+	getWithLog: function(info) {
+		var gotten = this.get(info);
+		if (gotten) {
+			return gotten
+		} else {
+			console.log('Bad species data');
+			console.log(info);
+		}
+	},
 	get: function(info) {
 		if (info) {
 			if (info.spcName && info.tag) {

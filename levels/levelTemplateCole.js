@@ -8,7 +8,7 @@ LevelData = {
 	],
 	mainSequence: [
 		{//First Questions
-			sceneData: {
+			sceneData: {//Scene 0
 							objs: [
 								{type:'AuxImage',
 									attrs: {handle: 'piston1', imgFunc: 'img("img/work/block0Pic2.jpg")', slotNum: 1}
@@ -19,32 +19,32 @@ LevelData = {
 							],
 						},
 				prompts:[ 
-					{//Prompt 1
+					{//Prompt 0
 						sceneData: undefined,
 						cutScene:true,
 						text: "Today we're going to investigate how work transfers energy to a system.  First we're going to develop the equations that describe a process on an adiabatic system. </p><p>If we compress the adiabatic system pictured to the right at a constant external pressure from state 1 to state 2, which of the following equations best represents the work done?</p>",
 						quiz: [
 							{type: 'multChoice',
 								options:[
-									{text:"## W = -\\int_{V_{1}}^{V_{2}}P_{sys}dV ##", isCorrect: false, message:"That's not correct"},
-									{text:"## W = - V\\Delta P_{ext} ##", isCorrect: false, message:"That's not correct"},
-									{text:"## W = -P_{ext}\\Delta V ##", isCorrect: true},
-									{text:"## W = -T\\Delta V ##", isCorrect: false, message:"That's not correct"}
+									{text:"## W = -\\int_{V_{1}}^{V_{2}}P_{sys}dV ##", correct: false, message:"That's not correct"},
+									{text:"## W = - V\\Delta P_{ext} ##", correct: false, message:"That's not correct"},
+									{text:"## W = -P_{ext}\\Delta V ##", correct: true},
+									{text:"## W = -T\\Delta V ##", correct: false, message:"That's not correct"}
 								]
 							},
 						]
 					},
-					{//Prompt 2
+					{//Prompt 1
 						sceneData:undefined,
 						cutScene:true,
 						text: "$$ W = -P_{ext}\\Delta V $$ <p> Indeed. This equation tells us that work done on a system is equal to how hard you compress a container per area times how much you compress it. <p> Now from the first law, we know $$ \\Delta U = Q + W $$ <p> For our adiabatic system, which of the following relations is correct, if we asume constant heat capacity?",
 						quiz: [
 							{type: 'multChoice',
 								options:[
-									{text:"## nc_v\\Delta T = Q ##", isCorrect: false, message:"But it's adiabatic!"},
-									{text:"##nc_v\\Delta T = -P_{ext}\\Delta V ##", isCorrect: true},
-									{text:"##nc_p\\Delta T = -P_{ext}\\Delta V ##", isCorrect: false, message:"Why Cp?"},
-									{text:"None of these are correct", isCorrect: false, message:"Yes it can.  What is Q equal to for an adiabatic system?"}
+									{text:"## nc_v\\Delta T = Q ##", correct: false, message:"But it's adiabatic!"},
+									{text:"##nc_v\\Delta T = -P_{ext}\\Delta V ##", correct: true},
+									{text:"##nc_p\\Delta T = -P_{ext}\\Delta V ##", correct: false, message:"Why Cp?"},
+									{text:"None of these are correct", correct: false, message:"Yes it can.  What is Q equal to for an adiabatic system?"}
 								]
 							}
 						]
@@ -52,7 +52,7 @@ LevelData = {
 				]	
 		},
 		{//First Scene
-			sceneData: {
+			sceneData: {//Scene 1
 				walls: [
 					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'FirstWall', border: {type: 'open'}, hitMode: 'ArrowSpd'},
 				],
@@ -66,10 +66,10 @@ LevelData = {
 				]
 			},
 			prompts:[
-				{
+				{//Prompt 0
 					sceneData: {
-						listeners: [
-							{handle: 'firstCheck', expr: 'fracDiff(temp("FirstWall"), 400) > .05', alertUnsatisfied: "Try to hit the molecule with the slider and see what happens!", priorityUnsatisfied: 1}
+						triggers: [
+							{handle: 'firstCheck', expr: 'fracDiff(temp("FirstWall"), 400) > .05', message: "Try to hit the molecule with the slider and see what happens!", priority: 1, }
 						]
 					},
 					text: "<center>##nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p>From the equation above we see that temperature increases as we do work by decreasing volume.  Temperature is an expression is molecular kinetic energy, so as the system is compressed, the molecules must speed up.  These ideal gas molecules can be thought of as perfectly elastic bouncy balls.  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?<p>",
@@ -78,14 +78,14 @@ LevelData = {
 					],
 					
 				},
-				{
+				{//Prompt 1
 				sceneData: undefined,
 				text: "<p>So the molecules speed up when they collide with the moving wall.  Those collisions add kinetic energy, which means that the temperature increases.</p><p>Now let's do an experiment where we compress our adiabatic system.",
 				}
 			]
 		},
 		{//Second Scene
-			sceneData: {
+			sceneData: {//Scene 2
 				walls: [
 					{pts: [P(40,60), P(510,60), P(510,380), P(40,380)], handler: 'staticAdiabatic', handle: 'SecondWall', border: {type: 'open'}}
 				],
@@ -113,11 +113,11 @@ LevelData = {
 				],
 			},
 			prompts:[
-				{
+				{//Prompt 0
 					sceneData:{
-						listeners: [
-								{handle: 'CheckP', expr: 'pExt("SecondWall")==15', satisfyCmmds: ['curLevel.dragWeightsDragsOne.disable()'], priorityUnsatisfied: 1},
-								{handle: 'CheckVol', expr: 'vol("SecondWall")<8', alertUnsatisfied: "Compress the system!", priorityUnsatisfied: 1}
+						triggers: [
+								{handle: 'CheckP', expr: 'pExt("SecondWall")==15', satisfyCmmds: ['curLevel.dragWeightsDragsOne.disable()'], priority: 1},
+								{handle: 'CheckVol', expr: 'vol("SecondWall")<8', alertUnsatisfied: "Compress the system!", priority: 1}
 							]
 					},
 						text: "Above is a well insulated piston cylinder assembly.  Place the block on top of the piston and observe the response.  Calculate the amount of work that the piston and block did on the system?",
@@ -125,7 +125,7 @@ LevelData = {
 							{type: 'textSmall', storeAs: 'WorkDoneAnswer', units: 'kJ', text: ''}
 						]
 				},
-				{
+				{//Prompt 1
 					sceneData: undefined,
 						text: "The system had an initial temperature of 200 K and contains 1.8 moles of an ideal monatomic gas.  You wrote that get('WorkDoneAnswer','int') kJ of work were done.  What final temperature should the system have?",
 						quiz: [
@@ -135,7 +135,7 @@ LevelData = {
 			]
 		},
 		{//Third Scene
-			sceneData: {
+			sceneData: {//Scene 3
 				walls: [
 					{pts: [P(40,60), P(510,60), P(510,380), P(40,380)], handler: 'staticAdiabatic', handle: 'ThirdWall', border: {type: 'open'}}
 				],
@@ -170,11 +170,11 @@ LevelData = {
 				]
 			},
 			prompts:[
-				{
+				{//Prompt 0
 					sceneData: {
-						listeners: [
-							{handle: 'checkPext', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.disable()'] , priorityUnsatisfied: 1},
-							{handle: 'checkVol2', expr: 'vol("ThirdWall")<8', alertUnsatisfied: "Compress the system!", priorityUnsatisfied: 1}
+						trigger: [
+							{handle: 'checkPext', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.disable()'] , priority: 1},
+							{handle: 'checkVol2', expr: 'vol("ThirdWall")<8', alertUnsatisfied: "Compress the system!", priority: 1}
 						]
 					},
 					text: "Previously you answered that the compression did get('WorkDoneAnswer','int') KJ on the system bringing it to a final temperature of get('TempAnswer','int') K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
@@ -182,7 +182,7 @@ LevelData = {
 						{type: 'text', storeAs: 'DiscrepencyAnswer'}
 					]
 				},
-				{
+				{//Prompt 1
 					sceneData: undefined,
 						cutScene: true,
 						text: "<center> ## nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p> If you'll notice, the T vs. V graph is linear.  Using the equation above, find what its slope should should be with 1.8 moles of an ideal monatomic gas.  Do the slopes from the equation and from the graph match?",
@@ -192,7 +192,7 @@ LevelData = {
 							{type: 'text', preText: "Given our ## P_{ext} ## should the graph be linear or did something go wrong? Explain.", text: " "}
 						]
 				},
-				{
+				{//Prompt 2
 					sceneData: undefined,
 						cutScene: true,
 						text: "Now we'll look at expanding the same system of 1.8 moles with ## P_{ext} ## of 2 bar from 7.5L to 15 L. <p> How much work will the system do on its surroundings in this expansion, and what will its final temperature be?",
@@ -201,12 +201,12 @@ LevelData = {
 							{type: 'textSmall', label: 'Final Temperature:', storeAs: 'tempAnswer', text: " ", units: "K"}
 						]
 				},
-				{
+				{//Prompt 3
 					sceneData: {
-						listeners: [
-							{handle: 'checkPext2', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.enable()'], priorityUnsatisfied: 1},
-							{handle: 'checkPext3', expr: 'pExt("ThirdWall")==2', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.disable()'], priorityUnsatisfied: 1},
-							{handle: 'checkPext4', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['walls.ThirdWall.resetWork()'], priorityUnsatisfied: 1},
+						triggers: [
+							{handle: 'checkPext2', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.enable()'], priority: 1},
+							{handle: 'checkPext3', expr: 'pExt("ThirdWall")==2', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.disable()'], priority: 1},
+							{handle: 'checkPext4', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['walls.ThirdWall.resetWork()'], priority: 1},
 							{handle: 'checkVole3', expr: 'fracDiff(vol("ThirdWall"),14.9)<.01', satisfyStore: [{storeAs:'Temp', expr: 'temp("ThirdWall")'}]}
 						],
 						objs: [
@@ -217,7 +217,7 @@ LevelData = {
 					},
 					text: "You wrote that the system would do get('workAnswer', 'int') kJ of work for a final temperature of get('tempAnswer', 'int') K. Find out if you were right by performing the experiment above. ",
 				},
-				{
+				{//Prompt 4
 					sceneData:undefined, 
 					text: "The system has undergone a two-step process.  First it was compressed by adding a block.  Then it was expanded to its original volume by removing the block.  Before the compression, the system's temperature was 200K.  After the expansion, the temperature was get('Temp', 'int') K.  Why is the system temperature higher after going through this two-step process?",
 					quiz: [

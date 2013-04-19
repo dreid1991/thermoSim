@@ -3,7 +3,6 @@
 <link type='text/css' href = '../css/custom-theme/jquery-ui-1.9.2.custom.sim.css' rel='stylesheet' />
 <link type='text/css' href = '../styles.css' rel='stylesheet'/>
 <link type='text/css' href = '../mathStyles.css' rel='stylesheet'/>
-
 <div class='sim noSelect wrapper'>
 	<table class='tableWrapper'>
 	<tr><td>
@@ -78,11 +77,15 @@
 	</td>
 	<td class='padLeft floatTop'>
 		<div id='auxSlots' class='sim auxSlots noSelect'>
-			<div id='aux1' class='sim aux' filledWith=''>
+			<div id='aux1Wrapper>
+				<div id='aux1' class='sim aux' filledWith=''>
+				</div>
 			</div>
 			<div id='auxSpacer' class='sim auxSpacer'>
 			</div>
-			<div id='aux2' class='sim aux' filledWith=''>
+			<div id='aux2Wrapper'>
+				<div id='aux2' class='sim aux' filledWith=''>
+				</div>
 			</div>
 		</div>
 	</td></tr>
@@ -100,7 +103,7 @@
 			</div>
 		
 			<div id='nextPrevDiv' align='right' class='sim'>
-				<button id = 'previous'>Previous</button>
+				<button id = 'previous'>Back</button>
 				<button id = 'next'>Next</button>
 			</div>
 
@@ -110,7 +113,6 @@
 	<div id='baseDash' class='sim bottomRound noSelect'></div>
 </div>
 <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
 <script src = '../underscore-min.js'></script>
 <script src = '../js/jquery-1.9.0.min.js'></script>
 <script src = '../js/jquery-ui-1.9.2.custom.min.js'></script>
@@ -142,7 +144,9 @@
 <script src = '../WallMethodsCollide.js'></script>
 <script src = '../WallMethodsBorder.js'></script>
 <script src = '../ButtonManager.js'></script>
-<script src = '../Renderer.js'></script>
+<script src = '../QuizRenderer.js'></script>
+<script src = '../ThresholdEnergySpcChanger.js'></script>
+<script src = '../ConditionManager.js'></script>
 <script src = '../objects01.js'></script>
 <script src = '../objects02.js'></script>
 <script src = '../objects03.js'></script>

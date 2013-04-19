@@ -140,6 +140,8 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	this.collide.setSpcs(this.spcs);
 	this.level.spcs = this.spcs;
 	this.level.dataHandler = this.dataHandler;
+	this.aux1Clone;
+	this.aux2Clone;
 	this.buttonMangerClone;
 	this.buttonManagerBlank = buttonManagerBlank;
 	this.dashRunClone;
@@ -302,6 +304,9 @@ Timeline.Section.prototype = {
 			$('#baseHeader').html('')
 			this.dashRunClone = $('#dashRun').clone(true);
 			$('#dashRun').remove();
+			var aux1 = $('#aux1');
+			var aux2 = $('#aux2');
+			//if (aux1.attr('filledWith') 
 			for (var graphName in this.level.graphs) {
 				var graph = this.level.graphs[graphName];
 				graph.clearHTML();

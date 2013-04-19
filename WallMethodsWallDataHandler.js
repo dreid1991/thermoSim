@@ -34,7 +34,7 @@ WallMethods.wallDataHandler = {
 			} else {
 				return this.data[type]
 			}
-		} else if (!suppressOutput) {
+		} else if (suppressOutput !== true) {
 			console.log('Tried to get bad data type "' + type + '" with args');
 			console.log(args);
 		}
@@ -106,7 +106,7 @@ WallMethods.wallDataHandler = {
 			this.data.temp = new WallMethods.DataObj();
 			var dataObj = this.data.temp;
 			this.setupStdDataObj(dataObj, 'temp');
-			var dots = this.dotManager.get({tag: this.handle});
+			var dots = this.dotManager.getWithLog({tag: this.handle});
 			if (!tempFunc) { 
 				tempFunc = function () {
 					var sumKE = 0;
