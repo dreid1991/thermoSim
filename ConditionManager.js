@@ -60,7 +60,7 @@ ConditionManager.prototype = {
 		if (willAdvance) {
 			conds.map(function(cond) {
 				cond.satisfied = true
-				if (/conditions/i.text(cond.checkOn)) {
+				if (/conditions/i.test(cond.checkOn)) {
 					cond.recordVals();
 				}
 			});
