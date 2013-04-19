@@ -58,7 +58,12 @@ ConditionManager.prototype = {
 			alert(message);
 		}
 		if (willAdvance) {
-			conds.map(function(cond) {cond.satisfied = true});
+			conds.map(function(cond) {
+				cond.satisfied = true
+				if (/conditions/i.text(cond.checkOn)) {
+					cond.recordVals();
+				}
+			});
 		}
 		return willAdvance;
 	},

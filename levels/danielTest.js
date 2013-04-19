@@ -131,7 +131,7 @@ LevelData = {
 			
 						],
 						triggers: [
-							{handle: 'trumpet', expr: "pExt('wally') > 3", message: 'la', requiredFor: 'prompt1'}
+							{handle: 'trumpet', expr: "pExt('wally') > 3", message: 'la', requiredFor: 'prompt1', checkOn: 'conditions'}
 						],
 						// objs: [
 							// {
