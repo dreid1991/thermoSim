@@ -8,6 +8,7 @@ function AuxImage(attrs) {
 	this.bgCol = curLevel.bgCol;
 	this.makeDiv(this.slotNum)
 	this.addImage(this.imgFunc);
+	curLevel.auxs[this.handle] = this;
 	this.setupStd();
 }
 
@@ -39,8 +40,16 @@ _.extend(AuxImage.prototype, AuxFunctions, objectFuncs, {//CONSISTANT PLEASE - F
 			
 		
 	},
+	clearHTML: function() {
+		this.cleanUpParent();
+	},
+	restoreHTML: function() {
+		$(this.parentDiv).css({width: this.dims.dx, height: this.dims.dy, 'background-color': this.bgCol.hex, 'border-radius': 20, padding: 0});
+		this.addImage(this.imgFunc);
+	},
 	remove: function() {
 		this.cleanUpParent();
+		delete curLevel.auxs[this.handle];
 
 	}
 

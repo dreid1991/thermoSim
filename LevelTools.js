@@ -6,7 +6,7 @@ LevelTools = {
 		this.numUpdates = 0;
 		this.wallSpeed = defaultTo(1, this.wallSpeed);
 		this.makeListenerHolders();
-		
+		this.auxs = {};
 		this.attracting = false;
 		this.gravitying = false;
 		this.setUpdateRunListener();

@@ -140,8 +140,6 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	this.collide.setSpcs(this.spcs);
 	this.level.spcs = this.spcs;
 	this.level.dataHandler = this.dataHandler;
-	this.aux1Clone;
-	this.aux2Clone;
 	this.buttonMangerClone;
 	this.buttonManagerBlank = buttonManagerBlank;
 	this.dashRunClone;
@@ -153,12 +151,20 @@ Timeline.Section.prototype = {
 		this.replaceDiv($('#dashRunWrapper'), $('#dashRun'), this.dashRunClone || this.dashRunBlank);
 		this.replaceDiv($('#buttonManagerWrapper'), $('#buttonManager'), this.buttonManagerClone || this.buttonManagerBlank);
 		this.pushToGlobal();
-
+		if (this.aux1Clone) {
+			this.replaceDiv($('#aux1Wrapper'), $('aux1'), this.aux1Clone);
+			this.aux1Clone = undefined;
+		}
+		if (this.aux2Clone) {
+			this.replaceDiv($('#aux2Wrapper'), $('aux2'), this.aux2Clone);
+			this.aux2Clone = undefined;
+		}
 		if (!this.inited) {
 			this.promptIdx = -1;
 			this.stepTo(-1);
 			this.inited = true;
 		} else {
+			this.restoreAuxs();
 			this.restoreGraphs();
 		}
 	},
@@ -289,6 +295,12 @@ Timeline.Section.prototype = {
 		window.conditionManager = this.conditionManager;
 
 	},
+	restoreAuxs: function() {
+		for (var auxName in this.level.auxs) {
+			var aux = this.level.auxs[auxName];
+			aux.restoreHTML();
+		}
+	},
 	restoreGraphs: function() {
 		for (var graphName in this.level.graphs) {
 			var graph = this.level.graphs[graphName];
@@ -304,12 +316,13 @@ Timeline.Section.prototype = {
 			$('#baseHeader').html('')
 			this.dashRunClone = $('#dashRun').clone(true);
 			$('#dashRun').remove();
-			var aux1 = $('#aux1');
-			var aux2 = $('#aux2');
-			//if (aux1.attr('filledWith') 
 			for (var graphName in this.level.graphs) {
 				var graph = this.level.graphs[graphName];
 				graph.clearHTML();
+			}
+			for (var auxName in this.level.auxs) {
+				var aux = this.level.auxs[auxName];
+				aux.clearHTML();
 			}
 		}
 	},
