@@ -8,38 +8,37 @@ LevelData = {
 	],
 	
 	mainSequence: [
-		// {//S0(p0,p1): q0 and q1, both cutscenes
-			// sceneData:undefined, 
-			// prompts:[
-				// {//p0, q0
-					// sceneData:undefined,
-					// cutScene:true,
-					// text:"<p>Today we're going to investigate heat capacities.  Using your own words, how would you explain heat capacity to a high school senior?</p>",
-					// quiz:[
-						// {
-							// storeAs: 'foo1', 
-							// type:'text', 
-							// text:'Type your answer here.', 
-							// }, 
-						// ]	
-					// },	 
-				// {//p1, q1
-					// sceneData: undefined, 
-					// cutScene: true, 
-					// text: "<p>We'll start by heating a constant volume system.  It contains 1 mole of an ideal monotomic gas.  How much energy should this heating 'cost'?</p>",
-					// quiz:[						
-					// {
-						// type: 'textSmall', 
-						// storeAs: 'foo2', 
-						// units: 'kJ', 
-						// text: ''
-					// },							
+		{//S0(p0,p1): q0 and q1, both cutscenes
+			sceneData:undefined, 
+			prompts:[
+				{//p0, q0
+					sceneData:undefined,
+					cutScene:true,
+					text:"<p>Today we're going to investigate heat capacities.  Using your own words, how would you explain heat capacity to a high school senior?</p>",
+					quiz:[
+						{
+							storeAs: 'foo1', 
+							type:'text', 
+							text:'Type your answer here.', 
+							}, 
+						]	
+					},	 
+				{//p1, q1
+					sceneData: undefined, 
+					cutScene: true, 
+					text: "<p>We'll start by heating a constant volume system.  It contains 1 mole of an ideal monotomic gas.  How much energy should this heating 'cost'?</p>",
+					quiz:[						
+					{
+						type: 'textSmall', 
+						storeAs: 'foo2', 
+						units: 'kJ', 
+						text: ''
+					},							
 					 
-					// ]
-				// }
-			// ]
-		// }, 
-/*
+					]
+				}
+			]
+		}, 
 		{//S1(p0,p1,p2): q2- constant volume heating, q3- cutscene constant volume, q4- constant pressure heating
 			sceneData: {
 				walls: [
@@ -52,15 +51,9 @@ LevelData = {
 				objs: [
 					{type: 'Heater', attrs: {handle: 'heaterWally1', wallInfo: 'wally1', tempMax: 500, max: 5}},	
 				],			
-				dataReadouts: [
-					//{wallInfo: 'wally', data: 'pExt', readout: 'pistonReadoutRightPiston'},
-					//{wallInfo: 'wally', data: 'vol', readout: 'pistonReadoutRightPiston'},
+				dataReadouts: [			
 					{label: 'Heat: ', expr: 'q("wally1")', units: 'kJ', sigFigs: 2, handle: 'heating1', readout: 'mainReadout'},
-					{label: 'Temp: ', expr: 'temp("wally1")', units: 'K', sigFigs: 1, handle: 'temperature1', readout: 'mainReadout'}, 
-					//{wallInfo: 'right', data: 'pInt', readout: 'mainReadout'},
-					//{wallInfo: 'left', data: 'Temp', readout: 'mainReadout'}, 
-					//{wallInfo: 'left', data: 'q', readout: 'mainReadout'},
-					//{wallInfo: 'left', data: 'pInt', readout: 'mainReadout'},										
+					{label: 'Temp: ', expr: 'temp("wally1")', units: 'K', sigFigs: 1, handle: 'temperature1', readout: 'mainReadout'}, 												
 				]
 					// triggers: [
 							// {handle: 'heatcheck', expr: 'fracDiff(temp("wally1"), 250) < 0.05', message: 'Heat the system by 100 K', priorityUnsatisfied:1},
@@ -68,12 +61,12 @@ LevelData = {
 			}, 
 			prompts:[				
 				{//p0, q2
-					sceneData: 
-						{
-						triggers: [
-							{handle: 'heatcheck', expr: 'fracDiff(temp("wally1"), 250) < 0.05', message: 'Heat the system by 100 K', priority:1, checkOn: 'conditions'},
-									],
-						},											
+					// sceneData: 
+						// {
+						// triggers: [
+							// {handle: 'heatcheck', expr: 'fracDiff(temp("wally1"), 250) < 0.05', message: 'Heat the system by 100 K', priority:1, checkOn: 'conditions'},
+									// ],
+						// },											
 					cutScene:false,
 					text: "Now let's perform an experiment.  You wrote that this heating would 'cost' get('foo20', 'string', 'noValue') kJ.  The system shown above contains our one mole of ideal monatomic gas.   You can add energy by using the slider to activate the heater.  Increase the temperature by 100 K. Note that you can cool the system if its temperature increases too much.<p>How does your prediction for the heating amount compare to the experimental result? Explain.</p>",
 					quiz:[
@@ -86,7 +79,7 @@ LevelData = {
 				},
 				{//p1, q3
 				cutScene: true, 
-				text: "<p>Now we're going to look at heating in a constant pressure system. This means the volume is no longer constant. If we increase its temperature by 100 K, how do you think the energy 'cost' will compare to heating the constant volume system?  Explain.</p>", 
+				text: "<p>Now we're going to look at heating in a constant pressure system. This means the volume is no longer constant. <p>If we increase its temperature by 100 K, how do you think the energy 'cost' will compare to heating the constant volume system?  Explain.</p>", 
 				quiz:[
 						{
 							storeAs: 'foo4', 
@@ -111,16 +104,10 @@ LevelData = {
 								{type: 'Heater', attrs: {handle: 'heaterWally2', cleanUpWith: 'section', wallInfo: 'wally2'}},
 								{type: 'Piston', attrs: {handle: 'pistony', cleanUpWith: 'section', wallInfo: 'wally2', makeSlider: false, init: 3}},								
 							],
-						dataReadouts: [
-								//{wallInfo: 'wally', data: 'pExt', readout: 'pistonReadoutRightPiston'},
-								//{wallInfo: 'wally', data: 'vol', readout: 'pistonReadoutRightPiston'},
+						dataReadouts: [								
 								{label: 'Heat: ', expr: 'q("wally2")', units: 'kJ', sigFigs: 2, handle: 'heating2', readout: 'mainReadout'},
 								{label: 'Temp: ', expr: 'temp("wally2")', units: 'K', sigFigs: 1, handle: 'temperature2', readout: 'mainReadout'},
-								{label: 'pExt: ', expr: 'pExt("wally2")', units: 'bar', sigFigs: 2, handle: 'pressure2', readout: 'pistonReadoutPistony'},
-								//{wallInfo: 'right', data: 'pInt', readout: 'mainReadout'},
-								//{wallInfo: 'left', data: 'Temp', readout: 'mainReadout'}, 
-								//{wallInfo: 'left', data: 'q', readout: 'mainReadout'},
-								//{wallInfo: 'left', data: 'pInt', readout: 'mainReadout'},										
+								{label: 'pExt: ', expr: 'pExt("wally2")', units: 'bar', sigFigs: 2, handle: 'pressure2', readout: 'pistonReadoutPistony'},																
 							],
 						cmmds: [
 							'curLevel.heaterHeaterWally1.disable()'
@@ -138,10 +125,10 @@ LevelData = {
 				}				
 			]
 		}, 
-		{//S2(p0); q5- cutscene, constant pressure heating analysis
+		{//S2(p0); q5- cutscene, constant pressure heating analysis of volume change and work 
 			sceneData:undefined, 
 			prompts:[
-				{
+				{//p0, q5
 				cutScene:true, 
 				text: "<p>The system had a constant external pressure of 3 bar, contained one mole of an ideal monatomic gas, and was heated by 100 K.  From the first law, what should the change in system volume have been?</p>", 
 				quiz:[						
@@ -161,8 +148,8 @@ LevelData = {
 					]
 				}
 			]	
-		}, */
-		{//Sixth section; one wall with heater and extra info displayed, 
+		}, 
+		{//S3(p0, p1); q6- constant pressure with work displayed for theoretical and experimental comparison, q7- synthesize Cv and Cp
 			sceneData: 
 				{
 					walls: [
@@ -172,54 +159,49 @@ LevelData = {
 					dots: [	
 							//{type: 'spc1', pos: P(100, 100), dims: V(300, 300), count: 500, temp:600, returnTo: 'wally', tag: 'wally1'},
 							//{type: 'ugly', pos: P(100, 100), dims: V(300, 300), count: 500, temp:600, returnTo: 'wally1', tag: 'wally1'},
-							{spcName: 'ugly', pos: P(310, 50), dims: V(200, 350), count: 1000, temp:150, returnTo: 'wally3', tag: 'wally3'},
+							{spcName: 'ugly', pos: P(310, 50), dims: V(200, 350), count: 1000, temp:150, returnTo: 'wally3', tag: 'wally2'},
 					],
 					objs: [
 							{type: 'Heater', attrs: {handle: 'heaterWally3', cleanUpWith: 'section', wallInfo: 'wally3'}},
 							{type: 'Piston', attrs: {handle: 'pistony3', cleanUpWith: 'section', wallInfo: 'wally3', makeSlider: false, init: 3}},
 					],
-					dataReadouts: [
-							//{wallInfo: 'wally', data: 'pExt', readout: 'pistonReadoutRightPiston'},
-							//{wallInfo: 'wally', data: 'vol', readout: 'pistonReadoutRightPiston'},
+					dataReadouts: [							
 							{label: 'Heat: ', expr: 'q("wally3")', units: 'kJ', sigFigs: 2, handle: 'heating3', readout: 'mainReadout'},
 							{label: 'Temp: ', expr: 'temp("wally3")', units: 'K', sigFigs: 2, handle: 'temperature3', readout: 'mainReadout'}, 
 							{label: 'pExt: ', expr: 'pExt("wally3")', units: 'bar', sigFigs: 2, handle: 'external pressure', readout: 'pistonReadoutPistony3'},
 							{label: 'work: ', expr: 'work("wally3")', units: 'kJ', sigFigs: 2, handle: 'work', readout: 'mainReadout'},
-							//{wallInfo: 'right', data: 'pInt', readout: 'mainReadout'},
-							//{wallInfo: 'left', data: 'Temp', readout: 'mainReadout'}, 
-							//{wallInfo: 'left', data: 'q', readout: 'mainReadout'},
-							//{wallInfo: 'left', data: 'pInt', readout: 'mainReadout'},										
-					],
+																
+						],
 			},			
 			prompts: [
-						{
+						{//p0, q6
 						text: "Here's the same system with the work done displayed.  Increase the temperature by 100 K.  You predicted that get('foo5', 'string', 'noValue') kJ of work would be done.  How does this compare to the experimental result?",
 						quiz:[
-						{
-							storeAs: 'foo7', 
-							type:'text', 
-							text:'Type your answer here.', 
-						},
+								{		
+									storeAs: 'foo7', 
+									type:'text', 
+									text:'Type your answer here.', 
+								},
+							]
+						}, 
+						{//p1, q7
+						text: "We've established that when you expand at constant pressure, the system does work on its surroundings.  Can you use this idea to explain why a system's heat capacity is higher at constant pressure than at constant volume?",
+						quiz:[
+								{
+									storeAs: 'foo8', 
+									type:'text', 
+									text:'Type your answer here.', 
+								},
+							]	
+						}
 					]
-				}, 
-				{
-					text: "We've established that when you expand at constant pressure, the system does work on its surroundings.  Can you use this idea to explain why a system's heat capacity is higher at constant pressure than at constant volume?",
-					quiz:[
-							{
-								storeAs: 'foo8', 
-								type:'text', 
-								text:'Type your answer here.', 
-							},
-						]
-					}
-			]
 		}, 
-		{//Seventh section; cutscene, one question in one prompt
+		{//S6(p0); q8- cutscene question asking to relate quantitative to qualitative understanding
 			sceneData:undefined, 
 			prompts:[
 				{
 				cutScene:true, 
-				text: "<p>The heat capacity per mole of gas can be described at the heat per temperature change, or ##\\frac{dq}{dT} ##.</p><p> We know that the constant volume heat capacity of an ideal monatomic gas is ##\\frac{3}{2}R##. </p><p>From the first law, solve for what the ##\\frac{dq}{dt}##, or heat capacity, would be for this system at constant pressure. </p><p>How does the result relate to your conceptual understanding of how constant pressure systems behaves?  Explain.</p>", 
+				text: "<p>The heat capacity per mole of gas can be described at the heat per temperature change, or ##\\frac{dq}{dT} ##.</p><p> We know that the constant volume heat capacity of an ideal monatomic gas is ##\\frac{3}{2}R##. </p><p>From the first law, solve for what the ##\\frac{dq}{dt}##, or heat capacity, would be for this system at constant pressure. </p><p>How does the result relate to your conceptual understanding of how constant pressure systems behave?  Explain.</p>", 
 				quiz:[
 						{
 							storeAs: 'foo9', 

@@ -523,8 +523,10 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 				function(){
 					var slotPos = slot.pos;
 					var UV = V(slotPos.x-weight.pos.x, slotPos.y-weight.pos.y).UV();
-					weight.pos.x = stepTowards(weight.pos.x, slotPos.x, UV.dx*this.moveSpeed);
-					weight.pos.y = stepTowards(weight.pos.y, slotPos.y, UV.dy*this.moveSpeed);
+					if (UV.dx && UV.dy) {
+						weight.pos.x = stepTowards(weight.pos.x, slotPos.x, UV.dx*this.moveSpeed);
+						weight.pos.y = stepTowards(weight.pos.y, slotPos.y, UV.dy*this.moveSpeed);
+					}
 					if (this.weightArrived(weight, slot)) {
 						removeListener(curLevel, 'update', listenerName);
 						//weight.slot = slot;

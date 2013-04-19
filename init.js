@@ -14,6 +14,7 @@ $(function(){
 		Hist: GraphHist,
 		Phase: GraphPhase
 	}
+	$('#mainHeader').html(LevelData.levelTitle);
 	//why are we even doing all this hiding?
 	$('#canvasDiv').hide();
 	$('#base').hide();
