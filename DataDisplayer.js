@@ -19,7 +19,6 @@ DataDisplayer.prototype = {
 		var readoutEntry = readout.addEntry(label + handle);
 		var dataEntry = new this.Entry(handle, label, decPlaces, expr, units, listenerStr, this, readoutEntry);
 		this.entries[dataEntry.handle] = dataEntry;
-		this.addCleanUp(cleanUpWith, dataEntry);
 		with (DataGetFuncs) {
 			var func;
 			eval('func = function(){return ' + expr + '}')
@@ -68,12 +67,6 @@ DataDisplayer.prototype = {
 			return round;
 		}
 		
-	},
-	addCleanUp: function(cleanUpWith, dataEntry) {
-		var self = this;
-		addListener(curLevel, cleanUpWith + 'CleanUp', 'entry' + dataEntry.handle, function() {
-			dataEntry.remove();
-		})
 	},
 	removeEntry: function(handle) {
 		if (this.entries[handle]) {

@@ -15,6 +15,7 @@ function GraphScatter(attrs) {
 	this.borderSpacing = 70;
 
 	this.legendWidth = 80;
+	attrs.axesFixed = attrs.axesFixed || {};
 	this.axesFixed = {x: defaultTo(false, attrs.axesFixed.x), y: defaultTo(false, attrs.axesFixed.y)}
 	this.graphRangeFrac = new GraphBase.Range(this.borderSpacing/this.dims.dx, (this.dims.dx - (this.legendWidth+8))/this.dims.dx, 1-this.borderSpacing/this.dims.dy, .05);
 	this.makeReset = attrs.makeReset;
