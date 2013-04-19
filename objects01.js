@@ -1475,13 +1475,10 @@ _.extend(Stops.prototype, objectFuncs, {
 function Trigger(attrs){//like dataList... is:'greaterThan', ... checkVal
 	this.type = 'Trigger';
 	this.handle = attrs.handle;
-	this.cleanUpWith = defaultTo(timeline.currentSetupType, attrs.cleanUpWith);
-	this.conditionsOn = this.cleanUpWith.killNumbers();
 	this.conditionFunc = this.wrapExpr(attrs.expr);
-
 	this.checkOn = attrs.checkOn;
+	this.requiredFor = attrs.requiredFor === false ? undefined : (attrs.requiredFor || 'now');
 	this.alerts = {true:attrs.alertSatisfied, false:attrs.alertUnsatisfied};
-	this.requiredForAdvance = defaultTo(true, attrs.requiredForAdvance);
 	this.priorities = {true:defaultTo(0, attrs.prioritySatisfied), false:defaultTo(0, attrs.priorityUnsatisfied)};
 	this.satisfyStore = defaultTo(undefined, attrs.satisfyStore);
 	this.satisfyCmmds = defaultTo(undefined, attrs.satisfyCmmds);
@@ -1505,13 +1502,8 @@ _.extend(Trigger.prototype, objectFuncs, {
 		return func;
 	},
 	initCheckOnConditions: function() {
-		if (this.requiredForAdvance) {
-			addListener(curLevel, this.conditionsOn + 'Condition', this.handle,
-				function(){
-					var didWin = this.conditionFunc();
-					return {didWin:didWin, alert:this.alerts[didWin], priority:this.priorities[didWin]};
-				},
-			this);
+		if (this.requiredFor) {
+			conditionManager.add(this);
 		}
 	},
 	initCheckOnInterval: function() {
@@ -1529,12 +1521,8 @@ _.extend(Trigger.prototype, objectFuncs, {
 				}
 			},
 		this);
-		if (this.requiredForAdvance) {
-			addListener(curLevel, this.conditionsOn + 'Condition', this.handle,
-				function(){
-					return {didWin: this.amSatisfied, alert:this.alerts[this.amSatisfied], priority:this.priorities[this.amSatisfied]};
-				},
-			this);	
+		if (this.requiredFor) {
+			conditionManager.add(this);
 		}
 	},
 	recordVals: function(){

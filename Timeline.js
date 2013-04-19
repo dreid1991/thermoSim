@@ -23,6 +23,53 @@ Timeline.prototype = {
 		if (this.sectionIdx !== undefined) 
 			this.sections[this.sectionIdx].clear()
 	},
+	now: function() {
+		return {sectionIdx: this.sectionIdx, promptIdx: this.sections[this.sectionIdx].promptIdx};
+	},
+	findElemBoundsByHandle: function(handle) {
+		var matches = [];
+		var matchedSectionIdx;
+		var i, j, moments, events, elemDatum, wallIdx, objIdx, cmmdIdx;
+		//will not work for dots, have no handle
+		checkLoop: 
+			for (i=0; i<this.sections.length; i++) {
+				moments = this.sections[i].moments;
+				for (j=0; j<moments.length; j++) {
+					events = moments[j].events;
+					for (wallIdx=0; wallIdx<events.walls.length; wallIdx++) {
+						if (handle == events.walls[wallIdx].elemDatum.handle) {
+							matches.push(moments[j].timestamp);
+							matchedSectionIdx = i;
+							if (matches.length == 2) break checkLoop;
+						}
+					}
+					for (objIdx=0; objIdx<events.objs.length; objIdx++) {
+						if (events.objs[objIdx].elemDatum.handle) {
+							if (events.objs[objIdx].elemDatum.handle == handle) {
+								matches.push(moments[j].timestamp);
+								matchedSectionIdx = i;
+								if (matches.length == 2) break checkLoop;
+							}
+						} else if (events.objs[objIdx].elemDatum.attrs) {
+							if (events.objs[objIdx].elemDatum.attrs.handle == handle) {
+								matches.push(moments[j].timestamp);
+								matchedSectionIdx = i;
+								if (matches.length == 2) break checkLoop;
+							}
+						}
+					}
+					for (cmmdIdx=0; cmmdIdx<events.cmmds.length; cmmdIdx++) {
+						if (handle == events.cmmds[cmmdIdx].elemDatum.handle) {
+							matches.push(moments[j].timestamp);
+							matchedSectionIdx = i;
+							if (matches.length == 2) break checkLoop;
+						}
+					}
+				}
+			}
+		matches.push(matchedSectionIdx);
+		return matches;
+	},
 	show: function(sectionIdx, promptIdx, refreshing) {
 		var changingSection = this.sectionIdx != sectionIdx;
 		var changingPrompt = changingSection || promptIdx != this.sections[sectionIdx].promptIdx;
@@ -67,7 +114,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 //need to make clean up listeners still
 	this.timeline = timeline;
 	this.inited = false
-	this.promptIdx;
+	this.promptIdx = -1;
 	this.time = -2;
 	this.sectionData = sectionData;
 	this.moments = [];
@@ -81,6 +128,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	this.dotManager = new DotManager();
 	this.dataHandler = new DataHandler();
 	this.dataDisplayer = new DataDisplayer();
+	this.conditionManager = new ConditionManager();
 	this.thresholdEnergySpcChanger = new ThresholdEnergySpcChanger(this.collide);
 	this.buttonManager = new ButtonManager('buttonManager');
 	this.spcs = {};
@@ -103,7 +151,7 @@ Timeline.Section.prototype = {
 		this.pushToGlobal();
 
 		if (!this.inited) {
-			this.promptIdx = 0; // just make time idx
+			this.promptIdx = -1;
 			this.stepTo(-1);
 			this.inited = true;
 		} else {
@@ -234,6 +282,7 @@ Timeline.Section.prototype = {
 		window.buttonManager = this.buttonManager;
 		window.dataHandler = this.dataHandler;
 		window.thresholdEnergySpcChanger = this.thresholdEnergySpcChanger;
+		window.conditionManager = this.conditionManager;
 
 	},
 	restoreGraphs: function() {
