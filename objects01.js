@@ -1472,14 +1472,14 @@ _.extend(Stops.prototype, objectFuncs, {
 //////////////////////////////////////////////////////////////////////////
 //Trigger
 //////////////////////////////////////////////////////////////////////////
-function Trigger(attrs){//like dataList... is:'greaterThan', ... checkVal
+function Trigger(attrs) {
 	this.type = 'Trigger';
 	this.handle = attrs.handle;
 	this.conditionFunc = this.wrapExpr(attrs.expr);
 	this.checkOn = attrs.checkOn;
 	this.requiredFor = attrs.requiredFor === false ? undefined : (attrs.requiredFor || 'now');
-	this.alerts = {true:attrs.alertSatisfied, false:attrs.alertUnsatisfied};
-	this.priorities = {true:defaultTo(0, attrs.prioritySatisfied), false:defaultTo(0, attrs.priorityUnsatisfied)};
+	this.message = attrs.message;
+	this.priority = defaultTo(0, attrs.priorityUnsatisfied || attrs.priority);
 	this.satisfyStore = defaultTo(undefined, attrs.satisfyStore);
 	this.satisfyCmmds = defaultTo(undefined, attrs.satisfyCmmds);
 	this.amSatisfied = false;
@@ -1542,7 +1542,6 @@ _.extend(Trigger.prototype, objectFuncs, {
 		return this.amSatisfied;
 	},
 	remove: function(){
-		removeListener(curLevel, this.conditionsOn + 'Condition', this.handle);
 		removeListener(curLevel, 'update', this.handle);
 	},
 })

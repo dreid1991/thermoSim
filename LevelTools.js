@@ -63,6 +63,31 @@ LevelTools = {
 			}
 		}
 	},
+	addTriggerCleanUp: function(levelData) {
+		for (var sIdx=0; sIdx<levelData.mainSequence.length; sIdx++) {
+			var s = levelData.mainSequence[sIdx];
+			if (s.sceneData) {
+				this.addTriggerDataCleanUp(s.sceneData.triggers);
+			}
+			for (var pIdx=0; pIdx<s.prompts.length; pIdx++) {
+				var p = s.prompts[pIdx];
+				if (p.sceneData) {
+					this.addTriggerDataCleanUp(p.sceneData.triggers);
+				}
+			}
+		}
+	},
+	addTriggerDataCleanUp: function(triggers) {
+		triggers = triggers || [];
+		for (var i=0; i<triggers.length; i++) {
+			var trigger = triggers[i];
+			if (!trigger.cleanUpWith) {
+				if (trigger.requiredFor && trigger.requiredFor != 'now') {
+					trigger.cleanUpWith = trigger.requiredFor;
+				}
+			}
+		}
+	},
 	setDefaultPromptVals: function(levelData){
 		for (var sectionIdxLocal=0; sectionIdxLocal<levelData.mainSequence.length; sectionIdxLocal++) {
 			var section = levelData.mainSequence[sectionIdxLocal];

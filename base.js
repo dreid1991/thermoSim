@@ -172,7 +172,11 @@ function removeInterval(funcHandle) {
 	}
 }
 function removeListener(object, typeName, funcName){
+	// try{
 	delete object[typeName + 'Listeners'][funcName];
+	// }catch(e){
+		// console.log('hafsd');
+	// }
 }
 
 

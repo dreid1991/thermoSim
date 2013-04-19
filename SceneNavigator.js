@@ -71,33 +71,16 @@ SceneNavigator.prototype = {
 	},
 
 	checkWillAdvanceConditions: function(newSectionIdx, newPromptIdx){
-
+		//not checked when going backwards
 		var changingSection = timeline.sectionIdx!=newSectionIdx;
-		var conditionsMet = 0;
-		var curPrompt = timeline.curPrompt();
-		var curFinished = defaultTo(false, curPrompt.finished);
-		
-		conditionsMet = Math.max(conditionsMet, curFinished);
-		if (!conditionsMet) {
-			var promptResults = curLevel.promptConditions();
-			if (promptResults.didWin) {
-				if (changingSection) {
-					var sectionResults = curLevel.sectionConditions();
-					if (sectionResults.didWin) {
-						conditionsMet = 1;
-					} else {
-						conditionsMet = 0;
-						alertValid(sectionResults.alert);
-					}
-				} else {
-					conditionsMet = 1;
-				}
-			} else {
-				conditionsMet = 0;
-				alertValid(promptResults.alert);
-			}
+		var now = timeline.now();
+		var promptMet = conditionManager.canAdvance(now.promptIdx);
+		var sectionMet = true;
+		if (changingSection && promptMet) {
+			sectionMet = conditionManager.canAdvance(-1);
 		}
-		return conditionsMet;
+		
+		return Math.min(promptMet, sectionMet);
 	},
 	checkWillAdvanceQuiz: function(){
 		var quiz = curLevel.quiz;

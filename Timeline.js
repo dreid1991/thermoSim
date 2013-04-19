@@ -98,7 +98,8 @@ Timeline.prototype = {
 	refresh: function() {
 		var curPromptIdx = this.sections[this.sectionIdx].promptIdx;
 		var curSection = this.sections[this.sectionIdx];
-		var newSectionInstance = new Timeline.Section(this, curSection.sectionData, this.buttonManagerBlank, this.dashRunBlank);
+		var conditionMgr = curSection.conditionManager;
+		var newSectionInstance = new Timeline.Section(this, curSection.sectionData, this.buttonManagerBlank, this.dashRunBlank, conditionMgr);
 		//curSection.cleanUpPrompt();
 		curSection.clear();
 		this.sections.splice(this.sectionIdx, 1, newSectionInstance);
@@ -110,7 +111,7 @@ Timeline.prototype = {
 
 }
 
-Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBlank) {
+Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBlank, conditionManager) {
 //need to make clean up listeners still
 	this.timeline = timeline;
 	this.inited = false
@@ -128,7 +129,8 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	this.dotManager = new DotManager();
 	this.dataHandler = new DataHandler();
 	this.dataDisplayer = new DataDisplayer();
-	this.conditionManager = new ConditionManager();
+	
+	this.conditionManager = conditionManager ? conditionManager.stripForInheritance() : new ConditionManager();
 	this.thresholdEnergySpcChanger = new ThresholdEnergySpcChanger(this.collide);
 	this.buttonManager = new ButtonManager('buttonManager');
 	this.spcs = {};

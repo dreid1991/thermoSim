@@ -34,8 +34,8 @@ LevelData = {
 					// },
 					{
 						type: 'DragWeights',
-						cleanUpWith: 'prompt0',
-						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 2}], pInit: 3}
+						cleanUpWith: 'prompt1',
+						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 2}], pInit: 2}
 					},
 					{
 						type: 'ThresholdEnergyPair',
@@ -58,9 +58,9 @@ LevelData = {
 
 						
 				],
-				triggers: [
-					{handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: true}
-				],
+				// triggers: [
+					// {handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: true}
+				// ],
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'uglier', tag: 'wally'}}
@@ -129,7 +129,10 @@ LevelData = {
 					sceneData: {
 						objs: [
 			
-						]
+						],
+						triggers: [
+							{handle: 'trumpet', expr: "pExt('wally') > 3", message: 'la', requiredFor: 'prompt1'}
+						],
 						// objs: [
 							// {
 								// type: 'AuxImage',

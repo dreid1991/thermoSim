@@ -86,6 +86,7 @@ $(function(){
 	
 	LevelTools.addImgs(LevelData);
 	LevelTools.setDefaultPromptVals(LevelData);
+	LevelTools.addTriggerCleanUp(LevelData);
 	LevelTools.addStoreAs(LevelData);
 	LevelTools.showRunDivs();
 
