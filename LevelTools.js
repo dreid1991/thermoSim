@@ -63,6 +63,30 @@ LevelTools = {
 			}
 		}
 	},
+	transferObjCleanUp: function(levelData) {
+		for (var sectionIdx=0; sectionIdx<levelData.mainSequence.length; sectionIdx++) {
+			var section = levelData.mainSequence[sectionIdx];
+			if (section.sceneData) {
+				this.transferObjDataCleanUp(section.sceneData.objs);
+			}
+			for (var promptIdx=0; promptIdx<section.prompts.length; promptIdx++) {
+				var prompt = section.prompts[promptIdx];
+				if (prompt.sceneData) {
+					this.transferObjDataCleanUp(prompt.sceneData.objs);
+				}
+			}
+		}		
+	},
+	transferObjDataCleanUp: function(objData) {
+		if (objData) {
+			for (var i=0; i<objData.length; i++) {
+				var objDatum = objData[i];
+				if (objDatum.attrs.cleanUpWith && !objDatum.cleanUpWith) {
+					objDatum.cleanUpWith = objDatum.attrs.cleanUpWith;
+				}
+			}
+		}
+	},
 	addTriggerCleanUp: function(levelData) {
 		for (var sIdx=0; sIdx<levelData.mainSequence.length; sIdx++) {
 			var s = levelData.mainSequence[sIdx];
@@ -104,18 +128,6 @@ LevelTools = {
 			var def = defs[defIdx];
 			var spc = new Species(def.spcName, def.m, def.r, def.col, defIdx, def.cv, def.hF298, def.hVap298, def.antoineCoeffs, def.cpLiq, def.spcVolLiq, dotManager);
 			target[def.spcName] = spc;
-		}
-	},
-	addSceneDataTypes: function() {
-		//will still need to add type if you're rendering a function.  
-		for (var sIdx=0; sIdx<this.mainSequence.length; sIdx++) {
-			var section = this.mainSequence[sIdx];
-			if (section.sceneData) section.sceneData.type = 'section';
-			if (!section.prompts) console.log('Section ' + sIdx + ' has no prompts!  Sections must have at least one prompt.');
-			for (var pIdx=0; pIdx<section.prompts.length; pIdx++) {
-				var prompt = section.prompts[pIdx];
-				if (prompt.sceneData) prompt.sceneData.type = 'prompt';
-			}
 		}
 	},
 	move: function(){
@@ -198,13 +210,6 @@ LevelTools = {
 		$('#dashRunWrapper').hide();
 		$('#dashOutro').hide();
 		$('#dashCutScene').hide();
-	},
-	//is this used?
-	borderStd: function(info){
-		info = defaultTo({}, info);
-		var wall = defaultTo(0, info.wallInfo);
-		
-		walls[wall].border([1,2,3,4], 5, this.wallCol.copy().adjust(-100,-100,-100), [{y:info.min}, {}, {}, {y:info.min}]);
 	},
 
 	update: function(){
@@ -388,43 +393,4 @@ LevelTools = {
 		makeListenerHolder(this, 'promptCondition');
 		makeListenerHolder(this, 'setup');
 	},
-	
-	sectionConditions: function(){
-		//ALERT NOT BUBBLING UP CORRECTLY.  IT GETS TO THIS FUNCTION FROM STATE LISTENERS BUT IS NOT RETURNED
-		var didWin = 1;
-		var alerts = {1:undefined, 0:undefined};
-		var priorities = {1:0, 0:0};
-		var conditions = this.sectionConditionListeners
-		for (var conditionName in conditions) {
-			var condition = conditions[conditionName]
-			winResults = condition.func.apply(condition.obj); //returns didWin, alert, priority (high takes precidence);
-			didWin = Math.min(didWin, winResults.didWin);
-			if (winResults.alert) {
-				var priority = defaultTo(0, winResults.priority);
-				if (priority>=priorities[Number(winResults.didWin)]) {
-					alerts[Number(winResults.didWin)] = winResults.alert;
-				}
-			}	
-		}	
-		return {didWin:didWin, alert:alerts[didWin]};
-	},
-	promptConditions: function(idx){
-		var didWin = 1;
-		var alerts = {1:undefined, 0:undefined};
-		var priorities = {1:0, 0:0};
-		var conditions = this.promptConditionListeners;
-		for (var conditionName in conditions) {
-			var condition = conditions[conditionName]
-			winResults = condition.func.apply(condition.obj); //returns didWin, alert, priority (high takes precidence);
-			didWin = Math.min(didWin, winResults.didWin);
-			if (winResults.alert) {
-				var priority = defaultTo(0, winResults.priority);
-				if (priority>=priorities[Number(winResults.didWin)]) {
-					alerts[Number(winResults.didWin)] = winResults.alert;
-				}
-			}	
-		}	
-		return {didWin:didWin, alert:alerts[didWin]};
-	},
-
 }

@@ -88,7 +88,9 @@ $(function(){
 	LevelTools.setDefaultPromptVals(LevelData);
 	LevelTools.addTriggerCleanUp(LevelData);
 	LevelTools.addStoreAs(LevelData);
+	LevelTools.transferObjCleanUp(LevelData);
 	LevelTools.showRunDivs();
+	
 
 	for (var sectionIdx=0; sectionIdx<LevelData.mainSequence.length; sectionIdx++) {
 		timeline.pushSection(LevelData.mainSequence[sectionIdx]);

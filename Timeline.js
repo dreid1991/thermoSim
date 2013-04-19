@@ -463,11 +463,12 @@ Timeline.Section.prototype = {
 		cmmds = cmmds ? cmmds : [];
 		for (var i=0; i<cmmds.length; i++) {
 			var cmmdInput = cmmds[i];
+			
 			if (typeof cmmdInput == 'string' || typeof cmmdInput == 'function') {
 			
 				cmmd = new Timeline.Command('point', cmmdInput, undefined, true, false);
 			} else {
-				cmmd = new Timeline.Command(cmmdInput.type, cmmdInput.spawn, cmmdInput.remove, cmmdInput.oneWay, cmmdInput.once);
+				cmmd = new Timeline.Command(cmmdInput.type, cmmdInput.spawn, cmmdInput.remove, defaultTo(true, cmmdInput.oneWay), cmmdInput.once);
 			}
 			if (/span/i.test(cmmd.type)) {
 				this.applyCmmdSpan(timeline, moments, timelineElems, cmmd, eventClass, cmmd.once, timestampHead);
