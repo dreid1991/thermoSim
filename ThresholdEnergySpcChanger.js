@@ -37,22 +37,22 @@ ThresholdEnergySpcChanger.prototype = {
 	makeBreakUpFunc: function() {
 		var self = this;
 		return function(a, b, UVAB) {
-			var internalEnergy;
+			var kineticEnergy;
 			var pairA = self.pairs[a.spcName];
 			var pairB = self.pairs[b.spcName];
 			if (pairA) {
-				internalEnergy = a.internalEnergy();
-				if (pairA.thresholdEnergy >= internalEnergy && a.spcName == pairA.spcNameHigh) {
+				kineticEnergy = a.kineticEnergy();
+				if (pairA.thresholdEnergy >= kineticEnergy && a.spcName == pairA.spcNameHigh) {
 					dotManager.changeDotSpc([a], pairA.spcNameLow);
-				} else if (pairA.thresholdEnergy < internalEnergy && a.spcName == pairA.spcNameLow) {
+				} else if (pairA.thresholdEnergy < kineticEnergy && a.spcName == pairA.spcNameLow) {
 					dotManager.changeDotSpc([a], pairA.spcNameHigh);
 				}
 			}
 			if (pairB) {
-				internalEnergy = b.internalEnergy();
-				if (pairB.thresholdEnergy >= internalEnergy && b.spcName == pairB.spcNameHigh) {
+				kineticEnergy = b.kineticEnergy();
+				if (pairB.thresholdEnergy >= kineticEnergy && b.spcName == pairB.spcNameHigh) {
 					dotManager.changeDotSpc([b], pairB.spcNameLow);
-				} else if (pairB.thresholdEnergy < internalEnergy && b.spcName == pairB.spcNameLow) {
+				} else if (pairB.thresholdEnergy < kineticEnergy && b.spcName == pairB.spcNameLow) {
 					dotManager.changeDotSpc([b], pairB.spcNameHigh);
 				}			
 			}

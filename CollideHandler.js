@@ -1,4 +1,4 @@
-function CollideHandler(){
+function CollideHandler(dotManager){
 	this.tConst = tConst;
 	this.cp = cp;
 	this.cv = cv;

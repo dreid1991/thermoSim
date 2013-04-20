@@ -210,6 +210,9 @@ DotManager.prototype = {
 	getByName: function(spcName) {
 		if (this.lists[spcName]) {
 			return this.lists[spcName];
+		} else if (spcs[spcName]) {
+			this.lists[spcName] = [];
+			return this.lists[spcName];
 		} else {
 			console.log('Tried to get bad spcName ' + spcName);
 			console.trace();

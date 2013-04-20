@@ -94,7 +94,7 @@ Species.prototype = {
 		return (this.hF298 * 1000 + (this.cv + R) * (temp - 298.15)) / N;
 	},
 	internalEnergy: function(temp) {
-		return (this.hF198 * 1000 + this.cv * (temp - 298.15)) / N;
+		return (this.hF298 * 1000 + this.cv * (temp - 298.15)) / N;
 	},
 	tBoil: function(pressure) { //in bar
 		pressure /= MMHGTOBAR;
@@ -560,8 +560,11 @@ Dot.prototype = {
 		//joules in that dot
 		return (this.hF298 + (this.temp() - 298.15) * (this.cv + R / N));
 	},
-	internalEnergy: function(temp) {
+	internalEnergy: function() {
 		return (this.hF298 + (this.temp() - 298.15) * this.cv);
+	},
+	kineticEnergy: function() {
+		return this.temp() * this.cvKinetic;
 	},
 	speed: function(){
 		return this.v.mag()*this.pxToMS;

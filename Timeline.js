@@ -124,9 +124,9 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	//sort moments here
 	this.level = new LevelInstance();
 	this.mainReadout = new Readout('mainReadout', 30, myCanvas.width-125, 25, '13pt calibri', Col(255,255,255), 'left', this.level);
-	this.collide = new CollideHandler();
-	this.walls = WallHandler();
 	this.dotManager = new DotManager();
+	this.collide = new CollideHandler(this.dotManager);
+	this.walls = WallHandler();
 	this.dataHandler = new DataHandler();
 	this.dataDisplayer = new DataDisplayer();
 	

@@ -118,9 +118,8 @@ ReactionHandler = {
 	},
 
 	hitE: function(a, b, perpAB, perpBA){
-		return .5*(Math.abs(perpAB)*perpAB*a.m + Math.abs(perpBA)*perpBA*b.m)*this.tConst * (a.cv + b.cv) // / 2?;
+		return .5*(Math.abs(perpAB)*perpAB*a.m*a.cvKinetic + Math.abs(perpBA)*perpBA*b.m*b.cvKinetic)*this.tConst;
 		//abs will handle dots moving away from other dot
-		//in temperature
 	},
 	probFunc: function(hitE, activE) {
 		var x = Math.max(hitE/activE - 1, 0);
@@ -284,7 +283,4 @@ ReactionHandler.Reaction.prototype = {
 	remove: function() {
 		this.parent.removeRxn(this.handle);
 	}
-	// convertToTemp: function(enthalpy) { //in kj
-		// return enthalpy / (cv * JtoKJ);
-	// }
 }
