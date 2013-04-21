@@ -147,7 +147,7 @@ WallMethods.collideMethods ={
 			var inTemp = dot.temp();
 			var eToAdd = eAddSign * Math.min(Math.abs(this[wallIdx].eToAdd), dot.cv * 20);
 			if (eToAdd < 0 && inTemp  <= 20) 
-				eToAdd = -(Math.max(0, inTemp -1)) * dot.cv;
+				eToAdd = -(Math.max(0, inTemp - 1)) * dot.cv;
 
 			this[wallIdx].eToAdd -= eToAdd;
 			var outTemp = inTemp + eToAdd / dot.cv;
@@ -156,9 +156,6 @@ WallMethods.collideMethods ={
 			this.reflect(dot, wallUV, perpV);
 			dot.v.dx*=spdRatio;
 			dot.v.dy*=spdRatio;
-			if (validNumber(dot.v.dy) === false || validNumber(dot.v.dx) === false) {
-				console.log('hello');
-			}
 			dot.internalPotential *= outTemp / inTemp;
 			this[wallIdx].forceInternal += dot.m*(Math.abs(perpV) + Math.abs(outPerpV));
 			this[wallIdx].q += eToAdd*JtoKJ;

@@ -12,17 +12,25 @@ SceneNavigator.prototype = {
 		//the entry point for the submit button is submitAdvanceFunc in LevelTools
 		var curSection = timeline.curSection();
 		var curPrompt = timeline.curPrompt();
+		var now = timeline.now();
 		var willAdvance = forceAdvance || this.checkWillAdvance();
-
+		var amAdvancing = true;
 		if (willAdvance) {
-			if (curPrompt) {
-				curPrompt.finished = true;
+			// if (curPrompt) {
+				// curPrompt.finished = true;
+			// }
+			var dirExpr = this.checkDirections(curPrompt.directions);
+			
+			if (dirExpr) {
+				amAdvancing = this.execDirections(dirExpr)
+			} 
+			if (amAdvancing) {
+				var nextIdxs = this.getNextIdxs();
+				this.showPrompt(nextIdxs.newSectionIdx, nextIdxs.newPromptIdx);
 			}
-			var nextIdxs = this.getNextIdxs()
-			this.showPrompt(nextIdxs.newSectionIdx, nextIdxs.newPromptIdx);
-			return true;
+			//return true;
 		}
-		return false;
+		//return false;
 		
 	},
 
@@ -40,12 +48,53 @@ SceneNavigator.prototype = {
 		}
 		return {newSectionIdx:newSectionIdx, newPromptIdx:newPromptIdx};
 	},
-
+	checkDirections: function(dirs) {
+		if (dirs) {
+			var curPrompt = timeline.curPrompt();
+			var whereTo = dirs(curPrompt);
+			if (whereTo) {
+				return whereTo;
+			}
+		}
+		return undefined;
+	},
+	execDirections: function(dirExpr) {
+		var directionFuncs = {
+			branchPromptsPreClean: function(prompts) {
+				prompts = prompts instanceof Array ? prompts : [prompts];
+				timeline[timeline.sectionIdx].branchPromptsPreClean(prompts);
+				return true;
+			},
+			branchPromptsPostClean: function(prompts) {
+				prompts = prompts instanceof Array ? prompts : [prompts];
+				timeline[timeline.sectionIdx].branchPromptsPostClean(prompts)
+				return true;
+				//need to check if we are making a branch that already exists or not. If so, do nothing.  It not, kill branches and make new
+			},
+			branchSections: function(sections) {
+				sections = sections instanceof Array ? sections : [sections];
+				timeline[timeline.sectionIdx].branchSections(sections)
+				return true;
+			},
+			surface: function() {
+				timeline.surface();
+				return false;
+			},
+			advance: function() {
+				timeline[timeline.sectionIdx].killBranches();
+				return true;
+			}
+			
+		}
+		with (directionFuncs) {
+			return dirExpr();
+		}
+	},
 	getPrevIdxs: function() {
-		var curSectionIdx = timeline.sectionIdx;
+		var now = timeline.now();
+		var curSectionIdx = now.sectionIdx;
 		var newSectionIdx = curSectionIdx;
-		var curSection = timeline.curSection();
-		var curPromptIdx = curSection.promptIdx;
+		var curPromptIdx = now.promptIdx;
 		var newPromptIdx = curPromptIdx;
 		if (curPromptIdx==0) {
 			if (curSectionIdx>0) {
@@ -101,7 +150,13 @@ SceneNavigator.prototype = {
 
 	prevPrompt: function(){
 		var prevIdxs = this.getPrevIdxs();
-		this.showPrompt(prevIdxs.newSectionIdx, prevIdxs.newPromptIdx);
+		var now = timeline.now();
+		//nonononono  redo this
+		if (prevIdxs.sectionIdx == now.sectionIdx && prevIdxs.promptIdx == now.promptIdx) {
+			timelineStack.pop();
+		} else {
+			this.showPrompt(prevIdxs.newSectionIdx, prevIdxs.newPromptIdx);
+		}
 	}
 
 

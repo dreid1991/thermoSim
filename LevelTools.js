@@ -13,6 +13,7 @@ LevelTools = {
 		addListener(this, 'data', 'run', this.dataRun, this);
 
 	},
+	//Hey, make funcs like foreach Quiz, foreach Prompt, give cbs
 	addStoreAs: function(levelData) {
 		var storeAs=0;
 		for (var sectionIdx=0; sectionIdx<levelData.mainSequence.length; sectionIdx++) {

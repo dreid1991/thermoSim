@@ -1,5 +1,6 @@
 //need to interp all this stuff before rendering, yo
-function Timeline() {
+function Timeline(parent) { //make it so it can inherit blanks as well
+	this.parent = parent;
 	//cloning return jquery reference rather than deepcopy if done before page fully loaded
 	this.buttonManagerBlank = document.getElementById('buttonManager').outerHTML;
 	this.dashRunBlank = document.getElementById('dashRun').outerHTML;
@@ -25,6 +26,9 @@ Timeline.prototype = {
 	},
 	now: function() {
 		return {sectionIdx: this.sectionIdx, promptIdx: this.sections[this.sectionIdx].promptIdx};
+	},
+	surface: function() {
+		//if (this.parent) ...
 	},
 	findElemBoundsByHandle: function(handle) {
 		var matches = [];
@@ -117,6 +121,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	this.inited = false
 	this.promptIdx = -1;
 	this.time = -2;
+	this.branches = [];
 	this.sectionData = sectionData;
 	this.moments = [];
 	this.populateMoments(timeline, timeline.elems, this.moments, this.sectionData);
@@ -144,6 +149,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	this.buttonManagerBlank = buttonManagerBlank;
 	this.dashRunClone;
 	this.dashRunBlank = dashRunBlank;
+	this.steppingTowards;
 }
 
 Timeline.Section.prototype = {
@@ -183,30 +189,50 @@ Timeline.Section.prototype = {
 			while (dest != this.time) {
 				var nextMom = this.nextTowardsDest(this.time, dest);
 				if (!nextMom) break;
+				
+				var preCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPreClean');
+				var postCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPostClean');
+				
 				nextMom.fire(this.time, nextMom.timestamp);
+				if (nextMom.timestamp == preCleanBranchTimestamp || nextMom.timestamp == postCleanBranchTimestamp) {
+					this.steppingTowards = dest;
+					break;
+				}
 				this.time = nextMom.timestamp;
 			}
 		} else if (dest < this.time) {
 			//step back to (dest).9
 			//then jump to (dest).1 for setup, then (dest).2 for html
 			//avoids unnecessary cutscene entering/exiting
+			var enteredBranch = false;
 			var curMom = this.momentAt(this.time);
 			if (curMom) curMom.fire(this.time, dest);
-			var reAddElemsDest = this.getTimestamp(Math.floor(dest), 'tail');
+			var reAddElemsDest = this.getTimestamp(Math.floor(dest), 'branchPreClean');
 			while (reAddElemsDest != this.time) {
 				var nextMom = this.nextTowardsDest(this.time, reAddElemsDest);
 				if (!nextMom) break;
+				var preCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPreClean');
+				var postCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPostClean');
 				nextMom.fire(this.time, nextMom.timestamp);
+				
+				if (nextMom.timestamp == preCleanBranchTimestamp || nextMom.timestamp == postCleanBranchTimestamp) {
+					this.steppingTowards = dest;
+					enteredBranch = true;
+					break;
+				}				
+				
 				this.time = nextMom.timestamp;
 
 			}
 			this.time = this.getTimestamp(Math.floor(dest), 'setup') - 1e-4;
-			while (dest != this.time) {
-				var nextMom = this.nextMoment(this.time);
-				if (!nextMom) break;
-				nextMom.fire(this.time, nextMom.timestamp);
-				this.time = nextMom.timestamp;
-			}			
+			if (!enteredBranch) {
+				while (dest != this.time) {
+					var nextMom = this.nextMoment(this.time);
+					if (!nextMom) break;
+					nextMom.fire(this.time, nextMom.timestamp);
+					this.time = nextMom.timestamp;
+				}			
+			} //this will probably need work.  It may not make any sense at all!  How could I know?
 		}
 
 	},
@@ -273,6 +299,73 @@ Timeline.Section.prototype = {
 		this.stepTo(destTime);
 		this.time = destTime;
 	},
+	spliceInMoment: function(moment) {
+		for (var i=0; i<this.moments.length; i++) {
+			for (this.moments[i].timestamp > moment.timestamp) {
+				this.moments.splice(i, 0, moment);
+				break;
+			}
+		}
+	},
+	branchPromptsPreClean: function(prompts) {
+		var timestamp = this.getTimestamp(Math.floor(this.time), 'branchPreClean');
+		this.branchPrompts(prompts, timestamp);
+	},
+	branchPromptsPostClean: function(prompts) {
+		var timestamp = this.getTimestamp(Math.floor(this.time), 'branchPostClean');
+		this.branchPrompts(prompts, timestamp);
+	},
+	branchPrompts: function(prompts, timestamp) {
+		var moment = new Timeline.Moment(timestamp);
+		var curTimeline = this.timeline;
+		
+		var cmmd = new Timeline.Command('point', function() {
+			var branchTimeline = new Timeline(curTimeline);
+			branchTimeline.pushSection({prompts: prompts});
+			branchTimeline.sections[0].inheritState(this);
+			//this makes it so we don't have to call showSection, which would replace the html
+			
+			branchTimeline.sectionIdx = 0;
+			branchTimeline.inited = true;
+			window.timeline = branchTimeline;
+			branchTimeline.pushToGlobal();
+			branchTimeline.show(0, 0);
+			
+		}, undefined, false, false, undefined);
+		
+		var spawn = Timeline.stateFuncs.cmmds.spawn;
+		moment.events.cmmds.push(new Timeline.Event.Point(this, this.timeline.elems, cmmd, spawn, this.timeline.takeNumber(), false, false, moment));
+		this.spliceInMoment(moment);
+	},
+	branchSections: function(sections) {
+		var timestamp = this.getTimestamp(Math.floor(this.time), 'branchPostClean');
+		var moment = new Timeline.Moment(timestamp);
+		var curTimeline = this.timeline;
+		var cmmd = new Timeline.Command('point', function() {
+			var branchTimeline = new Timeline(curTimeline, BLANK STUFF);
+			for (var i=0; i<sections.length; i++) {
+				branchTimeline.pushSection(sections[i]);
+			}
+			this.timeline.clearCurrentSection();
+			window.timeline = branchTimeline;
+			branchTimeline.show(0, 0);
+		}, undefined, false, false, undefined);
+		var spawn = Timeline.stateFuncs.cmmds.spawn;
+		moment.events.cmmds.push(new Timeline.Event.Point(this, this.timeline.elems, cmmd, spawn, this.timeline.takeNumber(), false, false, moment));
+		this.spliceInMoment(moment);
+	},
+	killBranches: function() {
+		var preCleanTimestamp = this.getTimestamp(Math.floor(this.time), 'branchPreClean');
+		var postCleanTimestamp = this.getTimestamp(Math.floor(this.time), 'branchPostClean');
+		var preMom = this.getMomentAt(preCleanTimestamp);
+		var postMom = this.getMomentAt(postCleanTimestamp);
+		if (preMom) {
+			this.moments.splice(this.moments.indexOf(preMom, 1));
+		}
+		if (postMom) {
+			this.moments.splice(this.moments.indexOf(postMom, 1));
+		}
+	},
 	curPrompt: function() {
 		return this.sectionData.prompts[this.promptIdx];
 	},
@@ -280,6 +373,19 @@ Timeline.Section.prototype = {
 		if (current.length) 
 			current.remove();
 		wrapper.append(clone);
+	},
+	inheritState: function(section) {
+		this.curLevel = section.level;
+		this.collide = section.collide;
+		this.walls = section.walls;
+		this.dotManager = section.dotManager;
+		this.spcs = section.spcs;
+		this.dataDisplayer = section.dataDisplayer;
+		this.sliderList = section.sliderList;
+		this.buttonManager = section.buttonManager;
+		this.dataHandler = section.dataHandler;
+		this.thresholdEnergySpcChanger = section.thresholdEnergySpcChanger;
+		//not inheriting condition manager.  That is prompt index specific and not really part of the state
 	},
 	pushToGlobal: function() {
 		window.curLevel = this.level;
@@ -531,11 +637,6 @@ Timeline.Section.prototype = {
 		var event = new Timeline.Event.Point(this, timelineElems, elemDatum, spawn, id, oneWay, once, moment);
 		moment.events[eventClass].push(event);
 	},
-	// pushOnce: function(moment, timelineElems, id, elemDatum, spawn, eventClass, timestamp) {
-		// var moment = this.getOrCreateMoment(moments, timestamp);
-		// var event = new Timeline.Event.Point(this, timelineElems, elemDatum, spawn, id, moment);
-		// moment.events[eventClass].push(event);
-	// },
 	getTimestamp: function(time, when) {
 		var timeAdj;
 		if (/tailhtml/i.test(when)) {
@@ -546,8 +647,12 @@ Timeline.Section.prototype = {
 			timeAdj = .1;
 		} else if (/headhtml/i.test(when)) {
 			timeAdj = .2;
-		} else if (/head/.test(when)) {
+		} else if (/head/i.test(when)) {
 			timeAdj = 0;
+		} else if (/branchPreClean/i.test(when)) {
+			timeAdj = .85;
+		} else if (/branchPostClean/i.test(when)) {
+			timeAdj = .95;
 		}
 
 		var idx = this.parseIntegerTimeIdx(time);
@@ -700,17 +805,6 @@ Timeline.stateFuncs = {
 			elems[id] = undefined;
 		}
 	},
-	// buttons: {
-		// spawn: function(section, elems, id, btnDatum) {
-			// section.buttonManager.addButton(btnDatum.groupHandle, btnDatum.handle, btnDatum.label, btnDatum.exprs, btnDatum.prefIdx, btnDatum.isDown, btnDatum.cleanUpWith);
-			// elems[id] = btnDatum;
-		// },
-		// remove: function(section, elems, id) {
-			// var btnDatum = elems[id];
-			// section.buttonManager.removeButton(btnDatum.groupHandle, btnDatum.handle);
-			// elems[id] = undefined;
-		// }
-	// },	
 	cmmds: {
 		spawn: function(section, elems, id, cmmd) {
 			var spawnExpr = cmmd.spawn;
@@ -811,13 +905,6 @@ Timeline.Moment.prototype = {
 					}
 				}
 			}
-			// else if (event instanceof Timeline.Event.Once) {
-				// if (!event.fired) {
-					// elemDatum = getAndEval(event.elemDatum);
-					// event.spawn(event.section, event.timelineElems, event.id, elemDatum);
-					// event.fired = true;
-				// }
-			// }
 		}
 	}
 }
@@ -864,14 +951,5 @@ Timeline.Event = {
 		this.once = once;
 		this.active = true;
 	},
-	//get rid of
-	// Once: function(section, timeElems, elemDatum, spawn, id, moment) {
-		// this.section = section;
-		// this.timelineElems = timelineElems;
-		// this.elemDatum = elemDatum;
-		// this.spawn = spawn;
-		// this.id = id;
-		// this.fired = false;
-		// this.moment = moment;
-	// }
+
 }

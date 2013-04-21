@@ -1,3 +1,5 @@
+// rxnCnts = {aa: 0, ab: 0, bb: 0};
+
 ReactionHandler = {
 	addReaction: function(attrs){ //rctA, rctB, hRxn, activeE, prods)
 		attrs.parent = this;
@@ -130,6 +132,15 @@ ReactionHandler = {
 		var activeE = rxn.activeE;
 		var prods = rxn.prods;
 		return function(a, b, UVAB, perpAB, perpBA) {
+			// if (a.spcName == 'ugly' && b.spcName == 'ugly') {
+				// rxnCnts.aa++;
+			// } else if (a.spcName == 'ugly' && b.spcName == 'uglier') {
+				// rxnCnts.ab++;
+			// } else if (a.spcName == 'uglier' && b.spcName == 'ugly') {
+				// rxnCnts.ab++;
+			// } else if (a.spcName == 'uglier' && b.spcName == 'uglier') {
+				// rxnCnts.bb++;
+			// }
 			var hitE = this.hitE(a, b, perpAB, -perpBA);
 			if (Math.random() < this.probFunc(hitE, activeE)) {
 				if (!this.react(a, b, prods)) {
@@ -146,6 +157,15 @@ ReactionHandler = {
 		var rxns = this.rxns[idStr];
 		
 		return function(a, b, UVAB, perpAB, perpBA) {
+			// if (a.spcName == 'ugly' && b.spcName == 'ugly') {
+				// rxnCnts.aa++;
+			// } else if (a.spcName == 'ugly' && b.spcName == 'uglier') {
+				// rxnCnts.ab++;
+			// } else if (a.spcName == 'uglier' && b.spcName == 'ugly') {
+				// rxnCnts.ab++;
+			// } else if (a.spcName == 'uglier' && b.spcName == 'uglier') {
+				// rxnCnts.bb++;
+			// }
 			var hitE = this.hitE(a, b, perpAB, -perpBA);
 			var probs = [];
 			var sumProbs = 0;
