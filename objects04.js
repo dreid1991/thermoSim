@@ -59,7 +59,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var gasConst = R;
 		for (var spcName in spcDefs) {
 			funcs[spcName] = function(x, T) {
-				return Math.exp(coeff * x * x / (gasConst * T)); 
+				return Math.exp(coeff * (1 - x) * (1 - x) / (gasConst * T)); 
 			}
 		}
 		return funcs;
