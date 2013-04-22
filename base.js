@@ -511,17 +511,7 @@ function getLen(pts) {
 	}
 	return len;
 }
-function inPrompt() {
-	return /prompt/i.test(currentSetupType);
-}
-function nameVar(str) {
-	if (currentSetupType=='section') {
-		return str + 'S' + sectionIdx;
-	} else {
-		return str + 'S' + sectionIdx + 'P' + promptIdx;
-	}
-	 
-}
+
 function byAttr(obj, attrVal, attr) {
 	if (obj instanceof Array) {
 		for(var listIdx=0; listIdx<obj.length; listIdx++){

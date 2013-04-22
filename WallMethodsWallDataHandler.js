@@ -298,7 +298,6 @@ WallMethods.wallDataHandler = {
 		dataObj.id(id);
 		dataObj.type(id);
 		dataObj.wallHandle(this.handle);
-		if (inPrompt()) this.setupPromptRecordStop(dataObj, dataObj.id());
 	},
 	setupInfoDataObj: function(dataObj, type, info) {
 		dataObj.recording(true);
@@ -307,23 +306,8 @@ WallMethods.wallDataHandler = {
 		dataObj.wallHandle(this.handle);
 		dataObj.type(type);
 		dataObj.idArgs(info);
-		if (inPrompt()) this.setupPromptRecordStop(dataObj);
 	},
-	//I add a listener to clean up recording with the prompt only because everything in the wall gets removed on leaving the section.
-	setupPromptRecordStop: function(dataObj) {
-		var listenerHandle = 'recordStop' + dataObj.id().toCapitalCamelCase();
-		addListener(curLevel, currentSetupType + 'CleanUp', listenerHandle, function() {
-			dataObj.recordStop();
-			removeListener(curLevel, currentSetupType + 'CleanUp', listenerHandle);
-		})
-	},
-	setupPromptDisplayStop: function(dataObj) {
-		var listenerHandle = 'displayStop' + dataObj.id().toCapitalCamelCase();
-		addListener(curLevel, currentSetupType + 'CleanUp', listenerHandle, function() {
-			dataObj.displayStop();
-			removeListener(curLevel, currentSetupType + 'CleanUp', listenerHandle)
-		});
-	},
+
 	//to be called in context of DataObj
 	recordStopDestroy: function() {
 		this.recording(false);

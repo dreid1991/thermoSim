@@ -13,11 +13,26 @@ LevelTools = {
 		addListener(this, 'data', 'run', this.dataRun, this);
 
 	},
-	//Hey, make funcs like foreach Quiz, foreach Prompt, give cbs
-	addStoreAs: function(levelData) {
+	// foreachQuestion: function(cb, prompts, idObj) {
+		// for (var promptIdx=0; promptIdx<prompts.length; promptIdx++) {
+			// var quiz = prompts[promptIdx].quiz;
+			// if (quiz) {
+				// for (var questionIdx=0; questionIdx<quiz.length; questionIdx++) {
+					// var question = quiz[questionIdx];
+					// cb(question, idObj);
+				// }
+			// }
+		// }
+	// },
+	// foreachPrompt: function(cb, section, idObj) {
+		// var prompts = section.prompts;
+		// if (!prompts) console.log('A section is missing prompts');
+		
+	// },
+	addStoreAs: function(sections) {
 		var storeAs=0;
-		for (var sectionIdx=0; sectionIdx<levelData.mainSequence.length; sectionIdx++) {
-			var section = levelData.mainSequence[sectionIdx];
+		for (var sectionIdx=0; sectionIdx<sections.length; sectionIdx++) {
+			var section = sections[sectionIdx];
 			for (var promptIdx=0; promptIdx<section.prompts.length; promptIdx++) {
 				var prompt = section.prompts[promptIdx];
 				if (prompt.quiz) {
@@ -32,10 +47,10 @@ LevelTools = {
 			}
 		}
 	},
-	addImgs: function(levelData) {
+	addImgs: function(sections) {
 		var questionId = 0;
-		for (var sectionIdx=0; sectionIdx<levelData.mainSequence.length; sectionIdx++) {
-			var section = levelData.mainSequence[sectionIdx];
+		for (var sectionIdx=0; sectionIdx<sections.length; sectionIdx++) {
+			var section = sections[sectionIdx];
 			if (!section.prompts) console.log('Section ' + sectionIdx + ' has no prompts!  Sections must have at least one prompt.');
 			for (var promptIdx=0; promptIdx<section.prompts.length; promptIdx++) {
 				var title = prompt.title;
@@ -64,9 +79,9 @@ LevelTools = {
 			}
 		}
 	},
-	transferObjCleanUp: function(levelData) {
-		for (var sectionIdx=0; sectionIdx<levelData.mainSequence.length; sectionIdx++) {
-			var section = levelData.mainSequence[sectionIdx];
+	transferObjCleanUp: function(sections) {
+		for (var sectionIdx=0; sectionIdx<sections.length; sectionIdx++) {
+			var section = sections[sectionIdx];
 			if (section.sceneData) {
 				this.transferObjDataCleanUp(section.sceneData.objs);
 			}
@@ -88,9 +103,9 @@ LevelTools = {
 			}
 		}
 	},
-	addTriggerCleanUp: function(levelData) {
-		for (var sIdx=0; sIdx<levelData.mainSequence.length; sIdx++) {
-			var s = levelData.mainSequence[sIdx];
+	addTriggerCleanUp: function(sections) {
+		for (var sIdx=0; sIdx<sections.length; sIdx++) {
+			var s = sections[sIdx];
 			if (s.sceneData) {
 				this.addTriggerDataCleanUp(s.sceneData.triggers);
 			}
@@ -113,9 +128,9 @@ LevelTools = {
 			}
 		}
 	},
-	setDefaultPromptVals: function(levelData){
-		for (var sectionIdxLocal=0; sectionIdxLocal<levelData.mainSequence.length; sectionIdxLocal++) {
-			var section = levelData.mainSequence[sectionIdxLocal];
+	setDefaultPromptVals: function(sections){
+		for (var sectionIdxLocal=0; sectionIdxLocal<sections.length; sectionIdxLocal++) {
+			var section = sections[sectionIdxLocal];
 			for (var promptIdxLocal=0; promptIdxLocal<section.prompts.length; promptIdxLocal++) {
 				var prompt = section.prompts[promptIdxLocal];
 				prompt.finished = false;

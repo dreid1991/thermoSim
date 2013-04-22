@@ -85,11 +85,11 @@ $(function(){
 	myCanvas.height = canvasHeight;
 	//LevelTools.addSpcs(LevelData.spcDefs, window.spcs); FE
 	
-	LevelTools.addImgs(LevelData);
-	LevelTools.setDefaultPromptVals(LevelData);
-	LevelTools.addTriggerCleanUp(LevelData);
-	LevelTools.addStoreAs(LevelData);
-	LevelTools.transferObjCleanUp(LevelData);
+	LevelTools.addImgs(LevelData.mainSequence);
+	LevelTools.setDefaultPromptVals(LevelData.mainSequence);
+	LevelTools.addTriggerCleanUp(LevelData.mainSequence);
+	LevelTools.addStoreAs(LevelData.mainSequence);
+	LevelTools.transferObjCleanUp(LevelData.mainSequence);
 	LevelTools.showRunDivs();
 	
 

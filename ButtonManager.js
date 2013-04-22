@@ -295,7 +295,6 @@ ButtonManager.Button = function(handle, buttonId, wrapperId, label, exprs, prefI
 		this.cb = this.wrapExprs(exprs);
 	}
 	this.prefIdx = prefIdx;
-	this.cleanUpWith = cleanUpWith || currentSetupType;
 }
 
 ButtonManager.Button.prototype = {

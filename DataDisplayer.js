@@ -12,7 +12,6 @@ DataDisplayer.prototype = {
 		var handle = attrs.handle;
 		var expr = attrs.expr || '';
 		var units = attrs.units || '';
-		var cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 		var readout = this.readouts[attrs.readout];
 		if (!readout) console.log('Bad readout name ' + attrs.readout);
 		var listenerStr = 'display' + label + this.entries.length;

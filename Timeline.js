@@ -42,10 +42,11 @@ Timeline.prototype = {
 		}
 	},
 	catchSurface: function(caughtTimeline) {
+		this.curSection().pushToGlobal();
 		if (caughtTimeline.isSectionsBranch) {
-			//reassert HTML
+			this.curSection().restoreHTML();
 		}
-		this.show(this.steppingTowards.sectionIdx, this.steppingTowards.promptIdx, false);
+		this.show(this.steppingTowards.sectionIdx, this.steppingTowards.promptIdx);
 	},
 	findElemBoundsByHandle: function(handle) {
 		var matches = [];
@@ -191,6 +192,12 @@ Timeline.Section.prototype = {
 			this.restoreGraphs();
 		}
 	},
+	restoreHTML: function() {
+		this.replaceDiv($('#dashRunWrapper'), $('#dashRun'), this.dashRunClone || this.dashRunBlank);
+		this.replaceDiv($('#buttonManagerWrapper'), $('#buttonManager'), this.buttonManagerClone || this.buttonManagerBlank);
+		this.restoreGraphs();
+		this.restoreAuxs();
+	},
 	showPrompt: function(promptIdx) {
 		//should all be rolled into moments now
 		var destTime = this.getTimestamp(promptIdx, 'headHTML');
@@ -209,9 +216,9 @@ Timeline.Section.prototype = {
 				
 				var preCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPreClean');
 				var postCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPostClean');
-				
+				var from = this.time;
 				this.time = nextMom.timestamp;
-				nextMom.fire(this.time, nextMom.timestamp);
+				nextMom.fire(from, this.time);
 				if (nextMom.timestamp == preCleanBranchTimestamp || nextMom.timestamp == postCleanBranchTimestamp) {
 					break;
 				}
@@ -229,8 +236,9 @@ Timeline.Section.prototype = {
 				if (!nextMom) break;
 				var preCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPreClean');
 				var postCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPostClean');
+				var from = this.time;
 				this.time = nextMom.timestamp;
-				nextMom.fire(this.time, nextMom.timestamp);
+				nextMom.fire(from, this.time);
 				
 				if (nextMom.timestamp == preCleanBranchTimestamp || nextMom.timestamp == postCleanBranchTimestamp) {
 					this.steppingTowards = dest;
@@ -245,8 +253,9 @@ Timeline.Section.prototype = {
 				while (dest != this.time) {
 					var nextMom = this.nextMoment(this.time);
 					if (!nextMom) break;
+					var from = this.time;
 					this.time = nextMom.timestamp;
-					nextMom.fire(this.time, nextMom.timestamp);
+					nextMom.fire(from, this.time);
 				}			
 			} //this will probably need work.  It may not make any sense at all!  How could I know?
 		}
@@ -317,7 +326,7 @@ Timeline.Section.prototype = {
 	},
 	spliceInMoment: function(moment) {
 		for (var i=0; i<this.moments.length; i++) {
-			for (this.moments[i].timestamp > moment.timestamp) {
+			if (this.moments[i].timestamp > moment.timestamp) {
 				this.moments.splice(i, 0, moment);
 				break;
 			}

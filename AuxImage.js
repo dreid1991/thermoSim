@@ -1,6 +1,5 @@
 function AuxImage(attrs) {
 	this.type = 'AuxImage';
-	this.cleanUpWith = defaultTo(currentSetupType, attrs.cleanUpWith);
 	this.handle = attrs.handle;
 	this.imgFunc = attrs.imgFunc;
 	this.slotNum = attrs.slotNum;
