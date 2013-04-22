@@ -31,6 +31,7 @@ function Liquid(attrs) {
 	this.updateListenerName = this.type + this.handle;
 	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs, this.surfAreaObj);
 	this.wallGas.addLiquid(this);
+	this.energyForDots = 0;
 	if (makePhaseDiagram) {
 		this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, this.handle, attrs.primaryKey);
 		curLevel.graphs[this.phaseDiagram.handle] = this.phaseDiagram;
@@ -186,6 +187,10 @@ _.extend(Liquid.prototype, objectFuncs, {
 					ejectDots();
 					sizeWall();
 					checkUpdatePhase();
+					//Kind of changing methods here, this wrapping functions thing seems a little funny
+					if (self.addEnergyToDots(window.dotManager.lists.ALLDOTS, self.energyForDots)) {
+						self.energyForDots = 0;
+					}
 				})
 				
 			} else {
@@ -197,6 +202,19 @@ _.extend(Liquid.prototype, objectFuncs, {
 				turns ++;
 			}
 		})
+	},
+	addEnergyToDots: function(dots, energy) {
+		if (dots.length && energy) {
+			var addTo = Math.min(dots.length, 20);
+			var i = Math.max(0, Math.floor(Math.random() * dots.length - addTo));
+			var ePer = energy / addTo;
+			for (var ceil = addTo + i; i<ceil; i++) {
+				dots[i].addEnergy(ePer);
+			}
+			return true;
+			
+		}
+		return false;
 	},
 	setupCalcCp: function(spcDefs, dotMgrLiq) {
 		var self = this;
@@ -373,23 +391,28 @@ _.extend(Liquid.prototype, objectFuncs, {
 			var a = chanceZero / (1 - chanceZero);
 			var chanceAbs = a / (a + Math.exp(-dF[dot.spcName] * this.drivingForceSensitivity));
 			if (chanceAbs > Math.random()) {
-				return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcDefs);//need to set Cp in this;  WHAT IS THIS?
+				return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcDefs, this.dataGas.temp);
 			}
 		}
 		this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
 		
 		
 	},
-	absorbDot: function(dot, drawList, dotMgrLiq, wallLiq, spcDefs) {
+	absorbDot: function(dot, drawList, dotMgrLiq, wallLiq, spcDefs, gasTemp) {
 		var dotMgrGas = window.dotManager; 
 		dotMgrGas.remove(dot);
 		drawList.splice(Math.floor(Math.random() * drawList.length), 0, dot);
 		dot.setWall(wallLiq.handle);
 		dotMgrLiq.add(dot);
-		var tempDotF = dot.tempCondense();
+		
+		var tDotF = gasTemp[gasTemp.length - 1];
+		this.energyForDots += (dot.temp() - tDotF) * dot.cv;
+		dot.setTemp(tDotF);
+		
+		
 		var CpLiqOld = this.Cp;
 		this.calcCp();
-		this.temp = (this.temp * CpLiqOld + tempDotF * dot.cpLiq) / this.Cp;
+		this.temp = (this.temp * CpLiqOld + dot.tempCondense() * dot.cpLiq) / this.Cp;
 		this.numAbs[dot.spcName]++;
 		return false; //returning false isn't used here, but I like to return false when a dot is removed from a dot/wall collision check because it is used in dot collisions.  Feels consistent.  
 	},

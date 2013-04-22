@@ -537,7 +537,8 @@ Dot.prototype = {
 	addEnergy: function(dE) {
 		var curTemp = this.temp();
 		tF = Math.max(1, curTemp + dE / this.cv)
-		this.setTemp(tF);
+		this.v.mult(Math.sqrt(tF / curTemp));
+		this.internalPotential *= tF / curTemp;
 		return (tF - curTemp) * this.cv;
 	},
 	setWall: function(wallHandle) {
