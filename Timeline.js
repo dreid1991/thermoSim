@@ -1,13 +1,16 @@
 //need to interp all this stuff before rendering, yo
-function Timeline(parent) { //make it so it can inherit blanks as well
+function Timeline(parent, buttonManagerBlank, dashRunBlank, isSectionsBranch, isPromptsBranch) { //make it so it can inherit blanks as well
 	this.parent = parent;
 	//cloning return jquery reference rather than deepcopy if done before page fully loaded
-	this.buttonManagerBlank = document.getElementById('buttonManager').outerHTML;
-	this.dashRunBlank = document.getElementById('dashRun').outerHTML;
+	this.buttonManagerBlank = buttonManagerBlank || document.getElementById('buttonManager').outerHTML;
+	this.dashRunBlank = dashRunBlank || document.getElementById('dashRun').outerHTML;
+	this.isSectionsBranch = isSectionsBranch || false;
+	this.isPromptsBranch = isPromptsBranch || false;
 	this.sections = [];
 	this.sectionIdx = undefined;
 	this.curId = 0;
 	this.elems = [];
+	this.steppingTowards;
 }
 
 Timeline.prototype = {
@@ -28,7 +31,21 @@ Timeline.prototype = {
 		return {sectionIdx: this.sectionIdx, promptIdx: this.sections[this.sectionIdx].promptIdx};
 	},
 	surface: function() {
-		//if (this.parent) ...
+		if (this.parent) {
+			if (this.isSectionsBranch) {
+				this.curSection().cleanUpPrompt();
+				this.clearCurrentSection();
+			} else if (this.isPromptsBranch) {
+				this.curSection().cleanUpPrompt();
+			}
+			this.parent.catchSurface(this);
+		}
+	},
+	catchSurface: function(caughtTimeline) {
+		if (caughtTimeline.isSectionsBranch) {
+			//reassert HTML
+		}
+		this.show(this.steppingTowards.sectionIdx, this.steppingTowards.promptIdx, false);
 	},
 	findElemBoundsByHandle: function(handle) {
 		var matches = [];
@@ -75,6 +92,7 @@ Timeline.prototype = {
 		return matches;
 	},
 	show: function(sectionIdx, promptIdx, refreshing) {
+		this.steppingTowards = {sectionIdx: sectionIdx, promptIdx: promptIdx};
 		var changingSection = this.sectionIdx != sectionIdx;
 		var changingPrompt = changingSection || promptIdx != this.sections[sectionIdx].promptIdx;
 		// if (changingPrompt || refreshing) {
@@ -149,7 +167,6 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	this.buttonManagerBlank = buttonManagerBlank;
 	this.dashRunClone;
 	this.dashRunBlank = dashRunBlank;
-	this.steppingTowards;
 }
 
 Timeline.Section.prototype = {
@@ -193,12 +210,11 @@ Timeline.Section.prototype = {
 				var preCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPreClean');
 				var postCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPostClean');
 				
+				this.time = nextMom.timestamp;
 				nextMom.fire(this.time, nextMom.timestamp);
 				if (nextMom.timestamp == preCleanBranchTimestamp || nextMom.timestamp == postCleanBranchTimestamp) {
-					this.steppingTowards = dest;
 					break;
 				}
-				this.time = nextMom.timestamp;
 			}
 		} else if (dest < this.time) {
 			//step back to (dest).9
@@ -213,6 +229,7 @@ Timeline.Section.prototype = {
 				if (!nextMom) break;
 				var preCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPreClean');
 				var postCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPostClean');
+				this.time = nextMom.timestamp;
 				nextMom.fire(this.time, nextMom.timestamp);
 				
 				if (nextMom.timestamp == preCleanBranchTimestamp || nextMom.timestamp == postCleanBranchTimestamp) {
@@ -221,7 +238,6 @@ Timeline.Section.prototype = {
 					break;
 				}				
 				
-				this.time = nextMom.timestamp;
 
 			}
 			this.time = this.getTimestamp(Math.floor(dest), 'setup') - 1e-4;
@@ -229,8 +245,8 @@ Timeline.Section.prototype = {
 				while (dest != this.time) {
 					var nextMom = this.nextMoment(this.time);
 					if (!nextMom) break;
-					nextMom.fire(this.time, nextMom.timestamp);
 					this.time = nextMom.timestamp;
+					nextMom.fire(this.time, nextMom.timestamp);
 				}			
 			} //this will probably need work.  It may not make any sense at all!  How could I know?
 		}
@@ -316,20 +332,30 @@ Timeline.Section.prototype = {
 		this.branchPrompts(prompts, timestamp);
 	},
 	branchPrompts: function(prompts, timestamp) {
+		var self = this;
 		var moment = new Timeline.Moment(timestamp);
 		var curTimeline = this.timeline;
 		
 		var cmmd = new Timeline.Command('point', function() {
-			var branchTimeline = new Timeline(curTimeline);
-			branchTimeline.pushSection({prompts: prompts});
-			branchTimeline.sections[0].inheritState(this);
-			//this makes it so we don't have to call showSection, which would replace the html
+			var promptIdx = Math.floor(timestamp);
+			//self.time += 1e-4;
+			if (this.branches[promptIdx]) { //need to check if it's the *same* extension.  Maybe ID them 
+				window.timeline = this.branches[promptIdx];
+				timeline.pushToGlobal();
+				timeline.show(0, timeline.sections[0].promptIdx);
+			} else {
+				var branchTimeline = new Timeline(curTimeline, undefined, undefined, false, true);
+				this.branches[promptIdx] = branchTimeline
+				branchTimeline.pushSection({prompts: prompts});
+				branchTimeline.sections[0].inheritState(this);
+				//this makes it so we don't have to call showSection, which would replace the html
+				branchTimeline.sectionIdx = 0;
+				branchTimeline.inited = true;
+				window.timeline = branchTimeline;
+				branchTimeline.pushToGlobal();
+				branchTimeline.show(0, 0);
+			}	
 			
-			branchTimeline.sectionIdx = 0;
-			branchTimeline.inited = true;
-			window.timeline = branchTimeline;
-			branchTimeline.pushToGlobal();
-			branchTimeline.show(0, 0);
 			
 		}, undefined, false, false, undefined);
 		
@@ -338,15 +364,17 @@ Timeline.Section.prototype = {
 		this.spliceInMoment(moment);
 	},
 	branchSections: function(sections) {
+		var self = this;
 		var timestamp = this.getTimestamp(Math.floor(this.time), 'branchPostClean');
 		var moment = new Timeline.Moment(timestamp);
 		var curTimeline = this.timeline;
 		var cmmd = new Timeline.Command('point', function() {
-			var branchTimeline = new Timeline(curTimeline, BLANK STUFF);
+			var branchTimeline = new Timeline(curTimeline, curTimeline.buttonManagerBlank, curTimeline.dashRunBlank, true, false);
 			for (var i=0; i<sections.length; i++) {
 				branchTimeline.pushSection(sections[i]);
 			}
-			this.timeline.clearCurrentSection();
+			self.timeline.clearCurrentSection();
+			//self.time += 1e-4;
 			window.timeline = branchTimeline;
 			branchTimeline.show(0, 0);
 		}, undefined, false, false, undefined);
