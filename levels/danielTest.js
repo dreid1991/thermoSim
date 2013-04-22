@@ -232,10 +232,14 @@ LevelData = {
 			
 	],
 	auxSections: {
+		goofy: [
+		//list of sections
 		
+		]
 	},
 	auxPrompts: {
 		spare: [
+			//list of prompts
 			{
 				sceneData: undefined,
 				title: 'hello',

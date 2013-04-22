@@ -24,9 +24,16 @@ SceneNavigator.prototype = {
 			if (dirExpr) {
 				amAdvancing = this.execDirections(dirExpr)
 			} 
+			//this needs works
 			if (amAdvancing) {
 				var nextIdxs = this.getNextIdxs();
-				this.showPrompt(nextIdxs.newSectionIdx, nextIdxs.newPromptIdx);
+				var now = timeline.now();
+				timeline[timeline.sectionIdx].killBranches();
+				for (nextIdxs.sectionIdx == now.sectionIdx && nextIdxs.promptIdx == now.promptIdx) {
+					timeline.surface(true);
+				} else {
+					this.showPrompt(nextIdxs.newSectionIdx, nextIdxs.newPromptIdx);
+				}
 			}
 			//return true;
 		}
@@ -151,9 +158,8 @@ SceneNavigator.prototype = {
 	prevPrompt: function(){
 		var prevIdxs = this.getPrevIdxs();
 		var now = timeline.now();
-		//nonononono  redo this
 		if (prevIdxs.sectionIdx == now.sectionIdx && prevIdxs.promptIdx == now.promptIdx) {
-			timelineStack.pop();
+			timeline.surface(false);
 		} else {
 			this.showPrompt(prevIdxs.newSectionIdx, prevIdxs.newPromptIdx);
 		}

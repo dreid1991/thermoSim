@@ -47,7 +47,7 @@ LevelTools = {
 			}
 		}
 	},
-	addImgs: function(sections) {
+	addImgsAndQuestionIds: function(sections) {
 		var questionId = 0;
 		for (var sectionIdx=0; sectionIdx<sections.length; sectionIdx++) {
 			var section = sections[sectionIdx];

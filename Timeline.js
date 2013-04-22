@@ -30,13 +30,14 @@ Timeline.prototype = {
 	now: function() {
 		return {sectionIdx: this.sectionIdx, promptIdx: this.sections[this.sectionIdx].promptIdx};
 	},
-	surface: function() {
+	surface: function(forwards) {
+		forwards = defaultTo(true, forwards);
 		if (this.parent) {
 			if (this.isSectionsBranch) {
-				this.curSection().cleanUpPrompt();
+				this.curSection().cleanUpPrompt(forwards);
 				this.clearCurrentSection();
 			} else if (this.isPromptsBranch) {
-				this.curSection().cleanUpPrompt();
+				this.curSection().cleanUpPrompt(forwards);
 			}
 			this.parent.catchSurface(this);
 		}
@@ -46,6 +47,7 @@ Timeline.prototype = {
 		if (caughtTimeline.isSectionsBranch) {
 			this.curSection().restoreHTML();
 		}
+		if (!this.sections[this.steppingTowards.sectionIdx].inited) this.sections[this.steppingTowards.sectionIdx].inited = true;
 		this.show(this.steppingTowards.sectionIdx, this.steppingTowards.promptIdx);
 	},
 	findElemBoundsByHandle: function(handle) {
@@ -92,10 +94,10 @@ Timeline.prototype = {
 		matches.push(matchedSectionIdx);
 		return matches;
 	},
-	show: function(sectionIdx, promptIdx, refreshing) {
+	show: function(sectionIdx, promptIdx, refreshing, forceShowPrompt) {
 		this.steppingTowards = {sectionIdx: sectionIdx, promptIdx: promptIdx};
 		var changingSection = this.sectionIdx != sectionIdx;
-		var changingPrompt = changingSection || promptIdx != this.sections[sectionIdx].promptIdx;
+		var changingPrompt = changingSection || promptIdx != this.sections[sectionIdx].promptIdx || forceShowPrompt;
 		// if (changingPrompt || refreshing) {
 			// this.sections[sectionIdx].cleanUpPrompt();
 		// }
@@ -175,14 +177,7 @@ Timeline.Section.prototype = {
 		this.replaceDiv($('#dashRunWrapper'), $('#dashRun'), this.dashRunClone || this.dashRunBlank);
 		this.replaceDiv($('#buttonManagerWrapper'), $('#buttonManager'), this.buttonManagerClone || this.buttonManagerBlank);
 		this.pushToGlobal();
-		if (this.aux1Clone) {
-			this.replaceDiv($('#aux1Wrapper'), $('aux1'), this.aux1Clone);
-			this.aux1Clone = undefined;
-		}
-		if (this.aux2Clone) {
-			this.replaceDiv($('#aux2Wrapper'), $('aux2'), this.aux2Clone);
-			this.aux2Clone = undefined;
-		}
+
 		if (!this.inited) {
 			this.promptIdx = -1;
 			this.stepTo(-1);
@@ -219,7 +214,7 @@ Timeline.Section.prototype = {
 				var from = this.time;
 				this.time = nextMom.timestamp;
 				nextMom.fire(from, this.time);
-				if (nextMom.timestamp == preCleanBranchTimestamp || nextMom.timestamp == postCleanBranchTimestamp) {
+				if (Math.abs(nextMom.timestamp - preCleanBranchTimestamp) < 1e-5 || Math.abs(nextMom.timestamp - postCleanBranchTimestamp) < 1e-5) {
 					break;
 				}
 			}
@@ -240,7 +235,7 @@ Timeline.Section.prototype = {
 				this.time = nextMom.timestamp;
 				nextMom.fire(from, this.time);
 				
-				if (nextMom.timestamp == preCleanBranchTimestamp || nextMom.timestamp == postCleanBranchTimestamp) {
+				if (Math.abs(nextMom.timestamp - preCleanBranchTimestamp) < 1e-5 || Math.abs(nextMom.timestamp - postCleanBranchTimestamp) < 1e-5) {
 					this.steppingTowards = dest;
 					enteredBranch = true;
 					break;
@@ -315,12 +310,20 @@ Timeline.Section.prototype = {
 	},
 	momentAt: function(time) {
 		for (var i=0; i<this.moments.length; i++) {
-			if (this.moments[i].timestamp == time) return this.moments[i];
+			if (Math.abs(this.moments[i].timestamp - time) < 1e-5) { //can have imprecise adding.  Don't want it to mess up stamps
+				return this.moments[i];
+			}
 		}
 	},
-	cleanUpPrompt: function() {
+	cleanUpPrompt: function(forward) {
 		//only to be called when leaving a section;
-		var destTime = this.getTimestamp(this.sectionData.prompts.length - 1, 'tail');
+		var destTime;
+		if (forward) {
+			destTime = this.getTimestamp(this.sectionData.prompts.length - 1, 'tail');
+		} else {
+			destTime = this.getTimestamp(this.promptIdx, 'head') - 1e-4;
+		}
+		
 		this.stepTo(destTime);
 		this.time = destTime;
 	},
@@ -348,13 +351,14 @@ Timeline.Section.prototype = {
 		var cmmd = new Timeline.Command('point', function() {
 			var promptIdx = Math.floor(timestamp);
 			//self.time += 1e-4;
-			if (this.branches[promptIdx]) { //need to check if it's the *same* extension.  Maybe ID them 
-				window.timeline = this.branches[promptIdx];
-				timeline.pushToGlobal();
-				timeline.show(0, timeline.sections[0].promptIdx);
+			if (this.branches[promptIdx] && this.branches[promptIdx].id == prompts.id) {
+				window.timeline = this.branches[promptIdx].timeline;
+				timeline.sections[0].pushToGlobal();
+				var now = timeline.now()
+				timeline.show(now.sectionIdx, now.promptIdx);
 			} else {
 				var branchTimeline = new Timeline(curTimeline, undefined, undefined, false, true);
-				this.branches[promptIdx] = branchTimeline
+				this.branches[promptIdx] = new Timeline.Branch(branchTimeline, prompts.id);
 				branchTimeline.pushSection({prompts: prompts});
 				branchTimeline.sections[0].inheritState(this);
 				//this makes it so we don't have to call showSection, which would replace the html
@@ -378,14 +382,25 @@ Timeline.Section.prototype = {
 		var moment = new Timeline.Moment(timestamp);
 		var curTimeline = this.timeline;
 		var cmmd = new Timeline.Command('point', function() {
-			var branchTimeline = new Timeline(curTimeline, curTimeline.buttonManagerBlank, curTimeline.dashRunBlank, true, false);
-			for (var i=0; i<sections.length; i++) {
-				branchTimeline.pushSection(sections[i]);
+			var promptIdx = Math.floor(self.time);
+			if (this.branches[promptIdx] && this.branches[promptIdx].id == sections.id) {
+				window.timeline = this.branches[promptIdx].timeline;
+				timeline.pushToGlobal();
+				timeline.showHTML();
+				var now = timeline.now()
+				//will have cleaned up prompt on surfacing
+				timeline.show(now.sectionIdx, now.promptIdx, false, true);
+			} else {
+				var branchTimeline = new Timeline(curTimeline, curTimeline.buttonManagerBlank, curTimeline.dashRunBlank, true, false);
+				for (var i=0; i<sections.length; i++) {
+					branchTimeline.pushSection(sections[i]);
+				}
+				//don't need to clear prompt, that will be taken care of when we resume
+				self.timeline.clearCurrentSection();
+				//self.time += 1e-4;
+				window.timeline = branchTimeline;
+				branchTimeline.show(0, 0);
 			}
-			self.timeline.clearCurrentSection();
-			//self.time += 1e-4;
-			window.timeline = branchTimeline;
-			branchTimeline.show(0, 0);
 		}, undefined, false, false, undefined);
 		var spawn = Timeline.stateFuncs.cmmds.spawn;
 		moment.events.cmmds.push(new Timeline.Event.Point(this, this.timeline.elems, cmmd, spawn, this.timeline.takeNumber(), false, false, moment));
@@ -989,4 +1004,8 @@ Timeline.Event = {
 		this.active = true;
 	},
 
+}
+Timeline.Branch = function(timeline, id) {
+	this.timeline = timeline;
+	this.id = id;
 }
