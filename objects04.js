@@ -118,7 +118,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var dims = pos.VTo(b);
 		
 		for (var spcName in counts) {
-			spcs[spcName].populate(pos, dims, counts[spcName], temp, wallLiq.handle, wallLiq.handle, dotMgrLiq); 
+			spcs[spcName].populate(pos, dims, counts[spcName], temp, wallLiq.handle, undefined, wallLiq.handle, dotMgrLiq); 
 		}
 	},
 	recordTempLiq: function(wallLiq) {

@@ -43,12 +43,13 @@ Timeline.prototype = {
 		}
 	},
 	catchSurface: function(caughtTimeline) {
+		window.timeline = this;
 		this.curSection().pushToGlobal();
 		if (caughtTimeline.isSectionsBranch) {
 			this.curSection().restoreHTML();
 		}
-		if (!this.sections[this.steppingTowards.sectionIdx].inited) this.sections[this.steppingTowards.sectionIdx].inited = true;
-		this.show(this.steppingTowards.sectionIdx, this.steppingTowards.promptIdx);
+		//if (!this.sections[this.steppingTowards.sectionIdx].inited) this.sections[this.steppingTowards.sectionIdx].inited = true;
+		this.show(this.steppingTowards.sectionIdx, this.steppingTowards.promptIdx, false, true);
 	},
 	findElemBoundsByHandle: function(handle) {
 		var matches = [];
@@ -179,8 +180,8 @@ Timeline.Section.prototype = {
 		this.pushToGlobal();
 
 		if (!this.inited) {
-			this.promptIdx = -1;
 			this.stepTo(-1);
+			this.promptIdx = -1;
 			this.inited = true;
 		} else {
 			this.restoreAuxs();
@@ -196,11 +197,14 @@ Timeline.Section.prototype = {
 	showPrompt: function(promptIdx) {
 		//should all be rolled into moments now
 		var destTime = this.getTimestamp(promptIdx, 'headHTML');
-		this.promptIdx = promptIdx;
-		this.stepTo(destTime);
+		var stepPrompt = this.stepTo(destTime);
+		//if (stepPrompt) {
+			this.promptIdx = promptIdx;
+		//}
 
 	},
 	stepTo: function(dest) {
+		var stepPrompt = true;
 		var moments = this.moments;
 		if (dest > this.time || Math.floor(this.time) == Math.floor(dest)) {
 			var curMom = this.momentAt(this.time);
@@ -215,6 +219,7 @@ Timeline.Section.prototype = {
 				this.time = nextMom.timestamp;
 				nextMom.fire(from, this.time);
 				if (Math.abs(nextMom.timestamp - preCleanBranchTimestamp) < 1e-5 || Math.abs(nextMom.timestamp - postCleanBranchTimestamp) < 1e-5) {
+					stepPrompt = false;
 					break;
 				}
 			}
@@ -238,6 +243,7 @@ Timeline.Section.prototype = {
 				if (Math.abs(nextMom.timestamp - preCleanBranchTimestamp) < 1e-5 || Math.abs(nextMom.timestamp - postCleanBranchTimestamp) < 1e-5) {
 					this.steppingTowards = dest;
 					enteredBranch = true;
+					stepPrompt = false;
 					break;
 				}				
 				
@@ -254,6 +260,7 @@ Timeline.Section.prototype = {
 				}			
 			} //this will probably need work.  It may not make any sense at all!  How could I know?
 		}
+		return stepPrompt;
 
 	},
 	stepToBound: function(up) {
@@ -351,21 +358,21 @@ Timeline.Section.prototype = {
 		var cmmd = new Timeline.Command('point', function() {
 			var promptIdx = Math.floor(timestamp);
 			//self.time += 1e-4;
-			if (this.branches[promptIdx] && this.branches[promptIdx].id == prompts.id) {
-				window.timeline = this.branches[promptIdx].timeline;
+			if (self.branches[promptIdx] && self.branches[promptIdx].id == prompts.id) {
+				window.timeline = self.branches[promptIdx].timeline;
 				timeline.sections[0].pushToGlobal();
 				var now = timeline.now()
-				timeline.show(now.sectionIdx, now.promptIdx);
+				timeline.show(now.sectionIdx, now.promptIdx, false, true);
 			} else {
 				var branchTimeline = new Timeline(curTimeline, undefined, undefined, false, true);
-				this.branches[promptIdx] = new Timeline.Branch(branchTimeline, prompts.id);
+				self.branches[promptIdx] = new Timeline.Branch(branchTimeline, prompts.id);
 				branchTimeline.pushSection({prompts: prompts});
-				branchTimeline.sections[0].inheritState(this);
+				branchTimeline.sections[0].inheritState(self);
 				//this makes it so we don't have to call showSection, which would replace the html
 				branchTimeline.sectionIdx = 0;
 				branchTimeline.inited = true;
 				window.timeline = branchTimeline;
-				branchTimeline.pushToGlobal();
+				branchTimeline.sections[0].pushToGlobal();
 				branchTimeline.show(0, 0);
 			}	
 			
@@ -383,9 +390,9 @@ Timeline.Section.prototype = {
 		var curTimeline = this.timeline;
 		var cmmd = new Timeline.Command('point', function() {
 			var promptIdx = Math.floor(self.time);
-			if (this.branches[promptIdx] && this.branches[promptIdx].id == sections.id) {
-				window.timeline = this.branches[promptIdx].timeline;
-				timeline.pushToGlobal();
+			if (self.branches[promptIdx] && self.branches[promptIdx].id == sections.id) {
+				window.timeline = self.branches[promptIdx].timeline;
+				timeline.sections[timeline.sectionIdx].pushToGlobal();
 				timeline.showHTML();
 				var now = timeline.now()
 				//will have cleaned up prompt on surfacing
@@ -427,7 +434,7 @@ Timeline.Section.prototype = {
 		wrapper.append(clone);
 	},
 	inheritState: function(section) {
-		this.curLevel = section.level;
+		this.level = section.level;
 		this.collide = section.collide;
 		this.walls = section.walls;
 		this.dotManager = section.dotManager;

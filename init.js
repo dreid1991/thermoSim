@@ -91,7 +91,27 @@ $(function(){
 	LevelTools.addStoreAs(LevelData.mainSequence);
 	LevelTools.transferObjCleanUp(LevelData.mainSequence);
 	LevelTools.showRunDivs();
-	LevelTools.
+	
+	for (var auxSectionName in LevelData.auxSections) {
+		var auxSections = LevelData.auxSections[auxSectionName];
+		auxSections = auxSections instanceof Array ? auxSections : [auxSections];
+		LevelTools.addImgsAndQuestionIds(auxSections);
+		LevelTools.setDefaultPromptVals(auxSections);
+		LevelTools.addTriggerCleanUp(auxSections);
+		LevelTools.addStoreAs(auxSections);
+		LevelTools.transferObjCleanUp(auxSections);		
+	}
+	
+	for (var auxPromptsName in LevelData.auxPrompts) {
+		var auxPrompts = LevelData.auxPrompts[auxPromptsName];
+		auxPrompts = auxPrompts instanceof Array ? auxPrompts : [auxPrompts];
+		var asSection = {prompts: auxPrompts};
+		LevelTools.addImgsAndQuestionIds(asSection);
+		LevelTools.setDefaultPromptVals(asSection);
+		LevelTools.addTriggerCleanUp(asSection);
+		LevelTools.addStoreAs(asSection);
+		LevelTools.transferObjCleanUp(asSection);	
+	}
 
 	for (var sectionIdx=0; sectionIdx<LevelData.mainSequence.length; sectionIdx++) {
 		timeline.pushSection(LevelData.mainSequence[sectionIdx]);

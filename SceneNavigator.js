@@ -20,19 +20,18 @@ SceneNavigator.prototype = {
 				// curPrompt.finished = true;
 			// }
 			var dirExpr = this.checkDirections(curPrompt.directions);
-			
-			if (dirExpr) {
-				amAdvancing = this.execDirections(dirExpr)
-			} 
-			//this needs works
-			if (amAdvancing) {
+			instrs = dirExpr ? this.evalDirections(dirExpr) : {advance: true, killbranches: false};
+		
+			if (instrs.killBranches) {
+				timeline.sections[timeline.sectionIdx].killBranches();
+			}
+			if (instrs.advance) {
 				var nextIdxs = this.getNextIdxs();
 				var now = timeline.now();
-				timeline[timeline.sectionIdx].killBranches();
-				for (nextIdxs.sectionIdx == now.sectionIdx && nextIdxs.promptIdx == now.promptIdx) {
+				if (nextIdxs.sectionIdx == now.sectionIdx && nextIdxs.promptIdx == now.promptIdx) {
 					timeline.surface(true);
 				} else {
-					this.showPrompt(nextIdxs.newSectionIdx, nextIdxs.newPromptIdx);
+					this.showPrompt(nextIdxs.sectionIdx, nextIdxs.promptIdx);
 				}
 			}
 			//return true;
@@ -53,7 +52,7 @@ SceneNavigator.prototype = {
 		} else {
 			newPromptIdx++;
 		}
-		return {newSectionIdx:newSectionIdx, newPromptIdx:newPromptIdx};
+		return {sectionIdx: newSectionIdx, promptIdx:newPromptIdx};
 	},
 	checkDirections: function(dirs) {
 		if (dirs) {
@@ -65,36 +64,35 @@ SceneNavigator.prototype = {
 		}
 		return undefined;
 	},
-	execDirections: function(dirExpr) {
+	evalDirections: function(dirExpr) {
 		var directionFuncs = {
 			branchPromptsPreClean: function(prompts) {
 				prompts = prompts instanceof Array ? prompts : [prompts];
-				timeline[timeline.sectionIdx].branchPromptsPreClean(prompts);
-				return true;
+				timeline.sections[timeline.sectionIdx].branchPromptsPreClean(prompts);
+				return {advance: true, killBranches: false};
 			},
 			branchPromptsPostClean: function(prompts) {
 				prompts = prompts instanceof Array ? prompts : [prompts];
-				timeline[timeline.sectionIdx].branchPromptsPostClean(prompts)
-				return true;
+				timeline.sections[timeline.sectionIdx].branchPromptsPostClean(prompts)
+				return {advance: true, killBranches: false};
 				//need to check if we are making a branch that already exists or not. If so, do nothing.  It not, kill branches and make new
 			},
 			branchSections: function(sections) {
 				sections = sections instanceof Array ? sections : [sections];
-				timeline[timeline.sectionIdx].branchSections(sections)
-				return true;
+				timeline.sections[timeline.sectionIdx].branchSections(sections)
+				return {advance: true, killBranches: false};
 			},
 			surface: function() {
 				timeline.surface();
-				return false;
+				return {advance: false, killBranches: false};
 			},
 			advance: function() {
-				timeline[timeline.sectionIdx].killBranches();
-				return true;
+				return {advance: true, killBranches: true};
 			}
 			
 		}
 		with (directionFuncs) {
-			return dirExpr();
+			return eval(dirExpr);
 		}
 	},
 	getPrevIdxs: function() {
@@ -111,13 +109,13 @@ SceneNavigator.prototype = {
 		} else {
 			newPromptIdx--;
 		}
-		return {newSectionIdx:newSectionIdx, newPromptIdx:newPromptIdx};
+		return {sectionIdx:newSectionIdx, promptIdx:newPromptIdx};
 	},
 
 	checkWillAdvance: function() {
 		var nextIdxs = this.getNextIdxs();
-		var newSectionIdx = nextIdxs.newSectionIdx;
-		var newPromptIdx = nextIdxs.newPromptIdx;
+		var newSectionIdx = nextIdxs.sectionIdx;
+		var newPromptIdx = nextIdxs.promptIdx;
 		var willAdvance = 1;
 		willAdvance = Math.min(willAdvance, this.checkWillAdvanceConditions(newSectionIdx, newPromptIdx));
 		if (willAdvance) {
@@ -161,7 +159,7 @@ SceneNavigator.prototype = {
 		if (prevIdxs.sectionIdx == now.sectionIdx && prevIdxs.promptIdx == now.promptIdx) {
 			timeline.surface(false);
 		} else {
-			this.showPrompt(prevIdxs.newSectionIdx, prevIdxs.newPromptIdx);
+			this.showPrompt(prevIdxs.sectionIdx, prevIdxs.promptIdx);
 		}
 	}
 

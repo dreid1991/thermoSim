@@ -14,11 +14,11 @@ LevelData = {
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: 'cVIsothermal', isothermal: true, temp: 250, handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}} 
+					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: /*'cVIsothermal'*/'staticAdiabatic', /*temp: 250, */handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}} 
 				],
 				dots: [
-				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 1600, temp: 250, returnTo: 'wally', tag: 'wally'}
+					{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 600, temp: 250, returnTo: 'wally', tag: 'wally'}
 					//{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 600, temp: 100, returnTo: 'wally', tag: 'wally', cleanUpWith: 'prompt0'},
 					//{spcName: 'duckling', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
@@ -27,10 +27,10 @@ LevelData = {
 						// type: 'AuxImage',
 						// attrs: {handle: 'picci', slotNum: 0, imgFunc: 'img("img/work/block0Pic1.jpg")'}
 					// },
-					// {
-						// type: 'Liquid',
-						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 700}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}, makePhaseDiagram: true}
-					// },
+					{
+						type: 'Liquid',
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 700}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3}, makePhaseDiagram: true}
+					},
 					{
 						type: 'DragWeights',
 						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 6}], pInit: 3, cleanUpWith: 'prompt1'}
@@ -65,11 +65,11 @@ LevelData = {
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
 					//{data: 'collisions'}
 				],
-				rxns: [
-					{handle: 'rxn1', rctA: 'ugly', activeE: 10, prods: {uglier: 2}},
-					{handle: 'rxn2', rctA: 'uglier', rctB: 'uglier', activeE: 10, prods: {ugly: 1}}
-					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
-				],
+				// rxns: [
+					// {handle: 'rxn1', rctA: 'ugly', activeE: 10, prods: {uglier: 2}},
+					// {handle: 'rxn2', rctA: 'uglier', rctB: 'uglier', activeE: 10, prods: {ugly: 1}}
+					// //{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
+				// ],
 				dataReadouts: [
 					{label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'}
 					// {label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},
@@ -101,7 +101,7 @@ LevelData = {
 					}
 				],
 				cmmds: [
-					'walls.wally.isothermalStop()',
+					//'walls.wally.isothermalStop()',
 					{type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				],
 				// rxns: [
@@ -164,7 +164,10 @@ LevelData = {
 						}
 					],
 					title: 'wooo!',
-					text: 'Woink.'
+					text: 'Woink.',
+					directions: function(cameFrom) {
+						return 'branchPromptsPostClean(LevelData.auxPrompts.spare)'
+					}
 				},
 				{
 					sceneData: {

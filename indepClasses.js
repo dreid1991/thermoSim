@@ -50,7 +50,7 @@ function Species (spcName, mass, radius, color, idNum, cv, hF298, hVap298, antoi
 	
 }
 Species.prototype = {
-	populate: function(pos, dims, count, temp, tag, elemId, returnTo, dotMgrLocal){
+	populate: function(pos, dims, count, temp, tag, elemId, returnTo, dotMgrLocal) {
 		dotMgrLocal = dotMgrLocal || dotManager;
 		var x = pos.x;
 		var y = pos.y;
