@@ -523,7 +523,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 				function(){
 					var slotPos = slot.pos;
 					var UV = V(slotPos.x-weight.pos.x, slotPos.y-weight.pos.y).UV();
-					if (UV.dx && UV.dy) {
+					if (validNumber(UV.dx) !== false && validNumber(UV.dy) !== false) {
 						weight.pos.x = stepTowards(weight.pos.x, slotPos.x, UV.dx*this.moveSpeed);
 						weight.pos.y = stepTowards(weight.pos.y, slotPos.y, UV.dy*this.moveSpeed);
 					}
@@ -660,7 +660,6 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		removeListener(curLevel, 'mousemove', 'weights');
 		removeListener(curLevel, 'mouseup', 'weights');
 		var dest = this.getDest();
-		var energyChanged = new Boolean();
 		var selected = this.selected;
 		this.dropIntoBin(this.selected, dest)
 		delete this.origPos;
