@@ -415,6 +415,7 @@ Timeline.Section.prototype = {
 				for (var i=0; i<sections.length; i++) {
 					branchTimeline.pushSection(sections[i]);
 				}
+				self.branches[self.promptIdx] = new Timline.Branch(branchTimeline, sections.id);
 				//don't need to clear prompt, that will be taken care of when we resume
 				self.timeline.clearCurrentSection();
 				//self.time += 1e-4;
