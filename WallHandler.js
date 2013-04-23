@@ -153,7 +153,7 @@ WallMethods.main = {
 		}
 		return wallGrid;
 	},
-	setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show, record, tSet, col, dotMgr, close){
+	setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show, record, tSet, col, dotMgr, close, isothermalRate){
 		bounds = defaultTo({yMin:30, yMax: 435}, bounds);
 		include = defaultTo(1, include);
 		this[wallIdx] = pts;
@@ -187,6 +187,7 @@ WallMethods.main = {
 		this[wallIdx].massChunks = {};
 		this[wallIdx].forceInternal = 0;
 		this[wallIdx].pLastRecord = turn;
+		this[wallIdx].isothermalRate = defaultTo(1, isothermalRate);
 		this[wallIdx].mass = 0;
 		this[wallIdx].parent = this;
 		makeListenerHolder(this[wallIdx], 'cleanUp');
@@ -200,7 +201,7 @@ WallMethods.main = {
 	addWall: function(attrs){
 		this.numWalls++;
 		var newIdx = this.length;
-		this.setWallVals(newIdx, attrs.pts, attrs.handle, attrs.bounds, attrs.include, attrs.vol, attrs.show, attrs.record, attrs.temp, attrs.col, attrs.dotManager, attrs.close);
+		this.setWallVals(newIdx, attrs.pts, attrs.handle, attrs.bounds, attrs.include, attrs.vol, attrs.show, attrs.record, attrs.temp, attrs.col, attrs.dotManager, attrs.close, attrs.isothermalRate);
 		this.setupWall(newIdx);
 		this.setWallHandler(newIdx, attrs.handler);
 		if (attrs.border) this[newIdx].addBorder(attrs.border);

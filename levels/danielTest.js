@@ -14,7 +14,7 @@ LevelData = {
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: /*'cVIsothermal'*/'staticAdiabatic', /*temp: 250, */handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}} 
+					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: 'staticAdiabatic', handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}} 
 				],
 				dots: [
 					{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
@@ -27,10 +27,10 @@ LevelData = {
 						// type: 'AuxImage',
 						// attrs: {handle: 'picci', slotNum: 0, imgFunc: 'img("img/work/block0Pic1.jpg")'}
 					// },
-					{
-						type: 'Liquid',
-						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 700}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}, makePhaseDiagram: true}
-					},
+					// {
+						// type: 'Liquid',
+						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 700}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}, makePhaseDiagram: true}
+					// },
 					{
 						type: 'DragWeights',
 						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 6}], pInit: 3, cleanUpWith: 'prompt1'}

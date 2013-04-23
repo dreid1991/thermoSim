@@ -10,7 +10,7 @@ function Timeline(parent, buttonManagerBlank, dashRunBlank, isSectionsBranch, is
 	this.sectionIdx = undefined;
 	this.curId = 0;
 	this.elems = [];
-	this.steppingTowards;
+	this.suspended = false;
 }
 
 Timeline.prototype = {
@@ -39,17 +39,23 @@ Timeline.prototype = {
 			} else if (this.isPromptsBranch) {
 				this.curSection().cleanUpPrompt(forwards);
 			}
-			this.parent.catchSurface(this);
+			this.parent.catchSurface(this, forwards);
 		}
 	},
-	catchSurface: function(caughtTimeline) {
+	catchSurface: function(caughtTimeline, forwards) {
 		window.timeline = this;
+		timeline.suspended = false;
 		this.curSection().pushToGlobal();
 		if (caughtTimeline.isSectionsBranch) {
 			this.curSection().restoreHTML();
 		}
 		//if (!this.sections[this.steppingTowards.sectionIdx].inited) this.sections[this.steppingTowards.sectionIdx].inited = true;
-		this.show(this.steppingTowards.sectionIdx, this.steppingTowards.promptIdx, false, true);
+		if (forwards) {
+			sceneNavigator.nextPrompt(true);
+		} else {
+			sceneNavigator.prevPrompt();
+		}
+		//this.show(this.steppingTowards.sectionIdx, this.steppingTowards.promptIdx, false, true);
 	},
 	findElemBoundsByHandle: function(handle) {
 		var matches = [];
@@ -96,7 +102,7 @@ Timeline.prototype = {
 		return matches;
 	},
 	show: function(sectionIdx, promptIdx, refreshing, forceShowPrompt) {
-		this.steppingTowards = {sectionIdx: sectionIdx, promptIdx: promptIdx};
+		//this.steppingTowards = {sectionIdx: sectionIdx, promptIdx: promptIdx};
 		var changingSection = this.sectionIdx != sectionIdx;
 		var changingPrompt = changingSection || promptIdx != this.sections[sectionIdx].promptIdx || forceShowPrompt;
 		// if (changingPrompt || refreshing) {
@@ -197,14 +203,15 @@ Timeline.Section.prototype = {
 	showPrompt: function(promptIdx) {
 		//should all be rolled into moments now
 		var destTime = this.getTimestamp(promptIdx, 'headHTML');
-		var stepPrompt = this.stepTo(destTime);
-		//if (stepPrompt) {
-			this.promptIdx = promptIdx;
-		//}
+		var suspended = this.stepTo(destTime);
+		if (suspended) {
+			this.timeline.suspended = true;
+			this.promptIdx = Math.floor(this.time) + .5;
+		}
 
 	},
 	stepTo: function(dest) {
-		var stepPrompt = true;
+		var suspended = false;
 		var moments = this.moments;
 		if (dest > this.time || Math.floor(this.time) == Math.floor(dest)) {
 			var curMom = this.momentAt(this.time);
@@ -219,7 +226,7 @@ Timeline.Section.prototype = {
 				this.time = nextMom.timestamp;
 				nextMom.fire(from, this.time);
 				if (Math.abs(nextMom.timestamp - preCleanBranchTimestamp) < 1e-5 || Math.abs(nextMom.timestamp - postCleanBranchTimestamp) < 1e-5) {
-					stepPrompt = false;
+					suspended = true;
 					break;
 				}
 			}
@@ -241,15 +248,17 @@ Timeline.Section.prototype = {
 				nextMom.fire(from, this.time);
 				
 				if (Math.abs(nextMom.timestamp - preCleanBranchTimestamp) < 1e-5 || Math.abs(nextMom.timestamp - postCleanBranchTimestamp) < 1e-5) {
-					this.steppingTowards = dest;
+					//this.steppingTowards = dest;
 					enteredBranch = true;
-					stepPrompt = false;
+					suspended = true;
 					break;
 				}				
 				
 
 			}
+			//maybe only do this if not entering branch
 			this.time = this.getTimestamp(Math.floor(dest), 'setup') - 1e-4;
+			
 			if (!enteredBranch) {
 				while (dest != this.time) {
 					var nextMom = this.nextMoment(this.time);
@@ -260,7 +269,7 @@ Timeline.Section.prototype = {
 				}			
 			} //this will probably need work.  It may not make any sense at all!  How could I know?
 		}
-		return stepPrompt;
+		return suspended;
 
 	},
 	stepToBound: function(up) {

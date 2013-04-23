@@ -145,8 +145,8 @@ WallMethods.collideMethods ={
 		if (this[wallIdx].eToAdd) {
 			var eAddSign = getSign(this[wallIdx].eToAdd);
 			var inTemp = dot.temp();
-			var eToAdd = eAddSign * Math.min(Math.abs(this[wallIdx].eToAdd), dot.cv * 20);
-			if (eToAdd < 0 && inTemp  <= 20) 
+			var eToAdd = eAddSign * Math.min(Math.abs(this[wallIdx].eToAdd), dot.cv * 20 * this[wallIdx].isothermalRate);
+			if (eToAdd < 0 && inTemp  <= 20 * this[wallIdx].isothermalRate) 
 				eToAdd = -(Math.max(0, inTemp - 1)) * dot.cv;
 
 			this[wallIdx].eToAdd -= eToAdd;
