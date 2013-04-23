@@ -31,6 +31,7 @@ function Liquid(attrs) {
 	this.updateListenerName = this.type + this.handle;
 	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs, this.surfAreaObj);
 	this.wallGas.addLiquid(this);
+	this.phaseChangeEnabled = true;
 	this.energyForDots = 0;
 	if (makePhaseDiagram) {
 		this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, this.handle, attrs.primaryKey);
@@ -79,7 +80,17 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 		return nA;
 	},
-	
+	togglePhaseChange: function() {
+		this.phaseChangeEnabled ? this.disablePhaseChange() : this.enablePhaseChange();
+	},
+	enablePhaseChange: function() {
+		window.walls.setWallHandler(this.wallLiq.handle, {func: this.hit, obj: this});
+		this.phaseChangeEnabled = true;
+	},
+	disablePhaseChange: function() {
+		window.walls.setWallHandler(this.wallLiq.handle, {func: this.hitNoPhaseChange, obj: this});
+		this.phaseChangeEnabled = false;
+	},
 	getLiqWallVol: function(spcDefs, counts, dotMgr) {
 		var vol = 0;
 		if (!dotMgr) {
@@ -184,7 +195,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 					calcEquil();
 					drawDots();
 					moveDots();
-					ejectDots();
+					if (self.phaseChangeEnabled) ejectDots();
 					sizeWall();
 					checkUpdatePhase();
 					//Kind of changing methods here, this wrapping functions thing seems a little funny
@@ -397,6 +408,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 		this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
 		
 		
+	},
+	hitNoPhaseChange: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
+		this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
 	},
 	absorbDot: function(dot, drawList, dotMgrLiq, wallLiq, spcDefs, gasTemp) {
 		var dotMgrGas = window.dotManager; 

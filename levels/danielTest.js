@@ -27,16 +27,17 @@ LevelData = {
 						// type: 'AuxImage',
 						// attrs: {handle: 'picci', slotNum: 0, imgFunc: 'img("img/work/block0Pic1.jpg")'}
 					// },
-					// {
-						// type: 'Liquid',
-						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 700}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}, makePhaseDiagram: true}
-					// },
+					{
+						type: 'Liquid',
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 700}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}, makePhaseDiagram: true}
+					},
 					{
 						type: 'DragWeights',
 						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 6}], pInit: 3, cleanUpWith: 'prompt1'}
 					},
 					// {
 						// type: 'ThresholdEnergyPair',
+						// attrs: {spcNameLow: 'ugly', spcNameHigh: 'uglier', thresholdEnergy: 12}
 						// attrs: {spcNameLow: 'ugly', spcNameHigh: 'uglier', thresholdEnergy: 12}
 					// },
 					{
@@ -187,18 +188,18 @@ LevelData = {
 					quiz: [
 						{type: 'multChoice',
 							options:[
-								{text:"## W = -\\int_{V_{1}}^{V_{2}}P_{sys}dV ##", correct: false, messageWrong:"That's not correct"},
-								{text:"## W = - V\\Delta P_{ext} ##", correct: false, messageWrong:"That's not correct"},
+								{text:"## W = -\\int_{V_{1}}^{V_{2}}P_{sys}dV ##", correct: false, message:"That's not correct"},
+								{text:"## W = - V\\Delta P_{ext} ##", correct: false, message:"That's not correct"},
 								{text:"## W = -P_{ext}\\Delta V ##", correct: true},
-								{text:"## W = -T\\Delta V ##", correct: false, messageWrong:"That's not correct"}
+								{text:"## W = -T\\Delta V ##", correct: false, message:"That's not correct"}
 							]
 						},
 						{type: 'multChoice',
 							options:[
-								{text:"fawe", messageWrong:"That's not correct"},
-								{text:"## W = - V\\Delta P_{ext} ##", messageWrong:"That's not correct"},
+								{text:"fawe", message:"That's not correct"},
+								{text:"## W = - V\\Delta P_{ext} ##", message:"That's not correct"},
 								{text:"## W = -P_{ext}\\Delta V ##"},
-								{text:"## W = -T\\Delta V ##", messageWrong:"That's not correct"}
+								{text:"## W = -T\\Delta V ##", message:"That's not correct"}
 							]
 						}
 					]

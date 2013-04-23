@@ -43,7 +43,7 @@ SceneNavigator.prototype = {
 	getNextIdxs: function() {
 		var newSectionIdx = timeline.sectionIdx;
 		var curSection = timeline.curSection();
-		var newPromptIdx = curSection.promptIdx;
+		var newPromptIdx = Math.floor(curSection.promptIdx);
 		if (newPromptIdx+1==curSection.sectionData.prompts.length) {
 			if (newSectionIdx+1 < timeline.sections.length) {
 				newSectionIdx++;
@@ -99,7 +99,7 @@ SceneNavigator.prototype = {
 		var now = timeline.now();
 		var curSectionIdx = now.sectionIdx;
 		var newSectionIdx = curSectionIdx;
-		var curPromptIdx = now.promptIdx;
+		var curPromptIdx = Math.ceil(now.promptIdx);
 		var newPromptIdx = curPromptIdx;
 		if (curPromptIdx==0) {
 			if (curSectionIdx>0) {

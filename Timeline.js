@@ -207,6 +207,8 @@ Timeline.Section.prototype = {
 		if (suspended) {
 			this.timeline.suspended = true;
 			this.promptIdx = Math.floor(this.time) + .5;
+		} else {
+			this.promptIdx = promptIdx;
 		}
 
 	},
