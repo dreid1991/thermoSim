@@ -117,6 +117,12 @@ ReactionHandler = {
 			this.initPair(rxnPair);
 			
 		}
+		// var doubleDecomp = rxn.copy();
+		// doubleDecomp.rctB = doubleDecomp.rctA;
+		// doubleDecomp.rctBDef = doubleDecomp.rctADef;
+		// doubleDecomp.activeE *= 2;
+		// doubleDecomp.doubleProds();
+		// this.initPair(doubleDecomp);
 	},
 
 	hitE: function(a, b, perpAB, perpBA){

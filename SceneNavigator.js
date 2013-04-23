@@ -8,8 +8,9 @@ SceneNavigator.prototype = {
 	refresh: function() {
 		timeline.refresh();
 	},
-	nextPrompt: function(forceAdvance){
+	nextPrompt: function(forceAdvance, checkDirs){
 		//the entry point for the submit button is submitAdvanceFunc in LevelTools
+		checkDirs = defaultTo(true, checkDirs);
 		var curSection = timeline.curSection();
 		var curPrompt = timeline.curPrompt();
 		var now = timeline.now();
@@ -19,7 +20,9 @@ SceneNavigator.prototype = {
 			// if (curPrompt) {
 				// curPrompt.finished = true;
 			// }
-			var dirExpr = this.checkDirections(curPrompt.directions);
+			if (checkDirs) {
+				var dirExpr = this.checkDirections(curPrompt.directions);
+			}
 			instrs = dirExpr ? this.evalDirections(dirExpr) : {advance: true, killbranches: false};
 		
 			if (instrs.killBranches) {

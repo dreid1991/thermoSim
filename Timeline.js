@@ -51,7 +51,7 @@ Timeline.prototype = {
 		}
 		//if (!this.sections[this.steppingTowards.sectionIdx].inited) this.sections[this.steppingTowards.sectionIdx].inited = true;
 		if (forwards) {
-			sceneNavigator.nextPrompt(true);
+			sceneNavigator.nextPrompt(true, false);
 		} else {
 			sceneNavigator.prevPrompt();
 		}
@@ -218,6 +218,7 @@ Timeline.Section.prototype = {
 		if (dest > this.time || Math.floor(this.time) == Math.floor(dest)) {
 			var curMom = this.momentAt(this.time);
 			if (curMom) curMom.fire(this.time, dest);
+			this.time += dest > this.time ? 1e-4 : -1e-4;
 			while (dest != this.time) {
 				var nextMom = this.nextTowardsDest(this.time, dest);
 				if (!nextMom) break;
@@ -236,9 +237,9 @@ Timeline.Section.prototype = {
 			//step back to (dest).9
 			//then jump to (dest).1 for setup, then (dest).2 for html
 			//avoids unnecessary cutscene entering/exiting
-			var enteredBranch = false;
 			var curMom = this.momentAt(this.time);
 			if (curMom) curMom.fire(this.time, dest);
+			this.time -= 1e-4;
 			var reAddElemsDest = this.getTimestamp(Math.floor(dest), 'branchPreClean');
 			while (reAddElemsDest != this.time) {
 				var nextMom = this.nextTowardsDest(this.time, reAddElemsDest);
@@ -251,7 +252,6 @@ Timeline.Section.prototype = {
 				
 				if (Math.abs(nextMom.timestamp - preCleanBranchTimestamp) < 1e-5 || Math.abs(nextMom.timestamp - postCleanBranchTimestamp) < 1e-5) {
 					//this.steppingTowards = dest;
-					enteredBranch = true;
 					suspended = true;
 					break;
 				}				
@@ -259,9 +259,9 @@ Timeline.Section.prototype = {
 
 			}
 			//maybe only do this if not entering branch
-			this.time = this.getTimestamp(Math.floor(dest), 'setup') - 1e-4;
+			if (!suspended) {
+				this.time = this.getTimestamp(Math.floor(dest), 'setup') - 1e-4;
 			
-			if (!enteredBranch) {
 				while (dest != this.time) {
 					var nextMom = this.nextMoment(this.time);
 					if (!nextMom) break;
@@ -363,6 +363,7 @@ Timeline.Section.prototype = {
 	},
 	branchPrompts: function(prompts, timestamp) {
 		var self = this;
+		this.killBranchMoments();
 		var moment = new Timeline.Moment(timestamp);
 		var curTimeline = this.timeline;
 		
@@ -396,6 +397,7 @@ Timeline.Section.prototype = {
 	},
 	branchSections: function(sections) {
 		var self = this;
+		this.killBranchMoments();
 		var timestamp = this.getTimestamp(Math.floor(this.time), 'branchPostClean');
 		var moment = new Timeline.Moment(timestamp);
 		var curTimeline = this.timeline;
@@ -425,16 +427,21 @@ Timeline.Section.prototype = {
 		this.spliceInMoment(moment);
 	},
 	killBranches: function() {
+		this.killBranchMoments();
+		this.branches[this.promptIdx] = undefined;
+
+	},
+	killBranchMoments: function() {
 		var preCleanTimestamp = this.getTimestamp(Math.floor(this.time), 'branchPreClean');
 		var postCleanTimestamp = this.getTimestamp(Math.floor(this.time), 'branchPostClean');
-		var preMom = this.getMomentAt(preCleanTimestamp);
-		var postMom = this.getMomentAt(postCleanTimestamp);
+		var preMom = this.momentAt(preCleanTimestamp);
+		var postMom = this.momentAt(postCleanTimestamp);
 		if (preMom) {
-			this.moments.splice(this.moments.indexOf(preMom, 1));
+			this.moments.splice(this.moments.indexOf(preMom), 1);
 		}
 		if (postMom) {
-			this.moments.splice(this.moments.indexOf(postMom, 1));
-		}
+			this.moments.splice(this.moments.indexOf(postMom), 1);
+		}	
 	},
 	curPrompt: function() {
 		return this.sectionData.prompts[this.promptIdx];

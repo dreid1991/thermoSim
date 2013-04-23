@@ -74,7 +74,12 @@ DataGetFuncs = {
 				val = parseFloat(gotten);
 			} else if (type == 'string') {
 				val = gotten.sanitize();
+			} else if (Number(gotten) == gotten) {
+				val = Number(gotten);
+			} else {
+				val = gotten;
 			}
+			
 			if (isNum) {
 				max = max === undefined || isNaN(max) ? val : max;
 				min = min === undefined || isNaN(min) ? val : min;
