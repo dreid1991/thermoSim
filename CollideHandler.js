@@ -1,7 +1,5 @@
 function CollideHandler(dotManager){
 	this.tConst = tConst;
-	this.cp = cp;
-	this.cv = cv;
 	this.rxns = {};
 	this.dotManager = dotManager;
 	this.activeRxns = [];

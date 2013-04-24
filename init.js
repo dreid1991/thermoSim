@@ -29,9 +29,6 @@ $(function(){
 	N = 1000;//Avagadro's number
 	R = 8.314;
 	KB = R / N;
-	cv = 1.5*R;
-	cp = 2.5*R;
-	//compAdj = '32';
 	extraIntervals = {};
 	vConst = 1/10000;
 	//pConst = 16.1423; //for atm
@@ -48,21 +45,14 @@ $(function(){
 	ACTUALN = 6.022e23;
 	g = 1.75;
 	gInternal = .01;
-	workConst = .158e-3;//for kJ;
 	updateInterval = 30;//500;
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);
 	pxToMS = 19.33821;
 	auxHolderDivs = ['aux1', 'aux2'];
-	promptIdx = 0; //get rid of this as soon as possible
-	sectionIdx = 0; //and this
-	//sliderList = [];  FE
-	//spcs = {};  FE
 	stored = {};
-	//window.dataDisplayer = new DataDisplayer(); FE in
 	addJQueryElems($('button'), 'button');
 	draw = new DrawingTools();
-	//collide = new CollideHandler(); FE
 	turnUpdater = setInterval('curLevel.update()', updateInterval);
 	dataUpdater = setInterval('curLevel.updateData()', dataInterval);
 	attractor = new Attractor();
@@ -77,25 +67,24 @@ $(function(){
 	$('#previous').click(function(){sceneNavigator.prevPrompt()});
 	$('#next').click(function(){sceneNavigator.nextPrompt()});	
 	timeline = new Timeline();
-	//buttonManager = new ButtonManager($('#buttonManager')); FE
-	//dataHandler = new DataHandler(); FE
 	canvasHeight = 450;
 	myCanvas.width = $('#main').width();
 
 	myCanvas.height = canvasHeight;
-	//LevelTools.addSpcs(LevelData.spcDefs, window.spcs); FE
-	
-	LevelTools.addImgsAndQuestionIds(LevelData.mainSequence);
+	var questionId = 0;
+	questionId = LevelTools.addImgsAndQuestionIds(LevelData.mainSequence, questionId);
 	LevelTools.setDefaultPromptVals(LevelData.mainSequence);
 	LevelTools.addTriggerCleanUp(LevelData.mainSequence);
 	LevelTools.addStoreAs(LevelData.mainSequence);
 	LevelTools.transferObjCleanUp(LevelData.mainSequence);
 	LevelTools.showRunDivs();
-	
+	var branchId = 0;
 	for (var auxSectionName in LevelData.auxSections) {
 		var auxSections = LevelData.auxSections[auxSectionName];
 		auxSections = auxSections instanceof Array ? auxSections : [auxSections];
-		LevelTools.addImgsAndQuestionIds(auxSections);
+		questionId = LevelTools.addImgsAndQuestionIds(auxSections, questionId);
+		auxSections.id = branchId;
+		branchId++;
 		LevelTools.setDefaultPromptVals(auxSections);
 		LevelTools.addTriggerCleanUp(auxSections);
 		LevelTools.addStoreAs(auxSections);
@@ -106,7 +95,9 @@ $(function(){
 		var auxPrompts = LevelData.auxPrompts[auxPromptsName];
 		auxPrompts = auxPrompts instanceof Array ? auxPrompts : [auxPrompts];
 		var asSection = {prompts: auxPrompts};
-		LevelTools.addImgsAndQuestionIds(asSection);
+		questionId = LevelTools.addImgsAndQuestionIds(asSection, questionId);
+		auxPrompts.id = branchId;
+		branchId++;
 		LevelTools.setDefaultPromptVals(asSection);
 		LevelTools.addTriggerCleanUp(asSection);
 		LevelTools.addStoreAs(asSection);

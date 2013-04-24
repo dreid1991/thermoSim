@@ -47,8 +47,7 @@ LevelTools = {
 			}
 		}
 	},
-	addImgsAndQuestionIds: function(sections) {
-		var questionId = 0;
+	addImgsAndQuestionIds: function(sections, questionId) {
 		for (var sectionIdx=0; sectionIdx<sections.length; sectionIdx++) {
 			var section = sections[sectionIdx];
 			if (!section.prompts) console.log('Section ' + sectionIdx + ' has no prompts!  Sections must have at least one prompt.');
@@ -78,6 +77,7 @@ LevelTools = {
 				}
 			}
 		}
+		return questionId;
 	},
 	transferObjCleanUp: function(sections) {
 		for (var sectionIdx=0; sectionIdx<sections.length; sectionIdx++) {
