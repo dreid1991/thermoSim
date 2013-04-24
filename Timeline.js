@@ -217,7 +217,7 @@ Timeline.Section.prototype = {
 		var from = this.time;
 		var moments = this.moments;
 		//hey, all the 1e-4 business is to indicate that I'm going past the last moment I want to hit.  1e-5 is to account for rounding error
-		if (dest > this.time || Math.floor(this.time) == Math.floor(dest + 1e-4)) {
+		if (dest > this.time || /*Math.floor(this.time) == Math.floor(dest + 1e-4) && */ (dest < this.time && /htmlhead/i.test(this.getTimestampType(dest)))) {
 			var curMom = this.momentAt(this.time);
 			if (curMom) curMom.fire(this.time, dest);
 			if (curMom) this.time += dest > this.time ? 1e-4 : -1e-4;
@@ -235,7 +235,7 @@ Timeline.Section.prototype = {
 					break;
 				}
 			}
-		} else if (dest < this.time && /htmlhead/i.test(this.getTimestampType(dest))) {
+		} else if (dest < this.time) {
 			//step back to (dest).9
 			//then jump to (dest).1 for setup, then (dest).2 for html
 			//avoids unnecessary cutscene entering/exiting
@@ -740,11 +740,20 @@ Timeline.Section.prototype = {
 	},
 	getTimestampType: function(timestamp) {
 		if (timestamp % 1 == .8) {
-		
-		} else if (timestamp % 1 == .9) {
-		
-		} else if (timestamp % 1 == .1) {
-		} else if (timestamp % 1 
+			return 'tailhtml';
+		} else if (Math.abs(timestamp % 1 - .9) <1e-5) {
+			return 'tail';
+		} else if (Math.abs(timestamp % 1 - .1) <1e-5) {
+			return 'setup';
+		} else if (Math.abs(timestamp % 1 - .2) <1e-5) {
+			return 'headhtml';
+		} else if (Math.abs(timestamp % 1 - .0) <1e-5) {
+			return 'head';
+		} else if (Math.abs(timestamp % 1 - .85) <1e-5) {
+			'branchPreClean';
+		} else if (Math.abs(timestamp % 1 - .15) <1e-5) {
+			'branchPostClean';
+		}
 	},
 	parseIntegerTimeIdx: function(time) {
 		if (typeof time == 'string') {
