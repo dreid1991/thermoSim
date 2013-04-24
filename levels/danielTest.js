@@ -168,9 +168,11 @@ LevelData = {
 					directions: function(cameFrom) {
 						with (DataGetFuncs) {
 							if (get('theAnswer') == '12') {
-								return 'branchPromptsPostClean(LevelData.auxPrompts.spare)'	
+								return 'branchPromptsPostClean(LevelData.auxPrompts.spare)';
+							} else if (get('theAnswer') == '24') {
+								return 'branchSections(LevelData.auxSections.goofy)';
 							} else {
-								return 'advance()'
+								return 'advance()';
 							}
 						}
 					}
@@ -242,7 +244,22 @@ LevelData = {
 	],
 	auxSections: {
 		goofy: [
-		//list of sections
+			{
+				sceneData: {
+					walls: [
+						{pts: [P(50, 50), P(400, 50), P(400, 350), P(50, 350)], handler: 'staticAdiabatic', handle: 'wapple'} 
+					],
+					dots: [
+						{spcName: 'spc1', pos: P(55, 55), dims: V(200, 200), count: 199, temp: 300, returnTo: 'wapple', tag: 'wapple'} 
+					],			
+				},
+				prompts: [
+					{
+						text: 'The wonderful text',
+						title: 'worp'
+					}
+				]
+			}
 		
 		]
 	},

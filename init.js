@@ -84,7 +84,7 @@ $(function(){
 		auxSections = auxSections instanceof Array ? auxSections : [auxSections];
 		questionId = LevelTools.addImgsAndQuestionIds(auxSections, questionId);
 		auxSections.id = branchId;
-		branchId++;
+		branchId ++;
 		LevelTools.setDefaultPromptVals(auxSections);
 		LevelTools.addTriggerCleanUp(auxSections);
 		LevelTools.addStoreAs(auxSections);
@@ -97,7 +97,7 @@ $(function(){
 		var asSection = {prompts: auxPrompts};
 		questionId = LevelTools.addImgsAndQuestionIds(asSection, questionId);
 		auxPrompts.id = branchId;
-		branchId++;
+		branchId ++;
 		LevelTools.setDefaultPromptVals(asSection);
 		LevelTools.addTriggerCleanUp(asSection);
 		LevelTools.addStoreAs(asSection);

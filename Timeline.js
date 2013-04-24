@@ -339,7 +339,7 @@ Timeline.Section.prototype = {
 		if (forward) {
 			destTime = this.getTimestamp(this.sectionData.prompts.length - 1, 'tail');
 		} else {
-			destTime = this.getTimestamp(this.promptIdx, 'head') - 1e-4;
+			destTime = this.getTimestamp(this.promptIdx, 'head');
 		}
 		
 		this.stepTo(destTime);
@@ -373,6 +373,7 @@ Timeline.Section.prototype = {
 			if (self.branches[promptIdx] && self.branches[promptIdx].id == prompts.id) {
 				window.timeline = self.branches[promptIdx].timeline;
 				timeline.sections[0].pushToGlobal();
+				
 				var now = timeline.now()
 				timeline.show(now.sectionIdx, now.promptIdx, false, true);
 			} else {
@@ -404,9 +405,11 @@ Timeline.Section.prototype = {
 		var cmmd = new Timeline.Command('point', function() {
 			var promptIdx = Math.floor(self.time);
 			if (self.branches[promptIdx] && self.branches[promptIdx].id == sections.id) {
+				self.timeline.clearCurrentSection();
 				window.timeline = self.branches[promptIdx].timeline;
 				timeline.sections[timeline.sectionIdx].pushToGlobal();
-				timeline.showHTML();
+				timeline.sections[timeline.sectionIdx].showSection();
+				//timeline.showHTML();//this doesn't actually exist
 				var now = timeline.now()
 				//will have cleaned up prompt on surfacing
 				timeline.show(now.sectionIdx, now.promptIdx, false, true);
@@ -415,7 +418,7 @@ Timeline.Section.prototype = {
 				for (var i=0; i<sections.length; i++) {
 					branchTimeline.pushSection(sections[i]);
 				}
-				self.branches[self.promptIdx] = new Timline.Branch(branchTimeline, sections.id);
+				self.branches[self.promptIdx] = new Timeline.Branch(branchTimeline, sections.id);
 				//don't need to clear prompt, that will be taken care of when we resume
 				self.timeline.clearCurrentSection();
 				//self.time += 1e-4;
