@@ -109,7 +109,7 @@ Timeline.prototype = {
 			// this.sections[sectionIdx].cleanUpPrompt();
 		// }
 		if (changingSection && this.sectionIdx !== undefined) {
-			this.sections[this.sectionIdx].stepToBound(sectionIdx > this.sectionIdx);
+			this.sections[this.sectionIdx].cleanUpPrompt(sectionIdx > this.sectionIdx);
 		}
 
 		if (changingSection || refreshing) {
@@ -215,10 +215,11 @@ Timeline.Section.prototype = {
 	stepTo: function(dest) {
 		var suspended = false;
 		var moments = this.moments;
-		if (dest > this.time || Math.floor(this.time) == Math.floor(dest)) {
+		//hey, all the 1e-4 business is to indicate that I'm going past the last moment I want to hit.  1e-5 is to account for rounding error
+		if (dest > this.time || Math.floor(this.time) == Math.floor(dest + 1e-4)) {
 			var curMom = this.momentAt(this.time);
 			if (curMom) curMom.fire(this.time, dest);
-			this.time += dest > this.time ? 1e-4 : -1e-4;
+			if (curMom) this.time += dest > this.time ? 1e-4 : -1e-4;
 			while (dest != this.time) {
 				var nextMom = this.nextTowardsDest(this.time, dest);
 				if (!nextMom) break;
@@ -227,7 +228,7 @@ Timeline.Section.prototype = {
 				var postCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPostClean');
 				var from = this.time;
 				this.time = nextMom.timestamp;
-				nextMom.fire(from, this.time);
+				nextMom.fire(from, dest);
 				if (Math.abs(nextMom.timestamp - preCleanBranchTimestamp) < 1e-5 || Math.abs(nextMom.timestamp - postCleanBranchTimestamp) < 1e-5) {
 					suspended = true;
 					break;
@@ -239,7 +240,7 @@ Timeline.Section.prototype = {
 			//avoids unnecessary cutscene entering/exiting
 			var curMom = this.momentAt(this.time);
 			if (curMom) curMom.fire(this.time, dest);
-			this.time -= 1e-4;
+			if (curMom) this.time -= 1e-4;
 			var reAddElemsDest = this.getTimestamp(Math.floor(dest), 'branchPreClean');
 			while (reAddElemsDest != this.time) {
 				var nextMom = this.nextTowardsDest(this.time, reAddElemsDest);
@@ -248,7 +249,7 @@ Timeline.Section.prototype = {
 				var postCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPostClean');
 				var from = this.time;
 				this.time = nextMom.timestamp;
-				nextMom.fire(from, this.time);
+				nextMom.fire(from, dest);
 				
 				if (Math.abs(nextMom.timestamp - preCleanBranchTimestamp) < 1e-5 || Math.abs(nextMom.timestamp - postCleanBranchTimestamp) < 1e-5) {
 					//this.steppingTowards = dest;
@@ -267,21 +268,12 @@ Timeline.Section.prototype = {
 					if (!nextMom) break;
 					var from = this.time;
 					this.time = nextMom.timestamp;
-					nextMom.fire(from, this.time);
+					nextMom.fire(from, dest);
 				}			
 			} //this will probably need work.  It may not make any sense at all!  How could I know?
 		}
 		return suspended;
 
-	},
-	stepToBound: function(up) {
-		if (up) {
-			this.stepTo(this.sectionData.prompts.length);
-			this.time = this.sectionData.prompts.length;
-		} else {
-			this.stepTo(0);
-			this.time = 0;
-		}
 	},
 	nextTowardsDest: function(cur, dest) {
 		var curMoment = this.momentAt(cur);
@@ -339,7 +331,7 @@ Timeline.Section.prototype = {
 		if (forward) {
 			destTime = this.getTimestamp(this.sectionData.prompts.length - 1, 'tail');
 		} else {
-			destTime = this.getTimestamp(this.promptIdx, 'head');
+			destTime = this.getTimestamp(this.promptIdx, 'head') - 1e-4;
 		}
 		
 		this.stepTo(destTime);
@@ -955,9 +947,9 @@ Timeline.Moment.prototype = {
 		if (span.active) {
 			var elemDatum = getAndEval(span.elemDatum);
 			if (span.boundType == 'head') {
-				if (to == this.timestamp && from < to) {
+				if (from < to && from < this.timestamp && to < span.partner.moment.timestamp) {
 					span.spawn(span.section, span.timelineElems, span.id, elemDatum);
-				} else if (from == this.timestamp && to < from) {
+				} else if (to < from && to < this.timestamp) {
 					span.remove(span.section, span.timelineElems, span.id);
 					if (span.once) {
 						span.active = false;
@@ -969,7 +961,7 @@ Timeline.Moment.prototype = {
 					span.remove(span.section, span.timelineElems, span.id);
 					if (span.once) 
 						span.active = false;
-				} else if (from > to) {
+				} else if (to < from && to >= span.partner.moment.timestamp) {
 					span.spawn(span.section, span.timelineElems, span.id, elemDatum);
 				}
 			}
@@ -982,7 +974,7 @@ Timeline.Moment.prototype = {
 			if (event instanceof Timeline.Event.Span) {
 				this.fireSpans([event], from, to)
 			} else if (event instanceof Timeline.Event.Point) {
-				if (to == this.timestamp && (event.elemDatum.oneWay ? from < to : true) && event.active) {
+				if (((from < this.timestamp && this.timestamp <= to) || (to <= this.timestamp && this.timestamp < from)) && (event.elemDatum.oneWay ? from < to : true) && event.active) {
 					elemDatum = getAndEval(event.elemDatum);
 					event.spawn(event.section, event.timelineElems, event.id, elemDatum);
 					if (event.once) {

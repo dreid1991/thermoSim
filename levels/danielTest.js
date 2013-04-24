@@ -133,9 +133,9 @@ LevelData = {
 						objs: [
 			
 						],
-						triggers: [
-							{handle: 'trumpet', expr: "pExt('wally') > 3", message: 'la', requiredFor: 'prompt1', checkOn: 'conditions'}
-						],
+						// triggers: [
+							// {handle: 'trumpet', expr: "pExt('wally') > 3", message: 'la', requiredFor: 'prompt1', checkOn: 'conditions'}
+						// ],
 						
 						// objs: [
 							// {
@@ -187,6 +187,15 @@ LevelData = {
 					title: 'titley'
 				},
 				{
+					sceneData: {
+						// cmmds: [
+							// "alert('woop')"
+						// ]
+					},
+					text: 'prompt2',
+					title: 'titley'
+				},
+				{
 					sceneData: undefined,
 					cutScene: true,
 					title: 'hello',
@@ -228,12 +237,21 @@ LevelData = {
 				],
 				dots: [
 					{spcName: 'spc1', pos: P(55, 55), dims: V(200, 200), count: 199, temp: 300, returnTo: 'wapple', tag: 'wapple'} 
-				],			
+				],		
+				objs: [
+					{
+						type: 'DragWeights',
+						attrs: {handle: 'draggy', wallInfo: 'wapple', weightDefs: [{count: 2, pressure: 1}], pInit: .5}
+					}
+				],					
 			},
 			prompts: [
 				{
 					title: 'section 1',
-					text: 'eval(get("theAnswer", "int") * 2) hello people faces'
+					text: 'eval(get("theAnswer", "int") * 2) hello people faces',
+					sceneData: {
+						
+					}
 				}
 			
 			]
@@ -251,11 +269,21 @@ LevelData = {
 					],
 					dots: [
 						{spcName: 'spc1', pos: P(55, 55), dims: V(200, 200), count: 199, temp: 300, returnTo: 'wapple', tag: 'wapple'} 
-					],			
+					],		
+					objs: [
+						{
+							type: 'DragWeights',
+							attrs: {handle: 'draggy', wallInfo: 'wapple', weightDefs: [{count: 2, pressure: 1}], pInit: .5}
+						},
+					],
 				},
 				prompts: [
 					{
 						text: 'The wonderful text',
+						title: 'worp'
+					},
+					{
+						text: 'The superb text',
 						title: 'worp'
 					}
 				]
