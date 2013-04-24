@@ -59,8 +59,7 @@ SceneNavigator.prototype = {
 	},
 	checkDirections: function(dirs) {
 		if (dirs) {
-			var curPrompt = timeline.curPrompt();
-			var whereTo = dirs(curPrompt);
+			var whereTo = dirs();
 			if (whereTo) {
 				return whereTo;
 			}
@@ -69,24 +68,24 @@ SceneNavigator.prototype = {
 	},
 	evalDirections: function(dirExpr) {
 		var directionFuncs = {
-			branchPromptsPreClean: function(prompts) {
+			branchPromptsPreClean: function(prompts, killBranches) {
 				prompts = prompts instanceof Array ? prompts : [prompts];
 				timeline.sections[timeline.sectionIdx].branchPromptsPreClean(prompts);
-				return {advance: true, killBranches: false};
+				return {advance: true, killBranches: defaultTo(false, killBranches)};
 			},
-			branchPromptsPostClean: function(prompts) {
+			branchPromptsPostClean: function(prompts, killBranches) {
 				prompts = prompts instanceof Array ? prompts : [prompts];
 				timeline.sections[timeline.sectionIdx].branchPromptsPostClean(prompts)
-				return {advance: true, killBranches: false};
+				return {advance: true, killBranches: defaultTo(false, killBranches)};
 				//need to check if we are making a branch that already exists or not. If so, do nothing.  It not, kill branches and make new
 			},
-			branchSections: function(sections) {
+			branchSections: function(sections, killBranches) {
 				sections = sections instanceof Array ? sections : [sections];
 				timeline.sections[timeline.sectionIdx].branchSections(sections)
-				return {advance: true, killBranches: false};
+				return {advance: true, killBranches: defaultTo(false, killBranches)};
 			},
-			surface: function() {
-				timeline.surface();
+			surface: function(forwards) {
+				timeline.surface(forwards);
 				return {advance: false, killBranches: false};
 			},
 			advance: function() {

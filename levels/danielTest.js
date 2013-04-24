@@ -165,7 +165,7 @@ LevelData = {
 					],
 					title: 'wooo!',
 					text: 'Woink.',
-					directions: function(cameFrom) {
+					directions: function() {
 						with (DataGetFuncs) {
 							if (get('theAnswer') == '12') {
 								return 'branchPromptsPostClean(LevelData.auxPrompts.spare)';
@@ -284,7 +284,10 @@ LevelData = {
 					},
 					{
 						text: 'The superb text',
-						title: 'worp'
+						title: 'worp',
+						directions: function() {
+							return 'surface(false)';
+						}
 					}
 				]
 			}

@@ -44,7 +44,7 @@ DataGetFuncs = {
 		return src[src.length - 1];
 	},
 	moles: function(wallHandle, args) {
-		var src = walls[wallHandle].getDataSrc('mass', args);
+		var src = walls[wallHandle].getDataSrc('moles', args);
 		return src[src.length - 1];
 	},
 	frac: function(wallHandle, args) {

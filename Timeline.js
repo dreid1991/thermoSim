@@ -214,6 +214,7 @@ Timeline.Section.prototype = {
 	},
 	stepTo: function(dest) {
 		var suspended = false;
+		var from = this.time;
 		var moments = this.moments;
 		//hey, all the 1e-4 business is to indicate that I'm going past the last moment I want to hit.  1e-5 is to account for rounding error
 		if (dest > this.time || Math.floor(this.time) == Math.floor(dest + 1e-4)) {
@@ -226,7 +227,7 @@ Timeline.Section.prototype = {
 				
 				var preCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPreClean');
 				var postCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPostClean');
-				var from = this.time;
+				//var from = this.time;
 				this.time = nextMom.timestamp;
 				nextMom.fire(from, dest);
 				if (Math.abs(nextMom.timestamp - preCleanBranchTimestamp) < 1e-5 || Math.abs(nextMom.timestamp - postCleanBranchTimestamp) < 1e-5) {
@@ -234,7 +235,7 @@ Timeline.Section.prototype = {
 					break;
 				}
 			}
-		} else if (dest < this.time) {
+		} else if (dest < this.time && /htmlhead/i.test(this.getTimestampType(dest))) {
 			//step back to (dest).9
 			//then jump to (dest).1 for setup, then (dest).2 for html
 			//avoids unnecessary cutscene entering/exiting
@@ -247,7 +248,7 @@ Timeline.Section.prototype = {
 				if (!nextMom) break;
 				var preCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPreClean');
 				var postCleanBranchTimestamp = this.getTimestamp(Math.floor(nextMom.timestamp), 'branchPostClean');
-				var from = this.time;
+				//var from = this.time;
 				this.time = nextMom.timestamp;
 				nextMom.fire(from, dest);
 				
@@ -260,8 +261,9 @@ Timeline.Section.prototype = {
 
 			}
 			//maybe only do this if not entering branch
+			//THIS BEHAVIOR MUST BE RESTRICTED TO IF WE'RE ENTERING A SECTION
 			if (!suspended) {
-				this.time = this.getTimestamp(Math.floor(dest), 'setup') - 1e-4;
+				this.time = this.getTimestamp(Math.floor(dest + 1e-4), 'setup') - 1e-4;
 			
 				while (dest != this.time) {
 					var nextMom = this.nextMoment(this.time);
@@ -331,7 +333,7 @@ Timeline.Section.prototype = {
 		if (forward) {
 			destTime = this.getTimestamp(this.sectionData.prompts.length - 1, 'tail');
 		} else {
-			destTime = this.getTimestamp(this.promptIdx, 'head') - 1e-4;
+			destTime = this.getTimestamp(0, 'head') - 1e-4; 
 		}
 		
 		this.stepTo(destTime);
@@ -736,6 +738,14 @@ Timeline.Section.prototype = {
 
 		}
 	},
+	getTimestampType: function(timestamp) {
+		if (timestamp % 1 == .8) {
+		
+		} else if (timestamp % 1 == .9) {
+		
+		} else if (timestamp % 1 == .1) {
+		} else if (timestamp % 1 
+	},
 	parseIntegerTimeIdx: function(time) {
 		if (typeof time == 'string') {
 			if (/section/i.test(time)) {
@@ -949,7 +959,7 @@ Timeline.Moment.prototype = {
 			if (span.boundType == 'head') {
 				if (from < to && from < this.timestamp && to < span.partner.moment.timestamp) {
 					span.spawn(span.section, span.timelineElems, span.id, elemDatum);
-				} else if (to < from && to < this.timestamp) {
+				} else if (to < from && to < this.timestamp && from <= span.partner.moment.timestamp) {
 					span.remove(span.section, span.timelineElems, span.id);
 					if (span.once) {
 						span.active = false;
