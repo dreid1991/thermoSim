@@ -35,11 +35,10 @@ LevelData = {
 						type: 'DragWeights',
 						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 6}], pInit: 3, cleanUpWith: 'prompt1'}
 					},
-					// {
-						// type: 'ThresholdEnergyPair',
-						// attrs: {spcNameLow: 'ugly', spcNameHigh: 'uglier', thresholdEnergy: 12}
-						// attrs: {spcNameLow: 'ugly', spcNameHigh: 'uglier', thresholdEnergy: 12}
-					// },
+					{
+						type: 'ActivationEnergyPair',
+						attrs: {spcNameLow: 'ugly', spcNameHigh: 'uglier', thresholdEnergy: 12}
+					},
 					{
 						type: 'Heater',
 						cleanUpWith: 'prompt1',
@@ -66,11 +65,11 @@ LevelData = {
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
 					//{data: 'collisions'}
 				],
-				rxns: [
-					{handle: 'rxn1', rctA: 'ugly', activeE: 10, prods: {uglier: 2}},
-					{handle: 'rxn2', rctA: 'uglier', rctB: 'uglier', activeE: 10, prods: {ugly: 1}}
-					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
-				],
+				// rxns: [
+					// {handle: 'rxn1', rctA: 'ugly', activeE: 10, prods: {uglier: 2}},
+					// {handle: 'rxn2', rctA: 'uglier', rctB: 'uglier', activeE: 10, prods: {ugly: 1}}
+					// //{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
+				// ],
 				dataReadouts: [
 					{label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'}
 					// {label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},

@@ -1,4 +1,4 @@
-function ThresholdEnergySpcChanger(collideHandler) {
+function ActivationEnergySpcChanger(collideHandler) {
 	this.collideHandler = collideHandler;
 	this.pairs = {}; //map of spcName to the threshold data, which is high/low
 	this.active = false;
@@ -6,7 +6,7 @@ function ThresholdEnergySpcChanger(collideHandler) {
 	this.breakUpFunc = this.makeBreakUpFunc();
 }
 // the pair object is not an attribute of the changer to make this fit into the object framework
-ThresholdEnergySpcChanger.prototype = {
+ActivationEnergySpcChanger.prototype = {
 	addPair: function(pairObj) {
 		//have check that spc names exist by this point
 		var nameLow = pairObj.spcNameLow;
@@ -16,7 +16,7 @@ ThresholdEnergySpcChanger.prototype = {
 		} else {
 			this.pairs[pairObj.spcNameLow] = pairObj;
 			this.pairs[pairObj.spcNameHigh] = pairObj;
-			if (!this.active) this.addThresholdBreakUp();
+			if (!this.active) this.addActiveEBreakUp();
 		}
 		
 	},
@@ -28,7 +28,7 @@ ThresholdEnergySpcChanger.prototype = {
 			this.restoreBreakUp();
 		}
 	},
-	addThresholdBreakUp: function() {
+	addActiveEBreakUp: function() {
 		this.collideHandler.breakUp = this.breakUpFunc;
 	},
 	restoreBreakUp: function() {
@@ -42,17 +42,17 @@ ThresholdEnergySpcChanger.prototype = {
 			var pairB = self.pairs[b.spcName];
 			if (pairA) {
 				kineticEnergy = a.kineticEnergy();
-				if (pairA.thresholdEnergy >= kineticEnergy && a.spcName == pairA.spcNameHigh) {
+				if (pairA.activationEnergy >= kineticEnergy && a.spcName == pairA.spcNameHigh) {
 					dotManager.changeDotSpc([a], pairA.spcNameLow);
-				} else if (pairA.thresholdEnergy < kineticEnergy && a.spcName == pairA.spcNameLow) {
+				} else if (pairA.activationEnergy < kineticEnergy && a.spcName == pairA.spcNameLow) {
 					dotManager.changeDotSpc([a], pairA.spcNameHigh);
 				}
 			}
 			if (pairB) {
 				kineticEnergy = b.kineticEnergy();
-				if (pairB.thresholdEnergy >= kineticEnergy && b.spcName == pairB.spcNameHigh) {
+				if (pairB.activationEnergy >= kineticEnergy && b.spcName == pairB.spcNameHigh) {
 					dotManager.changeDotSpc([b], pairB.spcNameLow);
-				} else if (pairB.thresholdEnergy < kineticEnergy && b.spcName == pairB.spcNameLow) {
+				} else if (pairB.activationEnergy < kineticEnergy && b.spcName == pairB.spcNameLow) {
 					dotManager.changeDotSpc([b], pairB.spcNameHigh);
 				}			
 			}

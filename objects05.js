@@ -98,14 +98,14 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 
 })
 
-function ThresholdEnergyPair(attrs) {
+function ActivationEnergyPair(attrs) {
 	this.type = 'ThresholdEnergyPair';
 	if (spcs[attrs.spcNameLow] && spcs[attrs.spcNameHigh]) {
 		this.spcNameLow = attrs.spcNameLow;
 		this.spcNameHigh = attrs.spcNameHigh;
 		this.spcDefLow = spcs[this.spcNameLow];
 		this.spcDefHigh = spcs[this.spcNameHigh];
-		this.thresholdEnergy = attrs.thresholdEnergy;
+		this.activationEnergy = attrs.activationEnergy;
 		this.addToChanger();
 		this.setupStd();
 	} else {
@@ -113,11 +113,11 @@ function ThresholdEnergyPair(attrs) {
 		console.log('The names are ' + attrs.spcNameLow + ' and ' + attrs.spcNameHigh);
 	}
 }
-_.extend(ThresholdEnergyPair.prototype, objectFuncs, {
+_.extend(ActivationEnergyPair.prototype, objectFuncs, {
 	addToChanger: function() {
-		thresholdEnergySpcChanger.addPair(this);
+		activationEnergySpcChanger.addPair(this);
 	},
 	remove: function() {
-		thresholdEnergySpcChanger.removePair(this);
+		activationEnergySpcChanger.removePair(this);
 	}
 })

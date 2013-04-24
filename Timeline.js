@@ -164,7 +164,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	this.dataDisplayer = new DataDisplayer();
 	
 	this.conditionManager = conditionManager ? conditionManager.stripForInheritance() : new ConditionManager();
-	this.thresholdEnergySpcChanger = new ThresholdEnergySpcChanger(this.collide);
+	this.activationEnergySpcChanger = new ActivationEnergySpcChanger(this.collide);
 	this.buttonManager = new ButtonManager('buttonManager');
 	this.spcs = {};
 	LevelTools.addSpcs(LevelData.spcDefs, this.spcs, this.dotManager);
@@ -462,7 +462,7 @@ Timeline.Section.prototype = {
 		this.sliderList = section.sliderList;
 		this.buttonManager = section.buttonManager;
 		this.dataHandler = section.dataHandler;
-		this.thresholdEnergySpcChanger = section.thresholdEnergySpcChanger;
+		this.activationEnergySpcChanger = section.activationEnergySpcChanger;
 		//not inheriting condition manager.  That is prompt index specific and not really part of the state
 	},
 	pushToGlobal: function() {
@@ -475,7 +475,7 @@ Timeline.Section.prototype = {
 		window.sliderList = this.sliderList;
 		window.buttonManager = this.buttonManager;
 		window.dataHandler = this.dataHandler;
-		window.thresholdEnergySpcChanger = this.thresholdEnergySpcChanger;
+		window.activationEnergySpcChanger = this.activationEnergySpcChanger;
 		window.conditionManager = this.conditionManager;
 
 	},
@@ -642,7 +642,6 @@ Timeline.Section.prototype = {
 			this.applySpanToMoments(timeline, moments, elems, sceneData.graphs, 'objs', timestamp, Timeline.stateFuncs.graphs.spawn, Timeline.stateFuncs.graphs.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.rxns, 'objs', timestamp, Timeline.stateFuncs.rxns.spawn, Timeline.stateFuncs.rxns.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.buttonGroups, 'objs', timestamp, Timeline.stateFuncs.buttonGrps.spawn, Timeline.stateFuncs.buttonGrps.remove);
-			//this.applySpanToMoments(timeline, moments, elems, sceneData.buttons, 'objs', timestamp, Timeline.stateFuncs.buttons.spawn, Timeline.stateFuncs.buttons.remove);
 			this.applyCmmdsToMoments(timeline, moments, elems, sceneData.cmmds, 'cmmds', timestamp);
 
 		}
@@ -871,9 +870,14 @@ Timeline.stateFuncs = {
 	buttonGrps: {
 		spawn: function(section, elems, id, grpDatum) {
 			section.buttonManager.addGroup(grpDatum.handle, grpDatum.label, grpDatum.prefIdx, grpDatum.isRadio, grpDatum.isToggle);
-			for (var i=0; i<grpDatum.buttons.length; i++) {
-				var buttonDatum = grpDatum.buttons[i];
-				section.buttonManager.addButton(grpDatum.handle, buttonDatum.handle, buttonDatum.label, buttonDatum.exprs, buttonDatum.prefIdx, buttonDatum.isDown);
+			if (grpDatum.buttons) {
+				for (var i=0; i<grpDatum.buttons.length; i++) {
+					var buttonDatum = grpDatum.buttons[i];
+					section.buttonManager.addButton(grpDatum.handle, buttonDatum.handle, buttonDatum.label, buttonDatum.exprs, buttonDatum.prefIdx, buttonDatum.isDown);
+				}
+			} else {
+				console.log('Button group ' + grpDatum.handle + ' has no buttons.  Just thought you should know.  This object is logged below.');
+				console.log(grpDatum);
 			}
 			elems[id] = grpDatum;
 		},

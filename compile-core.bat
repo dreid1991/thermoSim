@@ -30,7 +30,7 @@ java -jar ../compiler.jar ^
 --js WallMethodsBorder.js ^
 --js ButtonManager.js ^
 --js QuizRenderer.js ^
---js ThresholdEnergySpcChanger.js ^
+--js ActivationEnergySpcChanger.js ^
 --js ConditionManager.js ^
 --js objects01.js ^
 --js objects02.js ^
