@@ -285,9 +285,9 @@ LevelData = {
 					{
 						text: 'The superb text',
 						title: 'worp',
-						directions: function() {
-							return 'surface(false)';
-						}
+						// directions: function() {
+							// return 'surface()';
+						// }
 					}
 				]
 			}

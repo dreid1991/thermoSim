@@ -106,7 +106,10 @@ objectFuncs = {
 			sliderTitleWrapper = sliderWrapper;
 		}
 		var sliderId = 'slider' + this.handle.toCapitalCamelCase();
-		this.sliderWrappers = makeSlider(sliderTitleWrapper, sliderWrapper, sliderId, title, attrs, handlers);
+		var sliderWrapper = makeSlider(sliderTitleWrapper, sliderWrapper, sliderId, title, attrs, handlers)
+		if (!this.sliderWrapperIds) this.sliderWrapperIds = [];
+		this.sliderWrapperIds.push($(sliderTitleWrapper).attr('id'));
+		this.sliderWrapperIds.push($(sliderWrapper).attr('id'));
 		return sliderId;
 	},
 	checkForMigrateCenter: function() {
@@ -125,8 +128,10 @@ objectFuncs = {
 	},//DOESN'T WORK  MUST MIGRATE ALL BOUND FUNCTIONS AS WELL, I THINK
 	removeSlider: function() {
 		//can be seperate wrappers for title, slider
-		for (var wrapperIdx=0; wrapperIdx<this.sliderWrappers.length; wrapperIdx++) {
-			this.sliderWrappers[wrapperIdx].html('');
+		if (this.sliderWrapperIds) {
+			for (var wrapperIdx=0; wrapperIdx<this.sliderWrapperIds.length; wrapperIdx++) {
+				$('#' + this.sliderWrapperIds[wrapperIdx]).html('');
+			}
 		}
 		
 	},

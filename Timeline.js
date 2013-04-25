@@ -217,7 +217,7 @@ Timeline.Section.prototype = {
 		var from = this.time;
 		var moments = this.moments;
 		//hey, all the 1e-4 business is to indicate that I'm going past the last moment I want to hit.  1e-5 is to account for rounding error
-		if (dest > this.time || /*Math.floor(this.time) == Math.floor(dest + 1e-4) && */ (dest < this.time && /htmlhead/i.test(this.getTimestampType(dest)))) {
+		if (dest > this.time || /*Math.floor(this.time) == Math.floor(dest + 1e-4) && */ (dest < this.time && !/headhtml/i.test(this.getTimestampType(dest)))) {
 			var curMom = this.momentAt(this.time);
 			if (curMom) curMom.fire(this.time, dest);
 			if (curMom) this.time += dest > this.time ? 1e-4 : -1e-4;

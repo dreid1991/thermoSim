@@ -248,7 +248,7 @@ Color.prototype = {
 		if (r.length==1) {r = '0'+r;}
 		if (g.length==1) {g = '0'+g;}
 		if (b.length==1) {b = '0'+b;}
-		this.hex = r+g+b;
+		this.hex = '#' + r + g + b;
 	},
 	copy: function(){
 		return new Color(this.r, this.g, this.b);
