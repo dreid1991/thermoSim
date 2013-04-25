@@ -14,8 +14,9 @@ QuizRenderer.prototype = {
 
 			$(appendTo).append(wrapperHTML);
 			var wrapper = $('#quizWrapper');
-			$(quizWrapper).append(contentHTML);
-			$(quizWrapper).append(footerHTML);
+
+			$(wrapper).append(contentHTML);
+			$(wrapper).append(footerHTML);
 			
 			var content = $('#quizContent');
 			var footer = $('#quizFooter');		
@@ -60,7 +61,7 @@ QuizRenderer.prototype = {
 	renderMultChoice: function(question, appendTo) {
 		var options = question.options;
 		//do I even close this table?  What is going on?
-		var html = '<br><table width=100%<tr><td width=10%></td><td>';
+		var html = '<table width=100%<tr><td width=10%></td><td>';
 		for (var i=0; i<options.length; i++) {
 			var option = options[i];
 			var id = question.storeAs + String(i);
