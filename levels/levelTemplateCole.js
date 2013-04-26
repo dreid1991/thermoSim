@@ -37,7 +37,7 @@ LevelData = {
 					{//Prompt 1
 						sceneData:undefined,
 						cutScene:true,
-						text: "$$ W = -P_{ext}\\Delta V $$ <p> Indeed. This equation tells us that work done on a system is equal to how hard you compress a container per area times how much you compress it. <p> Now from the first law, we know $$ \\Delta U = Q + W $$ <p> For our adiabatic system, which of the following relations is correct, if we asume constant heat capacity?",
+						text: "$$ W = -P_{ext}\\Delta V $$ <p> Indeed. This equation tells us that work done on a system is equal to how hard you compress a container per area times how much you compress it. <p> Now from the first law, we know </p>$$ \\Delta U = Q + W $$  For our adiabatic system, which of the following relations is correct, if we asume constant heat capacity?",
 						quiz: [
 							{type: 'multChoice',
 								options:[
@@ -211,6 +211,7 @@ LevelData = {
 						],
 						objs: [
 							{type: 'Stops',
+							cleanUpWith: 'prompt4',
 								attrs: { handle: 'stopper', wallInfo: 'ThirdWall', stopPt: {vol: 15}}
 							}
 						]

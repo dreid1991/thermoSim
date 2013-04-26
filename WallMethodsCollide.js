@@ -170,13 +170,28 @@ WallMethods.collideMethods ={
 		// this[wallIdx].forceInternal += dot.m*(perpV + v.dy);
 	// },
 	cVAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
-		var tempO = dot.temp();
-		var v = dot.v;
-		var dotVyF = -v.dy + 2*walls[wallIdx].v;
-		this[wallIdx].forceInternal += 2 * dot.m * perpV;
-		var tempUnAdj = tConst * .5 * dot.m * (dot.v.dx*dot.v.dx + dotVyF*dotVyF); //with cv = R
-		dot.setTemp(tempO + (tempUnAdj - tempO) * dot.cvKinetic / dot.cv);
-		if (dot.v.dy * dotVyF < 0) dot.v.dy *= -1;
+		/*
+		This is usually used for just one molecule, so the correct heat transfer behavior is not really important.
+		The heat capacity adjustment can lead to the dot's speed converging to the wall's speed, which makes it constantly hit the wall and look funny
+		It behaves fine in a many-molecule case, but in this case, just doing an elastic collision is better
+		*/
+		dot.v.dy = -dot.v.dy + 2 * this[wallIdx].v;
+		
+		// var tempO = dot.temp();
+		// console.log('new');
+		// console.log('init temp ' + tempO);
+		// console.log('init dot.v.dy ' + dot.v.dy);
+		// var v = dot.v;
+		// var dotVyF = -v.dy + 2*walls[wallIdx].v; //can do 'this' instead of walls
+		// console.log(walls[wallIdx].v);
+		// console.log('unadjusted dotVyF ' + dotVyF);
+		// this[wallIdx].forceInternal += 2 * dot.m * perpV;
+		// var tempUnAdj = tConst * .5 * dot.m * (dot.v.dx*dot.v.dx + dotVyF*dotVyF); //with cv = R
+		// console.log('temp unadj ' + tempUnAdj);
+		// dot.setTemp(tempO + (tempUnAdj - tempO) * dot.cvKinetic / dot.cv);
+		// console.log('temp adj ' + dot.temp());
+		// if (dot.v.dy * dotVyF < 0) dot.v.dy *= -1;
+		// console.log('final dot.v.dy ' + dot.v.dy);
 
 	},
 	reflect: function(dot, wallUV, perpV){

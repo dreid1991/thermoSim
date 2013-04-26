@@ -1,9 +1,8 @@
 //need to interp all this stuff before rendering, yo
-function Timeline(parent, buttonManagerBlank, dashRunBlank, isSectionsBranch, isPromptsBranch) { //make it so it can inherit blanks as well
+function Timeline(parent, buttonManagerBlank, isSectionsBranch, isPromptsBranch) { //make it so it can inherit blanks as well
 	this.parent = parent;
 	//cloning return jquery reference rather than deepcopy if done before page fully loaded
 	this.buttonManagerBlank = buttonManagerBlank || document.getElementById('buttonManager').outerHTML;
-	this.dashRunBlank = dashRunBlank || document.getElementById('dashRun').outerHTML;
 	this.isSectionsBranch = isSectionsBranch || false;
 	this.isPromptsBranch = isPromptsBranch || false;
 	this.sections = [];
@@ -21,7 +20,7 @@ Timeline.prototype = {
 		return this.sections[this.sectionIdx].curPrompt();
 	},
 	pushSection: function(sectionData) {
-		this.sections.push(new Timeline.Section(this, sectionData, this.buttonManagerBlank, this.dashRunBlank));
+		this.sections.push(new Timeline.Section(this, sectionData, this.buttonManagerBlank));
 	},
 	clearCurrentSection: function() {
 		if (this.sectionIdx !== undefined) 
@@ -131,7 +130,7 @@ Timeline.prototype = {
 		var curPromptIdx = this.sections[this.sectionIdx].promptIdx;
 		var curSection = this.sections[this.sectionIdx];
 		var conditionMgr = curSection.conditionManager;
-		var newSectionInstance = new Timeline.Section(this, curSection.sectionData, this.buttonManagerBlank, this.dashRunBlank, conditionMgr);
+		var newSectionInstance = new Timeline.Section(this, curSection.sectionData, this.buttonManagerBlank, conditionMgr);
 		//curSection.cleanUpPrompt();
 		curSection.clear();
 		this.sections.splice(this.sectionIdx, 1, newSectionInstance);
@@ -143,7 +142,7 @@ Timeline.prototype = {
 
 }
 
-Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBlank, conditionManager) {
+Timeline.Section = function(timeline, sectionData, buttonManagerBlank, conditionManager) {
 //need to make clean up listeners still
 	this.timeline = timeline;
 	this.inited = false
@@ -175,13 +174,16 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, dashRunBl
 	this.level.dataHandler = this.dataHandler;
 	this.buttonMangerClone;
 	this.buttonManagerBlank = buttonManagerBlank;
-	this.dashRunClone;
-	this.dashRunBlank = dashRunBlank;
+	this.dashRunId = 'dashRun' + (window.dashRunId++);
+	this.dashRun = $('#dashRunBlank').clone(true).attr('id', this.dashRunId);
+	$('#dashRunWrapper').append(this.dashRun);
 }
 
 Timeline.Section.prototype = {
 	showSection: function(curSectionIdx) {
-		this.replaceDiv($('#dashRunWrapper'), $('#dashRun'), this.dashRunClone || this.dashRunBlank);
+		//this.replaceDiv($('#dashRunWrapper'), $('#dashRun'), this.dashRunClone || this.dashRunBlank);
+		this.dashRun.show();
+		this.dashRun.attr('id', 'dashRun');
 		this.replaceDiv($('#buttonManagerWrapper'), $('#buttonManager'), this.buttonManagerClone || this.buttonManagerBlank);
 		this.pushToGlobal();
 
@@ -195,7 +197,8 @@ Timeline.Section.prototype = {
 		}
 	},
 	restoreHTML: function() {
-		this.replaceDiv($('#dashRunWrapper'), $('#dashRun'), this.dashRunClone || this.dashRunBlank);
+		this.dashRun.show();
+		this.dashRun.attr('id', 'dashRun');
 		this.replaceDiv($('#buttonManagerWrapper'), $('#buttonManager'), this.buttonManagerClone || this.buttonManagerBlank);
 		this.restoreGraphs();
 		this.restoreAuxs();
@@ -371,7 +374,7 @@ Timeline.Section.prototype = {
 				var now = timeline.now()
 				timeline.show(now.sectionIdx, now.promptIdx, false, true);
 			} else {
-				var branchTimeline = new Timeline(curTimeline, undefined, undefined, false, true);
+				var branchTimeline = new Timeline(curTimeline, undefined, false, true);
 				self.branches[promptIdx] = new Timeline.Branch(branchTimeline, prompts.id);
 				branchTimeline.pushSection({prompts: prompts});
 				branchTimeline.sections[0].inheritState(self);
@@ -408,7 +411,7 @@ Timeline.Section.prototype = {
 				//will have cleaned up prompt on surfacing
 				timeline.show(now.sectionIdx, now.promptIdx, false, true);
 			} else {
-				var branchTimeline = new Timeline(curTimeline, curTimeline.buttonManagerBlank, curTimeline.dashRunBlank, true, false);
+				var branchTimeline = new Timeline(curTimeline, curTimeline.buttonManagerBlank, true, false);
 				for (var i=0; i<sections.length; i++) {
 					branchTimeline.pushSection(sections[i]);
 				}
@@ -495,8 +498,10 @@ Timeline.Section.prototype = {
 			this.buttonManagerClone = $('#buttonManager').clone(true);
 			$('#buttonManager').html('');
 			$('#baseHeader').html('')
-			this.dashRunClone = $('#dashRun').clone(true);
-			$('#dashRun').remove();
+			this.dashRun.attr('id', this.dashRunId);
+			this.dashRun.hide();
+			//this.dashRunClone = $('#dashRun').clone(true);
+			//$('#dashRun').remove();
 			for (var graphName in this.level.graphs) {
 				var graph = this.level.graphs[graphName];
 				graph.clearHTML();
