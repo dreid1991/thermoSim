@@ -417,13 +417,13 @@ button.ui-button.sim::-moz-focus-inner { border: 0; padding: 0; } /* reset extra
 
 .ui-tabs .ui-tabs-nav li.sim { list-style: none; float: left; position: relative; top: 0; margin: 1px .2em 0 0; border-bottom: 0; padding: 0; white-space: nowrap; }
 
-.ui-tabs .ui-tabs-nav li a.sim { float: left; padding: .5em 1em; text-decoration: none; }
+.ui-tabs .ui-tabs-nav li.sim a.sim { float: left; padding: .5em 1em; text-decoration: none; }
 
 .ui-tabs .ui-tabs-nav li.ui-tabs-active.sim { margin-bottom: -1px; padding-bottom: 1px; }
 
-.ui-tabs .ui-tabs-nav li.ui-tabs-active a.sim, .ui-tabs .ui-tabs-nav li.ui-state-disabled a.sim, .ui-tabs .ui-tabs-nav li.ui-tabs-loading a.sim { cursor: text; }
+.ui-tabs .ui-tabs-nav li.ui-tabs-active.sim a.sim, .ui-tabs .ui-tabs-nav li.ui-state-disabled.sim a.sim, .ui-tabs .ui-tabs-nav li.ui-tabs-loading.sim a.sim { cursor: text; }
 
-.ui-tabs .ui-tabs-nav li a.sim, .ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-active a.sim { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
+.ui-tabs .ui-tabs-nav li.sim a.sim, .ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-active.sim a.sim { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
 
 .ui-tabs .ui-tabs-panel.sim { display: block; border-width: 0; padding: 1em 1.4em; background: none; }
 

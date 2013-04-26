@@ -135,6 +135,10 @@ function Col(r, g, b){
 	return new Color(r, g, b);
 }
 
+
+function ValObj(x) {
+	this.x = x;
+}
 Vector.prototype = {
 	UV: function(){
 		var mag = Math.sqrt(this.dx*this.dx + this.dy*this.dy);

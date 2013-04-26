@@ -66,6 +66,7 @@ $(function(){
 	$('#toLastStep').click(function(){sceneNavigator.prevPrompt()});
 	$('#previous').click(function(){sceneNavigator.prevPrompt()});
 	$('#next').click(function(){sceneNavigator.nextPrompt()});	
+	var dashRunId = new ValObj(0);
 	timeline = new Timeline();
 	canvasHeight = 450;
 	myCanvas.width = $('#main').width();
