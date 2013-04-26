@@ -7,7 +7,7 @@ function ButtonManager(wrapperDivId) {
 }
 //should add clean up with stuff
 ButtonManager.prototype = {
-	addGroup: function(handle, label, prefIdx, isRadio, isToggle, cleanUpWith) {
+	addGroup: function(handle, label, prefIdx, isRadio, isToggle) {
 		var mgrWrapper = $('#' + this.wrapperDivId);
 		var groupId = 'group' + handle;
 		var wrapperId = groupId + 'Wrapper';
@@ -17,7 +17,7 @@ ButtonManager.prototype = {
 		var groupWrapperHTML = templater.div({attrs: {id: [wrapperId], handle: [handle], class: ['buttonManagerElem', 'displayText', 'buttonGroupWrapper']}, innerHTML: wrapperInner});
 		var groupPadderHTML = templater.div({attrs: {id: [padderId], handle: [handle], class: ['buttonManagerElem', 'buttonGroupPadder']}, innerHTML: groupWrapperHTML});
 		mgrWrapper.append(groupPadderHTML);
-		this.groups.push(new ButtonManager.Group(mgrWrapper, groupId, handle, label, prefIdx, isRadio, isToggle, cleanUpWith));
+		this.groups.push(new ButtonManager.Group(mgrWrapper, groupId, handle, label, prefIdx, isRadio, isToggle));
 	},
 	removeGroup: function(groupHandle) {
 		var group = this.getGroup(groupHandle);
@@ -38,15 +38,6 @@ ButtonManager.prototype = {
 			console.log('Bad group handle ' + groupHandle);
 		}
 	},
-	// cleanUp: function(type) {
-		// for (var grpIdx=this.groups.length - 1; grpIdx>=0; grpIdx--) {
-			// if (this.groups[grpIdx].cleanUpWith == type) {
-				// this.removeGroup(this.groups[grpIdx].handle);
-			// } else {
-				// this.groups[grpIdx].cleanUp(type);
-			// }
-		// }
-	// },
 	getGroupDiv: function(group) {
 		var children = $('#' + this.wrapperDivId).children();
 		for (var i=0; i<children.length; i++) {
@@ -112,6 +103,7 @@ ButtonManager.prototype = {
 		}
 	},
 	addButton: function(groupHandle, handle, label, exprs, prefIdx, isDown) {
+		//exprs can be string/func/array or {mouseDown: samestuff, mouseup: samestuff}
 		var group = this.getGroup(groupHandle);
 		if (group)
 			group.addButton(handle, label, exprs, prefIdx, isDown);
@@ -206,18 +198,29 @@ ButtonManager.Group.prototype = {
 		var buttonJQ = $('button#' + buttonId);
 		addJQueryElems(buttonJQ, 'button');
 		var button = this.buttons[this.buttons.length - 1];
-		var cb = button.cb;
+		var click = button.click;
+		var mousedown = button.mousedown;
+		var mouseup = button.mouseup;
+		//hey - mouseup and mousedown only work for non-toggles and non-radios
 		if (this.isRadio) {
-			cb = this.wrapInRadio(button, cb);
+			click = this.wrapInRadio(button, click);
 		} else if (this.isToggle) {
-			cb = this.wrapInToggle(button, cb);
+			click = this.wrapInToggle(button, click);
 		}
 		if (isDown && this.isRadio) {
 			this.pushRadio(button);
 		} else if (isDown && this.isToggle) {
 			this.toggleButton(button);
 		}
-		$(buttonJQ).click(cb);
+		if (click) {
+			$(buttonJQ).click(click);
+		} 
+		if (mousedown) {
+			$(buttonJQ).mousedown(mousedown);
+		}
+		if (mouseup) {
+			$(buttonJQ).mouseup(mouseup);
+		}
 	},
 	removeButton: function(buttonHandle) {
 		var button = this.getButton(buttonHandle);
@@ -289,18 +292,41 @@ ButtonManager.Button = function(handle, buttonId, wrapperId, label, exprs, prefI
 	this.buttonId = buttonId;
 	this.wrapperId = wrapperId;
 	this.label = label;
-	if (typeof exprs == 'function') {
-		this.cb = exprs;
+	this.click;
+	this.mousedown;
+	this.mouseup;
+	if (exprs.mousedown || exprs.mouseup) {
+		if (exprs.mousedown) {
+			this.mousedown = this.wrapExprs(exprs.mousedown);
+		}
+		if (exprs.mouseup) {
+			this.mouseup = this.wrapExprs(exprs.mouseup);
+		}
 	} else {
-		this.cb = this.wrapExprs(exprs);
+		this.click = this.wrapExprs(exprs)
 	}
+	// if (typeof exprs == 'function') {
+		// this.click = exprs;
+	// } else if (typeof exprs == 'string' || exprs instanceof Array) {
+		// this.click = this.wrapExprs(exprs)
+	// } else if (exprs.mousedown) {
+		// this.mousedown = this.wrapExprs(exprs.mousedown);
+	// } else if (exprs.mouseup) {
+		// this.mouseup = this.wrapExprs(exprs.mouseup);
+	// }
+
 	this.prefIdx = prefIdx;
 }
 
 ButtonManager.Button.prototype = {
 	wrapExprs: function(exprs) {
-		exprStr = exprs.join(';') + ';';
-		var func;
+		if (typeof exprs == 'function') return exprs;
+		var func, exprStr;
+		if (exprs instanceof Array) {
+			exprStr = exprs.join(';') + ';';
+		} else {
+			exprStr = exprs + ';';
+		}
 		with (DataGetFuncs) {
 			func = eval('(function() {return ' + exprStr + '})');
 		}

@@ -438,14 +438,6 @@ function recursiveAddClass(elem, HTMLClass) {
 	
 }
 
-function addButton(id, text, divId){
-	divId = defaultTo('buttons', divId);
-	$('.active #'+divId).append(templater.button({attrs: {id: [id]}, innerHTML: text}));
-	var button = $('button#'+id);
-	addJQueryElems(button, 'button');
-	return button;
-}
-
 
 function hideSliders(){
 	for (var handleIdx=0; handleIdx<sliderList.length; idIdx++){

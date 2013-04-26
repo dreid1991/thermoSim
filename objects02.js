@@ -72,14 +72,32 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		return this;
 	},
 	makeButtons: function(){
-		addButton(this.buttonAddId, 'Add mass');
-		addButton(this.buttonRemoveId, 'Remove mass');
 		var self = this;
-		$('#'+this.buttonAddId).mousedown(function(){self.buttonAddDown()});
-		//$('#'+this.buttonAddId).mouseup(function(){self.buttonAddUp()});
+		var groupHandle = this.handle + 'SandButtons';
+		buttonManager.addGroup(groupHandle, 'Sand controls');
+		//groupHandle, handle, label, exprs, prefIdx, isDown)
+		buttonManager.addButton(groupHandle, 'add', 'Add mass', 
+			{mousedown: function() 
+				{
+					self.buttonAddDown();
+				}
+			}
+		);
+		buttonManager.addButton(groupHandle, 'remove', 'Remove mass', 
+			{mousedown: function() 
+				{
+					self.buttonRemoveDown();
+				}
+			}
+		);
+	
+		// addButton(this.buttonAddId, 'Add mass');
+		// addButton(this.buttonRemoveId, 'Remove mass');
+		// $('#'+this.buttonAddId).mousedown(function(){self.buttonAddDown()});
+		// //$('#'+this.buttonAddId).mouseup(function(){self.buttonAddUp()});
 		
-		$('#'+this.buttonRemoveId).mousedown(function(){self.buttonRemoveDown()});
-		//$('#'+this.buttonRemoveId).mouseup(function(){self.buttonRemoveUp()});
+		// $('#'+this.buttonRemoveId).mousedown(function(){self.buttonRemoveDown()});
+		// //$('#'+this.buttonRemoveId).mouseup(function(){self.buttonRemoveUp()});
 	},
 	removeButtons: function(){
 		$('#' + this.buttonAddId).remove();

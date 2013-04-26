@@ -1,43 +1,17 @@
 
 canvasHeight = 450;
+LevelData = {
+	levelTitle: 'Reversibility Template',
 
+		
+	spcDefs: [
+		//add antoine coefs, cvLiq, hvap
+		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'spc2', m: 4, r: 2, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
+		{spcName: 'spc3', m: 4, r: 1, col: Col(255, 255, 255), cv: 2.5 * R, hF298: -30, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
+	],	
 
-$(function(){
-	animText = new AnimText(c);
-	myCanvas.height = canvasHeight;
-	window.curLevel = new Alec();
-	curLevel.cutSceneEnd();
-	curLevel.init();
-
-});
-
-myCanvas.width = $('#main').width();
-
-
-
-function Alec(){
-	this.setStds();
-	this.wallSpeed = 1;
-	this.readouts = {};
-	this.compMode = 'Isothermal';//is this used?
-
-	
-	addSpecies(['spc1', 'spc3', 'spc4', 'spc6']);
-	this.yMin = 30;
-	this.yMax = 350;
-}
-_.extend(Alec.prototype, 
-			LevelTools, 
-{
-	init: function() {
-		this.readout = new Readout('mainReadout', 30, myCanvas.width-400, 25, '13pt calibri', Col(255,255,255), 'left');
-		$('#mainHeader').html('Reversible and irreversible processes');
-		showPrompt(0, 0, true);
-	},
-	
-	
-	
-	sections: [
+	mainSequence: [
 		{
 			sceneData: undefined,
 			prompts: [
@@ -57,11 +31,10 @@ _.extend(Alec.prototype,
 		{
 			sceneData: {
 				walls: [
-					{pts:[P(40,40), P(510,40), P(510,350), P(40,350)], handler: 'staticAdiabatic', handle: 'left'},
+					{pts:[P(40,10), P(510,10), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'left', temp: 273, isothermalRate: 80, border: {type: 'open', width: 10} },
 				],
 				dots: [
-					{spcName: 'spc3', pos: P(45,50), dims: V(465,300), count: 500, temp:150, returnTo: 'left', tag: 'left'},
-					{spcName: 'spc1', pos: P(45,50), dims: V(465,300), count: 300, temp: 150, returnTo: 'left', tag: 'left'}
+					{spcName: 'spc3', pos: P(45,90), dims: V(465,260), count: 550, temp:215, returnTo: 'left', tag: 'left'},
 				],	
 				objs: [
 					{
@@ -71,8 +44,9 @@ _.extend(Alec.prototype,
 							wallInfo: 'left',
 							min: 0,
 							init: 0,
-							max: 0,
-							makeSlider: false
+							max: 3,
+							makeSlider: false,	
+							compMode: 'cPAdiabaticDamped',
 						}	
 					},
 					{
@@ -80,35 +54,269 @@ _.extend(Alec.prototype,
 						attrs: {
 							handle: 'Weight1',
 							wallInfo: 'left',
-							weightDefs: [{count: 4, pressure:0.5}, {count: 2, pressure:1}],
-							pInit: 2,
+							weightDefs: [{count: 1, pressure:2}],
+							pInit: 1,
 							pistonOffset: V(130,-41),
 							displayText: true,
 						}
+					},
+					{
+						type: 'QArrowsAmmt',
+						attrs: {handle: 'arrow', wallInfo: 'left', scale: 1}
+					}	
+				],
+				graphs: [
+					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'External Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
+						sets:[
+							{handle: 'externalPressure', label: 'P ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
+							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
+						]
 					}
-				],
+				],	
 				dataRecord: [
-					{wallInfo: 'left', data: 'frac', attrs: {spcName: 'spc1', tag: 'left'}}
+					{wallInfo: 'left', data: 'frac', attrs: {spcName: 'spc3', tag: 'left'}}
 				],
-				dataDisplay: [
-					{wallInfo: 'left', data: 'tempSmooth', readout: 'mainReadout'},
-					{wallInfo: 'left', data: 'pExt', readout: 'pistonReadoutRightPiston'},
-					{wallInfo: 'left', data: 'frac', attrs: {spcName: 'spc1', tag: 'left'}, readout: 'mainReadout'}
+				dataReadouts: [
+					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', decPlaces: 0, handle: 'tempReadout', readout: 'mainReadout'},
+					{label: 'Q: ', expr: 'q("left")', units: 'kJ', decPlaces: 1, handle: 'heatReadout', readout: 'mainReadout'},
+					{label: 'Pint: ', expr: 'pInt("left")', units: 'bar', decPlaces: 1, handle: 'pIntReadout', readout: 'pistonReadoutRightPiston'},
+					{label: 'Vol: ', expr: 'vol("left")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
+					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'mainReadout'}
 				],
 			},
 			prompts: [
 				{
-					title: 'TITLE',
-					text: 'This is the Text',
-				}
-				
-			
+					quiz: [
+						{	
+							type: 'textSmall',
+							preText: "Let's begin our experiment with an isothermal compression process using a single block. Please place the block on the piston. Estimate the value of work in this compression process.",
+							text: ' ', 
+							units: 'kJ',
+							storeAs: 'Ans1'
+						}
+					],
+					title: 'Current Step'		
+				},
+				{
+					sceneData: undefined, 
+					quiz: [
+						{
+							type: 'text',
+							preText:'You calculated get("Ans1", "string") kJ for the isothermal compression process.  How does that compare to the value of heat?  Explain.',
+							text: 'type your answer here',
+							storeAs: 'Long1'
+						}
+					],
+				},
+				{
+					sceneData: undefined, 
+					quiz: [
+						{
+							type: 'text',
+							preText:'Now remove the block and let the piston isothermally expand.  For the compression process, you estimated that it "cost" you get("Ans1", "string") kJ of work.  Estimate how much work you "got back" from the expansion.',
+							text: 'type your answer here',
+							storeAs: 'Ans2'
+						}
+					],
+				},
 			]
-		}
-		
-		
-	
+		},
+		{	
+			sceneData: {
+				walls: [
+					{pts:[P(40,10), P(510,10), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'left', temp: 273, isothermalRate: 80, border: {type: 'open', width: 10} },
+				],
+				dots: [
+					{spcName: 'spc3', pos: P(45,90), dims: V(465,260), count: 550, temp:215, returnTo: 'left', tag: 'left'},
+				],	
+				objs: [
+					{
+						type: 'Piston',
+						attrs: {
+							handle: 'RightPiston',
+							wallInfo: 'left',
+							min: 0,
+							init: 0,
+							max: 3,
+							makeSlider: false,	
+							compMode: 'cPAdiabaticDamped',
+						}	
+					},
+					{
+						type: 'DragWeights',
+						attrs: {
+							handle: 'Weight1',
+							wallInfo: 'left',
+							weightDefs: [{count: 2, pressure:1}],
+							pInit: 1,
+							pistonOffset: V(130,-41),
+							displayText: true,
+						}
+					},
+					{
+						type: 'QArrowsAmmt',
+						attrs: {handle: 'arrow', wallInfo: 'left', scale: 1}
+					}	
+				],
+				graphs: [
+					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'External Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
+						sets:[
+							{handle: 'externalPressure', label: 'P ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
+							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
+						]
+					}
+				],	
+				dataRecord: [
+					{wallInfo: 'left', data: 'frac', attrs: {spcName: 'spc3', tag: 'left'}}
+				],
+				dataReadouts: [
+					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', sigFigs: 3, handle: 'tempReadout', readout: 'mainReadout'},
+					{label: 'Q: ', expr: 'q("left")', units: 'kJ', sigFigs: 1, handle: 'heatReadout', readout: 'mainReadout'},
+					{label: 'Pint: ', expr: 'pInt("left")', units: 'bar', sigFigs: 2, handle: 'pIntReadout', readout: 'pistonReadoutRightPiston'},
+					{label: 'Vol: ', expr: 'vol("left")', units: 'L', sigFigs: 3, handle: 'volReadout', readout: 'mainReadout'},
+					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'mainReadout'}
+				],
+			},
+			prompts:[
+				{
+					quiz: [
+						{	
+							type: 'textSmall',
+							preText: "Now place both blocks on the piston one at a time, waiting for the piston to settle before placing the next block. Estimate the value of work done on the system in this compression process.",
+							text: ' ', 
+							units: 'kJ',
+							storeAs: 'Ans3'
+						}
+					],
+					title: 'Current Step'		
+				},
+				{
+					sceneData: undefined, 
+					quiz: [
+						{
+							type: 'text',
+							preText:'You calculated get("Ans3", "string") kJ for the isothermal compression process.  How does this compare to the value of work calculated in the single block simulation?  Explain.',
+							text: 'type your answer here',
+							storeAs: 'Long2'
+						}
+					],
+				},
+				{
+					sceneData: undefined, 
+					quiz: [
+						{
+							type: 'textSmall',
+							preText:'Now remove both blocks one at a time, waiting for the piston to settle before removing the next block. Estimate the work done on the system',
+							text: '',
+							storeAs: 'Ans4'
+						}
+					],
+				},
+			]
+		},
+		{
+			sceneData: {
+				walls: [
+					{pts:[P(40,10), P(510,10), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'left', temp: 273, isothermalRate: 80, border: {type: 'open', width: 10} },
+				],
+				dots: [
+					{spcName: 'spc3', pos: P(45,90), dims: V(465,260), count: 550, temp:215, returnTo: 'left', tag: 'left'},
+				],	
+				objs: [
+					{
+						type: 'Piston',
+						attrs: {
+							handle: 'RightPiston',
+							wallInfo: 'left',
+							min: 0,
+							init: 0,
+							max: 3,
+							makeSlider: false,	
+							compMode: 'cPAdiabaticDamped',
+						}	
+					},
+					{
+						type: 'Sandbox',
+						attrs: {
+							handle: 'Sand1',
+							wallInfo: 'left',
+							min: 1,
+							init: 1,
+							max: 3,
+						}
+					},
+					{
+						type: 'QArrowsAmmt',
+						attrs: {handle: 'arrow', wallInfo: 'left', scale: 1}
+					}	
+				],
+				graphs: [
+					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'External Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
+						sets:[
+							{handle: 'externalPressure', label: 'P ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
+							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
+						]
+					}
+				],	
+				dataRecord: [
+					{wallInfo: 'left', data: 'frac', attrs: {spcName: 'spc3', tag: 'left'}}
+				],
+				dataReadouts: [
+					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', sigFigs: 3, handle: 'tempReadout', readout: 'mainReadout'},
+					{label: 'Q: ', expr: 'q("left")', units: 'kJ', decPlaces: 1, handle: 'heatReadout', readout: 'mainReadout'},
+					{label: 'Pint: ', expr: 'pInt("left")', units: 'bar', sigFigs: 2, handle: 'pIntReadout', readout: 'pistonReadoutRightPiston'},
+					{label: 'Vol: ', expr: 'vol("left")', units: 'L', sigFigs: 3, handle: 'volReadout', readout: 'mainReadout'},
+					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'mainReadout'}
+				],
+			},
+			prompts:[
+				{
+					quiz: [
+						{	
+							type: 'textSmall',
+							preText: "Now slowly add mass until the external pressure is equal to 3 bar. How much work was done on the system?",
+							text: ' ', 
+							units: 'kJ',
+							storeAs: 'Ans5'
+						}
+					],
+					title: 'Current Step'		
+				},
+				{
+					sceneData: undefined, 
+					quiz: [
+						{
+							type: 'textSmall',
+							preText:'You calculated get("Ans5", "string") kJ for the isothermal compression process.  Now slowly remove mass until the external pressure is equal to 1 bar. How much work was done on the system?',
+							text: '',
+							storeAs: 'Ans6'
+						}
+					],
+				},
+				{
+					sceneData: undefined, 
+					quiz: [
+						{
+							type: 'text',
+							preText:'How do these two values of work compare? What can be said about the amount of work put into a sytem compared to the amount of work gotten out when external pressure is changed in smaller increments?',
+							text: 'type your answer here',
+							storeAs: 'Long3'
+						}
+					],
+				},
+				{
+					sceneData: undefined, 
+					quiz: [
+						{
+							type: 'text',
+							preText:'Can a real process be truly reversible? What kind of changes in input are required for a process to be truly reversible?',
+							text: 'type your answer here',
+							storeAs: 'Long4'
+						}
+					],
+				},
+			]
+		}	
 	]
 
 }
-)
