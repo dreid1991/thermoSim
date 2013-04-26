@@ -1,8 +1,10 @@
 <html>
 <body>
+<!SIMULATION>
 <link type='text/css' href = '../css/custom-theme/jquery-ui-1.9.2.custom.sim.css' rel='stylesheet' />
 <link type='text/css' href = '../styles.css' rel='stylesheet'/>
 <link type='text/css' href = '../mathStyles.css' rel='stylesheet'/>
+
 <div class='sim noSelect wrapper'>
 	<table class='tableWrapper'>
 	<tr><td>
@@ -28,7 +30,7 @@
 			</div>
 -->
 			<div id='dashRunWrapper' style='position:relative'>
-				<div id='dashRun' class='sim dashMed noSelect' style='position:relative'>
+				<div id='dashRunBlank' class='sim dashMed noSelect' style='position:relative;display:none;'>
 					<center>
 						<div id='buttons' class='sim'>
 				
@@ -52,7 +54,7 @@
 						</div>
 					</center>
 				</div>
-				<button id='resetExp' style='position:absolute; right:.5em; bottom:.25em; z-index: 1' class='sim'><img src='img/refresh.gif'></img></button>
+				<button id='resetExp' style='position:absolute; right:.5em; bottom:.25em; z-index: 1' class='sim'><!image appended in init></button>
 			</div>
 			<div id='dashCutScene' class='sim dashMed noSelect'></div>
 <!--
@@ -77,15 +79,11 @@
 	</td>
 	<td class='padLeft floatTop'>
 		<div id='auxSlots' class='sim auxSlots noSelect'>
-			<div id='aux1Wrapper'>
-				<div id='aux1' class='sim aux' filledWith=''>
-				</div>
+			<div id='aux1' class='sim aux' filledWith=''>
 			</div>
 			<div id='auxSpacer' class='sim auxSpacer'>
 			</div>
-			<div id='aux2Wrapper'>
-				<div id='aux2' class='sim aux' filledWith=''>
-				</div>
+			<div id='aux2' class='sim aux' filledWith=''>
 			</div>
 		</div>
 	</td></tr>
@@ -114,7 +112,7 @@
 </div>
 <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 <script src = '../underscore-min.js'></script>
-<script src = '../js/jquery-1.9.0.min.js'></script>
+<script src = '../js/jquery-2.0.0.min.js'></script>
 <script src = '../js/jquery-ui-1.9.2.custom.min.js'></script>
 <script src = '../ExpressionInterpreter.js'></script>
 <script src = '../SceneNavigator.js'></script>
@@ -158,10 +156,11 @@
 <script src = '../LevelTools.js'></script>
 <script src = '../LevelInstance.js'></script>
 <script src = '../Timeline.js'></script>
-
-<script src = 'levelTemplateCole.js'></script>
 <script src = '../init.js'></script>
 
-</script>
+<script src = 'levelTemplateCole.js'></script>
+
+
+
 </body>
 </html>

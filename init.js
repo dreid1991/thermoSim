@@ -1,5 +1,11 @@
 $(function(){
 	//R is defined at the top of base so it can be used in level data
+	window.IMGPATHPREFIX = '';
+	window.simHost = window.simHost || '';
+	if (window.simHost == 'CW') {
+		window.IMGPATHPREFIX = 'content/sims/levels/'
+	}
+	$('#resetExp').append("<img src='" + IMGPATHPREFIX + "img/refresh.gif'></img>");
 	MathJax.Hub.Config({tex2jax: {inlineMath: [['##','##'], ['\\(','\\)']], displayMath: [['$$', '$$']]}});
 	_.extend(Array.prototype, toInherit.ArrayExtenders);
 	_.extend(Math, toInherit.MathExtenders);

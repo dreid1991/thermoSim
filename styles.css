@@ -24,6 +24,9 @@ td.floatTop{
 	border-radius: 20px;
 
 }
+textarea.sim { 
+    resize: none; 
+}
 /* Make it pad the outside of groups */
 
 .sim.buttonGroupPadder{

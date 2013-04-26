@@ -82,7 +82,7 @@ GraphBase = {
 				},
 				innerHTML: templater.img({
 					attrs: {
-						src: ['img/refresh.gif']
+						src: [window.IMGPATHPREFIX + 'img/refresh.gif']
 					}
 					})
 			});

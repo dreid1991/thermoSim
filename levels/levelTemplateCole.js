@@ -222,10 +222,19 @@ LevelData = {
 					sceneData:undefined, 
 					text: "The system has undergone a two-step process.  First it was compressed by adding a block.  Then it was expanded to its original volume by removing the block.  Before the compression, the system's temperature was 200K.  After the expansion, the temperature was get('Temp', 'int') K.  Why is the system temperature higher after going through this two-step process?",
 					quiz: [
-						{type: 'text', text: "type your answer here."}
+						{type: 'text', text: "Type your answer here."}
 					]
 				}
 			]
 		},
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					title: '',
+					text: 'You have completed the simulation.'
+				}
+			]
+		}
 	]
 }

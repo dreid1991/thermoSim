@@ -926,6 +926,9 @@ Timeline.stateFuncs = {
 		remove: function(section, elems, id) {
 			var cmmd = elems[id];
 			elems[id] = undefined;
+			// if (!cmmd) {
+				// console.log('omg no command');
+			// }
 			var removeExpr = cmmd.remove;
 			if (removeExpr) {
 				with (DataGetFuncs) {
@@ -981,7 +984,7 @@ Timeline.Moment.prototype = {
 					}
 				}
 			} else if (span.boundType == 'tail') {
-				if (to > from) {
+				if (to > from && from >= span.partner.moment.timestamp) {
 					span.remove(span.section, span.timelineElems, span.id);
 					if (span.once) 
 						span.active = false;

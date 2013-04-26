@@ -96,10 +96,10 @@ DataGetFuncs = {
 		if (asObj) {
 			//HEY - as obj currently only return image, no p, br, or centering.  
 			//It is they way because of AuxPicture.  Look into that before making changes here
-			return {attrs: {src: [path]}};
+			return {attrs: {src: [window.IMGPATHPREFIX + path]}};
 	
 		} else {
-			var imgHTML = templater.img({attrs: {src: [path]}});
+			var imgHTML = templater.img({attrs: {src: [window.IMGPATHPREFIX + path]}});
 			
 			if (center) {
 				imgHTML = templater.center({innerHTML: imgHTML});
