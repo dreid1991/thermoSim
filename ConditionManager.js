@@ -87,14 +87,19 @@ ConditionManager.prototype = {
 		}
 	},
 	timeStrToStamp: function(str) {
-		if (/now/i.test(str)) {
-			return timeline.now().promptIdx;
-		} else if (/section/i.test(str)) {
+	
+		if (/section/i.test(str)) {
 			return -1;
 		} else if (/prompt/i.test(str)) {
 			return Number(/[0-9]+/.exec(str));
 		} else if (!isNaN(Number(str))) {
 			return Number(str);
+		} else {
+			// if (timeline.nowTime().promptIdx != -1) {
+				// return -1;
+			// } else {
+			return timeline.nowTime().promptIdx;
+			//}
 		}
 	}
 }

@@ -29,6 +29,9 @@ Timeline.prototype = {
 	now: function() {
 		return {sectionIdx: this.sectionIdx, promptIdx: this.sections[this.sectionIdx].promptIdx};
 	},
+	nowTime: function() {
+		return {sectionIdx: this.sectionIdx, promptIdx: Math.floor(this.sections[this.sectionIdx].time)};
+	},
 	surface: function(forwards) {
 		forwards = defaultTo(true, forwards);
 		if (this.parent) {
@@ -184,6 +187,7 @@ Timeline.Section.prototype = {
 		//this.replaceDiv($('#dashRunWrapper'), $('#dashRun'), this.dashRunClone || this.dashRunBlank);
 		this.dashRun.show();
 		this.dashRun.attr('id', 'dashRun');
+		this.dashRun.addClass('active');
 		this.replaceDiv($('#buttonManagerWrapper'), $('#buttonManager'), this.buttonManagerClone || this.buttonManagerBlank);
 		this.pushToGlobal();
 
@@ -199,6 +203,7 @@ Timeline.Section.prototype = {
 	restoreHTML: function() {
 		this.dashRun.show();
 		this.dashRun.attr('id', 'dashRun');
+		this.dashRun.addClass('active');
 		this.replaceDiv($('#buttonManagerWrapper'), $('#buttonManager'), this.buttonManagerClone || this.buttonManagerBlank);
 		this.restoreGraphs();
 		this.restoreAuxs();
@@ -499,6 +504,7 @@ Timeline.Section.prototype = {
 			$('#buttonManager').html('');
 			$('#baseHeader').html('')
 			this.dashRun.attr('id', this.dashRunId);
+			this.dashRun.removeClass('active');
 			this.dashRun.hide();
 			//this.dashRunClone = $('#dashRun').clone(true);
 			//$('#dashRun').remove();

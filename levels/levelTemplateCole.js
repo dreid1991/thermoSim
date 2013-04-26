@@ -117,7 +117,7 @@ LevelData = {
 					sceneData:{
 						triggers: [
 								{handle: 'CheckP', expr: 'pExt("SecondWall")==15', satisfyCmmds: ['curLevel.dragWeightsDragsOne.disable()'], priority: 1},
-								{handle: 'CheckVol', expr: 'vol("SecondWall")<8', alertUnsatisfied: "Compress the system!", priority: 1}
+								{handle: 'CheckVol', expr: 'vol("SecondWall")<8', message: "Compress the system!", priority: 1}
 							]
 					},
 						text: "Above is a well insulated piston cylinder assembly.  Place the block on top of the piston and observe the response.  Calculate the amount of work that the piston and block did on the system?",
@@ -172,9 +172,9 @@ LevelData = {
 			prompts:[
 				{//Prompt 0
 					sceneData: {
-						trigger: [
+						triggers: [
 							{handle: 'checkPext', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.disable()'] , priority: 1},
-							{handle: 'checkVol2', expr: 'vol("ThirdWall")<8', alertUnsatisfied: "Compress the system!", priority: 1}
+							{handle: 'checkVol2', expr: 'vol("ThirdWall")<8', message: "Compress the system!", priority: 1}
 						]
 					},
 					text: "Previously you answered that the compression did get('WorkDoneAnswer','int') KJ on the system bringing it to a final temperature of get('TempAnswer','int') K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
@@ -207,7 +207,7 @@ LevelData = {
 							{handle: 'checkPext2', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.enable()'], priority: 1},
 							{handle: 'checkPext3', expr: 'pExt("ThirdWall")==2', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.disable()'], priority: 1},
 							{handle: 'checkPext4', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['walls.ThirdWall.resetWork()'], priority: 1},
-							{handle: 'checkVole3', expr: 'fracDiff(vol("ThirdWall"),14.9)<.01', satisfyStore: [{storeAs:'Temp', expr: 'temp("ThirdWall")'}]}
+							{handle: 'checkVole3', expr: 'fracDiff(vol("ThirdWall"),14.9)<.01', message: "Take the block off the system!", satisfyStore: [{storeAs:'Temp', expr: 'temp("ThirdWall")'}]}
 						],
 						objs: [
 							{type: 'Stops',
@@ -231,6 +231,7 @@ LevelData = {
 			sceneData: undefined,
 			prompts: [
 				{
+					cutScene: true,
 					title: '',
 					text: 'You have completed the simulation.'
 				}

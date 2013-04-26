@@ -88,19 +88,19 @@ objectFuncs = {
 			
 			switch (position) {
 				case 'left':
-					sliderWrapper = $('#sliderHolderLeft');
-					$('#sliderHolderSingle').hide();
-					$('#sliderHolderDouble').show();
+					sliderWrapper = $('.active #sliderHolderLeft');
+					$('.active #sliderHolderSingle').hide();
+					$('.active #sliderHolderDouble').show();
 					break;
 				case 'center':
-					sliderWrapper = $('#sliderHolderCenter');
-					$('#sliderHolderSingle').show();
-					$('#sliderHolderDouble').hide();
+					sliderWrapper = $('.active #sliderHolderCenter');
+					$('.active #sliderHolderSingle').show();
+					$('.active #sliderHolderDouble').hide();
 					break;
 				case 'right':
-					sliderWrapper = $('#sliderHolderRight');
-					$('#sliderHolderSingle').hide();
-					$('#sliderHolderDouble').show();
+					sliderWrapper = $('.active #sliderHolderRight');
+					$('.active #sliderHolderSingle').hide();
+					$('.active #sliderHolderDouble').show();
 					break;
 			}
 			sliderTitleWrapper = sliderWrapper;
@@ -611,7 +611,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 			var bin = this.bins.store[binName];
 			if (bin.visible) {
 				var x = bin.x + this.storeBinWidth/2
-				var y = bin.y - this.binHeight+10;
+				var y = bin.y - this.binHeight;
 				var mass = this.weightGroups[binName].pressure;
 				var text = mass + ' bar each';
 				draw.text(text, P(x, y), this.font, this.fontCol, 'center', 0, c);
