@@ -84,9 +84,9 @@ SceneNavigator.prototype = {
 				timeline.sections[timeline.sectionIdx].branchSections(sections)
 				return {advance: true, killBranches: defaultTo(false, killBranches)};
 			},
-			surface: function(forwards) {
+			surface: function(forwards, killBranches) {
 				timeline.surface(forwards);
-				return {advance: false, killBranches: false};
+				return {advance: false, killBranches: defaultTo(false, killBranches)};
 			},
 			advance: function() {
 				return {advance: true, killBranches: true};

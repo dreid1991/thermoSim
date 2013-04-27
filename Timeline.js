@@ -33,15 +33,20 @@ Timeline.prototype = {
 		return {sectionIdx: this.sectionIdx, promptIdx: Math.floor(this.sections[this.sectionIdx].time)};
 	},
 	surface: function(forwards) {
+		var branchType = false;
 		forwards = defaultTo(true, forwards);
 		if (this.parent) {
 			if (this.isSectionsBranch) {
-				this.curSection().cleanUpPrompt(forwards);
-				this.clearCurrentSection();
+				branchType = this.curSection().cleanUpPrompt(forwards);
+				if (!branchType) { 
+					this.clearCurrentSection();
+				}
 			} else if (this.isPromptsBranch) {
-				this.curSection().cleanUpPrompt(forwards);
+				branchType = this.curSection().cleanUpPrompt(forwards);
 			}
-			this.parent.catchSurface(this, forwards);
+			if (!branchType) {
+				this.parent.catchSurface(this, forwards);
+			}
 		}
 	},
 	catchSurface: function(caughtTimeline, forwards) {
@@ -221,7 +226,9 @@ Timeline.Section.prototype = {
 
 	},
 	stepTo: function(dest) {
+		var branchType = false;
 		var suspended = false;
+		//suspended and branchType are kind of redundant
 		var from = this.time;
 		var moments = this.moments;
 		//hey, all the 1e-4 business is to indicate that I'm going past the last moment I want to hit.  1e-5 is to account for rounding error
@@ -239,6 +246,8 @@ Timeline.Section.prototype = {
 				this.time = nextMom.timestamp;
 				nextMom.fire(from, dest);
 				if (Math.abs(nextMom.timestamp - preCleanBranchTimestamp) < 1e-5 || Math.abs(nextMom.timestamp - postCleanBranchTimestamp) < 1e-5) {
+					var branchTimeline = this.branches[Math.floor(this.time)].timeline;
+					branchType = branchTimeline.isSectionsBranch ? 'sections' : branchTimeline.isPromptsBranch ? 'prompts' : undefined;
 					suspended = true;
 					break;
 				}
@@ -262,6 +271,8 @@ Timeline.Section.prototype = {
 				
 				if (Math.abs(nextMom.timestamp - preCleanBranchTimestamp) < 1e-5 || Math.abs(nextMom.timestamp - postCleanBranchTimestamp) < 1e-5) {
 					//this.steppingTowards = dest;
+					var branchTimeline = this.branches[Math.floor(this.time)].timeline;
+					branchType = branchTimeline.isSectionsBranch ? 'sections' : branchTimeline.isPromptsBranch ? 'prompts' : undefined;
 					suspended = true;
 					break;
 				}				
@@ -282,7 +293,7 @@ Timeline.Section.prototype = {
 				}			
 			} //this will probably need work.  It may not make any sense at all!  How could I know?
 		}
-		return suspended;
+		return branchType;
 
 	},
 	nextTowardsDest: function(cur, dest) {
@@ -337,15 +348,17 @@ Timeline.Section.prototype = {
 	},
 	cleanUpPrompt: function(forward) {
 		//only to be called when leaving a section;
+		var hitBranch = false;
 		var destTime;
 		if (forward) {
-			destTime = this.getTimestamp(this.sectionData.prompts.length - 1, 'tail');
+			destTime = this.getTimestamp(this.sectionData.prompts.length - 1, 'branchPostClean') + 1e-4; //adding to make you step backwards into a branch too
 		} else {
 			destTime = this.getTimestamp(0, 'head') - 1e-4; 
 		}
 		
-		this.stepTo(destTime);
+		var branchType = this.stepTo(destTime);
 		this.time = destTime;
+		return branchType;
 	},
 	spliceInMoment: function(moment) {
 		for (var i=0; i<this.moments.length; i++) {
@@ -762,7 +775,7 @@ Timeline.Section.prototype = {
 			return 'head';
 		} else if (Math.abs(timestamp % 1 - .85) <1e-5) {
 			'branchPreClean';
-		} else if (Math.abs(timestamp % 1 - .15) <1e-5) {
+		} else if (Math.abs(timestamp % 1 - .95) <1e-5) {
 			'branchPostClean';
 		}
 	},

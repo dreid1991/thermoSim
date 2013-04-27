@@ -285,9 +285,34 @@ LevelData = {
 					{
 						text: 'The superb text',
 						title: 'worp',
-						// directions: function() {
-							// return 'surface()';
-						// }
+						quiz: [
+							{
+								type: 'textSmall',
+								label: 'foo',
+								text: 'hello',
+								messageWrong: 'hello',
+								storeAs: 'theBranch'
+							
+							}
+						],
+						directions: function() {
+							with (DataGetFuncs) {
+								if (get('theBranch') == 'hello') {
+									return 'branchSections(LevelData.auxSections.secondLevel)';
+								}
+							}
+							
+						}
+					}
+				]
+			}
+		
+		],
+		secondLevel: [
+			{sceneData: undefined,
+				prompts: [
+					{title: 'deeper section',
+					text: 'deeper text'
 					}
 				]
 			}
