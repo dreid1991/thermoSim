@@ -19,8 +19,8 @@ Timeline.prototype = {
 	curPrompt:function() {
 		return this.sections[this.sectionIdx].curPrompt();
 	},
-	pushSection: function(sectionData) {
-		this.sections.push(new Timeline.Section(this, sectionData, this.buttonManagerBlank));
+	pushSection: function(sectionData, motherTimeline, motherSection) {
+		this.sections.push(new Timeline.Section(this, sectionData, this.buttonManagerBlank, undefined, motherTimeline, motherSection));
 	},
 	clearCurrentSection: function() {
 		if (this.sectionIdx !== undefined) 
@@ -135,13 +135,24 @@ Timeline.prototype = {
 
 	},
 	refresh: function() {
-		var curPromptIdx = this.sections[this.sectionIdx].promptIdx;
 		var curSection = this.sections[this.sectionIdx];
-		var conditionMgr = curSection.conditionManager;
-		var newSectionInstance = new Timeline.Section(this, curSection.sectionData, this.buttonManagerBlank, conditionMgr);
+		var promptIdx = curSection.promptIdx;
+		var dataCurPrompt = curSection.sectionData.prompts[promptIdx];
+		//var curPromptIdx = this.sections[this.sectionIdx].promptIdx;
+		var motherSection = curSection.motherSection;
+		var motherTimeline = curSection.motherTimeline;
+		var conditionMgr = curSection.conditionManager; //not sure what I should do with this.  Come back to.  Certainly *not* what I'm doing now.
+		var newSectionInstance = new Timeline.Section(curSection.motherTimeline, curSection.sectionData, this.buttonManagerBlank, conditionMgr);
 		//curSection.cleanUpPrompt();
-		curSection.clear();
-		this.sections.splice(this.sectionIdx, 1, newSectionInstance);
+		motherSection.clear();
+		//I think I want to kill the branches, but non the moments that create them.  Then I don't have to worry about instances of the un-refreshed level being around
+		//Actually, I want to keep section branches.  NOT IMPLEMENTED
+		//I think I'll need to 'clear()' all the way up to the motherSection in case html (graphs, auxpicture) was added in a branched prompt
+		newSectionInstance.copyBranchMoments(motherSection);
+		newSectionInstance.copySectionBranches(motherSection);
+		var motherSectionIdx = motherTimeline.sections.indexOf(motherSection);
+		motherTimeline.sections.splice(motherSectionIdx, 1, newSectionInstance);
+		
 		this.show(this.sectionIdx, curPromptIdx, true);
 	},
 	takeNumber: function() {
@@ -150,7 +161,7 @@ Timeline.prototype = {
 
 }
 
-Timeline.Section = function(timeline, sectionData, buttonManagerBlank, conditionManager) {
+Timeline.Section = function(timeline, sectionData, buttonManagerBlank, conditionManager, motherTimeline, motherSection) {
 //need to make clean up listeners still
 	this.timeline = timeline;
 	this.inited = false
@@ -175,7 +186,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, condition
 	this.buttonManager = new ButtonManager('buttonManager');
 	this.spcs = {};
 	LevelTools.addSpcs(LevelData.spcDefs, this.spcs, this.dotManager);
-	this.sliderList = [];
+	this.sliderList = [];//work on getting rid of this
 	this.dataDisplayer.setReadouts(this.level.readouts);
 	this.collide.setSpcs(this.spcs);
 	this.level.spcs = this.spcs;
@@ -185,6 +196,9 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, condition
 	this.dashRunId = 'dashRun' + (window.dashRunId++);
 	this.dashRun = $('#dashRunBlank').clone(true).attr('id', this.dashRunId);
 	$('#dashRunWrapper').append(this.dashRun);
+	
+	this.motherTimeline = motherTimeline || this.timeline;
+	this.motherSection = motherSection || this;
 }
 
 Timeline.Section.prototype = {
@@ -394,7 +408,7 @@ Timeline.Section.prototype = {
 			} else {
 				var branchTimeline = new Timeline(curTimeline, undefined, false, true);
 				self.branches[promptIdx] = new Timeline.Branch(branchTimeline, prompts.id);
-				branchTimeline.pushSection({prompts: prompts});
+				branchTimeline.pushSection({prompts: prompts}, self.motherTimeline, self.motherSection);
 				branchTimeline.sections[0].inheritState(self);
 				//this makes it so we don't have to call showSection, which would replace the html
 				branchTimeline.sectionIdx = 0;
@@ -408,7 +422,7 @@ Timeline.Section.prototype = {
 		}, undefined, false, false, undefined);
 		
 		var spawn = Timeline.stateFuncs.cmmds.spawn;
-		moment.events.cmmds.push(new Timeline.Event.Point(this, this.timeline.elems, cmmd, spawn, this.timeline.takeNumber(), false, false, moment));
+		moment.events.branchCmmd = new Timeline.Event.BranchCmmd(this, this.timeline.elems, cmmd, spawn, this.timeline.takeNumber(), moment, false);
 		this.spliceInMoment(moment);
 	},
 	branchSections: function(sections) {
@@ -442,7 +456,7 @@ Timeline.Section.prototype = {
 			}
 		}, undefined, false, false, undefined);
 		var spawn = Timeline.stateFuncs.cmmds.spawn;
-		moment.events.cmmds.push(new Timeline.Event.Point(this, this.timeline.elems, cmmd, spawn, this.timeline.takeNumber(), false, false, moment));
+		moment.events.branchCmmd = new Timeline.Event.BranchCmmd(this, this.timeline.elems, cmmd, spawn, this.timeline.takeNumber(), moment, true);
 		this.spliceInMoment(moment);
 	},
 	killBranches: function() {
@@ -971,10 +985,6 @@ Timeline.stateFuncs = {
 Timeline.Moment = function(timestamp) {
 	this.timestamp = timestamp;
 	this.events = new Timeline.EventClassHolder();
-	//I *think* we can group it into walls, generics, cmmds, setups .
-	//setups may be able to be rolled into commands.  Setup will be like linking two objects that are added in an unknown order.  Not necessary for linking objects to walls since order is known.  
-		//A point command would probably work.
-	//Generics include any objects, listeners, graphs, etc.  Anything that will have spawn/remove.  If there are interdependancies, 
 }
 
 Timeline.Moment.prototype = {
@@ -983,6 +993,7 @@ Timeline.Moment.prototype = {
 		this.fireSpans(this.events.walls, from, to);
 		this.fireSpans(this.events.objs, from, to);
 		this.fireCmmds(this.events.cmmds, from, to);
+		this.fireCmmds([this.events.branchCmmd], from, to);
 	},
 	fireSpans: function(spans, from, to) {
 		for (var i=0; i<spans.length; i++) {
@@ -1019,7 +1030,7 @@ Timeline.Moment.prototype = {
 			var event = cmmds[i];
 			if (event instanceof Timeline.Event.Span) {
 				this.fireSpans([event], from, to)
-			} else if (event instanceof Timeline.Event.Point) {
+			} else if (event instanceof Timeline.Event.Point || event instanceof Timeline.Event.BranchCmmd) {
 				if (((from < this.timestamp && this.timestamp <= to) || (to <= this.timestamp && this.timestamp < from)) && (event.elemDatum.oneWay ? from < to : true) && event.active) {
 					elemDatum = getAndEval(event.elemDatum);
 					event.spawn(event.section, event.timelineElems, event.id, elemDatum);
@@ -1046,7 +1057,7 @@ Timeline.EventClassHolder = function() {
 	this.dots = [];
 	this.objs = [];
 	this.cmmds = [];
-
+	this.branchCmmd;
 }
 
 Timeline.Event = {
@@ -1074,6 +1085,20 @@ Timeline.Event = {
 		this.once = once;
 		this.active = true;
 	},
+	BranchCmmd: function(section, timelineElems, elemDatum, spawn, id, moment, isSectionsBranch) {
+		this.section = section;
+		this.section = section;
+		this.timelineElems = timelineElems;
+		this.elemDatum = elemDatum;
+		this.spawn = spawn;
+		this.id = id;
+		this.oneWay = false;
+		this.moment = moment;
+		this.once = false;
+		this.active = true;
+		this.isSectionsBranch = isSectionsBranch;
+		this.isPromptsBranch = !isSectionsBranch;
+	}
 
 }
 Timeline.Branch = function(timeline, id) {
