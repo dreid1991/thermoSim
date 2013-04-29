@@ -31,7 +31,7 @@ SceneNavigator.prototype = {
 			if (instrs.advance) {
 				var nextIdxs = this.getNextIdxs();
 				var now = timeline.now();
-				if (nextIdxs.sectionIdx == now.sectionIdx && nextIdxs.promptIdx == now.promptIdx) {
+				if (nextIdxs.sectionIdx == now.sectionIdx && nextIdxs.promptIdx == Math.floor(now.promptIdx)) {
 					timeline.surface(true);
 				} else {
 					this.showPrompt(nextIdxs.sectionIdx, nextIdxs.promptIdx);

@@ -46,6 +46,8 @@ Timeline.prototype = {
 			}
 			if (!branchType) {
 				this.parent.catchSurface(this, forwards);
+			} else {
+				this.curSection().promptIdx += .5;
 			}
 		}
 	},
@@ -273,7 +275,7 @@ Timeline.Section.prototype = {
 			//avoids unnecessary cutscene entering/exiting
 			var curMom = this.momentAt(this.time);
 			if (curMom) curMom.fire(this.time, dest);
-			if (curMom) this.time -= 1e-4;
+			/*if (curMom) */this.time -= 1e-4;
 			var reAddElemsDest = this.getTimestamp(Math.floor(dest), 'branchPreClean');
 			while (reAddElemsDest != this.time) {
 				var nextMom = this.nextTowardsDest(this.time, reAddElemsDest);
