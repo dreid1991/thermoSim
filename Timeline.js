@@ -123,7 +123,7 @@ Timeline.prototype = {
 			this.clearCurrentSection();
 			this.sectionIdx = sectionIdx;
 			//going to assume prompts are shown in sequential order for now
-			this.sections[sectionIdx].showSection(this.sectionIdx);
+			this.sections[sectionIdx].showSection();
 		}
 		if (changingPrompt || refreshing) {
 			this.sections[sectionIdx].showPrompt(promptIdx);
@@ -142,18 +142,19 @@ Timeline.prototype = {
 		var motherSection = curSection.motherSection;
 		var motherTimeline = curSection.motherTimeline;
 		var conditionMgr = curSection.conditionManager; //not sure what I should do with this.  Come back to.  Certainly *not* what I'm doing now.
-		var newSectionInstance = new Timeline.Section(curSection.motherTimeline, curSection.sectionData, this.buttonManagerBlank, conditionMgr);
+		var newMotherSection = new Timeline.Section(curSection.motherTimeline, curSection.sectionData, this.buttonManagerBlank, conditionMgr);
 		//curSection.cleanUpPrompt();
 		motherSection.clear();
 		//I think I want to kill the branches, but non the moments that create them.  Then I don't have to worry about instances of the un-refreshed level being around
 		//Actually, I want to keep section branches.  NOT IMPLEMENTED
 		//I think I'll need to 'clear()' all the way up to the motherSection in case html (graphs, auxpicture) was added in a branched prompt
-		newSectionInstance.copyBranchMoments(motherSection);
-		newSectionInstance.copySectionBranches(motherSection);
+			//noooop!  consider:  Prompt branches only affect the state the the section we just cleared
+		newMotherSection.copyBranchEvents(motherSection.moments);
 		var motherSectionIdx = motherTimeline.sections.indexOf(motherSection);
-		motherTimeline.sections.splice(motherSectionIdx, 1, newSectionInstance);
-		
-		this.show(this.sectionIdx, curPromptIdx, true);
+		motherTimeline.sections.splice(motherSectionIdx, 1, newMotherSection);
+		newMotherSection.showSection();
+		newMotherSection.deepStepTo(dataCurPrompt, motherSection.branches); 
+		//this.show(this.sectionIdx, curPromptIdx, true);
 	},
 	takeNumber: function() {
 		return this.curId ++;
@@ -202,7 +203,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, condition
 }
 
 Timeline.Section.prototype = {
-	showSection: function(curSectionIdx) {
+	showSection: function() {
 		//this.replaceDiv($('#dashRunWrapper'), $('#dashRun'), this.dashRunClone || this.dashRunBlank);
 		this.dashRun.show();
 		this.dashRun.attr('id', 'dashRun');
@@ -246,7 +247,7 @@ Timeline.Section.prototype = {
 		var from = this.time;
 		var moments = this.moments;
 		//hey, all the 1e-4 business is to indicate that I'm going past the last moment I want to hit.  1e-5 is to account for rounding error
-		if (dest > this.time || /*Math.floor(this.time) == Math.floor(dest + 1e-4) && */ (dest < this.time && !/headhtml/i.test(this.getTimestampType(dest)))) {
+		if (dest > this.time || (dest < this.time && !/headhtml/i.test(this.getTimestampType(dest)))) {
 			var curMom = this.momentAt(this.time);
 			if (curMom) curMom.fire(this.time, dest);
 			if (curMom) this.time += dest > this.time ? 1e-4 : -1e-4;
@@ -309,6 +310,64 @@ Timeline.Section.prototype = {
 		}
 		return branchType;
 
+	},
+	deepStepTo: function(destPromptData, inheritedBranches) {
+		//Your attention please:  This is only used for refreshing.  Deal with it.
+		//so it only works going forward
+		var timeLast = this.time;
+		for (var i=this.moments.indexOf(this.momentAt(this.time)); i<this.moments.length-1; i++) {
+			//will need to stop this before it gets to infinity.  I think the -1 in the condition should take care of it
+			var moment = this.moments[i];
+			var branchCmmd;
+			if (moment.branchCmmd) {
+				branchCmmd = moment.branchCmmd;
+				moment.branchCmmd = undefined;
+			}
+			var timeNext = this.moments[i + 1].timestamp; 
+			if (timeNext == Infinity) timeNext = this.moments[i].timestamp;
+			//Make sure we don't say we're stepping to Infinity
+			if (this.sectionData.prompts[Math.floor(moment.timestamp)] == destPromptData) {
+				this.stepTo(this.getTimestamp(moment.timestamp, 'headhtml'))
+				return true;
+			}
+			moment.fire(this.time, timeNext);
+			
+			if (branchCmmd) {
+				var promptIdx = Math.floor(this.time);
+				var branch = inheritedBranches[promptIdx];
+				if (branch.timeline.isSectionsBranch) {
+					this.branches[promptIdx] = branch;
+				} else if (branch.timeline.isPromptsBranch) {
+					//make a new one, the deep step through with old it's branches.  Yes, that is the grammar I meant
+					var promptBranchBranches = branch.timeline.sections[0].branches;
+					var branchMoment = new Timeline.moment(this.time);
+					branchMoment.branchCmmd = branchCmmd;
+					branchMoment.fire(this.time, timeNext);
+					var spawnedBranch = this.branches[promptIdx];
+					var hitDest = spawnedBranch.deepStepTo(destPromptData, promptBranchBranches);
+					if (hitDest) return true;
+					
+				}
+			}
+			this.time = moment.timestamp;
+			
+		}
+		
+	},
+	copyBranchEvents: function(srcMoments) {
+		for (var i=0; i<srcMoments.length; i++) {
+			var srcMoment = srcMoments[i];
+			if (srcMoment.branchCmmd) {
+				var destMoment = this.momentAt(srcMoment.time)
+				if (destMoment) {
+					destMoment.branchCmmd = srcMoment.branchCmmd;
+				} else {
+					destMoment = new Timeline.Moment(srcMoment.timestamp);
+					destMoment.branchCmmd = srcMoment.branchCmmd;
+					this.spliceInMoment(destMoment);
+				}
+			}
+		}
 	},
 	nextTowardsDest: function(cur, dest) {
 		var curMoment = this.momentAt(cur);

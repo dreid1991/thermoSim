@@ -105,12 +105,12 @@ objectFuncs = {
 			}
 			sliderTitleWrapper = sliderWrapper;
 		}
-		var sliderId = 'slider' + this.handle.toCapitalCamelCase();
-		var sliderWrapper = makeSlider(sliderTitleWrapper, sliderWrapper, sliderId, title, attrs, handlers)
-		if (!this.sliderWrapperIds) this.sliderWrapperIds = [];
-		this.sliderWrapperIds.push($(sliderTitleWrapper).attr('id'));
-		this.sliderWrapperIds.push($(sliderWrapper).attr('id'));
-		return sliderId;
+		var sliderSelector = '.active #slider' + this.handle.toCapitalCamelCase();
+		var sliderWrapper = makeSlider(sliderTitleWrapper, sliderWrapper, sliderSelector, title, attrs, handlers)
+		if (!this.sliderWrapperSelectors) this.sliderWrapperSelectors = [];
+		this.sliderWrapperSelectors.push($(sliderTitleWrapper).attr('id'));
+		this.sliderWrapperSelectors.push($(sliderWrapper).attr('id'));
+		return sliderSelector;
 	},
 	checkForMigrateCenter: function() {
 		if ($('#sliderHolderCenter').html().killWhiteSpace() != '') {
@@ -128,9 +128,9 @@ objectFuncs = {
 	},//DOESN'T WORK  MUST MIGRATE ALL BOUND FUNCTIONS AS WELL, I THINK
 	removeSlider: function() {
 		//can be seperate wrappers for title, slider
-		if (this.sliderWrapperIds) {
-			for (var wrapperIdx=0; wrapperIdx<this.sliderWrapperIds.length; wrapperIdx++) {
-				$('#' + this.sliderWrapperIds[wrapperIdx]).html('');
+		if (this.sliderWrapperSelectors) {
+			for (var wrapperIdx=0; wrapperIdx<this.sliderWrapperSelectors.length; wrapperIdx++) {
+				$('#' + this.sliderWrapperSelectors[wrapperIdx]).html('');
 			}
 		}
 		
@@ -1057,8 +1057,8 @@ function Piston(attrs){
 	walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);		
 	//this.wall.setDefaultReadout(this.readout);
 	if (this.makeSlider) {
-		this.sliderId = this.addSlider('Pressure', {value: this.pToPercent(pInit)}, [{eventType:'slide', obj:this, func:this.parseSlider}], this.sliderWrapper, this.sliderTitleWrapper);
-		this.slider = $('#' + this.sliderId);
+		this.sliderSelector = this.addSlider('Pressure', {value: this.pToPercent(pInit)}, [{eventType:'slide', obj:this, func:this.parseSlider}], this.sliderWrapper, this.sliderTitleWrapper);
+		this.slider = $(this.sliderSelector);
 	}
 	
 	this.setupStd();
@@ -1232,10 +1232,10 @@ function Heater(attrs){
 	this.setupStd();
 	if (this.makeSlider) {
 
-		this.sliderId = this.addSlider('Heater', {value:50}, 
+		this.sliderSelector = this.addSlider('Heater', {value:50}, 
 			[{eventType:'slide', obj:this, func:this.parseSlider},
 			{eventType:'slidestop', obj:this, func:function(event, ui){
-												$('#'+this.sliderId).slider('option', {value:50});
+												$(this.sliderSelector).slider('option', {value:50});
 												ui.value=50;
 												this.parseSlider(event, ui)
 											}
