@@ -313,9 +313,9 @@ Timeline.Section.prototype = {
 	},
 	deepStepTo: function(destPromptData, inheritedBranches) {
 		//Your attention please:  This is only used for refreshing.  Deal with it.
-		//so it only works going forward
-		var timeLast = this.time;
-		for (var i=this.moments.indexOf(this.momentAt(this.time)); i<this.moments.length-1; i++) {
+		//so it only works if the section has just been rendered.
+		var timeLast = -1
+		for (var i=this.moments.indexOf(this.nextMoment(timeLast)); i<this.moments.length-1; i++) {
 			//will need to stop this before it gets to infinity.  I think the -1 in the condition should take care of it
 			var moment = this.moments[i];
 			var branchCmmd;
@@ -323,14 +323,13 @@ Timeline.Section.prototype = {
 				branchCmmd = moment.branchCmmd;
 				moment.branchCmmd = undefined;
 			}
-			var timeNext = this.moments[i + 1].timestamp; 
-			if (timeNext == Infinity) timeNext = this.moments[i].timestamp;
-			//Make sure we don't say we're stepping to Infinity
+			var timeNext = this.moments[i].timestamp; 
 			if (this.sectionData.prompts[Math.floor(moment.timestamp)] == destPromptData) {
 				this.stepTo(this.getTimestamp(moment.timestamp, 'headhtml'))
+				this.promptIdx = Math.floor(moment.timestamp);
 				return true;
 			}
-			moment.fire(this.time, timeNext);
+			moment.fire(timeLast, timeNext);
 			
 			if (branchCmmd) {
 				var promptIdx = Math.floor(this.time);
@@ -349,7 +348,8 @@ Timeline.Section.prototype = {
 					
 				}
 			}
-			this.time = moment.timestamp;
+			timeLast = timeNext;
+			this.time = timeNext;
 			
 		}
 		
@@ -1073,7 +1073,7 @@ Timeline.Moment.prototype = {
 					}
 				}
 			} else if (span.boundType == 'tail') {
-				if (to > from && from >= span.partner.moment.timestamp) {
+				if (to > from && from >= span.partner.moment.timestamp && from < this.timestamp) {
 					span.remove(span.section, span.timelineElems, span.id);
 					if (span.once) 
 						span.active = false;

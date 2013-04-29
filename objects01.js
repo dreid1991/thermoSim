@@ -108,10 +108,11 @@ objectFuncs = {
 		var sliderSelector = '.active #slider' + this.handle.toCapitalCamelCase();
 		var sliderWrapper = makeSlider(sliderTitleWrapper, sliderWrapper, sliderSelector, title, attrs, handlers)
 		if (!this.sliderWrapperSelectors) this.sliderWrapperSelectors = [];
-		this.sliderWrapperSelectors.push($(sliderTitleWrapper).attr('id'));
-		this.sliderWrapperSelectors.push($(sliderWrapper).attr('id'));
+		this.sliderWrapperSelectors.push('.active #' + $(sliderTitleWrapper).attr('id'));
+		this.sliderWrapperSelectors.push('.active #' + $(sliderWrapper).attr('id'));
 		return sliderSelector;
 	},
+	//remove this. can't clone sliders.  or make more clever to clone it thyself method
 	checkForMigrateCenter: function() {
 		if ($('#sliderHolderCenter').html().killWhiteSpace() != '') {
 			this.migrateCenterSlider();
@@ -124,20 +125,19 @@ objectFuncs = {
 		var centerHTML = $('#sliderHolderCenter').html();
 		$('#sliderHolderCenter').html('');
 		$('#sliderHolderLeft').html(centerHTML);
-		//look into jQuery.clone
-	},//DOESN'T WORK  MUST MIGRATE ALL BOUND FUNCTIONS AS WELL, I THINK
+	},
 	removeSlider: function() {
 		//can be seperate wrappers for title, slider
 		if (this.sliderWrapperSelectors) {
 			for (var wrapperIdx=0; wrapperIdx<this.sliderWrapperSelectors.length; wrapperIdx++) {
-				$('#' + this.sliderWrapperSelectors[wrapperIdx]).html('');
+				$(this.sliderWrapperSelectors[wrapperIdx]).html('');
 			}
 		}
 		
 	},
 	hideSliderDivs: function(){
-		$('#sliderHolderSingle').hide();
-		$('#sliderHolderDouble').hide();
+		$('.active #sliderHolderSingle').hide();
+		$('.active #sliderHolderDouble').hide();
 	},
 	valToPercent: function(val) {
 		return 100*(val-this.min)/(this.max-this.min);
@@ -1264,12 +1264,12 @@ _.extend(Heater.prototype, objectFuncs, {
 		this.liquid.addQ(.1 * this.qRate * updateInterval);
 	},
 	disable: function() {
-		var slider = $('#' + this.sliderId);
+		var slider = $(this.sliderSelector);
 		if (slider.length) $(slider).slider('disable');
 		this.enabled = false;
 	},
 	enable: function() {
-		var slider = $('#' + this.sliderId);
+		var slider = $(this.sliderSelector);
 		if (slider.length) $(slider).slider('enable');
 		this.enabled = true;
 	},
