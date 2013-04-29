@@ -142,14 +142,14 @@ Timeline.prototype = {
 		var motherSection = curSection.motherSection;
 		var motherTimeline = curSection.motherTimeline;
 		var conditionMgr = curSection.conditionManager; //not sure what I should do with this.  Come back to.  Certainly *not* what I'm doing now.
-		var newMotherSection = new Timeline.Section(curSection.motherTimeline, curSection.sectionData, this.buttonManagerBlank, conditionMgr);
+		var newMotherSection = new Timeline.Section(curSection.motherTimeline, motherSection.sectionData, this.buttonManagerBlank, conditionMgr);
 		//curSection.cleanUpPrompt();
 		motherSection.clear();
 		//I think I want to kill the branches, but non the moments that create them.  Then I don't have to worry about instances of the un-refreshed level being around
 		//Actually, I want to keep section branches.  NOT IMPLEMENTED
 		//I think I'll need to 'clear()' all the way up to the motherSection in case html (graphs, auxpicture) was added in a branched prompt
 			//noooop!  consider:  Prompt branches only affect the state the the section we just cleared
-		newMotherSection.copyBranchEvents(motherSection.moments);
+		newMotherSection.copyBranchCmmds(motherSection.moments);
 		var motherSectionIdx = motherTimeline.sections.indexOf(motherSection);
 		motherTimeline.sections.splice(motherSectionIdx, 1, newMotherSection);
 		newMotherSection.showSection();
@@ -319,9 +319,9 @@ Timeline.Section.prototype = {
 			//will need to stop this before it gets to infinity.  I think the -1 in the condition should take care of it
 			var moment = this.moments[i];
 			var branchCmmd;
-			if (moment.branchCmmd) {
-				branchCmmd = moment.branchCmmd;
-				moment.branchCmmd = undefined;
+			if (moment.events.branchCmmd) {
+				branchCmmd = moment.events.branchCmmd;
+				moment.events.branchCmmd = undefined;
 			}
 			var timeNext = this.moments[i].timestamp; 
 			if (this.sectionData.prompts[Math.floor(moment.timestamp)] == destPromptData) {
@@ -336,34 +336,41 @@ Timeline.Section.prototype = {
 				var branch = inheritedBranches[promptIdx];
 				if (branch.timeline.isSectionsBranch) {
 					this.branches[promptIdx] = branch;
+					//also step out of it
 				} else if (branch.timeline.isPromptsBranch) {
 					//make a new one, the deep step through with old it's branches.  Yes, that is the grammar I meant
 					var promptBranchBranches = branch.timeline.sections[0].branches;
-					var branchMoment = new Timeline.moment(this.time);
-					branchMoment.branchCmmd = branchCmmd;
+					var branchMoment = new Timeline.Moment(moment.timestamp);
+					branchMoment.events.branchCmmd = branchCmmd;
 					branchMoment.fire(this.time, timeNext);
 					var spawnedBranch = this.branches[promptIdx];
-					var hitDest = spawnedBranch.deepStepTo(destPromptData, promptBranchBranches);
+					spawnedBranch.timeline.sections[0].copyBranchCmmds(branch.timeline.sections[0].moments);
+					var hitDest = spawnedBranch.timeline.sections[0].deepStepTo(destPromptData, promptBranchBranches);
 					if (hitDest) return true;
 					
 				}
+			}
+			if (branchCmmd) {
+				moment.events.branchCmmd = branchCmmd;
 			}
 			timeLast = timeNext;
 			this.time = timeNext;
 			
 		}
-		
+		return false;
 	},
-	copyBranchEvents: function(srcMoments) {
+	copyBranchCmmds: function(srcMoments) {
 		for (var i=0; i<srcMoments.length; i++) {
 			var srcMoment = srcMoments[i];
-			if (srcMoment.branchCmmd) {
-				var destMoment = this.momentAt(srcMoment.time)
+			var branchCmmd = srcMoment.events.branchCmmd;
+			if (branchCmmd) {
+				branchCmmd.section = this;
+				var destMoment = this.momentAt(srcMoment.timestamp)
 				if (destMoment) {
-					destMoment.branchCmmd = srcMoment.branchCmmd;
+					destMoment.events.branchCmmd = branchCmmd;
 				} else {
 					destMoment = new Timeline.Moment(srcMoment.timestamp);
-					destMoment.branchCmmd = srcMoment.branchCmmd;
+					destMoment.events.branchCmmd = branchCmmd;
 					this.spliceInMoment(destMoment);
 				}
 			}
@@ -450,25 +457,22 @@ Timeline.Section.prototype = {
 		this.branchPrompts(prompts, timestamp);
 	},
 	branchPrompts: function(prompts, timestamp) {
-		var self = this;
 		this.killBranchMoments();
 		var moment = new Timeline.Moment(timestamp);
-		var curTimeline = this.timeline;
 		
-		var cmmd = new Timeline.Command('point', function() {
+		var cmmd = new Timeline.Command('point', function(curTimeline, curSection) {
 			var promptIdx = Math.floor(timestamp);
-			//self.time += 1e-4;
-			if (self.branches[promptIdx] && self.branches[promptIdx].id == prompts.id) {
-				window.timeline = self.branches[promptIdx].timeline;
+			if (curSection.branches[promptIdx] && curSection.branches[promptIdx].id == prompts.id) {
+				window.timeline = curSection.branches[promptIdx].timeline;
 				timeline.sections[0].pushToGlobal();
 				
 				var now = timeline.now()
 				timeline.show(now.sectionIdx, now.promptIdx, false, true);
 			} else {
-				var branchTimeline = new Timeline(curTimeline, undefined, false, true);
-				self.branches[promptIdx] = new Timeline.Branch(branchTimeline, prompts.id);
-				branchTimeline.pushSection({prompts: prompts}, self.motherTimeline, self.motherSection);
-				branchTimeline.sections[0].inheritState(self);
+				var branchTimeline = new Timeline(curTimeline, curSection.buttonManagerBlank, false, true);
+				curSection.branches[promptIdx] = new Timeline.Branch(branchTimeline, prompts.id);
+				branchTimeline.pushSection({prompts: prompts}, curSection.motherTimeline, curSection.motherSection);
+				branchTimeline.sections[0].inheritState(curSection);
 				//this makes it so we don't have to call showSection, which would replace the html
 				branchTimeline.sectionIdx = 0;
 				branchTimeline.inited = true;
@@ -485,16 +489,15 @@ Timeline.Section.prototype = {
 		this.spliceInMoment(moment);
 	},
 	branchSections: function(sections) {
-		var self = this;
 		this.killBranchMoments();
 		var timestamp = this.getTimestamp(Math.floor(this.time), 'branchPostClean');
 		var moment = new Timeline.Moment(timestamp);
-		var curTimeline = this.timeline;
-		var cmmd = new Timeline.Command('point', function() {
-			var promptIdx = Math.floor(self.time);
-			if (self.branches[promptIdx] && self.branches[promptIdx].id == sections.id) {
-				self.timeline.clearCurrentSection();
-				window.timeline = self.branches[promptIdx].timeline;
+		
+		var cmmd = new Timeline.Command('point', function(curTimeline, curSection) {
+			var promptIdx = Math.floor(curSection.time);
+			if (curSection.branches[promptIdx] && curSection.branches[promptIdx].id == sections.id) {
+				curTimeline.clearCurrentSection();
+				window.timeline = curSection.branches[promptIdx].timeline;
 				timeline.sections[timeline.sectionIdx].pushToGlobal();
 				timeline.sections[timeline.sectionIdx].showSection();
 				//timeline.showHTML();//this doesn't actually exist
@@ -506,9 +509,9 @@ Timeline.Section.prototype = {
 				for (var i=0; i<sections.length; i++) {
 					branchTimeline.pushSection(sections[i]);
 				}
-				self.branches[self.promptIdx] = new Timeline.Branch(branchTimeline, sections.id);
+				curSection.branches[curSection.promptIdx] = new Timeline.Branch(branchTimeline, sections.id);
 				//don't need to clear prompt, that will be taken care of when we resume
-				self.timeline.clearCurrentSection();
+				curSection.timeline.clearCurrentSection();
 				//self.time += 1e-4;
 				window.timeline = branchTimeline;
 				branchTimeline.show(0, 0);
@@ -865,7 +868,7 @@ Timeline.Section.prototype = {
 				}
 			}
 		} else {
-			return time;
+			return Math.floor(time);
 		}	
 	},
 	getOrCreateMoment: function(moments, timestamp) {
@@ -1005,7 +1008,7 @@ Timeline.stateFuncs = {
 			if (spawnExpr) {
 				with (DataGetFuncs) {
 					if (typeof spawnExpr == 'function') {
-						spawnExpr();
+						spawnExpr(section.timeline, section);
 					} else if (typeof spawnExpr == 'string') {
 						eval('(' + spawnExpr + ')');	
 					} else if (spawnExpr instanceof Array) {
