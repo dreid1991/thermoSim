@@ -23,7 +23,7 @@ SceneNavigator.prototype = {
 			if (checkDirs) {
 				var dirExpr = this.checkDirections(curPrompt.directions);
 			}
-			instrs = dirExpr ? this.evalDirections(dirExpr) : {advance: true, killbranches: false};
+			instrs = dirExpr != undefined ? this.evalDirections(dirExpr) : {advance: true, killBranches: false};
 		
 			if (instrs.killBranches) {
 				timeline.sections[timeline.sectionIdx].killBranches();
@@ -64,7 +64,7 @@ SceneNavigator.prototype = {
 				return whereTo;
 			}
 		}
-		return undefined;
+		return {advance: true, killBranches: true};
 	},
 	evalDirections: function(dirExpr) {
 		var directionFuncs = {

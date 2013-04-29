@@ -55,6 +55,7 @@ Timeline.prototype = {
 		window.timeline = this;
 		timeline.suspended = false;
 		this.curSection().pushToGlobal();
+		if (!forwards) this.curSection().time -= 1e-4;
 		if (caughtTimeline.isSectionsBranch) {
 			this.curSection().restoreHTML();
 		}
@@ -275,7 +276,7 @@ Timeline.Section.prototype = {
 			//avoids unnecessary cutscene entering/exiting
 			var curMom = this.momentAt(this.time);
 			if (curMom) curMom.fire(this.time, dest);
-			/*if (curMom) */this.time -= 1e-4;
+			if (curMom) this.time -= 1e-4;
 			var reAddElemsDest = this.getTimestamp(Math.floor(dest), 'branchPreClean');
 			while (reAddElemsDest != this.time) {
 				var nextMom = this.nextTowardsDest(this.time, reAddElemsDest);
