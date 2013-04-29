@@ -51,7 +51,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		return usedSpcs;
 	},
 	makeActCoeffFuncs: function(type, info, spcDefs) {
-		if (type == 'twoSfxMrg') {
+		if (/(twoSfxMrg|twosuffixmargoules)/i.test(type)) {
 			var coeff = info.a
 			return this.makeTwoSfxMrgFuncs(spcDefs, coeff);
 		}
@@ -176,7 +176,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcDefs, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt);//you were making the liquid eject if df<0 whether hit or not
 		var sizeWall = this.setupSizeWall(wallLiq, wallGas, spcDefs, dotMgrLiq, wallGasIdxs, wallSurfAreaObj)
 		var zeroAttrs = this.zeroAttrs;
-		if (this.phasePressure) {
+		if (!this.phasePressure) {
 			this.checkUpdatePhase = function() {};
 		} 
 		
