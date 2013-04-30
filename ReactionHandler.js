@@ -130,8 +130,9 @@ ReactionHandler = {
 		//abs will handle dots moving away from other dot
 	},
 	probFunc: function(hitE, activE) {
-		var x = Math.max(hitE/activE - 1, 0);
-		return 2*(x - .5*x*x);//max of 1, min of 0
+		return hitE > activE ? 1 : 0;
+		//var x = Math.max(hitE/activE - 1, 0);
+		//return 2*(x - .5*x*x);//max of 1, min of 0
 	},
 	rctHandlerSinglePair: function(idStr) {
 		var rxn = this.rxns[idStr][0];
