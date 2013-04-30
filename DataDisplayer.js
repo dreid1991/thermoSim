@@ -47,6 +47,8 @@ DataDisplayer.prototype = {
 		var numDec = 0;
 		var decIdx = src.indexOf('.');
 		if (decIdx == -1) {
+			src = String(src) + '.';
+			for (var i=0; i<decPlaces; i++) src += '0';
 			return src;
 		} else {
 			var roundFactor = Number('1e' + decPlaces);

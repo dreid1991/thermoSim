@@ -4,6 +4,10 @@ LevelData = {
 
 	spcDefs: [
 		//add antoine coefs, cvLiq, hvap
+		{spcName: 'a', m: 4, r: 1, col: Col(255, 0, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'b', m: 4, r: 1, col: Col(0, 255, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'c', m: 4, r: 1, col: Col(100, 100, 255), cv: 1.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'd', m: 4, r: 1, col: Col(255, 255, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
 		{spcName: 'spc1', m: 4, r: 1, col: Col(200, 0, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
 		{spcName: 'ugly', m: 4, r: 1, col: Col(150, 100, 100), cv: 1.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'uglier', m: 4, r: 1, col: Col(250, 250, 250), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
@@ -18,7 +22,8 @@ LevelData = {
 				],
 				dots: [
 					//{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 1000, temp: 250, returnTo: 'wally', tag: 'wally'}
+					{spcName: 'a', pos: P(55, 55), dims: V(150, 200), count: 600, temp: 250, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'b', pos: P(55, 55), dims: V(150, 200), count: 600, temp: 250, returnTo: 'wally', tag: 'wally'}
 					//{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 600, temp: 100, returnTo: 'wally', tag: 'wally', cleanUpWith: 'prompt0'},
 					//{spcName: 'duckling', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
@@ -27,14 +32,14 @@ LevelData = {
 						// type: 'AuxImage',
 						// attrs: {handle: 'picci', slotNum: 0, imgFunc: 'img("img/work/block0Pic1.jpg")'}
 					// },
-					{
-						type: 'Liquid',
-						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}, makePhaseDiagram: false}
-					},
-					{
-						type: 'DragWeights',
-						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 6}], pInit: 3, cleanUpWith: 'prompt1'}
-					},
+					// {
+						// type: 'Liquid',
+						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}, makePhaseDiagram: false}
+					// },
+					// {
+						// type: 'DragWeights',
+						// attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 6}], pInit: 3, cleanUpWith: 'prompt1'}
+					// },
 					// {
 						// type: 'ActivationEnergyPair',
 						// attrs: {spcNameLow: 'ugly', spcNameHigh: 'uglier', thresholdEnergy: 12}
@@ -61,15 +66,15 @@ LevelData = {
 				// ],
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
-					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'uglier', tag: 'wally'}}
+					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'a', tag: 'wally'}}
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
 					//{data: 'collisions'}
 				],
-				// rxns: [
-					// {handle: 'rxn1', rctA: 'ugly', activeE: 10, prods: {uglier: 2}},
-					// {handle: 'rxn2', rctA: 'uglier', rctB: 'uglier', activeE: 10, prods: {ugly: 1}}
-					// //{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
-				// ],
+				rxns: [
+					{handle: 'rxn1', rctA: 'a', rctB: 'b', activeE: 10, prods: {c: 1, d: 1}},
+					{handle: 'rxn2', rctA: 'c', rctB: 'd', activeE: 10, prods: {a: 1, b: 1}}
+					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
+				],
 				dataReadouts: [
 					{label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'}
 					// {label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},
@@ -78,32 +83,32 @@ LevelData = {
 					//{label: 'pExt: ', expr: 'pExt("wally")', units: 'bar', decPlaces: 1, handle: 'extextext', readout: 'mainReadout'}
 					//{label: 'RCT: ', expr: 'frac("wally", {spcName: "spc1", tag: "wally"}) + frac("wally", {spcName: "ugly", tag: "wally"})', sigFigs: 2, handle: 'coalseamgas', readout: 'mainReadout'}
 				],
-				buttonGroups: [
-					{handle: 'heaterState', label: 'Heater', prefIdx: 1, isRadio: true, cleanUpWith: 'prompt1', 
-						buttons: [
-							{handle: 'on', label: 'On', isDown: true, exprs: ['curLevel.heaterHeaty.enable()']},
-							{handle: 'off', label: 'Off', exprs: ['curLevel.heaterHeaty.disable()']}
-						]
-					},
-					{handle: 'tempControl', label: 'Temp control', isRadio: true,
-						buttons: [
-							{handle: 'adiabatic', label: 'Adiabatic', exprs: ['walls.wally.isothermalStop()']},
-							{handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}			
-						]
-					},
-					{handle: 'rxnControl', label: 'Rxn control', isToggle: true,
-						buttons: [
-							{handle: 'rxn1On', label: 'Forward on', exprs: ['collide.enableRxn("rxn1")']},
-							{handle: 'rxn1Off', label: 'Forward off', exprs: ['collide.disableRxn("rxn1")']},
-							{handle: 'rxn2On', label: 'Backward on', exprs: ['collide.enableRxn("rxn2")']},
-							{handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.disableRxn("rxn2")']}
-						]
-					}
-				],
-				cmmds: [
-					//'walls.wally.isothermalStop()',
-					{type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
-				],
+				// buttonGroups: [
+					// {handle: 'heaterState', label: 'Heater', prefIdx: 1, isRadio: true, cleanUpWith: 'prompt1', 
+						// buttons: [
+							// {handle: 'on', label: 'On', isDown: true, exprs: ['curLevel.heaterHeaty.enable()']},
+							// {handle: 'off', label: 'Off', exprs: ['curLevel.heaterHeaty.disable()']}
+						// ]
+					// },
+					// {handle: 'tempControl', label: 'Temp control', isRadio: true,
+						// buttons: [
+							// {handle: 'adiabatic', label: 'Adiabatic', exprs: ['walls.wally.isothermalStop()']},
+							// {handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}			
+						// ]
+					// },
+					// {handle: 'rxnControl', label: 'Rxn control', isToggle: true,
+						// buttons: [
+							// {handle: 'rxn1On', label: 'Forward on', exprs: ['collide.enableRxn("rxn1")']},
+							// {handle: 'rxn1Off', label: 'Forward off', exprs: ['collide.disableRxn("rxn1")']},
+							// {handle: 'rxn2On', label: 'Backward on', exprs: ['collide.enableRxn("rxn2")']},
+							// {handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.disableRxn("rxn2")']}
+						// ]
+					// }
+				// ],
+				// cmmds: [
+					// //'walls.wally.isothermalStop()',
+					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
+				// ],
 				// rxns: [
 					// {handle: 'rxn1', rctA: 'spc1', rctB: 'ugly', activeE: 15, prods: {duckling: 1}},
 					// {handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
@@ -111,7 +116,7 @@ LevelData = {
 				graphs: [
 					{type: 'Scatter', handle: 'PvsVOne', xLabel: "temp (K)", yLabel: "frac hot spc", axesInit:{x:{min:0, step:1}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
-							{handle:'frac', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'pExt("wally")', y: "frac('wally', {spcName: 'uglier', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
+							{handle:'frac', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "2*frac('wally', {spcName: 'a', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
 						]
 					},
 					// {type: 'Scatter', handle: 'tempvstime', xLabel: "vol", yLabel: "pExt (K)", axesInit:{x:{min:0, step:3}, y:{min:0, step:2}}, numGridLines: {x: 3, y: 10},

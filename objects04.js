@@ -51,9 +51,12 @@ _.extend(Liquid.prototype, objectFuncs, {
 		return usedSpcs;
 	},
 	makeActCoeffFuncs: function(type, info, spcDefs) {
+		type = type || 'ideal';
 		if (/(twoSfxMrg|twosuffixmargoules)/i.test(type)) {
 			var coeff = info.a
 			return this.makeTwoSfxMrgFuncs(spcDefs, coeff);
+		} else if (/ideal/i.test(type)) {
+			return function(x, T) {return 1};
 		}
 	},
 	makeTwoSfxMrgFuncs: function(spcDefs, coeff) {
