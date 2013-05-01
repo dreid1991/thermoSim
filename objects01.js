@@ -1449,14 +1449,17 @@ _.extend(Stops.prototype, objectFuncs, {
 	},
 	init: function(){
 		if (this.height>this.wall[0].y) {
-			this.boundToSet = 'yMax';
+			this.boundToSet = 'max';
 		} else {
-			this.boundToSet = 'yMin'
+			this.boundToSet = 'min'
 		}
 		this.yBoundSave = this.wall.bounds[this.boundToSet];
 		var settingObj = {};
-		settingObj[this.boundToSet] = this.height;
-		walls.setBounds(this.wallInfo, settingObj);
+		if (this.boundToSet == 'max') {
+			walls.setBounds(this.wallInfo, undefined, this.height);
+		} else if (this.boundToSet == 'min') {
+			walls.setBounds(this.wallInfo, this.height, undefined);
+		}
 		if (this.willDraw) {
 			addListener(curLevel, 'update', 'drawStops' + this.wallInfo, this.draw, '');
 		}
@@ -1464,9 +1467,11 @@ _.extend(Stops.prototype, objectFuncs, {
 	},
 	remove: function(){
 		if (window.walls && !walls.removed) {
-			var settingObj = {};
-			settingObj[this.boundToSet] = this.yBoundSave;
-			walls.setBounds(this.wallInfo, settingObj);
+			if (this.boundToSet == 'max') {
+				walls.setBounds(this.wallInfo, undefined, this.yBoundSave);
+			} else if (this.boundToSet == 'min') {
+				walls.setBounds(this.wallInfo, this.yBoundSave, undefined);
+			}
 		}
 		if (this.willDraw) {
 			removeListener(curLevel, 'update', 'drawStops' + this.wallInfo);

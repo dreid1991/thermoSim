@@ -81,8 +81,8 @@ WallMethods.wall = {
 						funcOnFinish(highBound);
 						nextY = highBound;
 					}
-				} else if(unboundedY>bounds.yMax || unboundedY<bounds.yMin) {
-					nextY = this.hitBounds(lastY, gLocal, bounds.yMin, bounds.yMax);
+				} else if(unboundedY>bounds.max.y || unboundedY<bounds.min.y) {
+					nextY = this.hitBounds(lastY, gLocal, bounds.min.y, bounds.max.y);
 				} else {
 					nextY = unboundedY;
 					this.v += gLocal;
@@ -99,14 +99,15 @@ WallMethods.wall = {
 	moveInit: function(){
 		var gLocal = g;
 		var bounds = this.bounds;
+		
 		addListener(curLevel, 'wallMove', 'cP' + this.handle,
 			function(){
 				var lastY = this[0].y
 				var nextY;
 				var unboundedY = lastY + this.v + .5*gLocal;
 				var dyWeight = null;
-				if(unboundedY>bounds.yMax || unboundedY<bounds.yMin){
-					nextY = this.hitBounds(lastY, gLocal, bounds.yMin, bounds.yMax);
+				if(unboundedY>bounds.max.y || unboundedY<bounds.min.y){
+					nextY = this.hitBounds(lastY, gLocal, bounds.min.y, bounds.max.y);
 				}else{
 					nextY = unboundedY;
 					this.v += gLocal;

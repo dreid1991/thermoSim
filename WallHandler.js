@@ -58,12 +58,22 @@ WallMethods.main = {
 		this.defaultReadout = undefined;
 		return this;
 	},
-	setBounds: function(wallInfo, bounds){
+	setBounds: function(wallInfo, min, max){
 		var wallBounds = this[this.idxByInfo(wallInfo)].bounds;
-		for (var boundName in bounds){
-			wallBounds[boundName] = bounds[boundName]
+		if (max) {
+			if (max instanceof Point) {
+				wallBounds.max = max;
+			} else {
+				wallBounds.max.y = max;
+			}	
 		}
-		return this;
+		if (min) {
+			if (min instanceof Point) {
+				wallBounds.min = min;
+			} else {
+				wallBounds.min.y = min;
+			}	
+		}
 	},
 	setup: function(){
 		this.gridDim=20;
@@ -154,7 +164,7 @@ WallMethods.main = {
 		return wallGrid;
 	},
 	setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show, record, tSet, col, dotMgr, close, isothermalRate){
-		bounds = defaultTo({yMin:30, yMax: 435}, bounds);
+		bounds = {min: P(0, bounds && bounds.yMin ? bounds.yMin : 30), max: P(0, bounds && bounds.yMax ? bounds.yMax : 435)};
 		include = defaultTo(1, include);
 		this[wallIdx] = pts;
 		_.extend(this[wallIdx], WallMethods.wall, WallMethods.wallDataHandler);	
