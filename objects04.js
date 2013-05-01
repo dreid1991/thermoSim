@@ -31,6 +31,7 @@ function Liquid(attrs) {
 	this.updateListenerName = this.type + this.handle;
 	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs, this.surfAreaObj);
 	this.wallGas.addLiquid(this);
+	this.wallBound = this.addWallBound(this.wallGas);
 	this.phaseChangeEnabled = true;
 	this.energyForDots = 0;
 	if (makePhaseDiagram) {
@@ -489,6 +490,17 @@ _.extend(Liquid.prototype, objectFuncs, {
 		
 		var graph = new GraphPhase({spcAName: spcAName, spcBName: spcBName, axisInit: axisInit, actCoeffFuncs: actCoeffFuncs, handle: handle, primaryKey: primaryKey, liquid: this, wallGas: this.wallGas});
 		return graph;
+	},
+	addWallBound: function(wallGas) {
+		wallGas.setBounds(undefined, this.wallLiq[0]);
+		var boundFunc = function(wallGas, nextY, boundY) {
+			var wallGasY = wallGas[0].y;
+			var liqY = this[0].y;
+			var wallGasMass = wallGas.mass;
+			//var 
+		}
+	
+		var handler = new WallMethods.BoundHandler(func, this, true);
 	},
 	remove: function() {
 		removeListener(curLevel, 'update', this.updateListenerName);

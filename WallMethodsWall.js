@@ -106,9 +106,30 @@ WallMethods.wall = {
 				var nextY;
 				var unboundedY = lastY + this.v + .5*gLocal;
 				var dyWeight = null;
-				if(unboundedY>bounds.max.y || unboundedY<bounds.min.y){
-					nextY = this.hitBounds(lastY, gLocal, bounds.min.y, bounds.max.y);
-				}else{
+				if (unboundedY>bounds.max.y) {
+					//want a list of things to do.  Want an *option* for if to do standard hitBounds.  Add like {func:, obj:, replaceStd: }
+					var useStdBound = true;
+					for (var i=0; i<this.boundMaxHandlers.length; i++) {
+						if (this.boundMaxHandlers[i].replacesStd) {
+							nextY = this.boundMaxHandlers[i].func.apply(this.boundMaxHandlers[i].obj, [this, nextY, bounds.max.y]);
+							useStdBound = false;
+						} else {
+							this.boundMaxHandlers[i].func.apply(this.boundMaxHandlers[i].obj, [this, nextY, bounds.max.y]);
+						}
+					}
+					if (useStdBound) nextY = this.hitBounds(lastY, gLocal, bounds.min.y, bounds.max.y);
+				} else if (unboundedY<bounds.min.y) {
+					var useStdBound = true;
+					for (var i=0; i<this.boundMinHandlers.length; i++) {
+						if (this.boundMinHandlers[i].replacesStd) {
+							nextY = this.boundMinHandlers[i].func.apply(this.boundMinHandlers[i].obj, [this, nextY, bounds.min.y]);
+							useStdBound = false;
+						} else {
+							this.boundMinHandlers[i].func.apply(this.boundMinHandlers[i].obj, [this, nextY, bounds.min.y]);
+						}
+					}
+					if (useStdBound) nextY = this.hitBounds(lastY, gLocal, bounds.min.y, bounds.max.y);
+				} else {
 					nextY = unboundedY;
 					this.v += gLocal;
 
@@ -270,6 +291,23 @@ WallMethods.wall = {
 			delete this.liquids[liquid.handle];
 		}
 	},
+	setBounds: function(min, max){
+		var wallBounds = this.bounds;
+		if (max) {
+			if (max instanceof Point) {
+				wallBounds.max = max;
+			} else {
+				wallBounds.max.y = max;
+			}	
+		}
+		if (min) {
+			if (min instanceof Point) {
+				wallBounds.min = min;
+			} else {
+				wallBounds.min.y = min;
+			}	
+		}
+	},
 	addBorder: function(attrs) {
 		attrs.wall = this;
 		this.border = new WallMethods.Border(attrs);
@@ -375,4 +413,9 @@ WallMethods.wall = {
 		}
 	}
 	
+}
+WallMethods.BoundHandler = function(func, obj, replacesStd) {
+	this.func = func;
+	this.obj = obj;
+	this.replacesStd = replacesStd;
 }

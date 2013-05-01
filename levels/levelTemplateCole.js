@@ -7,6 +7,7 @@ LevelData = {
 		{spcName: 'spc3', m: 3, r: 1, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3}
 	],
 	mainSequence: [
+		/*
 		{//First Questions
 			sceneData: {//Scene 0
 							objs: [
@@ -41,10 +42,10 @@ LevelData = {
 						quiz: [
 							{type: 'multChoice',
 								options:[
-									{text:"## nc_v\\Delta T = Q ##", correct: false, message:"But it's adiabatic!"},
+									{text:"## nc_v\\Delta T = Q ##", correct: false, message:"That's not correct"},
 									{text:"##nc_v\\Delta T = -P_{ext}\\Delta V ##", correct: true},
-									{text:"##nc_p\\Delta T = -P_{ext}\\Delta V ##", correct: false, message:"Why Cp?"},
-									{text:"None of these are correct", correct: false, message:"Yes it can.  What is Q equal to for an adiabatic system?"}
+									{text:"##nc_p\\Delta T = -P_{ext}\\Delta V ##", correct: false, message:"That's not correct"},
+									{text:"None of these are correct", correct: false, message:"That's not correct"}
 								]
 							}
 						]
@@ -127,13 +128,14 @@ LevelData = {
 				},
 				{//Prompt 1
 					sceneData: undefined,
-						text: "The system had an initial temperature of 200 K and contains 1.8 moles of an ideal monatomic gas.  You wrote that get('WorkDoneAnswer','int') kJ of work were done.  What final temperature should the system have?",
+						text: "The system had an initial temperature of 200 K and contains 1.6 moles of an ideal monatomic gas.  You wrote that get('WorkDoneAnswer','int') kJ of work were done.  What final temperature should the system have?",
 						quiz: [
 							{type: 'textSmall', storeAs: 'TempAnswer', units: 'K', text: ''}
 						]
 				},
 			]
 		},
+		*/
 		{//Third Scene
 			sceneData: {//Scene 3
 				walls: [
@@ -185,7 +187,7 @@ LevelData = {
 				{//Prompt 1
 					sceneData: undefined,
 						cutScene: true,
-						text: "<center> ## nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p> If you'll notice, the T vs. V graph is linear.  Using the equation above, find what its slope should should be with 1.8 moles of an ideal monatomic gas.  Do the slopes from the equation and from the graph match?",
+						text: "<center> ## nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p> If you'll notice, the T vs. V graph is linear.  Using the equation above, find what its slope should should be with 1.6 moles of an ideal monatomic gas.  Do the slopes from the equation and from the graph match?",
 						quiz: [
 							{type: 'textSmall', label: 'Slope from graph', storeAs: 'slopeFromGraph', text: " "},
 							{type: 'textSmall', label: 'Slope from equation', storeAs: 'slopeFromEquation', text: " "},
@@ -195,7 +197,7 @@ LevelData = {
 				{//Prompt 2
 					sceneData: undefined,
 						cutScene: true,
-						text: "Now we'll look at expanding the same system of 1.8 moles with ## P_{ext} ## of 2 bar from 7.5L to 15 L. <p> How much work will the system do on its surroundings in this expansion, and what will its final temperature be?",
+						text: "Now we'll look at expanding the same system of 1.6 moles with ## P_{ext} ## of 2 bar from 7.5L to 15 L. <p> How much work will the system do on its surroundings in this expansion, and what will its final temperature be?",
 						quiz: [
 							{type: 'textSmall', label: "Work Done:",storeAs: 'workAnswer', text: " ", units: "kJ"},
 							{type: 'textSmall', label: 'Final Temperature:', storeAs: 'tempAnswer', text: " ", units: "K"}

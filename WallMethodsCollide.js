@@ -68,6 +68,7 @@ WallMethods.collideMethods ={
 		v2 = (m1*vo1 + m2*vo2 - m1*v1)/(m2*A)
 		*/
 		var tempO = dot.temp();
+		var KEO = .5 * dot.m * (dot.v.dx * dot.v.dx + dot.v.dy * dot.v.dy);
 		var dotVyF;
 		var wall = this[wallIdx];
 		var vo = dot.v.copy();
@@ -98,6 +99,10 @@ WallMethods.collideMethods ={
 			wall.v = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
 			dot.y = pt.y+dot.r;			
 		}
+		var KEF = .5 * dot.m * (dot.v.dx * dot.v.dx + dotVyF * dotVyF);
+		var ratio = Math.sqrt((KEO + 2 * (KEF - KEO) / 3) / KEF);
+		dotVyF *= ratio;
+		dot.v.dx *= ratio;
 		var tempUnAdj = tConst * .5 * dot.m * (dot.v.dx*dot.v.dx + dotVyF*dotVyF); //with cv = R
 		dot.setTemp(tempO + (tempUnAdj - tempO) * dot.cvKinetic / dot.cv);
 		if (dot.v.dy * dotVyF < 0) dot.v.dy *= -1;

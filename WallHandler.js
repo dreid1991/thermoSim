@@ -58,23 +58,7 @@ WallMethods.main = {
 		this.defaultReadout = undefined;
 		return this;
 	},
-	setBounds: function(wallInfo, min, max){
-		var wallBounds = this[this.idxByInfo(wallInfo)].bounds;
-		if (max) {
-			if (max instanceof Point) {
-				wallBounds.max = max;
-			} else {
-				wallBounds.max.y = max;
-			}	
-		}
-		if (min) {
-			if (min instanceof Point) {
-				wallBounds.min = min;
-			} else {
-				wallBounds.min.y = min;
-			}	
-		}
-	},
+
 	setup: function(){
 		this.gridDim=20;
 		this.xSpan = Math.floor(myCanvas.width/this.gridDim);
@@ -198,6 +182,8 @@ WallMethods.main = {
 		this[wallIdx].forceInternal = 0;
 		this[wallIdx].pLastRecord = turn;
 		this[wallIdx].isothermalRate = defaultTo(1, isothermalRate);
+		this[wallIdx].boundMaxHandlers = [];
+		this[wallIdx].boundMinHandlers = [];
 		this[wallIdx].mass = 0;
 		this[wallIdx].parent = this;
 		makeListenerHolder(this[wallIdx], 'cleanUp');
