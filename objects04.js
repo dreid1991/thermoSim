@@ -199,7 +199,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 					calcEquil();
 					drawDots();
 					moveDots();
-					//if (self.phaseChangeEnabled) ejectDots();
+					if (self.phaseChangeEnabled) ejectDots();
 					sizeWall();
 					checkUpdatePhase();
 					//Kind of changing methods here, this wrapping functions thing seems a little funny
@@ -495,18 +495,20 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var boundFunc = function(wallGas, nextY, boundY) {
 			var wallGasY = wallGas[0].y;
 			var wallGasVelocity = wallGas.v;
-			var liqY = this[0].y;
+			var liqY = this.wallLiq[0].y;
 			var wallGasMass = wallGas.mass;
 		
 			
 			//1 simUnit * (2/3) <for 2d to 3d> * tConst * 3/2 KB = joules
 			var energy = (.5 * wallGasMass * wallGasVelocity * wallGasVelocity + wallGasMass * window.g * (boundY - wallGasY)) * window.tConst * window.KB
-			wallGas[0].y = boundY;
 			wallGas.v = 0;
 			this.temp += energy / this.Cp;
+			return boundY;
 		}
 	
 		var handler = new WallMethods.BoundHandler(boundFunc, this, true);
+		wallGas.addBoundHandler('max', handler);
+		return handler;
 	},
 	remove: function() {
 		removeListener(curLevel, 'update', this.updateListenerName);

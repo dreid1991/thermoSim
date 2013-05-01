@@ -141,6 +141,25 @@ WallMethods.wall = {
 			},
 		this);
 	},
+	addBoundHandler: function(type, handler) {
+		var handlers = this['bound' + type.toCapitalCamelCase() + 'Handlers'];
+		if (handlers) {
+			handlers.push(handler);
+		} else {
+			console.log('Bad wall bound handler type ' + type);
+		}
+	},
+	removeBoundHandler: function(type, handler) {
+		var handlers = this['bound' + type.toCapitalCamelCase() + 'Handlers'];
+		if (handlers) {
+			var idx = handlers.indexOf(handler);
+			if (idx>=0) {
+				handlers.splice(idx, 1);
+			}
+		} else {
+			console.log('Bad wall bound handler type ' + type);
+		}
+	},
 	moveStop: function(){
 		this.v = 0;
 		removeListener(curLevel, 'wallMove', 'cP' + this.handle);

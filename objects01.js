@@ -1023,7 +1023,7 @@ function Piston(attrs){
 	this.wall = walls[this.wallInfo];
 	this.min = defaultTo(2, attrs.min);
 	this.max = defaultTo(15, attrs.max);
-	this.makeSlider = defaultTo(true, attrs.makeSlider);
+	this.makeSlider = defaultTo(false, attrs.makeSlider);
 
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	this.slant = .07;
