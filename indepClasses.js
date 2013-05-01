@@ -518,6 +518,9 @@ Dot.prototype = {
 	},
 	setTemp: function(newTemp) {
 		var curTemp = this.temp();
+		if (!curTemp) {
+			console.log('AAH');
+		}
 		//if (curTemp!=0) {
 			this.v.mult(Math.sqrt(newTemp / curTemp));
 			this.internalPotential *= newTemp / curTemp;

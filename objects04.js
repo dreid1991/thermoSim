@@ -421,8 +421,8 @@ _.extend(Liquid.prototype, objectFuncs, {
 		for (var transIdx=0; transIdx<toTransfer.length; transIdx++) {
 		
 			var dot = toTransfer[transIdx];
-			if (isNaN(dot.temp())) {
-				console.log('woop!');
+			if (dot.temp() == 0) {
+				dot.v.dy = -1; //preventing setTemp with original temp == 0.  That will set temp to NaN
 			}
 			dot.setTemp(this.temp);
 			var hVap = dot.hVap();
