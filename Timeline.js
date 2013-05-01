@@ -175,7 +175,8 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, condition
 	this.sectionData = sectionData;
 	this.moments = [];
 	this.populateMoments(timeline, timeline.elems, this.moments, this.sectionData);
-	this.moments = _.sortBy(this.moments, function(moment) {return moment.timestamp});
+	this.sortMoments();
+
 	//sort moments here
 	this.level = new LevelInstance();
 	this.mainReadout = new Readout('mainReadout', 30, myCanvas.width-125, 25, '13pt calibri', Col(255,255,255), 'left', this.level);
@@ -503,7 +504,6 @@ Timeline.Section.prototype = {
 				window.timeline = curSection.branches[promptIdx].timeline;
 				timeline.sections[timeline.sectionIdx].pushToGlobal();
 				timeline.sections[timeline.sectionIdx].showSection();
-				//timeline.showHTML();//this doesn't actually exist
 				var now = timeline.now()
 				//will have cleaned up prompt on surfacing
 				timeline.show(now.sectionIdx, now.promptIdx, false, true);
@@ -515,7 +515,6 @@ Timeline.Section.prototype = {
 				curSection.branches[curSection.promptIdx] = new Timeline.Branch(branchTimeline, sections.id);
 				//don't need to clear prompt, that will be taken care of when we resume
 				curSection.timeline.clearCurrentSection();
-				//self.time += 1e-4;
 				window.timeline = branchTimeline;
 				branchTimeline.show(0, 0);
 			}
@@ -610,7 +609,6 @@ Timeline.Section.prototype = {
 			}
 		}
 	},
-	//MAKE THESE ACCESSABLE IN TIMELINE
 	addCmmdSpan: function(prompt, cmmdInput) {
 		promptIdx = prompt == 'now' ? this.promptIdx : prompt;
 		var timestampHead = this.getTimestamp(promptIdx, 'setup');
@@ -623,7 +621,7 @@ Timeline.Section.prototype = {
 		}
 		this.timeline.elems[id] = cmmd;
 		this.applyCmmdSpan(this.timeline, this.moments, this.timeline.elems, cmmd, 'cmmds', cmmd.once, timestampHead, id);
-
+		this.sortMoments();
 	},
 
 	addCmmdPoint: function(prompt, when, func, oneWay, once) { //public func.  Test settings a heater's liquid
@@ -634,6 +632,7 @@ Timeline.Section.prototype = {
 		var cmmd = new Timeline.Command('point', func, undefined, oneWay, once);
 		this.timeline.elems[id] = cmmd;
 		this.applyCmmdPoint(this.timeline, this.moments, this.timeline.elems, cmmd, 'cmmds', once, timestamp, id);
+		this.sortMoments();
 	},
 	populateMoments: function(timeline, elems, moments, sectionData) {
 		moments.push(new Timeline.Moment(-2)); //dummy moment to start on
@@ -873,6 +872,9 @@ Timeline.Section.prototype = {
 		} else {
 			return Math.floor(time);
 		}	
+	},
+	sortMoments: function() {
+		this.moments = _.sortBy(this.moments, function(moment) {return moment.timestamp});
 	},
 	getOrCreateMoment: function(moments, timestamp) {
 		for (var i=0; i<moments.length; i++) {

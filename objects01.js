@@ -1225,8 +1225,8 @@ function Heater(attrs){
 	this.draw = this.makeDrawFunc(colMin, colDefault, colMax);
 	this.wallPts = this.pos.roundedRect(this.dims, .3, 'ccw');
 	this.eAdded=0;
-	if (attrs.liquid) { //liquid invoked using liquid handle
-		this.setupLiquidHeat(attrs.liquid);
+	if (attrs.liquidHandle) { //liquid invoked using liquid handle
+		this.setupLiquidHeat(attrs.liquidHandle);
 	}
 	this.wallHandleHeater = 'heater' + this.handle.toCapitalCamelCase();
 	this.setupStd();
@@ -1382,17 +1382,20 @@ _.extend(Heater.prototype, objectFuncs, {
 			this.wall.q += dE;
 		}
 	},
-	setupLiquidHeat: function(liquidData) {
+	setupLiquidHeat: function(liquidHandle) {
 		var self = this;
-		timeline.addEvent('now', 'now', 'setup', 'cmmds', function() {
-			var handle = liquidData.handle;
+		timeline.curSection().addCmmdPoint('now', 'setup', function() {
 			var type = 'Liquid';
-			var liquid = curLevel.selectObj(type, handle);
-			if (!liquid) console.log('Bad liquid data for heater ' + this.handle + '.  Handle ' + handle);
+			var liquid = curLevel.selectObj(type, liquidHandle);
+			liquid.heater = self;
+			if (!liquid) console.log('Bad liquid handle for heater ' + this.handle + '.  Handle ' + handle);
 			var liqWall = liquid.getWallLiq();
 			liqWall.recordQ();
 			self.liquid = liquid;		
-		})
+		}, true, false)
+	},
+	removeLiquid: function() {
+		this.liquid = undefined;
 	},
 	remove: function(){
 		this.removeSlider();

@@ -199,7 +199,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 					calcEquil();
 					drawDots();
 					moveDots();
-					if (self.phaseChangeEnabled) ejectDots();
+					//if (self.phaseChangeEnabled) ejectDots();
 					sizeWall();
 					checkUpdatePhase();
 					//Kind of changing methods here, this wrapping functions thing seems a little funny
@@ -473,7 +473,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var temp = this.temp;
 		q = Math.min(Cp * (3000 - temp), Math.max((-temp + 10) * Cp, q));
 		this.temp += q / Cp;
-		console.log(q/Cp);
 		this.wallLiq.q += q;
 	},
 	makePhaseDiagram: function(liquid, spcDefs, actCoeffFuncs, handle, primaryKey) {
@@ -512,6 +511,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 	remove: function() {
 		removeListener(curLevel, 'update', this.updateListenerName);
 		this.wallGas.removeLiquid(this);
+		if (this.heater) this.heater.removeLiquid();
 		if (!this.wallLiq.removed) walls.removeWall(this.wallLiq.handle);
 		if (!this.wallGas.removed) this.wallGas.removeSurfAreaAdjust(this.handle);
 	},
