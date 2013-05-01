@@ -205,7 +205,7 @@ DotManager.prototype = {
 	getByNameAndTag: function(info) {
 		if (this.lists[info.spcName + '-' + info.tag]) {
 			return this.lists[info.spcName + '-' + info.tag];
-		} else if (spcs[spcName]) {
+		} else if (spcs[info.spcName]) {
 			this.lists[info.spcName + '-' + info.tag] = [];
 			return this.lists[info.spcName + '-' + info.tag];
 		} else {
