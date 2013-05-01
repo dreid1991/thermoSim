@@ -111,10 +111,10 @@ WallMethods.wall = {
 					var useStdBound = true;
 					for (var i=0; i<this.boundMaxHandlers.length; i++) {
 						if (this.boundMaxHandlers[i].replacesStd) {
-							nextY = this.boundMaxHandlers[i].func.apply(this.boundMaxHandlers[i].obj, [this, nextY, bounds.max.y]);
+							nextY = this.boundMaxHandlers[i].func.apply(this.boundMaxHandlers[i].obj, [this, unboundedY, bounds.max.y]);
 							useStdBound = false;
 						} else {
-							this.boundMaxHandlers[i].func.apply(this.boundMaxHandlers[i].obj, [this, nextY, bounds.max.y]);
+							this.boundMaxHandlers[i].func.apply(this.boundMaxHandlers[i].obj, [this, unboundedY, bounds.max.y]);
 						}
 					}
 					if (useStdBound) nextY = this.hitBounds(lastY, gLocal, bounds.min.y, bounds.max.y);
@@ -122,10 +122,10 @@ WallMethods.wall = {
 					var useStdBound = true;
 					for (var i=0; i<this.boundMinHandlers.length; i++) {
 						if (this.boundMinHandlers[i].replacesStd) {
-							nextY = this.boundMinHandlers[i].func.apply(this.boundMinHandlers[i].obj, [this, nextY, bounds.min.y]);
+							nextY = this.boundMinHandlers[i].func.apply(this.boundMinHandlers[i].obj, [this, unboundedY, bounds.min.y]);
 							useStdBound = false;
 						} else {
-							this.boundMinHandlers[i].func.apply(this.boundMinHandlers[i].obj, [this, nextY, bounds.min.y]);
+							this.boundMinHandlers[i].func.apply(this.boundMinHandlers[i].obj, [this, unboundedY, bounds.min.y]);
 						}
 					}
 					if (useStdBound) nextY = this.hitBounds(lastY, gLocal, bounds.min.y, bounds.max.y);

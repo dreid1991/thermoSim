@@ -29,17 +29,17 @@ function Liquid(attrs) {
 	this.chanceZeroDf = .4;
 	this.drivingForceSensitivity = 10;//formalize this a bit
 	this.updateListenerName = this.type + this.handle;
+	if (makePhaseDiagram) {
+		this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, this.handle, attrs.primaryKey);
+		curLevel.graphs[this.phaseDiagram.handle] = this.phaseDiagram;
+		this.phasePressure = attrs.phasePressure || 1;
+		if (this.phasePressure) this.phaseDiagram.setPressure(this.phasePressure);
+	}
 	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs, this.surfAreaObj);
 	this.wallGas.addLiquid(this);
 	this.wallBound = this.addWallBound(this.wallGas);
 	this.phaseChangeEnabled = true;
 	this.energyForDots = 0;
-	if (makePhaseDiagram) {
-		this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, this.handle, attrs.primaryKey);
-		curLevel.graphs[this.phaseDiagram.handle] = this.phaseDiagram;
-		this.phasePressure = attrs.phasePressure;
-		if (this.phasePressure) this.phaseDiagram.setPressure(this.phasePressure);
-	}
 	this.setupStd();
 }
 
@@ -322,7 +322,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				if (dF > 0) { 
 					numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
 				} else {
-					numEjt[spcName] += 1 + Math.sqrt(abs * (-dF * drivingForceSensitivity + 1));
+					numEjt[spcName] += 1/*Math.min(abs, 1)*/ + Math.sqrt(abs * (-dF * drivingForceSensitivity + 1));
 					numEjt[spcName] += (wallLiq[0].x - wallLiq[1].x) * -dF * drivingForceSensitivity / 2000;
 				}
 				//numEjt[spcName] = 1;
@@ -491,8 +491,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 		return graph;
 	},
 	addWallBound: function(wallGas) {
+		//if the falling wall is moving really quickly, energy added may not quite = P\Delta V because wall velocity increases stepwise, not smoothly.  It is around the whatever threshold though
 		wallGas.setBounds(undefined, this.wallLiq[0]);
-		var boundFunc = function(wallGas, nextY, boundY) {
+		var boundFunc = function(wallGas, unboundedY, boundY) {
 			var wallGasY = wallGas[0].y;
 			var wallGasVelocity = wallGas.v;
 			var liqY = this.wallLiq[0].y;
