@@ -495,12 +495,19 @@ _.extend(Liquid.prototype, objectFuncs, {
 		wallGas.setBounds(undefined, this.wallLiq[0]);
 		var boundFunc = function(wallGas, nextY, boundY) {
 			var wallGasY = wallGas[0].y;
+			var wallGasVelocity = wallGas.v;
 			var liqY = this[0].y;
 			var wallGasMass = wallGas.mass;
-			//var 
+		
+			
+			//1 simUnit * (2/3) <for 2d to 3d> * tConst * 3/2 KB = joules
+			var energy = (.5 * wallGasMass * wallGasVelocity * wallGasVelocity + wallGasMass * window.g * (boundY - wallGasY)) * window.tConst * window.KB
+			wallGas[0].y = boundY;
+			wallGas.v = 0;
+			this.temp += energy / this.Cp;
 		}
 	
-		var handler = new WallMethods.BoundHandler(func, this, true);
+		var handler = new WallMethods.BoundHandler(boundFunc, this, true);
 	},
 	remove: function() {
 		removeListener(curLevel, 'update', this.updateListenerName);

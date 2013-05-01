@@ -95,17 +95,18 @@ DotManager.prototype = {
 		}
 	},
 	get: function(info) {
-		if (info) {
-			if (info.spcName && info.tag) {
-				return this.lists[info.spcName + '-' + info.tag];
-			} else if (info.spcName) {
-				return this.lists[info.spcName];
-			} else if (info.tag) {
-				return this.lists[info.tag];
-			}
-		} else {
-			return this.lists.ALLDOTS;
-		}
+		return this.createIfNotExists(info);
+		// if (info) {
+			// if (info.spcName && info.tag) {
+				// return this.lists[info.spcName + '-' + info.tag];
+			// } else if (info.spcName) {
+				// return this.lists[info.spcName];
+			// } else if (info.tag) {
+				// return this.lists[info.tag];
+			// }
+		// } else {
+			// return this.lists.ALLDOTS;
+		// }
 	},
 	clearAll: function() {
 		for (var list in this.lists) {
@@ -113,12 +114,14 @@ DotManager.prototype = {
 		}
 	},
 	createIfNotExists: function(info) {
-		if (info.spcName && info.tag) {
-			return this.getByNameAndTag(info);
-		} else if (info.spcName) {
-			return this.getByName(info.spcName);
-		} else if (info.tag) {
-			return this.getByTag(info.tag);
+		if (info) {
+			if (info.spcName && info.tag) {
+				return this.getByNameAndTag(info);
+			} else if (info.spcName) {
+				return this.getByName(info.spcName);
+			} else if (info.tag) {
+				return this.getByTag(info.tag);
+			}
 		} else {
 			return this.lists.ALLDOTS;
 		}
@@ -202,9 +205,12 @@ DotManager.prototype = {
 	getByNameAndTag: function(info) {
 		if (this.lists[info.spcName + '-' + info.tag]) {
 			return this.lists[info.spcName + '-' + info.tag];
-		} else {
+		} else if (spcs[spcName]) {
 			this.lists[info.spcName + '-' + info.tag] = [];
 			return this.lists[info.spcName + '-' + info.tag];
+		} else {
+			console.log('Tried to get bad spcName ' + spcName);
+			console.trace();			
 		}
 	},
 	getByName: function(spcName) {

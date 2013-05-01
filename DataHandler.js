@@ -14,13 +14,6 @@ DataHandler.prototype = {
 			return self.KEAvg(info)*self.tConst;
 		}
 	},
-	avgTemp: function() {
-		var sum = 0;
-		for (var wallIdx=0; wallIdx<walls.length; wallIdx++) {
-			sum += walls[wallIdx].data.t[walls[wallIdx].data.t.length-1];
-		}
-		return sum/walls.length;
-	},
 	countFunc: function(info){
 		var self = this;
 		return function() {
