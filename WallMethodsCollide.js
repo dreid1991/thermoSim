@@ -137,6 +137,9 @@ WallMethods.collideMethods ={
 		dotVyF = (vo1*(m1-m2)+2*m2*vo2)/(dot.m+m2);
 		wall.v = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
 		dot.y = pt.y+dot.r;		
+		var ratio = Math.sqrt((KEO + 2 * (KEF - KEO) / 3) / KEF);
+		dotVyF *= ratio;
+		dot.v.dx *= ratio;
 		var tempUnAdj = tConst * .5 * dot.m * (dot.v.dx*dot.v.dx + dotVyF*dotVyF); //with cv = R
 		dot.setTemp(tempO + (tempUnAdj - tempO) * dot.cvKinetic / dot.cv);
 		if (dot.v.dy * dotVyF < 0) dot.v.dy *= -1;
