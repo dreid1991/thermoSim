@@ -195,6 +195,14 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var checkUpdatePhase = self.checkUpdatePhase;	
 				removeListener(curLevel, 'update', listenerName);
 				addListener(curLevel, 'update', listenerName, function() {
+					// for (var i=0; i<dotMgrLiq.count; i++) {
+						// if (isNaN(dotMgrLiq.lists.ALLDOTS[i].x) || isNaN(dotMgrLiq.lists.ALLDOTS[i].y)) {
+							// console.log('sfda');
+						// }
+					// }
+					if (isNaN(self.temp)) {
+						console.log('blorp');
+					}
 					calcCp();
 					calcEquil();
 					drawDots();
@@ -205,6 +213,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 					//Kind of changing methods here, this wrapping functions thing seems a little funny
 					if (self.addEnergyToDots(window.dotManager.lists.ALLDOTS, self.energyForDots)) {
 						self.energyForDots = 0;
+					}
+					if (isNaN(self.temp)) {
+						console.log('blorp');
 					}
 				})
 				
@@ -278,9 +289,8 @@ _.extend(Liquid.prototype, objectFuncs, {
 					var pEq = pPure * actCoeff * liqFrac;
 					sumPEq += pEq;
 					pEqs[spcName] = pEq;
-					sumPEq += pEq;
 				}
-				var dPEq = wallGas.pExt() - pEqs;
+				var dPEq = wallGas.pExt() - sumPEq;
 				for (var spcName in spcDefs) {
 					drivingForce[spcName] = dPEq * pEqs[spcName] / sumPEq;
 				}
@@ -399,12 +409,20 @@ _.extend(Liquid.prototype, objectFuncs, {
 			var dot = toTransfer[transIdx];
 			dot.setTemp(this.temp);
 			var hVap = dot.hVap();
-			dot.v.dy = -Math.abs(toTransfer[transIdx].v.dy)
+			dot.v.dy = -Math.abs(dot.v.dy);
 			dot.y = wallLiq[0].y - 1;
 			dot.setWall(wallGas.handle);
 			drawList.splice(drawList.indexOf(dot), 1);
 			this.calcCp();
 			this.temp -= hVap / this.Cp;
+			if (this.Cp == 0) {
+				this.temp = 0;
+				this.energyForDots -= hVap;
+			}
+			if (this.temp < 0) {
+				this.energyForDots -= this.Cp * (1 - this.temp); //setting temp to 1;
+				this.temp = 1;
+			}
 		}
 		dotMgrGas.add(toTransfer);
 	},
@@ -424,6 +442,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 	},
 	hit: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 		//it's a sigmoid!
+		if (isNaN(this.temp) || this.temp < 0) {
+			console.log('woop');
+		}
 		var dF = this.drivingForce;
 		if (dF[dot.spcName] !== undefined) {
 			var chanceZero = this.chanceZeroDf;
@@ -433,14 +454,18 @@ _.extend(Liquid.prototype, objectFuncs, {
 				return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcDefs, this.dataGas.temp);
 			}
 		}
-		this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
-		
-		
+		if (this.dotMgrLiq.count) {
+			this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
+		}
+		if (isNaN(this.temp) || this.temp < 0) {
+			console.log('woop');
+		}		
 	},
 	hitNoPhaseChange: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 		this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
 	},
 	absorbDot: function(dot, drawList, dotMgrLiq, wallLiq, spcDefs, gasTemp) {
+		
 		var dotMgrGas = window.dotManager; 
 		dotMgrGas.remove(dot);
 		drawList.splice(Math.floor(Math.random() * drawList.length), 0, dot);
@@ -450,8 +475,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var tDotF = gasTemp[gasTemp.length - 1];
 		this.energyForDots += (dot.temp() - tDotF) * dot.cv;
 		dot.setTemp(tDotF);
-		
-		
+			
 		var CpLiqOld = this.Cp;
 		this.calcCp();
 		this.temp = (this.temp * CpLiqOld + dot.tempCondense() * dot.cpLiq) / this.Cp;
@@ -459,7 +483,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 		return false; //returning false isn't used here, but I like to return false when a dot is removed from a dot/wall collision check because it is used in dot collisions.  Feels consistent.  
 	},
 	adjTemps: function(dot, wallUV, perpV, dataGas, dataLiq, tLiq, gasSpcLists, spcDefs) {
-		
 		var tGas = dataGas.temp[dataGas.temp.length - 1];
 		var tDot = dot.temp();
 		var CDot = dot.cv;
@@ -493,11 +516,19 @@ _.extend(Liquid.prototype, objectFuncs, {
 		return this.wallGas;
 	},
 	addQ: function(q) {
+		if (isNaN(this.temp) || this.temp < 0) {
+			console.log('woop');
+		}
 		var Cp = this.Cp;
-		var temp = this.temp;
-		q = Math.min(Cp * (3000 - temp), Math.max((-temp + 10) * Cp, q));
-		this.temp += q / Cp;
-		this.wallLiq.q += q;
+		if (Cp != 0) {
+			var temp = this.temp;
+			q = Math.min(Cp * (3000 - temp), Math.max((-temp + 10) * Cp, q));
+			this.temp += q / Cp;
+			this.wallLiq.q += q;
+		}
+		if (isNaN(this.temp) || this.temp < 0) {
+			console.log('woop');
+		}
 	},
 	makePhaseDiagram: function(liquid, spcDefs, actCoeffFuncs, handle, primaryKey) {
 		var spcAName, spcBName
