@@ -174,7 +174,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 	},
 	setupUpdate: function(spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName, drawList, dotMgrLiq, wallLiq, numAbs, drivingForceSensitivity, numEjt, wallGas, wallGasIdxs, wallSurfAreaObj) {
 		this.calcCp = this.setupCalcCp(spcDefs, dotMgrLiq);
-		this.calcEquil = this.setupUpdateEquil(spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce);
+		this.calcEquil = this.setupUpdateEquil(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce);
 		this.drawDots = this.setupDrawDots(drawList);
 		this.moveDots = this.setupMoveDots(dotMgrLiq, spcDefs, wallLiq, wallGas, wallGasIdxs);
 		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcDefs, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt);//you were making the liquid eject if df<0 whether hit or not
@@ -208,14 +208,14 @@ _.extend(Liquid.prototype, objectFuncs, {
 					}
 				})
 				
-			} else {
-				calcCp();
-				calcEquil();
-				drawDots();
-				moveDots();
-				sizeWall();	
-				turns ++;
-			}
+			} 
+			calcCp();
+			calcEquil();
+			drawDots();
+			moveDots();
+			sizeWall();	
+			turns ++;
+			
 		})
 	},
 	addEnergyToDots: function(dots, energy) {
@@ -246,20 +246,44 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 
 	},
-	setupUpdateEquil: function(spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce) {
+	setupUpdateEquil: function(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce) {
 		var self = this;
 		return function() {
-			for (var spcName in spcDefs) {
-				var spc = spcDefs[spcName];
-				var gasFrac = dataGas[spcName][dataGas[spcName].length - 1];
-				var liqFrac = dataLiq[spcName][dataLiq[spcName].length - 1];
-				var liqTemp = self.temp;
-				var actCoeff = actCoeffFuncs[spcName](liqFrac, liqTemp);
-				var antCoeffs = spcDefs[spcName].antoineCoeffs;
-				var pPure = self.getPPure(antCoeffs.a, antCoeffs.b, antCoeffs.c, liqTemp);
-				var pEq = pPure * actCoeff * liqFrac;
-				var pGas = gasFrac * dataGas.pInt[dataGas.pInt.length - 1];
-				drivingForce[spcName] = pGas - pEq;
+			//hey - assuming that if the walls get within 5 px of each other, we're in a constant pressure situation.  
+			var nearLiq = Math.abs(wallGas[0].y - wallLiq[0].y) < 5;
+			if (!nearLiq) {
+				for (var spcName in spcDefs) {
+					var spc = spcDefs[spcName];
+					var gasFrac = dataGas[spcName][dataGas[spcName].length - 1];
+					var liqFrac = dataLiq[spcName][dataLiq[spcName].length - 1];
+					var liqTemp = self.temp;
+					var actCoeff = actCoeffFuncs[spcName](liqFrac, liqTemp);
+					var antCoeffs = spcDefs[spcName].antoineCoeffs;
+					var pPure = self.getPPure(antCoeffs.a, antCoeffs.b, antCoeffs.c, liqTemp);
+					var pEq = pPure * actCoeff * liqFrac;
+					var pGas = gasFrac * dataGas.pInt[dataGas.pInt.length - 1];
+					drivingForce[spcName] = pGas - pEq;
+				}
+			} else {
+				var sumPEq = 0;
+				var pEqs = {};
+				for (var spcName in spcDefs) {
+					var spc = spcDefs[spcName];
+					var gasFrac = dataGas[spcName][dataGas[spcName].length - 1];
+					var liqFrac = dataLiq[spcName][dataLiq[spcName].length - 1];
+					var liqTemp = self.temp;
+					var actCoeff = actCoeffFuncs[spcName](liqFrac, liqTemp);
+					var antCoeffs = spcDefs[spcName].antoineCoeffs;
+					var pPure = self.getPPure(antCoeffs.a, antCoeffs.b, antCoeffs.c, liqTemp);
+					var pEq = pPure * actCoeff * liqFrac;
+					sumPEq += pEq;
+					pEqs[spcName] = pEq;
+					sumPEq += pEq;
+				}
+				var dPEq = wallGas.pExt() - pEqs;
+				for (var spcName in spcDefs) {
+					drivingForce[spcName] = dPEq * pEqs[spcName] / sumPEq;
+				}
 			}
 		}
 	},
@@ -322,7 +346,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				if (dF > 0) { 
 					numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
 				} else {
-					numEjt[spcName] += 1/*Math.min(abs, 1)*/ + Math.sqrt(abs * (-dF * drivingForceSensitivity + 1));
+					numEjt[spcName] += Math.min(abs, 1) + Math.sqrt(abs * (-dF * drivingForceSensitivity + 1));
 					numEjt[spcName] += (wallLiq[0].x - wallLiq[1].x) * -dF * drivingForceSensitivity / 2000;
 				}
 				//numEjt[spcName] = 1;
