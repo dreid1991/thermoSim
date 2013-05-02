@@ -535,6 +535,14 @@ function extend(old, add) {
 		return add(old());
 	}
 }
+
+function getNth(obj, n) {
+	var i = 0;
+	for (var a in obj) {
+		if (i++ == n) return obj[a];
+	}
+}
+
 function countAttrs(obj) {
 	var count = 0;
 	for (var a in obj) count++;

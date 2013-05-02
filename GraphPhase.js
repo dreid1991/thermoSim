@@ -35,7 +35,6 @@ function GraphPhase(attrs) {
 	this.graph.addMarker({handle: 'gas', col: Col(0, 200, 0), markerType: 'bullseye', x: this.yFunc, y: this.gasTempFunc});
 	this.graph.hasData = true;
 }
-
 GraphPhase.prototype = {
 	recordFracData: function(wall, spcName) {
 		wall.recordFrac({spcName: spcName, tag: wall.handle})
@@ -52,6 +51,15 @@ GraphPhase.prototype = {
 			return fracData[fracData.length - 1];
 		}		
 	},
+	clearHTML: function() {
+		this.graph.clearHTML();
+	},
+	restoreHTML: function() {
+		this.graph.restoreHTML();
+	},
+	drawAllData: function() {
+		this.graph.drawAllData();
+	},
 	disable: function() {
 		this.graph.disable();
 	},
@@ -65,9 +73,10 @@ GraphPhase.prototype = {
 		this.graph.remove();
 	},
 	setPressure: function(pressure) {
-		this.updateEquilData(pressure);
+		var equilData = this.updateEquilData(pressure);
 		this.updateGraph();
 		this.pressure = pressure;
+		return equilData;
 	},
 	getKeyNamePairs: function(spcA, spcB, pressure) {
 		if (spcA.tBoil(pressure) < spcB.tBoil(pressure)) {
@@ -93,7 +102,7 @@ GraphPhase.prototype = {
 		}	
 
 		this.equilData = liqPts.concat(gasPts.reverse());
-		
+		return phaseData
 	},
 	updateGraph: function() {
 		this.graph.clearData(this.equilDataHandle, false);
@@ -101,4 +110,4 @@ GraphPhase.prototype = {
 		this.graph.updateRange();
 		this.graph.drawAllData();
 	},
-}
+};

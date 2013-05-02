@@ -14,6 +14,11 @@ function Liquid(attrs) {
 	this.temp = tempInit;
 	var spcCounts = attrs.spcCounts; //{spcA: 100, spcB:200}
 	this.spcDefs = this.getSpcDefs(spcCounts);
+	
+	this.isTwoComp = countAttrs(this.spcDefs) == 2;
+	this.spcA = getNth(this.spcDefs, 0);
+	if (this.isTwoComp) this.spcB = getNth(this.spcDefs, 1);
+	
 	this.drivingForce = this.makeDrivingForce(this.spcDefs);
 	this.dotMgrLiq = this.makeDotManager(this.spcDefs);
 	this.wallLiq = this.makeWallLiq(this.spcDefs, spcCounts, this.wallGas, this.wallPtIdxs, this.dotMgrLiq);
@@ -29,16 +34,18 @@ function Liquid(attrs) {
 	this.chanceZeroDf = .4;
 	this.drivingForceSensitivity = 10;//formalize this a bit
 	this.updateListenerName = this.type + this.handle;
+	this.phasePressure = attrs.phasePressure || 1;
 	if (makePhaseDiagram) {
 		this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, this.handle, attrs.primaryKey);
 		curLevel.graphs[this.phaseDiagram.handle] = this.phaseDiagram;
-		this.phasePressure = attrs.phasePressure || 1;
-		if (this.phasePressure) this.phaseDiagram.setPressure(this.phasePressure);
+		this.phaseDiagram.setPressure(this.phasePressure);
 	}
+	this.updateEquilData(this.phaseDiagram, [this.phasePressure]);
 	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs, this.surfAreaObj);
 	this.wallGas.addLiquid(this);
 	this.wallBound = this.addWallBound(this.wallGas);
 	this.phaseChangeEnabled = true;
+	this.equilData;
 	this.energyForDots = 0;
 	this.setupStd();
 }
@@ -174,14 +181,14 @@ _.extend(Liquid.prototype, objectFuncs, {
 	},
 	setupUpdate: function(spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName, drawList, dotMgrLiq, wallLiq, numAbs, drivingForceSensitivity, numEjt, wallGas, wallGasIdxs, wallSurfAreaObj) {
 		this.calcCp = this.setupCalcCp(spcDefs, dotMgrLiq);
-		this.calcEquil = this.setupUpdateEquil(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce);
+		this.calcEquil = this.setupUpdateEquil(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, dotMgrLiq);
 		this.drawDots = this.setupDrawDots(drawList);
 		this.moveDots = this.setupMoveDots(dotMgrLiq, spcDefs, wallLiq, wallGas, wallGasIdxs);
 		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcDefs, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt);//you were making the liquid eject if df<0 whether hit or not
 		var sizeWall = this.setupSizeWall(wallLiq, wallGas, spcDefs, dotMgrLiq, wallGasIdxs, wallSurfAreaObj)
 		var zeroAttrs = this.zeroAttrs;
 		if (!this.phasePressure) {
-			this.checkUpdatePhase = function() {};
+			this.checkUpdateEquilAndPhaseDiagram = function() {};
 		} 
 		
 		var calcCp = this.calcCp, calcEquil = this.calcEquil, drawDots = this.drawDots, moveDots = this.moveDots, ejectDots = this.ejectDots;
@@ -190,9 +197,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var self = this;
 		addListener(curLevel, 'update', listenerName, function() {
 			if (turns == 5) {
-				if (!self.checkUpdatePhase) 
-					self.checkUpdatePhase = self.setupCheckUpdatePhase(self.phaseDiagram, self.wallGas.getDataSrc('pExt'), self.wallGas.getDataSrc('pInt'));
-				var checkUpdatePhase = self.checkUpdatePhase;	
+				if (!self.checkUpdateEquilAndPhaseDiagram) 
+					self.checkUpdateEquilAndPhaseDiagram = self.setupCheckUpdateEquilPhaseDiagram(self.phaseDiagram, self.wallGas.getDataSrc('pExt'), self.wallGas.getDataSrc('pInt'));
+				var checkUpdateEquilAndPhaseDiagram = self.checkUpdateEquilAndPhaseDiagram;	
 				removeListener(curLevel, 'update', listenerName);
 				addListener(curLevel, 'update', listenerName, function() {
 					calcCp();
@@ -201,7 +208,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 					moveDots();
 					if (self.phaseChangeEnabled) ejectDots();
 					sizeWall();
-					checkUpdatePhase();
+					checkUpdateEquilAndPhaseDiagram();
 					//Kind of changing methods here, this wrapping functions thing seems a little funny
 					if (self.addEnergyToDots(window.dotManager.lists.ALLDOTS, self.energyForDots)) {
 						self.energyForDots = 0;
@@ -246,25 +253,15 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 
 	},
-	setupUpdateEquil: function(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce) {
+	setupUpdateEquil: function(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, dotMgrLiq) {
 		var self = this;
 		return function() {
 			//hey - assuming that if the walls get within 5 px of each other, we're in a constant pressure situation.  
 			var nearLiq = Math.abs(wallGas[0].y - wallLiq[0].y) < 5;
-			if (!nearLiq) {
-				for (var spcName in spcDefs) {
-					var spc = spcDefs[spcName];
-					var gasFrac = dataGas[spcName][dataGas[spcName].length - 1];
-					var liqFrac = dataLiq[spcName][dataLiq[spcName].length - 1];
-					var liqTemp = self.temp;
-					var actCoeff = actCoeffFuncs[spcName](liqFrac, liqTemp);
-					var antCoeffs = spcDefs[spcName].antoineCoeffs;
-					var pPure = self.getPPure(antCoeffs.a, antCoeffs.b, antCoeffs.c, liqTemp);
-					var pEq = pPure * actCoeff * liqFrac;
-					var pGas = gasFrac * dataGas.pInt[dataGas.pInt.length - 1];
-					drivingForce[spcName] = pGas - pEq;
-				}
-			} else {
+			var allVapor = dotMgrLiq.count == 0;
+			if (allVapor) {
+				
+			} else if (nearLiq) {
 				var sumPEq = 0;
 				var pEqs = {};
 				for (var spcName in spcDefs) {
@@ -283,7 +280,21 @@ _.extend(Liquid.prototype, objectFuncs, {
 				for (var spcName in spcDefs) {
 					drivingForce[spcName] = dPEq * pEqs[spcName] / sumPEq;
 				}
+			} else {
+				for (var spcName in spcDefs) {
+					var spc = spcDefs[spcName];
+					var gasFrac = dataGas[spcName][dataGas[spcName].length - 1];
+					var liqFrac = dataLiq[spcName][dataLiq[spcName].length - 1];
+					var liqTemp = self.temp;
+					var actCoeff = actCoeffFuncs[spcName](liqFrac, liqTemp);
+					var antCoeffs = spcDefs[spcName].antoineCoeffs;
+					var pPure = self.getPPure(antCoeffs.a, antCoeffs.b, antCoeffs.c, liqTemp);
+					var pEq = pPure * actCoeff * liqFrac;
+					var pGas = gasFrac * dataGas.pInt[dataGas.pInt.length - 1];
+					drivingForce[spcName] = pGas - pEq;
+				}
 			}
+				
 		}
 	},
 	setupDrawDots: function(drawList) {
@@ -370,17 +381,26 @@ _.extend(Liquid.prototype, objectFuncs, {
 			surfAreaObj.val = 2 * height + wallLiq[1].x - wallLiq[0].x;
 		}
 	},
-	setupCheckUpdatePhase: function(phaseDiagram, srcA, srcB) {
+	setupCheckUpdateEquilPhaseDiagram: function(phaseDiagram, srcA, srcB) {
 		var src = srcA ? srcA : srcB;
 		var turnsDiff = 0;
+		var self = this;
 		return function() {
 			if (src[src.length - 1] != phaseDiagram.pressure) {
 				turnsDiff ++;
 			}
 			if (turnsDiff > 15) {
-				phaseDiagram.setPressure(src[src.length - 1]);
+				self.updateEquilData(phaseDiagram, src);
+
 				turnsDiff = 0;
 			}
+		}
+	},
+	updateEquilData: function(phaseDiagram, src) {
+		if (phaseDiagram) {
+			this.equilData = phaseDiagram.setPressure(src[src.length - 1]);
+		} else if (this.isTwoComp) {
+			this.equilData = phaseEquilGenerator.constP(this.spcA, this.spcB, this.actCoeffFuncs, src[src.length - 1], 20);
 		}
 	},
 	eject: function(dotMgrLiq, dotMgrGas, spcDefs, spcName, numEject, wallGas, drawList, wallLiq) {
