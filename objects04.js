@@ -257,44 +257,76 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var self = this;
 		return function() {
 			//hey - assuming that if the walls get within 5 px of each other, we're in a constant pressure situation.  
-			var nearLiq = Math.abs(wallGas[0].y - wallLiq[0].y) < 5;
+			var wallNearLiq = Math.abs(wallGas[0].y - wallLiq[0].y) < 5;
 			var allVapor = dotMgrLiq.count == 0;
 			if (allVapor) {
-				
-			} else if (nearLiq) {
-				var sumPEq = 0;
-				var pEqs = {};
-				for (var spcName in spcDefs) {
-					var spc = spcDefs[spcName];
-					var gasFrac = dataGas[spcName][dataGas[spcName].length - 1];
-					var liqFrac = dataLiq[spcName][dataLiq[spcName].length - 1];
-					var liqTemp = self.temp;
-					var actCoeff = actCoeffFuncs[spcName](liqFrac, liqTemp);
-					var antCoeffs = spcDefs[spcName].antoineCoeffs;
-					var pPure = self.getPPure(antCoeffs.a, antCoeffs.b, antCoeffs.c, liqTemp);
-					var pEq = pPure * actCoeff * liqFrac;
-					sumPEq += pEq;
-					pEqs[spcName] = pEq;
-				}
-				var dPEq = wallGas.pExt() - sumPEq;
-				for (var spcName in spcDefs) {
-					drivingForce[spcName] = dPEq * pEqs[spcName] / sumPEq;
-				}
+				self.updateEquilAllVap(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, dotMgrLiq);
+			} else if (wallNearLiq) {
+				self.updateEquilWithPExt(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, dotMgrLiq);
 			} else {
-				for (var spcName in spcDefs) {
-					var spc = spcDefs[spcName];
-					var gasFrac = dataGas[spcName][dataGas[spcName].length - 1];
-					var liqFrac = dataLiq[spcName][dataLiq[spcName].length - 1];
-					var liqTemp = self.temp;
-					var actCoeff = actCoeffFuncs[spcName](liqFrac, liqTemp);
-					var antCoeffs = spcDefs[spcName].antoineCoeffs;
-					var pPure = self.getPPure(antCoeffs.a, antCoeffs.b, antCoeffs.c, liqTemp);
-					var pEq = pPure * actCoeff * liqFrac;
-					var pGas = gasFrac * dataGas.pInt[dataGas.pInt.length - 1];
-					drivingForce[spcName] = pGas - pEq;
-				}
+				self.updateEquilStd(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, dotMgrLiq);
 			}
 				
+		}
+	},
+	updateEquilAllVap: function(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, dotMgrLiq) {
+		if (this.isTwoComp) {
+			var equilDataData = this.equilData.data;
+			var temp = dataGas.temp[dataGas.temp.length - 1];
+			var yLight = dataGas[this.equilData.keyLight][dataGas[this.equilData.keyLight].length - 1];
+			for (var i=1, ii=equilDataData.length; i<ii; i++) {
+				if (equilDataData[i].yLight <= yLight) {
+					var y2 = equilDataData[i].yLight;
+					var y1 = equilDataData[i - 1].yLight;
+					var t2 = equilDataData[i].temp;
+					var t1 = equilDataData[i - 1].temp;
+					var tDew = t1 + (yLight - y1) * (t2 - t1) / (y2 - y1);
+					var dF = temp > tDew ? -3 : 0;
+					for (var spcName in spcDefs) {
+						drivingForce[spcName] = dF;
+					}
+					break;
+				}
+			}
+		} else {
+			var spc = this.spcA;
+			var tBoil = spc.tBoil(dataGas.pInt[dataGas.pInt.length - 1]);
+			var temp = dataGas.temp[dataGas.temp.length - 1];
+			drivingForce[spc.spcName] = temp > tBoil ? -3 : 0; //very low chance of condensing at dF = -3
+		}
+	},
+	updateEquilWithPExt: function(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, dotMgrLiq) {
+		var sumPEq = 0;
+		var pEqs = {};
+		for (var spcName in spcDefs) {
+			var spc = spcDefs[spcName];
+			var gasFrac = dataGas[spcName][dataGas[spcName].length - 1];
+			var liqFrac = dataLiq[spcName][dataLiq[spcName].length - 1];
+			var liqTemp = this.temp;
+			var actCoeff = actCoeffFuncs[spcName](liqFrac, liqTemp);
+			var antCoeffs = spcDefs[spcName].antoineCoeffs;
+			var pPure = this.getPPure(antCoeffs.a, antCoeffs.b, antCoeffs.c, liqTemp);
+			var pEq = pPure * actCoeff * liqFrac;
+			sumPEq += pEq;
+			pEqs[spcName] = pEq;
+		}
+		var dPEq = wallGas.pExt() - sumPEq;
+		for (var spcName in spcDefs) {
+			drivingForce[spcName] = dPEq * pEqs[spcName] / sumPEq;
+		}	
+	},
+	updateEquilStd: function(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, dotMgrLiq) {
+		for (var spcName in spcDefs) {
+			var spc = spcDefs[spcName];
+			var gasFrac = dataGas[spcName][dataGas[spcName].length - 1];
+			var liqFrac = dataLiq[spcName][dataLiq[spcName].length - 1];
+			var liqTemp = this.temp;
+			var actCoeff = actCoeffFuncs[spcName](liqFrac, liqTemp);
+			var antCoeffs = spcDefs[spcName].antoineCoeffs;
+			var pPure = this.getPPure(antCoeffs.a, antCoeffs.b, antCoeffs.c, liqTemp);
+			var pEq = pPure * actCoeff * liqFrac;
+			var pGas = gasFrac * dataGas.pInt[dataGas.pInt.length - 1];
+			drivingForce[spcName] = pGas - pEq;
 		}
 	},
 	setupDrawDots: function(drawList) {
@@ -351,8 +383,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var dF = drivingForce[spcName];
 				var abs = numAbs[spcName];
 				numAbs[spcName] = 0;
-				//converges to abs as df -> 0
-				
+								
 				if (dF > 0) { 
 					numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
 				} else {
@@ -386,7 +417,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var turnsDiff = 0;
 		var self = this;
 		return function() {
-			if (src[src.length - 1] != phaseDiagram.pressure) {
+			if (src[src.length - 1] != self.equilData.pressure) {
 				turnsDiff ++;
 			}
 			if (turnsDiff > 15) {
@@ -429,10 +460,13 @@ _.extend(Liquid.prototype, objectFuncs, {
 			drawList.splice(drawList.indexOf(dot), 1);
 			dotMgrLiq.remove(dot);
 			this.calcCp();
-			this.temp -= hVap / this.Cp;
+			if (this.Cp < 0.5) {
+				this.energyForDots -= hVap;
+			} else {	
+				this.temp -= hVap / this.Cp;
+			}
 			if (this.Cp == 0) {
 				this.temp = 0;
-				this.energyForDots -= hVap;
 			}
 			if (this.temp < 0) {
 				this.energyForDots -= this.Cp * (1 - this.temp); //setting temp to 1;
@@ -485,10 +519,16 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var tDotF = gasTemp[gasTemp.length - 1];
 		this.energyForDots += (dot.temp() - tDotF) * dot.cv;
 		dot.setTemp(tDotF);
-			
+		var tempCondense;
+		if (this.Cp < 0.5 && this.drivingForce[dot.spcName] > 0) {//if liq Cp is too low, add energy of vaporization to dots
+			tempCondense = dot.temp();
+			this.energyForDots += (dot.tempCondense() - tempCondense) * dot.cv;
+		} else {
+			tempCondense = dot.tempCondense();
+		}
 		var CpLiqOld = this.Cp;
 		this.calcCp();
-		this.temp = (this.temp * CpLiqOld + dot.tempCondense() * dot.cpLiq) / this.Cp;
+		this.temp = (this.temp * CpLiqOld + tempCondense * dot.cpLiq) / this.Cp;
 		this.numAbs[dot.spcName]++;
 		return false; //returning false isn't used here, but I like to return false when a dot is removed from a dot/wall collision check because it is used in dot collisions.  Feels consistent.  
 	},

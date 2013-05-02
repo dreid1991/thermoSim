@@ -13,7 +13,7 @@ PhaseEquilGenerator.prototype = {
 		var actFuncLight = actCoeffFuncs[keyLight.spcName];
 		var actFuncHeavy = actCoeffFuncs[keyHeavy.spcName];
 		var equilData = this.makeConstPEquil(pressure, keyLight, keyHeavy, tBoilLight, tBoilHeavy, actFuncLight, actFuncHeavy, numPts);
-		return new PhaseEquilGenerator.EquilData(equilData, keyLight.spcName, keyHeavy.spcName);
+		return new PhaseEquilGenerator.EquilData(equilData, keyLight.spcName, keyHeavy.spcName, pressure);
 	},
 	makeConstPEquil: function(pressure, keyLight, keyHeavy, tBoilLight, tBoilHeavy, actFuncLight, actFuncHeavy, numPts) {
 		var equilData = [];
@@ -68,8 +68,9 @@ PhaseEquilGenerator.EquilPt = function(xLight, xHeavy, yLight, yHeavy, temp, pre
 	this.temp = temp;
 	this.pressure = pressure;
 }
-PhaseEquilGenerator.EquilData = function(data, keyLight, keyHeavy) {
+PhaseEquilGenerator.EquilData = function(data, keyLight, keyHeavy, pressure) {
 	this.data = data;
 	this.keyLight = keyLight;
 	this.keyHeavy = keyHeavy;
+	this.pressure = pressure;
 }
