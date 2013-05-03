@@ -1,4 +1,24 @@
 WallMethods.wallDataHandler = {
+	setupCp: function() {
+		var handle = this.handle;
+		var spcLists = [];
+		var cps = [];
+		for (var i=0; i<LevelData.spcDefs.length; i++) {
+			var spcName = LevelData.spcDefs[i].spcName;
+			var spcList = dotManager.get({tag: handle, spcName: spcName});
+			if (spcList) {
+				spcLists.push(spcList);
+				cps.push(LevelData.spcDefs[i].cv / N);
+			}
+		}
+		return function() {
+			var Cp = 0;
+			for (var i=0; i<spcLists.length; i++) {
+				Cp += spcLists[i].length * cps[i];
+			}
+			return Cp;
+		}
+	},
 	pExt: function(){
 		var SA = this[1].x - this[0].x;
 		return this.pConst*this.mass*this.g/SA;

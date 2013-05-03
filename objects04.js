@@ -14,7 +14,7 @@ function Liquid(attrs) {
 	this.temp = tempInit;
 	var spcCounts = attrs.spcCounts; //{spcA: 100, spcB:200}
 	this.spcDefs = this.getSpcDefs(spcCounts);
-	
+	this.tempDisplay = this.temp;
 	this.isTwoComp = countAttrs(this.spcDefs) == 2;
 	this.spcA = getNth(this.spcDefs, 0);
 	if (this.isTwoComp) this.spcB = getNth(this.spcDefs, 1);
@@ -147,7 +147,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 	recordTempLiq: function(wallLiq) {
 		var self = this;
 		wallLiq.recordTemp(function() {
-			return self.temp;
+			return self.tempDisplay;
 		})
 	},
 	initData: function(wall, spcDefs, extras) {
@@ -203,6 +203,10 @@ _.extend(Liquid.prototype, objectFuncs, {
 				}
 				removeListener(curLevel, 'update', listenerName);
 				addListener(curLevel, 'update', listenerName, function() {
+					if (0 < self.Cp && self.Cp < 1.5) {
+						fixLiquidTemp();
+					}
+					self.tempDisplay = self.temp;
 					calcCp();
 					calcEquil();
 					drawDots();
@@ -211,7 +215,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 					sizeWall();
 					checkUpdateEquilAndPhaseDiagram();
 					//Kind of changing methods here, this wrapping functions thing seems a little funny
-					if (0 < self.Cp && self.Cp < .5) {
+					if (0 < self.Cp && self.Cp < 1.5) {
 						fixLiquidTemp();
 					}
 					if (self.addEnergyToDots(window.dotManager.lists.ALLDOTS, self.energyForDots)) {
@@ -220,6 +224,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				})
 				
 			} 
+			self.tempDisplay = self.temp;
 			calcCp();
 			calcEquil();
 			drawDots();
@@ -230,22 +235,13 @@ _.extend(Liquid.prototype, objectFuncs, {
 		})
 	},
 	setupFixLiquidTemp: function(wallGas, dotMgrGas, gasTempData) {
-		var spcLists = [];
-		var cvs = [];
-		for (var spcName in window.spcs) {
-			var spcList = dotMgrGas.get({tag: wallGas.handle, spcName: spcName});
-			if (spcList) {
-				spcLists.push(spcList);
-				cvs.push(window.spcs[spcName].cv / N;
-			}
-		}
-		var spcsLocal = window.spcs;
+		var self = this;
 		return function() {
-			var CpGas = 0;
-			for (var i=0; i<spcLists.length; i++) {
-				CpGas += spcLists[i].length * cvs[i];
-			}
-			//you were settings the liquid temp to the equilibrium temp, but got kind of tired
+			var CpGas = wallGas.Cp();
+			var tempEq = (self.temp * self.Cp + gasTempData[gasTempData.length - 1] * CpGas) / (CpGas + self.Cp);
+			var dE = (tempEq - self.temp) * self.Cp;
+			self.temp = tempEq;
+			self.energyForDots -= dE;
 		}
 		
 	},
@@ -410,7 +406,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 								
 				if (dF > 0) { 
 					numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
-				} else {
+				} else if (dF < 0) {
 					numEjt[spcName] += 1 + Math.sqrt(abs * (-dF * drivingForceSensitivity + 1));
 					numEjt[spcName] += (wallLiq[0].x - wallLiq[1].x) * -dF * drivingForceSensitivity / 2000;
 				}
@@ -464,9 +460,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var dHLiq = 0;
 		var dotList = dotMgrLiq.get({spcName: spcName})
 		var sliceIdx = Math.min(dotList.length, numEject);
-		if (numEject >= dotMgrLiq.count) {
-			console.log('woop');
-		}
+
 		var toTransfer = dotList.slice(0, sliceIdx);
 		//dotMgrLiq.remove(toTransfer);
 		//taking energy out of liquid.  If I did from ejecting gas molec, would not be able to vaporize below a temp because tEject would be < 0

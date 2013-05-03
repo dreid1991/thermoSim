@@ -43,10 +43,6 @@ WallMethods.DataObj.prototype = {
 		if (recording !== undefined) this.recordingVal = recording;
 		return this.recordingVal;
 	},
-	// displaying: function(displaying) {
-		// if (displaying !== undefined) this.displayingVal = displaying;
-		// return this.displayingVal;
-	// },
 	//attn: the function behavior is different from the value behavior.  It calls instead of returns the values if no argument is given.
 	//This is inconsistant, but I think fits the use cases better
 	recordStop: function(func) {
@@ -56,11 +52,4 @@ WallMethods.DataObj.prototype = {
 			this.recordStopVal();
 		}
 	},
-	// displayStop: function(func) {
-		// if (func) {
-			// this.displayStopVal = func;
-		// } else if (this.displayStopVal && this.displayingVal) {
-			// this.displayStopVal();
-		// }
-	// },
 }

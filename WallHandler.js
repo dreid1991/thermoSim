@@ -185,6 +185,7 @@ WallMethods.main = {
 		this[wallIdx].boundMaxHandlers = [];
 		this[wallIdx].boundMinHandlers = [];
 		this[wallIdx].mass = 0;
+		this[wallIdx].Cp = this[wallIdx].setupCp();
 		this[wallIdx].parent = this;
 		makeListenerHolder(this[wallIdx], 'cleanUp');
 		this[handle] = this[wallIdx];
