@@ -307,7 +307,12 @@ WallMethods.wallDataHandler = {
 			dataObj = this.data.frac[this.data.frac.length-1];
 			this.setupInfoDataObj(dataObj, 'frac', info);
 
-			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function() {return countList.length/totalList.length}, this, 'update');
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function() {
+				// if (false) {
+					// console.log('woop!');
+				// }
+				return countList.length/totalList.length
+			}, this, 'update');
 		}
 		return dataObj;		
 	},

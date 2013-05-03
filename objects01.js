@@ -1261,7 +1261,7 @@ _.extend(Heater.prototype, objectFuncs, {
 		
 	},
 	heatLiq: function() {
-		this.liquid.addQ(.1 * this.qRate * updateInterval);
+		this.liquid.addQ(.15 * this.qRate * updateInterval);
 	},
 	disable: function() {
 		var slider = $(this.sliderSelector);
@@ -1392,7 +1392,7 @@ _.extend(Heater.prototype, objectFuncs, {
 			var liqWall = liquid.getWallLiq();
 			liqWall.recordQ();
 			self.liquid = liquid;		
-		}, true, false)
+		}, true, true) //once is fine, will be readded each time
 	},
 	removeLiquid: function() {
 		this.liquid = undefined;

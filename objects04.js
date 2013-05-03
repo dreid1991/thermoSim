@@ -26,7 +26,8 @@ function Liquid(attrs) {
 	this.numAbs = deepCopy(this.drivingForce);
 	this.numEjt = deepCopy(this.numAbs);
 	this.makeDots(this.wallLiq, this.wallGas, this.wallPtIdxs, spcCounts, tempInit, this.dotMgrLiq) && this.deleteCount(this.spcDefs);
-	this.dataGas = this.initData(this.wallGas, this.spcDefs, ['pInt', 'temp', 'pExt']);
+	this.dataGas = this.initData(this.wallGas, this.spcDefs, ['pInt', 'temp']);
+	this.setupGrabPExt(this.wallGas, this.dataGas);
 	this.dataLiq = this.initData(this.wallLiq, this.spcDefs);
 	this.recordTempLiq(this.wallLiq);
 	this.drawList = this.makeDrawList(this.dotMgrLiq); //need to make draw list in random order otherwise dots drawn on top will look more prominant than they are.
@@ -57,6 +58,15 @@ _.extend(Liquid.prototype, objectFuncs, {
 			usedSpcs[spc] = window.spcs[spc];
 		}
 		return usedSpcs;
+	},
+	setupGrabPExt: function(wallGas, dataGas) {
+		var self = this;
+		timeline.curSection().addCmmdPoint('now', 'setup', function() {
+			var pExtObj = wallGas.getDataSrc('pExt', undefined, true);
+			if (pExtObj) {
+				dataGas.pExt = pExtObj;
+			}
+		}, true, true)
 	},
 	makeActCoeffFuncs: function(type, info, spcDefs) {
 		type = type || 'ideal';

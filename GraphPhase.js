@@ -27,8 +27,8 @@ function GraphPhase(attrs) {
 	var liquid = this.liquid;
 	this.liqTempFunc = function(){return liquid.temp};
 	this.gasTempFunc = this.makeTempFunc(this.wallGas);
-	this.xFunc = this.makeFracFunc(this.wallGas, this.keyNamePairs[this.primaryKeyType]);
-	this.yFunc = this.makeFracFunc(this.liquid.wallLiq, this.keyNamePairs[this.primaryKeyType]);
+	this.yFunc = this.makeFracFunc(this.wallGas, this.keyNamePairs[this.primaryKeyType]);
+	this.xFunc = this.makeFracFunc(this.liquid.wallLiq, this.keyNamePairs[this.primaryKeyType]);
 	this.updateGraph();
 	this.active = false;
 	this.graph.addMarker({handle: 'liquid', col: Col(200, 0, 0), markerType: 'bullseye', x: this.xFunc, y: this.liqTempFunc});
