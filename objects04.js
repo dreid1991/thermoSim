@@ -187,19 +187,20 @@ _.extend(Liquid.prototype, objectFuncs, {
 		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcDefs, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt);//you were making the liquid eject if df<0 whether hit or not
 		var sizeWall = this.setupSizeWall(wallLiq, wallGas, spcDefs, dotMgrLiq, wallGasIdxs, wallSurfAreaObj)
 		var zeroAttrs = this.zeroAttrs;
-		if (!this.phasePressure) {
-			this.checkUpdateEquilAndPhaseDiagram = function() {};
-		} 
-		
+		var fixLiquidTemp = this.setupFixLiquidTemp(wallGas, dotManager, dataGas.temp);
 		var calcCp = this.calcCp, calcEquil = this.calcEquil, drawDots = this.drawDots, moveDots = this.moveDots, ejectDots = this.ejectDots;
 		calcCp();
 		var turns = 0;
 		var self = this;
 		addListener(curLevel, 'update', listenerName, function() {
 			if (turns == 5) {
-				if (!self.checkUpdateEquilAndPhaseDiagram) 
+				var checkUpdateEquilAndPhaseDiagram;
+				if (self.isTwoComp) {
 					self.checkUpdateEquilAndPhaseDiagram = self.setupCheckUpdateEquilPhaseDiagram(self.phaseDiagram, self.wallGas.getDataSrc('pExt'), self.wallGas.getDataSrc('pInt'));
-				var checkUpdateEquilAndPhaseDiagram = self.checkUpdateEquilAndPhaseDiagram;	
+					checkUpdateEquilAndPhaseDiagram = self.checkUpdateEquilAndPhaseDiagram;	
+				} else {
+					checkUpdateEquilAndPhaseDiagram = function(){};
+				}
 				removeListener(curLevel, 'update', listenerName);
 				addListener(curLevel, 'update', listenerName, function() {
 					calcCp();
@@ -210,6 +211,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 					sizeWall();
 					checkUpdateEquilAndPhaseDiagram();
 					//Kind of changing methods here, this wrapping functions thing seems a little funny
+					if (0 < self.Cp && self.Cp < .5) {
+						fixLiquidTemp();
+					}
 					if (self.addEnergyToDots(window.dotManager.lists.ALLDOTS, self.energyForDots)) {
 						self.energyForDots = 0;
 					}
@@ -224,6 +228,26 @@ _.extend(Liquid.prototype, objectFuncs, {
 			turns ++;
 			
 		})
+	},
+	setupFixLiquidTemp: function(wallGas, dotMgrGas, gasTempData) {
+		var spcLists = [];
+		var cvs = [];
+		for (var spcName in window.spcs) {
+			var spcList = dotMgrGas.get({tag: wallGas.handle, spcName: spcName});
+			if (spcList) {
+				spcLists.push(spcList);
+				cvs.push(window.spcs[spcName].cv / N;
+			}
+		}
+		var spcsLocal = window.spcs;
+		return function() {
+			var CpGas = 0;
+			for (var i=0; i<spcLists.length; i++) {
+				CpGas += spcLists[i].length * cvs[i];
+			}
+			//you were settings the liquid temp to the equilibrium temp, but got kind of tired
+		}
+		
 	},
 	addEnergyToDots: function(dots, energy) {
 		if (dots.length && energy) {
@@ -281,7 +305,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 					var t2 = equilDataData[i].temp;
 					var t1 = equilDataData[i - 1].temp;
 					var tDew = t1 + (yLight - y1) * (t2 - t1) / (y2 - y1);
-					var dF = temp > tDew ? -3 : 0;
+					var dF = temp > tDew ? -10 : 0;
 					for (var spcName in spcDefs) {
 						drivingForce[spcName] = dF;
 					}
@@ -292,7 +316,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			var spc = this.spcA;
 			var tBoil = spc.tBoil(dataGas.pInt[dataGas.pInt.length - 1]);
 			var temp = dataGas.temp[dataGas.temp.length - 1];
-			drivingForce[spc.spcName] = temp > tBoil ? -3 : 0; //very low chance of condensing at dF = -3
+			drivingForce[spc.spcName] = temp > tBoil ? -10 : 0; //very low chance of condensing at dF = -10
 		}
 	},
 	updateEquilWithPExt: function(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, dotMgrLiq) {
@@ -460,13 +484,10 @@ _.extend(Liquid.prototype, objectFuncs, {
 			drawList.splice(drawList.indexOf(dot), 1);
 			dotMgrLiq.remove(dot);
 			this.calcCp();
-			if (this.Cp < 0.5) {
-				this.energyForDots -= hVap;
-			} else {	
-				this.temp -= hVap / this.Cp;
-			}
+			this.temp -= hVap / this.Cp;
 			if (this.Cp == 0) {
 				this.temp = 0;
+				this.energyForDots -= hVap;
 			}
 			if (this.temp < 0) {
 				this.energyForDots -= this.Cp * (1 - this.temp); //setting temp to 1;
@@ -519,16 +540,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var tDotF = gasTemp[gasTemp.length - 1];
 		this.energyForDots += (dot.temp() - tDotF) * dot.cv;
 		dot.setTemp(tDotF);
-		var tempCondense;
-		if (this.Cp < 0.5 && this.drivingForce[dot.spcName] > 0) {//if liq Cp is too low, add energy of vaporization to dots
-			tempCondense = dot.temp();
-			this.energyForDots += (dot.tempCondense() - tempCondense) * dot.cv;
-		} else {
-			tempCondense = dot.tempCondense();
-		}
 		var CpLiqOld = this.Cp;
 		this.calcCp();
-		this.temp = (this.temp * CpLiqOld + tempCondense * dot.cpLiq) / this.Cp;
+		this.temp = (this.temp * CpLiqOld + dot.tempCondense() * dot.cpLiq) / this.Cp;
 		this.numAbs[dot.spcName]++;
 		return false; //returning false isn't used here, but I like to return false when a dot is removed from a dot/wall collision check because it is used in dot collisions.  Feels consistent.  
 	},

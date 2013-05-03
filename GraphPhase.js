@@ -42,13 +42,21 @@ GraphPhase.prototype = {
 	makeTempFunc: function(wallGas) {
 		var tempData = wallGas.getDataSrc('temp');
 		return function() {
-			return tempData[tempData.length - 1];
+			var sum = 0;
+			for (var i=Math.max(0, tempData.length - 30); i<tempData.length; i++) {
+				sum += tempData[i];
+			}
+			return sum / Math.min(Math.max(1, tempData.length), 30);
 		}
 	},
 	makeFracFunc: function(wall, spcName) {
 		var fracData = wall.getDataSrc('frac', {spcName: spcName, tag: wall.handle});
 		return function() {
-			return fracData[fracData.length - 1];
+			var sum = 0;
+			for (var i=Math.max(0, fracData.length - 30); i<fracData.length; i++) {
+				sum += fracData[i];
+			}
+			return sum / Math.min(Math.max(1, fracData.length), 30);
 		}		
 	},
 	clearHTML: function() {
