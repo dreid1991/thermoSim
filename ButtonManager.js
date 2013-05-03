@@ -328,7 +328,7 @@ ButtonManager.Button.prototype = {
 			exprStr = exprs + ';';
 		}
 		with (DataGetFuncs) {
-			func = eval('(function() {return ' + exprStr + '})');
+			func = eval('(function() {' + exprStr + '})');
 		}
 		return func;
 	},

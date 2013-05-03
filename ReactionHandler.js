@@ -9,6 +9,10 @@ ReactionHandler = {
 		return rxn;
 
 	},
+	rxnIsEnabled: function(handle) {
+		var active = this.getRxn(this.activeRxns, handle);
+		return active ? true : false;
+	},
 	disableRxn: function(handle) {
 		this.removeRxn(handle);
 	},

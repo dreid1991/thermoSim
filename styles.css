@@ -97,17 +97,28 @@ textarea.sim {
 	
 }
 
-.sim.canvasDiv{
+.sim.canvasDiv {
 	border-top: 3px solid;
 	border-bottom:3px solid;
 	border-color:#b3b2b1;	
 }
-.sim.displayText, table.displayText{
+.sim.displayText, table.displayText {
 	font-family:Verdana, garamond;/*WHAT IS GARAMOND?  SHOULD GET OTHER FALLBACKS.*/
 	font-size:medium;
 	color:white;
 	padding:5px;
 }
+
+table.data {
+	font-family:Verdana;
+	font-size:medium;
+	color:white;
+}
+
+table.data td {
+	text-align:center;
+}
+
 .sim.niceFont{
 	font-family:Verdana, garamond;
 }

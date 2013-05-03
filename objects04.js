@@ -471,7 +471,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var sliceIdx = Math.min(dotList.length, numEject);
 
 		var toTransfer = dotList.slice(0, sliceIdx);
-		//dotMgrLiq.remove(toTransfer);
 		//taking energy out of liquid.  If I did from ejecting gas molec, would not be able to vaporize below a temp because tEject would be < 0
 		for (var transIdx=0; transIdx<toTransfer.length; transIdx++) {
 		
