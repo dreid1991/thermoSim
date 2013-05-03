@@ -491,12 +491,9 @@ function UVToAngle(UV) {
 	return Math.atan2(UV.dy, UV.dx);
 }
 function getSign(val){
-	var sign=1;
-	if (val!=0) {
-		sign = Math.abs(val)/val;
-	}
-	return sign;
+	return val < 0 ? -1 : 1;
 }
+
 function fracDiff(a, b) {
 	return Math.abs(a-b)/Math.min(Math.abs(a), Math.abs(b));
 }

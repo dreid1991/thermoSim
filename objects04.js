@@ -26,7 +26,7 @@ function Liquid(attrs) {
 	this.numAbs = deepCopy(this.drivingForce);
 	this.numEjt = deepCopy(this.numAbs);
 	this.makeDots(this.wallLiq, this.wallGas, this.wallPtIdxs, spcCounts, tempInit, this.dotMgrLiq) && this.deleteCount(this.spcDefs);
-	this.dataGas = this.initData(this.wallGas, this.spcDefs, ['pInt', 'temp']);
+	this.dataGas = this.initData(this.wallGas, this.spcDefs, ['pInt', 'temp', 'pExt']);
 	this.dataLiq = this.initData(this.wallLiq, this.spcDefs);
 	this.recordTempLiq(this.wallLiq);
 	this.drawList = this.makeDrawList(this.dotMgrLiq); //need to make draw list in random order otherwise dots drawn on top will look more prominant than they are.
@@ -156,13 +156,10 @@ _.extend(Liquid.prototype, objectFuncs, {
 			for (var extraIdx=0; extraIdx<extras.length; extraIdx++) {
 				var extra = extras[extraIdx];
 				var dataObj = wall.getDataObj(extra, undefined, true);
-				if (dataObj === false) {
-					var recordFunc = 'record' + extra.toCapitalCamelCase();
-					wall[recordFunc]();
-					data[extra] = wall.getDataObj(extra).src();
-				} else {
+				if (dataObj) {
 					data[extra] = dataObj.src();
 				}
+				//will only get, not record now
 			}
 		}
 		for (var spcName in spcDefs) {
@@ -187,7 +184,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcDefs, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt);//you were making the liquid eject if df<0 whether hit or not
 		var sizeWall = this.setupSizeWall(wallLiq, wallGas, spcDefs, dotMgrLiq, wallGasIdxs, wallSurfAreaObj)
 		var zeroAttrs = this.zeroAttrs;
-		var fixLiquidTemp = this.setupFixLiquidTemp(wallGas, dotManager, dataGas.temp);
+		var fixLiquidTemp = this.setupFixLiquidTemp(wallGas, dotManager, dataGas);
 		var calcCp = this.calcCp, calcEquil = this.calcEquil, drawDots = this.drawDots, moveDots = this.moveDots, ejectDots = this.ejectDots;
 		calcCp();
 		var turns = 0;
@@ -203,7 +200,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				}
 				removeListener(curLevel, 'update', listenerName);
 				addListener(curLevel, 'update', listenerName, function() {
-					if (0 < self.Cp && self.Cp < 1.5) {
+					if (0 < self.Cp && self.Cp < 2.5) {
 						fixLiquidTemp();
 					}
 					self.tempDisplay = self.temp;
@@ -214,10 +211,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 					if (self.phaseChangeEnabled) ejectDots();
 					sizeWall();
 					checkUpdateEquilAndPhaseDiagram();
-					//Kind of changing methods here, this wrapping functions thing seems a little funny
-					if (0 < self.Cp && self.Cp < 1.5) {
-						fixLiquidTemp();
-					}
 					if (self.addEnergyToDots(window.dotManager.lists.ALLDOTS, self.energyForDots)) {
 						self.energyForDots = 0;
 					}
@@ -234,16 +227,38 @@ _.extend(Liquid.prototype, objectFuncs, {
 			
 		})
 	},
-	setupFixLiquidTemp: function(wallGas, dotMgrGas, gasTempData) {
+	setupFixLiquidTemp: function(wallGas, dotMgrGas, dataGas) {
 		var self = this;
+
 		return function() {
-			var CpGas = wallGas.Cp();
-			var tempEq = (self.temp * self.Cp + gasTempData[gasTempData.length - 1] * CpGas) / (CpGas + self.Cp);
-			var dE = (tempEq - self.temp) * self.Cp;
-			self.temp = tempEq;
+			var tDew = self.tDew(self.spcA, self.spcB, dataGas, self.equilData);
+			var tGas = dataGas.temp[dataGas.temp.length - 1];
+			//var dewWeight = .9;
+			var sign = getSign(tGas - tDew);
+			var tLiqF = tDew + sign * Math.min(5, sign * (tGas - tDew));
+			//var tLiqF = dewWeight * tDew + (1 - dewWeight) * tGas;  //so liquid is near dew pt but is moving in the direction the gas would push it in thermal equilibrium
+			var dE = (tLiqF - self.temp) * self.Cp;
+			self.temp = tLiqF;
 			self.energyForDots -= dE;
 		}
 		
+	},
+	tDew: function(spcA, spcB, dataGas, equilData) {
+		if (spcA && spcB) {
+			var equilDataData = equilData.data;
+			var yLight = dataGas[equilData.keyLight][dataGas[equilData.keyLight].length - 1];
+			for (var i=1, ii=equilDataData.length; i<ii; i++) {
+				if (equilDataData[i].yLight <= yLight) {
+					var y2 = equilDataData[i].yLight;
+					var y1 = equilDataData[i - 1].yLight;
+					var t2 = equilDataData[i].temp;
+					var t1 = equilDataData[i - 1].temp;
+					return t1 + (yLight - y1) * (t2 - t1) / (y2 - y1);
+				}
+			}
+		} else {
+			return spcA.tBoil(dataGas.pExt ? dataGas.pExt[dataGas.pExt.length - 1] : dataGas.pInt[dataGas.pInt.length - 1]);
+		}		
 	},
 	addEnergyToDots: function(dots, energy) {
 		if (dots.length && energy) {
@@ -290,30 +305,14 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 	},
 	updateEquilAllVap: function(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, dotMgrLiq) {
-		if (this.isTwoComp) {
-			var equilDataData = this.equilData.data;
-			var temp = dataGas.temp[dataGas.temp.length - 1];
-			var yLight = dataGas[this.equilData.keyLight][dataGas[this.equilData.keyLight].length - 1];
-			for (var i=1, ii=equilDataData.length; i<ii; i++) {
-				if (equilDataData[i].yLight <= yLight) {
-					var y2 = equilDataData[i].yLight;
-					var y1 = equilDataData[i - 1].yLight;
-					var t2 = equilDataData[i].temp;
-					var t1 = equilDataData[i - 1].temp;
-					var tDew = t1 + (yLight - y1) * (t2 - t1) / (y2 - y1);
-					var dF = temp > tDew ? -10 : 0;
-					for (var spcName in spcDefs) {
-						drivingForce[spcName] = dF;
-					}
-					break;
-				}
-			}
-		} else {
-			var spc = this.spcA;
-			var tBoil = spc.tBoil(dataGas.pInt[dataGas.pInt.length - 1]);
-			var temp = dataGas.temp[dataGas.temp.length - 1];
-			drivingForce[spc.spcName] = temp > tBoil ? -10 : 0; //very low chance of condensing at dF = -10
+		var tDew = this.tDew(this.spcA, this.spcB, dataGas, this.equilData);
+		var temp = dataGas.temp[dataGas.temp.length - 1];
+		var dF = temp > tDew ? -10 : 0;  //very low chance of condensing at dF = -10
+		for (var spcName in spcDefs) {
+			drivingForce[spcName] = dF;   
 		}
+			
+
 	},
 	updateEquilWithPExt: function(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, dotMgrLiq) {
 		var sumPEq = 0;
@@ -345,7 +344,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			var antCoeffs = spcDefs[spcName].antoineCoeffs;
 			var pPure = this.getPPure(antCoeffs.a, antCoeffs.b, antCoeffs.c, liqTemp);
 			var pEq = pPure * actCoeff * liqFrac;
-			var pGas = gasFrac * dataGas.pInt[dataGas.pInt.length - 1];
+			var pGas = gasFrac * (dataGas.pExt ? dataGas.pExt[dataGas.pExt.length - 1] : dataGas.pInt[dataGas.pInt.length - 1]);
 			drivingForce[spcName] = pGas - pEq;
 		}
 	},
