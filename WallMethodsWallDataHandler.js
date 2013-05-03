@@ -122,7 +122,8 @@ WallMethods.wallDataHandler = {
 	},
 	
 	recordTemp: function(tempFunc) {
-		if (!this.data.temp || !this.data.temp.recording()) {
+		var dataObj = this.data.temp;
+		if (!dataObj || !dataObj.recording()) {
 			this.data.temp = new WallMethods.DataObj();
 			var dataObj = this.data.temp;
 			this.setupStdDataObj(dataObj, 'temp');
@@ -176,7 +177,8 @@ WallMethods.wallDataHandler = {
 		}
 	},
 	recordPInt: function() {
-		if (!this.data.pInt || !this.data.pInt.recording()) {
+		var dataObj = this.data.pInt;
+		if (!dataObj || !dataObj.recording()) {
 			this.data.pInt = new WallMethods.DataObj();
 			var dataObj = this.data.pInt;
 			this.setupStdDataObj(dataObj, 'pInt');
@@ -189,7 +191,8 @@ WallMethods.wallDataHandler = {
 		return dataObj;
 	},
 	recordPExt: function() {
-		if (!this.data.pExt || !this.data.pExt.recording()) {
+		var dataObj = this.data.pExt;
+		if (!dataObj || !dataObj.recording()) {
 			this.data.pExt = new WallMethods.DataObj();
 			var dataObj = this.data.pExt;
 			this.setupStdDataObj(dataObj, 'pExt');
@@ -198,16 +201,18 @@ WallMethods.wallDataHandler = {
 		return dataObj;
 	},
 	recordVol: function() {
-		if (!this.data.vol || !this.data.vol.recording()) {
+		var dataObj = this.data.vol;
+		if (!dataObj || !dataObj.recording()) {
 			this.data.vol = new WallMethods.DataObj();
 			var dataObj = this.data.vol;
 			this.setupStdDataObj(dataObj, 'vol');
 			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function() {return this.parent.wallVolume(this.handle)}, this, 'update');
-		}
+		} 
 		return dataObj;
 	},
 	recordWork: function() {
-		if (!this.data.work || !this.data.work.recording()) {
+		var dataObj = this.data.work;
+		if (!dataObj || !dataObj.recording()) {
 			this.data.work = new WallMethods.DataObj();
 			var dataObj = this.data.work;
 			this.setupStdDataObj(dataObj, 'work');
@@ -243,7 +248,8 @@ WallMethods.wallDataHandler = {
 		return dataObj;
 	},
 	recordMass: function() {
-		if (!this.data.mass || !this.data.mass.recording()) {
+		var dataObj = this.data.mass;
+		if (!dataObj || !dataObj.recording()) {
 			this.data.mass = new WallMethods.DataObj();
 			var dataObj = this.data.mass;
 			this.setupStdDataObj(dataObj, 'mass');
@@ -252,11 +258,47 @@ WallMethods.wallDataHandler = {
 		return dataObj;			
 	},
 	recordQ: function() {
-		if (!this.data.q || !this.data.q.recording()) {
+		var dataObj = this.data.q;
+		if (!dataObj || !dataObj.recording()) {
 			this.data.q = new WallMethods.DataObj();
 			var dataObj = this.data.q;
 			this.setupStdDataObj(dataObj, 'q');
 			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function(){return this.q}, this, 'update');
+		}
+		return dataObj;
+	},
+	recordEnthalpy: function() { //not going to make recording by spc possible right now
+		var dataObj = this.data.enthalpy;
+		if (!dataObj || !dataObj.recording()) {
+			this.data.enthalpy = new WallMethods.DataObj();
+			var dataObj = this.data.enthalp;
+			this.setupStdDataObj(dataObj, 'enthalpy');
+			var cvs = _.pluck(LevelData.spcDefs, 'cv');
+			var hFs = _.pluck(LevelData.spcDefs, 'hF98');
+			var spcNames = _.pluck(LevelData.spcDefs, 'spcName');
+			var dotLists = [];
+			for (var i=spcNames.length-1; i>=0; i--) {
+				cvs[i] /= N;
+				hFs[i] /= N;
+				var dots = this.dotManager.get({tag: this.handle, spcName: spcNames[i]});
+				if (dots) {
+					dotLists.push(dots);
+				} else {
+					spcNames.splice(i, 1);
+					cvs.splice(i, 1);
+					hFs.splice(i, 1);
+				}
+			}
+			dotLists.reverse();
+			var tempList = this.getDataSrc('temp');
+			var calcEnthalpy = function() {
+				var enthalpy = 0;
+				var tempRel = tempList[tempList.length - 1] - 298.15;
+				for (var i=0; i<dotLists.length; i++) {
+					enthalpy += dotLists[i].length * (hFs[i] + cvs[i] * tempRel);
+				}
+				return enthalpy;
+			}
 		}
 		return dataObj;
 	},

@@ -207,6 +207,9 @@ ButtonManager.Group.prototype = {
 		} else if (this.isToggle) {
 			click = this.wrapInToggle(button, click);
 		}
+		if (isDown && click) {
+			click();
+		}
 		if (isDown && this.isRadio) {
 			this.pushRadio(button);
 		} else if (isDown && this.isToggle) {
@@ -305,15 +308,6 @@ ButtonManager.Button = function(handle, buttonId, wrapperId, label, exprs, prefI
 	} else {
 		this.click = this.wrapExprs(exprs)
 	}
-	// if (typeof exprs == 'function') {
-		// this.click = exprs;
-	// } else if (typeof exprs == 'string' || exprs instanceof Array) {
-		// this.click = this.wrapExprs(exprs)
-	// } else if (exprs.mousedown) {
-		// this.mousedown = this.wrapExprs(exprs.mousedown);
-	// } else if (exprs.mouseup) {
-		// this.mouseup = this.wrapExprs(exprs.mouseup);
-	// }
 
 	this.prefIdx = prefIdx;
 }

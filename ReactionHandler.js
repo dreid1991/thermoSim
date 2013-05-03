@@ -27,7 +27,7 @@ ReactionHandler = {
 		for (var rxnId in this.rxns) {
 			var spcRxns = this.rxns[rxnId];
 			var removedRxn = false;
-			for (var spcRxnIdx=0; spcRxnIdx<spcRxns.length; spcRxnIdx++) {
+			for (var spcRxnIdx=spcRxns.length - 1; spcRxnIdx>=0; spcRxnIdx--) {
 				var spcRxn = spcRxns[spcRxnIdx];
 				if (spcRxn.handle == handle) {
 					spcRxns.splice(spcRxnIdx, 1);
