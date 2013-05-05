@@ -51,7 +51,7 @@ $(function(){
 	ACTUALN = 6.022e23;
 	g = 1.75;
 	gInternal = .01;
-	updateInterval = 30;//500;
+	updateInterval = 30;
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);
 	pxToMS = 19.33821;
@@ -115,23 +115,7 @@ $(function(){
 		timeline.pushSection(LevelData.mainSequence[sectionIdx]);
 	}
 	timeline.show(0, 0);
-	//window.curLevel = new LevelData();
-	//curLevel.cutSceneEnd();
-	//curLevel.init();
-	// myCanvas.width = $('#main').width();
-	// canvasHeight = 450;
-	// animText = new AnimText(c);
-	// myCanvas.height = canvasHeight;
-	// renderer = new Renderer();
-	// window.curLevel = new LevelTemplate();
-	// curLevel.cutSceneEnd();
-	// curLevel.init();
-	// addJQueryElems($('button'), 'button');
-	// $('#resetExp').click(function(){curLevel.reset()});
-	// $('#toSim').click(function(){nextPrompt()});
-	// $('#toLastStep').click(function(){prevPrompt()});
-	// $('#previous').click(function(){prevPrompt()});
-	// $('#next').click(function(){nextPrompt()});
+
 	/*Timing stuff
 	
 	started = false;

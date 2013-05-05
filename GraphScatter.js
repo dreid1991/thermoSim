@@ -196,26 +196,18 @@ GraphScatter.Set.prototype = {
 		var bCoord = this.graph.valToCoord(b);
 		//Input values aren't translated to pixel coordinates at this point.  
 		//Am making conversion scalars so I don't have to call valToCoord for every point
-		if (aCoord.x!=bCoord.x) {
-			var xScale = Math.abs(aCoord.x-bCoord.x)/Math.abs(a.x-b.x);
-		} else {
-			var xScale = 1;
-		}
-		if (aCoord.y!=bCoord.y) {
-			var yScale = Math.abs(aCoord.y-bCoord.y)/Math.abs(a.y-b.y);
-		} else {
-			yScale = 1;
-		}
-		var perpUV = a.VTo(b).UV().perp();
+		var scaling = this.graph.dataScaling();
+
+		var perpUV = aCoord.VTo(bCoord).UV().perp();
 
 		for (var dataIdx=xDataRange-1; dataIdx>0; dataIdx--) {
 			var xIdx = bDataIdx.x + dataIdx;
 			var yIdx = bDataIdx.y + dataIdx;
-			var aToData = V(xScale*(data.x[xIdx]-a.x), yScale*(data.y[yIdx]-a.y));
+			var aToData = aCoord.VTo(this.graph.valToCoord(P(data.x[xIdx], data.y[yIdx])));
 			var dist = Math.abs(aToData.dotProd(perpUV));
 			if (dist>this.fillInPtsMin) {
 				var ptOverLine = P(data.x[xIdx], data.y[yIdx]);
-				var edgePtInfo = this.getEdgePt({x:xIdx, y:yIdx}, bDataIdx, perpUV, ptOverLine, dist, a, data, xScale, yScale);
+				var edgePtInfo = this.getEdgePt({x:xIdx, y:yIdx}, bDataIdx, perpUV, ptOverLine, dist, aCoord, data, scaling);
 				if (!edgePtInfo) {
 					break;
 				}
@@ -228,12 +220,12 @@ GraphScatter.Set.prototype = {
 		return {newPts: [], dataIdxs:[]};
 		
 	},
-	getEdgePt: function(dataIdxsMax, dataIdxsMin, perpUV, lastPt, lastDist, a, data, xScale, yScale) {
+	getEdgePt: function(dataIdxsMax, dataIdxsMin, perpUV, lastPt, lastDist, aCoord, data, scaling) {
 		var dataRange = dataIdxsMax.x - dataIdxsMin.x;
 		for (var dataIdx=dataRange-1; dataIdx>0; dataIdx--) {
-			var xIdx = dataIdxsMin.x+dataIdx;
-			var yIdx = dataIdxsMin.y+dataIdx;
-			var aToData = V(xScale*(data.x[xIdx]-a.x), yScale*(data.y[yIdx]-a.y));
+			var xIdx = dataIdxsMin.x + dataIdx;
+			var yIdx = dataIdxsMin.y + dataIdx;
+			var aToData = aCoord.VTo(this.graph.valToCoord(P(data.x[xIdx], data.y[yIdx])));
 			var dist = Math.abs(aToData.dotProd(perpUV));
 			if (dist < lastDist) {
 				return {pt:lastPt, dataIdx:{x:xIdx+1, y:yIdx+1}};

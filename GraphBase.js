@@ -529,7 +529,11 @@ GraphBase = {
 		var y = this.dims.dy - (this.gridSpacing.y * (this.numGridLines.y - 1) * (val.y - this.axisRange.y.min) / rangeY + (1 - this.graphRangeFrac.y.min) * this.dims.dy);
 		return P(x,y);
 	},
-
+	dataScaling: function() {
+		var dx = this.gridSpacing.x / this.stepSize.x;
+		var dy = this.gridSpacing.y / this.stepSize.y;
+		return V(dx, dy);
+	},
 	checkMark: function(pos, dims, oversize, fillCol, drawCanvas) {
 		var strokeCol = Col(0, 0, 0);
 		pos.x -= oversize;
