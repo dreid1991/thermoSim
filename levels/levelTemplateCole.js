@@ -159,11 +159,11 @@ LevelData = {
 					{handle: 'pistonwork1', expr: 'work("ThirdWall")', readout: 'pistonReadoutPistonOne', label: 'work: ', units: 'kJ', sigFigs: 3}
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'PvsVTwo', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:2}, y:{min:0, step:4}}, 
-						sets:[
-							{handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'vol("ThirdWall")', y: 'pExt("ThirdWall")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
-						]
-					},
+					// {type: 'Scatter', handle: 'PvsVTwo', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:2}, y:{min:0, step:4}}, 
+						// sets:[
+							// {handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'vol("ThirdWall")', y: 'pExt("ThirdWall")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
+						// ]
+					// },
 					{type: 'Scatter', handle: 'TvsVOne', xLabel: "Volume (L)", yLabel: "Temperature (K)", axesInit:{x:{min:6, step:2}, y:{min:0, step:200}}, 
 						sets:[
 							{handle:'temp', label:'T sys', pointCol:Col(50,50,255), flashCol:Col(50,50,255), data:{x: 'vol("ThirdWall")', y: 'temp("ThirdWall")'}, trace: true, fillInPts: true, fillInPtsMin: 5}

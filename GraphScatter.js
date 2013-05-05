@@ -60,7 +60,10 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			var toAdd = [];
 			for (var address in this.data){
 				var set = this.data[address];
-				if (set.recording) set.enqueuePts();
+				if (set.recording) {
+					set.trimNewData();
+					set.enqueuePts();
+				}
 			}
 			this.flushQueues(true, false);
 			this.hasData = true;
@@ -161,6 +164,95 @@ GraphScatter.Set.prototype = {
 	},
 	recordStop: function() {
 		removeListener(curLevel, 'update', this.recordListenerName);
+	},
+	trimNewData: function() {
+		if (this.graphedPtIdxs.length) {
+			var dataX = this.data.x;
+			var dataY = this.data.y;
+			var lastIdxX = this.graphedPtIdxs[this.graphedPtIdxs.length - 1].x;
+			var lastIdxY = this.graphedPtIdxs[this.graphedPtIdxs.length - 1].y;
+			var dDataIdxX = dataX.length - lastIdxX;//clean up thy one off's
+			var dDataIdxY = dataY.length - lastIdxY;
+			if (dDataIdxX != dDataIdxY) {
+				return false;
+			}
+			var runs = this.findRuns(dataX, dataY, lastIdxY, lastIdxX);
+			for (var i=runs.length - 1; i>=0; i--) {
+				this.trimRun(dataX, dataY, runs[i]);
+			}
+		}
+	},
+	findRuns: function(dataX, dataY, lastIdxX, lastIdxY) {
+		var Run = function(xStartIdx, yStartIdx, length) {
+			this.xStartIdx = xStartIdx;
+			this.yStartIdx = yStartIdx;
+			this.length = length;
+		}
+		var runs = [];
+		var curRunPts = [];
+		var runUV = undefined;
+		var runStartX = lastIdxX;
+		var runStartY = lastIdxY;
+		for (var i=0; i<dDataIdxX - 1; i++) {
+			var pt = P(dataX[lastIdxX + i], dataY[lastIdxY + i]);
+			if (curRunPts.length <= 1) {
+				curRunPts.push(pt);
+				if (curRunPts.length == 2) {
+					runUV = curRunPts[0].VTo(curRunPts[1]).UV();
+				}
+			} else {
+				var ptUV = curRunPts[0].VTo(pt).UV();
+				if (Math.abs(ptUV.dotProd(runUV)) > .95) {
+					curRunPts.push(pt);
+				} else {
+					if (curRunPts.length >= 2) {
+						runs.push(new Run(runStartX, runStartY, lastIdxX + i - runStartX, lastIdxY + i - runStartY));
+					}
+					curRunPts = [pt];
+					runStartX = lastIdxX + i;
+					runStartY = lastIdxY + i;
+				}
+			}
+		}
+		if (curRun.length > 2) {
+			runs.push(curRun);
+		}	
+		return runs;
+	},
+	trimRun: function(dataX, dataY, run) {
+		var idxBoundA = P(dataX[run.xStartIdx], dataY[run.yStartIdx]);
+		var idxBoundB = P(dataX[run.xStartIdx + run.length], dataY[run.yStartIdx + run.length]);
+		var AB = boundA.VTo(B);
+		var BA = boundB.VTo(A);
+		var spaceBoundA = idxBoundA;
+		var spaceBoundB = idxBoundB;
+		var idxsBoundSpace = true;
+		
+		for (var i=0; i<run.length; i++) {
+			var pt = P(dataX[run.xStartIdx + i], dataY[run.yStartIdx } i]);
+			if (idxsBoundSpace && idxBoundsA.VTo(pt).dotProd(AB) < 0 || idxBoundsB.VTo(pt).dotProd(BA) < 0) {
+				idxsBoundSpace = false;	
+			}
+			if (spaceBoundA.VTo(spaceBoundB).dotProd(pt) < 0) {
+				spaceBoundA = pt;
+			} else if (spaceBoundB.VTo(spaceBoundB).dotProd(pt) < 0) {
+				spaceBoundB = pt;
+			}
+		}
+		var newX = [idxBoundA.x];
+		var newY = [idxBoundA.y]
+		if (spaceBoundA != idxBoundA) {
+			newX.push(spaceBoundA.x);
+			newY.push(spaceBoundA.y);
+		}
+		if (spaceBoundB != idxBoundB) {
+			newX.push(spaceBoundB.x);
+			newY.push(spaceBoundB.y);
+		}
+		newX.push(idxBoundB.x);
+		newY.push(idxBoundB.y);
+		dataX.splice(run.xStartIdx, run.length, newX);
+		dataY.splice(run.yStartIdx, run.length, newY);
 	},
 	enqueuePts: function() {
 		var newPt = this.data.pt();
