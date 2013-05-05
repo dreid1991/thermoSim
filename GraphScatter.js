@@ -159,7 +159,7 @@ GraphScatter.Set.prototype = {
 	},
 	recordStart: function() {
 		addListener(curLevel, 'update', this.recordListenerName, function() {
-			if (turn % 2 == 0) this.addVal();
+			this.addVal();
 		}, this);
 	},
 	recordStop: function() {
@@ -176,13 +176,13 @@ GraphScatter.Set.prototype = {
 			if (dDataIdxX != dDataIdxY) {
 				return false;
 			}
-			var runs = this.findRuns(dataX, dataY, lastIdxY, lastIdxX);
+			var runs = this.findRuns(dataX, dataY, lastIdxY, lastIdxX, dDataIdxX);
 			for (var i=runs.length - 1; i>=0; i--) {
 				this.trimRun(dataX, dataY, runs[i]);
 			}
 		}
 	},
-	findRuns: function(dataX, dataY, lastIdxX, lastIdxY) {
+	findRuns: function(dataX, dataY, lastIdxX, lastIdxY, dDataIdxX) {
 		var Run = function(xStartIdx, yStartIdx, length) {
 			this.xStartIdx = xStartIdx;
 			this.yStartIdx = yStartIdx;
@@ -202,10 +202,10 @@ GraphScatter.Set.prototype = {
 				}
 			} else {
 				var ptUV = curRunPts[0].VTo(pt).UV();
-				if (Math.abs(ptUV.dotProd(runUV)) > .95) {
+				if (Math.abs(ptUV.dotProd(runUV)) > .96) {
 					curRunPts.push(pt);
 				} else {
-					if (curRunPts.length >= 2) {
+					if (curRunPts.length >= 3) {
 						runs.push(new Run(runStartX, runStartY, lastIdxX + i - runStartX, lastIdxY + i - runStartY));
 					}
 					curRunPts = [pt];
@@ -214,29 +214,31 @@ GraphScatter.Set.prototype = {
 				}
 			}
 		}
-		if (curRun.length > 2) {
-			runs.push(curRun);
+		if (curRunPts.length >= 3) {
+			runs.push(new Run(runStartX, runStartY, lastIdxX + i - runStartX, lastIdxY + i - runStartY));
 		}	
 		return runs;
 	},
 	trimRun: function(dataX, dataY, run) {
 		var idxBoundA = P(dataX[run.xStartIdx], dataY[run.yStartIdx]);
-		var idxBoundB = P(dataX[run.xStartIdx + run.length], dataY[run.yStartIdx + run.length]);
-		var AB = boundA.VTo(B);
-		var BA = boundB.VTo(A);
+		var idxBoundB = P(dataX[run.xStartIdx + run.length - 1], dataY[run.yStartIdx + run.length - 1]);
 		var spaceBoundA = idxBoundA;
 		var spaceBoundB = idxBoundB;
+		var AB = spaceBoundA.VTo(spaceBoundB);
+		var BA = spaceBoundB.VTo(spaceBoundA);
 		var idxsBoundSpace = true;
 		
-		for (var i=0; i<run.length; i++) {
-			var pt = P(dataX[run.xStartIdx + i], dataY[run.yStartIdx } i]);
-			if (idxsBoundSpace && idxBoundsA.VTo(pt).dotProd(AB) < 0 || idxBoundsB.VTo(pt).dotProd(BA) < 0) {
+		for (var i=1; i<run.length - 1; i++) {
+			var pt = P(dataX[run.xStartIdx + i], dataY[run.yStartIdx + i]);
+			if (idxsBoundSpace && (idxBoundA.VTo(pt).dotProd(AB) < 0 || idxBoundB.VTo(pt).dotProd(BA) < 0)) {
 				idxsBoundSpace = false;	
 			}
-			if (spaceBoundA.VTo(spaceBoundB).dotProd(pt) < 0) {
+			if (AB.dotProd(spaceBoundA.VTo(pt)) < 0) {
 				spaceBoundA = pt;
-			} else if (spaceBoundB.VTo(spaceBoundB).dotProd(pt) < 0) {
+				AB = spaceBoundA.VTo(spaceBoundB)
+			} else if (BA.dotProd(spaceBoundB.VTo(pt)) < 0) {
 				spaceBoundB = pt;
+				BA = spaceBoundB.VTo(spaceBoundA);
 			}
 		}
 		var newX = [idxBoundA.x];
@@ -251,8 +253,11 @@ GraphScatter.Set.prototype = {
 		}
 		newX.push(idxBoundB.x);
 		newY.push(idxBoundB.y);
-		dataX.splice(run.xStartIdx, run.length, newX);
-		dataY.splice(run.yStartIdx, run.length, newY);
+		console.log('trimming ' + (run.length - newX.length));
+		var argsX = [run.xStartIdx, run.length].concat(newX);
+		var argsY = [run.yStartIdx, run.length].concat(newY);
+		Array.prototype.splice.apply(dataX, argsX);
+		Array.prototype.splice.apply(dataY, argsY);
 	},
 	enqueuePts: function() {
 		var newPt = this.data.pt();
