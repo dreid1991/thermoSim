@@ -4,35 +4,35 @@ LevelData = {
 	spcDefs: [
 		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, 
 		{spcName: 'ugly', m: 4, r: 2, col: Col(255, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
-		{spcName: 'uglier', m: 4, r: 2, col: Col(255, 255, 255), cv: 3 * R, hF298: -15, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
-		{spcName: 'duckling', m: 4, r: 2, col: Col(255, 255, 255), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
+		{spcName: 'uglier', m: 4, r: 2, col: Col(255, 255, 255), cv: 3 * R, hF298: -12, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
+		{spcName: 'duckling', m: 4, r: 2, col: Col(255, 255, 255), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
 	],
 	mainSequence: [
-		// {//S0	
-		// sceneData: undefined, 	
-		// prompts:[
-			// {//p0, q0
-				// sceneData:undefined,
-				// cutScene:true,
-				// text:"<p>In this simulation we're going to investigate the distinction between chemical reaction rate and equilibrium. In your own words, how would you explain the difference between the reaction rate and equilibrium?</p>",
-				// quiz:[
-					// {
-						// storeAs: 'foo1', 
-						// type:'text', 
-						// text:'Type your answer here.', 
-					// }, 
-				// ]	
-			// },	 
-		// ]
-		// },	
+		{//S0	
+		sceneData: undefined, 	
+		prompts:[
+			{//p0, q0
+				sceneData:undefined,
+				cutScene:true,
+				text:"<p>In this simulation we're going to investigate the distinction between chemical reaction rate and equilibrium. In your own words, how would you explain the difference between the reaction rate and equilibrium?</p>",
+				quiz:[
+					{
+						storeAs: 'foo1', 
+						type:'text', 
+						text:'Type your answer here.', 
+					}, 
+				]	
+			},	 
+		]
+		},	
 		{//S1
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'staticAdiabatic', temp: 400, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
+					{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', isothermalRate: 5, temp: 400, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
 				],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(70, 70), dims: V(420, 290), count: 600, temp: 200, returnTo: 'wally', tag: 'wally'}
+					{spcName: 'ugly', pos: P(70, 70), dims: V(400, 270), count: 600, temp: 400, returnTo: 'wally', tag: 'wally'}
 					//{spcName: 'duckling', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
@@ -72,14 +72,14 @@ LevelData = {
 					//{handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: false}
 				],
 				dataRecord: [
-					{wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
-					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
+					{wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}},
+					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugly', tag: 'wally'}},
 					//{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'uglier', tag: 'wally'}}
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
 					//{data: 'collisions'}
 				],
 				dataReadouts: [
-					// {label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'Temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 					// {label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},
 					// {label: 'Coll/sec: ', expr: 'collisions()', units: '', decPlaces: 0, handle: 'lala', readout: 'mainReadout'}
 					//{label: 'pInt: ', expr: 'pInt("wally")', units: 'bar', decPlaces: 1, handle: 'intintnit', readout: 'mainReadout'},
@@ -107,13 +107,13 @@ LevelData = {
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				// ],
 				rxns: [
-					{handle: 'rxn1', rctA: 'ugly', activeE: 5, prods: {uglier: 1}},
+					{handle: 'rxn1', rctA: 'ugly', activeE: 9, prods: {uglier: 1}},
 					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'molATime', xLabel: "time", yLabel: "moles A", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 4}, axesFixed: {y: false},
+					{type: 'Scatter', handle: 'molAtime', xLabel: "time", yLabel: "mole fraction of A", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
-							{handle:'moles', label:'moles A', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "time('wally')", y: "moles('wally', {spcName: 'ugly', tag: 'wally'})"}, trace: true, showPts: false, fillInPtsMin: 5}
+							{handle:'moles', label:'frac A', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "time('wally')", y: "frac('wally', {spcName: 'ugly', tag: 'wally'})"}, trace: true, showPts: false, fillInPtsMin: 5}
 						]
 					},
 					// {type: 'Scatter', handle: 'tempvstime', xLabel: "vol", yLabel: "pExt (K)", axesInit:{x:{min:0, step:3}, y:{min:0, step:2}}, numGridLines: {x: 3, y: 10},
@@ -173,11 +173,11 @@ LevelData = {
 		{//S2
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'staticAdiabatic', temp: 'get("foo4", "string", "noValue")', handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
+					{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 'get("foo4", "string", "noValue")', handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
 				],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(70, 70), dims: V(420, 290), count: 600, temp: 200, returnTo: 'wally', tag: 'wally'}
+					{spcName: 'ugly', pos: P(70, 70), dims: V(420, 290), count: 600, temp: 'get("foo4", "string", "noValue")', returnTo: 'wally', tag: 'wally'}
 					//{spcName: 'duckling', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
@@ -224,7 +224,7 @@ LevelData = {
 					//{data: 'collisions'}
 				],
 				dataReadouts: [
-					// {label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'Temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 					// {label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},
 					// {label: 'Coll/sec: ', expr: 'collisions()', units: '', decPlaces: 0, handle: 'lala', readout: 'mainReadout'}
 					//{label: 'pInt: ', expr: 'pInt("wally")', units: 'bar', decPlaces: 1, handle: 'intintnit', readout: 'mainReadout'},
@@ -256,9 +256,9 @@ LevelData = {
 					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'molA-time', xLabel: "time", yLabel: "moles A", axesInit:{x:{min:0, step:80}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'molAtime', xLabel: "time", yLabel: "mole fraction of A", axesInit:{x:{min:0, step:80}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
-							{handle:'moles', label:'moles A', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "time('wally')", y: "moles('wally')", trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}}
+							{handle:'moles', label:'moles A', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "time('wally')", y: "moles('wally')"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
 						]
 					},
 					// {type: 'Scatter', handle: 'tempvstime', xLabel: "vol", yLabel: "pExt (K)", axesInit:{x:{min:0, step:3}, y:{min:0, step:2}}, numGridLines: {x: 3, y: 10},

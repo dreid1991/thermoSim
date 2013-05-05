@@ -201,8 +201,8 @@ GraphScatter.Set.prototype = {
 					runUV = curRunPts[0].VTo(curRunPts[1]).UV();
 				}
 			} else {
-				var ptUV = curRunPts[0].VTo(pt).UV();
-				if (Math.abs(ptUV.dotProd(runUV)) > .96) {
+				var ptUV = curRunPts[curRunPts.length - 1].VTo(pt).UV();
+				if (Math.abs(ptUV.dotProd(runUV)) > .99) {
 					curRunPts.push(pt);
 				} else {
 					if (curRunPts.length >= 3) {
@@ -253,7 +253,6 @@ GraphScatter.Set.prototype = {
 		}
 		newX.push(idxBoundB.x);
 		newY.push(idxBoundB.y);
-		console.log('trimming ' + (run.length - newX.length));
 		var argsX = [run.xStartIdx, run.length].concat(newX);
 		var argsY = [run.yStartIdx, run.length].concat(newY);
 		Array.prototype.splice.apply(dataX, argsX);
