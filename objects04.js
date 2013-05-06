@@ -36,10 +36,11 @@ function Liquid(attrs) {
 	this.drivingForceSensitivity = 10;//formalize this a bit
 	this.updateListenerName = this.type + this.handle;
 	this.phasePressure = attrs.phasePressure || 1;
+	this.makePhaseDiagram = this.wrapMakePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, 'liquid' + this.handle.toCapitalCamelCase(), attrs.primaryKey, attrs.makeGasMarker, attrs.makeSystemMarker, attrs.makeLiquidMarker, this.phasePressure);
 	if (makePhaseDiagram) {
-		this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, 'liquid' + this.handle.toCapitalCamelCase(), attrs.primaryKey);
-		curLevel.graphs[this.phaseDiagram.handle] = this.phaseDiagram;
-		this.phaseDiagram.setPressure(this.phasePressure);
+	
+		this.phaseDiagram = this.makePhaseDiagram();
+		//this.phaseDiagram.setPressure(this.phasePressure);
 	}
 	this.updateEquilData(this.phaseDiagram, [this.phasePressure]);
 	this.setupUpdate(this.spcDefs, this.dataGas, this.dataLiq, this.actCoeffFuncs, this.drivingForce, this.updateListenerName, this.drawList, this.dotMgrLiq, this.wallLiq, this.numAbs, this.drivingForceSensitivity, this.numEjt, this.wallGas, this.wallPtIdxs, this.surfAreaObj);
@@ -245,7 +246,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			var tGas = dataGas.temp[dataGas.temp.length - 1];
 			//var dewWeight = .9;
 			var sign = getSign(tGas - tDew);
-			var tLiqF = tDew + sign * Math.min(10, sign * (tGas - tDew));
+			var tLiqF = tDew + sign * Math.min(15, sign * (tGas - tDew));
 			//var tLiqF = dewWeight * tDew + (1 - dewWeight) * tGas;  //so liquid is near dew pt but is moving in the direction the gas would push it in thermal equilibrium
 			var dE = (tLiqF - self.temp) * self.Cp;
 			self.temp = tLiqF;
@@ -590,7 +591,14 @@ _.extend(Liquid.prototype, objectFuncs, {
 			this.wallLiq.q += q;
 		}
 	},
-	makePhaseDiagram: function(liquid, spcDefs, actCoeffFuncs, handle, primaryKey) {
+	wrapMakePhaseDiagram: function(liquid, spcDefs, actCoeffFuncs, handle, primaryKey, makeGasMarker, makeSystemMarker, makeLiquidMarker, pressure) {
+		var self = this;
+		var makePhase = this.makePhaseDiagram;
+		return function() {
+			return makePhase.apply(self, [liquid, spcDefs, actCoeffFuncs, handle, primaryKey, makeGasMarker, makeSystemMarker, makeLiquidMarker, pressure]);
+		}
+	},
+	makePhaseDiagram: function(liquid, spcDefs, actCoeffFuncs, handle, primaryKey, makeGasMarker, makeSystemMarker, makeLiquidMarker, pressure) {
 		var spcAName, spcBName
 		//var primaryKey = 'Heavy';
 		for (var spcName in spcDefs) {
@@ -602,7 +610,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 		var axisInit = {x: {min: 0, max: 1}, y: {min: 200, max: 400}};
 		
-		var graph = new GraphPhase({spcAName: spcAName, spcBName: spcBName, axisInit: axisInit, actCoeffFuncs: actCoeffFuncs, handle: handle, primaryKey: primaryKey, liquid: this, wallGas: this.wallGas});
+		var graph = new GraphPhase({spcAName: spcAName, spcBName: spcBName, axisInit: axisInit, actCoeffFuncs: actCoeffFuncs, handle: handle, primaryKey: primaryKey, liquid: this, wallGas: this.wallGas, makeGasMarker: makeGasMarker, makeSystemMarker: makeSystemMarker, makeLiquidMarker: makeLiquidMarker, pressure: pressure});
 		return graph;
 	},
 	addWallBound: function(wallGas) {

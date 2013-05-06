@@ -26,15 +26,17 @@ function GraphPhase(attrs) {
 	var liquid = this.liquid;
 	this.liqTempFunc = function(){return liquid.temp};
 	this.gasTempFunc = this.makeTempFunc(this.wallGas);
+	this.yFuncKillLow = this.makeFracFunc(this.wallGas, this.keyNamePairs[this.primaryKeyType], true);
 	this.yFunc = this.makeFracFunc(this.wallGas, this.keyNamePairs[this.primaryKeyType]);
+	this.xFuncKillLow = this.makeFracFunc(this.liquid.wallLiq, this.keyNamePairs[this.primaryKeyType], true);
 	this.xFunc = this.makeFracFunc(this.liquid.wallLiq, this.keyNamePairs[this.primaryKeyType]);
 	this.updateGraph();
 	this.active = false;
 	if (defaultTo(true, attrs.makeLiquidMarker)) {
 		this.makeLiquidMarker();
 	}
-	if (defaultTo(true, attrs.makeOverallMarker)) {
-		this.makeOverallMarker();
+	if (defaultTo(true, attrs.makeSystemMarker)) {
+		this.makeSystemMarker();
 	}
 	if (defaultTo(true, attrs.makeGasMarker)) {
 		this.makeGasMarker();
@@ -50,9 +52,9 @@ GraphPhase.prototype = {
 		
 	},
 	makeLiquidMarker: function() {
-		this.graph.addMarker({handle: 'liquid', col: Col(200, 0, 0), markerType: 'bullseye', x: this.xFunc, y: this.liqTempFunc, label: 'Liquid'});
+		this.graph.addMarker({handle: 'liquid', col: Col(200, 0, 0), markerType: 'bullseye', x: this.xFuncKillLow, y: this.liqTempFunc, label: 'Liquid'});
 	},
-	makeOverallMarker: function() {
+	makeSystemMarker: function() {
 		var self = this;
 		var liquid = self.liquid;
 		var wallGas = liquid.wallGas;
@@ -70,7 +72,7 @@ GraphPhase.prototype = {
 		
 	},
 	makeGasMarker: function() {
-		this.graph.addMarker({handle: 'gas', col: Col(0, 200, 0), markerType: 'bullseye', x: this.yFunc, y: this.gasTempFunc, label: 'Gas'});
+		this.graph.addMarker({handle: 'gas', col: Col(0, 200, 0), markerType: 'bullseye', x: this.yFuncKillLow, y: this.gasTempFunc, label: 'Gas'});
 	},
 	makeTempFunc: function(wallGas) {
 		var tempData = wallGas.getDataSrc('temp');
@@ -82,15 +84,30 @@ GraphPhase.prototype = {
 			return sum / Math.min(Math.max(1, tempData.length), 30);
 		}
 	},
-	makeFracFunc: function(wall, spcName) {
+	makeFracFunc: function(wall, spcName, killLow) {
 		var fracData = wall.getDataSrc('frac', {spcName: spcName, tag: wall.handle});
-		return function() {
-			var sum = 0;
-			for (var i=Math.max(0, fracData.length - 30); i<fracData.length; i++) {
-				sum += fracData[i];
-			}
-			return sum / Math.min(Math.max(1, fracData.length), 30);
-		}		
+		var dotMgr = wall.dotManager;
+		if (killLow) {
+			return function() {
+				if (dotMgr.count > 50) {
+					var sum = 0;
+					for (var i=Math.max(0, fracData.length - 30); i<fracData.length; i++) {
+						sum += fracData[i];
+					}
+					return sum / Math.min(Math.max(1, fracData.length), 30);
+				} else {
+					return -1e5;
+				}
+			}		
+		} else {
+			return function() {
+				var sum = 0;
+				for (var i=Math.max(0, fracData.length - 30); i<fracData.length; i++) {
+					sum += fracData[i];
+				}
+				return sum / Math.min(Math.max(1, fracData.length), 30);
+			}			
+		}
 	},
 	clearHTML: function() {
 		this.graph.clearHTML();

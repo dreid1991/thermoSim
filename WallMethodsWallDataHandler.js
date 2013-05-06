@@ -353,7 +353,7 @@ WallMethods.wallDataHandler = {
 				// if (false) {
 					// console.log('woop!');
 				// }
-				return countList.length/totalList.length
+				return countList.length / (totalList.length || 1);
 			}, this, 'update');
 		}
 		return dataObj;		
