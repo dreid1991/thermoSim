@@ -10,11 +10,13 @@ function GraphPhase(attrs) {
 	this.handle = attrs.handle;
 	this.actCoeffFuncs = attrs.actCoeffFuncs;
 	this.pressure = attrs.pressure || 1;
+	attrs.axesFixed = {x: true};
+	attrs.numGridLines = {x: 6};
 	this.keyNamePairs = this.getKeyNamePairs(this.spcA, this.spcB, this.pressure);
 	//this.primarySpcName = this.getPrimarySpcName(this.spcA, this.spcB, this.primaryKeyType, this.pressure);
 	if (!(this.spcA && this.spcB)) console.log('Bad species data for phase diagram ' + this.spcAName + ' ' + this.spcBName);
 	attrs.yLabel = 'Temp';
-	attrs.xLabel = 'x' + this.keyNamePairs[this.primaryKeyType]; // make this a spc name
+	attrs.xLabel = 'frac ' + this.keyNamePairs[this.primaryKeyType].toCapitalCamelCase();
 	attrs.makeReset = false;
 	this.graph = new GraphScatter(attrs); //passing along axisInit
 	this.equilData;

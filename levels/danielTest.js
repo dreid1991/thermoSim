@@ -34,7 +34,7 @@ LevelData = {
 					// },
 					{
 						type: 'Liquid',
-						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}, makePhaseDiagram: true, makeGasMarker: false}
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 500}, primaryKey: 'light', actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}, makePhaseDiagram: true, makeGasMarker: false}
 					},
 					{
 						type: 'DragWeights',
