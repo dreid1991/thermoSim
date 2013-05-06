@@ -38,11 +38,26 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 	{
 		addSet: function(attrs){//address, label, pointCol, flashCol, data:{x:{wallInfo, data}, y:{same}}){
 			if (!this.data[attrs.handle]) {
+				var self = this;
 				var set = new GraphScatter.Set(this, attrs.handle, attrs.label, attrs.data, attrs.pointCol, attrs.flashCol, attrs.fillInPts, attrs.fillInPtsMin, attrs.trace, attrs.recording, attrs.showPts);
-
+				var ptCol = attrs.pointCol.copy();
 				this.data[attrs.handle] = set;
-				
-				this.makeLegendEntry(set, attrs.handle);
+				var drawFunc;
+				if (attrs.trace && defaultTo(true, attrs.showPts)) {
+					drawFunc = function(pos) {
+						draw.line(pos.copy().movePt(V(-9, 0)), pos.copy().movePt(V(9, 0)), ptCol, self.graphDisplay);
+						self.drawPtStd(pos, ptCol)
+					}
+				} else if (attrs.trace) {
+					drawFunc = function(pos) {
+						draw.line(pos.copy().movePt(V(-9, 0)), pos.copy().movePt(V(9, 0)), ptCol, self.graphDisplay);
+					}
+				} else {
+					drawFunc = function(pos) {
+						self.drawPtStd(pos, ptCol);
+					}
+				}
+				this.makeLegendEntry(set, set.label, attrs.handle, drawFunc);
 				this.drawAllBG();
 			}
 		},
@@ -69,8 +84,8 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 		},
 		addLast: function(){ //point of entry
 			var toAdd = [];
-			for (var address in this.data){
-				var set = this.data[address];
+			for (var setName in this.data){
+				var set = this.data[setName];
 				if (set.recording && set.dataValid) {
 					set.trimNewData();
 					set.enqueuePts();

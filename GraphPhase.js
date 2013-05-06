@@ -30,8 +30,8 @@ function GraphPhase(attrs) {
 	this.xFunc = this.makeFracFunc(this.liquid.wallLiq, this.keyNamePairs[this.primaryKeyType]);
 	this.updateGraph();
 	this.active = false;
-	this.graph.addMarker({handle: 'liquid', col: Col(200, 0, 0), markerType: 'bullseye', x: this.xFunc, y: this.liqTempFunc});
-	this.graph.addMarker({handle: 'gas', col: Col(0, 200, 0), markerType: 'bullseye', x: this.yFunc, y: this.gasTempFunc});
+	this.graph.addMarker({handle: 'liquid', col: Col(200, 0, 0), markerType: 'bullseye', x: this.xFunc, y: this.liqTempFunc, label: 'Liquid', handle: 'liquid'});
+	this.graph.addMarker({handle: 'gas', col: Col(0, 200, 0), markerType: 'bullseye', x: this.yFunc, y: this.gasTempFunc, label: 'Gas', handle: 'gas'});
 	this.graph.hasData = true;
 }
 GraphPhase.prototype = {

@@ -115,11 +115,11 @@ GraphBase = {
 		var canvasDisplay = this.makeCanvas(this.dims, this.parentDiv, this.handle + 'Graph', this.makeReset, this.handle + 'Button');
 		this.graphDisplayHTMLElement = canvasDisplay.HTMLElem;
 		this.graphDisplay = canvasDisplay.canvas;
-		//should reassert click handlers too
 		this.layers.setDrawCanvas(this.graphDisplay);
 		if (this.legend) {
 			for (var legendEntry in this.legend) {
-				this.legend[legendEntry].setCheckMarkCanvas(this.graphDisplay);
+				this.legend[legendEntry].setCanvas(this.graphDisplay);
+				this.legend[legendEntry].toggleActivate();
 			}
 		}
 	},
@@ -183,13 +183,6 @@ GraphBase = {
 		else 
 			console.log('Bad set handle ' + setHandle);
 	},
-	setsToPts: function(x, y, setName){
-		var pts = new Array(x.length);
-		for(var ptIdx=0; ptIdx<x.length; ptIdx++){
-			pts[ptIdx] = {x:x[ptIdx], y:y[ptIdx], address:setName};
-		}
-		return pts;
-	},
 	drawAllBG: function(){
 		this.drawBGRect();
 		this.drawGrid();
@@ -237,12 +230,7 @@ GraphBase = {
 	},
 	drawLegend: function(){
 		for (var entryName in this.legend){
-			var entry = this.legend[entryName];
-			var text = entry.text;
-			this.drawLegendToggle(entry);
-			var font = this.legendFont
-			draw.text(text, entry.textPos,  this.legendFont, this.textCol, 'left', 0, this.graphDisplay);
-			this.drawPtStd(entry.pos, entry.col);
+			var entry = this.legend[entryName].draw();
 		}
 	},
 	
@@ -297,9 +285,9 @@ GraphBase = {
 		this.drawLayers();
 	},
 
-	drawLayers: function() {
+	drawLayers: function(force) {
 		//redrawing all data is hugely faster than erasing flashers with get/put image data.  get/put took ~25% of a core for two markers.  Redrawing is fast.
-		if (turn % 2 && this.hasData && this.layers.count) {
+		if ((turn % 2 || force ) && this.hasData && this.layers.count) {
 			this.drawAllData();
 			for (var layerIdx=0; layerIdx<this.layers.layers.length; layerIdx++) {
 				var layer = this.layers.layers[layerIdx];
@@ -432,24 +420,16 @@ GraphBase = {
 			}		
 		}
 	},
-	drawLegendToggle: function(entry){
-		draw.fillStrokeRect(entry.boxPos, entry.boxDims, this.gridCol, this.toggleCol, this.graphDisplay);
-		var set = entry.set;
-		if (set.visible) {
-			entry.checkMark.draw();
-		}
-	},
-	makeLegendEntry: function(set, address){
+	makeLegendEntry: function(set, label, handle, drawMarker) {
 		var x = this.dims.dx-this.legendWidth+5;
 		var y = 30;
 		for (var entryIdx in this.legend){
 			y += 35;
 		}
-
-		var legendEntry = new GraphBase.LegendEntry(this, set, set.pointCol, set.label, x, y, this.legendFontSize, this.dims, this.toggleCol);
+		var legendEntry = new GraphBase.LegendEntry(this, set, label, x, y, this.legendFontSize, this.dims, this.toggleCol, this.legendFont, this.textCol, drawMarker);
 		legendEntry.toggleActivate();
 		
-		this.legend[address] = legendEntry;
+		this.legend[handle] = legendEntry;
 		this.drawAllBG();
 	},
 	getRange: function(axis){
@@ -478,13 +458,6 @@ GraphBase = {
 		this.axisRange = new GraphBase.Range(Number.MAX_VALUE, -Number.MAX_VALUE, Number.MAX_VALUE, -Number.MAX_VALUE);
 		this.valRange = new GraphBase.Range(Number.MAX_VALUE, -Number.MAX_VALUE, Number.MAX_VALUE, -Number.MAX_VALUE);
 	},
-	makePtDataGrabFunc: function(data){
-		return function(){
-			var xLast = data.x[data.x.length-1];
-			var yLast = data.y[data.y.length-1];
-			return P(xLast, yLast);
-		}
-	},
 	ptsExist: function(pts){
 		for (var ptIdx=0; ptIdx<pts.length; ptIdx++){
 			var pt = pts[ptIdx];
@@ -493,11 +466,6 @@ GraphBase = {
 			}
 		}
 		return true;
-	},
-	makeHistDataGrabFunc: function(data){
-		return function(address){
-			return {address:address, data:data[data.length-1]};
-		}
 	},
 	valToCoord: function(val){
 		var rangeX = this.axisRange.x.max - this.axisRange.x.min;
@@ -535,23 +503,38 @@ GraphBase = {
 	
 }
 
-GraphBase.LegendEntry = function(graph, set, col, text, x, y, fontSize, graphDims) {
+GraphBase.LegendEntry = function(graph, set, text, x, y, fontSize, graphDims, toggleCol, font, textCol, drawMarker) {
 	this.graph = graph;
 	this.set = set;
 	this.pos = P(x, y);
-	this.col = col;
+	this.font = font;
+	this.textCol = textCol;
+	this.toggleCol = toggleCol;
 	this.text = text;
 	this.textPos = P(x + 10, y + fontSize / 2);
 	this.fontSize = fontSize;
 	this.boxPos = P(graphDims.dx - 18, y - 5); //whatever, will look at later
 	this.boxDims = V(13, 13);
 	this.mouseListenerName = 'toggle' + this.graph.handle.toCapitalCamelCase() + this.set.handle.toCapitalCamelCase();
+	this.drawMarker = drawMarker;
 	this.checkMark = graph.checkMark(this.boxPos.copy(), this.boxDims.copy(), graph.checkMarkOversize, graph.toggleCol, graph.graphDisplay);
+	
 }
 
 GraphBase.LegendEntry.prototype = {
-	drawCheck: function() {
-		this.checkMark.draw();
+	draw: function() {
+		this.drawToggle();
+		this.drawText();
+		this.drawMarker(this.pos);
+	},
+	drawToggle: function() {
+		draw.fillStrokeRect(this.boxPos, this.boxDims, this.graph.gridCol, this.toggleCol, this.graph.graphDisplay);
+		if (this.set.visible) {
+			this.checkMark.draw();
+		}
+	},
+	drawText: function() {
+		draw.text(this.text, this.textPos,  this.font, this.textCol, 'left', 0, this.graph.graphDisplay);
 	},
 	toggle: function() {
 		if (ptInRect(this.boxPos, this.boxDims, mouseOffsetDiv(this.graph.parentDivId))) {
@@ -572,7 +555,8 @@ GraphBase.LegendEntry.prototype = {
 	toggleDeactivate: function() {
 		removeListener(curLevel, 'mouseup', this.mouseListenerName);
 	},
-	setCheckMarkCanvas: function(canvas) {
+	setCanvas: function(canvas) {
+		
 		this.checkMark.setCanvas(canvas);
 	}
 }
@@ -596,7 +580,6 @@ GraphBase.Marker = function(attrs) {
 		this.dataY = attrs.y;
 	else
 		this.dataY = this.wrapInDataGet(attrs.y);
-		
 	this.graph = attrs.graph;
 	this.graphDisplay = attrs.graphDisplay;
 	//this.graphDisplay = attrs.graphDisplay;
@@ -607,10 +590,11 @@ GraphBase.Marker = function(attrs) {
 
 	this.markerType = attrs.markerType;
 	this.col = attrs.col;
+	this.visible = true;
 	this.layers = attrs.layers;
 	this.dataValid = true;
 	if (this.drawFuncs[this.markerType]) {
-		this.draw = this.drawFuncs[this.markerType];
+		this.drawCB = this.drawFuncs[this.markerType];
 	} else {
 		console.log('Bad marker type ' + this.markerType + '.  Choices include ');
 		for (var name in this.drawFuncs) console.log(name);
@@ -618,6 +602,10 @@ GraphBase.Marker = function(attrs) {
 	this.characLen = 15;
 	this.imgCharacLen = this.characLen + 2;
 	this.layers.addItem('marker', this);
+	var self = this;
+	if (attrs.label) {
+		this.legendEntry = this.addLegendEntry(attrs.label, function(pos) {self.drawCB(pos)});
+	}
 }
 
 GraphBase.Marker.prototype = {
@@ -636,16 +624,24 @@ GraphBase.Marker.prototype = {
 	setDrawCanvas: function(drawCanvas) {
 		this.graphDisplay = drawCanvas;
 	},
-	drawFuncs: {
-		bullseye: function() {
-			var cLen = this.characLen;
+	addLegendEntry: function(label, drawCB) {//function(set, label, handle, drawMarker) 
+		this.graph.makeLegendEntry(this, label, this.handle, drawCB)
+	},
+	draw: function() {
+		if (this.visible) {
 			if (this.dataValid) this.coordLast = this.graph.valToCoord(P(this.dataX(), this.dataY()));
-			var coord = this.coordLast;
-			window.draw.circle(coord, .15 * cLen, this.col, true, this.graphDisplay);
-			window.draw.line(coord.copy().movePt(V(-cLen / 2, 0)), coord.copy().movePt(V(cLen / 2, 0)), this.col, this.graphDisplay);
-			window.draw.line(coord.copy().movePt(V(0, -cLen / 2)), coord.copy().movePt(V(0, cLen / 2)), this.col, this.graphDisplay);
+			var pos = this.coordLast;
+			this.drawCB(pos);
+		}
+	},
+	drawFuncs: {
+		bullseye: function(pos) {
+			var cLen = this.characLen;
+			window.draw.circle(pos, .15 * cLen, this.col, true, this.graphDisplay);
+			window.draw.line(pos.copy().movePt(V(-cLen / 2, 0)), pos.copy().movePt(V(cLen / 2, 0)), this.col, this.graphDisplay);
+			window.draw.line(pos.copy().movePt(V(0, -cLen / 2)), pos.copy().movePt(V(0, cLen / 2)), this.col, this.graphDisplay);
 			//maybe set alpha lower for outer circle
-			window.draw.circle(coord, .3 * cLen, this.col, false, this.graphDisplay);
+			window.draw.circle(pos, .3 * cLen, this.col, false, this.graphDisplay);
 			
 			
 		}
@@ -700,4 +696,3 @@ GraphBase.Layers.prototype = {
 		}
 	}
 }
-//GraphBase.prototype.

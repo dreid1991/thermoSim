@@ -2,7 +2,7 @@ function DrawingTools(){};
 
 DrawingTools.prototype = {
 
-	clear: function(col){
+	clear: function(col) {
 		var width = myCanvas.width;
 		var height = myCanvas.height;
 		c.clearRect(0, 0, width, height);
@@ -10,13 +10,13 @@ DrawingTools.prototype = {
 		c.fillRect(0,0, width, height);	
 	},
 	dots: function(){
-		for (var spcName in spcs){
+		for (var spcName in spcs) {
 			var dots = spcs[spcName].dots;
 			c.fillStyle = spcs[spcName].col.hex;
-			if(dots[0]){
+			if (dots[0]) {
 				var r = dots[0].r;//from 5250ms/500 -> 4975 ms/500.  also don't define dot locally
 			}
-			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++){
+			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++) {
 				c.beginPath();
 				c.arc(dots[dotIdx].x, dots[dotIdx].y, r, 0, Math.PI*2, true);
 				c.closePath();
@@ -34,7 +34,7 @@ DrawingTools.prototype = {
 		}
 	},
 	walls: function(walls, col){
-		for (var wallIdx=0; wallIdx<walls.length; wallIdx++){
+		for (var wallIdx=0; wallIdx<walls.length; wallIdx++) {
 			var wall = walls[wallIdx];
 			if (wall.show) {
 				c.beginPath();
@@ -63,23 +63,23 @@ DrawingTools.prototype = {
 			drawCanvas.stroke();
 		}
 	},
-	fillPts: function(pts, col, drawCanvas){
+	fillPts: function(pts, col, drawCanvas) {
 		drawCanvas.fillStyle = col.hex;
 		drawCanvas.beginPath();
 		drawCanvas.moveTo(pts[0].x, pts[0].y);
-		for (var ptIdx=1; ptIdx<pts.length; ptIdx++){
+		for (var ptIdx=1; ptIdx<pts.length; ptIdx++) {
 			drawCanvas.lineTo(pts[ptIdx].x, pts[ptIdx].y);
 		}
 		drawCanvas.closePath();
 		drawCanvas.fill();
 	},
-	fillPtsAlpha: function(pts, col, alpha, drawCanvas){
+	fillPtsAlpha: function(pts, col, alpha, drawCanvas) {
 		var prevAlpha = drawCanvas.globalAlpha;
 		drawCanvas.globalAlpha = alpha;
 		draw.fillPts(pts, col, drawCanvas);
 		drawCanvas.globalAlpha = prevAlpha;
 	},
-	fillPtsStroke: function(pts, fillCol, strokeCol, drawCanvas){
+	fillPtsStroke: function(pts, fillCol, strokeCol, drawCanvas) {
 		drawCanvas.fillStyle = fillCol.hex
 		drawCanvas.strokeStyle = strokeCol.hex
 		drawCanvas.beginPath();
@@ -91,7 +91,7 @@ DrawingTools.prototype = {
 		drawCanvas.stroke();
 		drawCanvas.fill();
 	},
-	roundedRect: function(pos, dims, r, col, drawCanvas){
+	roundedRect: function(pos, dims, r, col, drawCanvas) {
 		var x = pos.x;
 		var y = pos.y;
 		var width = dims.dx;
@@ -107,7 +107,7 @@ DrawingTools.prototype = {
 		drawCanvas.fill();
 		
 	},
-	fillRect: function(corner, dims, fillCol, drawCanvas){
+	fillRect: function(corner, dims, fillCol, drawCanvas) {
 		drawCanvas.fillStyle = fillCol.hex
 		drawCanvas.fillRect(corner.x, corner.y, dims.dx, dims.dy);
 	},
@@ -117,12 +117,12 @@ DrawingTools.prototype = {
 		drawCanvas.fillRect(corner.x, corner.y, dims.dx, dims.dy);
 		drawCanvas.strokeRect(corner.x, corner.y, dims.dx, dims.dy);
 	},
-	strokeRect: function(corner, dims, col, drawCanvas){
+	strokeRect: function(corner, dims, col, drawCanvas) {
 		drawCanvas.strokeStyle = col.hex;
 		drawCanvas.strokeRect(corner.x, corner.y, dims.dx, dims.dy);
 	},
 
-	line: function(p1, p2, col, drawCanvas){
+	line: function(p1, p2, col, drawCanvas) {
 		drawCanvas.strokeStyle = col.hex;
 		drawCanvas.beginPath();
 		drawCanvas.moveTo(p1.x, p1.y);
@@ -130,11 +130,11 @@ DrawingTools.prototype = {
 		drawCanvas.closePath();
 		drawCanvas.stroke();
 	},
-	curvedLine: function(line, curvePt, quadEnd, drawCanvas){
+	curvedLine: function(line, curvePt, quadEnd, drawCanvas) {
 		drawCanvas.lineTo(line.x, line.y);
 		drawCanvas.quadraticCurveTo(curvePt.x, curvePt.y, quadEnd.x, quadEnd.y);
 	},
-	path: function(pts, col, drawCanvas){
+	path: function(pts, col, drawCanvas) {
 		drawCanvas.strokeStyle = col.hex;
 		drawCanvas.beginPath();
 		drawCanvas.moveTo(pts[0].x, pts[0].y);
@@ -143,7 +143,7 @@ DrawingTools.prototype = {
 		}
 		drawCanvas.stroke();		
 	},
-	text: function(text, pos, font, col, align, rotation, drawCanvas){
+	text: function(text, pos, font, col, align, rotation, drawCanvas) {
 		drawCanvas.save();
 		drawCanvas.translate(pos.x, pos.y);
 		drawCanvas.rotate(rotation);
