@@ -584,7 +584,7 @@ Timeline.Section.prototype = {
 	restoreGraphs: function() {
 		for (var graphName in this.level.graphs) {
 			var graph = this.level.graphs[graphName];
-			graph.setValidData();
+			graph.setDataValid();
 			graph.restoreHTML();
 			graph.drawAllData();
 		}
@@ -971,7 +971,7 @@ Timeline.stateFuncs = {
 				} else {
 					console.log("Tried to load graph with bad handle " + graphDatum.handle);
 				}
-				graph.setValidData();
+				graph.setDataValid();
 			} else {
 				graph = new window.Graphs[graphDatum.type](graphDatum);
 			}

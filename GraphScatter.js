@@ -46,9 +46,9 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 				this.drawAllBG();
 			}
 		},
-		setValidData: function() {
+		setDataValid: function() {
 			for (var setName in this.data) {
-				this.data[setName].setValidData();
+				this.data[setName].setDataValid();
 			}
 		},
 		drawAllData: function(){
@@ -67,7 +67,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			var toAdd = [];
 			for (var address in this.data){
 				var set = this.data[address];
-				if (set.recording && set.validData) {
+				if (set.recording && set.dataValid) {
 					set.trimNewData();
 					set.enqueuePts();
 				}
@@ -130,7 +130,7 @@ GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol,
 	this.queuePts = [];
 	this.queueIdxs = [];
 	this.recording = defaultTo(true, recording);
-	this.validData = true;
+	this.dataValid = true;
 	if (this.recording) this.recordStart();
 
 }
@@ -143,13 +143,13 @@ GraphScatter.Set.prototype = {
 		this.queueIdxs.splice(0, this.queueIdxs.length);
 		this.queuePts.splice(0, this.queuePts.length);
 	},
-	setValidData: function() {
+	setDataValid: function() {
 		try {
 			var x = this.dataFuncs.x();
 			var y = this.dataFuncs.y();
-			if (validNumber(x) !== false && validNumber(y) !== false) this.validData = true;
+			if (validNumber(x) !== false && validNumber(y) !== false) this.dataValid = true;
 		} catch(e) {
-			this.validData = false;
+			this.dataValid = false;
 		}
 	},
 	addVal: function() {
@@ -176,7 +176,7 @@ GraphScatter.Set.prototype = {
 	},
 	recordStart: function() {
 		addListener(curLevel, 'update', this.recordListenerName, function() {
-			if (this.validData) this.addVal();
+			if (this.dataValid) this.addVal();
 		}, this);
 	},
 	recordStop: function() {

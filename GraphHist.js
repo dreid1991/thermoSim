@@ -128,6 +128,7 @@ GraphHist.Set = function(graph, handle, dataExpr, barCol) {
 	this.handle = handle || 'onlyData';
 	this.data = new GraphHist.Data();
 	this.dataFunc = new GraphHist.DataFunc(graph, dataExpr);
+	this.dataValid = true;
 	this.barCol = barCol;
 	this.visible = true;
 }
@@ -136,6 +137,11 @@ GraphHist.Set.prototype = {
 		this.data.x = this.dataFunc.x();
 	},
 	recordStop: function(){},
+	setDataValid: function() {
+		try() {
+			this.dataValid = validNumber(this.dataFunc.x()) !== false) ? true : false;	
+		} catch(e) {};
+	},
 	
 }
 GraphHist.Data = function() {
