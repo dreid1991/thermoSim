@@ -584,6 +584,7 @@ Timeline.Section.prototype = {
 	restoreGraphs: function() {
 		for (var graphName in this.level.graphs) {
 			var graph = this.level.graphs[graphName];
+			graph.setValidData();
 			graph.restoreHTML();
 			graph.drawAllData();
 		}
@@ -965,35 +966,28 @@ Timeline.stateFuncs = {
 			if (/^load$/i.test(graphDatum.type)) {
 				graph = window.storedGraphs[graphDatum.handle];
 				if (graph) {
-					var record = defaultTo(false, graphDatum.record);
-					if (!record) {
-						for (var set in graph.data) {
-							graph.data[set].recording = false;
-						}
-					} else {
-						for (var set in graph.data) {
-							graph.data[set].recordStart();
-						}
-					}
 					graph.initDrawLayers();
 					graph.restoreHTML();
-					graph.drawAllData();
 				} else {
 					console.log("Tried to load graph with bad handle " + graphDatum.handle);
 				}
+				graph.setValidData();
 			} else {
 				graph = new window.Graphs[graphDatum.type](graphDatum);
 			}
+			graph.drawAllData();
 			for (var setIdx=0; setIdx<graphDatum.sets.length; setIdx++) {
 				var set = graphDatum.sets[setIdx];
 				graph.addSet(set);
 			}
-			graph.drawAllData();
 			section.level.graphs[graphDatum.handle] = graph;
 			elems[id] = graph;
 		},
 		remove: function(section, elems, id) {
 			var graph = elems[id];
+			for (var setName in graph.data) {
+				graph.data[setName].recording = false;
+			}
 			delete section.level.graphs[graph.handle];
 			graph.remove();
 			elems[id] = undefined;

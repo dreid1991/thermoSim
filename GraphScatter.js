@@ -46,6 +46,11 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 				this.drawAllBG();
 			}
 		},
+		setValidData: function() {
+			for (var setName in this.data) {
+				this.data[setName].setValidData();
+			}
+		},
 		drawAllData: function(){
 			//redrawing the background is twice as fast as pasting it in
 			this.drawAllBG();
@@ -62,7 +67,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			var toAdd = [];
 			for (var address in this.data){
 				var set = this.data[address];
-				if (set.recording) {
+				if (set.recording && set.validData) {
 					set.trimNewData();
 					set.enqueuePts();
 				}
@@ -125,6 +130,7 @@ GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol,
 	this.queuePts = [];
 	this.queueIdxs = [];
 	this.recording = defaultTo(true, recording);
+	this.validData = true;
 	if (this.recording) this.recordStart();
 
 }
@@ -136,6 +142,15 @@ GraphScatter.Set.prototype = {
 		this.flashers.splice(0, this.flashers.length);
 		this.queueIdxs.splice(0, this.queueIdxs.length);
 		this.queuePts.splice(0, this.queuePts.length);
+	},
+	setValidData: function() {
+		try {
+			var x = this.dataFuncs.x();
+			var y = this.dataFuncs.y();
+			if (validNumber(x) !== false && validNumber(y) !== false) this.validData = true;
+		} catch(e) {
+			this.validData = false;
+		}
 	},
 	addVal: function() {
 		this.data.x.push(this.dataFuncs.x());
@@ -161,7 +176,7 @@ GraphScatter.Set.prototype = {
 	},
 	recordStart: function() {
 		addListener(curLevel, 'update', this.recordListenerName, function() {
-			this.addVal();
+			if (this.validData) this.addVal();
 		}, this);
 	},
 	recordStop: function() {
