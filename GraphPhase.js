@@ -30,8 +30,15 @@ function GraphPhase(attrs) {
 	this.xFunc = this.makeFracFunc(this.liquid.wallLiq, this.keyNamePairs[this.primaryKeyType]);
 	this.updateGraph();
 	this.active = false;
-	this.graph.addMarker({handle: 'liquid', col: Col(200, 0, 0), markerType: 'bullseye', x: this.xFunc, y: this.liqTempFunc, label: 'Liquid', handle: 'liquid'});
-	this.graph.addMarker({handle: 'gas', col: Col(0, 200, 0), markerType: 'bullseye', x: this.yFunc, y: this.gasTempFunc, label: 'Gas', handle: 'gas'});
+	if (defaultTo(true, attrs.makeLiquidMarker)) {
+		this.makeLiquidMarker();
+	}
+	if (defaultTo(true, attrs.makeOverallMarker)) {
+		this.makeOverallMarker();
+	}
+	if (defaultTo(true, attrs.makeGasMarker)) {
+		this.makeGasMarker();
+	}
 	this.graph.hasData = true;
 }
 GraphPhase.prototype = {
@@ -41,6 +48,29 @@ GraphPhase.prototype = {
 	setDataValid: function() {
 		this.graph.setDataValid();
 		
+	},
+	makeLiquidMarker: function() {
+		this.graph.addMarker({handle: 'liquid', col: Col(200, 0, 0), markerType: 'bullseye', x: this.xFunc, y: this.liqTempFunc, label: 'Liquid'});
+	},
+	makeOverallMarker: function() {
+		var self = this;
+		var liquid = self.liquid;
+		var wallGas = liquid.wallGas;
+		var dotMgrGas = liquid.wallGas.dotManager;
+		var dotMgrLiq = liquid.wallLiq.dotManager;
+		var xFunc = function() {
+			return (self.xFunc() * dotMgrLiq.count + self.yFunc() * dotMgrGas.count) / (dotMgrGas.count + dotMgrLiq.count);
+		}
+		var yFunc = function() {
+			var gasCv = wallGas.getCv();
+			return (gasCv * self.gasTempFunc() + liquid.Cp * self.liqTempFunc()) / (gasCv + liquid.Cp);
+		}
+		this.graph.addMarker({handle: 'system', col: Col(200, 200, 0), markerType: 'bullseye', x: xFunc, y: yFunc, label: 'System'});
+		
+		
+	},
+	makeGasMarker: function() {
+		this.graph.addMarker({handle: 'gas', col: Col(0, 200, 0), markerType: 'bullseye', x: this.yFunc, y: this.gasTempFunc, label: 'Gas'});
 	},
 	makeTempFunc: function(wallGas) {
 		var tempData = wallGas.getDataSrc('temp');

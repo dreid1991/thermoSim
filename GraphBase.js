@@ -3,6 +3,7 @@ GraphBase = {
 	setStds: function(){
 		window.storedGraphs[this.handle] = this;
 		window.curLevel.graphs[this.handle] = this; //also set in timeline, but is child of liquid or something, doesn't go through timeline add graph funcs
+		//also - this overwrites the phase diagram's entry in curLevel.  I *think* that's alright because it makes it so one can add sets and stuff. Phase is just kind of a wrapper anyway
 		this.hashMarkLen = 10;
 		this.checkMarkOversize = 3;
 		this.bgCol = curLevel.bgCol;
