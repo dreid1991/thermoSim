@@ -32,10 +32,10 @@ LevelData = {
 						// type: 'AuxImage',
 						// attrs: {handle: 'picci', slotNum: 0, imgFunc: 'img("img/work/block0Pic1.jpg")'}
 					// },
-					// {
-						// type: 'Liquid',
-						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}, makePhaseDiagram: true}
-					// },
+					{
+						type: 'Liquid',
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}, makePhaseDiagram: true}
+					},
 					{
 						type: 'DragWeights',
 						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 6}], pInit: 3, cleanUpWith: 'prompt1'}
@@ -134,7 +134,6 @@ LevelData = {
 							// {handle:'temp', label:'temp', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'vol("wally")', y: "pExt('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						// ]
 					// }
-					//{type: 'load', handle: 'theSavedHandle', sets: [...sets to add.  Can also do addSet in cmmds.  Will deal with adding duplicates by not adding a set if it already exists
 						
 					 // {type: 'Hist', handle: 'PvsVOne', xLabel: "xLabel", yLabel: "yLabel", axesInit:{x:{min:0, step:50}, y:{min:0, step:10}}, 
 						// sets:[
@@ -271,7 +270,8 @@ LevelData = {
 						sets:[
 							{handle:'pExt2', label:'pExt2', pointCol:Col(50,200,50), flashCol:Col(255,200,200), data:{x: 'vol("wapple")', y: 'pExt("wapple")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]
-					}
+					},
+					{type: 'load', handle: 'liquidSwishy'}
 				]
 			},
 			prompts: [

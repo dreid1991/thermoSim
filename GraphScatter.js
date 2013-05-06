@@ -50,6 +50,10 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			for (var setName in this.data) {
 				this.data[setName].setDataValid();
 			}
+			for (var markerName in this.markers) {
+				this.markers[markerName].setDataValid();
+			}
+			
 		},
 		drawAllData: function(){
 			//redrawing the background is twice as fast as pasting it in
@@ -525,6 +529,9 @@ GraphScatter.Flasher.prototype = {
 			this.advance();
 		}, this)
 		return handle;
+	},
+	setDrawCanvas: function(drawCanvas) {
+		this.graphDisplay = drawCanvas;
 	},
 	draw: function() {
 		this.coordLast = this.graph.valToCoord(this.pt);

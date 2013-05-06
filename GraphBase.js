@@ -2,6 +2,7 @@ GraphBase = {
 
 	setStds: function(){
 		window.storedGraphs[this.handle] = this;
+		window.curLevel.graphs[this.handle] = this; //also set in timeline, but is child of liquid or something, doesn't go through timeline add graph funcs
 		this.hashMarkLen = 10;
 		this.checkMarkOversize = 3;
 		this.bgCol = curLevel.bgCol;
@@ -113,7 +114,9 @@ GraphBase = {
 		}
 		var canvasDisplay = this.makeCanvas(this.dims, this.parentDiv, this.handle + 'Graph', this.makeReset, this.handle + 'Button');
 		this.graphDisplayHTMLElement = canvasDisplay.HTMLElem;
-		this.graphDisplay = canvasDisplay.canvas;	
+		this.graphDisplay = canvasDisplay.canvas;
+		//should reassert click handlers too
+		this.layers.setDrawCanvas(this.graphDisplay);
 		if (this.legend) {
 			for (var legendEntry in this.legend) {
 				this.legend[legendEntry].setCheckMarkCanvas(this.graphDisplay);
@@ -179,43 +182,6 @@ GraphBase = {
 			set.setData(data);
 		else 
 			console.log('Bad set handle ' + setHandle);
-	},
-	save: function(saveName){
-	
-		var saveName = defaultTo('graph'+this.handle, saveName);
-		saveName = unique(saveName, stored);
-		this.dataSave = {};
-		//need to redo this.  Make like a save function for each set.
-		// for (var set in this.data){
-			// this.dataSave[set] = {pts:{}, src:{}};
-			// this.dataSave[set].pts.x = deepCopy(this.data[set].x);
-			// this.dataSave[set].pts.y = deepCopy(this.data[set].y);
-			// if(this.data[set].xInitDataIdx){
-				// this.dataSave[set].src.x = deepCopy(this.data[set].src.x);//.splice(this.data[set].xInitDataIdx, this.data[set].src.x.length);
-			// }//THIS DEMANDS ATTENTION.  FIX START IDX
-			// if(this.data[set].yInitDataIdx){
-				// this.dataSave[set].src.y = deepCopy(this.data[set].src.y);//.splice(this.data[set].yInitDataIdx, this.data[set].src.y.length);
-			// }
-		// }
-		// store(saveName, this);
-		return saveName;
-	},
-	load: function(){
-		//if(!$('#' + this.handle + 'GraphDiv').length){
-			this.makeCanvas(this.dims);
-		//}
-		var toAdd = []
-		for (var set in this.data){
-			this.data[set].x = [];
-			this.data[set].y = [];
-			this.data[set].src.x = deepCopy(this.dataSave[set].src.x);
-			this.data[set].src.y = deepCopy(this.dataSave[set].src.y);
-						
-			var toAdd = toAdd.concat(this.setsToPts(this.dataSave[set].pts.x, this.dataSave[set].pts.y, set));
-		
-		}
-		this.addPts(toAdd, false, true);
-		return this;
 	},
 	setsToPts: function(x, y, setName){
 		var pts = new Array(x.length);
@@ -642,6 +608,7 @@ GraphBase.Marker = function(attrs) {
 	this.markerType = attrs.markerType;
 	this.col = attrs.col;
 	this.layers = attrs.layers;
+	this.dataValid = true;
 	if (this.drawFuncs[this.markerType]) {
 		this.draw = this.drawFuncs[this.markerType];
 	} else {
@@ -661,16 +628,25 @@ GraphBase.Marker.prototype = {
 		}
 		return func;
 	},
+	setDataValid: function() {
+		try {
+			this.dataValid = (validNumber(this.dataX()) !== false && validNumber(this.dataY()) !== false) ? true : false;
+		} catch (e) {};
+	},
+	setDrawCanvas: function(drawCanvas) {
+		this.graphDisplay = drawCanvas;
+	},
 	drawFuncs: {
 		bullseye: function() {
 			var cLen = this.characLen;
-			this.coordLast = this.graph.valToCoord(P(this.dataX(), this.dataY()));
+			if (this.dataValid) this.coordLast = this.graph.valToCoord(P(this.dataX(), this.dataY()));
 			var coord = this.coordLast;
 			window.draw.circle(coord, .15 * cLen, this.col, true, this.graphDisplay);
 			window.draw.line(coord.copy().movePt(V(-cLen / 2, 0)), coord.copy().movePt(V(cLen / 2, 0)), this.col, this.graphDisplay);
 			window.draw.line(coord.copy().movePt(V(0, -cLen / 2)), coord.copy().movePt(V(0, cLen / 2)), this.col, this.graphDisplay);
 			//maybe set alpha lower for outer circle
 			window.draw.circle(coord, .3 * cLen, this.col, false, this.graphDisplay);
+			
 			
 		}
 	},
@@ -687,6 +663,14 @@ GraphBase.Layers.prototype = {
 	addLayer: function(handle) {
 		this.layers.push([]);
 		this.handleIdxPairs[handle] = this.layers.length - 1;
+	},
+	setDrawCanvas: function(drawCanvas) {
+		for (var i=0; i<this.layers.length; i++) {
+			var layerItems = this.layers[i];
+			for (var j=0; j<layerItems.length; j++) {
+				layerItems[j].setDrawCanvas(drawCanvas);
+			}
+		}
 	},
 	removeLayer: function(handle) {
 		var spliceIdx = this.handleIdxPairs[handle];

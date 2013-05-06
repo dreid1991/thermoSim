@@ -37,7 +37,7 @@ function Liquid(attrs) {
 	this.updateListenerName = this.type + this.handle;
 	this.phasePressure = attrs.phasePressure || 1;
 	if (makePhaseDiagram) {
-		this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, this.handle, attrs.primaryKey);
+		this.phaseDiagram = this.makePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, 'liquid' + this.handle.toCapitalCamelCase(), attrs.primaryKey);
 		curLevel.graphs[this.phaseDiagram.handle] = this.phaseDiagram;
 		this.phaseDiagram.setPressure(this.phasePressure);
 	}

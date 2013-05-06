@@ -13,7 +13,6 @@ function GraphPhase(attrs) {
 	this.keyNamePairs = this.getKeyNamePairs(this.spcA, this.spcB, this.pressure);
 	//this.primarySpcName = this.getPrimarySpcName(this.spcA, this.spcB, this.primaryKeyType, this.pressure);
 	if (!(this.spcA && this.spcB)) console.log('Bad species data for phase diagram ' + this.spcAName + ' ' + this.spcBName);
-	attrs.handle += 'Scatter';
 	attrs.yLabel = 'Temp';
 	attrs.xLabel = 'x' + this.keyNamePairs[this.primaryKeyType]; // make this a spc name
 	attrs.makeReset = false;
@@ -38,6 +37,10 @@ function GraphPhase(attrs) {
 GraphPhase.prototype = {
 	recordFracData: function(wall, spcName) {
 		wall.recordFrac({spcName: spcName, tag: wall.handle})
+	},
+	setDataValid: function() {
+		this.graph.setDataValid();
+		
 	},
 	makeTempFunc: function(wallGas) {
 		var tempData = wallGas.getDataSrc('temp');

@@ -138,8 +138,8 @@ GraphHist.Set.prototype = {
 	},
 	recordStop: function(){},
 	setDataValid: function() {
-		try() {
-			this.dataValid = validNumber(this.dataFunc.x()) !== false) ? true : false;	
+		try {
+			this.dataValid = validNumber(this.dataFunc.x()) !== false ? true : false;	
 		} catch(e) {};
 	},
 	
