@@ -961,7 +961,24 @@ Timeline.stateFuncs = {
 	},
 	graphs: {
 		spawn: function(section, elems, id, graphDatum) {
-			var graph = new window.Graphs[graphDatum.type](graphDatum);
+			var graph;
+			if (/^load$/i.test(graphDatum.type)) {
+				graph = window.storedGraphs[graphDatum.handle];
+				if (graph) {
+					graph.restoreHTML();
+					graph.drawAllData();
+					var record = defaultTo(false, graphDatum.record);
+					if (record) {
+						for (var set in graph.data) {
+							graph.data[set].recording = false;
+						}
+					}
+				} else {
+					console.log("Tried to load graph with bad handle " + graphDatum.handle);
+				}
+			} else {
+				graph = new window.Graphs[graphDatum.type](graphDatum);
+			}
 			for (var setIdx=0; setIdx<graphDatum.sets.length; setIdx++) {
 				var set = graphDatum.sets[setIdx];
 				graph.addSet(set);
@@ -971,6 +988,7 @@ Timeline.stateFuncs = {
 		},
 		remove: function(section, elems, id) {
 			var graph = elems[id];
+			delete section.level.graphs[graph.handle];
 			graph.remove();
 			elems[id] = undefined;
 		}		

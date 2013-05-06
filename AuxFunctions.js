@@ -36,6 +36,10 @@ AuxFunctions = {
 			}
 		}
 	},
+	parentDivEmpty: function() {
+		var filledWith = this.parentDiv.attr('filledWith');
+		return filledWith == undefined || filledWith == '';
+	},
 	cleanUpParent: function() {
 		$(this.parentDiv).removeAttr('style');
 		$(this.parentDiv).html('');

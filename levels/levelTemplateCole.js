@@ -163,12 +163,12 @@ LevelData = {
 						sets:[
 							{handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'vol("ThirdWall")', y: 'pExt("ThirdWall")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]
-					}//,
-					// {type: 'Scatter', handle: 'TvsVOne', xLabel: "Volume (L)", yLabel: "Temperature (K)", axesInit:{x:{min:6, step:2}, y:{min:0, step:200}}, 
-						// sets:[
-							// {handle:'temp', label:'T sys', pointCol:Col(50,50,255), flashCol:Col(50,50,255), data:{x: 'vol("ThirdWall")', y: 'temp("ThirdWall")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
-						// ]
-					// }	
+					},
+					{type: 'Scatter', handle: 'TvsVOne', xLabel: "Volume (L)", yLabel: "Temperature (K)", axesInit:{x:{min:6, step:2}, y:{min:0, step:200}}, 
+						sets:[
+							{handle:'temp', label:'T sys', pointCol:Col(50,50,255), flashCol:Col(50,50,255), data:{x: 'vol("ThirdWall")', y: 'temp("ThirdWall")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
+						]
+					}	
 				]
 			},
 			prompts:[

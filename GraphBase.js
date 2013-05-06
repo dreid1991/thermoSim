@@ -1,6 +1,7 @@
 GraphBase = {
 
 	setStds: function(){
+		window.storedGraphs[this.handle] = this;
 		this.hashMarkLen = 10;
 		this.checkMarkOversize = 3;
 		this.bgCol = curLevel.bgCol;
@@ -102,6 +103,11 @@ GraphBase = {
 		
 	},
 	restoreHTML: function() {
+		var parentEmpty = this.parentDivEmpty();
+		if (!parentEmpty) {
+			this.parentDiv = this.pickParentDiv('graph');
+			this.parentDivId = $(this.parentDiv).attr('id');	
+		}
 		var canvasDisplay = this.makeCanvas(this.dims, this.parentDiv, this.handle + 'Graph', this.makeReset, this.handle + 'Button');
 		this.graphDisplayHTMLElement = canvasDisplay.HTMLElem;
 		this.graphDisplay = canvasDisplay.canvas;	

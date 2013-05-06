@@ -57,6 +57,7 @@ $(function(){
 	pxToMS = 19.33821;
 	auxHolderDivs = ['aux1', 'aux2'];
 	stored = {};
+	storedGraphs = {};
 	addJQueryElems($('button'), 'button');
 	draw = new DrawingTools();
 	turnUpdater = setInterval('curLevel.update()', updateInterval);

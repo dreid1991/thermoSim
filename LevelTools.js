@@ -256,7 +256,7 @@ LevelTools = {
 			self.dataRunNoGraphs();
 			addListener(curLevel, 'data', 'run', self.dataRun, self);
 			//addListener(curLevel, 'update'/*'data'*/, 'runGraphs', self.dataRun, self);
-		}, 250);
+		}, 50);
 	},
 	dataRunNoGraphs: function() {
 		for (var datum in this.recordListeners){

@@ -32,14 +32,14 @@ LevelData = {
 						// type: 'AuxImage',
 						// attrs: {handle: 'picci', slotNum: 0, imgFunc: 'img("img/work/block0Pic1.jpg")'}
 					// },
-					{
-						type: 'Liquid',
-						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}, makePhaseDiagram: true}
-					},
 					// {
-						// type: 'DragWeights',
-						// attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 6}], pInit: 3, cleanUpWith: 'prompt1'}
+						// type: 'Liquid',
+						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 500}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}, makePhaseDiagram: true}
 					// },
+					{
+						type: 'DragWeights',
+						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 6}], pInit: 3, cleanUpWith: 'prompt1'}
+					},
 					// {
 						// type: 'ActivationEnergyPair',
 						// attrs: {spcNameLow: 'ugly', spcNameHigh: 'uglier', thresholdEnergy: 12}
@@ -47,7 +47,7 @@ LevelData = {
 					{
 						type: 'Heater',
 						cleanUpWith: 'prompt1',
-						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty', liquidHandle: 'swishy'}
+						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'}
 					},
 				
 					// {
@@ -79,8 +79,8 @@ LevelData = {
 					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				],
 				dataReadouts: [
-					{label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
-					{label: 'liq temp: ', expr: 'tempSmooth("liquidSwishy")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'}
+					{label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'}
+				//	{label: 'liq temp: ', expr: 'tempSmooth("liquidSwishy")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'}
 					// {label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},
 					// {label: 'Coll/sec: ', expr: 'collisions()', units: '', decPlaces: 0, handle: 'lala', readout: 'mainReadout'}
 					//{label: 'pInt: ', expr: 'pInt("wally")', units: 'bar', decPlaces: 1, handle: 'intintnit', readout: 'mainReadout'},
@@ -134,11 +134,18 @@ LevelData = {
 							// {handle:'temp', label:'temp', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'vol("wally")', y: "pExt('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						// ]
 					// }
+					//{type: 'load', handle: 'theSavedHandle', sets: [...sets to add.  Can also do addSet in cmmds.  Will deal with adding duplicates by not adding a set if it already exists
+						
 					 // {type: 'Hist', handle: 'PvsVOne', xLabel: "xLabel", yLabel: "yLabel", axesInit:{x:{min:0, step:50}, y:{min:0, step:10}}, 
 						// sets:[
 							// {handle:'pExt', barCol:Col(255,50,50), data:"vDist('wally', {spcName: 'spc1', tag: 'wally'})"}
 						// ]
 					// }
+					{type: 'Scatter', handle: 'PvsVTwo', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:2}, y:{min:0, step:4}}, 
+						sets:[
+							{handle:'pExt', label:'pExt', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'vol("wally")', y: 'pExt("wally")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
+						]
+					}
 
 				],
 			},
@@ -258,7 +265,10 @@ LevelData = {
 						type: 'DragWeights',
 						attrs: {handle: 'draggy', wallInfo: 'wapple', weightDefs: [{count: 2, pressure: 1}], pInit: .5}
 					}
-				],					
+				],
+				graphs: [
+					{type: 'load', handle: 'PvsVTwo'}
+				]
 			},
 			prompts: [
 				{
