@@ -30,13 +30,16 @@ GraphBase = {
 		this.graphDisplay = canvasDisplay.canvas;
 		this.layers = new GraphBase.Layers();
 		this.wrapperId;
-		addListener(curLevel, 'update', 'drawLayers' + this.handle, this.drawLayers, this);
+		this.initDrawLayers();
 		this.hasData = false;
 	},
 	makeDataFunc: function(expr) {
 		with (DataGetFuncs) {
 			return eval('(function() { return ' + expr + '})');
 		}
+	},
+	initDrawLayers: function() {
+		addListener(curLevel, 'update', 'drawLayers' + this.handle, this.drawLayers, this);
 	},
 	setNumGridLinesAndSpacing: function(numGridLines) {
 		var numLinesX, numLinesY, spacingX, spacingY;
@@ -447,19 +450,21 @@ GraphBase = {
 			this.stepSize.y = newStepSize;
 		}
 	},
-	drawAxisVals: function(){
-		for (var xGridIdx=0; xGridIdx<this.numGridLines.x; xGridIdx++){
-			var xPos = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing.x * xGridIdx;
-			var yPos = this.graphRangeFrac.y.min * this.dims.dy + this.hashMarkLen + 10 + this.axisValFontSize/2;
-			var text = String(round(this.axisRange.x.min + this.stepSize.x * xGridIdx, 1));
-			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', 0, this.graphDisplay);
+	drawAxisVals: function() {
+		if (this.stepSize.x > 0 && this.stepSize.y > 0) {
+			for (var xGridIdx=0; xGridIdx<this.numGridLines.x; xGridIdx++){
+				var xPos = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing.x * xGridIdx;
+				var yPos = this.graphRangeFrac.y.min * this.dims.dy + this.hashMarkLen + 10 + this.axisValFontSize/2;
+				var text = String(round(this.axisRange.x.min + this.stepSize.x * xGridIdx, 1));
+				draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', 0, this.graphDisplay);
+			}
+			for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
+				var yPos = this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing.y * yGridIdx;
+				var xPos = this.graphRangeFrac.x.min * this.dims.dx - this.hashMarkLen - 10;
+				var text = String(round(this.axisRange.y.min + this.stepSize.y*yGridIdx,1));
+				draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', -Math.PI/2, this.graphDisplay);
+			}		
 		}
-		for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
-			var yPos = this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing.y * yGridIdx;
-			var xPos = this.graphRangeFrac.x.min * this.dims.dx - this.hashMarkLen - 10;
-			var text = String(round(this.axisRange.y.min + this.stepSize.y*yGridIdx,1));
-			draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', -Math.PI/2, this.graphDisplay);
-		}		
 	},
 	drawLegendToggle: function(entry){
 		draw.fillStrokeRect(entry.boxPos, entry.boxDims, this.gridCol, this.toggleCol, this.graphDisplay);

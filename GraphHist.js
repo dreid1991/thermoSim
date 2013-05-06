@@ -32,9 +32,11 @@ and leaving open possibility of multiple sets (though that would probably look c
 _.extend(GraphHist.prototype, AuxFunctions, GraphBase, 
 	{
 		addSet: function(attrs){
-			var set = new GraphHist.Set(this, attrs.handle, attrs.data, attrs.barCol);
-			this.data[set.handle] = set;
-			this.drawAllBG();
+			if (!this.data[attrs.handle]) {
+				var set = new GraphHist.Set(this, attrs.handle, attrs.data, attrs.barCol);
+				this.data[set.handle] = set;
+				this.drawAllBG();
+			}
 		},
 		drawAllData: function(){
 			this.drawAllBG();

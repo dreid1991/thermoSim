@@ -198,7 +198,7 @@ LevelData = {
 							}
 						}
 					}
-				},
+				},/*
 				{
 					sceneData: {
 						// cmmds: [
@@ -248,7 +248,7 @@ LevelData = {
 					sceneData: undefined,
 					text: 'can we do another?',
 					title: 'titleynext'
-				}
+				}*/
 				
 			]
 		},
@@ -267,7 +267,11 @@ LevelData = {
 					}
 				],
 				graphs: [
-					{type: 'load', handle: 'PvsVTwo'}
+					{type: 'load', handle: 'PvsVTwo',
+						sets:[
+							{handle:'pExt2', label:'pExt2', pointCol:Col(50,200,50), flashCol:Col(255,200,200), data:{x: 'vol("wapple")', y: 'pExt("wapple")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
+						]
+					}
 				]
 			},
 			prompts: [

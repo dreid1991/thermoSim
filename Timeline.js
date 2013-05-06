@@ -965,14 +965,19 @@ Timeline.stateFuncs = {
 			if (/^load$/i.test(graphDatum.type)) {
 				graph = window.storedGraphs[graphDatum.handle];
 				if (graph) {
-					graph.restoreHTML();
-					graph.drawAllData();
 					var record = defaultTo(false, graphDatum.record);
-					if (record) {
+					if (!record) {
 						for (var set in graph.data) {
 							graph.data[set].recording = false;
 						}
+					} else {
+						for (var set in graph.data) {
+							graph.data[set].recordStart();
+						}
 					}
+					graph.initDrawLayers();
+					graph.restoreHTML();
+					graph.drawAllData();
 				} else {
 					console.log("Tried to load graph with bad handle " + graphDatum.handle);
 				}
@@ -983,6 +988,7 @@ Timeline.stateFuncs = {
 				var set = graphDatum.sets[setIdx];
 				graph.addSet(set);
 			}
+			graph.drawAllData();
 			section.level.graphs[graphDatum.handle] = graph;
 			elems[id] = graph;
 		},

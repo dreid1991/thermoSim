@@ -37,12 +37,14 @@ function GraphScatter(attrs) {
 _.extend(GraphScatter.prototype, AuxFunctions, GraphBase, 
 	{
 		addSet: function(attrs){//address, label, pointCol, flashCol, data:{x:{wallInfo, data}, y:{same}}){
-			var set = new GraphScatter.Set(this, attrs.handle, attrs.label, attrs.data, attrs.pointCol, attrs.flashCol, attrs.fillInPts, attrs.fillInPtsMin, attrs.trace, attrs.recording, attrs.showPts);
+			if (!this.data[attrs.handle]) {
+				var set = new GraphScatter.Set(this, attrs.handle, attrs.label, attrs.data, attrs.pointCol, attrs.flashCol, attrs.fillInPts, attrs.fillInPtsMin, attrs.trace, attrs.recording, attrs.showPts);
 
-			this.data[attrs.handle] = set;
-			
-			this.makeLegendEntry(set, attrs.handle);
-			this.drawAllBG();
+				this.data[attrs.handle] = set;
+				
+				this.makeLegendEntry(set, attrs.handle);
+				this.drawAllBG();
+			}
 		},
 		drawAllData: function(){
 			//redrawing the background is twice as fast as pasting it in
@@ -364,7 +366,7 @@ GraphScatter.Set.prototype = {
 		}
 	},
 	drawPts: function(justQueue) {
-		if (this.visible && (this.showPts || this.trace)) {
+		if (this.visible && (this.showPts || this.trace) && (this.queuePts.length || this.graphedPts.length)) {
 			var toDraw;
 			var idxs = [];
 			if (justQueue) {
@@ -377,7 +379,7 @@ GraphScatter.Set.prototype = {
 			} 
 			if (this.trace) {
 				if (justQueue) {
-					if (this.graphedPtIdxs.length) {
+					if (this.graphedPtIdxs.length && idxs.length) {
 						this.drawTrace(this.graphedPtIdxs[this.graphedPtIdxs.length - 1].x, idxs[idxs.length - 1].x, this.graphedPtIdxs[this.graphedPtIdxs.length - 1].y, idxs[idxs.length - 1].y);
 					}
 				} else {
