@@ -166,7 +166,7 @@ GraphScatter.Set.prototype = {
 		try {
 			var x = this.dataFuncs.x();
 			var y = this.dataFuncs.y();
-			if (validNumber(x) !== false && validNumber(y) !== false) this.dataValid = true;
+			this.dataValid = validNumber(x) !== false && validNumber(y) !== false ? true : false;
 		} catch(e) {
 			this.dataValid = false;
 		}

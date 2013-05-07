@@ -630,7 +630,9 @@ GraphBase.Marker.prototype = {
 	setDataValid: function() {
 		try {
 			this.dataValid = (validNumber(this.dataX()) !== false && validNumber(this.dataY()) !== false) ? true : false;
-		} catch (e) {};
+		} catch (e) {
+			this.dataValid = false;
+		};
 	},
 	setDrawCanvas: function(drawCanvas) {
 		this.graphDisplay = drawCanvas;
