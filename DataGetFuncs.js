@@ -59,6 +59,10 @@ DataGetFuncs = {
 		var src = walls[wallHandle].getDataSrc('work');
 		return src[src.length - 1];
 	},
+	enthalpy: function(wallHandle) {
+		var src = walls[wallHandle].getDataSrc('enthalpy');
+		return src[src.length - 1];
+	},
 	vDist: function(wallHandle, args) {
 		var src = walls[wallHandle].getDataSrc('vDist', args);
 		return src[src.length - 1];

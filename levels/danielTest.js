@@ -34,7 +34,7 @@ LevelData = {
 					// },
 					{
 						type: 'Liquid',
-						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 500}, primaryKey: 'light', actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}, makePhaseDiagram: true, makeGasMarker: false}
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 500}, primaryKey: 'heavy', actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}, makePhaseDiagram: true}
 					},
 					{
 						type: 'DragWeights',
@@ -65,6 +65,7 @@ LevelData = {
 					// {handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: true}
 				// ],
 				dataRecord: [
+					{wallInfo: 'wally', data: 'enthalpy'}
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'a', tag: 'wally'}},
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'b', tag: 'wally'}},

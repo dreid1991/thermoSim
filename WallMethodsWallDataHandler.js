@@ -271,15 +271,15 @@ WallMethods.wallDataHandler = {
 		var dataObj = this.data.enthalpy;
 		if (!dataObj || !dataObj.recording()) {
 			this.data.enthalpy = new WallMethods.DataObj();
-			var dataObj = this.data.enthalp;
+			var dataObj = this.data.enthalpy;
 			this.setupStdDataObj(dataObj, 'enthalpy');
 			var cvs = _.pluck(LevelData.spcDefs, 'cv');
-			var hFs = _.pluck(LevelData.spcDefs, 'hF98');
+			var hFs = _.pluck(LevelData.spcDefs, 'hF298');
 			var spcNames = _.pluck(LevelData.spcDefs, 'spcName');
 			var dotLists = [];
 			for (var i=spcNames.length-1; i>=0; i--) {
 				cvs[i] /= N;
-				hFs[i] /= N;
+				hFs[i] *= (1000 / N);
 				var dots = this.dotManager.get({tag: this.handle, spcName: spcNames[i]});
 				if (dots) {
 					dotLists.push(dots);
@@ -299,6 +299,7 @@ WallMethods.wallDataHandler = {
 				}
 				return enthalpy;
 			}
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), calcEnthalpy, this, 'update');
 		}
 		return dataObj;
 	},

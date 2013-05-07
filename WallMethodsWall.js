@@ -219,7 +219,14 @@ WallMethods.wall = {
 	},
 
 	isothermalInit: function(temp){
-		if (temp) this.tSet = temp;
+		if (temp) {
+			if (typeof temp == 'number') {
+				this.tSet = temp;
+			} else if (/current/i.test(temp)) {
+				var tempData = this.getDataSrc('temp');	
+				this.tSet = tempData[tempData.length - 1];
+			}
+		}
 		this.eToAdd = 0;
 		var activeDots = dotManager.get({tag: this.handle});
 		var tempData = this.data.temp.src();
