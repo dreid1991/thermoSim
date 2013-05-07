@@ -37,7 +37,12 @@ GraphBase = {
 	},
 	makeDataFunc: function(expr) {
 		with (DataGetFuncs) {
-			return eval('(function() { return ' + expr + '})');
+			if (exprHasReturn(expr)) {
+				return eval('(function(){' + expr + '})');
+			} else {
+				return eval('(function(){return ' + expr + '})')
+			
+			}
 		}
 	},
 	initDrawLayers: function() {
@@ -613,7 +618,12 @@ GraphBase.Marker.prototype = {
 	wrapInDataGet: function(expr) {
 		var func;
 		with (DataGetFuncs) {
-			func = eval('(function(){return ' + expr + '})');
+			if (exprHasReturn(expr)) {
+				func = eval('(function(){' + expr + '})');
+			} else {
+				func = eval('(function(){return ' + expr + '})')
+			
+			}
 		}
 		return func;
 	},

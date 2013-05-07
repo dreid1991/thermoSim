@@ -505,6 +505,9 @@ function getLen(pts) {
 	return len;
 }
 
+function exprHasReturn(expr) {
+	return /(\(|\:|\?|\s)return/.test(' ' + expr);
+}
 function byAttr(obj, attrVal, attr) {
 	if (obj instanceof Array) {
 		for(var listIdx=0; listIdx<obj.length; listIdx++){

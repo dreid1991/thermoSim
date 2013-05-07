@@ -20,7 +20,12 @@ DataDisplayer.prototype = {
 		this.entries[dataEntry.handle] = dataEntry;
 		with (DataGetFuncs) {
 			var func;
-			eval('func = function(){return ' + expr + '}')
+			if (exprHasReturn(expr)) {
+				func = eval('(function(){' + expr + '})');
+			} else {
+				func = eval('(function(){return ' + expr + '})')
+			
+			}
 			addListener(curLevel, 'update', listenerStr, function() {
 				var displayStr = label;
 				var valStr;
