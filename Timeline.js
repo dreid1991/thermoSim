@@ -138,26 +138,23 @@ Timeline.prototype = {
 
 	},
 	refresh: function() {
+		//beware all ye who enter this function.  It hangs on by a thread.  
 		var curSection = this.sections[this.sectionIdx];
 		var promptIdx = curSection.promptIdx;
 		var dataCurPrompt = curSection.sectionData.prompts[promptIdx];
-		//var curPromptIdx = this.sections[this.sectionIdx].promptIdx;
+
 		var motherSection = curSection.motherSection;
 		var motherTimeline = curSection.motherTimeline;
-		var conditionMgr = curSection.conditionManager; //not sure what I should do with this.  Come back to.  Certainly *not* what I'm doing now.
+		var conditionMgr = motherSection.conditionManager; 
 		var newMotherSection = new Timeline.Section(curSection.motherTimeline, motherSection.sectionData, this.buttonManagerBlank, conditionMgr);
-		//curSection.cleanUpPrompt();
+
 		motherSection.clear();
-		//I think I want to kill the branches, but non the moments that create them.  Then I don't have to worry about instances of the un-refreshed level being around
-		//Actually, I want to keep section branches.  NOT IMPLEMENTED
-		//I think I'll need to 'clear()' all the way up to the motherSection in case html (graphs, auxpicture) was added in a branched prompt
-			//noooop!  consider:  Prompt branches only affect the state the the section we just cleared
 		newMotherSection.copyBranchCmmds(motherSection.moments);
 		var motherSectionIdx = motherTimeline.sections.indexOf(motherSection);
 		motherTimeline.sections.splice(motherSectionIdx, 1, newMotherSection);
 		newMotherSection.showSection();
 		newMotherSection.deepStepTo(dataCurPrompt, motherSection.branches); 
-		//this.show(this.sectionIdx, curPromptIdx, true);
+
 	},
 	takeNumber: function() {
 		return this.curId ++;
@@ -320,7 +317,7 @@ Timeline.Section.prototype = {
 		//so it only works if the section has just been rendered.
 		var timeLast = -1
 		for (var i=this.moments.indexOf(this.nextMoment(timeLast)); i<this.moments.length-1; i++) {
-			//will need to stop this before it gets to infinity.  I think the -1 in the condition should take care of it
+
 			var moment = this.moments[i];
 			var branchCmmd;
 			if (moment.events.branchCmmd) {
@@ -333,9 +330,11 @@ Timeline.Section.prototype = {
 				this.promptIdx = Math.floor(moment.timestamp);
 				return true;
 			}
+			this.promptIdx = Math.floor(this.time);
 			moment.fire(timeLast, timeNext);
 			
 			if (branchCmmd) {
+				moment.events.branchCmmd = branchCmmd; // putting branch cmmd back
 				var promptIdx = Math.floor(this.time);
 				var branch = inheritedBranches[promptIdx];
 				if (branch.timeline.isSectionsBranch) {
@@ -350,13 +349,14 @@ Timeline.Section.prototype = {
 					var spawnedBranch = this.branches[promptIdx];
 					spawnedBranch.timeline.sections[0].copyBranchCmmds(branch.timeline.sections[0].moments);
 					var hitDest = spawnedBranch.timeline.sections[0].deepStepTo(destPromptData, promptBranchBranches);
+					this.promptIdx = Math.floor(this.time) + .5;
+					this.time = moment.timestamp;
 					if (hitDest) return true;
 					
 				}
+				
 			}
-			if (branchCmmd) {
-				moment.events.branchCmmd = branchCmmd;
-			}
+
 			timeLast = timeNext;
 			this.time = timeNext;
 			
@@ -1144,7 +1144,7 @@ Timeline.EventClassHolder = function() {
 	this.dots = [];
 	this.objs = [];
 	this.cmmds = [];
-	this.branchCmmd;
+	this.branchCmmd = undefined;
 }
 
 Timeline.Event = {
