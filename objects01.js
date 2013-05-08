@@ -1224,6 +1224,7 @@ function Heater(attrs){
 	var colDefault = defaultTo(Col(100, 100, 100), attrs.colDefault);
 	this.draw = this.makeDrawFunc(colMin, colDefault, colMax);
 	this.wallPts = this.pos.roundedRect(this.dims, .3, 'ccw');
+	this.addWallHump(this.wallPts);
 	this.eAdded=0;
 	if (attrs.liquidHandle) { //liquid invoked using liquid handle
 		this.setupLiquidHeat(attrs.liquidHandle);
@@ -1262,6 +1263,23 @@ _.extend(Heater.prototype, objectFuncs, {
 	},
 	heatLiq: function() {
 		this.liquid.addQ(.15 * this.qRate * updateInterval);
+	},
+	addWallHump: function(wallPts) {
+		var horizontalStarts = [];
+		for (var i=0; i<wallPts.length - 1; i++) {
+			if (wallPts[i].y == wallPts[i + 1].y) {
+				horizontalStarts.push(i)
+			}
+		}
+		if (wallPts[wallPts.length - 1].y == wallPts[0].y) {
+			horizontalStarts.push(wallPts.length - 1);
+		}
+		var maxIdx = horizontalStarts[0];
+		for (var i=0; i<horizontalStarts.length; i++) {
+			maxIdx = wallPts[horizontalStarts[i]].y < wallPts[maxIdx].y ? horizontalStarts[i] : maxIdx;
+		}
+		var avgX = maxIdx == wallPts.length - 1 ? (wallPts[maxIdx].x + wallPts[0].x) / 2 : (wallPts[maxIdx].x + wallPts[maxIdx + 1].x) / 2;
+		wallPts.splice(maxIdx + 1, 0, P(avgX, wallPts[maxIdx].y - 5));
 	},
 	disable: function() {
 		var slider = $(this.sliderSelector);
