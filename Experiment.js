@@ -19,10 +19,10 @@ function Experiment() {
 	//rxn appending ONLY works for spcs [0] + [1] -> [2] + [3]
 	this.appendEqData = true;
 	this.runs = [
-		{eAF: 4, eAR: 10, hFA: -10, hFB: -10, hFC: -13, hFD: -13, tempDots1: 300, tempDots2: 300, tempWalls: 300},
-		{eAF: 4, eAR: 8, hFA: -10, hFB: -10, hFC: -12, hFD: -12, tempDots1: 400, tempDots2: 400, tempWalls: 400},
-		{eAF: 4, eAR: 6, hFA: -10, hFB: -10, hFC: -11, hFD: -11,tempDots1: 200, tempDots2: 200, tempWalls: 200},
-		{eAF: 4, eAR: 4, hFA: -10, hFB: -10, hFC: -10, hFD: -10, tempDots1: 500, tempDots2: 500, tempWalls: 500}
+		{eAF: 4, eAR: 10, hFA: -10, hFB: -10, hFC: -13, hFD: -13, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
+		{eAF: 4, eAR: 8, hFA: -10, hFB: -10, hFC: -12, hFD: -12, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
+		{eAF: 4, eAR: 6, hFA: -10, hFB: -10, hFC: -11, hFD: -11,tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
+		{eAF: 4, eAR: 4, hFA: -10, hFB: -10, hFC: -10, hFD: -10, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15}
 	]
 	this.runTime = 30; //seconds;
 	this.results = [];
@@ -88,6 +88,7 @@ Experiment.prototype = {
 
 Experiment.Results = function(data, setPts) {
 	this.data = {};
+	this.spcDefs = deepCopy(LevelData.spcDefs);
 	var tempSrc = walls[0].getDataSrc('temp');
 	this.finalTemp = this.avgLast(tempSrc, 300);
 	this.setPts = deepCopy(setPts);
@@ -112,17 +113,25 @@ Experiment.Results.prototype = {
 			tableRow += '<td>' + this.data[a] + '</td>';
 		}
 		if (appendEqData) {
-			tableRow += this.makeEqData(LevelData.spcDefs);
+			tableRow += this.makeEqData(this.spcDefs);
 		}
 		tableRow += '</tr>';
 		return tableRow;
 	},
 	makeEqData: function(spcDefs) {
 		var temp = this.finalTemp;
-		var hRxn = (N / 1000) * (spcs[spcDefs[3].spcName].enthalpy(temp) + spcs[spcDefs[2].spcName].enthalpy(temp)) - (spcs[spcDefs[1].spcName].enthalpy(temp) + spcs[spcDefs[0].spcName].enthalpy(temp))
+		var h3 = spcDefs[3].hF298 * 1000 + spcDefs[3].cv * (temp - 298.15)
+		var h2 = spcDefs[2].hF298 * 1000 + spcDefs[2].cv * (temp - 298.15)
+		var h1 = spcDefs[1].hF298 * 1000 + spcDefs[1].cv * (temp - 298.15)
+		var h0 = spcDefs[0].hF298 * 1000 + spcDefs[0].cv * (temp - 298.15)
+		var hRxn = h3 + h2 - (h1 + h0);
 		var eqConst = Math.exp(-hRxn / (R * temp)) * Math.exp(-(hRxn / R) * (1 / temp - 1/298.15)); // no entropy right now
-		var prodFrac = Newton(eqConst + ' - (1-x)*(1-x)/(x*x)', {x:.5}, 'x');
-		return '<td>' + eqConst + '</td><td>' + prodFrac + '</td>';
+		var testFrac;
+		for (var i=0; i<=1; i+=.1) {
+			var testFrac = Newton(eqConst + ' - (x*x)/((1-x)*(1-x))', {x: i}, 'x');
+			if (testFrac >= 0 && testFrac <= 1) break;
+		}
+		return '<td>' + eqConst + '</td><td>' + testFrac + '</td>';
 	},
 	objToStr: function(obj) {
 		var str = '';

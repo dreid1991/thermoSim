@@ -134,12 +134,8 @@ ReactionHandler = {
 		//abs will handle dots moving away from other dot
 	},
 	probFunc: function(hitE, activE) {
-		if (hitE > 1.2 * activE) {
-			return 1;
-		} else {
-			return 0;
-		}
-		//return hitE > activE ? 1 : 0;
+
+		return hitE > activE * 1.2 ? 1 : 0;
 		//var x = Math.max(hitE/activE - 1, 0);
 		//return 2*(x - .5*x*x);//max of 1, min of 0
 	},
