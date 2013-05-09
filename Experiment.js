@@ -16,15 +16,21 @@ function Experiment() {
 		nC: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "c", tag: "wally"})'),
 		nD: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "d", tag: "wally"})'),
 	}
+	this.dataToEval = {
+		fracProdsExp: new Experiment.Data('nC + nD'),
+		eqConstExp: new Experiment.Data('nC * nD / (nB * nA)')
+	}
 	//rxn appending ONLY works for spcs [0] + [1] -> [2] + [3]
 	this.appendEqData = true;
 	this.runs = [
-		{eAF: 4, eAR: 10, hFA: -10, hFB: -10, hFC: -13, hFD: -13, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
-		//{eAF: 4, eAR: 8, hFA: -10, hFB: -10, hFC: -12, hFD: -12, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
-		//{eAF: 4, eAR: 6, hFA: -10, hFB: -10, hFC: -11, hFD: -11,tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
+		// {eAF: 4, eAR: 10, hFA: -10, hFB: -10, hFC: -13, hFD: -13, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
+		// {eAF: 4, eAR: 8, hFA: -10, hFB: -10, hFC: -12, hFD: -12, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
+		// {eAF: 4, eAR: 6, hFA: -10, hFB: -10, hFC: -11, hFD: -11,tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
 		{eAF: 4, eAR: 4, hFA: -10, hFB: -10, hFC: -10, hFD: -10, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15}
 	]
-	this.numReplicates = 3
+	this.draw = false;
+	
+	this.numReplicates = 1
 	this.runTime = 10; //seconds;
 	this.resultSets = [];
 	this.runIdx = 0;
@@ -48,6 +54,9 @@ Experiment.prototype = {
 			
 			this.setVals(this.mutables, this.runs[this.runIdx]);
 			sceneNavigator.refresh();
+			if (!this.draw) {
+				curLevel.drawRun = function(){};
+			}
 			setTimeout(function() {self.tryNextMeasurement(self.mutables, self.data, self.runs[self.runIdx])}, this.runTime * 1000);
 		} else {
 			var table = '<table border="1" cellpadding="3">';
@@ -74,6 +83,9 @@ Experiment.prototype = {
 		for (var a in this.data) {
 			tableRow += '<td>' + a + '</td>';
 		}
+		for (var a in this.dataToEval) {
+			tableRow += '<td>' + a + '</td>';
+		}
 		if (this.appendEqData) {
 			tableRow += '<td>eq const</td>';
 			tableRow += '<td>mole frac prods</td>';
@@ -91,7 +103,7 @@ Experiment.prototype = {
 		if (this.resultSets[this.runIdx] == undefined) {
 			this.resultSets[this.runIdx] = [];
 		}
-		this.resultSets[this.runIdx].push(new Experiment.Results(data, setPts));
+		this.resultSets[this.runIdx].push(new Experiment.Results(data, setPts, this.dataToEval));
 	},
 	logLast: function() {
 		this.results[this.results.length - 1].log();
@@ -103,7 +115,7 @@ Experiment.prototype = {
 	}
 }
 
-Experiment.Results = function(data, setPts) {
+Experiment.Results = function(data, setPts, dataToEval) {
 	this.data = {};
 	this.spcDefs = deepCopy(LevelData.spcDefs);
 	var tempSrc = walls[0].getDataSrc('temp');
@@ -112,6 +124,7 @@ Experiment.Results = function(data, setPts) {
 	for (var datum in data) {
 		this.data[datum] = data[datum].avg(200);
 	}
+	this.evaledData = this.evalData(dataToEval, this.data);
 }
 
 Experiment.Results.prototype = {
@@ -121,6 +134,15 @@ Experiment.Results.prototype = {
 		console.log('Produced data');
 		console.log(this.objToStr(this.data) + '\n');
 	},
+	evalData: function(dataToEval, data) {
+		var evaled = {};
+		with (data) {
+			for (var a in dataToEval) {
+				evaled[a] = eval(dataToEval[a].path);
+			}
+		}
+		return evaled;
+	},
 	asTableRow: function(appendEqData) {
 		var tableRow = '<tr>';
 		for (var a in this.setPts) {
@@ -128,6 +150,9 @@ Experiment.Results.prototype = {
 		}
 		for (var a in this.data) {
 			tableRow += '<td>' + this.data[a] + '</td>';
+		}
+		for (var a in this.evaledData) {
+			tableRow += '<td>' + this.evaledData[a] + '</td>';
 		}
 		if (appendEqData) {
 			tableRow += this.makeEqData(this.spcDefs);

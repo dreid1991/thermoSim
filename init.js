@@ -14,9 +14,9 @@ Copyright (C) 2013  Daniel Reid
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+window.R = 8.314;
 $(function(){
-	//R is defined at the top of base so it can be used in level data
+	
 	window.IMGPATHPREFIX = '';
 	window.simHost = window.simHost || '';
 	if (window.simHost == 'CW') {
@@ -68,7 +68,7 @@ $(function(){
 	ACTUALN = 6.022e23;
 	g = 1.75;
 	gInternal = .01;
-	updateInterval = 30;
+	updateInterval = 10;//30;
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);
 	pxToMS = 19.33821;
