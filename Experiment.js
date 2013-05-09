@@ -15,6 +15,7 @@ function Experiment() {
 		nB: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "b", tag: "wally"})'),
 		nC: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "c", tag: "wally"})'),
 		nD: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "d", tag: "wally"})'),
+		temp: new Experiment.Data('walls[0].getDataSrc("temp")')
 	}
 	this.dataToEval = {
 		fracProdsExp: new Experiment.Data('nC + nD'),
@@ -23,15 +24,15 @@ function Experiment() {
 	//rxn appending ONLY works for spcs [0] + [1] -> [2] + [3]
 	this.appendEqData = true;
 	this.runs = [
-		// {eAF: 4, eAR: 10, hFA: -10, hFB: -10, hFC: -13, hFD: -13, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
-		// {eAF: 4, eAR: 8, hFA: -10, hFB: -10, hFC: -12, hFD: -12, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
-		// {eAF: 4, eAR: 6, hFA: -10, hFB: -10, hFC: -11, hFD: -11,tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
+		{eAF: 4, eAR: 10, hFA: -10, hFB: -10, hFC: -13, hFD: -13, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
+		{eAF: 4, eAR: 8, hFA: -10, hFB: -10, hFC: -12, hFD: -12, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
+		{eAF: 4, eAR: 6, hFA: -10, hFB: -10, hFC: -11, hFD: -11,tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
 		{eAF: 4, eAR: 4, hFA: -10, hFB: -10, hFC: -10, hFD: -10, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15}
 	]
 	this.draw = false;
 	
-	this.numReplicates = 1
-	this.runTime = 10; //seconds;
+	this.numReplicates = 6;
+	this.runTime = 20; //seconds;
 	this.resultSets = [];
 	this.runIdx = 0;
 	this.repIdx = -1;
