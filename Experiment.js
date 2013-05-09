@@ -22,13 +22,17 @@ function Experiment() {
 		eqConstExp: new Experiment.Data('nC * nD / (nB * nA)')
 	}
 	//rxn appending ONLY works for spcs [0] + [1] -> [2] + [3]
-	this.appendEqData = true;
-	this.runs = [
-		{eAF: 4, eAR: 10, hFA: -10, hFB: -10, hFC: -13, hFD: -13, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
-		{eAF: 4, eAR: 8, hFA: -10, hFB: -10, hFC: -12, hFD: -12, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
-		{eAF: 4, eAR: 6, hFA: -10, hFB: -10, hFC: -11, hFD: -11,tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
-		{eAF: 4, eAR: 4, hFA: -10, hFB: -10, hFC: -10, hFD: -10, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15}
+	this.dimensions = [
+		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempDots3'], testVals: '[298.15, 348.15 ... 500]'}]),
+		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13...-10]'}, {paths: ['eAR'], testVals: '[10, 8 ... 4]'}])
 	]
+	this.appendEqData = true;
+	// this.runs = [
+		// {eAF: 4, eAR: 10, hFA: -10, hFB: -10, hFC: -13, hFD: -13, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
+		// {eAF: 4, eAR: 8, hFA: -10, hFB: -10, hFC: -12, hFD: -12, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
+		// {eAF: 4, eAR: 6, hFA: -10, hFB: -10, hFC: -11, hFD: -11,tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
+		// {eAF: 4, eAR: 4, hFA: -10, hFB: -10, hFC: -10, hFD: -10, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15}
+	// ]
 	this.draw = false;
 	
 	this.numReplicates = 6;
@@ -113,6 +117,86 @@ Experiment.prototype = {
 		for (var datumName in run) {
 			mutables[datumName].set(run[datumName]);
 		}
+	}
+}
+
+
+Experiment.Dimension = function(pathsAndVals) {
+	var paths = _.pluck(pathsAndVals, 'paths');
+	var testVals = _.pluck(pathsAndVals, 'testVals');
+	this.testVals = this.extendSets(testVals, paths);
+}
+
+Experiment.Dimension.prototype = {
+	extendSets: function(sets, paths) {
+		var vals = [];
+		for (var i=0; i<sets.length; i++) {
+			vals.push(this.extendSet(sets[i]));
+		}
+		this.pareVals(vals, paths);
+		//need to pare down to min length and alert if paring happens
+		return vals;
+	},
+	extendSet: function(set) {
+		if (set.indexOf('...') == -1) console.log('Unrecognized set ' + set);
+		set.replace('...', ' ... ');
+		var resultVals = [];
+		var sigVals = this.cleanSigVals(set.match(/[\-0-9\.]+/g));
+		var startBound, step, endBound;
+		startBound = sigVals[0];
+		if (sigVals.length == 3) {
+			step = sigVals[1];
+			endBound = sigVals[2];
+		} else {
+			step = endBound > startBound ? 1 : -1;
+			endBound = sigVals[2];
+		}
+		return this.setFromSigVals(startBound, step, endBound);
+		
+	},
+	pareVals: function(vals, paths) {
+		var minLen = vals[0].length;
+		var maxLen = vals[0].length;
+		for (var i=0; i<vals.length; i++) {
+			minLen = Math.min(vals[i].length, minLen);
+			maxLen = Math.max(vals[i].length, maxLen);
+		}
+		if (minLen != maxLen) {
+			console.log('Dimension with paths ');
+			console.log(paths);
+			console.log('has mismatched dimensions: max is ' + maxLen + ' and min is ' + minLen);
+			console.log('Paring to min');
+			for (var i=0; i<vals.length; i++) {
+				vals[i] = vals[i].slice(0, minLen);
+			}
+		}
+		
+	},
+	cleanSigVals: function(sigVals) {
+		var asNumbers = [];
+		for (var i=0; i<sigVals.length; i++) {
+			var regexpRes = /[\.]+/.exec(sigVals[i]);
+			if (regexpRes && regexpRes[0] != sigVals[i]) {
+				asNumbers[i] = Number(sigVals[i]);
+			} else {
+				asNumbers[i] = Number(sigVals[i]);
+			}
+		}
+		return asNumbers;
+	},
+	setFromSigVals: function(startBound, step, endBound) {
+		var vals = [];
+		if (startBound < endBound) {
+			for (var i=startBound; i<=endBound; i+=step) {
+				vals.push(i);
+			}	
+		} else {
+			for (var i=startBound; i>=endBound; i+=step) { //step < 0
+				vals.push(i);
+			}
+		}
+		return vals;
+		
 	}
 }
 

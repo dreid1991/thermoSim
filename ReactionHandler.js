@@ -152,7 +152,7 @@ ReactionHandler = {
 	},
 	probFunc: function(hitE, activE) {
 
-		return hitE > activE * 1.2 ? 1 : 0;
+		return hitE > activE * 1.3 ? 1 : 0;
 		//var x = Math.max(hitE/activE - 1, 0);
 		//return 2*(x - .5*x*x);//max of 1, min of 0
 	},
