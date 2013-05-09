@@ -20,22 +20,31 @@ function Experiment() {
 	this.appendEqData = true;
 	this.runs = [
 		{eAF: 4, eAR: 10, hFA: -10, hFB: -10, hFC: -13, hFD: -13, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
-		{eAF: 4, eAR: 8, hFA: -10, hFB: -10, hFC: -12, hFD: -12, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
-		{eAF: 4, eAR: 6, hFA: -10, hFB: -10, hFC: -11, hFD: -11,tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
+		//{eAF: 4, eAR: 8, hFA: -10, hFB: -10, hFC: -12, hFD: -12, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
+		//{eAF: 4, eAR: 6, hFA: -10, hFB: -10, hFC: -11, hFD: -11,tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
 		{eAF: 4, eAR: 4, hFA: -10, hFB: -10, hFC: -10, hFD: -10, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15}
 	]
-	this.runTime = 30; //seconds;
-	this.results = [];
-	this.runIdx = -1;
+	this.numReplicates = 3
+	this.runTime = 10; //seconds;
+	this.resultSets = [];
+	this.runIdx = 0;
+	this.repIdx = -1;
 	this.measureNext()
 }
 
 Experiment.prototype = {
 	measureNext: function() {
 		var self = this;
-		this.runIdx++;
-		console.log(Math.round(this.runIdx / this.runs.length * 100) + ' %');
+		var runFrac = 1 / this.runs.length;
+		this.repIdx++;
+		if (this.repIdx == this.numReplicates) {
+			this.runIdx++;
+			this.repIdx = 0;
+		}
+		console.log(Math.round((this.runIdx / this.runs.length + runFrac * this.repIdx / this.numReplicates)* 100) + ' %');
+		
 		if (this.runs[this.runIdx]) {
+			
 			
 			this.setVals(this.mutables, this.runs[this.runIdx]);
 			sceneNavigator.refresh();
@@ -43,8 +52,13 @@ Experiment.prototype = {
 		} else {
 			var table = '<table border="1" cellpadding="3">';
 			table += this.makeHeaderRow();
-			for (var i=0; i<this.results.length; i++) {
-				table += this.results[i].asTableRow(this.appendEqData);
+			for (var i=0; i<this.resultSets.length; i++) {
+				table += '<tr><td></td></tr>';
+				var set = this.resultSets[i];
+				for (var j=0; j<set.length; j++) {
+					table += set[j].asTableRow(this.appendEqData);
+				
+				}
 			}
 			table += '</table>';
 			$('body').append('<br>');
@@ -74,7 +88,10 @@ Experiment.prototype = {
 
 	},
 	recordPt: function(data, setPts) {
-		this.results.push(new Experiment.Results(data, setPts));
+		if (this.resultSets[this.runIdx] == undefined) {
+			this.resultSets[this.runIdx] = [];
+		}
+		this.resultSets[this.runIdx].push(new Experiment.Results(data, setPts));
 	},
 	logLast: function() {
 		this.results[this.results.length - 1].log();
