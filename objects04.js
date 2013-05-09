@@ -23,7 +23,7 @@ function Liquid(attrs) {
 	this.wallGas = walls[this.wallInfo];
 	this.wallPtIdxs = attrs.wallPts || [this.wallGas.length - 2, this.wallGas.length - 3];
 	this.handle = attrs.handle;
-	this.actCoeffType = attrs.actCoeffType; //twoSfxMrg for two suffix margules, 
+	this.actCoeffType = attrs.actCoeffType || 'ideal'; //twoSfxMrg for two suffix margules, 
 	this.actCoeffInfo = attrs.actCoeffInfo;
 	var makePhaseDiagram = attrs.makePhaseDiagram;
 	this.Cp = 0; //to be set each turn/absorption and used in setting temperatures for reflecting dots.  Capital C denotes total heat capacity.
@@ -86,11 +86,13 @@ _.extend(Liquid.prototype, objectFuncs, {
 			}
 		}, true, true)
 	},
-	makeActCoeffFuncs: function(type, info, spcDefs) {
+	makeActCoeffFuncs: function(type, coeffInfo, spcDefs) {
 		type = type || 'ideal';
 		if (/(twoSfxMrg|twosuffixmargoules)/i.test(type)) {
-			var coeff = info.a
+			var coeff = coeffInfo.a
 			return this.makeTwoSfxMrgFuncs(spcDefs, coeff);
+		} else if (/van[\s]*laar/i.test(type)) {
+			return this.makeVanLaar(spcDefs, coeffInfo);
 		} else if (/ideal/i.test(type)) {
 			return function(x, T) {return 1};
 		}
@@ -104,6 +106,30 @@ _.extend(Liquid.prototype, objectFuncs, {
 			}
 		}
 		return funcs;
+	},
+	makeVanLaar: function(spcDefs, coeffInfo) {
+		var funcs = {};
+		for (var spcName in spcDefs) {
+			var actCoeffSelf = coeffInfo[spcName];
+			var actCoeffOther = this.getActCoeffOther(spcName, coeffInfo);
+			if (actCoeffSelf === undefined) {
+				console.log('Missing activity coefficient for ' + spcName);
+			}
+			funcs[spcName] = this.makeVanLaarFunc(actCoeffSelf, actCoeffOther);
+		}
+		return funcs;
+		//{spc1: ...., spc2:...}, //{spc1: ##, spc2: ##}
+		
+	},
+	makeVanLaarFunc: function(actCoeffSelf, actCoeffOther) {
+		return function (x, T) {
+			return Math.exp(actCoeffSelf * (actCoeffOther * (1 - x)) / (actCoeffSelf * x + actCoeffOther * (1 - x)) * (actCoeffOther * (1 - x)) / (actCoeffSelf * x + actCoeffOther * (1 - x)));
+		}
+	},
+	getActCoeffOther: function(selfName, binaryInfo) {
+		for (var spcName in binaryInfo) {
+			if (spcName != selfName) return binaryInfo[spcName];
+		}
 	},
 	makeWallLiq: function(defs, counts, wallGas, wallPtIdxs, dotMgrLiq, handle) {
 		var vol = this.getLiqWallVol(defs, counts);
