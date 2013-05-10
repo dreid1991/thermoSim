@@ -23,46 +23,37 @@ function Experiment() {
 	}
 	//rxn appending ONLY works for spcs [0] + [1] -> [2] + [3]
 	this.dimensions = [
-		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13...-10]'}, {paths: ['eAR'], testVals: '[10, 8 ... 4]'}]),
-		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempDots3'], testVals: '[298.15, 348.15 ... 500]'}])
+		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempWalls'], testVals: '[298.15, 348.15 ... 600]'}]),
+		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13...-10]'}, {paths: ['eAR'], testVals: '[10, 8 ... 4]'}])
 	]
 	this.appendEqData = true;
-	// this.runs = [
-		// {eAF: 4, eAR: 10, hFA: -10, hFB: -10, hFC: -13, hFD: -13, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
-		// {eAF: 4, eAR: 8, hFA: -10, hFB: -10, hFC: -12, hFD: -12, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
-		// {eAF: 4, eAR: 6, hFA: -10, hFB: -10, hFC: -11, hFD: -11,tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15},
-		// {eAF: 4, eAR: 4, hFA: -10, hFB: -10, hFC: -10, hFD: -10, tempDots1: 298.15, tempDots2: 298.15, tempWalls: 298.15}
-	// ]
+
 	this.draw = false;
-	
-	this.numReplicates = 6;
+
+	this.numReps = 6;
+	this.runNum = 0;
+	this.totalRuns = this.getTotalRuns();
 	this.runTime = 20; //seconds;
-	this.resultSets = [];
-	this.runIdx = 0;
-	this.repIdx = -1;
+	this.resultSets = [[]];
+	this.repIdx = 0;
+	this.dimValIdxs = this.makeDimValIdxs(this.dimensions);
+	this.finished = false;
 	this.measureNext()
 }
 
 Experiment.prototype = {
 	measureNext: function() {
 		var self = this;
-		var runFrac = 1 / this.runs.length;
-		this.repIdx++;
-		if (this.repIdx == this.numReplicates) {
-			this.runIdx++;
-			this.repIdx = 0;
-		}
-		console.log(Math.round((this.runIdx / this.runs.length + runFrac * this.repIdx / this.numReplicates)* 100) + ' %');
 		
-		if (this.runs[this.runIdx]) {
+		if (!this.finished) {
 			
 			
-			this.setVals(this.mutables, this.runs[this.runIdx]);
+			this.setVals(this.mutables, this.dimensions, this.dimValIdxs);
 			sceneNavigator.refresh();
 			if (!this.draw) {
 				curLevel.drawRun = function(){};
 			}
-			setTimeout(function() {self.tryNextMeasurement(self.mutables, self.data, self.runs[self.runIdx])}, this.runTime * 1000);
+			setTimeout(function() {self.tryNextMeasurement()}, this.runTime * 1000);
 		} else {
 			var table = '<table border="1" cellpadding="3">';
 			table += this.makeHeaderRow();
@@ -79,6 +70,44 @@ Experiment.prototype = {
 			$('body').append(table);
 
 		}
+	},
+	tryNextMeasurement: function() {
+		this.recordPt(this.data, this.mutables);
+		//this.logLast();
+		this.finished = this.tick();
+		this.measureNext();
+
+	},
+	tick: function() {
+		this.runNum ++;
+		console.log(Math.round(100 * this.runNum / this.totalRuns) + ' %');
+		var dims = this.dimensions;
+		var dimValIdxs = this.dimValIdxs;
+		this.repIdx++;
+		if (this.repIdx == this.numReps) {
+			this.repIdx = 0;
+			var finished = this.nextDimVal(dims, dimValIdxs);
+			return finished;
+		}
+		return false;
+	},
+	nextDimVal: function(dims, dimValIdxs) {
+		for (var i=dims.length - 1; i>=0; i--) {
+			dimValIdxs[i]++;
+			if (dimValIdxs[i] == dims[i].numPts) {
+				dimValIdxs[i] = 0;
+			} else {
+				return false;
+			}
+		}
+		return true;
+	},
+	makeDimValIdxs: function(dims) {
+		var dimValIdxs = [];
+		for (var i=0; i<dims.length; i++) {
+			dimValIdxs.push(0);
+		}
+		return dimValIdxs
 	},
 	makeHeaderRow: function() {
 		var tableRow = '<tr>';
@@ -98,43 +127,59 @@ Experiment.prototype = {
 		tableRow += '</tr>';
 		return tableRow;
 	},
-	tryNextMeasurement: function(mutables, data, run) {
-		this.recordPt(data, run);
-		//this.logLast();
-		this.measureNext();
-
-	},
-	recordPt: function(data, setPts) {
-		if (this.resultSets[this.runIdx] == undefined) {
-			this.resultSets[this.runIdx] = [];
+	getTotalRuns: function() {
+		var numSetPts = 1;
+		for (var i=0; i<this.dimensions.length; i++) {
+			numSetPts *= this.dimensions[i].numPts;
 		}
-		this.resultSets[this.runIdx].push(new Experiment.Results(data, setPts, this.dataToEval));
+		return numSetPts * this.numReps;
+	},
+	recordPt: function(data, mutables) {
+		if (this.resultSets[this.resultSets.length - 1].length == this.numReps) {
+			this.resultSets.push([]);
+		}
+
+		this.resultSets[this.resultSets.length - 1].push(new Experiment.Results(data, mutables, this.dataToEval));
 	},
 	logLast: function() {
 		this.results[this.results.length - 1].log();
 	},
-	setVals: function(mutables, run) {
-		for (var datumName in run) {
-			mutables[datumName].set(run[datumName]);
+	setVals: function(mutables, dims, dimValIdxs) {
+		for (var i=0; i<dims.length; i++) {
+			var dim = dims[i];
+			var dimValIdx = dimValIdxs[i];
+			for (var pathGrpIdx=0; pathGrpIdx<dim.paths.length; pathGrpIdx++) {
+				var val = dim.testVals[pathGrpIdx][dimValIdx];
+				var pathGrp = dim.paths[pathGrpIdx];
+				for (var pathNameIdx=0; pathNameIdx<pathGrp.length; pathNameIdx++) {
+					var pathName = pathGrp[pathNameIdx];
+					eval(mutables[pathName].path + ' = ' + val);
+				}
+			}
 		}
+		
 	}
 }
 
 
 Experiment.Dimension = function(pathsAndVals) {
-	var paths = _.pluck(pathsAndVals, 'paths');
+	this.paths = _.pluck(pathsAndVals, 'paths');
 	var testVals = _.pluck(pathsAndVals, 'testVals');
-	this.testVals = this.extendSets(testVals, paths);
+	this.testVals = this.extendSets(testVals, this.paths);
+	this.numPts = this.testVals[0].length;
 }
 
 Experiment.Dimension.prototype = {
 	extendSets: function(sets, paths) {
 		var vals = [];
 		for (var i=0; i<sets.length; i++) {
-			vals.push(this.extendSet(sets[i]));
+			if (sets[i] instanceof Array) {
+				vals.push(sets[i]);
+			} else {
+				vals.push(this.extendSet(sets[i]));
+			}
 		}
-		this.pareVals(vals, paths);
-		//need to pare down to min length and alert if paring happens
+		this.checkValLens(vals, paths);
 		return vals;
 	},
 	extendSet: function(set) {
@@ -154,7 +199,7 @@ Experiment.Dimension.prototype = {
 		return this.setFromSigVals(startBound, step, endBound);
 		
 	},
-	pareVals: function(vals, paths) {
+	checkValLens: function(vals, paths) {
 		var minLen = vals[0].length;
 		var maxLen = vals[0].length;
 		for (var i=0; i<vals.length; i++) {
@@ -164,11 +209,11 @@ Experiment.Dimension.prototype = {
 		if (minLen != maxLen) {
 			console.log('Dimension with paths ');
 			console.log(paths);
-			console.log('has mismatched dimensions: max is ' + maxLen + ' and min is ' + minLen);
-			console.log('Paring to min');
-			for (var i=0; i<vals.length; i++) {
-				vals[i] = vals[i].slice(0, minLen);
-			}
+			console.log('has mismatched values sets: max length is ' + maxLen + ' and min length is ' + minLen);
+			console.log('THIS EXPERIMENT WILL NOT WORK');
+			// for (var i=0; i<vals.length; i++) {
+				// vals[i] = vals[i].slice(0, minLen);
+			// }
 		}
 		
 	},
@@ -200,12 +245,12 @@ Experiment.Dimension.prototype = {
 	}
 }
 
-Experiment.Results = function(data, setPts, dataToEval) {
+Experiment.Results = function(data, mutables, dataToEval) {
 	this.data = {};
 	this.spcDefs = deepCopy(LevelData.spcDefs);
 	var tempSrc = walls[0].getDataSrc('temp');
 	this.finalTemp = this.avgLast(tempSrc, 300);
-	this.setPts = deepCopy(setPts);
+	this.setPts = this.recordMutables(mutables);
 	for (var datum in data) {
 		this.data[datum] = data[datum].avg(200);
 	}
@@ -218,6 +263,13 @@ Experiment.Results.prototype = {
 		console.log(this.objToStr(this.setPts));
 		console.log('Produced data');
 		console.log(this.objToStr(this.data) + '\n');
+	},
+	recordMutables: function(mutables) {
+		var evaled = {};
+		for (var name in mutables) {
+			evaled[name] = eval(mutables[name].path);
+		}
+		return evaled;
 	},
 	evalData: function(dataToEval, data) {
 		var evaled = {};
