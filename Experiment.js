@@ -26,6 +26,7 @@ function Experiment() {
 		tempDots1: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.dots[0].temp'),
 		tempDots2: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.dots[1].temp'),
 		tempWalls: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.walls[0].temp'),
+		r: new Experiment.Mutable('LevelData.spcDefs[0].r')
 	}
 	this.data = {
 		nA: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "a", tag: "wally"})'),
@@ -40,11 +41,12 @@ function Experiment() {
 	}
 	//appendEqData ONLY works for spcs [0] + [1] -> [2] + [3]
 	this.dimensions = [
-		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempWalls'], testVals: '[298.15, 348.15 ... 500]'}]),
-		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13 ... -10]'}, {paths: ['eAR'], testVals: '[10, 8... 4]'}])
+		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempWalls'], testVals: '[298.15, 348.15 ... 350]'}]),
+		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13 ... -12]'}, {paths: ['eAR'], testVals: '[10, 8... 8]'}]),
+		new Experiment.Dimension([{paths: ['r'], testVals: '[1 ... 2]'}])
 	]
 	this.appendEqData = true;
-	this.numReps = 2;
+	this.numReps = 1;
 	this.runTime = 15; //seconds;
 
 	//end of experiment parameters
@@ -52,6 +54,8 @@ function Experiment() {
 	this.draw = false;
 	this.runNum = 0;
 	this.totalRuns = this.getTotalRuns();
+	console.log('Running ' + this.totalRuns + ' tests at ' + this.runTime + ' seconds each.');
+	console.log('Total run time: ' + (this.totalRuns * this.runTime) + ' seconds')
 	this.resultsSets = [];
 	this.repIdx = 0;
 	this.dimValIdxs = this.makeDimValIdxs(this.dimensions);
