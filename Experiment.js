@@ -68,6 +68,7 @@ Experiment.prototype = {
 			table += '</table>';
 			$('body').append('<br>');
 			$('body').append(table);
+			curLevel.pause();
 
 		}
 	},
