@@ -23,18 +23,18 @@ function Experiment() {
 	}
 	//rxn appending ONLY works for spcs [0] + [1] -> [2] + [3]
 	this.dimensions = [
-		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempWalls'], testVals: '[298.15, 348.15 ... 600]'}]),
-		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13...-10]'}, {paths: ['eAR'], testVals: '[10, 8 ... 4]'}])
+		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempWalls'], testVals: '[298.15, 348.15 ... 400]'}]),
+		//new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13...-10]'}, {paths: ['eAR'], testVals: '[10, 8 ... 4]'}])
 	]
 	this.appendEqData = true;
 
 	this.draw = false;
 
-	this.numReps = 6;
+	this.numReps = 2;
 	this.runNum = 0;
 	this.totalRuns = this.getTotalRuns();
-	this.runTime = 20; //seconds;
-	this.resultSets = [[]];
+	this.runTime = 15; //seconds;
+	this.resultsSets = [];
 	this.repIdx = 0;
 	this.dimValIdxs = this.makeDimValIdxs(this.dimensions);
 	this.finished = false;
@@ -57,13 +57,13 @@ Experiment.prototype = {
 		} else {
 			var table = '<table border="1" cellpadding="3">';
 			table += this.makeHeaderRow();
-			for (var i=0; i<this.resultSets.length; i++) {
-				table += '<tr><td></td></tr>';
-				var set = this.resultSets[i];
-				for (var j=0; j<set.length; j++) {
-					table += set[j].asTableRow(this.appendEqData);
+			for (var i=0; i<this.resultsSets.length; i++) {
+				table += this.resultsSets[i].asTableRow(this.appendEqData, true);//'<tr><td></td></tr>';
+				// var set = this.resultsSets[i];
+				// for (var j=0; j<set.length; j++) {
+					// table += set[j].asTableRow(this.appendEqData);
 				
-				}
+				// }
 			}
 			table += '</table>';
 			$('body').append('<br>');
@@ -73,8 +73,7 @@ Experiment.prototype = {
 		}
 	},
 	tryNextMeasurement: function() {
-		this.recordPt(this.data, this.mutables);
-		//this.logLast();
+		this.recordPt(this.data, this.mutables, this.dimValIdxs);
 		this.finished = this.tick();
 		this.measureNext();
 
@@ -108,7 +107,7 @@ Experiment.prototype = {
 		for (var i=0; i<dims.length; i++) {
 			dimValIdxs.push(0);
 		}
-		return dimValIdxs
+		return dimValIdxs;
 	},
 	makeHeaderRow: function() {
 		var tableRow = '<tr>';
@@ -135,15 +134,18 @@ Experiment.prototype = {
 		}
 		return numSetPts * this.numReps;
 	},
-	recordPt: function(data, mutables) {
-		if (this.resultSets[this.resultSets.length - 1].length == this.numReps) {
-			this.resultSets.push([]);
+	recordPt: function(data, mutables, dataValIdxs) {
+		if (this.resultsSets.length) {
+			var last = this.resultsSets[this.resultsSets.length - 1];
+			if (!last.isAtIdxs(dataValIdxs)) {
+				this.resultsSets.push(new Experiment.ResultsSet(dataValIdxs));
+			}
+		} else {
+			this.resultsSets.push(new Experiment.ResultsSet(dataValIdxs));
 		}
+		
 
-		this.resultSets[this.resultSets.length - 1].push(new Experiment.Results(data, mutables, this.dataToEval));
-	},
-	logLast: function() {
-		this.results[this.results.length - 1].log();
+		this.resultsSets[this.resultsSets.length - 1].addResults(new Experiment.Results(data, mutables, this.dataToEval));
 	},
 	setVals: function(mutables, dims, dimValIdxs) {
 		for (var i=0; i<dims.length; i++) {
@@ -162,6 +164,32 @@ Experiment.prototype = {
 	}
 }
 
+
+Experiment.ResultsSet = function(dimValIdxs) {
+	this.dimValIdxs = dimValIdxs.concat();
+	this.results = [];
+}
+
+
+Experiment.ResultsSet.prototype = {
+	addResults: function(results) {
+		this.results.push(results);
+	},
+	isAtIdxs: function(idxs) {
+		for (var i=0; i<idxs.length; i++) {
+			if (idxs[i] != this.dimValIdxs[i]) return false;
+		}
+		return true;
+	},
+	asTableRow: function(appendEqData, pad) {
+		var row = '';
+		if (pad) row += '<tr><td></td></tr>';
+		for (var i=0; i<this.results.length; i++) {
+			row += this.results[i].asTableRow(appendEqData);
+		}
+		return row;
+	}
+}
 
 Experiment.Dimension = function(pathsAndVals) {
 	this.paths = _.pluck(pathsAndVals, 'paths');
