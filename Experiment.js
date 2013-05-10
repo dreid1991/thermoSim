@@ -23,8 +23,8 @@ function Experiment() {
 	}
 	//rxn appending ONLY works for spcs [0] + [1] -> [2] + [3]
 	this.dimensions = [
-		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempDots3'], testVals: '[298.15, 348.15 ... 500]'}]),
-		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13...-10]'}, {paths: ['eAR'], testVals: '[10, 8 ... 4]'}])
+		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13...-10]'}, {paths: ['eAR'], testVals: '[10, 8 ... 4]'}]),
+		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempDots3'], testVals: '[298.15, 348.15 ... 500]'}])
 	]
 	this.appendEqData = true;
 	// this.runs = [
@@ -139,17 +139,17 @@ Experiment.Dimension.prototype = {
 	},
 	extendSet: function(set) {
 		if (set.indexOf('...') == -1) console.log('Unrecognized set ' + set);
-		set.replace('...', ' ... ');
+		set = set.replace('...', ' ... ');
 		var resultVals = [];
 		var sigVals = this.cleanSigVals(set.match(/[\-0-9\.]+/g));
 		var startBound, step, endBound;
 		startBound = sigVals[0];
 		if (sigVals.length == 3) {
-			step = sigVals[1];
+			step = sigVals[1] - sigVals[0];
 			endBound = sigVals[2];
 		} else {
+			endBound = sigVals[1];
 			step = endBound > startBound ? 1 : -1;
-			endBound = sigVals[2];
 		}
 		return this.setFromSigVals(startBound, step, endBound);
 		
@@ -177,9 +177,9 @@ Experiment.Dimension.prototype = {
 		for (var i=0; i<sigVals.length; i++) {
 			var regexpRes = /[\.]+/.exec(sigVals[i]);
 			if (regexpRes && regexpRes[0] != sigVals[i]) {
-				asNumbers[i] = Number(sigVals[i]);
-			} else {
-				asNumbers[i] = Number(sigVals[i]);
+				asNumbers.push(Number(sigVals[i]));
+			} else if (!regexpRes) {
+				asNumbers.push(Number(sigVals[i]));
 			}
 		}
 		return asNumbers;
