@@ -23,14 +23,13 @@ function Experiment() {
 	}
 	//rxn appending ONLY works for spcs [0] + [1] -> [2] + [3]
 	this.dimensions = [
-		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempWalls'], testVals: '[298.15, 348.15 ... 400]'}]),
-		//new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13...-10]'}, {paths: ['eAR'], testVals: '[10, 8 ... 4]'}])
+		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempWalls'], testVals: '[298.15, 348.15 ... 350]'}]),
+		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13 ... -12]'}, {paths: ['eAR'], testVals: '[10, 8... 8]'}])
 	]
 	this.appendEqData = true;
 
 	this.draw = false;
-
-	this.numReps = 2;
+	this.numReps = 1;
 	this.runNum = 0;
 	this.totalRuns = this.getTotalRuns();
 	this.runTime = 15; //seconds;
@@ -55,22 +54,64 @@ Experiment.prototype = {
 			}
 			setTimeout(function() {self.tryNextMeasurement()}, this.runTime * 1000);
 		} else {
-			var table = '<table border="1" cellpadding="3">';
-			table += this.makeHeaderRow();
-			for (var i=0; i<this.resultsSets.length; i++) {
-				table += this.resultsSets[i].asTableRow(this.appendEqData, true);//'<tr><td></td></tr>';
-				// var set = this.resultsSets[i];
-				// for (var j=0; j<set.length; j++) {
-					// table += set[j].asTableRow(this.appendEqData);
-				
-				// }
-			}
-			table += '</table>';
-			$('body').append('<br>');
-			$('body').append(table);
+			console.log("Done!  Ready to print");
 			curLevel.pause();
 
 		}
+	},
+	print: function(dimensionOrder) {
+		if (!dimensionOrder) dimensionOrder = Experiment.Dimension.prototype.extendSet('[0 ... ' + (this.dimensions.length - 1) + ']');
+		var orderedResults = this.sortResults(this.resultsSets, dimensionOrder);
+		var table = '<table border="1" cellpadding="3">';
+		table += this.makeHeaderRow();
+		for (var i=0; i<orderedResults.length; i++) {
+			table += orderedResults[i].asTableRow(this.appendEqData, true);
+
+		}
+		table += '</table>';
+		$('body').append('<br>');
+		$('body').append(table);		
+	},
+	sortResults: function(sets, dimOrder) {
+		if (!dimOrder.length) return sets;
+		
+		var dimIdx = dimOrder[0];
+		var sorted = this.sortSetsByDimIdx(sets.concat(), dimIdx);
+		var groups = this.pluckGroups(sorted, dimIdx);
+		var idxInSets = 0;
+		for (var i=0; i<groups.length; i++) {
+			var args = [idxInSets, groups[i].length].concat(this.sortResults(groups[i], dimOrder.slice(1, dimOrder.length - 1)));
+			Array.prototype.splice.apply(sets, args);
+			idxInSets += groups[i].length;
+		}
+		return sets;
+
+	},
+	pluckGroups: function(sorted, dimIdx) {
+		var groups = [];
+		var lastVal = -1;
+		for (var i=0; i<sorted.length; i++) {
+			if (sorted[i].dimValIdxs[dimIdx] != lastVal) {
+				groups.push([]);
+				lastVal = sorted[i].dimValIdxs[dimIdx];
+			}
+			groups[groups.length - 1].push(sorted[i]);
+		}
+		return groups;
+	},
+	sortSetsByDimIdx: function(sets, byIdx) {
+		for (var i=0; i<sets.length; i++) {
+
+			for (var j=0; j<sets.length-1; j++) {
+				var here = sets[j];
+				var next = sets[j+1];
+				if (next.dimValIdxs[byIdx] < here.dimValIdxs[byIdx]) {
+					sets[j] = next;
+					sets[j+1] = here;
+				}
+			}
+		}
+		return sets;
 	},
 	tryNextMeasurement: function() {
 		this.recordPt(this.data, this.mutables, this.dimValIdxs);
