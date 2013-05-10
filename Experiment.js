@@ -1,3 +1,20 @@
+/*
+Copyright (C) 2013  Daniel Reid
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 function Experiment() {
 	this.mutables = {
 		eAF: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.rxns[0].activeE'),
@@ -21,18 +38,20 @@ function Experiment() {
 		fracProdsExp: new Experiment.Data('nC + nD'),
 		eqConstExp: new Experiment.Data('nC * nD / (nB * nA)')
 	}
-	//rxn appending ONLY works for spcs [0] + [1] -> [2] + [3]
+	//appendEqData ONLY works for spcs [0] + [1] -> [2] + [3]
 	this.dimensions = [
-		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempWalls'], testVals: '[298.15, 348.15 ... 350]'}]),
-		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13 ... -12]'}, {paths: ['eAR'], testVals: '[10, 8... 8]'}])
+		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempWalls'], testVals: '[298.15, 348.15 ... 500]'}]),
+		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13 ... -10]'}, {paths: ['eAR'], testVals: '[10, 8... 4]'}])
 	]
 	this.appendEqData = true;
+	this.numReps = 2;
+	this.runTime = 15; //seconds;
 
+	//end of experiment parameters
+	
 	this.draw = false;
-	this.numReps = 1;
 	this.runNum = 0;
 	this.totalRuns = this.getTotalRuns();
-	this.runTime = 15; //seconds;
 	this.resultsSets = [];
 	this.repIdx = 0;
 	this.dimValIdxs = this.makeDimValIdxs(this.dimensions);
@@ -281,9 +300,6 @@ Experiment.Dimension.prototype = {
 			console.log(paths);
 			console.log('has mismatched values sets: max length is ' + maxLen + ' and min length is ' + minLen);
 			console.log('THIS EXPERIMENT WILL NOT WORK');
-			// for (var i=0; i<vals.length; i++) {
-				// vals[i] = vals[i].slice(0, minLen);
-			// }
 		}
 		
 	},
