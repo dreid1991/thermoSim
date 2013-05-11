@@ -104,6 +104,19 @@ WallMethods.wallDataHandler = {
 			}
 		}
 	},
+	pareData: function() {
+		for (var dataName in this.data) {
+			var datum = this.data[dataName];
+			if (datum instanceof Array) {
+				for (var i=0; i<datum.length; i++) {
+					if (datum[i].srcVal.length > 600) datum[i].srcVal.splice(0, datum[i].srcVal.length - 300);
+				}
+			} else {
+				if (datum.srcVal.length > 600) 
+					datum.srcVal.splice(0, datum.srcVal.length - 300);
+			}
+		}	
+	},
 	createSingleValDataObj: function(dataObjName, valFunc, isArrayMember) {
 		var dataObj = new WallMethods.DataObj();
 		if (isArrayMember) {

@@ -93,6 +93,11 @@ WallMethods.main = {
 			this.setWallHandler(wallIdx, handler);
 		}
 	},
+	pareData: function() {
+		for (var i=0; i<this.length; i++) {
+			this[i].pareData();
+		}
+	},
 	setWallHandler: function(wallInfo, handler){
 		var wallIdx = this.idxByInfo(wallInfo);
 		if (/isothermal/i.test(handler)) {

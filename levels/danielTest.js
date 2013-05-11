@@ -50,7 +50,7 @@ LevelData = {
 					{
 						type: 'Heater',
 						cleanUpWith: 'prompt1',
-						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
+						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty', liquidHandle: 'swishy'}
 					},
 				
 					// {
@@ -70,16 +70,16 @@ LevelData = {
 				dataRecord: [
 					
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
-					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'a', tag: 'wally'}},
-					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'b', tag: 'wally'}},
-					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'c', tag: 'wally'}},
-					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'd', tag: 'wally'}}
+					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'a', tag: 'wally'}},
+					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'b', tag: 'wally'}},
+					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'c', tag: 'wally'}},
+					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'd', tag: 'wally'}}
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
 					//{data: 'collisions'}
 				],
 				rxns: [
-					{handle: 'rxn1', rctA: 'a', rctB: 'b', activeE: 4, prods: {c: 1, d: 1}},
-					{handle: 'rxn2', rctA: 'c', rctB: 'd', activeE: 10, prods: {a: 1, b: 1}}
+					// {handle: 'rxn1', rctA: 'a', rctB: 'b', activeE: 4, prods: {c: 1, d: 1}},
+					// {handle: 'rxn2', rctA: 'c', rctB: 'd', activeE: 10, prods: {a: 1, b: 1}}
 					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				],
 				dataReadouts: [
@@ -118,17 +118,17 @@ LevelData = {
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				// ],
 				graphs: [
-					{type: 'Scatter', handle: 'fracs', xLabel: "time (s)", yLabel: "mole face", axesInit:{x:{min:0, step:1}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
-						sets:[
-							{handle:'fracRct', label:'frac\nRct', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'a', tag: 'wally'}) + frac('wally', {spcName: 'b', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5},
-							{handle:'fracProd', label:'frac\nProd', pointCol:Col(50,50,255), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'c', tag: 'wally'}) + frac('wally', {spcName: 'd', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
-						]
-					},
-					{type: 'Scatter', handle: 'eqConst', xLabel: "time (s)", yLabel: "eq const", axesInit:{x:{min:0, step:1}, y:{min:0, step:.2}}, numGridLines: {y: 6}, 
-						sets:[
-							{handle:'frac', label:'eq\nconst', pointCol:Col(50,255,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'c', tag: 'wally'}) * frac('wally', {spcName: 'd', tag: 'wally'}) / (frac('wally', {spcName: 'a', tag: 'wally'}) * frac('wally', {spcName: 'b', tag: 'wally'}))"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
-						]
-					},
+					// {type: 'Scatter', handle: 'fracs', xLabel: "time (s)", yLabel: "mole face", axesInit:{x:{min:0, step:1}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+						// sets:[
+							// {handle:'fracRct', label:'frac\nRct', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'a', tag: 'wally'}) + frac('wally', {spcName: 'b', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5},
+							// {handle:'fracProd', label:'frac\nProd', pointCol:Col(50,50,255), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'c', tag: 'wally'}) + frac('wally', {spcName: 'd', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
+						// ]
+					// },
+					// {type: 'Scatter', handle: 'eqConst', xLabel: "time (s)", yLabel: "eq const", axesInit:{x:{min:0, step:1}, y:{min:0, step:.2}}, numGridLines: {y: 6}, 
+						// sets:[
+							// {handle:'frac', label:'eq\nconst', pointCol:Col(50,255,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'c', tag: 'wally'}) * frac('wally', {spcName: 'd', tag: 'wally'}) / (frac('wally', {spcName: 'a', tag: 'wally'}) * frac('wally', {spcName: 'b', tag: 'wally'}))"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
+						// ]
+					// },
 					// {type: 'Scatter', handle: 'tempvstime', xLabel: "vol", yLabel: "pExt (K)", axesInit:{x:{min:0, step:3}, y:{min:0, step:2}}, numGridLines: {x: 3, y: 10},
 						// sets:[
 							// {handle:'temp', label:'temp', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'vol("wally")', y: "pExt('wally')"}, trace: true, fillInPts: true, fillInPtsMin: 5}
