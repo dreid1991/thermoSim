@@ -14,7 +14,7 @@ LevelData = {
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: 'cVIsothermal', temp: 298.15, handle: 'wally', isothermalRate: 3, border: {type: 'open', thickness: 5, yMin: 30}} 
+					{pts: [P(20, 50), P(510, 50), P(500, 430), P(50, 430)], handler: 'cVIsothermal', temp: 298.15, handle: 'wally', isothermalRate: 3, border: {type: 'open', thickness: 5, yMin: 30}} 
 				],
 				dots: [
 					{spcName: 'a', pos: P(55, 55), dims: V(390, 340), count: 1000, temp: 298.15, returnTo: 'wally', tag: 'wally'},
@@ -70,6 +70,13 @@ LevelData = {
 					},
 
 				],
+				////as [{pos: , dir: , temp: , tag: , returnTo: }]
+				// cmmds: [
+					// function() {
+						// spcs.a.place([{pos: P(100, 100), dir: V(1, 0), temp: 100, tag: 'wally', returnTo: 'wally'}]);
+						// spcs.b.place([{pos: P(200, 100), dir: V(-1, 0), temp: 100, tag: 'wally', returnTo: 'wally'}]);
+					// }
+				// ]
 			},
 			prompts: [
 				{

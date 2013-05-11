@@ -31,10 +31,10 @@ LevelData = {
 		{
 			sceneData: {
 				walls: [
-					{pts:[P(40,10), P(510,10), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'left', temp: 273, isothermalRate: 80, border: {type: 'open', width: 10} },
+					{pts:[P(40,95), P(510,95), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'left', temp: 273, isothermalRate: 4, border: {type: 'open', width: 10} },
 				],
 				dots: [
-					{spcName: 'spc3', pos: P(45,90), dims: V(465,260), count: 550, temp:215, returnTo: 'left', tag: 'left'},
+					{spcName: 'spc3', pos: P(45,100), dims: V(465,240), count: 1100, temp:273, returnTo: 'left', tag: 'left'},
 				],	
 				objs: [
 					{
@@ -42,9 +42,9 @@ LevelData = {
 						attrs: {
 							handle: 'RightPiston',
 							wallInfo: 'left',
-							min: 0,
-							init: 0,
-							max: 3,
+							min: 1,
+							init: 1,
+							max: 4,
 							makeSlider: false,	
 							compMode: 'cPAdiabaticDamped',
 						}	
@@ -69,7 +69,9 @@ LevelData = {
 					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'External Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
 						sets:[
 							{handle: 'externalPressure', label: 'P ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
-							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
+							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+							{handle: 'internalPressure', label: 'P int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
+							data: {x: 'vol("left")', y: 'pInt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]
 					}
 				],	
@@ -83,6 +85,11 @@ LevelData = {
 					{label: 'Vol: ', expr: 'vol("left")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'mainReadout'}
 				],
+				triggers: [
+					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Place the block on the piston', requiredFor: 'prompt0', checkOn:'conditions'},
+					{handle: 'freeze', expr: 'pExt("left") == 4', satisfyCmmds: ['curLevel.dragWeightsWeight1.disable()'], requiredFor: 'prompt0'},
+					{handle: 'trigger2', expr: 'fracDiff(pExt("left"), 2) < 0.15', message: 'Remove the block from the piston', requiredFor: 'prompt2', checkOn:'conditions'},
+				],	
 			},
 			prompts: [
 				{
@@ -98,7 +105,7 @@ LevelData = {
 					title: 'Current Step'		
 				},
 				{
-					sceneData: undefined, 
+					sceneData: undefined,
 					quiz: [
 						{
 							type: 'text',
@@ -109,12 +116,17 @@ LevelData = {
 					],
 				},
 				{
-					sceneData: undefined, 
+					sceneData:{ 
+						cmmds: [
+							'curLevel.dragWeightsWeight1.enable()'
+						],
+					},	
 					quiz: [
 						{
-							type: 'text',
+							type: 'textSmall',
 							preText:'Now remove the block and let the piston isothermally expand.  For the compression process, you estimated that it "cost" you get("Ans1", "string") kJ of work.  Estimate how much work you "got back" from the expansion.',
-							text: 'type your answer here',
+							text: '',
+							units: 'kJ',
 							storeAs: 'Ans2'
 						}
 					],
@@ -124,10 +136,10 @@ LevelData = {
 		{	
 			sceneData: {
 				walls: [
-					{pts:[P(40,10), P(510,10), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'left', temp: 273, isothermalRate: 80, border: {type: 'open', width: 10} },
+					{pts:[P(40,95), P(510,95), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'left', temp: 273, isothermalRate: 4, border: {type: 'open', width: 10} },
 				],
 				dots: [
-					{spcName: 'spc3', pos: P(45,90), dims: V(465,260), count: 550, temp:215, returnTo: 'left', tag: 'left'},
+					{spcName: 'spc3', pos: P(45,100), dims: V(465,240), count: 1100, temp:273, returnTo: 'left', tag: 'left'},
 				],	
 				objs: [
 					{
@@ -135,9 +147,9 @@ LevelData = {
 						attrs: {
 							handle: 'RightPiston',
 							wallInfo: 'left',
-							min: 0,
-							init: 0,
-							max: 3,
+							min: 1,
+							init: 1,
+							max: 4,
 							makeSlider: false,	
 							compMode: 'cPAdiabaticDamped',
 						}	
@@ -162,7 +174,9 @@ LevelData = {
 					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'External Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
 						sets:[
 							{handle: 'externalPressure', label: 'P ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
-							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
+							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+							{handle: 'internalPressure', label: 'P int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
+							data: {x: 'vol("left")', y: 'pInt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]
 					}
 				],	
@@ -176,6 +190,11 @@ LevelData = {
 					{label: 'Vol: ', expr: 'vol("left")', units: 'L', sigFigs: 3, handle: 'volReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'mainReadout'}
 				],
+				triggers: [
+					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Place the blocks on the piston', requiredFor: 'prompt0', checkOn:'conditions'},
+					{handle: 'freeze', expr: 'pExt("left") == 4', satisfyCmmds: ['curLevel.dragWeightsWeight1.disable()'], requiredFor: 'prompt0'},
+					{handle: 'trigger2', expr: 'fracDiff(pExt("left"), 2) < 0.15', message: 'Remove the blocks from the piston', requiredFor: 'prompt2', checkOn:'conditions'},
+				]	
 			},
 			prompts:[
 				{
@@ -202,12 +221,17 @@ LevelData = {
 					],
 				},
 				{
-					sceneData: undefined, 
+					sceneData: {
+						cmmds: [
+							'curLevel.dragWeightsWeight1.enable()'
+						],
+					},	
 					quiz: [
 						{
 							type: 'textSmall',
 							preText:'Now remove both blocks one at a time, waiting for the piston to settle before removing the next block. Estimate the work done on the system',
 							text: '',
+							units: 'kJ',
 							storeAs: 'Ans4'
 						}
 					],
@@ -217,10 +241,10 @@ LevelData = {
 		{
 			sceneData: {
 				walls: [
-					{pts:[P(40,10), P(510,10), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'left', temp: 273, isothermalRate: 80, border: {type: 'open', width: 10} },
+					{pts:[P(40,95), P(510,95), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'left', temp: 273, isothermalRate: 4, border: {type: 'open', width: 10} },
 				],
 				dots: [
-					{spcName: 'spc3', pos: P(45,90), dims: V(465,260), count: 550, temp:215, returnTo: 'left', tag: 'left'},
+					{spcName: 'spc3', pos: P(45,100), dims: V(465,240), count: 1100, temp:273, returnTo: 'left', tag: 'left'},
 				],	
 				objs: [
 					{
@@ -228,9 +252,9 @@ LevelData = {
 						attrs: {
 							handle: 'RightPiston',
 							wallInfo: 'left',
-							min: 0,
-							init: 0,
-							max: 3,
+							min: 1,
+							init: 1,
+							max: 4,
 							makeSlider: false,	
 							compMode: 'cPAdiabaticDamped',
 						}	
@@ -254,7 +278,9 @@ LevelData = {
 					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'External Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
 						sets:[
 							{handle: 'externalPressure', label: 'P ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
-							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
+							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+							{handle: 'internalPressure', label: 'P int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
+							data: {x: 'vol("left")', y: 'pInt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]
 					}
 				],	
@@ -264,17 +290,21 @@ LevelData = {
 				dataReadouts: [
 					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', sigFigs: 3, handle: 'tempReadout', readout: 'mainReadout'},
 					{label: 'Q: ', expr: 'q("left")', units: 'kJ', decPlaces: 1, handle: 'heatReadout', readout: 'mainReadout'},
-					{label: 'Pint: ', expr: 'pInt("left")', units: 'bar', sigFigs: 2, handle: 'pIntReadout', readout: 'pistonReadoutRightPiston'},
+					//{label: 'Pint: ', expr: 'pInt("left")', units: 'bar', sigFigs: 2, handle: 'pIntReadout', readout: 'pistonReadoutRightPiston'},
 					{label: 'Vol: ', expr: 'vol("left")', units: 'L', sigFigs: 3, handle: 'volReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'mainReadout'}
 				],
+				triggers: [
+					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Add mass to the system', requiredFor: 'prompt0', checkOn:'conditions'},
+					{handle: 'trigger2', expr: 'fracDiff(pExt("left"), 2) < 0.15', message: 'Remove mass from the system', requiredFor: 'prompt1', checkOn:'conditions'},
+				],	
 			},
 			prompts:[
 				{
 					quiz: [
 						{	
 							type: 'textSmall',
-							preText: "Now slowly add mass until the external pressure is equal to 3 bar. How much work was done on the system?",
+							preText: "Now slowly add mass until the external pressure is equal to 4 bar. How much work was done on the system?",
 							text: ' ', 
 							units: 'kJ',
 							storeAs: 'Ans5'
@@ -287,8 +317,9 @@ LevelData = {
 					quiz: [
 						{
 							type: 'textSmall',
-							preText:'You calculated get("Ans5", "string") kJ for the isothermal compression process.  Now slowly remove mass until the external pressure is equal to 1 bar. How much work was done on the system?',
+							preText:'You calculated get("Ans5", "string") kJ for the isothermal compression process.  Now slowly remove mass until the external pressure is equal to 2 bar. How much work was done on the system?',
 							text: '',
+							units: 'kJ',
 							storeAs: 'Ans6'
 						}
 					],
@@ -315,6 +346,10 @@ LevelData = {
 						}
 					],
 				},
+				{
+					cutScene: true,
+					text: 'End of simulation.'
+				}
 			]
 		}	
 	]

@@ -14,7 +14,7 @@ Copyright (C) 2013  Daniel Reid
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+window.BCollide = 1;
 function Experiment() {
 	this.mutables = {
 		eAF: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.rxns[0].activeE'),
@@ -26,9 +26,9 @@ function Experiment() {
 		tempDots1: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.dots[0].temp'),
 		tempDots2: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.dots[1].temp'),
 		tempWalls: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.walls[0].temp'),
-		r: new Experiment.Mutable('LevelData.spcDefs[0].r')
+		BCollide: new Experiment.Mutable('window.BCollide')
 	}
-	this.data = {
+	this.data = { 
 		nA: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "a", tag: "wally"})'),
 		nB: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "b", tag: "wally"})'),
 		nC: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "c", tag: "wally"})'),
@@ -41,13 +41,13 @@ function Experiment() {
 	}
 	//appendEqData ONLY works for spcs [0] + [1] -> [2] + [3]
 	this.dimensions = [
-		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempWalls'], testVals: '[298.15, 348.15 ... 350]'}]),
-		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13 ... -12]'}, {paths: ['eAR'], testVals: '[10, 8... 8]'}]),
-		new Experiment.Dimension([{paths: ['r'], testVals: '[1 ... 2]'}])
+		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempWalls'], testVals: '[298.15, 348.15 ... 500]'}]),
+		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13 ... -10]'}, {paths: ['eAR'], testVals: '[10, 8... 4]'}])
+		//new Experiment.Dimension([{paths: ['BCollide'], testVals: '[.8, 1 ... 1.2]'}])
 	]
 	this.appendEqData = true;
 	this.numReps = 1;
-	this.runTime = 15; //seconds;
+	this.runTime = 20; //seconds;
 
 	//end of experiment parameters
 	
@@ -389,12 +389,13 @@ Experiment.Results.prototype = {
 	},
 	makeEqData: function(spcDefs) {
 		var temp = this.finalTemp;
-		var h3 = spcDefs[3].hF298 * 1000 + spcDefs[3].cv * (temp - 298.15)
-		var h2 = spcDefs[2].hF298 * 1000 + spcDefs[2].cv * (temp - 298.15)
-		var h1 = spcDefs[1].hF298 * 1000 + spcDefs[1].cv * (temp - 298.15)
-		var h0 = spcDefs[0].hF298 * 1000 + spcDefs[0].cv * (temp - 298.15)
-		var hRxn = h3 + h2 - (h1 + h0);
-		var eqConst = Math.exp(-hRxn / (R * temp)) * Math.exp(-(hRxn / R) * (1 / temp - 1/298.15)); // no entropy right now
+		var h3 = spcDefs[3].hF298 * 1000 + spcDefs[3].cv * (temp - 298.15);
+		var h2 = spcDefs[2].hF298 * 1000 + spcDefs[2].cv * (temp - 298.15);
+		var h1 = spcDefs[1].hF298 * 1000 + spcDefs[1].cv * (temp - 298.15);
+		var h0 = spcDefs[0].hF298 * 1000 + spcDefs[0].cv * (temp - 298.15);
+		var hRxn298 = 1000 * (spcDefs[2].hF298 + spcDefs[3].hF298 - (spcDefs[1].hF298 + spcDefs[0].hF298));
+		var hRxn = h3 + h2 - (h1 + h0);//SHOULD I JUST USE 298?  LOOK HERE: http://www.chem.ufl.edu/~itl/4411/lectures/lec_v.html
+		var eqConst = Math.exp(-hRxn298 / (R * 298.15)) * Math.exp(-(hRxn / R) * (1 / temp - 1/298.15)); // no entropy right now
 		var testFrac;
 		for (var i=0; i<=1; i+=.1) {
 			var testFrac = Newton(eqConst + ' - (x*x)/((1-x)*(1-x))', {x: i}, 'x');

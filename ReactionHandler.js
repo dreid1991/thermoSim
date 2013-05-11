@@ -151,8 +151,9 @@ ReactionHandler = {
 		//abs will handle dots moving away from other dot
 	},
 	probFunc: function(hitE, activE) {
-
 		return hitE > activE * 1.3 ? 1 : 0;
+		//var eRel = hitE - activE;
+		//return window.BCollide * eRel * Math.exp(-window.BCollide * eRel + 1)
 		//var x = Math.max(hitE/activE - 1, 0);
 		//return 2*(x - .5*x*x);//max of 1, min of 0
 	},

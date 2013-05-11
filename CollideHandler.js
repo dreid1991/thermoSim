@@ -27,6 +27,7 @@ function CollideHandler(dotManager){
 	this.breakUpStore = this.breakUp;
 	this.recordingHits = false;
 	this.recordCleanUpListenerName = 'recordCollideHits';
+	
 }
 _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 	setSpcs: function(spcs) {

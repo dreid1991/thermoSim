@@ -94,7 +94,7 @@ Species.prototype = {
 			dotManager.removeByInfo({name:this.def.spcName});
 		}
 	},
-	place: function(dotsInfo) { //as [{pos: , dir: , temp: , tag: , returhTo: }]
+	place: function(dotsInfo) { //as [{pos: , dir: , temp: , tag: , returnTo: }]
 		var birthList = [];
 		for (var infoIdx=0; infoIdx<dotsInfo.length; infoIdx++) {
 			var info = dotsInfo[infoIdx];
