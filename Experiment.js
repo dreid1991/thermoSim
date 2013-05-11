@@ -14,7 +14,7 @@ Copyright (C) 2013  Daniel Reid
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-window.BCollide = 1;
+window.BCollide = 1.5;
 function Experiment() {
 	this.mutables = {
 		eAF: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.rxns[0].activeE'),
@@ -41,13 +41,13 @@ function Experiment() {
 	}
 	//appendEqData ONLY works for spcs [0] + [1] -> [2] + [3]
 	this.dimensions = [
-		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempWalls'], testVals: '[298.15, 348.15 ... 500]'}]),
-		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-13 ... -10]'}, {paths: ['eAR'], testVals: '[10, 8... 4]'}])
+		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempWalls'], testVals: '[298.15, 398.15 ... 900]'}]),
+		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-20, -18 ... -16]'}, {paths: ['eAR'], testVals: '[24, 20... 16]'}])
 		//new Experiment.Dimension([{paths: ['BCollide'], testVals: '[.8, 1 ... 1.2]'}])
 	]
 	this.appendEqData = true;
-	this.numReps = 1;
-	this.runTime = 20; //seconds;
+	this.numReps = 4;
+	this.runTime = 40; //seconds;
 
 	//end of experiment parameters
 	
@@ -446,7 +446,7 @@ Experiment.Data.prototype = {
 	avg: function(numPts) {
 		var src = eval(this.path);
 		var x = 0;
-		for (var i=src.length-numPts; i<src.length; i++) {
+		for (var i=Math.max(0, src.length-numPts); i<src.length; i++) {
 			x += src[i];
 		}
 		return x / numPts;

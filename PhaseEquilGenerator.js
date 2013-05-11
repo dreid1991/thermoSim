@@ -38,10 +38,12 @@ PhaseEquilGenerator.prototype = {
 		for (var step=0, xHeavy=0; step<numPts; step++) {
 			var tGuess = tBoilLight + (tBoilHeavy - tBoilLight) * xHeavy;
 			var tStep = this.solveTAtStep(tGuess, pressure, xHeavy, keyLight, keyHeavy, tBoilLight, tBoilHeavy, actFuncLight, actFuncHeavy);
-			var pTotal = this.solvePTotal(tStep, xHeavy, keyLight, keyHeavy, actFuncLight, actFuncHeavy);
-			var pLight = this.pSpc(keyLight, tStep, actFuncLight, 1 - xHeavy);
-			
-			equilData.push(new PhaseEquilGenerator.EquilPt(1 - xHeavy, xHeavy, pLight / pTotal, 1 - pLight / pTotal, tStep, pressure));
+			if (tStep !== false) {
+				var pTotal = this.solvePTotal(tStep, xHeavy, keyLight, keyHeavy, actFuncLight, actFuncHeavy);
+				var pLight = this.pSpc(keyLight, tStep, actFuncLight, 1 - xHeavy);
+				
+				equilData.push(new PhaseEquilGenerator.EquilPt(1 - xHeavy, xHeavy, pLight / pTotal, 1 - pLight / pTotal, tStep, pressure));
+			}
 			xHeavy += stepSize;
 		}
 		
@@ -50,12 +52,14 @@ PhaseEquilGenerator.prototype = {
 	solveTAtStep: function(tInit, pSys, xHeavy, keyLight, keyHeavy, tBoilLight, tBoilHeavy, actFuncLight, actFuncHeavy) {
 		var temp = tInit;
 		var pCur = this.solvePTotal(temp, xHeavy, keyLight, keyHeavy, actFuncLight, actFuncHeavy);
+		var numSteps = 0;
 		while (fracDiff(pCur, pSys) > .01) {
 			//Newton method
+			numSteps++;
 			var derivative = this.getDPDT(temp, xHeavy, keyLight, keyHeavy, tBoilLight, tBoilHeavy, actFuncLight, actFuncHeavy);
 			temp += (pSys - pCur) / derivative;
-			temp = bound(temp, tBoilLight, tBoilHeavy);
 			pCur = this.solvePTotal(temp, xHeavy, keyLight, keyHeavy, actFuncLight, actFuncHeavy);
+			if (numSteps == 40) return false;
 		}
 		return temp;
 		

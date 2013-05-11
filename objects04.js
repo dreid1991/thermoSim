@@ -94,7 +94,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 		} else if (/van[\s]*laar/i.test(type)) {
 			return this.makeVanLaar(spcDefs, coeffInfo);
 		} else if (/ideal/i.test(type)) {
-			return function(x, T) {return 1};
+			var funcs = {};
+			for (var spcName in spcDefs) funcs[spcName] = function(x, T) {return 1};
+			return funcs;
 		}
 	},
 	makeTwoSfxMrgFuncs: function(spcDefs, coeff) {
@@ -267,6 +269,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 					checkUpdateEquilAndPhaseDiagram();
 					if (self.addEnergyToDots(window.dotManager.lists.ALLDOTS, self.energyForDots)) {
 						self.energyForDots = 0;
+					}
+					if (0 < self.Cp && self.Cp < 2.5) {
+						fixLiquidTemp();
 					}
 				})
 				
