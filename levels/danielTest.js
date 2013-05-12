@@ -35,13 +35,17 @@ LevelData = {
 						// type: 'AuxImage',
 						// attrs: {handle: 'picci', slotNum: 0, imgFunc: 'img("img/work/block0Pic1.jpg")'}
 					// },
-					{
-						type: 'Liquid',  
-						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 500}, primaryKey: 'heavy', actCoeffType: 'vanlaar', actCoeffInfo: {spc1:.9227, ugly: 1.67}, makePhaseDiagram: true}
-					},
+					// {
+						// type: 'Liquid',  
+						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, ugly: 500}, primaryKey: 'heavy', actCoeffType: 'vanlaar', actCoeffInfo: {spc1:.9227, ugly: 1.67}, makePhaseDiagram: true}
+					// },
 					{
 						type: 'DragWeights',
-						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 6}], pInit: 2, cleanUpWith: 'prompt1'}
+						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 3}], pInit: 2, cleanUpWith: 'prompt1'}
+					},
+					{
+						type: 'Cell',
+						attrs: {pos: P(200, 200), rad: 30, col: Col(30, 200, 30)}
 					},
 					// {
 						// type: 'ActivationEnergyPair',
@@ -50,7 +54,7 @@ LevelData = {
 					{
 						type: 'Heater',
 						cleanUpWith: 'prompt1',
-						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty', liquidHandle: 'swishy'}
+						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
 					},
 				
 					// {

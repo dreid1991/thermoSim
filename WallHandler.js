@@ -15,7 +15,7 @@ Copyright (C) 2013  Daniel Reid
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function WallHandler(attrs){//pts, handlers, handles, bounds, includes, vols, shows, records, temps){//records is a verb, like what the wall records.  Defaults to recording q, pint, t, v
+function WallHandler(attrs){
 	//a trap!  If you make it isothermal, you must specify a temperature to hold at in temps list
 	if (attrs) {
 		var newWall = new Array(attrs.pts.length);
@@ -23,9 +23,8 @@ function WallHandler(attrs){//pts, handlers, handles, bounds, includes, vols, sh
 		var newWall = new Array();
 	}
 	_.extend(newWall, WallMethods.main, WallMethods.collideMethods);
-	//addListener(curLevel, 'sectionCleanUp', 'walls', newWall.remove, newWall)
 	newWall.defaultCol = Col(255, 255, 255);
-	if (attrs) {//Yo yo, you can just do new WallHander() and then add walls
+	if (attrs) {
 		newWall.assemble(attrs);//pts, handles, bounds, includes, vols, shows, records)
 		if (attrs.handles.length!=attrs.pts.length) {
 			console.log('NAME YOUR WALLS');
@@ -44,7 +43,7 @@ WallMethods = {}
 //////////////////////////////////////////////////////////////////////////	
 WallMethods.main = {
 
-	assemble: function(attrs){//pts, handles, bounds, includes, vols, shows, records){
+	assemble: function(attrs){//pts, handles, bounds, vols, shows, records){
 		this.removed = false;
 		var pts = attrs.pts;
 		var handles = attrs.handles;
@@ -54,14 +53,13 @@ WallMethods.main = {
 		this.qArrowFill = Col(200, 0, 0);
 		this.qArrowFillFinal = Col(100, 0, 0);
 		this.qArrowStroke = Col(255, 255, 255);
-		var includes = defaultTo([], attrs.includes);
 		var bounds = defaultTo([], attrs.bounds);
 		var vols = defaultTo([], attrs.vols);
 		var shows = defaultTo([], attrs.shows);
 		var records = defaultTo([], attrs.records);
 		var tSets = defaultTo([], attrs.temps);
 		for (var wallIdx=0; wallIdx<pts.length; wallIdx++){
-			this.setWallVals(wallIdx, pts[wallIdx], handles[wallIdx], bounds[wallIdx], includes[wallIdx], vols[wallIdx], shows[wallIdx], records[wallIdx], tSets[wallIdx]);
+			this.setWallVals(wallIdx, pts[wallIdx], handles[wallIdx], bounds[wallIdx], vols[wallIdx], shows[wallIdx], records[wallIdx], tSets[wallIdx]);
 
 		}
 		
@@ -169,13 +167,11 @@ WallMethods.main = {
 		}
 		return wallGrid;
 	},
-	setWallVals: function(wallIdx, pts, handle, bounds, include, vol, show, record, tSet, col, dotMgr, close, isothermalRate){
+	setWallVals: function(wallIdx, pts, handle, bounds, vol, show, record, tSet, col, dotMgr, close, isothermalRate){
 		bounds = {min: P(0, bounds && bounds.yMin ? bounds.yMin : 30), max: P(0, bounds && bounds.yMax ? bounds.yMax : 435)};
-		include = defaultTo(1, include);
 		this[wallIdx] = pts;
 		_.extend(this[wallIdx], WallMethods.wall, WallMethods.wallDataHandler);	
 		this[wallIdx].handle = handle;
-		this[wallIdx].include = include;
 		this[wallIdx].hitMode = 'Std';
 		this[wallIdx].v = 0;
 		this[wallIdx].bounds = bounds;
@@ -220,7 +216,7 @@ WallMethods.main = {
 	addWall: function(attrs){
 		this.numWalls++;
 		var newIdx = this.length;
-		this.setWallVals(newIdx, attrs.pts, attrs.handle, attrs.bounds, attrs.include, attrs.vol, attrs.show, attrs.record, attrs.temp, attrs.col, attrs.dotManager, attrs.close, attrs.isothermalRate);
+		this.setWallVals(newIdx, attrs.pts, attrs.handle, attrs.bounds, attrs.vol, attrs.show, attrs.record, attrs.temp, attrs.col, attrs.dotManager, attrs.close, attrs.isothermalRate);
 		this.setupWall(newIdx);
 		this.setWallHandler(newIdx, attrs.handler);
 		if (attrs.border) this[newIdx].addBorder(attrs.border);
@@ -417,13 +413,6 @@ WallMethods.main = {
 		
 		
 	},
-	//is this used?
-	assignRecording: function(data) {
-		for (var dataSet in data) data.recording = false;
-	},
-	assignDisplaying: function(data) {
-		for (var dataSet in data) data.displaying = false;
-	},
 	////////////////////////////////////////////////////////////
 	//END
 	////////////////////////////////////////////////////////////
@@ -437,13 +426,6 @@ WallMethods.main = {
 	},
 	
 	//One wall, assuming first/last points do not overlap
-	totalVolume: function(){
-		var area=0;
-		for (var wallIdx=0; wallIdx<this.length; wallIdx++){
-			area+=this[wallIdx].include*this.wallArea(wallIdx);
-		}
-		return area*vConst;
-	},
 	wallVolume: function(wallInfo){
 		return this.area(this[wallInfo].slice(0,this[wallInfo].length-1))*vConst;
 	},

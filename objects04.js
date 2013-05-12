@@ -270,9 +270,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 					if (self.addEnergyToDots(window.dotManager.lists.ALLDOTS, self.energyForDots)) {
 						self.energyForDots = 0;
 					}
-					if (0 < self.Cp && self.Cp < 2.5) {
-						fixLiquidTemp();
-					}
 				})
 				
 			} 
