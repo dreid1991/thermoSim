@@ -663,14 +663,15 @@ _.extend(Liquid.prototype, objectFuncs, {
 		wallGas.setBounds(undefined, this.wallLiq[0]);
 		var boundFunc = function(wallGas, unboundedY, boundY) {
 			var wallGasY = wallGas[0].y;
-			var wallGasVelocity = wallGas.v;
+			var wallGasVelocity = wallGas.vs[0].dy;
 			var liqY = this.wallLiq[0].y;
 			var wallGasMass = wallGas.mass;
 		
 			
 			//1 simUnit * (2/3) <for 2d to 3d> * tConst * 3/2 KB = joules
 			var energy = (.5 * wallGasMass * wallGasVelocity * wallGasVelocity + wallGasMass * window.g * (boundY - wallGasY)) * window.tConst * window.KB
-			wallGas.v = 0;
+			wallGas.vs[0].dy = 0;
+			wallGas.vs[1].dy = 0;
 			this.temp += energy / this.Cp;
 			return boundY;
 		}

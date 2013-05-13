@@ -240,7 +240,11 @@ Vector.prototype = {
 	},
 	isValid: function() {
 		return this.dx!==undefined && !isNaN(this.dx) && this.dy!==undefined && !isNaN(this.dy);
-	}
+	},
+	zero: function() {
+		this.x = 0;
+		this.y = 0;
+	},
 }
 Color.prototype = {
 	adjust: function(dr, dg, db){

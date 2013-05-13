@@ -41,7 +41,7 @@ WallMethods.collideMethods ={
 		var dotVyF;
 		var vo = dot.v.copy();
 		var vo1 = dot.v.dy;
-		var vo2 = wall.v;
+		var vo2 = wall.vs[subWallIdx].dy;
 		var m1 = dot.m;
 		var m2 = wall.mass;
 		var absWallV = Math.abs(vo2);
@@ -60,11 +60,13 @@ WallMethods.collideMethods ={
 			
 			dotVyF = (-b + Math.sqrt(b*b - 4*a*c))/(2*a);
 			dot.y = dot.y+dot.r;
-			wall.v = (m1*vo1 + m2*vo2 - m1*dotVyF)/(m2*scalar);
+			wall.vs[0].dy = (m1*vo1 + m2*vo2 - m1*dotVyF)/(m2*scalar);
+			wall.vs[1].dy = wall.vs[0].dy;
 		} else {
 			var pt = wall[subWallIdx];
 			dotVyF = (vo1*(m1-m2)+2*m2*vo2)/(dot.m+m2);
-			wall.v = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
+			wall.vs[0].dy  = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
+			wall.vs[1].dy  = wall.vs[0].dy;
 			dot.y = pt.y+dot.r;			
 		}
 		var KEF = .5 * dot.m * (dot.v.dx * dot.v.dx + dotVyF * dotVyF);
@@ -84,12 +86,13 @@ WallMethods.collideMethods ={
 		var dotVyF;
 		var vo = dot.v.copy();
 		var vo1 = dot.v.dy;
-		var vo2 = wall.v;
+		var vo2 = wall.vs[subWallIdx].dy;
 		var m1 = dot.m;
 		var m2 = wall.mass;
 		var pt = wall[subWallIdx];
 		dotVyF = (vo1*(m1-m2)+2*m2*vo2)/(dot.m+m2);
-		wall.v = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
+		wall.vs[0].dy = (vo2*(m2-m1)+2*m1*vo1)/(m2+m1);
+		wall.vs[1].dy = wall.vs[0].dy;
 		dot.y = pt.y+dot.r;		
 		var ratio = Math.sqrt((KEO + 2 * (KEF - KEO) / 3) / KEF);
 		dotVyF *= ratio;
@@ -132,7 +135,8 @@ WallMethods.collideMethods ={
 		The heat capacity adjustment can lead to the dot's speed converging to the wall's speed, which makes it constantly hit the wall and look funny
 		It behaves fine in a many-molecule case, but in this case, just doing an elastic collision is better
 		*/
-		dot.v.dy = -dot.v.dy + 2 * wall.v;
+		//walls only move in y right now...
+		dot.v.dy = -dot.v.dy + 2 * wall.vs[subWallIdx].dy;
 		
 	},
 	reflect: function(dot, wallUV, perpV){

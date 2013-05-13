@@ -173,7 +173,7 @@ WallMethods.main = {
 		_.extend(this[wallIdx], WallMethods.wall, WallMethods.wallDataHandler);	
 		this[wallIdx].handle = handle;
 		this[wallIdx].hitMode = 'Std';
-		this[wallIdx].v = 0;
+		this[wallIdx].vs = this.makeWallVs(pts);
 		this[wallIdx].bounds = bounds;
 		this[wallIdx].dotManager = dotMgr || dotManager; //global gas dot manager
 		if (vol) {
@@ -224,6 +224,13 @@ WallMethods.main = {
 		if (attrs.hitMode) this[newIdx].setHitMode(attrs.hitMode);
 		return this[newIdx];
 		
+	},
+	makeWallVs: function(pts) {
+		var vs = [];
+		for (var i=0; i<pts.length; i++) {
+			vs.push(V(0, 0));
+		}
+		return vs;
 	},
 	setPtsInit: function(){
 		for (var wallIdx=0; wallIdx<this.length; wallIdx++){

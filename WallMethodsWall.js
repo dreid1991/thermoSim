@@ -27,7 +27,7 @@ WallMethods.wall = {
 			this[ptIdx].y = init[ptIdx].y;//Must copy by value to keep point object the same since things follow the points
 		}
 		this.forceInternal = 0;
-		this.v = 0;
+		for (var i=0; i<this.vs.length; i++) this.vs[i].zero();
 		this.parent.setupWall(this.parent.indexOf(this));
 	},
 	setVol: function(vol){
@@ -38,7 +38,6 @@ WallMethods.wall = {
 	volToY: function(vol) {
 		var width = this[2].distTo(this[3]);
 		var height = vol/(vConst*width);
-		var extendUV = this[2].VTo(this[3]).UV().perp('cw');
 		return this[2].y - height;
 	},
 	changeSetPt: function(dest, compType, speed){
@@ -48,26 +47,28 @@ WallMethods.wall = {
 			var wallMoveMethod = 'cVAdiabatic';
 		}
 		removeListener(curLevel, 'wallMove', 'cV' + this.handle);
-		var setY = function(curY){
-			this[0].y = curY;
-			this[1].y = curY;
-			this[this.length-1].y = curY;
+		var setY = function(wall, curY){
+			wall[0].y = curY;
+			wall[1].y = curY;
+			wall[wall.length-1].y = curY;
 		}
 		var y = this[0].y
 		var dist = dest-y;
 		if (dist!=0) {
 			var sign = getSign(dist);
-			this.v = speed*sign;
+			this.vs[0].dy = speed*sign;
+			this.vs[1].dy = speed*sign;
 			this.parent.setSubWallHandler(this.handle, 0, wallMoveMethod);
 			addListener(curLevel, 'wallMove', 'cV' + this.handle,
 				function(){
 					var y = this[0].y
-					setY.apply(this, [stepTowards(y, dest, this.v)])
+					setY(wall, stepTowards(y, dest, this.vs[0].dy));
 					this.parent.setupWall(this.handle);
 					if(round(y,2)==round(dest,2)){
 						removeListener(curLevel, 'wallMove', 'cV' + this.handle);
 						this.parent.setSubWallHandler(this.handle, 0, 'staticAdiabatic');
-						this.v = 0;
+						this.vs[0].dy = 0;
+						this.vs[1].dy = 0;
 					}
 				},
 			this);
@@ -86,7 +87,7 @@ WallMethods.wall = {
 			function(){
 				var lastY = this[0].y
 				var nextY;
-				var unboundedY = lastY + this.v + .5*gLocal;
+				var unboundedY = lastY + this.vs[0].dy + .5*gLocal;
 				var dyWeight = null;
 				if (unboundedY<lowBound || unboundedY>highBound) {
 					this.moveStop();
@@ -102,7 +103,8 @@ WallMethods.wall = {
 					nextY = this.hitBounds(lastY, gLocal, bounds.min.y, bounds.max.y);
 				} else {
 					nextY = unboundedY;
-					this.v += gLocal;
+					this.vs[0].dy += gLocal;
+					this.vs[1].dy += gLocal;
 
 				}
 				this[0].y = nextY;
@@ -121,7 +123,7 @@ WallMethods.wall = {
 			function(){
 				var lastY = this[0].y
 				var nextY;
-				var unboundedY = lastY + this.v + .5*gLocal;
+				var unboundedY = lastY + this.vs[0].dy + .5*gLocal;
 				var dyWeight = null;
 				if (unboundedY>bounds.max.y) {
 					//want a list of things to do.  Want an *option* for if to do standard hitBounds.  Add like {func:, obj:, replaceStd: }
@@ -148,7 +150,8 @@ WallMethods.wall = {
 					if (useStdBound) nextY = this.hitBounds(lastY, gLocal, bounds.min.y, bounds.max.y);
 				} else {
 					nextY = unboundedY;
-					this.v += gLocal;
+					this.vs[0].dy += gLocal;
+					this.vs[1].dy += gLocal;
 
 				}
 				this[0].y = nextY;
@@ -178,36 +181,41 @@ WallMethods.wall = {
 		}
 	},
 	moveStop: function(){
-		this.v = 0;
+		this.vs[0].dy = 0;
+		this.vs[1].dy = 0;
 		removeListener(curLevel, 'wallMove', 'cP' + this.handle);
 		removeListener(curLevel, 'wallMove', 'releaseWithBounds' + this.handle);
 	},
 	hitBounds: function(lastY, gLocal, yMin, yMax){
 		var tLeft = 1;
-		var unboundedY = lastY + this.v*tLeft + .5*gLocal*tLeft*tLeft;
+		var dy = this.vs[0].dy;
+		var unboundedY = lastY + dy*tLeft + .5*gLocal*tLeft*tLeft;
 		var boundedY = Math.max(yMin, Math.min(yMax, unboundedY));
-		var discr = this.v*this.v + 2*gLocal*(boundedY-lastY);
+		var discr = dy*dy + 2*gLocal*(boundedY-lastY);
 		if (boundedY==yMax){
 			
-			var tHit = (-this.v + Math.sqrt(discr))/gLocal;
+			var tHit = (-dy + Math.sqrt(discr))/gLocal;
 
-		}else if (boundedY==yMin){
+		} else if (boundedY==yMin) {
 			
-			var tHit = (-this.v - Math.sqrt(discr))/gLocal;
+			var tHit = (-dy - Math.sqrt(discr))/gLocal;
 		}
-		this.v+=gLocal*tHit;
-		this.v*=-1;
+		this.vs[0].dy+=gLocal*tHit;
+		this.vs[1].dy+=gLocal*tHit;
+		this.vs[0].dy*=-1;
+		this.vs[1].dy*=-1;
 		tLeft-=tHit;
-		
-		if(-2*this.v< tLeft*gLocal && this.v<0){
-			var tBounce = Math.abs(2*this.v/gLocal);
+		dy = this.vs[0].dy;
+		if(-2*dy< tLeft*gLocal && dy<0){
+			var tBounce = Math.abs(2*dy/gLocal);
 			var numBounces = Math.floor(tLeft/tBounce);
 			tLeft-=numBounces*tBounce;
 		}
-		var nextY = boundedY + this.v*tLeft + .5*gLocal*tLeft*tLeft;
+		var nextY = boundedY + dy*tLeft + .5*gLocal*tLeft*tLeft;
  
 		
-		this.v += gLocal*tLeft;
+		this.vs[0].dy += gLocal*tLeft;
+		this.vs[1].dy += gLocal*tLeft;
 		
 		return nextY;
 	},
@@ -369,10 +377,16 @@ WallMethods.wall = {
 			oldHandlers.push(this.parent.getSubWallHandler(idx, spliceIdx))
 		}
 		var oldPts = this.concat();
-		var newPts = oldPts.slice(0, spliceIdx).concat(toAdd, oldPts.slice(spliceIdx, oldPts.length));
-		for (var ptIdx=0; ptIdx<newPts.length; ptIdx++) {
-			this[ptIdx] = newPts[ptIdx];
-		}
+		var toAddVs = [];
+		for (var i=0; i<toAdd.length; i++) toAddVs.push(V(0, 0));
+		var vSpliceArgs = [spliceIdx, 0].concat(toAddVs);
+		var ptSpliceArgs = [spliceIdx, 0].concat(toAdd);
+		Array.prototype.splice.apply(this, ptSpliceArgs);
+		Array.prototype.splice.apply(this.vs, vSpliceArgs);
+		// var newPts = oldPts.slice(0, spliceIdx).concat(toAdd, oldPts.slice(spliceIdx, oldPts.length));
+		// for (var ptIdx=0; ptIdx<newPts.length; ptIdx++) {
+			// this[ptIdx] = newPts[ptIdx];
+		// }
 		for (var movedPtIdx=spliceIdx + toAdd.length; movedPtIdx<this.length; movedPtIdx++) {
 			this.parent.setSubWallHandler(this.handle, movedPtIdx, oldHandlers[movedPtIdx - toAdd.length - spliceIdx]);
 		}
@@ -390,6 +404,7 @@ WallMethods.wall = {
 			handlers.push(this.parent.getSubWallHandler(idx, toMoveIdx));
 		}
 		this.splice(spliceIdx, num);
+		this.vs.splice(splice, num);
 		for (var subWallIdx=spliceIdx; subWallIdx<this.length; subWallIdx++) {
 			this.parent.setSubWallHandler(idx, subWallIdx, handlers[subWallIdx-spliceIdx]);
 		}
