@@ -375,7 +375,7 @@ Point.prototype = {
 		return this;
 	},
 	rotate: function(around, rad){
-		var origin = V(around.x, around.y)
+		var origin = new Vector(around.x, around.y)
 		this.movePt(origin.copy().neg());
 		var x = this.x;
 		var y = this.y;

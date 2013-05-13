@@ -230,6 +230,7 @@ WallMethods.main = {
 		for (var i=0; i<pts.length; i++) {
 			vs.push(V(0, 0));
 		}
+		vs.push(vs[0]);
 		return vs;
 	},
 	setPtsInit: function(){
@@ -348,8 +349,48 @@ WallMethods.main = {
 		
 	},
 	checkWallHit: function(dot, wall, wallPt, wallPtIdx){
+		//doing all this new Point and Vector business to take out one function call
 		var wallUV = wall.wallUVs[wallPtIdx];
-		var perpUV = wall.wallPerpUVs[wallPtIdx]
+		var perpUV = wall.wallPerpUVs[wallPtIdx];
+		//this is to make the walls two-sided.  It sort of works
+		// var dotToWall = new Vector(wallPt.x - dot.x, wallPt.y - dot.y);
+		// var dotProdToWall = dotToWall.dx * perpUV.dx + dotToWall.dy * perpUV.dy;
+		// var sign = Math.abs(dotProdToWall) / dotProdToWall;
+		// if (sign * dotProdToWall < dot.r) {
+			// //makes it so it definitely hits if we're closer than r
+			// var dotProdNext = -dotProdToWall;
+		// } else {
+			// var dotEdgePt;
+			// if (dotProdToWall >= 0) {
+				// dotEdgePt = new Point(dot.x + perpUV.dx * dot.r, dot.y + perpUV.dy * dot.r)
+			// } else {
+				// dotEdgePt = new Point(dot.x - perpUV.dx * dot.r, dot.y - perpUV.dy * dot.r)
+			// }
+			// var wallANext = new Point(wallPt.x + wall.vs[wallPtIdx].dx, wallPt.y + wall.vs[wallPtIdx].dy);
+			// var wallBNext = new Point(wall[wallPtIdx + 1].x + wall.vs[wallPtIdx + 1].dx, wall[wallPtIdx + 1].y + wall.vs[wallPtIdx + 1].dy);
+			// var edgePtNext = new Point(dotEdgePt.x + dot.v.dx, dotEdgePt.y + dot.v.dy);
+			// var dx = wallBNext.x - wallANext.x;
+			// var dy = wallBNext.y - wallANext.y;
+			// var mag = Math.sqrt(dx * dx + dy * dy);
+			// //hello.  If you even change the direction that perp wall UVs are taken, this will break.
+			// var dotToWallNext = new Vector(wallANext.x - edgePtNext.x, wallANext.y - edgePtNext.y);
+			// var perpNext = new Vector(-dy / mag, dx / mag);
+			// var dotProdNext = dotToWallNext.dx * perpNext.dx + dotToWallNext.dy * perpNext.dy;
+		// }
+		
+		// if (dotProdToWall * dotProdNext <=0 && this.isBetween(dot, wall, wallPtIdx, wallUV)) {
+	
+			// var perpV = -perpUV.dx * dot.v.dx - perpUV.dy * dot.v.dy;
+			// var dxo = dot.v.dx;
+			// var dyo = dot.v.dy;
+			// var tempo = dot.temp();
+			// this['didHit' + wall.hitMode](dot, wall, wallPtIdx, wallUV, perpV, perpUV);
+			// return true;
+		// } else {
+			// return false;
+		// }
+		
+		
 		var dotVec = V(dot.x + dot.v.dx - perpUV.dx*dot.r - wallPt.x, dot.y + dot.v.dy - perpUV.dy*dot.r - wallPt.y);
 		var distFromWall = perpUV.dotProd(dotVec);
 		var perpV = -perpUV.dotProd(dot.v);

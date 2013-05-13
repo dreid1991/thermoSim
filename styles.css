@@ -197,7 +197,7 @@ table.data td {
 .sim.base{
 	padding-top:1em;
 	display:inline-block;
-	width:750px;
+	width:550px;
 }
 .sim.answerDiv{
 	color:white;
@@ -212,6 +212,10 @@ table.data td {
 	color:white;
 	float:right;
 	display:inline-block;
+}
+
+table.tableWrapper{
+	border-spacing: 0px;
 }
 
 table.tableBorder, tr.tableBorder, td.tableBorder {
