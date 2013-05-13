@@ -104,9 +104,9 @@ WallMethods.main = {
 		for (var subWallIdx=0; subWallIdx<this[wallIdx].length; subWallIdx++){
 			var subWall = this[wallIdx][subWallIdx];
 			if (typeof handler == 'string') {
-				this[wallIdx + '-' + subWallIdx] = {obj: this, func: this[handler]};
+				this[wallIdx].handlers[subWallIdx] = {obj: this, func: this[handler]};
 			} else if (typeof handler == 'object') {
-				this[wallIdx + '-' + subWallIdx] = handler;
+				this[wallIdx].handlers[subWallIdx] = handler;
 			}
 			//this.setSubWallHandler(wallIdx, subWallIdx, handler);
 		}
@@ -116,9 +116,9 @@ WallMethods.main = {
 		if (typeof handler == 'string') {
 			this[wallIdx][subWallIdx].isothermal = /isothermal/i.test(handler); 
 			
-			this[wallIdx + '-' + subWallIdx] = {obj: this, func: this[handler]};
+			this[wallIdx].handlers[subWallIdx] = {obj: this, func: this[handler]};
 		} else if (typeof handler == 'object') {
-			this[wallIdx + '-' + subWallIdx] = handler;
+			this[wallIdx].handlers[subWallIdx] = handler;
 		}		
 	},
 	getSubWallHandler: function(wallInfo, subWallIdx) {
@@ -190,6 +190,7 @@ WallMethods.main = {
 		this[wallIdx].liquids = {};
 		this[wallIdx].data = {};
 		this[wallIdx].q = 0;
+		this[wallIdx].handlers = [];
 		this[wallIdx].pIntLen = 35;
 		this[wallIdx].surfAreaAdj = {};
 		this[wallIdx].eToAdd = 0;
@@ -313,50 +314,51 @@ WallMethods.main = {
 	
 		for (var dotIdx=0; dotIdx<dots.length; dotIdx++){
 			var dot = dots[dotIdx];
-			var checkedWalls = [];
+			var checkedWallIdxs = [];
+			var checkedSubWallIdxs = [];
 			var gridX = Math.floor(dot.x/gridDim);
 			var gridY = Math.floor(dot.y/gridDim);
-			//HEY - DO TESTING TO FIGURE OUT IF SHOULD DEFINED Math.min(gridspot...) OR CALCULATE EACH TIME
-			for (var x=Math.max(gridX-1, 0), xCeil=Math.min(gridX+1, xSpan)+1; x<xCeil; x++){
-				for (var y=Math.max(gridY-1, 0), yCeil=Math.min(gridY+1, ySpan)+1; y<yCeil; y++){
-					
-					for (var wallIdx=0; wallIdx<this.length; wallIdx++){
-						var gridSquare = this[wallIdx].wallGrids[x][y];
-
-						for (var lineIdx=0; lineIdx<gridSquare.length; lineIdx++){
-							var line = gridSquare[lineIdx];
-							if (this.haveChecked([wallIdx, line], checkedWalls)===false){
-								//add if hit, break out of this dot's loops
-								this.checkWallHit(dot, [wallIdx, line]);
-								checkedWalls.push([wallIdx, line]);
+			gridLoop:
+				for (var x=Math.max(gridX-1, 0), xCeil=Math.min(gridX+1, xSpan)+1; x<xCeil; x++){
+					for (var y=Math.max(gridY-1, 0), yCeil=Math.min(gridY+1, ySpan)+1; y<yCeil; y++){
+						
+						for (var wallIdx=0; wallIdx<this.length; wallIdx++){
+							var gridSquare = this[wallIdx].wallGrids[x][y];
+							
+							for (var lineIdx=0; lineIdx<gridSquare.length; lineIdx++){
+								var line = gridSquare[lineIdx];
+								if (this.haveChecked(wallIdx, line, checkedWallIdxs, checkedSubWallIdxs)===false){
+									//add if hit, break out of this dot's loops
+									if (this.checkWallHit(dot, this[wallIdx], this[wallIdx][line], line) === true) break gridLoop;
+									checkedWallIdxs.push(wallIdx);
+									checkedSubWallIdxs.push(line);
+								}
 							}
 						}
 					}
 				}
-			}
 		}
 		
 	},
-	checkWallHit: function(dot, line){
-		var wallIdx = line[0];
-		var subWallIdx = line[1];
-		var wallPt = this[wallIdx][subWallIdx];
-		var wallUV = this[wallIdx].wallUVs[subWallIdx];
-		var perpUV = this[wallIdx].wallPerpUVs[subWallIdx]
+	checkWallHit: function(dot, wall, wallPt, wallPtIdx){
+		var wallUV = wall.wallUVs[wallPtIdx];
+		var perpUV = wall.wallPerpUVs[wallPtIdx]
 		var dotVec = V(dot.x + dot.v.dx - perpUV.dx*dot.r - wallPt.x, dot.y + dot.v.dy - perpUV.dy*dot.r - wallPt.y);
 		var distFromWall = perpUV.dotProd(dotVec);
 		var perpV = -perpUV.dotProd(dot.v);
-		var hitMode = this[line[0]].hitMode;
-		if (distFromWall<0 && distFromWall>-30 && this.isBetween(dot, wallIdx, subWallIdx, wallUV)){
-			this['didHit'+hitMode](dot, wallIdx, subWallIdx, wallUV, perpV, perpUV);
+		var hitMode = wall.hitMode;
+		if (distFromWall<0 && distFromWall>-15 && this.isBetween(dot, wall, wallPtIdx, wallUV)){
+			this['didHit'+hitMode](dot, wall, wallPtIdx, wallUV, perpV, perpUV);
+			return true;
 		}
+		return false;
 	},
-	isBetween: function(dot, wallIdx, subWallIdx, wallUV){
+	isBetween: function(dot, wall, wallPtIdx, wallUV){
 		var wallAdjust = dot.v.dotProd(wallUV);
 		var xAdj = wallAdjust*wallUV.dx;
 		var yAdj = wallAdjust*wallUV.dy;
-		var wallPtA = P(walls[wallIdx][subWallIdx].x+xAdj, walls[wallIdx][subWallIdx].y+yAdj);
-		var wallPtB = P(walls[wallIdx][subWallIdx+1].x+xAdj, walls[wallIdx][subWallIdx+1].y+yAdj);
+		var wallPtA = P(wall[wallPtIdx].x+xAdj, wall[wallPtIdx].y+yAdj);
+		var wallPtB = P(wall[wallPtIdx+1].x+xAdj, wall[wallPtIdx+1].y+yAdj);
 		var reverseWallUV = V(-wallUV.dx, -wallUV.dy);
 		var dotVecA = V(dot.x-wallPtA.x, dot.y-wallPtA.y);
 		var dotVecB = V(dot.x-wallPtB.x, dot.y-wallPtB.y);
@@ -365,35 +367,35 @@ WallMethods.main = {
 	////////////////////////////////////////////////////////////
 	//WALL HIT HANDLER WRAPPERS
 	////////////////////////////////////////////////////////////		
-	didHitStd: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV) {
-		var handler = this[wallIdx + '-' + subWallIdx];
-		handler.func.apply(handler.obj, [dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);		
+	didHitStd: function(dot, wall, subWallIdx, wallUV, perpV, perpUV) {
+		var handler = wall.handlers[subWallIdx];
+		handler.func.apply(handler.obj, [dot, wall, subWallIdx, wallUV, perpV, perpUV]);		
 	},
-	didHitArrowDV: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV) {
+	didHitArrowDV: function(dot, wall, subWallIdx, wallUV, perpV, perpUV) {
 		var vo = dot.v.copy();
-		var handler = this[wallIdx + '-' + subWallIdx];
-		handler.func.apply(handler.obj, [dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
+		var handler = wall.handlers[subWallIdx];
+		handler.func.apply(handler.obj, [dot, wall, subWallIdx, wallUV, perpV, perpUV]);
 		var pos = P(dot.x, dot.y);
 		var vf = dot.v.copy();
 		var perpVf = -perpUV.dotProd(dot.v);
 		this.drawArrowV(pos, vo, vf, perpV, perpVf);  
 	},
-	didHitArrowSpd: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV) {
+	didHitArrowSpd: function(dot, wall, subWallIdx, wallUV, perpV, perpUV) {
 		var vo = dot.v.copy();
-		var handler = this[wallIdx + '-' + subWallIdx];
-		handler.func.apply(handler.obj, [dot, wallIdx, subWallIdx, wallUV, perpV, perpUV]);
+		var handler = wall.handlers[subWallIdx];
+		handler.func.apply(handler.obj, [dot, wall, subWallIdx, wallUV, perpV, perpUV]);
 		var pos = P(dot.x, dot.y);
 		var vf = dot.v.copy();
 		var perpVf = -perpUV.dotProd(dot.v);
 		this.drawArrowSpd(pos, vo, vf, perpV, perpVf);  
 	},
-	didHitGravity: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV) {
-		var handler = this[wallIdx + '-' + subWallIdx];
+	didHitGravity: function(dot, wall, subWallIdx, wallUV, perpV, perpUV) {
+		var handler = wall.handlers[subWallIdx];
 		if (wallUV.dx!=0) {
 			var yo = dot.y;
 			var dyo = dot.v.dy;
 		}
-		handler.func.apply(handler.obj, [dot, wallIdx, subWallIdx, wallUV, perpV, perpUV])
+		handler.func.apply(handler.obj, [dot, wall, subWallIdx, wallUV, perpV, perpUV])
 		if (wallUV.dx!=0) {
 			//v^2 = vo^2 + 2ax;
 			var discrim = dot.v.dy*dot.v.dy + 2*gInternal * (dot.y-yo);
@@ -416,9 +418,9 @@ WallMethods.main = {
 	////////////////////////////////////////////////////////////
 	//END
 	////////////////////////////////////////////////////////////
-	haveChecked: function(wall, list) {
-		for (var listIdx=0; listIdx<list.length; listIdx++){
-			if (list[listIdx][0]==wall[0] && list[listIdx][1]==wall[1]) {
+	haveChecked: function(wallIdx, subWallIdx, wallIdxs, subWallIdxs) {
+		for (var i=0; i<wallIdxs.length; i++){
+			if (wallIdxs[i]==wallIdx && subWallIdxs[i]==subWallIdx) {
 				return true;
 			}
 		}

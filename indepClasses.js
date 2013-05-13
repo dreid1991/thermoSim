@@ -28,6 +28,7 @@ function Dot(x, y, v, spcName, tag, elemId, returnTo) {
 	//btdubs, try to be type-safe with members so V8 can optimize dot
 	this.hF298 = defaultTo(0, def.hF298 * 1000 / N);
 	this.hVap298 = defaultTo(0, def.hVap298 * 1000 / N);
+	this.sF298 = defaultTo(0, def.sF298 * 1000 / N);
 	this.cvKinetic = 1.5 * R / N;
 	this.cv = def.cv / N;
 	this.cp = this.cv + R;
@@ -50,7 +51,7 @@ function Dot(x, y, v, spcName, tag, elemId, returnTo) {
 	this.active = true;
 }
 //{spcName: 'spc1', m: 2, r: 1, col: Col(200, 0, 0), cv: 2.5 * R, hF: -10, hVap: 40, cvLiq: 12},
-function Species (spcName, mass, radius, color, idNum, cv, hF298, hVap298, antoineCoeffs, cpLiq, spcVolLiq, dotManager) {
+function Species (spcName, mass, radius, color, idNum, cv, hF298, hVap298, sF298, antoineCoeffs, cpLiq, spcVolLiq, dotManager) {
 	this.spcName = spcName;
 	this.m = mass;
 	this.r = radius;
@@ -60,6 +61,7 @@ function Species (spcName, mass, radius, color, idNum, cv, hF298, hVap298, antoi
 	this.cp = cv + R;
 	this.hF298 = hF298;
 	this.hVap298 = hVap298;
+	this.sF298 = sF298;
 	this.antoineCoeffs = antoineCoeffs;
 	this.cpLiq = cpLiq;
 	this.spcVolLiq = spcVolLiq;

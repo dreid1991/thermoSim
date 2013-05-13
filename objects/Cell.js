@@ -19,27 +19,29 @@ function Cell(attrs) {
 	this.type = 'Cell';
 	this.handle = attrs.handle;
 	var initPos = attrs.pos; // upper left corner
-	var thickness = attrs.thickness || 30;
-	var numCorners = 8;
+	var thickness = Math.max(16, attrs.thickness || 16);
+	this.nodeMass = attrs.nodeMass || 40;
+	var numCorners = 4;
 	var initRadius = attrs.rad;
 	var membraneColor = attrs.col;
 	var initDots = attrs.dots; //will need to work out timeline integration somehow OR just have dots clean up with membrane.  I don't think there are many reasonable cases where that will cause problems
-	this.guideNodes = this.makeGuideNodes(initPos, initRadius, numCorners);
+	this.guideNodes = this.makeGuideNodes(initPos, initRadius, numCorners, this.nodeMass);
 	var outerWallPts = this.makeOuterWallPts(this.guideNodes, thickness);
 	var innerWallPts = this.makeInnerWallPts(this.guideNodes, thickness);
-	this.innerWall = walls.addWall({pts: innerWallPts, handle: this.handle + 'inner', handler: 'staticAdiabatic', show: true, record: false, col: Col(255, 0,0 )});
 	this.outerWall = walls.addWall({pts: outerWallPts, handle: this.handle + 'outer', handler: 'staticAdiabatic', show: true, record: false, col: Col(0, 255, 0)});
+	this.innerWall = walls.addWall({pts: innerWallPts, handle: this.handle + 'inner', handler: 'staticAdiabatic', show: true, record: false, col: Col(255, 0,0 )});
+	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall);
 }
 
 _.extend(Cell.prototype, objectFuncs, {
-	makeGuideNodes: function(pos, radius, numCorners) {
+	makeGuideNodes: function(pos, radius, numCorners, nodeMass) {
 		center = pos.copy().movePt(V(radius, radius));
 		var guideNodes = [];
 		var angle = 0;
 		var anglePerStep = 2 * Math.PI / numCorners;
 		for (var i=0; i<numCorners; i++) {
 			var nodePos = P(center.x + radius * Math.cos(angle), center.y + radius * Math.sin(angle));
-			guideNodes.push(new Cell.GuideNode(nodePos));
+			guideNodes.push(new Cell.GuideNode(nodePos, nodeMass));
 			angle += anglePerStep;
 		}
 		for (var i=0; i<guideNodes.length; i++) {
@@ -75,6 +77,26 @@ _.extend(Cell.prototype, objectFuncs, {
 
 		return pts;	
 	},
+	assignWallHandlers: function(guideNodes, innerWall, outerWall) {
+		var walls = [innerWall, outerWall];
+		for (var wallIdx=0; wallIdx<walls.length; wallIdx++) {
+			var wall = walls[wallIdx];
+			for (var i=0; i<wall.length - 1; i++) {
+				
+				var nodeA = _.find(guideNodes, function(node) {node.innerWallIdx == i});
+				var nodeBWallIdx = i == wall.length - 2 ? 0 : i + 1;
+				var nodeB = _.find(guideNodes, function(node) {node.innerWallIdx == nodeBWallIdx});
+				this.assignWallHandler(wall.handle, i, nodeA, nodeB);
+			}
+		}
+	},
+	assignWallHandler: function(wallHandle, subWallIdx, nodeA, nodeB) {
+		var hitFunc = function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras) {
+			
+		}
+		walls.setSubWallHandler(wallHandle, subWallIdx, {func: hitFunc, obj: this});
+	},
+	//setSubWallHandler: function(wallInfo, subWallIdx, handler) {
 	remove: function() {
 		
 	},
@@ -82,11 +104,13 @@ _.extend(Cell.prototype, objectFuncs, {
 
 });
 
-Cell.GuideNode = function(pos) {
+Cell.GuideNode = function(pos, mass) {
 	this.pos = pos;
 	//maybe give it its wall pts too
 	this.next = undefined;
 	this.prev = undefined;
+	this.m = mass;
+	this.v = V(0, 0);
 	this.innerWallIdx = undefined;
 	this.outerWallIdx = undefined;
 }
@@ -94,3 +118,4 @@ Cell.GuideNode = function(pos) {
 Cell.GuideNode.prototype = {
 
 }
+

@@ -150,7 +150,7 @@ ReactionHandler = {
 		return .5*(Math.abs(perpAB)*perpAB*a.m*a.cvKinetic + Math.abs(perpBA)*perpBA*b.m*b.cvKinetic)*this.tConst;
 		//abs will handle dots moving away from other dot
 	},
-	probFunc: function(hitE, activE) {
+	probFunc: function(hitE, activE, sF298) {
 		return hitE > activE * 1.3 ? 1 : 0;
 		//var eRel = hitE - activE;
 		//return window.BCollide * eRel * Math.exp(-window.BCollide * eRel + 1)
@@ -172,7 +172,7 @@ ReactionHandler = {
 				// rxnCnts.bb++;
 			// }
 			var hitE = this.hitE(a, b, perpAB, -perpBA);
-			if (Math.random() < this.probFunc(hitE, activeE)) {
+			if (Math.random() < this.probFunc(hitE, activeE, rxn.sF298)) {
 				if (!this.react(a, b, prods)) {
 					return this.impactStd(a, b, UVAB, perpAB, perpBA);
 				}
@@ -200,7 +200,7 @@ ReactionHandler = {
 			var probs = [];
 			var sumProbs = 0;
 			for (var rxnIdx=0; rxnIdx<rxns.length; rxnIdx++) {
-				probs[rxnIdx] = this.probFunc(hitE, rxns[rxnIdx].activeE);
+				probs[rxnIdx] = this.probFunc(hitE, rxns[rxnIdx].activeE, rxn.sF298);
 				sumProbs += probs[rxnIdx];
 			}
 			var normalFact = sumProbs > 1 ? 1 / sumProbs : 1;
@@ -287,6 +287,7 @@ ReactionHandler.Reaction = function(attrs) { //prods as {name1: count, name2, co
 		
 		this.prods = this.reformatProds(attrs.prods);
 		this.prodCount = this.countProds(this.prods);
+		this.sRxn298 = this.calcSRxn([new ReactionHandler.ReactionComponent(this.rctA, 1), new ReactionHandler.ReactionComponent(this.rctB, 1)], this.prods, this.parent.spcs); 
 
 	},
 
@@ -302,6 +303,14 @@ ReactionHandler.Reaction.prototype = {
 		this.prodCount *= 2;
 		return this;
 	},
+	calcSRxn: function(rcts, prods, spcs) {
+		var sRxn = 0;
+		//kJ/mol
+		for (var i=0; i<prods.length; i++) sRxn += spcs[prods[i].name].sF298;
+		for (var i=0; i<rcts.length; i++) sRxn -= spcs[rcts[i].name].sF298;
+		return sRxn;
+		
+	},
 	increaseProd: function(spcName, increaseBy) {
 		var isEntry = false;
 		for (var prodIdx=0; prodIdx<this.prods.length; prodIdx++) {
@@ -312,14 +321,14 @@ ReactionHandler.Reaction.prototype = {
 				break;
 			}
 		}
-		if (!isEntry) this.prods.push({name: spcName, count: increaseBy});
+		if (!isEntry) this.prods.push(new ReactionHandler.ReactionComponent(spcName, increaseBy));
 		this.prodCount += increaseBy;
 		return this;
 	},
 	reformatProds: function(prods) {
 		var reformat = [];
 		for (var name in prods) {
-			reformat.push({name:name, count:prods[name]});
+			reformat.push(new ReactionHandler.ReactionComponent(name, prods[name]));
 		}
 		return reformat;	
 	},
@@ -333,4 +342,9 @@ ReactionHandler.Reaction.prototype = {
 	remove: function() {
 		this.parent.removeRxn(this.handle);
 	}
+}
+
+ReactionHandler.ReactionComponent = function(name, count) {
+	this.name = name;
+	this.count = count;
 }
