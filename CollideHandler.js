@@ -217,7 +217,7 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 	},
 
 	setup: function(spcs){
-		this.gridSize = 2*this.getMaxR(spcs);
+		this.gridSize = Math.max(5, 2*this.getMaxR(spcs));
 		this.numCols = Math.ceil(myCanvas.width/this.gridSize+1);
 		this.numRows = Math.ceil(myCanvas.height/this.gridSize+1);
 		this.xSpan = Math.floor(myCanvas.width/this.gridSize);

@@ -30,14 +30,15 @@ function GraphScatter(attrs) {
 	this.legendFont = this.legendFontSize+ 'pt calibri';
 	this.axisValFont = this.axisValFontSize+ 'pt calibri';
 	this.borderSpacing = 70;
-
+	this.logScale = attrs.logScale ? {x: defaultTo(false, attrs.logScale.x), y: defaultTo(false, attrs.logScale.y)} : {x: false, y: false};
+	//if log 
 	this.legendWidth = 80;
 	attrs.axesFixed = attrs.axesFixed || {};
 	this.axesFixed = {x: defaultTo(false, attrs.axesFixed.x), y: defaultTo(false, attrs.axesFixed.y)}
 	this.graphRangeFrac = new GraphBase.Range(this.borderSpacing/this.dims.dx, (this.dims.dx - (this.legendWidth+8))/this.dims.dx, 1-this.borderSpacing/this.dims.dy, .05);
 	this.makeReset = attrs.makeReset;
 	this.setNumGridLinesAndSpacing(attrs.numGridLines); 
-	this.axisInit = new GraphBase.Range(axisInit.x.min, axisInit.x.min + axisInit.x.step*(this.numGridLines.x-1), axisInit.y.min, axisInit.y.min + axisInit.y.step*(this.numGridLines.y-1));
+	this.axisInit = this.setAxesInit(axisInit, this.numGridLines);
 
 
 	this.resetRanges(); //val & axis ranges set in here
@@ -53,6 +54,30 @@ function GraphScatter(attrs) {
 }
 _.extend(GraphScatter.prototype, AuxFunctions, GraphBase, 
 	{
+		setAxesInit: function(axisInit, numGridLines) {
+			var xMin, xMax, yMin, yMax;
+			
+			
+			if (this.logScale.x) {
+				var orderOfMagSpan = numGridLines.x - 1;
+				yMin = Math.pow(10, Math.floor(Math.log(axisInit.x.min) / Math.LN10));
+				yMax = min * Math.pow(10, orderOfMagSpan);
+			} else {
+				xMin = axisInit.x.min;
+				xMax = xMin + axisInit.x.step * (numGridLines.x-1)
+			}
+			
+			if (this.logScale.y) {
+				var orderOfMagSpan = numGridLines.y - 1;
+				yMin = Math.pow(10, Math.floor(Math.log(axisInit.y.min) / Math.LN10));
+				yMax = yMin * Math.pow(10, orderOfMagSpan);
+
+			} else {
+				yMin = axisInit.y.min;
+				yMax = yMin + axisInit.y.step*(numGridLines.y-1);
+			}
+			return new GraphBase.Range(xMin, xMax, yMin, yMax);
+		},
 		addSet: function(attrs){//address, label, pointCol, flashCol, data:{x:{wallInfo, data}, y:{same}}){
 			if (!this.data[attrs.handle]) {
 				var self = this;

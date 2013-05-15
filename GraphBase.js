@@ -219,8 +219,10 @@ GraphBase = {
 		draw.roundedRect(P(0,0), V(this.dims.dx, this.dims.dy), 20, this.bgCol, this.graphDisplay); 
 	},
 	drawGrid: function(){
-		for (var xGridIdx=0; xGridIdx<this.numGridLines.x; xGridIdx++){
-			var x = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing.x * xGridIdx;
+		for (var xGridIdx=0; xGridIdx<this.numGridLines.x; xGridIdx++) {
+			var xVal = this.axisRange.x.min + this.stepSize.x * xGridIdx;
+			var pos = this.valToCoord(P(xVal, 1));
+			var x = pos.x//this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing.x * xGridIdx;
 			var yEnd = this.graphRangeFrac.y.max * this.dims.dy;
 			var yAxis = this.graphRangeFrac.y.min * this.dims.dy + this.hashMarkLen;
 			var p1 = P(x, yAxis);
@@ -228,7 +230,9 @@ GraphBase = {
 			draw.line(p1, p2, this.gridCol, this.graphDisplay);
 		}
 		for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
-			var y = this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing.y *yGridIdx;
+			var yVal = this.axisRange.y.min + this.stepSize.y * yGridIdx;//this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing.y *yGridIdx;
+			var pos = this.valToCoord(P(1, yVal));
+			var y = pos.y;
 			var xEnd = this.graphRangeFrac.x.min * this.dims.dx;
 			var xAxis = this.graphRangeFrac.x.max * this.dims.dx - this.hashMarkLen;
 			var p1 = P(xAxis, y);
@@ -384,11 +388,20 @@ GraphBase = {
 		var newStepSize;
 		//axes cannot shrink.  
 		if (rangeX!=0) {
-			var unroundStepX = rangeX / (this.numGridLines.x-2);
-			var expStepX = Math.pow(10, Math.floor(Math.log10(unroundStepX)))
-			newStepSize = Math.ceil(unroundStepX / expStepX) * expStepX;
-			newBounds.min = Math.floor(this.valRange.x.min / newStepSize) * newStepSize;
-			newBounds.max = newBounds.min + (this.numGridLines.x - 1) * newStepSize;
+			if (this.logScale.x) {
+				var orderOfMagSpan = this.numGridLines.x - 1;
+				var min = Math.pow(10, Math.floor(Math.log(this.valRange.x.min) / Math.LN10));
+				var max = min * Math.pow(10, orderOfMagSpan);
+				newBounds.min = min;
+				newBounds.max = max;
+				newStepSize = 1;
+			} else {
+				var unroundStepX = rangeX / (this.numGridLines.x-2);
+				var expStepX = Math.pow(10, Math.floor(Math.log10(unroundStepX)))
+				newStepSize = Math.ceil(unroundStepX / expStepX) * expStepX;
+				newBounds.min = Math.floor(this.valRange.x.min / newStepSize) * newStepSize;
+				newBounds.max = newBounds.min + (this.numGridLines.x - 1) * newStepSize;	
+			}
 			//this.stepSize.x = Math.ceil(unroundStepX/expStepX)*expStepX;
 			//this.axisRange.x.min = Math.floor(this.valRange.x.min/this.stepSize.x)*this.stepSize.x;
 			//this.axisRange.x.max = this.axisRange.x.min + (this.numGridLines.x-1)*this.stepSize.x;
@@ -411,11 +424,20 @@ GraphBase = {
 		var newBounds = {min: undefined, max: undefined};
 		var newStepSize;
 		if (rangeY!=0) {
-			var unroundStepY = rangeY / (this.numGridLines.y-2);
-			var expStepY = Math.pow(10, Math.floor(Math.log10(unroundStepY)))
-			newStepSize = Math.ceil(unroundStepY / expStepY) * expStepY;
-			newBounds.min = Math.floor(this.valRange.y.min / newStepSize) * newStepSize;
-			newBounds.max = newBounds.min + (this.numGridLines.y-1) * newStepSize;
+			if (this.logScale.y) {
+				var orderOfMagSpan = this.numGridLines.y - 1;
+				var min = Math.pow(10, Math.floor(Math.log(this.valRange.y.min) / Math.LN10));
+				var max = min * Math.pow(10, orderOfMagSpan);
+				newBounds.min = min;
+				newBounds.max = max;
+				newStepSize = 1;
+			} else {
+				var unroundStepY = rangeY / (this.numGridLines.y-2);
+				var expStepY = Math.pow(10, Math.floor(Math.log10(unroundStepY)))
+				newStepSize = Math.ceil(unroundStepY / expStepY) * expStepY;
+				newBounds.min = Math.floor(this.valRange.y.min / newStepSize) * newStepSize;
+				newBounds.max = newBounds.min + (this.numGridLines.y-1) * newStepSize;
+			}
 		} else {
 			newBounds.min = Math.floor(this.valRange.y.min);
 			newStepSize = .2;
@@ -432,13 +454,23 @@ GraphBase = {
 			for (var xGridIdx=0; xGridIdx<this.numGridLines.x; xGridIdx++){
 				var xPos = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing.x * xGridIdx;
 				var yPos = this.graphRangeFrac.y.min * this.dims.dy + this.hashMarkLen + 10 + this.axisValFontSize/2;
-				var text = String(round(this.axisRange.x.min + this.stepSize.x * xGridIdx, 1));
+				var text;
+				if (this.logScale.x) {
+					text = this.numToAxisVal(this.axisRange.x.min * Math.pow(10, xGridIdx));
+				} else {
+					text = this.numToAxisVal(this.axisRange.x.min + this.stepSize.x * xGridIdx, 1);
+				}
 				draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', 0, this.graphDisplay);
 			}
 			for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
 				var yPos = this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing.y * yGridIdx;
 				var xPos = this.graphRangeFrac.x.min * this.dims.dx - this.hashMarkLen - 10;
-				var text = String(round(this.axisRange.y.min + this.stepSize.y*yGridIdx,1));
+				var text;
+				if (this.logScale.y) {
+					text = this.numToAxisVal(this.axisRange.y.min * Math.pow(10, yGridIdx));
+				} else {
+					text = this.numToAxisVal(this.axisRange.y.min + this.stepSize.y * yGridIdx, 1);
+				}
 				draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', -Math.PI/2, this.graphDisplay);
 			}		
 		}
@@ -454,6 +486,16 @@ GraphBase = {
 		
 		this.legend[handle] = legendEntry;
 		this.drawAllBG();
+	},
+	numToAxisVal: function(x) {
+		if (x <= .1 || x >= 1000) {
+			var OOM = Math.floor(Math.log(x) / Math.LN10);
+			var significand = round(x / Math.pow(10, OOM), 1);
+			return significand + 'E' + OOM;
+			
+		} else {
+			return String(round(x, 1));
+		}
 	},
 	getRange: function(axis){
 		var min = Number.MAX_VALUE;
@@ -490,11 +532,20 @@ GraphBase = {
 		}
 		return true;
 	},
-	valToCoord: function(val){
-		var rangeX = this.axisRange.x.max - this.axisRange.x.min;
-		var rangeY = this.axisRange.y.max - this.axisRange.y.min;
-		var x = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing.x * (this.numGridLines.x - 1) * (val.x - this.axisRange.x.min) / rangeX; 
-		var y = this.dims.dy - (this.gridSpacing.y * (this.numGridLines.y - 1) * (val.y - this.axisRange.y.min) / rangeY + (1 - this.graphRangeFrac.y.min) * this.dims.dy);
+	valToCoord: function(val) {
+		var x, y;
+		if (this.logScale.x) {
+			x = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing.x * (this.numGridLines.x - 1) * Math.log(val.x / this.axisRange.x.min) / Math.log(this.axisRange.x.max / this.axisRange.x.min);
+		} else {
+			var rangeX = this.axisRange.x.max - this.axisRange.x.min;
+			x = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing.x * (this.numGridLines.x - 1) * (val.x - this.axisRange.x.min) / rangeX; 
+		}
+		if (this.logScale.y) {
+			y = this.dims.dy - (1 - this.graphRangeFrac.y.min * this.dims.dy) - this.gridSpacing.y * Math.log(val.y / this.axisRange.y.min) / Math.LN10;
+		} else {
+			var rangeY = this.axisRange.y.max - this.axisRange.y.min;
+			y = this.dims.dy - (1 - this.graphRangeFrac.y.min) * this.dims.dy - this.gridSpacing.y * (this.numGridLines.y - 1) * (val.y - this.axisRange.y.min) / rangeY;
+		}
 		return P(x,y);
 	},
 	dataScaling: function() {

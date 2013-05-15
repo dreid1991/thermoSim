@@ -657,8 +657,8 @@ _.extend(Liquid.prototype, objectFuncs, {
 			axisInit = {x: {min: 0, step: .2}, y: {min: 200, step: 50}};
 			graph = new GraphPhaseTwoComp({spcAName: spcAName, spcBName: spcBName, axisInit: axisInit, actCoeffFuncs: actCoeffFuncs, handle: handle, primaryKey: primaryKey, liquid: this, wallGas: this.wallGas, makeGasMarker: makeGasMarker, makeSystemMarker: makeSystemMarker, makeLiquidMarker: makeLiquidMarker, pressure: pressure});
 		} else {
-			axisInit = {x: {min: 200, step: 50}, y: {min: 0, step: 1}};
-			graph = new GraphPhaseOneComp({spcName: spcAName, axisInit: axisInit, handle: handle, liquid: this, wallGas: this.wallGas, makeSystemMarker: makeSystemMarker});
+			axisInit = {x: {min: 200, step: 50}, y: {min: 1e-4, step: 1}};
+			graph = new GraphPhaseOneComp({spcName: spcAName, axisInit: axisInit, handle: handle, liquid: this, wallGas: this.wallGas, makeSystemMarker: makeSystemMarker, logScale: {y: true}});
 		}
 		return graph;
 	},

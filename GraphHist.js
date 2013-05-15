@@ -29,6 +29,7 @@ function GraphHist(attrs){
 	this.borderSpacing = 70;
 	this.graphRangeFrac = new GraphBase.Range(this.borderSpacing/this.dims.dx, .95, 1-this.borderSpacing/this.dims.dy, .05);
 	//this.legendWidth = 80;
+	this.logScale = attrs.logScale ? {x: defaultTo(false, attrs.logScale.x), y: defaultTo(false, attrs.logScale.y)} : {x: false, y: false};
 	this.numBins = 18;
 	this.axesFixed = {x: defaultTo(false, attrs.axesFixed.x), y: defaultTo(false, attrs.axesFixed.y)}
 	this.setNumGridLinesAndSpacing(attrs.numGridLines); 
