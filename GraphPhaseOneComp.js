@@ -13,35 +13,66 @@ function GraphPhaseOneComp(attrs) {
 	attrs.yLabel = 'Pressure';
 	attrs.makeReset = false;
 	this.graph = new GraphScatter(attrs); //passing along axisInit
-	this.equilData;
+	this.equilDataSets = undefined;
 	this.updateEquilData();
-	this.equilDataHandle = this.handle + 'PhaseData';
-	this.graph.addSet({handle: this.equilDataHandle, label: 'Phase\nData', pointCol: Col(255, 255, 255), flashCol: Col(0, 0, 0), trace: true, recording: false, showPts: false});
-	this.recordFracData(this.wallGas, this.keyNamePairs[this.primaryKeyType]);
-	this.recordFracData(this.liquid.wallLiq, this.keyNamePairs[this.primaryKeyType]);
+	this.equilDataHandles = this.makeEqDataHandles(this.equilDataSets, this.handle);
+	this.addEqDataSets(this.graph, this.equilDataSets, this.equilDataHandles);
 	var liquid = this.liquid;
-	this.liqTempFunc = function(){return liquid.temp};
-	this.gasTempFunc = this.makeTempFunc(this.wallGas);
-	this.yFuncKillLow = this.makeFracFunc(this.wallGas, this.keyNamePairs[this.primaryKeyType], true);
-	this.yFunc = this.makeFracFunc(this.wallGas, this.keyNamePairs[this.primaryKeyType]);
-	this.xFuncKillLow = this.makeFracFunc(this.liquid.wallLiq, this.keyNamePairs[this.primaryKeyType], true);
-	this.xFunc = this.makeFracFunc(this.liquid.wallLiq, this.keyNamePairs[this.primaryKeyType]);
+	this.tempFunc = this.makeTempFunc(this.wallGas, this.liquid)
 	this.updateGraph();
 	this.active = false;
-	if (defaultTo(true, attrs.makeLiquidMarker)) {
-		this.makeLiquidMarker();
-	}
-	if (defaultTo(true, attrs.makeSystemMarker)) {
-		this.makeSystemMarker();
-	}
-	if (defaultTo(true, attrs.makeGasMarker)) {
-		this.makeGasMarker();
-	}
+	// if (defaultTo(true, attrs.makeLiquidMarker)) {
+		// this.makeLiquidMarker();
+	// }
+	// if (defaultTo(true, attrs.makeSystemMarker)) {
+		// this.makeSystemMarker();
+	// }
+	// if (defaultTo(true, attrs.makeGasMarker)) {
+		// this.makeGasMarker();
+	// }
 	this.graph.hasData = true;
 }
 
 GraphPhaseOneComp.prototype = {
+	addEqDataSets: function(graphs, equilDataSets, equilDataHandles) {
+		for (var i=0; i<equilDataSets.length; i++) {
+			this.graph.addSet({handle: this.equilDataHandles[i], label: 'Phase\nData', pointCol: Col(255, 255, 255), flashCol: Col(0, 0, 0), trace: true, recording: false, showPts: false});	
+		}
+	},
 	updateEquilData: function() {
-		phaseEquilGenerator.oneComp.equilData(this.spcName, 100, 400, false);
+		this.equilDataSets = phaseEquilGenerator.oneComp.equilData(this.spcName, 300, 400, 200, false);
+	},
+	makeTempFunc: function(wallGas, liquid) {
+		var gasTempData = wallGas.getDataSrc('temp');
+		return function() {
+			var liqCp = liquid.Cp;
+			var gasCp = wallGas.getCv();
+			return (gasTempData[gasTempdata.length - 1] * gasCp + liquid.temp * liqCp) / (gasCp + liqCp);         
+		}
+	},
+	updateGraph: function() {
+		for (var i=0; i<this.equilDataSets.length; i++) {
+			this.graph.clearData(this.equilDataHandles[i], false);
+			this.graph.enqueueData(this.equilDataHandles[i], this.equilDataToPoints(this.equilDataSets[i]));
+		}
+		this.graph.updateRange();
+		this.graph.drawAllData();
+	},
+	setPressure: function() {
+	
+	},
+	makeEqDataHandles: function(eqData, graphHandle) {
+		var handles = [];
+		for (var i=0; i<eqData.length; i++) {
+			handles.push(graphHandle + 'PhaseDataSet' + i);
+		}
+		return handles;
+	},
+	equilDataToPoints: function(equilData) {
+		var pts = [];
+		for (var i=0; i<equilData.length; i++) {
+			pts.push(P(equilData[i].temp, equilData[i].pressure));
+		}
+		return pts;
 	},
 }

@@ -135,7 +135,7 @@ PhaseEquilGenerator.OneComp.prototype = {
 			var temp = minTemp + i / (numPts - 1) * (tripPtTemp - minTemp);
 			var pressure = minP + i / (numPts - 1) * (tripPtP - minP);
 			var fracP = (pressure - minP) / (tripPtP - minP);
-			equilData.push(PhaseEquilGenerator.OneComp.EquilPt(spc.spcName, temp, fracP * fracP));
+			equilData.push(new PhaseEquilGenerator.OneComp.EquilPt(spc.spcName, temp, fracP * fracP));
 		}
 		return equilData;
 	},
