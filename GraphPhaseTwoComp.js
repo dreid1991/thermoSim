@@ -15,14 +15,13 @@ Copyright (C) 2013  Daniel Reid
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function GraphPhase(attrs) {
+function GraphPhaseTwoComp(attrs) {
 	this.spcAName = attrs.spcAName;
 	this.spcBName = attrs.spcBName;
 	this.spcA = spcs[this.spcAName];
 	this.spcB = spcs[this.spcBName];
 	this.wallGas = attrs.wallGas;
 	this.liquid = attrs.liquid;
-	this.constAttr = attrs.constAttr;
 	this.primaryKeyType = /light/i.test(attrs.primaryKey) ? 'Light' : 'Heavy';
 	this.handle = attrs.handle;
 	this.actCoeffFuncs = attrs.actCoeffFuncs;
@@ -62,7 +61,7 @@ function GraphPhase(attrs) {
 	}
 	this.graph.hasData = true;
 }
-GraphPhase.prototype = {
+GraphPhaseTwoComp.prototype = {
 	recordFracData: function(wall, spcName) {
 		wall.recordFrac({spcName: spcName, tag: wall.handle})
 	},
@@ -164,7 +163,7 @@ GraphPhase.prototype = {
 		
 	},
 	updateEquilData: function(pressure) {
-		var phaseData = phaseEquilGenerator.constP(this.spcA, this.spcB, this.actCoeffFuncs, pressure, 20);
+		var phaseData = phaseEquilGenerator.twoComp.constP(this.spcA, this.spcB, this.actCoeffFuncs, pressure, 20);
 		var liqPts = [];
 		var gasPts = [];
 		

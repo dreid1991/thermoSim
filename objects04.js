@@ -644,7 +644,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 	},
 	makePhaseDiagram: function(liquid, spcDefs, actCoeffFuncs, handle, primaryKey, makeGasMarker, makeSystemMarker, makeLiquidMarker, pressure) {
-		var spcAName, spcBName
+		var spcAName, spcBName, graph, axisInit;
 		//var primaryKey = 'Heavy';
 		for (var spcName in spcDefs) {
 			if (!spcAName) {
@@ -653,9 +653,13 @@ _.extend(Liquid.prototype, objectFuncs, {
 				spcBName = spcName;
 			}
 		}
-		var axisInit = {x: {min: 0, step: .2}, y: {min: 200, max: 400}};
-		
-		var graph = new GraphPhase({spcAName: spcAName, spcBName: spcBName, axisInit: axisInit, actCoeffFuncs: actCoeffFuncs, handle: handle, primaryKey: primaryKey, liquid: this, wallGas: this.wallGas, makeGasMarker: makeGasMarker, makeSystemMarker: makeSystemMarker, makeLiquidMarker: makeLiquidMarker, pressure: pressure});
+		if (this.isTwoComp) {
+			axisInit = {x: {min: 0, step: .2}, y: {min: 200, step: 50}};
+			graph = new GraphPhaseTwoComp({spcAName: spcAName, spcBName: spcBName, axisInit: axisInit, actCoeffFuncs: actCoeffFuncs, handle: handle, primaryKey: primaryKey, liquid: this, wallGas: this.wallGas, makeGasMarker: makeGasMarker, makeSystemMarker: makeSystemMarker, makeLiquidMarker: makeLiquidMarker, pressure: pressure});
+		} else {
+			axisInit = {x: {min: 200, step: 50}, y: {min: 0, step: 1}};
+			graph = new GraphPhaseOneComp({spcName: spcAName, axisInit: axisInit, handle: handle, liquid: this, wallGas: this.wallGas, makeSystemMarker: makeSystemMarker});
+		}
 		return graph;
 	},
 	addWallBound: function(wallGas) {

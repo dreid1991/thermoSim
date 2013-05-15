@@ -16,9 +16,13 @@ Copyright (C) 2013  Daniel Reid
 */
 
 function PhaseEquilGenerator() {
-	
+	this.oneComp = new PhaseEquilGenerator.OneComp();
+	this.twoComp = new PhaseEquilGenerator.TwoComp();
 }
-PhaseEquilGenerator.prototype = {
+
+PhaseEquilGenerator.TwoComp = function() {}
+
+PhaseEquilGenerator.TwoComp.prototype = {
 	//make a constT one.  That would be easy.  
 	constP: function(spcA, spcB, actCoeffFuncs, pressure, numPts) {
 		var tBoilA = spcA.tBoil(pressure);
@@ -30,7 +34,7 @@ PhaseEquilGenerator.prototype = {
 		var actFuncLight = actCoeffFuncs[keyLight.spcName];
 		var actFuncHeavy = actCoeffFuncs[keyHeavy.spcName];
 		var equilData = this.makeConstPEquil(pressure, keyLight, keyHeavy, tBoilLight, tBoilHeavy, actFuncLight, actFuncHeavy, numPts);
-		return new PhaseEquilGenerator.EquilData(equilData, keyLight.spcName, keyHeavy.spcName, pressure);
+		return new PhaseEquilGenerator.TwoComp.EquilData(equilData, keyLight.spcName, keyHeavy.spcName, pressure);
 	},
 	makeConstPEquil: function(pressure, keyLight, keyHeavy, tBoilLight, tBoilHeavy, actFuncLight, actFuncHeavy, numPts) {
 		var equilData = [];
@@ -42,7 +46,7 @@ PhaseEquilGenerator.prototype = {
 				var pTotal = this.solvePTotal(tStep, xHeavy, keyLight, keyHeavy, actFuncLight, actFuncHeavy);
 				var pLight = this.pSpc(keyLight, tStep, actFuncLight, 1 - xHeavy);
 				
-				equilData.push(new PhaseEquilGenerator.EquilPt(1 - xHeavy, xHeavy, pLight / pTotal, 1 - pLight / pTotal, tStep, pressure));
+				equilData.push(new PhaseEquilGenerator.TwoComp.EquilPt(1 - xHeavy, xHeavy, pLight / pTotal, 1 - pLight / pTotal, tStep, pressure));
 			}
 			xHeavy += stepSize;
 		}
@@ -78,10 +82,11 @@ PhaseEquilGenerator.prototype = {
 	},
 	pSpc: function(key, tSys, actFunc, x) {
 		return key.pPure(tSys) * actFunc(x, tSys) * x;
-	}
+	},
+
 }
 
-PhaseEquilGenerator.EquilPt = function(xLight, xHeavy, yLight, yHeavy, temp, pressure) {
+PhaseEquilGenerator.TwoComp.EquilPt = function(xLight, xHeavy, yLight, yHeavy, temp, pressure) {
 	this.xLight = xLight;
 	this.xHeavy = xHeavy;
 	this.yLight = yLight;
@@ -89,9 +94,55 @@ PhaseEquilGenerator.EquilPt = function(xLight, xHeavy, yLight, yHeavy, temp, pre
 	this.temp = temp;
 	this.pressure = pressure;
 }
-PhaseEquilGenerator.EquilData = function(data, keyLight, keyHeavy, pressure) {
+PhaseEquilGenerator.TwoComp.EquilData = function(data, keyLight, keyHeavy, pressure) {
 	this.data = data;
 	this.keyLight = keyLight;
 	this.keyHeavy = keyHeavy;
+	this.pressure = pressure;
+}
+
+PhaseEquilGenerator.OneComp = function() {};
+
+PhaseEquilGenerator.OneComp.prototype = {
+	equilData: function(spcName, tripPtTemp, critPtTemp, minTemp, genFakeData) {
+		var spc = window.spcs[spcName];
+		var liqGasEqData = this.genLiqGasData(spc, tripPtTemp, critPtTemp);
+		var solidLiqEqData = this.genSolidLiqEqData(spc, tripPtTemp, critPtTemp);
+		var solidGasEqData = this.genSolidGasEqData(spc, minTemp, tripPtTemp);
+		return [liqGasEqData, solidLiqEqData, solidGasEqData];
+	},
+	genLiqGasData: function(spc, tripPtTemp, critPtTemp) {
+		var equilData = [];
+		for (var temp = tripPtTemp; temp<=critPtTemp; temp+= (critPtTemp - tripPtTemp)/20){
+			var equilPressure = spc.pPure(temp);
+			equilData.push(new PhaseEquilGenerator.OneComp.EquilPt(spc.spcName, temp, equilPressure));
+		}
+		return equilData;
+	},
+	genSolidLiqEqData: function(spc, tripPtTemp, critPtTemp) {
+		var tripPtP = spc.pPure(tripPtTemp);
+		var maxP = spc.pPure(critPtTemp);
+		var tripPtPt = new PhaseEquilGenerator.OneComp.EquilPt(spc.spcName, tripPtTemp, tripPtP);
+		var maxPt = new PhaseEquilGenerator.OneComp.EquilPt(spc.spcName, tripPtTemp, maxP);
+		return [tripPtPt, maxPt];
+	},
+	genSolidGasEqData: function(spc, minTemp, tripPtTemp) {
+		var equilData = []
+		var tripPtP = spc.pPure(tripPtTemp);
+		var minP = 0.1*spc.pPure(minTemp);
+		var numPts = 20;
+		for (var i = 0; i<numPts; i++) {
+			var temp = minTemp + i / (numPts - 1) * (tripPtTemp - minTemp);
+			var pressure = minP + i / (numPts - 1) * (tripPtP - minP);
+			var fracP = (pressure - minP) / (tripPtP - minP);
+			equilData.push(PhaseEquilGenerator.OneComp.EquilPt(spc.spcName, temp, fracP * fracP));
+		}
+		return equilData;
+	},
+}
+
+PhaseEquilGenerator.OneComp.EquilPt = function(spcName, temp, pressure) {
+	this.spcName = spcName;
+	this.temp = temp;
 	this.pressure = pressure;
 }

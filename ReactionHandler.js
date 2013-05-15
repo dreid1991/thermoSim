@@ -150,8 +150,12 @@ ReactionHandler = {
 		return .5*(Math.abs(perpAB)*perpAB*a.m*a.cvKinetic + Math.abs(perpBA)*perpBA*b.m*b.cvKinetic)*this.tConst;
 		//abs will handle dots moving away from other dot
 	},
-	probFunc: function(hitE, activE, sF298) {
-		return hitE > activE * 1.3 ? 1 : 0;
+	probFunc: function(hitE, activE, sRxn298) {
+		if (hitE > activE * 1.5) {
+			return 1 - 1 / (1 + Math.sqrt(Math.exp(sRxn298)));
+		} else {
+			return 0;
+		}
 		//var eRel = hitE - activE;
 		//return window.BCollide * eRel * Math.exp(-window.BCollide * eRel + 1)
 		//var x = Math.max(hitE/activE - 1, 0);
@@ -172,7 +176,7 @@ ReactionHandler = {
 				// rxnCnts.bb++;
 			// }
 			var hitE = this.hitE(a, b, perpAB, -perpBA);
-			if (Math.random() < this.probFunc(hitE, activeE, rxn.sF298)) {
+			if (Math.random() < this.probFunc(hitE, activeE, rxn.sRxn298)) {
 				if (!this.react(a, b, prods)) {
 					return this.impactStd(a, b, UVAB, perpAB, perpBA);
 				}
