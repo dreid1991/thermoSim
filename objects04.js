@@ -560,7 +560,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		}
 		return draw;
 	},
-	hit: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
+	hit: function(dot, wall, subWallIdx, wallUV, perpV, perpUV, extras){
 		//it's a sigmoid!
 		var dF = this.drivingForce;
 		if (dF[dot.spcName] !== undefined) {
@@ -571,8 +571,11 @@ _.extend(Liquid.prototype, objectFuncs, {
 				return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcDefs, this.dataGas.temp);
 			}
 		}
+		
 		if (this.dotMgrLiq.count) {
 			this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
+		} else {
+			WallMethods.collideMethods.reflect(dot, wallUV, perpV);
 		}
 	
 	},

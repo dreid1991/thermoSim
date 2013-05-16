@@ -29,7 +29,7 @@ function GraphPhaseOneComp(attrs) {
 	this.addEqDataSets(this.graph, this.equilDataSets, this.equilDataHandles);
 	var liquid = this.liquid;
 	this.tempFunc = this.makeTempFunc(this.wallGas, this.liquid)
-	this.pressureFunc = this.makePressureFunc(this.wallGas);
+	this.pressureFunc = this.makePressureFunc(this.wallGas, this.spcName);
 	this.updateGraph();
 	this.active = false;
 	if (defaultTo(true, attrs.makeSystemMarker)) {
@@ -83,8 +83,10 @@ GraphPhaseOneComp.prototype = {
 	getOrderOfMagRange: function(yMin, yMax) {
 		return Math.ceil(Math.log(yMax) / Math.LN10) - Math.floor(Math.log(yMin) / Math.LN10);
 	},
-	makePressureFunc: function(wallGas) {
+	makePressureFunc: function(wallGas, spcName) {
 		// oy - composition.  RECORD IT
+		var fracDataObj = wallGas.recordFrac({spcName: spcName, tag: wallGas.handle});
+		var fracDataSrc = fracDataObj.src();
 		var pExtList = wallGas.getDataSrc('pExt', undefined, true);
 		var pList = pExtList !== false ? pExtList : wallGas.getDataSrc('pInt', undefined, true);
 		return function() {
@@ -92,7 +94,8 @@ GraphPhaseOneComp.prototype = {
 			for (var i=Math.max(0, pList.length - 30); i<pList.length; i++) {
 				sum += pList[i];
 			}
-			return sum / Math.min(pList.length, 30);
+			var pAvg = sum / Math.min(pList.length, 30) * fracDataSrc[fracDataSrc.length - 1];
+			return pAvg;
 		}
 		
 	},
