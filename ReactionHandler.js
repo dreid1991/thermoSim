@@ -151,15 +151,17 @@ ReactionHandler = {
 		//abs will handle dots moving away from other dot
 	},
 	probFunc: function(hitE, activE, sRxn298) {
-		if (hitE > activE * 1.5) {
-			return 1 - 1 / (1 + Math.sqrt(Math.exp(sRxn298)));
-		} else {
-			return 0;
-		}
-		//var eRel = hitE - activE;
-		//return window.BCollide * eRel * Math.exp(-window.BCollide * eRel + 1)
-		//var x = Math.max(hitE/activE - 1, 0);
-		//return 2*(x - .5*x*x);//max of 1, min of 0
+		return hitE > 1.5 * activE ? 1 / (1 + Math.exp(-sRxn298 / R)) : 0;
+/*
+Excuse me.  Please take a minute to marvel at the beauty and simplicity of that probability function.  And that it works with respect to hRxn, sRxn, and temp.
+the 1.5 * activE is to convert from 2d -> 3d, because it 2 dimensional space, it's more likely that your vectors will point towards each other, so to 
+make it behave like 3 dimensional stuff, we have to scale hitE down by 2/3, or activE up by 1.5.  Cool, right?
+So if it hits the threshold, we feed the entropy into a sigmoid function. Thermo says entropy's contribution to exp of eq. const is sRxn298 / R.  
+And emperically, it shows up here too.  I think there is something pretty fundamental to that.  I chose a sigmoid because it deals with edge cases very nicely,
+and it just so happens, it works!  Maybe I've stumbled upon the probability shape that linear changes in entropy of reaction describe (with same collision radius, mass)
+
+		
+*/
 	},
 	rctHandlerSinglePair: function(idStr) {
 		var rxn = this.rxns[idStr][0];
