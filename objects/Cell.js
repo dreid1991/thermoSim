@@ -21,7 +21,7 @@ function Cell(attrs) {
 	var initPos = attrs.pos; // upper left corner
 	var thickness = Math.max(16, attrs.thickness || 16);
 	this.nodeMass = attrs.nodeMass || 40;
-	var numCorners = 4;
+	var numCorners = 8;
 	var initRadius = attrs.rad;
 	var membraneColor = attrs.col;
 	var initDots = attrs.dots; //will need to work out timeline integration somehow OR just have dots clean up with membrane.  I don't think there are many reasonable cases where that will cause problems

@@ -12,9 +12,17 @@ function GraphPhaseOneComp(attrs) {
 	attrs.xLabel = 'Temperature';
 	attrs.yLabel = 'Pressure';
 	attrs.makeReset = false;
-	this.graph = new GraphScatter(attrs); //passing along axisInit
 	this.equilDataSets = undefined;
 	this.updateEquilData();
+	var yMin = this.getYMin(this.equilDataSets);
+	var yMax = this.getYMax(this.equilDataSets);
+	var orderOfMagRange = this.getOrderOfMagRange(yMin, yMax);
+	attrs.numGridLines = defaultTo({}, attrs.numGridLines);
+	attrs.numGridLines.y = orderOfMagRange + 1;
+	attrs.axisInit.y = {min: Math.pow(10, Math.floor(Math.log(yMin) / Math.LN10)), step: 1}; //step doesn't matter for log plot
+	attrs.logScale = {y: true};
+	this.graph = new GraphScatter(attrs); //passing along axisInit
+	
 	this.equilDataHandles = this.makeEqDataHandles(this.equilDataSets, this.handle);
 	this.addEqDataSets(this.graph, this.equilDataSets, this.equilDataHandles);
 	var liquid = this.liquid;
@@ -40,7 +48,30 @@ GraphPhaseOneComp.prototype = {
 		}
 	},
 	updateEquilData: function() {
-		this.equilDataSets = phaseEquilGenerator.oneComp.equilData(this.spcName, 300, 400, 200, false);
+		this.equilDataSets = phaseEquilGenerator.oneComp.equilData(this.spcName, 300, 400, 275, false);
+	},
+	getYMin: function(dataSets) {
+		var min = Number.MAX_VALUE;
+		for (var i=0; i<dataSets.length; i++) {
+			var set = dataSets[i];
+			for (var j=0; j<set.length; j++) {
+				min = Math.min(set[j].pressure, min);
+			}
+		}
+		return min;
+	},
+	getYMax: function(dataSets) {
+		var max = Number.MIN_VALUE;
+		for (var i=0; i<dataSets.length; i++) {
+			var set = dataSets[i];
+			for (var j=0; j<set.length; j++) {
+				max = Math.max(set[j].pressure, max);
+			}
+		}
+		return max;	
+	},
+	getOrderOfMagRange: function(yMin, yMax) {
+		return Math.ceil(Math.log(yMax) / Math.LN10) - Math.floor(Math.log(yMin) / Math.LN10);
 	},
 	makeTempFunc: function(wallGas, liquid) {
 		var gasTempData = wallGas.getDataSrc('temp');

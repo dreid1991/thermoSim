@@ -219,8 +219,13 @@ GraphBase = {
 		draw.roundedRect(P(0,0), V(this.dims.dx, this.dims.dy), 20, this.bgCol, this.graphDisplay); 
 	},
 	drawGrid: function(){
+		var xVal = this.axisRange.x.min / 10;
 		for (var xGridIdx=0; xGridIdx<this.numGridLines.x; xGridIdx++) {
-			var xVal = this.axisRange.x.min + this.stepSize.x * xGridIdx;
+			if (this.logScale.x) {
+				xVal *= 10;
+			} else {
+				var xVal = this.axisRange.x.min + this.stepSize.x * xGridIdx;
+			}
 			var pos = this.valToCoord(P(xVal, 1));
 			var x = pos.x//this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing.x * xGridIdx;
 			var yEnd = this.graphRangeFrac.y.max * this.dims.dy;
@@ -229,8 +234,13 @@ GraphBase = {
 			var p2 = P(x, yEnd);
 			draw.line(p1, p2, this.gridCol, this.graphDisplay);
 		}
+		var yVal = this.axisRange.y.min / 10;
 		for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
-			var yVal = this.axisRange.y.min + this.stepSize.y * yGridIdx;//this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing.y *yGridIdx;
+			if (this.logScale.y) {
+				yVal *= 10;
+			} else {
+				var yVal = this.axisRange.y.min + this.stepSize.y * yGridIdx;//this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing.y *yGridIdx;
+			}
 			var pos = this.valToCoord(P(1, yVal));
 			var y = pos.y;
 			var xEnd = this.graphRangeFrac.x.min * this.dims.dx;
@@ -541,7 +551,7 @@ GraphBase = {
 			x = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing.x * (this.numGridLines.x - 1) * (val.x - this.axisRange.x.min) / rangeX; 
 		}
 		if (this.logScale.y) {
-			y = this.dims.dy - (1 - this.graphRangeFrac.y.min * this.dims.dy) - this.gridSpacing.y * Math.log(val.y / this.axisRange.y.min) / Math.LN10;
+			y = this.dims.dy - (1 - this.graphRangeFrac.y.min) * this.dims.dy - this.gridSpacing.y * Math.log(val.y / this.axisRange.y.min) / Math.LN10;
 		} else {
 			var rangeY = this.axisRange.y.max - this.axisRange.y.min;
 			y = this.dims.dy - (1 - this.graphRangeFrac.y.min) * this.dims.dy - this.gridSpacing.y * (this.numGridLines.y - 1) * (val.y - this.axisRange.y.min) / rangeY;

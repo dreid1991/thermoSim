@@ -131,11 +131,16 @@ PhaseEquilGenerator.OneComp.prototype = {
 		var tripPtP = spc.pPure(tripPtTemp);
 		var minP = 0.1*spc.pPure(minTemp);
 		var numPts = 20;
+		//fitting exponential to data
+		//FORM OF: pressure = a * exp(temp * b)
+		var b = Math.log(tripPtP / minP) / (tripPtTemp - minTemp);
+		var a = minP / Math.exp(b * minTemp);
+		
 		for (var i = 0; i<numPts; i++) {
 			var temp = minTemp + i / (numPts - 1) * (tripPtTemp - minTemp);
-			var pressure = minP + i / (numPts - 1) * (tripPtP - minP);
-			var fracP = (pressure - minP) / (tripPtP - minP);
-			equilData.push(new PhaseEquilGenerator.OneComp.EquilPt(spc.spcName, temp, tripPtP * fracP * fracP));
+			var pressure = a * Math.exp(temp * b);
+			var pDisplay = minP + (pressure - minP) * Math.log((Math.E - 1) * (pressure - minP) / (tripPtP - minP) + 1)
+			equilData.push(new PhaseEquilGenerator.OneComp.EquilPt(spc.spcName, temp, pDisplay));
 		}
 		return equilData;
 	},
