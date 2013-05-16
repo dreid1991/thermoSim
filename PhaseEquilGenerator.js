@@ -129,7 +129,7 @@ PhaseEquilGenerator.OneComp.prototype = {
 	genSolidGasEqData: function(spc, minTemp, tripPtTemp) {
 		var equilData = []
 		var tripPtP = spc.pPure(tripPtTemp);
-		var minP = 0.1*spc.pPure(minTemp);
+		var minP = 0.5*spc.pPure(minTemp);
 		var numPts = 20;
 		//fitting exponential to data
 		//FORM OF: pressure = a * exp(temp * b)

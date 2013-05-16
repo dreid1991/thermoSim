@@ -62,7 +62,7 @@ WallMethods.wall = {
 			addListener(curLevel, 'wallMove', 'cV' + this.handle,
 				function(){
 					var y = this[0].y
-					setY(wall, stepTowards(y, dest, this.vs[0].dy));
+					setY(this, stepTowards(y, dest, this.vs[0].dy));
 					this.parent.setupWall(this.handle);
 					if(round(y,2)==round(dest,2)){
 						removeListener(curLevel, 'wallMove', 'cV' + this.handle);

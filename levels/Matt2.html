@@ -1,5 +1,6 @@
 <html>
 <body>
+<!SIMULATION>
 <link type='text/css' href = '../css/custom-theme/jquery-ui-1.9.2.custom.sim.css' rel='stylesheet' />
 <link type='text/css' href = '../styles.css' rel='stylesheet'/>
 <link type='text/css' href = '../mathStyles.css' rel='stylesheet'/>
@@ -29,7 +30,7 @@
 			</div>
 -->
 			<div id='dashRunWrapper' style='position:relative'>
-				<div id='dashRun' class='sim dashMed noSelect' style='position:relative'>
+				<div id='dashRunBlank' class='sim dashMed noSelect' style='position:relative;display:none;'>
 					<center>
 						<div id='buttons' class='sim'>
 				
@@ -53,7 +54,7 @@
 						</div>
 					</center>
 				</div>
-				<button id='resetExp' style='position:absolute; right:.5em; bottom:.25em; z-index: 1' class='sim'><img src='img/refresh.gif'></img></button>
+				<button id='resetExp' style='position:absolute; right:.5em; bottom:.25em; z-index: 1' class='sim'><!image appended in init></button>
 			</div>
 			<div id='dashCutScene' class='sim dashMed noSelect'></div>
 <!--
@@ -111,7 +112,7 @@
 </div>
 <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 <script src = '../underscore-min.js'></script>
-<script src = '../js/jquery-1.9.0.min.js'></script>
+<script src = '../js/jquery-2.0.0.min.js'></script>
 <script src = '../js/jquery-ui-1.9.2.custom.min.js'></script>
 <script src = '../ExpressionInterpreter.js'></script>
 <script src = '../SceneNavigator.js'></script>
@@ -124,12 +125,14 @@
 <script src = '../AuxFunctions.js'></script>
 <script src = '../PhaseEquilGenerator.js'></script>
 <script src = '../GraphBase.js'></script>
-<script src = '../GraphPhase.js'></script>
+<script src = '../GraphPhaseTwoComp.js'></script>
+<script src = '../GraphPhaseOneComp.js'></script>
 <script src = '../GraphScatter.js'></script>
 <script src = '../GraphHist.js'></script>
 <script src = '../GraphBlank.js'></script>
 <script src = '../DataDisplayer.js'></script>
 <script src = '../DataGetFuncs.js'></script>
+<script src = '../Experiment.js'></script>
 <script src = '../ReactionHandler.js'></script>
 <script src = '../CollideHandler.js'></script>
 <script src = '../Attractor.js'></script>
@@ -149,15 +152,18 @@
 <script src = '../objects03.js'></script>
 <script src = '../objects04.js'></script>
 <script src = '../objects05.js'></script>
+<script src = '../objects/Cell.js'></script>
 <script src = '../AuxImage.js'></script>
 <script src = '../animText.js'></script>
 <script src = '../Readout.js'></script>
 <script src = '../LevelTools.js'></script>
 <script src = '../LevelInstance.js'></script>
 <script src = '../Timeline.js'></script>
+<script src = '../init.js'></script>
 
 <script src = 'Matt2.js'></script>
-<script src = '../init.js'></script>
-</script>
+
+
+
 </body>
 </html>
