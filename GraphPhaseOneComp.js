@@ -13,6 +13,8 @@ function GraphPhaseOneComp(attrs) {
 	attrs.yLabel = 'Pressure';
 	attrs.makeReset = false;
 	this.equilDataSets = undefined;
+	this.triplePointTemp = attrs.triplePointTemp;
+	this.criticalPointTemp = attrs.criticalPointTemp;
 	this.updateEquilData();
 	var yMin = this.getYMin(this.equilDataSets);
 	var yMax = this.getYMax(this.equilDataSets);
@@ -27,8 +29,12 @@ function GraphPhaseOneComp(attrs) {
 	this.addEqDataSets(this.graph, this.equilDataSets, this.equilDataHandles);
 	var liquid = this.liquid;
 	this.tempFunc = this.makeTempFunc(this.wallGas, this.liquid)
+	this.pressureFunc = this.makePressureFunc(this.wallGas);
 	this.updateGraph();
 	this.active = false;
+	if (defaultTo(true, attrs.makeSystemMarker)) {
+		this.makeMarker();
+	}
 	// if (defaultTo(true, attrs.makeLiquidMarker)) {
 		// this.makeLiquidMarker();
 	// }
@@ -47,8 +53,12 @@ GraphPhaseOneComp.prototype = {
 			this.graph.addSet({handle: this.equilDataHandles[i], label: 'Phase\nData', pointCol: Col(255, 255, 255), flashCol: Col(0, 0, 0), trace: true, recording: false, showPts: false});	
 		}
 	},
+	makeMarker: function() {
+		this.graph.addMarker({handle: 'system', col: Col(200, 0, 0), markerType: 'bullseye', x: this.tempFunc, y: this.pressureFunc, label: 'System'});
+	},
+	
 	updateEquilData: function() {
-		this.equilDataSets = phaseEquilGenerator.oneComp.equilData(this.spcName, 300, 400, 275, false);
+		this.equilDataSets = phaseEquilGenerator.oneComp.equilData(this.spcName, this.triplePointTemp, this.criticalPointTemp, this.triplePointTemp - 25, false);
 	},
 	getYMin: function(dataSets) {
 		var min = Number.MAX_VALUE;
@@ -73,12 +83,25 @@ GraphPhaseOneComp.prototype = {
 	getOrderOfMagRange: function(yMin, yMax) {
 		return Math.ceil(Math.log(yMax) / Math.LN10) - Math.floor(Math.log(yMin) / Math.LN10);
 	},
+	makePressureFunc: function(wallGas) {
+		// oy - composition.  RECORD IT
+		var pExtList = wallGas.getDataSrc('pExt', undefined, true);
+		var pList = pExtList !== false ? pExtList : wallGas.getDataSrc('pInt', undefined, true);
+		return function() {
+			var sum = 0;
+			for (var i=Math.max(0, pList.length - 30); i<pList.length; i++) {
+				sum += pList[i];
+			}
+			return sum / Math.min(pList.length, 30);
+		}
+		
+	},
 	makeTempFunc: function(wallGas, liquid) {
 		var gasTempData = wallGas.getDataSrc('temp');
 		return function() {
 			var liqCp = liquid.Cp;
 			var gasCp = wallGas.getCv();
-			return (gasTempData[gasTempdata.length - 1] * gasCp + liquid.temp * liqCp) / (gasCp + liqCp);         
+			return (gasTempData[gasTempData.length - 1] * gasCp + liquid.temp * liqCp) / (gasCp + liqCp);         
 		}
 	},
 	updateGraph: function() {

@@ -22,7 +22,7 @@ LevelData = {
 				],
 				dots: [
 					{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 298.15, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 298.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 0, temp: 298.15, returnTo: 'wally', tag: 'wally'},
 					
 					
 					// {spcName: 'a', pos: P(55, 55), dims: V(390, 340), count: 1000, temp: 298.15, returnTo: 'wally', tag: 'wally'},
@@ -37,7 +37,7 @@ LevelData = {
 					// },
 					{
 						type: 'Liquid',  
-						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700}, makePhaseDiagram: true/*primaryKey: 'heavy', actCoeffType: 'vanlaar', actCoeffInfo: {spc1:.9227, ugly: 1.67}, makePhaseDiagram: true*/}
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700}, makePhaseDiagram: true, triplePointTemp: 300, criticalPointTemp: 500,/*primaryKey: 'heavy', actCoeffType: 'vanlaar', actCoeffInfo: {spc1:.9227, ugly: 1.67}, makePhaseDiagram: true*/}
 					},
 					{
 						type: 'DragWeights',

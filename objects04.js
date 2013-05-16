@@ -32,6 +32,8 @@ function Liquid(attrs) {
 	var spcCounts = attrs.spcCounts; //{spcA: 100, spcB:200}
 	this.spcDefs = this.getSpcDefs(spcCounts);
 	this.tempDisplay = this.temp;
+	this.criticalPointTemp = attrs.criticalPointTemp;
+	this.triplePointTemp = attrs.triplePointTemp; //single component stuff, for phase diagram
 	this.isTwoComp = countAttrs(this.spcDefs) == 2;
 	this.spcA = getNth(this.spcDefs, 0);
 	if (this.isTwoComp) this.spcB = getNth(this.spcDefs, 1);
@@ -657,8 +659,8 @@ _.extend(Liquid.prototype, objectFuncs, {
 			axisInit = {x: {min: 0, step: .2}, y: {min: 200, step: 50}};
 			graph = new GraphPhaseTwoComp({spcAName: spcAName, spcBName: spcBName, axisInit: axisInit, actCoeffFuncs: actCoeffFuncs, handle: handle, primaryKey: primaryKey, liquid: this, wallGas: this.wallGas, makeGasMarker: makeGasMarker, makeSystemMarker: makeSystemMarker, makeLiquidMarker: makeLiquidMarker, pressure: pressure});
 		} else {
-			axisInit = {x: {min: 200, step: 50}}; //y is set by phase graph
-			graph = new GraphPhaseOneComp({spcName: spcAName, axisInit: axisInit, handle: handle, liquid: this, wallGas: this.wallGas, makeSystemMarker: makeSystemMarker, logScale: {y: true}});
+			axisInit = {x: {min: 200, step: 70}}; //y is set by phase graph
+			graph = new GraphPhaseOneComp({spcName: spcAName, axisInit: axisInit, handle: handle, liquid: this, wallGas: this.wallGas, makeSystemMarker: makeSystemMarker, logScale: {y: true}, criticalPointTemp: this.criticalPointTemp, triplePointTemp: this.triplePointTemp});
 		}
 		return graph;
 	},
