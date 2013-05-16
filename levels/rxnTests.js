@@ -4,32 +4,34 @@ LevelData = {
 
 	spcDefs: [
 		//add antoine coefs, cvLiq, hvap
-		{spcName: 'a', m: 4, r: 1, col: Col(255, 0, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
-		{spcName: 'b', m: 4, r: 1, col: Col(0, 255, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
-		{spcName: 'c', m: 4, r: 1, col: Col(100, 100, 255), cv: 1.5 * R, hF298: -13, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
-		{spcName: 'd', m: 4, r: 1, col: Col(255, 255, 0), cv: 1.5 * R, hF298: -13, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'a', m: 4, r: 2, col: Col(255, 0, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: 0, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'b', m: 4, r: 2, col: Col(0, 255, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: 0, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'c', m: 4, r: 2, col: Col(100, 100, 255), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: -50, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'd', m: 4, r: 2, col: Col(255, 255, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: -50, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
 	],
 	mainSequence: [
 
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(20, 50), P(510, 50), P(500, 430), P(50, 430)], handler: 'cVIsothermal', temp: 298.15, handle: 'wally', isothermalRate: 3, border: {type: 'open', thickness: 5, yMin: 30}} 
+					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: 'cVIsothermal', temp: 798.15, handle: 'wally', isothermalRate: 3, border: {type: 'open', thickness: 5, yMin: 30}} 
 				],
 				dots: [
-					{spcName: 'a', pos: P(55, 55), dims: V(390, 340), count: 1000, temp: 298.15, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'b', pos: P(55, 55), dims: V(390, 340), count: 1000, temp: 298.15, returnTo: 'wally', tag: 'wally'}
+					{spcName: 'a', pos: P(55, 55), dims: V(390, 340), count: 600, temp: 798.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'b', pos: P(55, 55), dims: V(390, 340), count: 600, temp: 798.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'c', pos: P(55, 55), dims: V(390, 340), count: 400, temp: 798.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'd', pos: P(55, 55), dims: V(390, 340), count: 400, temp: 798.15, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
 					// {
 						// type: 'DragWeights',
 						// attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 6}], pInit: 2, cleanUpWith: 'prompt1'}
 					// },
-					{
-						type: 'Heater',
-						cleanUpWith: 'prompt1',
-						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
-					},
+					// {
+						// type: 'Heater',
+						// cleanUpWith: 'prompt1',
+						// attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
+					// },
 				
 					// {
 						// type: 'QArrowsAmmt',
@@ -50,8 +52,8 @@ LevelData = {
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'd', tag: 'wally'}}
 				],
 				rxns: [
-					{handle: 'rxn1', rctA: 'a', rctB: 'b', activeE: 4, prods: {c: 1, d: 1}},
-					{handle: 'rxn2', rctA: 'c', rctB: 'd', activeE: 10, prods: {a: 1, b: 1}}
+					{handle: 'rxn1', rctA: 'a', rctB: 'b', activeE: 5, prods: {c: 1, d: 1}},
+					{handle: 'rxn2', rctA: 'c', rctB: 'd', activeE: 5, prods: {a: 1, b: 1}}
 				],
 				dataReadouts: [
 					{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'}

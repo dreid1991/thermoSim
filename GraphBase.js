@@ -498,7 +498,7 @@ GraphBase = {
 		this.drawAllBG();
 	},
 	numToAxisVal: function(x) {
-		if (x <= .1 || x >= 1000) {
+		if ((x <= .1 || x >= 1000) && x != 0) {
 			var OOM = Math.floor(Math.log(x) / Math.LN10);
 			var significand = round(x / Math.pow(10, OOM), 1);
 			return significand + 'E' + OOM;
