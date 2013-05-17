@@ -555,7 +555,7 @@ GraphBase = {
 		} else {
 			var rangeY = this.axisRange.y.max - this.axisRange.y.min;
 			//y = this.dims.dy - (this.gridSpacing.y * (this.numGridLines.y - 1) * (val.y - this.axisRange.y.min) / rangeY + (1 - this.graphRangeFrac.y.min) * this.dims.dy);
-			y = this.dims.dy - (1 - this.graphRangeFrac.y.min) * this.dims.dy - this.gridSpacing.y * this.numGridLines.y * (val.y - this.axisRange.y.min) / rangeY;
+			y = this.dims.dy - (1 - this.graphRangeFrac.y.min) * this.dims.dy - this.gridSpacing.y * (this.numGridLines.y - 1) * (val.y - this.axisRange.y.min) / rangeY;
 		}
 		return P(x,y);
 	},

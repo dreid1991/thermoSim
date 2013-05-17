@@ -4,10 +4,10 @@ LevelData = {
 
 	spcDefs: [
 		//add antoine coefs, cvLiq, hvap
-		{spcName: 'a', m: 4, r: 2, col: Col(255, 0, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: 0, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
-		{spcName: 'b', m: 4, r: 2, col: Col(0, 255, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: 0, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
-		{spcName: 'c', m: 4, r: 2, col: Col(100, 100, 255), cv: 1.5 * R, hF298: -14, hVap298: 10, sF298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
-		{spcName: 'd', m: 4, r: 2, col: Col(255, 255, 0), cv: 1.5 * R, hF298: -14, hVap298: 10, sF298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'a', m: 4, r: 1.5, col: Col(255, 0, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: 0, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'b', m: 4, r: 1.5, col: Col(0, 255, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: 0, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'c', m: 4, r: 1.5, col: Col(100, 100, 255), cv: 1.5 * R, hF298: -14, hVap298: 10, sF298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'd', m: 4, r: , col: Col(255, 255, 0), cv: 1.5 * R, hF298: -14, hVap298: 10, sF298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
 	],
 	mainSequence: [
 
@@ -53,7 +53,7 @@ LevelData = {
 				],
 				rxns: [
 					{handle: 'rxn1', rctA: 'a', rctB: 'b', activeE: 5, prods: {c: 1, d: 1}},
-					{handle: 'rxn2', rctA: 'c', rctB: 'd', activeE: 14, prods: {a: 1, b: 1}}
+					{handle: 'rxn2', rctA: 'c', rctB: 'd', activeE: 13, prods: {a: 1, b: 1}}
 				],
 				dataReadouts: [
 					{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'}
