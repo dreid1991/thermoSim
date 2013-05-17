@@ -26,7 +26,7 @@ LevelData = {
 				{//p1, q1
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "<p>We'll start by heating a constant volume system.  It contains 1 mole of an ideal monotomic gas.  How much energy should this heating 'cost'?</p>",
+					text: "<p>We'll start by heating a constant volume system by 100 K.  It contains 1 mole of an ideal monotomic gas.  How much energy should this heating 'cost'?</p>",
 					quiz:[						
 					{
 						type: 'textSmall', 

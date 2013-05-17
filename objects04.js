@@ -659,10 +659,10 @@ _.extend(Liquid.prototype, objectFuncs, {
 			}
 		}
 		if (this.isTwoComp) {
-			axisInit = {x: {min: 0, step: .2}, y: {min: 200, step: 50}};
+			axisInit = {x: {min: 0, step: .2}, y: {min: 300, step: 1}}; // set in graph
 			graph = new GraphPhaseTwoComp({spcAName: spcAName, spcBName: spcBName, axisInit: axisInit, actCoeffFuncs: actCoeffFuncs, handle: handle, primaryKey: primaryKey, liquid: this, wallGas: this.wallGas, makeGasMarker: makeGasMarker, makeSystemMarker: makeSystemMarker, makeLiquidMarker: makeLiquidMarker, pressure: pressure});
 		} else {
-			axisInit = {x: {min: 200, step: 70}}; //y is set by phase graph
+			axisInit = {x: {min: 200, step: 1}}; //y is set by phase graph
 			graph = new GraphPhaseOneComp({spcName: spcAName, axisInit: axisInit, handle: handle, liquid: this, wallGas: this.wallGas, makeSystemMarker: makeSystemMarker, logScale: {y: true}, criticalPointTemp: this.criticalPointTemp, triplePointTemp: this.triplePointTemp});
 		}
 		return graph;

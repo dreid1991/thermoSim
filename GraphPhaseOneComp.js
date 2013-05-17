@@ -6,7 +6,7 @@ function GraphPhaseOneComp(attrs) {
 	this.liquid = attrs.liquid;
 	this.handle = attrs.handle;
 	this.pressure = attrs.pressure || 1;
-	attrs.axesFixed = {x: true, y: true};
+	attrs.axesFixed = {x: false, y: false};
 	//for now, only allowing axes x -> temp, y -> pressure
 	attrs.numGridLines = {x: 6};
 	attrs.xLabel = 'Temperature';
