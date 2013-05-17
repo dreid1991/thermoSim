@@ -1234,7 +1234,8 @@ function Heater(attrs){
 	this.qRateMax = defaultTo(1, attrs.max);
 	this.qRateMin = -this.qRateMax;
 	this.rot = defaultTo(0, attrs.rotation);
-
+	this.tempMax = defaultTo(Number.MAX_VALUE, attrs.tempMax);
+	this.tempMin = defaultTo(1, attrs.tempMin)
 	this.center = this.pos.copy().movePt(this.dims.copy().mult(.5));
 	var colMax = defaultTo(Col(200,0,0), attrs.colMax);
 	var colMin = defaultTo(Col(0,0,200), attrs.colMin);
@@ -1404,7 +1405,8 @@ _.extend(Heater.prototype, objectFuncs, {
 	},
 	hit: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){
 		walls.reflect(dot, wallUV, vPerp);
-		if (this.qRate) {
+		var temp = dot.temp();
+		if (this.qRate && temp > this.tempMax && temp < this.tempMin) {
 			var dE = dot.addEnergy(this.qRate) * .001;
 			this.eAdded += dE;
 		}

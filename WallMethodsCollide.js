@@ -139,7 +139,7 @@ WallMethods.collideMethods ={
 		dot.v.dy = -dot.v.dy + 2 * wall.vs[subWallIdx].dy;
 		
 	},
-	reflect: function(dot, wallUV, perpV){
+	reflect: function(dot, wallUV, perpV) {
 		dot.v.dx -= 2*wallUV.dy*perpV;
 		dot.v.dy += 2*wallUV.dx*perpV;
 		dot.x -= wallUV.dy

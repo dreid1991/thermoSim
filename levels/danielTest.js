@@ -1,6 +1,6 @@
 
 LevelData = {
-	levelTitle: 'Level template',
+	levelTitle: 'Two Component Phase Equilibrium',
 
 	spcDefs: [
 		//add antoine coefs, cvLiq, hvap
@@ -9,7 +9,7 @@ LevelData = {
 		// {spcName: 'c', m: 4, r: 1, col: Col(100, 100, 255), cv: 1.5 * R, hF298: -13, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
 		// {spcName: 'd', m: 4, r: 1, col: Col(255, 255, 0), cv: 1.5 * R, hF298: -13, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
 		{spcName: 'spc1', m: 4, r: 1, col: Col(200, 0, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
-		{spcName: 'ugly', m: 4, r: 1, col: Col(150, 100, 200), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.213, b: 1652.27, c: 231.48-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
+		{spcName: 'ugly', m: 4, r: 1, col: Col(150, 100, 255), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.213, b: 1652.27, c: 231.48-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'fairy', m: 4, r: 1, col: Col(250, 250, 250), cv: 1.5 * R, hF298: -12, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'duckling', m: 4, r: 1, col: Col(0, 255, 255), cv: 1.5 * R, hF298: -12, hVap298: 10, sF298: -1, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
 	],
@@ -41,7 +41,7 @@ LevelData = {
 					},
 					{
 						type: 'DragWeights',
-						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 3}], pInit: 2, cleanUpWith: 'prompt1'}
+						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 3}], weightScalar: 30, pInit: 2, cleanUpWith: 'prompt1'}
 					},
 					// {
 						// type: 'Cell',

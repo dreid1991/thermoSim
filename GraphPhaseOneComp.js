@@ -10,7 +10,7 @@ function GraphPhaseOneComp(attrs) {
 	//for now, only allowing axes x -> temp, y -> pressure
 	attrs.numGridLines = {x: 6};
 	attrs.xLabel = 'Temperature';
-	attrs.yLabel = 'Pressure';
+	attrs.yLabel = 'Pressure ' + this.spcName;
 	attrs.makeReset = false;
 	this.equilDataSets = undefined;
 	this.triplePointTemp = attrs.triplePointTemp;
