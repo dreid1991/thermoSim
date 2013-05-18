@@ -45,7 +45,7 @@ LevelData = {
 					// },
 					{
 						type: 'Cell',
-						attrs: {pos: P(200, 200), rad: 70, col: Col(30, 200, 30)}
+						attrs: {pos: P(200, 200), rad: 70, col: Col(30, 200, 30), handle: 'squishy'}
 					},
 					// {
 						// type: 'ActivationEnergyPair',

@@ -19,9 +19,9 @@ function Cell(attrs) {
 	this.type = 'Cell';
 	this.handle = attrs.handle;
 	var initPos = attrs.pos; // upper left corner
-	var thickness = 15;
+	var thickness = 10;
 	this.nodeMass = attrs.nodeMass || 40;
-	var numCorners = 8;
+	var numCorners = 4;
 	var initRadius = attrs.rad;
 	var membraneColor = attrs.col;
 	var initDots = attrs.dots; //will need to work out timeline integration somehow OR just have dots clean up with membrane.  I don't think there are many reasonable cases where that will cause problems
@@ -30,7 +30,10 @@ function Cell(attrs) {
 	var innerWallPts = this.makeInnerWallPts(this.guideNodes, thickness);
 	this.outerWall = walls.addWall({pts: outerWallPts, handle: this.handle + 'outer', handler: 'staticAdiabatic', show: true, record: false, col: Col(0, 255, 0)});
 	this.innerWall = walls.addWall({pts: innerWallPts, handle: this.handle + 'inner', handler: 'staticAdiabatic', show: true, record: false, col: Col(255, 0,0 )});
-	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall);
+	this.innerWall.hitThreshold = -10;
+	this.outerWall.hitThreshold = -10;
+	this.setupStd();
+	//this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall);
 }
 
 _.extend(Cell.prototype, objectFuncs, {
@@ -52,27 +55,32 @@ _.extend(Cell.prototype, objectFuncs, {
 	},
 	makeOuterWallPts: function(guideNodes, thickness) {
 		var pts = [];
-		var ptIdx = 0;
-		for (var i=guideNodes.length-1; i>=0; i--) {
-			var guideNode = guideNodes[i];
-			guideNode.innerWallIdx = i;
-			var fromNext = guideNode.next.pos.VTo(guideNode.pos).perp('ccw');
-			var toPrev = guideNode.pos.VTo(guideNode.prev.pos).perp('ccw');
-			var wallPtPos = guideNode.pos.copy().movePt(fromNext.add(toPrev).UV().mult(thickness / 2));
+		var wallPtIdx = 0;
+		var node = guideNodes[0];
+		while (wallPtIdx < guideNodes.length) {
+			node.prev.outerWallIdx = wallPtIdx;
+			var fromNext = node.next.pos.VTo(node.pos).perp('ccw');
+			var toPrev = node.pos.VTo(node.prev.pos).perp('ccw');
+			var wallPtPos = node.pos.copy().movePt(fromNext.add(toPrev).UV().mult(thickness / 2));
 			pts.push(wallPtPos);
+			wallPtIdx++;
+			node = node.prev;
 		}
 		return pts;
 		
 	},
 	makeInnerWallPts: function(guideNodes, thickness) {
 		var pts = [];
-		for (var i=0; i<guideNodes.length; i++) {
-			var guideNode = guideNodes[i];
-			guideNode.outerWallIdx = i;
-			var fromPrev = guideNode.prev.pos.VTo(guideNode.pos).perp('ccw');
-			var toNext = guideNode.pos.VTo(guideNode.next.pos).perp('ccw');
-			var wallPtPos = guideNode.pos.copy().movePt(fromPrev.add(toNext).UV().mult(thickness / 2));
+		var wallPtIdx = 0;
+		var node = guideNodes[0];
+		while(wallPtIdx < guideNodes.length) {
+			node.innerWallIdx = wallPtIdx;
+			var fromPrev = node.prev.pos.VTo(node.pos).perp('ccw');
+			var toNext = node.pos.VTo(node.next.pos).perp('ccw');
+			var wallPtPos = node.pos.copy().movePt(fromPrev.add(toNext).UV().mult(thickness / 2));
 			pts.push(wallPtPos);			
+			wallPtIdx++;
+			node = node.next;
 		}
 
 		return pts;	
