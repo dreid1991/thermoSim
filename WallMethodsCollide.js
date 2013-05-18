@@ -142,15 +142,16 @@ WallMethods.collideMethods ={
 	reflect: function(dot, wallUV, perpV) {
 		dot.v.dx -= 2*wallUV.dy*perpV;
 		dot.v.dy += 2*wallUV.dx*perpV;
-		if (dot.v.dx * -wallUV.dy + dot.v.dy * wallUV.dx >= 0) {
-			dot.x += 2 * -wallUV.dy * dot.r;
-			dot.y += 2 * wallUV.dx * dot.r;
-		} else {
-			dot.x -= 2 * -wallUV.dy * dot.r;
-			dot.y -= 2 * wallUV.dx * dot.r;
-		}
-		// dot.x -= wallUV.dy
-		// dot.y += wallUV.dx
+		//for two sided walls
+		// if (dot.v.dx * -wallUV.dy + dot.v.dy * wallUV.dx >= 0) {
+			// dot.x += 2 * -wallUV.dy * dot.r;
+			// dot.y += 2 * wallUV.dx * dot.r;
+		// } else {
+			// dot.x -= 2 * -wallUV.dy * dot.r;
+			// dot.y -= 2 * wallUV.dx * dot.r;
+		// }
+		dot.x -= wallUV.dy
+		dot.y += wallUV.dx
 	},
 	outlet: function(dot) {
 		dotManager.remove(dot);

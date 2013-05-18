@@ -40,6 +40,162 @@ WallMethods.wall = {
 		var height = vol/(vConst*width);
 		return this[2].y - height;
 	},
+	checkWallHit: function(dot, wallPtIdx){
+		//doing all this new Point and Vector business to take out one function call
+		var wallUV = this.wallUVs[wallPtIdx];
+		var perpUV = this.wallPerpUVs[wallPtIdx];
+		//this is to make the walls two-sided.  It sort of works
+		// var dotToWall = new Vector(wallPt.x - dot.x, wallPt.y - dot.y);
+		// var dotProdToWall = dotToWall.dx * perpUV.dx + dotToWall.dy * perpUV.dy;
+		// var sign = Math.abs(dotProdToWall) / dotProdToWall;
+		// if (sign * dotProdToWall < dot.r) {
+			// //makes it so it definitely hits if we're closer than r
+			// var dotProdNext = -dotProdToWall;
+		// } else {
+			// var dotEdgePt;
+			// if (dotProdToWall >= 0) {
+				// dotEdgePt = new Point(dot.x + perpUV.dx * dot.r, dot.y + perpUV.dy * dot.r)
+			// } else {
+				// dotEdgePt = new Point(dot.x - perpUV.dx * dot.r, dot.y - perpUV.dy * dot.r)
+			// }
+			// var wallANext = new Point(wallPt.x + wall.vs[wallPtIdx].dx, wallPt.y + wall.vs[wallPtIdx].dy);
+			// var wallBNext = new Point(wall[wallPtIdx + 1].x + wall.vs[wallPtIdx + 1].dx, wall[wallPtIdx + 1].y + wall.vs[wallPtIdx + 1].dy);
+			// var edgePtNext = new Point(dotEdgePt.x + dot.v.dx, dotEdgePt.y + dot.v.dy);
+			// var dx = wallBNext.x - wallANext.x;
+			// var dy = wallBNext.y - wallANext.y;
+			// var mag = Math.sqrt(dx * dx + dy * dy);
+			// //hello.  If you even change the direction that perp wall UVs are taken, this will break.
+			// var dotToWallNext = new Vector(wallANext.x - edgePtNext.x, wallANext.y - edgePtNext.y);
+			// var perpNext = new Vector(-dy / mag, dx / mag);
+			// var dotProdNext = dotToWallNext.dx * perpNext.dx + dotToWallNext.dy * perpNext.dy;
+		// }
+		
+		// if (dotProdToWall * dotProdNext <=0 && this.isBetween(dot, wall, wallPtIdx, wallUV)) {
+	
+			// var perpV = -perpUV.dx * dot.v.dx - perpUV.dy * dot.v.dy;
+			// var dxo = dot.v.dx;
+			// var dyo = dot.v.dy;
+			// var tempo = dot.temp();
+			// this['didHit' + wall.hitMode](dot, wall, wallPtIdx, wallUV, perpV, perpUV);
+			// return true;
+		// } else {
+			// return false;
+		// }
+		
+		
+		var dotVec = V(dot.x + dot.v.dx - perpUV.dx*dot.r - this[wallPtIdx].x, dot.y + dot.v.dy - perpUV.dy*dot.r - this[wallPtIdx].y);
+		var distFromWall = perpUV.dotProd(dotVec);
+		var perpV = -perpUV.dotProd(dot.v);
+		if (distFromWall<0 && distFromWall>this.hitThreshold && this.isBetween(dot, wallPtIdx, wallUV)){
+			this['didHit'+this.hitMode](dot, wallPtIdx, wallUV, perpV, perpUV);
+			return true;
+		}
+		return false;
+	},
+////////////////////////////////////////////////////////////
+//WALL HIT HANDLER WRAPPERS
+////////////////////////////////////////////////////////////	
+	didHitStd: function(dot, subWallIdx, wallUV, perpV, perpUV) {
+		var handler = this.handlers[subWallIdx];
+		handler.func.apply(handler.obj, [dot, this, subWallIdx, wallUV, perpV, perpUV]);		
+	},
+	isBetween: function(dot, wallPtIdx, wallUV){
+		//var wallAdjust = Math.abs(dot.v.dotProd(wallUV);
+		var xAdj = (Math.abs(dot.v.dx) + dot.r) * wallUV.dx;
+		var yAdj = (Math.abs(dot.v.dy) + dot.r) * wallUV.dy;
+		//hey, so I'm just going to extend the wall by R and V, because I'd rather overextend the wall than have leaks
+		var wallPtA = new Point(this[wallPtIdx].x - xAdj , this[wallPtIdx].y - yAdj);
+		var wallPtB = new Point(this[wallPtIdx+1].x + xAdj, this[wallPtIdx+1].y + yAdj);
+		var reverseWallUV = new Vector(-wallUV.dx, -wallUV.dy);
+		var dotVecA = new Vector(dot.x + dot.v.dx - wallPtA.x, dot.y + dot.v.dy - wallPtA.y);
+		var dotVecB = new Vector(dot.x + dot.v.dx - wallPtB.x, dot.y + dot.v.dy - wallPtB.y);
+		return dotVecA.dotProd(wallUV)>=0 && dotVecB.dotProd(reverseWallUV)>=0;
+	},
+	didHitArrowDV: function(dot, subWallIdx, wallUV, perpV, perpUV) {
+		var vo = dot.v.copy();
+		var handler = this.handlers[subWallIdx];
+		handler.func.apply(handler.obj, [dot, this, subWallIdx, wallUV, perpV, perpUV]);
+		var pos = P(dot.x, dot.y);
+		var vf = dot.v.copy();
+		var perpVf = -perpUV.dotProd(dot.v);
+		this.drawArrowV(pos, vo, vf, perpV, perpVf);  
+	},
+	didHitArrowSpd: function(dot, subWallIdx, wallUV, perpV, perpUV) {
+		var vo = dot.v.copy();
+		var handler = this.handlers[subWallIdx];
+		handler.func.apply(handler.obj, [dot, this, subWallIdx, wallUV, perpV, perpUV]);
+		var pos = P(dot.x, dot.y);
+		var vf = dot.v.copy();
+		var perpVf = -perpUV.dotProd(dot.v);
+		this.drawArrowSpd(pos, vo, vf, perpV, perpVf);  
+	},
+	didHitGravity: function(dot, subWallIdx, wallUV, perpV, perpUV) {
+		var handler = this.handlers[subWallIdx];
+		if (wallUV.dx!=0) {
+			var yo = dot.y;
+			var dyo = dot.v.dy;
+		}
+		handler.func.apply(handler.obj, [dot, this, subWallIdx, wallUV, perpV, perpUV])
+		if (wallUV.dx!=0) {
+			//v^2 = vo^2 + 2ax;
+			var discrim = dot.v.dy*dot.v.dy + 2*gInternal * (dot.y-yo);
+			if (discrim>=0) { 
+				if (dot.v.dy>0) {
+					dot.v.dy = Math.sqrt(discrim);
+				} else {
+					dot.v.dy = -Math.sqrt(discrim);
+				}		
+			} else { 
+				//should not have gotten as far up as reflection over wall moved it     so dyFinal<0/
+				//so basically I'm setting a new velocity (1e-7)and solving for the approptiate y
+				dot.v.dy = -1.e-7;
+				dot.y = (dot.v.dy*dot.v.dy - dyo*dyo)/(2*gInternal) + yo;
+			}
+		}
+	},
+////////////////////////////////////////////////////////////
+//END
+////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////
+//COLLIDE EXTRAS
+////////////////////////////////////////////////////////////
+	drawArrowV: function(pos, vo, vf, perpVo, perpVf){
+		var arrowPts = new Array(3);
+		arrowPts[0] = pos.copy().movePt(vo.copy().mult(10).neg());
+		arrowPts[1] = pos.copy();
+		arrowPts[2] = pos.copy().movePt(vf.copy().mult(10));
+		var lifespan = 50;
+		var arrowTurn = 0;
+		var handle = 'drawArrow'+round(pos.x,0)+round(pos.y,0);
+		var arrow = new ArrowLine(handle, arrowPts, Col(255,0,0), lifespan, c);
+
+
+		var textPos = pos.copy().movePt(vf.mult(15));
+		var delV = (Math.abs(perpVo)+Math.abs(perpVf))*pxToMS;
+		animText.newAnim({pos:textPos}, 
+				{pos:textPos.copy().movePt({dy:-20}), col:curLevel.bgCol},
+				{text:'deltaV = '+round(delV,1)+'m/s', time:3000}
+		);
+	},
+	drawArrowSpd: function(pos, vo, vf, perpVo, perpVf){
+		var arrowPts = new Array(3);
+		arrowPts[0] = pos.copy().movePt(vo.copy().mult(10).neg());
+		arrowPts[1] = pos.copy();
+		arrowPts[2] = pos.copy().movePt(vf.copy().mult(10));
+		var lifespan = 50;
+		var arrowTurn = 0;
+		var handle = 'drawArrow'+round(pos.x,0)+round(pos.y,0);
+		var arrow = new ArrowLine(handle, arrowPts, Col(255,0,0), lifespan, c);
+
+
+		var textPos = pos.copy().movePt(vf.mult(15));
+		var V = vf.mag()*pxToMS*.1;//MAYBE SEND DOT.  GET SPEED RIGHT WAY.
+		animText.newAnim({pos:textPos}, 
+				{pos:textPos.copy().movePt({dy:-20}), col:curLevel.bgCol},
+				{text:'Speed = '+round(V,1)+'m/s', time:3000}
+		);
+	},
 	changeSetPt: function(dest, compType, speed){
 		if(compType.indexOf('isothermal')!=-1){
 			var wallMoveMethod = 'cVIsothermal';

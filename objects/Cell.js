@@ -19,7 +19,7 @@ function Cell(attrs) {
 	this.type = 'Cell';
 	this.handle = attrs.handle;
 	var initPos = attrs.pos; // upper left corner
-	var thickness = Math.max(16, attrs.thickness || 16);
+	var thickness = 15;
 	this.nodeMass = attrs.nodeMass || 40;
 	var numCorners = 8;
 	var initRadius = attrs.rad;

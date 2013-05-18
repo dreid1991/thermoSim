@@ -43,10 +43,10 @@ LevelData = {
 						// type: 'DragWeights',
 						// attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 3}], weightScalar: 30, pInit: 2, cleanUpWith: 'prompt1'}
 					// },
-					// {
-						// type: 'Cell',
-						// attrs: {pos: P(200, 200), rad: 30, col: Col(30, 200, 30)}
-					// },
+					{
+						type: 'Cell',
+						attrs: {pos: P(200, 200), rad: 70, col: Col(30, 200, 30)}
+					},
 					// {
 						// type: 'ActivationEnergyPair',
 						// attrs: {spcNameLow: 'ugly', spcNameHigh: 'fairy', thresholdEnergy: 12}
