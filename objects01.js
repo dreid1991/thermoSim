@@ -1424,8 +1424,8 @@ _.extend(Heater.prototype, objectFuncs, {
 		timeline.curSection().addCmmdPoint('now', 'setup', function() {
 			var type = 'Liquid';
 			var liquid = curLevel.selectObj(type, liquidHandle);
-			liquid.heater = self;
 			if (!liquid) console.log('Bad liquid handle for heater ' + this.handle + '.  Handle ' + handle);
+			liquid.heater = self;
 			var liqWall = liquid.getWallLiq();
 			liqWall.recordQ();
 			self.liquid = liquid;		

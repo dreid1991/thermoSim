@@ -353,63 +353,64 @@ WallMethods.main = {
 		var wallUV = wall.wallUVs[wallPtIdx];
 		var perpUV = wall.wallPerpUVs[wallPtIdx];
 		//this is to make the walls two-sided.  It sort of works
-		// var dotToWall = new Vector(wallPt.x - dot.x, wallPt.y - dot.y);
-		// var dotProdToWall = dotToWall.dx * perpUV.dx + dotToWall.dy * perpUV.dy;
-		// var sign = Math.abs(dotProdToWall) / dotProdToWall;
-		// if (sign * dotProdToWall < dot.r) {
-			// //makes it so it definitely hits if we're closer than r
-			// var dotProdNext = -dotProdToWall;
-		// } else {
-			// var dotEdgePt;
-			// if (dotProdToWall >= 0) {
-				// dotEdgePt = new Point(dot.x + perpUV.dx * dot.r, dot.y + perpUV.dy * dot.r)
-			// } else {
-				// dotEdgePt = new Point(dot.x - perpUV.dx * dot.r, dot.y - perpUV.dy * dot.r)
-			// }
-			// var wallANext = new Point(wallPt.x + wall.vs[wallPtIdx].dx, wallPt.y + wall.vs[wallPtIdx].dy);
-			// var wallBNext = new Point(wall[wallPtIdx + 1].x + wall.vs[wallPtIdx + 1].dx, wall[wallPtIdx + 1].y + wall.vs[wallPtIdx + 1].dy);
-			// var edgePtNext = new Point(dotEdgePt.x + dot.v.dx, dotEdgePt.y + dot.v.dy);
-			// var dx = wallBNext.x - wallANext.x;
-			// var dy = wallBNext.y - wallANext.y;
-			// var mag = Math.sqrt(dx * dx + dy * dy);
-			// //hello.  If you even change the direction that perp wall UVs are taken, this will break.
-			// var dotToWallNext = new Vector(wallANext.x - edgePtNext.x, wallANext.y - edgePtNext.y);
-			// var perpNext = new Vector(-dy / mag, dx / mag);
-			// var dotProdNext = dotToWallNext.dx * perpNext.dx + dotToWallNext.dy * perpNext.dy;
-		// }
-		
-		// if (dotProdToWall * dotProdNext <=0 && this.isBetween(dot, wall, wallPtIdx, wallUV)) {
-	
-			// var perpV = -perpUV.dx * dot.v.dx - perpUV.dy * dot.v.dy;
-			// var dxo = dot.v.dx;
-			// var dyo = dot.v.dy;
-			// var tempo = dot.temp();
-			// this['didHit' + wall.hitMode](dot, wall, wallPtIdx, wallUV, perpV, perpUV);
-			// return true;
-		// } else {
-			// return false;
-		// }
-		
-		
-		var dotVec = V(dot.x + dot.v.dx - perpUV.dx*dot.r - wallPt.x, dot.y + dot.v.dy - perpUV.dy*dot.r - wallPt.y);
-		var distFromWall = perpUV.dotProd(dotVec);
-		var perpV = -perpUV.dotProd(dot.v);
-		var hitMode = wall.hitMode;
-		if (distFromWall<0 && distFromWall>-15 && this.isBetween(dot, wall, wallPtIdx, wallUV)){
-			this['didHit'+hitMode](dot, wall, wallPtIdx, wallUV, perpV, perpUV);
-			return true;
+		var dotToWall = new Vector(wallPt.x - dot.x, wallPt.y - dot.y);
+		var dotProdToWall = dotToWall.dx * perpUV.dx + dotToWall.dy * perpUV.dy;
+		var sign = Math.abs(dotProdToWall) / dotProdToWall;
+		if (sign * dotProdToWall < dot.r) {
+			//makes it so it definitely hits if we're closer than r
+			var dotProdNext = -dotProdToWall;
+		} else {
+			var dotEdgePt;
+			if (dotProdToWall >= 0) {
+				dotEdgePt = new Point(dot.x + perpUV.dx * dot.r, dot.y + perpUV.dy * dot.r)
+			} else {
+				dotEdgePt = new Point(dot.x - perpUV.dx * dot.r, dot.y - perpUV.dy * dot.r)
+			}
+			var wallANext = new Point(wallPt.x + wall.vs[wallPtIdx].dx, wallPt.y + wall.vs[wallPtIdx].dy);
+			var wallBNext = new Point(wall[wallPtIdx + 1].x + wall.vs[wallPtIdx + 1].dx, wall[wallPtIdx + 1].y + wall.vs[wallPtIdx + 1].dy);
+			var edgePtNext = new Point(dotEdgePt.x + dot.v.dx, dotEdgePt.y + dot.v.dy);
+			var dx = wallBNext.x - wallANext.x;
+			var dy = wallBNext.y - wallANext.y;
+			var mag = Math.sqrt(dx * dx + dy * dy);
+			//hello.  If you even change the direction that perp wall UVs are taken, this will break.
+			var dotToWallNext = new Vector(wallANext.x - edgePtNext.x, wallANext.y - edgePtNext.y);
+			var perpNext = new Vector(-dy / mag, dx / mag);
+			var dotProdNext = dotToWallNext.dx * perpNext.dx + dotToWallNext.dy * perpNext.dy;
 		}
-		return false;
+		
+		if (dotProdToWall * dotProdNext <=0 && this.isBetween(dot, wall, wallPtIdx, wallUV)) {
+	
+			var perpV = -perpUV.dx * dot.v.dx - perpUV.dy * dot.v.dy;
+			var dxo = dot.v.dx;
+			var dyo = dot.v.dy;
+			var tempo = dot.temp();
+			this['didHit' + wall.hitMode](dot, wall, wallPtIdx, wallUV, perpV, perpUV);
+			return true;
+		} else {
+			return false;
+		}
+		
+		
+		// var dotVec = V(dot.x + dot.v.dx - perpUV.dx*dot.r - wallPt.x, dot.y + dot.v.dy - perpUV.dy*dot.r - wallPt.y);
+		// var distFromWall = perpUV.dotProd(dotVec);
+		// var perpV = -perpUV.dotProd(dot.v);
+		// var hitMode = wall.hitMode;
+		// if (distFromWall<0 && distFromWall>-15 && this.isBetween(dot, wall, wallPtIdx, wallUV)){
+			// this['didHit'+hitMode](dot, wall, wallPtIdx, wallUV, perpV, perpUV);
+			// return true;
+		// }
+		// return false;
 	},
 	isBetween: function(dot, wall, wallPtIdx, wallUV){
-		var wallAdjust = dot.v.dotProd(wallUV);
-		var xAdj = wallAdjust*wallUV.dx;
-		var yAdj = wallAdjust*wallUV.dy;
-		var wallPtA = P(wall[wallPtIdx].x+xAdj, wall[wallPtIdx].y+yAdj);
-		var wallPtB = P(wall[wallPtIdx+1].x+xAdj, wall[wallPtIdx+1].y+yAdj);
-		var reverseWallUV = V(-wallUV.dx, -wallUV.dy);
-		var dotVecA = V(dot.x-wallPtA.x, dot.y-wallPtA.y);
-		var dotVecB = V(dot.x-wallPtB.x, dot.y-wallPtB.y);
+		//var wallAdjust = Math.abs(dot.v.dotProd(wallUV);
+		var xAdj = (Math.abs(dot.v.dx) + dot.r) * wallUV.dx;
+		var yAdj = (Math.abs(dot.v.dy) + dot.r) * wallUV.dy;
+		//hey, so I'm just going to extend the wall by R and V, because I'd rather overextend the wall than have leaks
+		var wallPtA = new Point(wall[wallPtIdx].x - xAdj , wall[wallPtIdx].y - yAdj);
+		var wallPtB = new Point(wall[wallPtIdx+1].x + xAdj, wall[wallPtIdx+1].y + yAdj);
+		var reverseWallUV = new Vector(-wallUV.dx, -wallUV.dy);
+		var dotVecA = new Vector(dot.x + dot.v.dx - wallPtA.x, dot.y + dot.v.dy - wallPtA.y);
+		var dotVecB = new Vector(dot.x + dot.v.dx - wallPtB.x, dot.y + dot.v.dy - wallPtB.y);
 		return dotVecA.dotProd(wallUV)>=0 && dotVecB.dotProd(reverseWallUV)>=0;
 	},
 	////////////////////////////////////////////////////////////
