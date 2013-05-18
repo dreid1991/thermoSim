@@ -20,7 +20,7 @@ Copyright (C) 2013  Daniel Reid
 //COLLIDE METHODS
 //////////////////////////////////////////////////////////////////////////
 WallMethods.collideMethods ={
-	cPAdiabaticDamped: function(dot, wall, subWallIdx, wallUV, perpV, perpUV, extras){
+	cPAdiabaticDamped: function(dot, wall, subWallIdx, wallUV, perpV, perpUV){
 		/*
 		To dampen wall speed , doing:
 		1 = dot
@@ -81,7 +81,7 @@ WallMethods.collideMethods ={
 		// dot.v.dy*=ratio;
 		wall.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
 	},	
-	cPAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
+	cPAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
 		var tempO = dot.temp();
 		var dotVyF;
 		var vo = dot.v.copy();
@@ -102,11 +102,11 @@ WallMethods.collideMethods ={
 		if (dot.v.dy * dotVyF < 0) dot.v.dy *= -1;
 		wall.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
 	},
-	staticAdiabatic: function(dot, wall, subWallIdx, wallUV, perpV, perpUV, extras){
+	staticAdiabatic: function(dot, wall, subWallIdx, wallUV, perpV, perpUV){
 		this.reflect(dot, wallUV, perpV);
 		wall.forceInternal += 2*dot.m*Math.abs(perpV);
 	},
-	cVIsothermal: function(dot, wall, subWallIdx, wallUV, perpV, perpUV, extras){
+	cVIsothermal: function(dot, wall, subWallIdx, wallUV, perpV, perpUV){
 		if (wall.eToAdd) {
 			var eAddSign = getSign(wall.eToAdd);
 			var inTemp = dot.temp();
@@ -129,7 +129,7 @@ WallMethods.collideMethods ={
 			this.reflect(dot, wallUV, perpV);
 		}
 	},
-	cVAdiabatic: function(dot, wall, subWallIdx, wallUV, perpV, perpUV, extras){
+	cVAdiabatic: function(dot, wall, subWallIdx, wallUV, perpV, perpUV){
 		/*
 		This is usually used for just one molecule, so the correct heat transfer behavior is not really important.
 		The heat capacity adjustment can lead to the dot's speed converging to the wall's speed, which makes it constantly hit the wall and look funny

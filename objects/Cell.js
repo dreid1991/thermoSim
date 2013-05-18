@@ -21,7 +21,7 @@ function Cell(attrs) {
 	var initPos = attrs.pos; // upper left corner
 	var thickness = 10;
 	this.nodeMass = attrs.nodeMass || 40;
-	var numCorners = 4;
+	var numCorners = 8;
 	var initRadius = attrs.rad;
 	var membraneColor = attrs.col;
 	var initDots = attrs.dots; //will need to work out timeline integration somehow OR just have dots clean up with membrane.  I don't think there are many reasonable cases where that will cause problems
@@ -32,8 +32,10 @@ function Cell(attrs) {
 	this.innerWall = walls.addWall({pts: innerWallPts, handle: this.handle + 'inner', handler: 'staticAdiabatic', show: true, record: false, col: Col(255, 0,0 )});
 	this.innerWall.hitThreshold = -10;
 	this.outerWall.hitThreshold = -10;
+	this.parentWallMemberTag = attrs.parentWallHandle;
+	this.cellMemberTag = 'cell' + this.handle.toCapitalCamelCase();
+	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall, this.parentWallMemberTag, this.cellMemberTag);
 	this.setupStd();
-	//this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall);
 }
 
 _.extend(Cell.prototype, objectFuncs, {
@@ -85,24 +87,35 @@ _.extend(Cell.prototype, objectFuncs, {
 
 		return pts;	
 	},
-	assignWallHandlers: function(guideNodes, innerWall, outerWall) {
-		var walls = [innerWall, outerWall];
-		for (var wallIdx=0; wallIdx<walls.length; wallIdx++) {
-			var wall = walls[wallIdx];
-			for (var i=0; i<wall.length - 1; i++) {
+	assignWallHandlers: function(guideNodes, innerWall, outerWall, parentWallMemberTag, cellMemberTag) {
+		for (var i=0; i<guideNodes.length; i++) {
+			this.assignWallHandler(innerWall, guideNodes[i].innerWallIdx, outerWall, guideNodes[i].outerWallIdx, guideNodes[i], guideNodes[i].next, cellMemberTag, parentWallMemberTag);
+			this.assignWallHandler(outerWall, guideNodes[i].outerWallIdx, innerWall, guideNodes[i].innerWallIdx, guideNodes[i], guideNodes[i].next, parentWallMemberTag, cellMemberTag);
+		}
+		
+		// for (var wallIdx=0; wallIdx<walls.length; wallIdx++) {
+			// var wall = walls[wallIdx];
+			// for (var i=0; i<wall.length - 1; i++) {
 				
-				var nodeA = _.find(guideNodes, function(node) {node.innerWallIdx == i});
-				var nodeBWallIdx = i == wall.length - 2 ? 0 : i + 1;
-				var nodeB = _.find(guideNodes, function(node) {node.innerWallIdx == nodeBWallIdx});
-				this.assignWallHandler(wall.handle, i, nodeA, nodeB);
+				// var nodeA = _.find(guideNodes, function(node) {node.innerWallIdx == i});
+				// var nodeBWallIdx = i == wall.length - 2 ? 0 : i + 1;
+				// var nodeB = _.find(guideNodes, function(node) {node.innerWallIdx == nodeBWallIdx});
+				// this.assignWallHandler(wall.handle, i, nodeA, nodeB);
+			// }
+		// }
+	},
+	assignWallHandler: function(self, selfIdx, opposite, oppositeIdx, nodeA, nodeB, selfTag, oppositeTag) {
+		var reflect = WallMethods.collideMethods.reflect;
+		var hitFunc = function(dot, wall, subWallIdx, wallUV, perpV, perpUV) {
+			
+			if (dot.tag == selfTag) {
+				reflect(dot, wallUV, perpV);
+			} else if (dot.tag == oppositeTag) {
+				var handler = opposite.handlers[oppositeIdx];
+				handler.func.apply(handler.obj, [dot, opposite, oppositeIdx, opposite.wallUVs[oppositeIdx], -perpV, opposite.wallPerpUVs[oppositeIdx]]);
 			}
 		}
-	},
-	assignWallHandler: function(wallHandle, subWallIdx, nodeA, nodeB) {
-		var hitFunc = function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras) {
-			
-		}
-		walls.setSubWallHandler(wallHandle, subWallIdx, {func: hitFunc, obj: this});
+		walls.setSubWallHandler(self.handle, selfIdx, {func: hitFunc, obj: this});
 	},
 	//setSubWallHandler: function(wallInfo, subWallIdx, handler) {
 	remove: function() {
