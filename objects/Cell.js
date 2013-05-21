@@ -21,7 +21,7 @@ function Cell(attrs) {
 	var initPos = attrs.pos; // upper left corner
 	var thickness = 10;
 	this.nodeMass = attrs.nodeMass || 40;
-	var numCorners = 8;
+	var numCorners = 4;
 	var initRadius = attrs.rad;
 	var membraneColor = attrs.col;
 	var initDots = attrs.dots; //will need to work out timeline integration somehow OR just have dots clean up with membrane.  I don't think there are many reasonable cases where that will cause problems
@@ -35,6 +35,7 @@ function Cell(attrs) {
 	this.parentWallMemberTag = attrs.parentWallHandle;
 	this.cellMemberTag = 'cell' + this.handle.toCapitalCamelCase();
 	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall, this.parentWallMemberTag, this.cellMemberTag);
+	this.wallMoveListenerName = this.addWallMoveListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness);
 	this.setupStd();
 }
 
@@ -88,28 +89,74 @@ _.extend(Cell.prototype, objectFuncs, {
 		return pts;	
 	},
 	assignWallHandlers: function(guideNodes, innerWall, outerWall, parentWallMemberTag, cellMemberTag) {
-		for (var i=0; i<guideNodes.length; i++) {
+		for (var i=0; i<guideNodes.length; i++) {//OY - MAKE SURE YOU MEAN guideNodes[i].prev FOR THE OUTER WALL
 			this.assignWallHandler(innerWall, guideNodes[i].innerWallIdx, outerWall, guideNodes[i].outerWallIdx, guideNodes[i], guideNodes[i].next, cellMemberTag, parentWallMemberTag);
-			this.assignWallHandler(outerWall, guideNodes[i].outerWallIdx, innerWall, guideNodes[i].innerWallIdx, guideNodes[i], guideNodes[i].next, parentWallMemberTag, cellMemberTag);
+			this.assignWallHandler(outerWall, guideNodes[i].outerWallIdx, innerWall, guideNodes[i].innerWallIdx, guideNodes[i].next, guideNodes[i], parentWallMemberTag, cellMemberTag);
 		}
-		
-		// for (var wallIdx=0; wallIdx<walls.length; wallIdx++) {
-			// var wall = walls[wallIdx];
-			// for (var i=0; i<wall.length - 1; i++) {
-				
-				// var nodeA = _.find(guideNodes, function(node) {node.innerWallIdx == i});
-				// var nodeBWallIdx = i == wall.length - 2 ? 0 : i + 1;
-				// var nodeB = _.find(guideNodes, function(node) {node.innerWallIdx == nodeBWallIdx});
-				// this.assignWallHandler(wall.handle, i, nodeA, nodeB);
-			// }
-		// }
 	},
 	assignWallHandler: function(self, selfIdx, opposite, oppositeIdx, nodeA, nodeB, selfTag, oppositeTag) {
 		var reflect = WallMethods.collideMethods.reflect;
 		var hitFunc = function(dot, wall, subWallIdx, wallUV, perpV, perpUV) {
 			
 			if (dot.tag == selfTag) {
-				reflect(dot, wallUV, perpV);
+				//am writing super slow code just to test physics.  will optimize after I check that it works
+				
+				var distNodeANodeB = nodeA.pos.VTo(nodeB.pos).dotProd(wallUV);
+				var distNodeADot = Math.abs(nodeA.pos.VTo(P(dot.x, dot.y)).dotProd(wallUV));
+				var distNodeBDot = Math.abs(nodeA.pos.VTo(P(dot.x, dot.y)).dotProd(wallUV));
+				
+				var centerNodeANodeB = nodeA.pos.copy().movePt(wallUV.copy().mult(distNodeANodeB * .5));
+				
+				var fracA = distNodeADot / distNodeANodeB;
+				var fracB = distNodeBDot / distNodeANodeB;
+
+				var vNodeAPerp_I = -nodeA.v.dotProd(perpUV);
+				var vNodeBPerp_I = -nodeB.v.dotProd(perpUV);
+				
+				
+				var vWallToDot_I = (1 - fracA) * vNodeAPerp_I + (1 - fracB) * vNodeAPerp_I;
+
+				var vLineDot_I = perpV - vWallToDot_I;
+				
+				var vWallTrans_I = .5 * (vNodeAPerp_I + vNodeAPerp_I);
+				
+				var vNodeARel_I = vNodeAPerp_I - vWallTrans_I;
+				var vNodeBRel_I = vNodeBPerp_I - vWallTrans_I;
+				
+				var IWall = nodeA.m * Math.pow(centerNodeANodeB.distTo(nodeA.pos), 2) + nodeB.m * Math.pow(centerNodeANodeB.distTo(nodeB.pos), 2);
+				var distCenterP = Math.abs(centerNodeANodeB.VTo(P(dot.x, dot.y)).dotProd(wallUV));
+				
+				var j = -2 * vLineDot_I / (1/dot.m + 1/(nodeA.m + nodeB.m) + distCenterP * distCenterP / IWall);
+				
+				nodeA.v.dx += perpUV.dx * vNodeARel_I;
+				nodeA.v.dy += perpUV.dy * vNodeARel_I;
+				//subtracting out relative velocities so I can add back in the final relative velocities
+				nodeB.v.dx += perpUV.dx * vNodeBRel_I;
+				nodeB.v.dy += perpUV.dy * vNodeBRel_I;
+				
+				dot.v.dx -= perpUV.dx * j / dot.m;
+				dot.v.dy -= perpUV.dy * j / dot.m;
+				
+				nodeA.v.dx += perpUV.dx * j / (nodeA.m + nodeB.m);
+				nodeA.v.dy += perpUV.dy * j / (nodeA.m + nodeB.m);
+
+				nodeB.v.dx += perpUV.dx * j / (nodeA.m + nodeB.m);
+				nodeB.v.dy += perpUV.dy * j / (nodeA.m + nodeB.m);				
+				
+				//var vWallTrans_F = vWallTrans_I - j / (nodeA.m + nodeB.m);
+				
+				var omegaA_I = vNodeAPerp_I / (.5 * distNodeANodeB);
+				var omegaA_F = omegaA_I - distCenterP * j / IWall;
+				var vNodeARel_F = omegaA_F * .5 * distNodeANodeB;
+				
+				var vNodeBRel_F = -vNodeARel_F;
+
+				nodeA.v.dx -= perpUV.dx * vNodeARel_F;
+				nodeA.v.dy -= perpUV.dy * vNodeARel_F;
+				
+				nodeB.v.dx -= perpUV.dx * vNodeBRel_F;
+				nodeB.v.dy -= perpUV.dy * vNodeBRel_F;
+				
 			} else if (dot.tag == oppositeTag) {
 				var handler = opposite.handlers[oppositeIdx];
 				handler.func.apply(handler.obj, [dot, opposite, oppositeIdx, opposite.wallUVs[oppositeIdx], -perpV, opposite.wallPerpUVs[oppositeIdx]]);
@@ -117,9 +164,33 @@ _.extend(Cell.prototype, objectFuncs, {
 		}
 		walls.setSubWallHandler(self.handle, selfIdx, {func: hitFunc, obj: this});
 	},
-	//setSubWallHandler: function(wallInfo, subWallIdx, handler) {
+	addWallMoveListener: function(nodes, innerWall, outerWall, handle, thickness) {
+		addListener(curLevel, 'wallMove', 'moveCell' + this.handle.toCapitalCamelCase(), function() {
+			var innerWallPtIdx = 0;
+			var outerWallPtIdx = outerWall.length - 2;
+			for (var i=0; i<nodes.length; i++) {
+				nodes[i].pos.x += nodes[i].v.dx;
+				nodes[i].pos.y += nodes[i].v.dy;
+			}
+			for (var i=0; i<nodes.length; i++) {
+				var node = nodes[i];
+				var perpFromPrev = node.prev.pos.VTo(node.pos).perp('cw');
+				var perpFromNext = node.next.pos.VTo(node.pos).perp('ccw')
+				var UVPointingOut = perpFromPrev.add(perpFromNext).UV();
+				outerWall[node.outerWallIdx].x = node.pos.x + UVPointingOut.dx * thickness / 2;
+				outerWall[node.outerWallIdx].y = node.pos.y + UVPointingOut.dy * thickness / 2;
+				
+				innerWall[node.innerWallIdx].x = node.pos.x - UVPointingOut.dx * thickness / 2;
+				innerWall[node.innerWallIdx].y = node.pos.y - UVPointingOut.dy * thickness / 2;
+			}
+			outerWall[outerWall.length - 1].x = outerWall[0].x;
+			outerWall[outerWall.length - 1].y = outerWall[0].y;
+			
+			innerWall[innerWall.length - 1].x = innerWall[0].x;
+			innerWall[innerWall.length - 1].y = innerWall[0].y;
+		})
+	},
 	remove: function() {
-		
 	},
 
 
@@ -127,11 +198,10 @@ _.extend(Cell.prototype, objectFuncs, {
 
 Cell.GuideNode = function(pos, mass) {
 	this.pos = pos;
-	//maybe give it its wall pts too
 	this.next = undefined;
 	this.prev = undefined;
-	this.m = mass;
 	this.v = V(0, 0);
+	this.m = mass;
 	this.innerWallIdx = undefined;
 	this.outerWallIdx = undefined;
 }

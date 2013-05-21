@@ -21,7 +21,7 @@ LevelData = {
 					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: 'staticAdiabatic',/* temp: 298.15,*/ handle: 'wally', isothermalRate: 3/*, border: {type: 'open', thickness: 5, yMin: 30}*/} 
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 1000, temp: 198.15, returnTo: 'wally', tag: 'wally'},
+					//{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 1000, temp: 198.15, returnTo: 'wally', tag: 'wally'},
 					// {spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 0, temp: 398.15, returnTo: 'wally', tag: 'wally'},
 					
 					
@@ -45,17 +45,17 @@ LevelData = {
 					// },
 					{
 						type: 'Cell',
-						attrs: {pos: P(200, 200), rad: 70, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally'}
+						attrs: {pos: P(200, 200), rad: 70, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', nodeMass: 2}
 					},
 					// {
 						// type: 'ActivationEnergyPair',
 						// attrs: {spcNameLow: 'ugly', spcNameHigh: 'fairy', thresholdEnergy: 12}
 					// },
-					{
-						type: 'Heater',
-						cleanUpWith: 'prompt1',
-						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
-					},
+					// {
+						// type: 'Heater',
+						// cleanUpWith: 'prompt1',
+						// attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
+					// },
 				
 					// {
 						// type: 'QArrowsAmmt',
@@ -119,7 +119,7 @@ LevelData = {
 				// ],
 				cmmds: [
 					// //'walls.wally.isothermalStop()',
-					//'spcs.spc1.place([{pos: P(100, 50.1), dir: V(1, .01), temp: 30, tag: "wally", returnTo: "wally"}])'
+					'spcs.spc1.place([{pos: P(75, 75), dir: V(1, 1), temp: 30, tag: "wally", returnTo: "wally"}])'
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				],
 				graphs: [

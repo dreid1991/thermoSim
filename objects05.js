@@ -138,3 +138,23 @@ _.extend(ActivationEnergyPair.prototype, objectFuncs, {
 		activationEnergySpcChanger.removePair(this);
 	}
 })
+
+function Blob(attrs) {
+	this.type = 'Blob';
+	this.pts = attrs.pts;
+	this.fillColor = attrs.fillCol;
+	this.handle = attrs.handle;
+	this.init();
+	this.setupStd();
+}
+_.extend(Blob.prototype, objectFuncs, {
+	init: function() {
+		addListener(curLevel, 'update', 'drawBlob' + this.handle, this.drawBlob, this);
+	},
+	drawBlob: function() {
+		draw.fillPts(this.pts, this.fillColor, c);
+	},
+	remove: function() {
+		removeListener(curLevel, 'update', 'drawBlob', this.handle);
+	},
+})
