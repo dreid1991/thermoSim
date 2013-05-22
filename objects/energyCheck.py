@@ -3,20 +3,23 @@
 import math
 
 
-mA = 2.5
-mB = 2.5
-mD = 5.
-vAo = -5.
-vBo = 1.
-vDo = 3.
+mA = 2.
+mB = 2.
+mD = 4.
+#vAo = -1.366897
+#vBo = -1.776966
+#vDo = 1.366897
+vAo = -3
+vBo = -1
+vDo = 1
 
 yA = 0.
-yB = 10. #yB > yA
-yD = 10.
-
+yB = 100#102.974 #yB > yA
+#yD = 71.2758
+yD = 25.#102.974
 yCenter = .5 * (yA + yB)
 IWall = mA * abs(yCenter - yA)**2 + mB * abs(yCenter - yB)**2
-
+#HEY - THIS IS BROKEN FROM yD > half way up
 
 rWallP = abs(yD - yCenter)
 
@@ -24,7 +27,7 @@ voWallTrans = .5 * (vAo + vBo)
 vAoRel = vAo - voWallTrans
 vBoRel = vBo - voWallTrans
 
-vWallToDot = vAo * yD / (yB - yA) + vBo * (1 - yD / (yB - yA))
+vWallToDot = vBo * yD / (yB - yA) + vAo * (1 - yD / (yB - yA))
 
 vAB = vDo - vWallToDot
 j = - 2 * vAB / ((1 / mD + 1 / (mA + mB)) + rWallP**2 / IWall)
@@ -35,7 +38,7 @@ vDf = vDo + j / mD
 vfWallTrans = voWallTrans - j / (mA + mB)
 
 omegaAo = vAoRel / abs(yA - yCenter)
-omegaAf = omegaAo - abs(yD - yCenter) * j / IWall
+omegaAf = omegaAo + (yD - yCenter) * j / IWall
 vAfRel = abs(yA - yCenter) * omegaAf
 
 vBfRel = -vAfRel

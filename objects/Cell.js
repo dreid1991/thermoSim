@@ -37,8 +37,10 @@ function Cell(attrs) {
 	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall, this.parentWallMemberTag, this.cellMemberTag);
 	this.wallMoveListenerName = this.addWallMoveListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness);
 	this.setupStd();
-	this.guideNodes[2].v.dy = -1;
-	// this.guideNodes[3].v.dy = -1;
+	this.guideNodes[2].v.dy = -1.3;
+	this.guideNodes[2].v.dx = -1.3;
+	this.guideNodes[3].v.dy = -1;
+	this.guideNodes[3].v.dx = -1;
 }
 
 _.extend(Cell.prototype, objectFuncs, {
@@ -135,14 +137,22 @@ _.extend(Cell.prototype, objectFuncs, {
 				
 				var fracA = distNodeADot / distNodeANodeB;
 				var fracB = distNodeBDot / distNodeANodeB;
-
-				var vNodeAPerp_I = -nodeA.v.dotProd(perpUV);
-				var vNodeBPerp_I = -nodeB.v.dotProd(perpUV);
+				
+				vecNodeAPerp = perpUV.copy().mult(nodeA.v.dotProd(perpUV));
+				vecNodeBPerp = perpUV.copy().mult(nodeB.v.dotProd(perpUV));
+				
+				nodeA.v.dx -= vecNodeAPerp.dx;
+				nodeA.v.dy -= vecNodeAPerp.dy;
+				nodeB.v.dx -= vecNodeBPerp.dx;
+				nodeB.v.dy -= vecNodeBPerp.dy;				
+				
+				var vNodeAPerp_I = vecNodeAPerp.dotProd(perpUV);
+				var vNodeBPerp_I = vecNodeBPerp.dotProd(perpUV);
 				
 				
 				var vWallToDot_I = (1 - fracA) * vNodeAPerp_I + (1 - fracB) * vNodeBPerp_I;
-
-				var vLineDot_I = perpV - vWallToDot_I;
+									//was minus in old approach
+				var vLineDot_I = perpV + vWallToDot_I;
 				
 				var vWallTrans_I = .5 * (vNodeAPerp_I + vNodeBPerp_I);
 				
@@ -154,34 +164,40 @@ _.extend(Cell.prototype, objectFuncs, {
 				
 				var j = -2 * vLineDot_I / (1/dot.m + 1/(nodeA.m + nodeB.m) + distCenterP * distCenterP / IWall);
 				
-				nodeA.v.dx += perpUV.dx * vNodeARel_I;
-				nodeA.v.dy += perpUV.dy * vNodeARel_I;
+				vecNodeAPerp.dx += perpUV.dx * vNodeARel_I;
+				vecNodeAPerp.dy += perpUV.dy * vNodeARel_I;
 				//subtracting out relative velocities so I can add back in the final relative velocities
-				nodeB.v.dx += perpUV.dx * vNodeBRel_I;
-				nodeB.v.dy += perpUV.dy * vNodeBRel_I;
+				vecNodeBPerp.dx += perpUV.dx * vNodeBRel_I;
+				vecNodeBPerp.dy += perpUV.dy * vNodeBRel_I;
 				
 				dot.v.dx -= perpUV.dx * j / dot.m;
 				dot.v.dy -= perpUV.dy * j / dot.m;
 				
-				nodeA.v.dx += perpUV.dx * j / (nodeA.m + nodeB.m);
-				nodeA.v.dy += perpUV.dy * j / (nodeA.m + nodeB.m);
-
-				nodeB.v.dx += perpUV.dx * j / (nodeA.m + nodeB.m);
-				nodeB.v.dy += perpUV.dy * j / (nodeA.m + nodeB.m);				
 				
 				//var vWallTrans_F = vWallTrans_I - j / (nodeA.m + nodeB.m);
 				
-				var omegaA_I = -vNodeARel_I / (.5 * distNodeANodeB);
+				var omegaA_I = vNodeARel_I / (.5 * distNodeANodeB);
 				var omegaA_F = omegaA_I + distCenterP * j / IWall;
 				var vNodeARel_F = omegaA_F * .5 * distNodeANodeB;
 				
 				var vNodeBRel_F = -vNodeARel_F;
 
-				nodeA.v.dx -= perpUV.dx * vNodeARel_F;
-				nodeA.v.dy -= perpUV.dy * vNodeARel_F;
+				vecNodeAPerp.dx -= perpUV.dx * vNodeARel_F;
+				vecNodeAPerp.dy -= perpUV.dy * vNodeARel_F;
 				
-				nodeB.v.dx -= perpUV.dx * vNodeBRel_F;
-				nodeB.v.dy -= perpUV.dy * vNodeBRel_F;
+				vecNodeBPerp.dx -= perpUV.dx * vNodeBRel_F;
+				vecNodeBPerp.dy -= perpUV.dy * vNodeBRel_F;
+
+				vecNodeAPerp.dx += perpUV.dx * j / (nodeA.m + nodeB.m);
+				vecNodeAPerp.dy += perpUV.dy * j / (nodeA.m + nodeB.m);
+
+				vecNodeBPerp.dx += perpUV.dx * j / (nodeA.m + nodeB.m);
+				vecNodeBPerp.dy += perpUV.dy * j / (nodeA.m + nodeB.m);			
+
+				nodeA.v.dx += vecNodeAPerp.dx;
+				nodeA.v.dy += vecNodeAPerp.dy;
+				nodeB.v.dx += vecNodeBPerp.dx;
+				nodeB.v.dy += vecNodeBPerp.dy;
 				
 			} else if (dot.tag == oppositeTag) {
 				var handler = opposite.handlers[oppositeIdx];
