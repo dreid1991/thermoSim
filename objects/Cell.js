@@ -21,7 +21,7 @@ function Cell(attrs) {
 	var initPos = attrs.pos; // upper left corner
 	var thickness = 10;
 	this.nodeMass = attrs.nodeMass || 40;
-	var numCorners = 4;
+	var numCorners = 8;
 	var initRadius = attrs.rad;
 	var membraneColor = attrs.col;
 	var initDots = attrs.dots; //will need to work out timeline integration somehow OR just have dots clean up with membrane.  I don't think there are many reasonable cases where that will cause problems
@@ -37,10 +37,10 @@ function Cell(attrs) {
 	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall, this.parentWallMemberTag, this.cellMemberTag);
 	this.wallMoveListenerName = this.addWallMoveListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness);
 	this.setupStd();
-	this.guideNodes[2].v.dy = -1.3;
-	this.guideNodes[2].v.dx = -1.3;
-	this.guideNodes[3].v.dy = -1;
-	this.guideNodes[3].v.dx = -1;
+	// this.guideNodes[2].v.dy = -1;
+	// this.guideNodes[2].v.dx = -1;
+	// this.guideNodes[3].v.dy = -1;
+	// this.guideNodes[3].v.dx = -1;
 }
 
 _.extend(Cell.prototype, objectFuncs, {
@@ -103,7 +103,6 @@ _.extend(Cell.prototype, objectFuncs, {
 		var hitFunc = function(dot, wall, subWallIdx, wallUV, perpV, perpUV) {
 			
 			if (dot.tag == selfTag) {
-				//am writing super slow code just to test physics.  will optimize after I check that it works
 				
 				var distNodeANodeB = nodeA.pos.VTo(nodeB.pos).dotProd(wallUV);
 				var distNodeADot = nodeA.pos.VTo(P(dot.x, dot.y)).dotProd(wallUV);
@@ -135,7 +134,7 @@ _.extend(Cell.prototype, objectFuncs, {
 				var vNodeARel_I = vNodeAPerp_I + vWallTrans_I;
 				var vNodeBRel_I = vNodeBPerp_I + vWallTrans_I;
 				
-				var IWall = nodeA.m * Math.pow(centerNodeANodeB.distTo(nodeA.pos), 2) + nodeB.m * Math.pow(centerNodeANodeB.distTo(nodeB.pos), 2);
+				var IWall = nodeA.m * centerNodeANodeB.distSqrTo(nodeA.pos) + nodeB.m * centerNodeANodeB.distSqrTo(nodeB.pos);
 				var distCenterP = centerNodeANodeB.VTo(P(dot.x, dot.y)).dotProd(wallUV);
 				
 				var j = -2 * vLineDot_I / (1/dot.m + 1/(nodeA.m + nodeB.m) + distCenterP * distCenterP / IWall);
@@ -143,14 +142,14 @@ _.extend(Cell.prototype, objectFuncs, {
 				dot.v.dx -= perpUV.dx * j / dot.m;
 				dot.v.dy -= perpUV.dy * j / dot.m;
 				
-				
-				//MOMENT OF INTERTIA IS SLIGHTLY OFF FROM PYTHON ONE
-				var omegaA_I = -vNodeARel_I / (.5 * distNodeANodeB);
-				var omegaA_F = omegaA_I + distCenterP * j / IWall;
-				var vNodeARel_F = omegaA_F * .5 * distNodeANodeB;
+				// var omegaA_I = vNodeARel_I / (.5 * distNodeANodeB);
+				// var omegaA_F = omegaA_I - distCenterP * j / IWall;
+				// var vNodeARel_F = omegaA_F * .5 * distNodeANodeB;
+				//inlined above three lines into one below
+				var vNodeARel_F = (vNodeARel_I / (.5 * distNodeANodeB) - distCenterP * j / IWall) * .5 * distNodeANodeB;
 				
 				var vNodeBRel_F = -vNodeARel_F;
-				
+				//vNodeARel_F*=-1;//quick fix
 				vWallTrans_F = vWallTrans_I - j / (nodeA.m + nodeB.m);
 				
 				var vNodeA_F = vWallTrans_F + vNodeARel_F;
@@ -161,6 +160,9 @@ _.extend(Cell.prototype, objectFuncs, {
 				nodeA.v.dy += perpUV.dy * vNodeA_F;
 				nodeB.v.dx += perpUV.dx * vNodeB_F;
 				nodeB.v.dy += perpUV.dy * vNodeB_F;
+				
+				dot.x += perpUV.dx;
+				dot.y += perpUV.dy;
 				
 			} else if (dot.tag == oppositeTag) {
 				var handler = opposite.handlers[oppositeIdx];
