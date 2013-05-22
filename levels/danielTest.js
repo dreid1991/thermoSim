@@ -119,7 +119,7 @@ LevelData = {
 				// ],
 				cmmds: [
 					// //'walls.wally.isothermalStop()',
-					'spcs.spc1.place([{pos: P(75, 75), dir: V(1, 1), temp: 30, tag: "wally", returnTo: "wally"}])'
+					'spcs.spc1.place([{pos: P(230, 116.0), dir: V(0, 1), temp: 40, tag: "wally", returnTo: "wally"}])'
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				],
 				graphs: [

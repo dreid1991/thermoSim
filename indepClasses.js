@@ -171,6 +171,11 @@ Vector.prototype = {
 		this.dy+=b.dy;
 		return this;
 	},
+	sub: function(b) {
+		this.dx-=b.dy;
+		this.dy-=b.dx;
+		return this;
+	},
 	set: function(b) {
 		this.dx = b.dx;
 		this.dy = b.dy;
@@ -182,6 +187,9 @@ Vector.prototype = {
 	},
 	dotProd: function(b){
 		return this.dx*b.dx + this.dy*b.dy;
+	},
+	perpDotProd: function(b) {
+		return this.dx * b.dy - this.dy * b.dx;
 	},
 	magSqr: function(){
 		return this.dx*this.dx + this.dy*this.dy;
@@ -307,10 +315,15 @@ Color.prototype = {
 
 }
 Point.prototype = {
-	distTo: function(pTo) {
-		var dx = this.x-pTo.x;
-		var dy = this.y-pTo.y;
+	distTo: function(b) {
+		var dx = this.x-b.x;
+		var dy = this.y-b.y;
 		return Math.sqrt(dx*dx + dy*dy);
+	},
+	distSqrTo: function(b) {
+		var dx = this.x-b.x;
+		var dy = this.y-b.y;
+		return dx*dx + dy*dy;	
 	},
 	VTo: function(b) {
 		return V(b.x-this.x, b.y-this.y);

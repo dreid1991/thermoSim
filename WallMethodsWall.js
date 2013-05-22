@@ -100,16 +100,26 @@ WallMethods.wall = {
 		handler.func.apply(handler.obj, [dot, this, subWallIdx, wallUV, perpV, perpUV]);		
 	},
 	isBetween: function(dot, wallPtIdx, wallUV){
-		//var wallAdjust = Math.abs(dot.v.dotProd(wallUV);
-		var xAdj = (Math.abs(dot.v.dx) + dot.r) * wallUV.dx;
-		var yAdj = (Math.abs(dot.v.dy) + dot.r) * wallUV.dy;
-		//hey, so I'm just going to extend the wall by R and V, because I'd rather overextend the wall than have leaks
-		var wallPtA = new Point(this[wallPtIdx].x - xAdj , this[wallPtIdx].y - yAdj);
-		var wallPtB = new Point(this[wallPtIdx+1].x + xAdj, this[wallPtIdx+1].y + yAdj);
-		var reverseWallUV = new Vector(-wallUV.dx, -wallUV.dy);
-		var dotVecA = new Vector(dot.x + dot.v.dx - wallPtA.x, dot.y + dot.v.dy - wallPtA.y);
-		var dotVecB = new Vector(dot.x + dot.v.dx - wallPtB.x, dot.y + dot.v.dy - wallPtB.y);
+		var wallAdjust = dot.v.dotProd(wallUV);
+		var xAdj = wallAdjust*wallUV.dx;
+		var yAdj = wallAdjust*wallUV.dy;
+		var wallPtA = P(this[wallPtIdx].x+xAdj, this[wallPtIdx].y+yAdj);
+		var wallPtB = P(this[wallPtIdx+1].x+xAdj, this[wallPtIdx+1].y+yAdj);
+		var reverseWallUV = V(-wallUV.dx, -wallUV.dy);
+		var dotVecA = V(dot.x-wallPtA.x, dot.y-wallPtA.y);
+		var dotVecB = V(dot.x-wallPtB.x, dot.y-wallPtB.y);
 		return dotVecA.dotProd(wallUV)>=0 && dotVecB.dotProd(reverseWallUV)>=0;
+		
+		//var wallAdjust = Math.abs(dot.v.dotProd(wallUV);
+		// var xAdj = (Math.abs(dot.v.dx) + dot.r) * wallUV.dx;
+		// var yAdj = (Math.abs(dot.v.dy) + dot.r) * wallUV.dy;
+		// //hey, so I'm just going to extend the wall by R and V, because I'd rather overextend the wall than have leaks
+		// var wallPtA = new Point(this[wallPtIdx].x - xAdj , this[wallPtIdx].y - yAdj);
+		// var wallPtB = new Point(this[wallPtIdx+1].x + xAdj, this[wallPtIdx+1].y + yAdj);
+		// var reverseWallUV = new Vector(-wallUV.dx, -wallUV.dy);
+		// var dotVecA = new Vector(dot.x + dot.v.dx - wallPtA.x, dot.y + dot.v.dy - wallPtA.y);
+		// var dotVecB = new Vector(dot.x + dot.v.dx - wallPtB.x, dot.y + dot.v.dy - wallPtB.y);
+		// return dotVecA.dotProd(wallUV)>=0 && dotVecB.dotProd(reverseWallUV)>=0;
 	},
 	didHitArrowDV: function(dot, subWallIdx, wallUV, perpV, perpUV) {
 		var vo = dot.v.copy();
