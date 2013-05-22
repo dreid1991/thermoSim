@@ -9,17 +9,16 @@ mD = 4.
 #vAo = -1.366897
 #vBo = -1.776966
 #vDo = 1.366897
-vAo = -3
-vBo = -1
-vDo = 1
+vAo = -1.4142135623730951
+vBo = -1.4142135623730951
+vDo = 1.4142135623730951
 
 yA = 0.
-yB = 100#102.974 #yB > yA
+yB = 98.99494936611664#102.974 #yB > yA
 #yD = 71.2758
-yD = 25.#102.974
+yD = 31.819#102.974
 yCenter = .5 * (yA + yB)
 IWall = mA * abs(yCenter - yA)**2 + mB * abs(yCenter - yB)**2
-#HEY - THIS IS BROKEN FROM yD > half way up
 
 rWallP = abs(yD - yCenter)
 

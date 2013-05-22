@@ -105,30 +105,6 @@ _.extend(Cell.prototype, objectFuncs, {
 			if (dot.tag == selfTag) {
 				//am writing super slow code just to test physics.  will optimize after I check that it works
 				
-				// var distNodeANodeB = nodeA.pos.VTo(nodeB.pos).dotProd(wallUV);
-				// var distNodeADot = nodeA.pos.VTo(P(dot.x, dot.y)).dotProd(wallUV);
-				// var distNodeBDot = -nodeB.pos.VTo(P(dot.x, dot.y)).dotProd(wallUV);
-				// var fracA = distNodeADot / distNodeANodeB;
-				// var fracB = distNodeBDot / distNodeANodeB;
-				
-				// var vNodeAPerp_I = -nodeA.v.dotProd(perpUV);
-				// var vNodeBPerp_I = -nodeB.v.dotProd(perpUV);
-				
-				// var centerNodeANodeB = nodeA.pos.copy().movePt(wallUV.copy().mult(distNodeANodeB * .5));
-				// var vWallToDot_I = perpUV.copy().mult((1 - fracA) * vNodeAPerp_I + (1 - fracB) * vNodeBPerp_I);
-				
-				// var vecCenterToDot = centerNodeANodeB.VTo(P(dot.x, dot.y));
-				
-				// var vecAB = dot.v.copy().sub(vWallToDot_I);
-				// var IWall = nodeA.m * centerNodeANodeB.distSqrTo(nodeA.pos) + nodeB.m * centerNodeANodeB.distSqrTo(nodeB.pos);
-				
-				// var j = -2 * vecAB.dotProd(perpUV) / (1 / dot.m + 1 / (nodeA.m + nodeB.m) + Math.pow(vecCenterToDot.perpDotProd(perpUV), 2) / IWall);
-				
-				// dot.v.add(perpUV.copy().mult(j / dot.m));
-				
-				
-				
-				
 				var distNodeANodeB = nodeA.pos.VTo(nodeB.pos).dotProd(wallUV);
 				var distNodeADot = nodeA.pos.VTo(P(dot.x, dot.y)).dotProd(wallUV);
 				var distNodeBDot = -nodeB.pos.VTo(P(dot.x, dot.y)).dotProd(wallUV);
@@ -151,57 +127,44 @@ _.extend(Cell.prototype, objectFuncs, {
 				
 				
 				var vWallToDot_I = (1 - fracA) * vNodeAPerp_I + (1 - fracB) * vNodeBPerp_I;
-									//was minus in old approach
+				
 				var vLineDot_I = perpV + vWallToDot_I;
 				
-				var vWallTrans_I = .5 * (vNodeAPerp_I + vNodeBPerp_I);
+				var vWallTrans_I = -.5 * (vNodeAPerp_I + vNodeBPerp_I);
 				
-				var vNodeARel_I = vNodeAPerp_I - vWallTrans_I;
-				var vNodeBRel_I = vNodeBPerp_I - vWallTrans_I;
+				var vNodeARel_I = vNodeAPerp_I + vWallTrans_I;
+				var vNodeBRel_I = vNodeBPerp_I + vWallTrans_I;
 				
 				var IWall = nodeA.m * Math.pow(centerNodeANodeB.distTo(nodeA.pos), 2) + nodeB.m * Math.pow(centerNodeANodeB.distTo(nodeB.pos), 2);
 				var distCenterP = centerNodeANodeB.VTo(P(dot.x, dot.y)).dotProd(wallUV);
 				
 				var j = -2 * vLineDot_I / (1/dot.m + 1/(nodeA.m + nodeB.m) + distCenterP * distCenterP / IWall);
 				
-				vecNodeAPerp.dx += perpUV.dx * vNodeARel_I;
-				vecNodeAPerp.dy += perpUV.dy * vNodeARel_I;
-				//subtracting out relative velocities so I can add back in the final relative velocities
-				vecNodeBPerp.dx += perpUV.dx * vNodeBRel_I;
-				vecNodeBPerp.dy += perpUV.dy * vNodeBRel_I;
-				
 				dot.v.dx -= perpUV.dx * j / dot.m;
 				dot.v.dy -= perpUV.dy * j / dot.m;
 				
 				
-				//var vWallTrans_F = vWallTrans_I - j / (nodeA.m + nodeB.m);
-				
-				var omegaA_I = vNodeARel_I / (.5 * distNodeANodeB);
+				//MOMENT OF INTERTIA IS SLIGHTLY OFF FROM PYTHON ONE
+				var omegaA_I = -vNodeARel_I / (.5 * distNodeANodeB);
 				var omegaA_F = omegaA_I + distCenterP * j / IWall;
 				var vNodeARel_F = omegaA_F * .5 * distNodeANodeB;
 				
 				var vNodeBRel_F = -vNodeARel_F;
-
-				vecNodeAPerp.dx -= perpUV.dx * vNodeARel_F;
-				vecNodeAPerp.dy -= perpUV.dy * vNodeARel_F;
 				
-				vecNodeBPerp.dx -= perpUV.dx * vNodeBRel_F;
-				vecNodeBPerp.dy -= perpUV.dy * vNodeBRel_F;
+				vWallTrans_F = vWallTrans_I - j / (nodeA.m + nodeB.m);
+				
+				var vNodeA_F = vWallTrans_F + vNodeARel_F;
+				var vNodeB_F = vWallTrans_F + vNodeBRel_F;
+				
 
-				vecNodeAPerp.dx += perpUV.dx * j / (nodeA.m + nodeB.m);
-				vecNodeAPerp.dy += perpUV.dy * j / (nodeA.m + nodeB.m);
-
-				vecNodeBPerp.dx += perpUV.dx * j / (nodeA.m + nodeB.m);
-				vecNodeBPerp.dy += perpUV.dy * j / (nodeA.m + nodeB.m);			
-
-				nodeA.v.dx += vecNodeAPerp.dx;
-				nodeA.v.dy += vecNodeAPerp.dy;
-				nodeB.v.dx += vecNodeBPerp.dx;
-				nodeB.v.dy += vecNodeBPerp.dy;
+				nodeA.v.dx += perpUV.dx * vNodeA_F;
+				nodeA.v.dy += perpUV.dy * vNodeA_F;
+				nodeB.v.dx += perpUV.dx * vNodeB_F;
+				nodeB.v.dy += perpUV.dy * vNodeB_F;
 				
 			} else if (dot.tag == oppositeTag) {
 				var handler = opposite.handlers[oppositeIdx];
-				handler.func.apply(handler.obj, [dot, opposite, oppositeIdx, opposite.wallUVs[oppositeIdx], -perpV, opposite.wallPerpUVs[oppositeIdx]]);
+				handler.func.apply(handler.obj, [dot, opposite, oppositeIdx, opposite.wallUVs[oppositeIdx], -dot.v.dotProd(opposite.wallPerpUVs[oppositeIdx]), opposite.wallPerpUVs[oppositeIdx]]);
 			}
 		}
 		walls.setSubWallHandler(self.handle, selfIdx, {func: hitFunc, obj: this});
