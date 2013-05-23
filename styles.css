@@ -83,6 +83,7 @@ textarea.sim {
 	height:25px;
 	border-top-left-radius:20px;
 	border-top-right-radius:20px;
+	font-family:Open Sans, Verdana, garamond;
 	background-color:#05111a;
 	text-align:center;
 	font-size:x-large;
@@ -119,14 +120,14 @@ textarea.sim {
 	border-color:#b3b2b1;	
 }
 .sim.displayText, table.displayText {
-	font-family:Verdana, garamond;/*WHAT IS GARAMOND?  SHOULD GET OTHER FALLBACKS.*/
+	font-family:Open Sans, Verdana, garamond;/*WHAT IS GARAMOND?  SHOULD GET OTHER FALLBACKS.*/
 	font-size:medium;
 	color:white;
 	padding:5px;
 }
 
 table.data {
-	font-family:Verdana;
+	font-family:Open Sans, Verdana;
 	font-size:medium;
 	color:white;
 	border: 2px solid white;
@@ -144,7 +145,7 @@ table.data th {
 }
 
 .sim.niceFont{
-	font-family:Verdana, garamond;
+	font-family:Open Sans, Verdana, garamond;
 }
 .sim.bottomAlign{
 	vertical-align:bottom;
