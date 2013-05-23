@@ -415,7 +415,9 @@ WallMethods.wall = {
 				this.tSet = temp;
 			} else if (/current/i.test(temp)) {
 				var tempData = this.getDataSrc('temp');	
-				this.tSet = tempData[tempData.length - 1];
+				if (tempData.length) {
+					this.tSet = tempData[tempData.length - 1];
+				}
 			}
 		}
 		this.eToAdd = 0;
