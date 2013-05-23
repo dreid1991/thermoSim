@@ -21,7 +21,7 @@ function Cell(attrs) {
 	var initPos = attrs.pos; // upper left corner
 	var thickness = 10;
 	this.nodeMass = attrs.nodeMass || 40;
-	var numCorners = 8;
+	var numCorners = 4;
 	var initRadius = attrs.rad;
 	var membraneColor = attrs.col;
 	var initDots = attrs.dots; //will need to work out timeline integration somehow OR just have dots clean up with membrane.  I don't think there are many reasonable cases where that will cause problems
@@ -37,7 +37,7 @@ function Cell(attrs) {
 	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall, this.parentWallMemberTag, this.cellMemberTag);
 	this.wallMoveListenerName = this.addWallMoveListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness);
 	this.dotId = timeline.takeNumber();
-	this.addDots(initPos, this.innerWall, attrs.dots, attrs.temp, this.dotId, this.cellMemberTag);
+	//this.addDots(initPos, this.innerWall, attrs.dots, attrs.temp, this.dotId, this.cellMemberTag);
 	this.setupStd();
 }
 
@@ -150,8 +150,8 @@ _.extend(Cell.prototype, objectFuncs, {
 				//vNodeARel_F*=-1;//quick fix
 				vWallTrans_F = vWallTrans_I - j / (nodeA.m + nodeB.m);
 				
-				var vNodeA_F = vWallTrans_F + vNodeARel_F;
-				var vNodeB_F = vWallTrans_F + vNodeBRel_F;
+				var vNodeA_F = -(vWallTrans_F - vNodeARel_F);
+				var vNodeB_F = -(vWallTrans_F - vNodeBRel_F);
 				
 
 				nodeA.v.dx += perpUV.dx * vNodeA_F;
