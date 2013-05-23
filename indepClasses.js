@@ -326,7 +326,11 @@ Point.prototype = {
 		return dx*dx + dy*dy;	
 	},
 	VTo: function(b) {
-		return V(b.x-this.x, b.y-this.y);
+		return new Vector(b.x-this.x, b.y-this.y);
+	},
+	UVTo: function(b) {
+		var mag = Math.sqrt((this.x - b.x) * (this.x - b.x) + (this.y - b.y) * (this.y - b.y));
+		return new Vector((b.x - this.x) / mag, (b.y - this.y) / mag);
 	},
 	fracVTo: function(b, frac) {
 		return this.VTo(b).mult(frac);
@@ -340,7 +344,7 @@ Point.prototype = {
 		this.y = b.y;
 	},
 	avg: function(b) {
-		return P((this.x+b.x)/2, (this.y+b.y)/2);
+		return new Point((this.x+b.x)/2, (this.y+b.y)/2);
 	},
 	area: function(a, b) {
 		var baseV = V(a.x-this.x, a.y-this.y);

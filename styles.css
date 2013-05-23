@@ -22,7 +22,6 @@ Copyright (C) 2013  Daniel Reid
 }
 .sim.main{
 	width:550px;
-
 }
 
 .sim.ui-button-as-radio-selected{
@@ -130,10 +129,18 @@ table.data {
 	font-family:Verdana;
 	font-size:medium;
 	color:white;
+	border: 2px solid white;
 }
 
 table.data td {
 	text-align:center;
+	border: 1px solid white;
+}
+
+table.data th {
+	padding: 6px;
+	text-align:center;
+	border-bottom: 1px solid white; 
 }
 
 .sim.niceFont{

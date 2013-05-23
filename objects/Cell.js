@@ -33,14 +33,12 @@ function Cell(attrs) {
 	this.innerWall.hitThreshold = -10;
 	this.outerWall.hitThreshold = -10;
 	this.parentWallMemberTag = attrs.parentWallHandle;
-	this.cellMemberTag = 'cell' + this.handle.toCapitalCamelCase();
+	this.cellMemberTag = this.innerWall.handle;
 	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall, this.parentWallMemberTag, this.cellMemberTag);
 	this.wallMoveListenerName = this.addWallMoveListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness);
+	this.dotId = timeline.takeNumber();
+	this.addDots(initPos, this.innerWall, attrs.dots, attrs.temp, this.dotId, this.cellMemberTag);
 	this.setupStd();
-	// this.guideNodes[2].v.dy = -1;
-	// this.guideNodes[2].v.dx = -1;
-	// this.guideNodes[3].v.dy = -1;
-	// this.guideNodes[3].v.dx = -1;
 }
 
 _.extend(Cell.prototype, objectFuncs, {
@@ -198,6 +196,33 @@ _.extend(Cell.prototype, objectFuncs, {
 			window.walls.setupWall(walls.indexOf(innerWall));
 			window.walls.setupWall(walls.indexOf(outerWall));
 		})
+	},
+	addDots: function(center, innerWall, toAdd, temp, elemId, tagAndReturnTo) {
+		for (var spcName in toAdd) {
+			var spc = window.spcs[spcName];
+			if (!spc) console.log('Bad species name sent to cell: ' + spcName);
+			var spcDots = [];
+			var numToAdd = toAdd[spcName];
+			var numPerRightTriangle = Math.floor(toAdd[spcName] / (2 * innerWall.length));
+			for (var ptIdx=0; ptIdx<innerWall.length - 1; ptIdx++) {
+				var a = innerWall[ptIdx];
+				var b = innerWall[ptIdx + 1];
+				var bisector = center.VTo(a).add(center.VTo(b)).UV();
+				this.populateRightTriangle(center, a, a.avg(b), numPerRightTriangle, spc, temp, bisector);
+				this.populateRightTriangle(center, b, a.avg(b), numPerRightTriangle, spc, temp, bisector);
+				
+			}
+			
+		}
+	},
+	populateRightTriangle: function(center, a, rightAnglePt, count, spc, temp, flatUV) {
+		var xFrac = Math.sqrt(Math.random()); //weighting towards outside
+		var perpUV = flatUV.copy().perp('cw');
+		if (rightAnglePt.VTo(a).dotProd(perpUV) < 0) {
+			perpUV = flatUV.copy().perp('ccw');
+		}
+		
+		
 	},
 	remove: function() {
 	},
