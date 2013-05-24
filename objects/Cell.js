@@ -271,7 +271,7 @@ _.extend(Cell.prototype, objectFuncs, {
 	checkExpelDot: function(dot, outerWall, perpUVPairs) {
 		for (var i=0; i<perpUVPairs; i++) {
 			var dotPos = new Point(dot.x, dot.y);
-			if (outerWall[i].VTo(dotPos).dotProd(perpUVPairs[i][0]) > 0 && outerWall[i + 1].VTo(dotPos).dotProd(perpUvPairs[i][1] > 0) {
+			if (outerWall[i].VTo(dotPos).dotProd(perpUVPairs[i][0]) > 0 && outerWall[i + 1].VTo(dotPos).dotProd(perpUvPairs[i][1]) > 0) {
 				
 			}
 		}

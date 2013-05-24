@@ -14,7 +14,6 @@ Copyright (C) 2013  Daniel Reid
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 function Liquid(attrs) {
 	//driving force convention: positive -> into liquid, neg -> into vapor
 	//still need to do pInt adjustment for wallGas
@@ -698,5 +697,3 @@ _.extend(Liquid.prototype, objectFuncs, {
 		if (!this.wallGas.removed) this.wallGas.removeSurfAreaAdjust(this.handle);
 	},
 })
-
-

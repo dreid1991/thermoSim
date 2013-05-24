@@ -1,5 +1,5 @@
 LevelData = {	
-	levelTitle: 'Heat capacity behaviors',
+	levelTitle: 'Heat capacities',
 	spcDefs: [
 		//add antoine coefs, cvLiq, hvap
 		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
@@ -26,7 +26,7 @@ LevelData = {
 				{//p1, q1
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "<p>We'll start by heating a constant volume system by 100 K.  It contains 1 mole of an ideal monotomic gas.  How much energy should this heating 'cost'?</p>",
+					text: "<p>We'll start by heating a constant volume system.  It contains 0.5 mole of an ideal monotomic gas.  How much energy should this heating 'cost'?</p>",
 					quiz:[						
 					{
 						type: 'textSmall', 
@@ -46,7 +46,7 @@ LevelData = {
 				],
 				dots: [	
 					//{type: 'spc1', pos: P(100, 100), dims: V(300, 300), count: 500, temp:600, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(50, 50), dims: V(200, 350), count: 1000, temp:150, returnTo: 'wally1', tag: 'wally1'},
+					{spcName: 'ugly', pos: P(50, 50), dims: V(200, 350), count: 500, temp:150, returnTo: 'wally1', tag: 'wally1'},
 				],
 				objs: [
 					{type: 'Heater', attrs: {handle: 'heaterWally1', wallInfo: 'wally1', tempMax: 500, max: 5}},	
@@ -60,53 +60,53 @@ LevelData = {
 									// ],
 			}, 
 			prompts:[				
-				{//p0, q2
-					// sceneData: 
+				// {//p0, q2
+					// // sceneData: 
+						// // {
+						// // triggers: [
+							// // {handle: 'heatcheck', expr: 'fracDiff(temp("wally1"), 250) < 0.05', message: 'Heat the system by 100 K', priority:1, checkOn: 'conditions'},
+									// // ],
+						// // },											
+					// cutScene:false,
+					// text: "Now let's perform an experiment.  You wrote that this heating would 'cost' get('foo20', 'string', 'noValue') kJ.  The system shown above contains our 0.5 mol of ideal monatomic gas.   You can add energy by using the slider to activate the heater.  Increase the temperature by 100 K. Note that you can cool the system if its temperature increases too much.<p>How does your prediction for the heating amount compare to the experimental result? Explain.</p>",
+					// quiz:[
 						// {
-						// triggers: [
-							// {handle: 'heatcheck', expr: 'fracDiff(temp("wally1"), 250) < 0.05', message: 'Heat the system by 100 K', priority:1, checkOn: 'conditions'},
-									// ],
-						// },											
-					cutScene:false,
-					text: "Now let's perform an experiment.  You wrote that this heating would 'cost' get('foo20', 'string', 'noValue') kJ.  The system shown above contains our one mole of ideal monatomic gas.   You can add energy by using the slider to activate the heater.  Increase the temperature by 100 K. Note that you can cool the system if its temperature increases too much.<p>How does your prediction for the heating amount compare to the experimental result? Explain.</p>",
-					quiz:[
-						{
-							storeAs: 'foo3', 
-							type:'text', 
-							text:'Type your answer here.', 
-						},
-					],					
-				},
-				{//p1, q3
-				cutScene: true, 
-				text: "<p>Now we're going to look at heating in a constant pressure system. This means the volume is no longer constant. <p>If we increase its temperature by 100 K, how do you think the energy 'cost' will compare to heating the constant volume system?  Explain.</p>", 
-				quiz:[
-						{
-							storeAs: 'foo4', 
-							type:'text', 
-							text:'Type your answer here.', 
-						}, 
-					]
-				},
+							// storeAs: 'foo3', 
+							// type:'text', 
+							// text:'Type your answer here.', 
+						// },
+					// ],					
+				// },
+				// {//p1, q3
+				// cutScene: true, 
+				// text: "<p>Now we're going to look at heating in a constant pressure system. This means the volume is no longer constant. <p>If we increase its temperature by 100 K, how do you think the energy 'cost' will compare to heating the constant volume system?  Explain.</p>", 
+				// quiz:[
+						// {
+							// storeAs: 'foo4', 
+							// type:'text', 
+							// text:'Type your answer here.', 
+						// }, 
+					// ]
+				// },
 				{//p2, q4
 					sceneData:
 						{
 						walls: [
 								//{pts:[P(40,40), P(250,40), P(250,425), P(40,425)], handler:'staticAdiabatic', handle:'wally1', border: {type: 'wrap'}},
-								{pts:[P(300,40), P(510,40), P(510,425), P(300,425)], handler:'staticAdiabatic', handle:'wally2', vol: 5, border: {type: 'open', yMin: 50}},
+								{pts:[P(300,40), P(510,40), P(510,425), P(300,425)], handler:'staticAdiabatic', handle:'wally2', vol: 4.7, border: {type: 'open', yMin: 50}},
 							],
 						dots: [	
 								//{type: 'spc1', pos: P(100, 100), dims: V(300, 300), count: 500, temp:600, returnTo: 'wally', tag: 'wally1'},
 								//{type: 'ugly', pos: P(100, 100), dims: V(300, 300), count: 500, temp:600, returnTo: 'wally1', tag: 'wally1'},
-								{spcName: 'ugly', pos: P(310, 200), dims: V(200, 200), count: 1000, temp:150, returnTo: 'wally2', tag: 'wally2'},
+								{spcName: 'ugly', pos: P(310, 220), dims: V(200, 180), count: 500, temp:150, returnTo: 'wally2', tag: 'wally2'},
 							],
 						objs: [
 								{type: 'Heater', attrs: {handle: 'heaterWally2', cleanUpWith: 'section', wallInfo: 'wally2'}},
-								{type: 'Piston', attrs: {handle: 'pistony', cleanUpWith: 'section', wallInfo: 'wally2', makeSlider: false, init: 3}},								
+								{type: 'Piston', attrs: {handle: 'pistony', cleanUpWith: 'section', wallInfo: 'wally2', makeSlider: false, init: 1.5}},								
 							],
 						dataReadouts: [								
 								{label: 'Heat: ', expr: 'q("wally2")', units: 'kJ', sigFigs: 2, handle: 'heating2', readout: 'mainReadout'},
-								{label: 'Temp: ', expr: 'temp("wally2")', units: 'K', sigFigs: 1, handle: 'temperature2', readout: 'mainReadout'},
+								{label: 'Temp: ', expr: 'tempSmooth("wally2")', units: 'K', sigFigs: 1, handle: 'temperature2', readout: 'mainReadout'},
 								{label: 'pExt: ', expr: 'pExt("wally2")', units: 'bar', sigFigs: 2, handle: 'pressure2', readout: 'pistonReadoutPistony'},																
 							],
 						cmmds: [
@@ -130,7 +130,7 @@ LevelData = {
 			prompts:[
 				{//p0, q5
 				cutScene:true, 
-				text: "<p>The system had a constant external pressure of 3 bar, contained one mole of an ideal monatomic gas, and was heated by 100 K.  From the first law, what should the change in system volume have been?</p>", 
+				text: "<p>The system had a constant external pressure of 3 bar, contained one mole of an ideal monatomic gas, and was heated by 100 K.</p>  From the first law, what should the change in system volume have been?<br>", 
 				quiz:[						
 					{
 						type: 'textSmall', 
@@ -140,7 +140,7 @@ LevelData = {
 					},
 					{
 						type: 'textSmall', 
-						preText: 'How much work did the system do on its surroundings?',
+						preText: '<br>How much work did the system do on its surroundings?<br>',
 						storeAs: 'foo6', 
 						units: 'kJ', 
 						text: ''
@@ -154,16 +154,17 @@ LevelData = {
 				{
 					walls: [
 							//{pts:[P(40,40), P(250,40), P(250,425), P(40,425)], handler:'staticAdiabatic', handle:'wally1', border: {type: 'wrap'}},
-							{pts:[P(300,40), P(510,40), P(510,425), P(300,425)], handler:'staticAdiabatic', handle:'wally3', vol: 5, border: {type: 'open', yMin: 50}},
+							{pts:[P(300,40), P(510,40), P(510,425), P(300,425)], handler:'staticAdiabatic', handle:'wally3', vol: 4.7, border: {type: 'open', yMin: 50}},
+							
 					],
 					dots: [	
 							//{type: 'spc1', pos: P(100, 100), dims: V(300, 300), count: 500, temp:600, returnTo: 'wally', tag: 'wally1'},
 							//{type: 'ugly', pos: P(100, 100), dims: V(300, 300), count: 500, temp:600, returnTo: 'wally1', tag: 'wally1'},
-							{spcName: 'ugly', pos: P(310, 50), dims: V(200, 350), count: 1000, temp:150, returnTo: 'wally3', tag: 'wally2'},
+							{spcName: 'ugly', pos: P(310, 200), dims: V(200, 200), count: 500, temp:150, returnTo: 'wally3', tag: 'wally3'},
 					],
 					objs: [
 							{type: 'Heater', attrs: {handle: 'heaterWally3', cleanUpWith: 'section', wallInfo: 'wally3'}},
-							{type: 'Piston', attrs: {handle: 'pistony3', cleanUpWith: 'section', wallInfo: 'wally3', makeSlider: false, init: 3}},
+							{type: 'Piston', attrs: {handle: 'pistony3', cleanUpWith: 'section', wallInfo: 'wally3', makeSlider: false, init: 1.5}},
 					],
 					dataReadouts: [							
 							{label: 'Heat: ', expr: 'q("wally3")', units: 'kJ', sigFigs: 2, handle: 'heating3', readout: 'mainReadout'},
@@ -173,7 +174,7 @@ LevelData = {
 																
 						],
 			},			
-			prompts: [
+			prompts: [					
 						{//p0, q6
 						text: "Here's the same system with the work done displayed.  Increase the temperature by 100 K.  You predicted that get('foo5', 'string', 'noValue') kJ of work would be done.  How does this compare to the experimental result?",
 						quiz:[

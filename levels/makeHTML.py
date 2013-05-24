@@ -1,5 +1,10 @@
+import sys
+fileList = open(sys.argv[1], 'r')
+levelDataFileName = sys.argv[2]
+print """
 <html>
 <body>
+<!SIMULATION>
 <link type='text/css' href = '../css/custom-theme/jquery-ui-1.9.2.custom.sim.css' rel='stylesheet' />
 <link type='text/css' href = '../styles.css' rel='stylesheet'/>
 <link type='text/css' href = '../mathStyles.css' rel='stylesheet'/>
@@ -20,16 +25,8 @@
 				</div>
 			</div>
 
-<!--
-			<div id='dashIntro' class='sim dashMed noSelect'>
-				<center>
-					<button id='toSim' class='sim noSelect'>To the simulation!</button>
-				</center>
-				
-			</div>
--->
 			<div id='dashRunWrapper' style='position:relative'>
-				<div id='dashRun' class='sim dashMed noSelect' style='position:relative'>
+				<div id='dashRunBlank' class='sim dashMed noSelect' style='position:relative;display:none;'>
 					<center>
 						<div id='buttons' class='sim'>
 				
@@ -53,18 +50,9 @@
 						</div>
 					</center>
 				</div>
-				<button id='resetExp' style='position:absolute; right:.5em; bottom:.25em; z-index: 1' class='sim'><img src='img/refresh.gif'></img></button>
+				<button id='resetExp' style='position:absolute; right:.5em; bottom:.25em; z-index: 1' class='sim'><!image appended in init></button>
 			</div>
 			<div id='dashCutScene' class='sim dashMed noSelect'></div>
-<!--
-			<div id='dashOutro' class='sim dash noSelect ' >
-				<center>
-					<button id='toLastStep' class='sim'>Back to the simulation</button>
-				</center>
-				
-				
-			</div>
--->
 		</div>
 	</td>
 	<td class='padLeft floatTop'>
@@ -110,15 +98,11 @@
 	<div id='baseDash' class='sim bottomRound noSelect'></div>
 </div>
 <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-<script src = '../underscore-min.js'></script>
-<script src = '../js/jquery-2.0.0.min.js'></script>
-<script src = '../js/jquery-ui-1.9.2.custom.min.js'></script>
-<script src = '../core-compiled.js'></script>
-
-
-<script src = 'danielTest.js'></script>
-
-
-
+"""
+for fileName in fileList:
+	print "<script src = '" + fileName.rstrip() + "'></script>"
+print "<script src = '" + levelDataFileName.rstrip() + "'></script>"
+print """
 </body>
 </html>
+"""

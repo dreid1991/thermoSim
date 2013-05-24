@@ -1,7 +1,7 @@
 
 canvasHeight = 450;
 LevelData = {
-	levelTitle: 'Reversibility Template',
+	levelTitle: 'Reversible and Irreversible Processes',
 
 		
 	spcDefs: [
@@ -12,22 +12,23 @@ LevelData = {
 	],	
 
 	mainSequence: [
-		{
-			sceneData: undefined,
-			prompts: [
-				{
-					cutScene: true,
-					text: '<p>In these experiments, we will explore what makes a process irreversible and what makes a process reversible.</p><p>Before we get to the experiment, please first describe what you think the difference between an irreversible and a reversible process is.</p>',
-					quiz:[
-						{
-							type: 'text',
-							text: 'type your answer here',
-						}
-					]
-				},
-			],	
+		
+		// {
+			// sceneData: undefined,
+			// // prompts: [
+				// // {
+					// // cutScene: true,
+					// // text: '<p>In these experiments, we will explore what makes a process irreversible and what makes a process reversible.</p><p>Before we get to the experiment, please first describe what you think the difference between an irreversible and a reversible process is.</p>',
+					// // quiz:[
+						// // {
+							// // type: 'text',
+							// // text: 'type your answer here',
+						// // }
+					// // ]
+				// // },
+			// // ],	
 			
-		},
+		// // },
 		{
 			sceneData: {
 				walls: [
@@ -49,6 +50,15 @@ LevelData = {
 							compMode: 'cPAdiabaticDamped',
 						}	
 					},
+					// {
+						// type: 'Blob',
+						// cleanUpWith: "prompt0",
+						// attrs: {
+							// handle: 'Blobby',
+							// fillCol: Col(150, 200, 150),
+							// pts: [P(150, 150), P(300, 150), P(300, 300), P(150, 300)],
+						// }
+					// },
 					{
 						type: 'DragWeights',
 						attrs: {

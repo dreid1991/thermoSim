@@ -2,10 +2,10 @@ LevelData = {
 	levelTitle: 'Chemical reaction rate and equilibrium',
 
 	spcDefs: [
-		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, 
-		{spcName: 'ugly', m: 4, r: 2, col: Col(255, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
-		{spcName: 'uglier', m: 4, r: 2, col: Col(255, 255, 255), cv: 3 * R, hF298: -12, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
-		{spcName: 'duckling', m: 4, r: 2, col: Col(255, 255, 255), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
+		{spcName: 'spc1', m: 4, r: 2, sF298: 0, col: Col(200, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, 
+		{spcName: 'ugly', m: 4, r: 2, sF298: 0, col: Col(255, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
+		{spcName: 'uglier', m: 4, r: 2, sF298: 20, col: Col(255, 255, 255), cv: 3 * R, hF298: -12, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
+		{spcName: 'duckling', m: 4, r: 2, sF298: 0, col: Col(255, 255, 255), cv: 3 * R, hF298: -11, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
 	],
 	mainSequence: [
 		{//S0	
@@ -28,7 +28,7 @@ LevelData = {
 		{//S1
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', isothermalRate: 5, temp: 400, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
+					{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', isothermalRate: 5, temp: 600, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
 				],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
@@ -107,7 +107,7 @@ LevelData = {
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				// ],
 				rxns: [
-					{handle: 'rxn1', rctA: 'ugly', activeE: 9, prods: {uglier: 1}},
+					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 9, prods: {uglier: 2}},
 					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				],
 				graphs: [
@@ -173,11 +173,11 @@ LevelData = {
 		{//S2
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 'get("foo4", "string", "noValue")', handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
+					{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 'get("foo4", "float", 500)', handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
 				],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(70, 70), dims: V(420, 290), count: 600, temp: 'get("foo4", "string", "noValue")', returnTo: 'wally', tag: 'wally'}
+					{spcName: 'ugly', pos: P(70, 70), dims: V(420, 290), count: 600, temp: 'get("foo4", "float", 500)', returnTo: 'wally', tag: 'wally'}
 					//{spcName: 'duckling', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
@@ -252,7 +252,7 @@ LevelData = {
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				// ],
 				rxns: [
-					{handle: 'rxn1', rctA: 'ugly', activeE: 5, prods: {uglier: 1}},
+					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 5, prods: {uglier: 2}},
 					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				],
 				graphs: [
@@ -297,7 +297,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Your results are shown in the table below. Can you explain the data's behavior from a physical perspective?<p><table class = 'data' border='1'><tr><td>Temp (K)</td><td>Time (s)</td></tr><tr><td>300</td><td>get('foo2', 'string', 'noValue')</td></tr><tr><td>get('foo4', 'string', 'noValue')</td><td>get('foo5', 'string', 'noValue')</td></tr></table></p>", 
+					text: "Your results are shown in the table below. Can you explain the data's behavior from a physical perspective?<p><table class = 'data' border='1'><tr><th>Temp (K)</th><th>Time (s)</th></tr><tr><td>300</td><td>get('foo2', 'string', 'noValue')</td></tr><tr><td>get('foo4', 'string', 'noValue')</td><td>get('foo5', 'string', 'noValue')</td></tr></table></p>", 
 					quiz:[
 							{
 								storeAs: 'foo5', 
@@ -458,8 +458,7 @@ LevelData = {
 					quiz:[
 							{
 								storeAs: 'foo2', 
-								type:'textSmall', 
-								units: 'seconds',
+								type:'text', 							
 								text:'', 
 							}, 
 					]
@@ -495,7 +494,7 @@ LevelData = {
 					},
 					{
 						type: 'Heater',
-						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty', max: 2.5, makeSlider: true}
+						attrs:{wallInfo: 'wally', tempMax: 5, handle: 'heaty', max: 2.5, makeSlider: true}
 					},
 
 					// {
@@ -551,7 +550,7 @@ LevelData = {
 					// {handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				// ],
 				graphs: [
-					{type: 'Scatter', handle: 'PvsVOne', xLabel: "temp (K)", yLabel: "frac hot spc", axesInit:{x:{min:0, step:10}, y:{min:0, step:.2}}, numGridLines: {y: 4}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'PvsVOne', xLabel: "temp (K)", yLabel: "frac hot spc", axesInit:{x:{min:0, step:10}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
 							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'temp("wally")', y: "frac('wally', {spcName: 'duckling', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
 						]
@@ -634,7 +633,7 @@ LevelData = {
 					],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(70, 70), dims: V(420, 290), count: 600, temp: 500, returnTo: 'wally', tag: 'wally'}
+					{spcName: 'ugly', pos: P(70, 70), dims: V(420, 290), count: 600, temp: 300, returnTo: 'wally', tag: 'wally'}
 					//{spcName: 'duckling', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
@@ -650,10 +649,10 @@ LevelData = {
 						// type: 'DragWeights',
 						// attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 2}], pInit: 3}
 					// },
-					{
-						type: 'ActivationEnergyPair',
-						attrs: {spcNameLow: 'ugly', spcNameHigh: 'duckling', activationEnergy: 10}
-					},
+					// {
+						// type: 'ActivationEnergyPair',
+						// attrs: {spcNameLow: 'ugly', spcNameHigh: 'duckling', activationEnergy: 4}
+					// },
 					{
 						type: 'Heater',
 						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty', max: 2.5, makeSlider: true}
@@ -699,7 +698,7 @@ LevelData = {
 					// ]},
 					{handle: 'rxnControl', label: 'Rxn control', isRadio: true, buttons: [
 						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Forward on', exprs: ['collide.enableRxn("rxn1")']},
-						{groupHandle: 'rxnControl', handle: 'rxnOff', label: 'Forward off', exprs: ['collide.disableRxn("rxn1")']},
+						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Forward off', exprs: ['collide.disableRxn("rxn1")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.enableRxn("rxn2")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.disableRxn("rxn2")']}
 						],
@@ -709,14 +708,14 @@ LevelData = {
 					// 'walls.wally.isothermalStop()',
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				// ],
-				// rxns: [
-					// {handle: 'rxn1', rctA: 'ugly', activeE: 5, prods: {uglier: 1}},
-					// {handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
-				// ],
+				rxns: [
+					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 5, prods: {duckling: 2}},
+					{handle: 'rxn2', rctA: 'duckling', rctB: 'duckling', activeE: 6, prods: {ugly: 2}}
+				],
 				graphs: [
-					{type: 'Scatter', handle: 'PvsVOne', xLabel: "temp (K)", yLabel: "frac hot spc", axesInit:{x:{min:0, step:80}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Time (s)", yLabel: "Product Mole Fraction", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
-							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'temp("wally")', y: "frac('wally', {spcName: 'duckling', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
+							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'duckling', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
 						]
 					},
 					// {type: 'Scatter', handle: 'tempvstime', xLabel: "vol", yLabel: "pExt (K)", axesInit:{x:{min:0, step:3}, y:{min:0, step:2}}, numGridLines: {x: 3, y: 10},
@@ -736,7 +735,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: "Now let's perform the experiment with both the forward and reverse reaction. Click 'enable' to start the reaction. How long does it take for the system to reach the equilibrium mole fraction of A you predict?", 
+					text: "Let's perform an experiment with both a forward and reverse reaction. Click 'enable' to start the reaction. How long does it take for the system to reach the equilibrium mole fraction of A?", 
 					quiz:[
 							{
 								storeAs: 'foo6', 

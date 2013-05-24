@@ -1,3 +1,4 @@
+
 <html>
 <body>
 <!SIMULATION>
@@ -21,14 +22,6 @@
 				</div>
 			</div>
 
-<!--
-			<div id='dashIntro' class='sim dashMed noSelect'>
-				<center>
-					<button id='toSim' class='sim noSelect'>To the simulation!</button>
-				</center>
-				
-			</div>
--->
 			<div id='dashRunWrapper' style='position:relative'>
 				<div id='dashRunBlank' class='sim dashMed noSelect' style='position:relative;display:none;'>
 					<center>
@@ -57,15 +50,6 @@
 				<button id='resetExp' style='position:absolute; right:.5em; bottom:.25em; z-index: 1' class='sim'><!image appended in init></button>
 			</div>
 			<div id='dashCutScene' class='sim dashMed noSelect'></div>
-<!--
-			<div id='dashOutro' class='sim dash noSelect ' >
-				<center>
-					<button id='toLastStep' class='sim'>Back to the simulation</button>
-				</center>
-				
-				
-			</div>
--->
 		</div>
 	</td>
 	<td class='padLeft floatTop'>
@@ -111,6 +95,7 @@
 	<div id='baseDash' class='sim bottomRound noSelect'></div>
 </div>
 <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
 <script src = '../underscore-min.js'></script>
 <script src = '../js/jquery-2.0.0.min.js'></script>
 <script src = '../js/jquery-ui-1.9.2.custom.min.js'></script>
@@ -147,12 +132,31 @@
 <script src = '../QuizRenderer.js'></script>
 <script src = '../ActivationEnergySpcChanger.js'></script>
 <script src = '../ConditionManager.js'></script>
-<script src = '../objects01.js'></script>
-<script src = '../objects02.js'></script>
-<script src = '../objects03.js'></script>
-<script src = '../objects04.js'></script>
-<script src = '../objects05.js'></script>
+<script src = '../objects/objectFuncs.js'></script>
+<script src = '../objects/ActivationEnergyPair.js'></script>
+<script src = '../objects/ArrowFly.js'></script>
+<script src = '../objects/ArrowLine.js'></script>
+<script src = '../objects/ArrowStatic.js'></script>
 <script src = '../objects/Cell.js'></script>
+<script src = '../objects/CheckMark.js'></script>
+<script src = '../objects/Clamps.js'></script>
+<script src = '../objects/CompArrow.js'></script>
+<script src = '../objects/DragArrow.js'></script>
+<script src = '../objects/DragWeights.js'></script>
+<script src = '../objects/flowFuncs.js'></script>
+<script src = '../objects/Heater.js'></script>
+<script src = '../objects/Inlet.js'></script>
+<script src = '../objects/Liquid.js'></script>
+<script src = '../objects/Outlet.js'></script>
+<script src = '../objects/ParticleEmitter.js'></script>
+<script src = '../objects/Piston.js'></script>
+<script src = '../objects/QArrowsAmmt.js'></script>
+<script src = '../objects/RMSChanger.js'></script>
+<script src = '../objects/Sandbox.js'></script>
+<script src = '../objects/Stops.js'></script>
+<script src = '../objects/TempChanger.js'></script>
+<script src = '../objects/Tracer.js'></script>
+<script src = '../objects/Trigger.js'></script>
 <script src = '../AuxImage.js'></script>
 <script src = '../animText.js'></script>
 <script src = '../Readout.js'></script>
@@ -160,10 +164,8 @@
 <script src = '../LevelInstance.js'></script>
 <script src = '../Timeline.js'></script>
 <script src = '../init.js'></script>
-
 <script src = 'levelTemplateCole.js'></script>
-
-
 
 </body>
 </html>
+
