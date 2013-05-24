@@ -40,6 +40,7 @@ function Cell(attrs) {
 	this.dotId = timeline.takeNumber();
 	this.addDots(center, this.innerWall, attrs.dots, attrs.temp, this.dotId, this.cellMemberTag);
 	this.expelForeignDots(center, this.outerWall, this.cellMemberTag, window.dotManager.lists.ALLDOTS);
+	window.dotMigrator.migrateDots(window.dotManager.get({tag:this.parentWallMemberTag}), [this.parentWallMemberTag], [this.outerWall.handle]);
 	this.setupStd();
 }
 

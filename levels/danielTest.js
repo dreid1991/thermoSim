@@ -18,10 +18,11 @@ LevelData = {
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: 'staticAdiabatic',/* temp: 298.15,*/ handle: 'wally', isothermalRate: 3/*, border: {type: 'open', thickness: 5, yMin: 30}*/} 
+					{pts: [P(50, 50), P(250, 50), P(250, 400), P(50, 400)], handler: 'staticAdiabatic',/* temp: 298.15,*/ handle: 'wally', isothermalRate: 3/*, border: {type: 'open', thickness: 5, yMin: 30}*/} ,
+					{pts: [P(300, 50), P(450, 50), P(450, 400), P(300, 400)], handler: 'staticAdiabatic',/* temp: 298.15,*/ handle: 'target', isothermalRate: 3/*, border: {type: 'open', thickness: 5, yMin: 30}*/} 
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(350, 300), count: 1000, temp: 198.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'spc1', pos: P(55, 55), dims: V(190, 300), count: 500, temp: 198.15, returnTo: 'wally', tag: 'wally'},
 					// {spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 0, temp: 398.15, returnTo: 'wally', tag: 'wally'},
 					
 					

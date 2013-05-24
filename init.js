@@ -83,6 +83,7 @@ $(function(){
 	attractor = new Attractor();
 	animText = new AnimText(c);
 	phaseEquilGenerator = new PhaseEquilGenerator();
+	dotMigrator = new DotMigrator();
 	quizRenderer = new QuizRenderer();
 	sceneNavigator = new SceneNavigator();
 	interpreter = new ExpressionInterpreter();
