@@ -23,7 +23,7 @@ function DotMigrator(){
 
 DotMigrator.prototype = {
 	migrateDots: function(dots, allowedWallHandles, disallowedWallHandles) {
-		this.width = $('#myCanvas').width(); //this stuff is here rather than in the constructor so the canvas can have nonzero dimensions when checked
+		this.width = $('#myCanvas').width(); //this stuff is here rather than in the constructor so the canvas can have non-zero dimensions when checked
 		this.height = $('#myCanvas').height();
 		this.colWidth = this.width / (this.numCols - 1);
 		this.rowHeight = this.height / (this.numRows - 1);

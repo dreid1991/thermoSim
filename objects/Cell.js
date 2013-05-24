@@ -21,9 +21,9 @@ function Cell(attrs) {
 	var initPos = attrs.pos; // upper left corner
 	var thickness = 10;
 	this.nodeMass = attrs.nodeMass || 100;
+	var initRadius = attrs.rad;
 	var center = initPos.copy().movePt(V(initRadius, initRadius));
 	var numCorners = 8;
-	var initRadius = attrs.rad;
 	var membraneColor = attrs.col;
 	var initDots = attrs.dots; //will need to work out timeline integration somehow OR just have dots clean up with membrane.  I don't think there are many reasonable cases where that will cause problems
 	this.guideNodes = this.makeGuideNodes(initPos, initRadius, numCorners, this.nodeMass);
@@ -39,7 +39,6 @@ function Cell(attrs) {
 	this.wallMoveListenerName = this.addWallMoveListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness);
 	this.dotId = timeline.takeNumber();
 	this.addDots(center, this.innerWall, attrs.dots, attrs.temp, this.dotId, this.cellMemberTag);
-	this.expelForeignDots(center, this.outerWall, this.cellMemberTag, window.dotManager.lists.ALLDOTS);
 	window.dotMigrator.migrateDots(window.dotManager.get({tag:this.parentWallMemberTag}), [this.parentWallMemberTag], [this.outerWall.handle]);
 	this.setupStd();
 }
@@ -205,11 +204,11 @@ _.extend(Cell.prototype, objectFuncs, {
 			if (!spc) console.log('Bad species name sent to cell: ' + spcName);
 			var spcDots = [];
 			var numToAdd = toAdd[spcName];
-			var numPerRightTriangle = Math.floor(toAdd[spcName] / (2 * innerWall.length));
+			var numPerRightTriangle = Math.floor(toAdd[spcName] / (2 * (innerWall.length - 1)));
 			for (var ptIdx=0; ptIdx<innerWall.length - 1; ptIdx++) {
 				var a = innerWall[ptIdx];
 				var b = innerWall[ptIdx + 1];
-				var bisector = center.VTo(a).add(center.VTo(b)).UV();
+				var bisector = center.VTo(a.avg(b)).UV();
 				
 				this.populateRightTriangle(center, a, a.avg(b), numPerRightTriangle, spc, temp, bisector, tagAndReturnTo, elemId, spcName);
 				this.populateRightTriangle(center, b, a.avg(b), numPerRightTriangle, spc, temp, bisector, tagAndReturnTo, elemId, spcName);
@@ -226,15 +225,14 @@ _.extend(Cell.prototype, objectFuncs, {
 			perpUV = flatUV.copy().perp('ccw');
 		}
 		var dots = [];
-		var UV = center.UVTo(rightAnglePt);
 		var yMax = rightAnglePt.distTo(a);
 		var xLen = center.distTo(rightAnglePt);
 		for (var i=0; i<count; i++) {
 			var xVal = Math.sqrt(Math.random()) * xLen; //weighting towards outside
 			var yVal = Math.random() * yMax * xVal / xLen;
-			var dotX = center.x + UV.dx * xVal;
-			var dotY = center.y + perpUV.dy * yVal;
-			var dir = V(Math.random(), Math.random()).UV();
+			var dotX = center.x + flatUV.dx * xVal + perpUV.dx * yVal;
+			var dotY = center.y + flatUV.dy * xVal + perpUV.dy * yVal;
+			var dir = V(Math.random() - .5, Math.random() - .5).UV();
 			dots.push(new Dot(dotX, dotY, dir, spcName, tagAndReturnTo, elemId, tagAndReturnTo));
 			dots[dots.length - 1].setTemp(temp); 
 		}
@@ -242,40 +240,6 @@ _.extend(Cell.prototype, objectFuncs, {
 		
 		
 		
-	},
-	expelForeignDots: function(center, outerWall, cellDotTag, dots) {
-		var perpUVPairs = [];
-		var zeroPerpDir, onePerpDir;
-		var centerA = center.VTo(outerWall[0]);
-		var centerB = center.VTo(outerWall[1]);
-		
-		var perpACW = centerA.perp('cw');
-		var perpBCCW = centerB.perp('ccw');
-		//is that even right?
-		if (Math.abs(Math.atan2(perpACW.dy, perpACW.dx) - Math.atan2(perpBCCW.dy, perpBCCW.dx)) < Math.PI) {
-			zeroPerpDir = 'cw';
-			onePerpDiR = 'ccw';
-		} else {
-			zeroPerpDir = 'ccw';
-			onePerpDiR = 'cw';
-		}
-		
-		for (var i=0; i<outerWall.length - 1; i++) {
-			perpUVPairs.push([center.VTo(outerWall[i]).UV().perp(zeroPerpDir), center.VTo(outerWall[i + 1]).UV().perp(onePerpDir)]);
-		}
-		
-		for (var i=0; i<dots.length; i++) {
-			this.checkExpelDot(dots[i], outerWall, perpUVPairs);
-		}
-		
-	},
-	checkExpelDot: function(dot, outerWall, perpUVPairs) {
-		for (var i=0; i<perpUVPairs; i++) {
-			var dotPos = new Point(dot.x, dot.y);
-			if (outerWall[i].VTo(dotPos).dotProd(perpUVPairs[i][0]) > 0 && outerWall[i + 1].VTo(dotPos).dotProd(perpUvPairs[i][1]) > 0) {
-				
-			}
-		}
 	},
 	remove: function() {
 	},
