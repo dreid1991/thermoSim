@@ -22,6 +22,7 @@
 ../Experiment.js
 ../ReactionHandler.js
 ../CollideHandler.js
+../DotMigrator.js
 ../Attractor.js
 ../DataHandler.js
 ../WallHandler.js

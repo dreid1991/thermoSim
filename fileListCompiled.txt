@@ -1,1 +1,1 @@
-core-compiled.js
+../core-compiled.js

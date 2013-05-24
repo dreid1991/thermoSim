@@ -19,7 +19,7 @@ LevelData = {
 				objs: [
 					{
 						type: 'ActivationEnergyPair',
-						attrs: {spcNameLow: 'ugly', spcNameHigh: 'fairy', activationEnergy: 12}
+						attrs: {spcNameLow: 'ugly', spcNameHigh: 'fairy', activationEnergy: 16}
 					},
 					{
 						type: 'Heater',
@@ -48,7 +48,7 @@ LevelData = {
 			prompts: [
 				{
 					title: '',
-					text: "When the purple molecules reach a specified energy (##12 kJ/mol##), they turn white to show they're excited.  How does the graph you produce by heating the system compare to the graph predicted by the Arrhenius rate equation shown below? $$k_ = Ae^{-\\frac{E_{a}}{RT}}$$",
+					text: "When the purple molecules reach a specified energy (##6 kJ/mol##), they turn white to show they're excited.  How does the graph you produce by heating the system compare to the graph predicted by the Arrhenius rate equation shown below? $$k_ = Ae^{-\\frac{E_{a}}{RT}}$$",
 				}
 				
 			]

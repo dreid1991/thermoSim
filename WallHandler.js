@@ -362,7 +362,14 @@ WallMethods.main = {
 		}
 		return false;
 	},
-	
+	getWallsByHandles: function(handles) {
+		var grabbed = []
+		for (var i=0; i<handles.length; i++) {
+			grabbed.push(this[handles[i]]);
+			if (!grabbed[grabbed.length - 1]) console.log('Bad wall handle ' + handles[i]);
+		}
+		return grabbed;
+	},
 	//One wall, assuming first/last points do not overlap
 	wallVolume: function(wallInfo){
 		return this.area(this[wallInfo].slice(0,this[wallInfo].length-1))*vConst;

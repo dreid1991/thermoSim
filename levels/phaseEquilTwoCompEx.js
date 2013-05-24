@@ -16,15 +16,15 @@ LevelData = {
 					{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'staticAdiabatic',/* temp: 298.15,*/ handle: 'wally', isothermalRate: 3, border: {type: 'open', thickness: 5, yMin: 30}} 
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(350, 200), count: 500, temp: 398.15, returnTo: 'wally', tag: 'wally'}
-					{spcName: 'spc2', pos: P(55, 55), dims: V(150, 200), count: 400, temp: 398.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'spc1', pos: P(55, 55), dims: V(350, 200), count: 500, temp: 398.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'spc2', pos: P(55, 55), dims: V(150, 200), count: 400, temp: 398.15, returnTo: 'wally', tag: 'wally'}
 					
 					
 				],
 				objs: [
 					{
 						type: 'Liquid',  
-						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, spc2: 300}, primaryKey: 'heavy', actCoeffType: 'ideal', /*actCoeffType: 'vanlaar', actCoeffInfo: {spc1:.9227, spc2: 1.67}*/, makePhaseDiagram: true}
+						attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700, spc2: 300}, primaryKey: 'heavy', actCoeffType: 'ideal' /*actCoeffType: 'vanlaar', actCoeffInfo: {spc1:.9227, spc2: 1.67}*/, makePhaseDiagram: true}
 					},
 					{
 						type: 'Piston',
@@ -75,7 +75,7 @@ LevelData = {
 					},
 					{
 						type: 'DragWeights',
-						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 3}], weightScalar: 30, pInit: 2, cleanUpWith: 'prompt1'}
+						attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 3}], weightScalar: 30, pInit: 5, cleanUpWith: 'prompt1'}
 					},
 					{
 						type: 'Heater',

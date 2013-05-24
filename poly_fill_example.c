@@ -21,7 +21,10 @@ for (pixelY=IMAGE_TOP; pixelY<IMAGE_BOT; pixelY++) {
 	i=0;
 	while (i<nodes-1) {
 		if (nodeX[i]>nodeX[i+1]) {
-			swap=nodeX[i]; nodeX[i]=nodeX[i+1]; nodeX[i+1]=swap; if (i) i--; 
+			swap=nodeX[i]; 
+			nodeX[i]=nodeX[i+1]; 
+			nodeX[i+1]=swap; 
+			if (i) i--; 
 		} else {
 		  i++; 
 		}

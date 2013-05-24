@@ -48,11 +48,11 @@ ExpressionInterpreter.prototype = {
 		MathJax.Hub.Queue(['Typeset', MathJax.Hub, div ? $(div).attr('id') : undefined])
 	},
 	addStored: function(text) {
-		var get = DataGetFuncs.get;
-
-		return text.replace(/get[\s]*\([A-Za-z0-9,\s\-\.'"]*\)/g, function(subStr, idx) {
-			return eval(subStr);
-		})	
+		with ({'get': DataGetFuncs.get}) { //for compiler
+			return text.replace(/get[\s]*\([A-Za-z0-9,\s\-\.'"]*\)/g, function(subStr, idx) {
+				return eval(subStr);
+			})	
+		}
 	},
 	eval: function(text) {
 		if (typeof text == 'number') return text;

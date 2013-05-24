@@ -60,34 +60,34 @@ LevelData = {
 									// ],
 			}, 
 			prompts:[				
-				// {//p0, q2
-					// // sceneData: 
-						// // {
-						// // triggers: [
-							// // {handle: 'heatcheck', expr: 'fracDiff(temp("wally1"), 250) < 0.05', message: 'Heat the system by 100 K', priority:1, checkOn: 'conditions'},
-									// // ],
-						// // },											
-					// cutScene:false,
-					// text: "Now let's perform an experiment.  You wrote that this heating would 'cost' get('foo20', 'string', 'noValue') kJ.  The system shown above contains our 0.5 mol of ideal monatomic gas.   You can add energy by using the slider to activate the heater.  Increase the temperature by 100 K. Note that you can cool the system if its temperature increases too much.<p>How does your prediction for the heating amount compare to the experimental result? Explain.</p>",
-					// quiz:[
+				{//p0, q2
+					// sceneData: 
 						// {
-							// storeAs: 'foo3', 
-							// type:'text', 
-							// text:'Type your answer here.', 
-						// },
-					// ],					
-				// },
-				// {//p1, q3
-				// cutScene: true, 
-				// text: "<p>Now we're going to look at heating in a constant pressure system. This means the volume is no longer constant. <p>If we increase its temperature by 100 K, how do you think the energy 'cost' will compare to heating the constant volume system?  Explain.</p>", 
-				// quiz:[
-						// {
-							// storeAs: 'foo4', 
-							// type:'text', 
-							// text:'Type your answer here.', 
-						// }, 
-					// ]
-				// },
+						// triggers: [
+							// {handle: 'heatcheck', expr: 'fracDiff(temp("wally1"), 250) < 0.05', message: 'Heat the system by 100 K', priority:1, checkOn: 'conditions'},
+									// ],
+						// },											
+					cutScene:false,
+					text: "Now let's perform an experiment.  You wrote that this heating would 'cost' get('foo2', 'string', 'noValue') kJ.  The system shown above contains our 0.5 mol of ideal monatomic gas.   You can add energy by using the slider to activate the heater.  Increase the temperature by 100 K. Note that you can cool the system if its temperature increases too much.<p>How does your prediction for the heating amount compare to the experimental result? Explain.</p>",
+					quiz:[
+						{
+							storeAs: 'foo3', 
+							type:'text', 
+							text:'Type your answer here.', 
+						},
+					],					
+				},
+				{//p1, q3
+				cutScene: true, 
+				text: "<p>Now we're going to look at heating in a constant pressure system. This means the volume is no longer constant. <p>If we increase its temperature by 100 K, how do you think the energy 'cost' will compare to heating the constant volume system?  Explain.</p>", 
+				quiz:[
+						{
+							storeAs: 'foo4', 
+							type:'text', 
+							text:'Type your answer here.', 
+						}, 
+					]
+				},
 				{//p2, q4
 					sceneData:
 						{
