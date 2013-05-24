@@ -195,6 +195,7 @@ WallMethods.main = {
 		this[wallIdx].pIntLen = 35;
 		this[wallIdx].surfAreaAdj = {};
 		this[wallIdx].eToAdd = 0;
+		this[wallIdx].isLiquid = false;
 		this[wallIdx].isothermal = false;
 		this[wallIdx].removed = false;
 		this[wallIdx].tSet = tSet;

@@ -74,18 +74,12 @@ ReactionHandler = {
 		}
 	},
 	initRxn: function(rxn) {
-		if (rxn.rctA && rxn.rctB) {
-			this.initPair(rxn)
-		} else if (rxn.rctA) {
-			this.initDecomp(rxn);
-		}
+		this.initPair(rxn)
+
 		this.activeRxns.push(rxn);
 		
 	},
 	
-
-
-	//make a removeReaction function
 	removeAllReactions: function(){
 		this.setDefaultHandler({func:this.impactStd, obj:this});
 	},
@@ -93,7 +87,6 @@ ReactionHandler = {
 		return defA.idNum < defB.idNum ? defA.idNum + '-' + defB.idNum : defB.idNum + '-' + defA.idNum;
 	},
 	//end public
-	//maybe automatically adding reverse should reverse activE be specified
 	initPair: function(rxn) {
 		//rctA, rctB, rctDefA, rctDefB, activeTemp, hRxn, prods
 		
@@ -119,32 +112,6 @@ ReactionHandler = {
 	//Input prods as {name:count, ...}
 	//reformatting since looping through array is faster than looping through obj
 	//internally formatted as [{name:'...', count:#}..]
-	initDecomp: function(rxn) {
-		var rctA = rxn.rctA;
-		var idA = rxn.rctADef.idNum;
-		for (var rctB in this.spcs) {
-			var rxnPair = rxn.copy();
-			var rctBDef = this.spcs[rctB];
-			rxnPair.rctB = rctB;
-			rxnPair.rctBDef = rctBDef;
-			
-			var idB = rctBDef.idNum;
-			if (idA == idB) {
-				rxnPair.activeE *= 2;
-				rxnPair.doubleProds();
-			} else {
-				rxnPair.increaseProd(rctB, 1);
-			}
-			this.initPair(rxnPair);
-			
-		}
-		// var doubleDecomp = rxn.copy();
-		// doubleDecomp.rctB = doubleDecomp.rctA;
-		// doubleDecomp.rctBDef = doubleDecomp.rctADef;
-		// doubleDecomp.activeE *= 2;
-		// doubleDecomp.doubleProds();
-		// this.initPair(doubleDecomp);
-	},
 
 	hitE: function(a, b, perpAB, perpBA){
 		return .5*(Math.abs(perpAB)*perpAB*a.m*a.cvKinetic + Math.abs(perpBA)*perpBA*b.m*b.cvKinetic)*this.tConst;

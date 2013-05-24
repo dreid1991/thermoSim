@@ -20,8 +20,9 @@ function Cell(attrs) {
 	this.handle = attrs.handle;
 	var initPos = attrs.pos; // upper left corner
 	var thickness = 10;
-	this.nodeMass = attrs.nodeMass || 40;
-	var numCorners = 4;
+	this.nodeMass = attrs.nodeMass || 100;
+	var center = initPos.copy().movePt(V(initRadius, initRadius));
+	var numCorners = 8;
 	var initRadius = attrs.rad;
 	var membraneColor = attrs.col;
 	var initDots = attrs.dots; //will need to work out timeline integration somehow OR just have dots clean up with membrane.  I don't think there are many reasonable cases where that will cause problems
@@ -37,7 +38,8 @@ function Cell(attrs) {
 	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall, this.parentWallMemberTag, this.cellMemberTag);
 	this.wallMoveListenerName = this.addWallMoveListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness);
 	this.dotId = timeline.takeNumber();
-	//this.addDots(initPos, this.innerWall, attrs.dots, attrs.temp, this.dotId, this.cellMemberTag);
+	this.addDots(center, this.innerWall, attrs.dots, attrs.temp, this.dotId, this.cellMemberTag);
+	this.expelForeignDots(center, this.outerWall, this.cellMemberTag, window.dotManager.lists.ALLDOTS);
 	this.setupStd();
 }
 
@@ -147,7 +149,6 @@ _.extend(Cell.prototype, objectFuncs, {
 				var vNodeARel_F = (vNodeARel_I / (.5 * distNodeANodeB) - distCenterP * j / IWall) * .5 * distNodeANodeB;
 				
 				var vNodeBRel_F = -vNodeARel_F;
-				//vNodeARel_F*=-1;//quick fix
 				vWallTrans_F = vWallTrans_I - j / (nodeA.m + nodeB.m);
 				
 				var vNodeA_F = -(vWallTrans_F - vNodeARel_F);
@@ -208,21 +209,72 @@ _.extend(Cell.prototype, objectFuncs, {
 				var a = innerWall[ptIdx];
 				var b = innerWall[ptIdx + 1];
 				var bisector = center.VTo(a).add(center.VTo(b)).UV();
-				this.populateRightTriangle(center, a, a.avg(b), numPerRightTriangle, spc, temp, bisector);
-				this.populateRightTriangle(center, b, a.avg(b), numPerRightTriangle, spc, temp, bisector);
+				
+				this.populateRightTriangle(center, a, a.avg(b), numPerRightTriangle, spc, temp, bisector, tagAndReturnTo, elemId, spcName);
+				this.populateRightTriangle(center, b, a.avg(b), numPerRightTriangle, spc, temp, bisector, tagAndReturnTo, elemId, spcName);
+				numToAdd -= 2 * numPerRightTriangle;
 				
 			}
+			this.populateRightTriangle(center, a, a.avg(b), numToAdd, spc, temp, bisector, tagAndReturnTo, elemId, spcName);
 			
 		}
 	},
-	populateRightTriangle: function(center, a, rightAnglePt, count, spc, temp, flatUV) {
-		var xFrac = Math.sqrt(Math.random()); //weighting towards outside
+	populateRightTriangle: function(center, a, rightAnglePt, count, spc, temp, flatUV, tagAndReturnTo, elemId, spcName) {
 		var perpUV = flatUV.copy().perp('cw');
 		if (rightAnglePt.VTo(a).dotProd(perpUV) < 0) {
 			perpUV = flatUV.copy().perp('ccw');
 		}
+		var dots = [];
+		var UV = center.UVTo(rightAnglePt);
+		var yMax = rightAnglePt.distTo(a);
+		var xLen = center.distTo(rightAnglePt);
+		for (var i=0; i<count; i++) {
+			var xVal = Math.sqrt(Math.random()) * xLen; //weighting towards outside
+			var yVal = Math.random() * yMax * xVal / xLen;
+			var dotX = center.x + UV.dx * xVal;
+			var dotY = center.y + perpUV.dy * yVal;
+			var dir = V(Math.random(), Math.random()).UV();
+			dots.push(new Dot(dotX, dotY, dir, spcName, tagAndReturnTo, elemId, tagAndReturnTo));
+			dots[dots.length - 1].setTemp(temp); 
+		}
+		window.dotManager.add(dots);
 		
 		
+		
+	},
+	expelForeignDots: function(center, outerWall, cellDotTag, dots) {
+		var perpUVPairs = [];
+		var zeroPerpDir, onePerpDir;
+		var centerA = center.VTo(outerWall[0]);
+		var centerB = center.VTo(outerWall[1]);
+		
+		var perpACW = centerA.perp('cw');
+		var perpBCCW = centerB.perp('ccw');
+		//is that even right?
+		if (Math.abs(Math.atan2(perpACW.dy, perpACW.dx) - Math.atan2(perpBCCW.dy, perpBCCW.dx)) < Math.PI) {
+			zeroPerpDir = 'cw';
+			onePerpDiR = 'ccw';
+		} else {
+			zeroPerpDir = 'ccw';
+			onePerpDiR = 'cw';
+		}
+		
+		for (var i=0; i<outerWall.length - 1; i++) {
+			perpUVPairs.push([center.VTo(outerWall[i]).UV().perp(zeroPerpDir), center.VTo(outerWall[i + 1]).UV().perp(onePerpDir)]);
+		}
+		
+		for (var i=0; i<dots.length; i++) {
+			this.checkExpelDot(dots[i], outerWall, perpUVPairs);
+		}
+		
+	},
+	checkExpelDot: function(dot, outerWall, perpUVPairs) {
+		for (var i=0; i<perpUVPairs; i++) {
+			var dotPos = new Point(dot.x, dot.y);
+			if (outerWall[i].VTo(dotPos).dotProd(perpUVPairs[i][0]) > 0 && outerWall[i + 1].VTo(dotPos).dotProd(perpUvPairs[i][1] > 0) {
+				
+			}
+		}
 	},
 	remove: function() {
 	},

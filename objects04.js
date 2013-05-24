@@ -41,6 +41,7 @@ function Liquid(attrs) {
 	this.drivingForce = this.makeDrivingForce(this.spcDefs);
 	this.dotMgrLiq = this.makeDotManager(this.spcDefs);
 	this.wallLiq = this.makeWallLiq(this.spcDefs, spcCounts, this.wallGas, this.wallPtIdxs, this.dotMgrLiq);
+	this.wallLiq.isLiquid = true;
 	this.surfAreaObj = this.wallGas.addSurfAreaAdjust(this.handle);
 	this.numAbs = deepCopy(this.drivingForce);
 	this.numEjt = deepCopy(this.numAbs);
