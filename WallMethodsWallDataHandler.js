@@ -298,7 +298,7 @@ WallMethods.wallDataHandler = {
 		return dataObj;
 	},
 	recordEnthalpy: function() { //not going to make recording by spc possible right now
-		var cvs, hF298s, hVap298s, dotLists, cpLiqs, calcEnthalpy;
+		var cvs = [], hF298s = [], hVap298s = [], cpLiqs = [], calcEnthalpy, dotLists = [];
 		var dataObj = this.data.enthalpy;
 		if (!dataObj || !dataObj.recording()) {
 			this.data.enthalpy = new WallMethods.DataObj();
@@ -307,23 +307,20 @@ WallMethods.wallDataHandler = {
 			var tempList = this.getDataSrc('temp');
 			if (this.isLiquid) {
 				for (var i=0; i<LevelData.spcDefs.length; i++) {
-					if (LevelData.spcDefs[i].hVap298 !== undefined && LevelData.spcDefs[i].cPLiq !== undefined) {
+					if (LevelData.spcDefs[i].hVap298 !== undefined && LevelData.spcDefs[i].cpLiq !== undefined) {
 						var dots = this.dotManager.get({tag: this.handle, spcName: LevelData.spcDefs[i].spcName});
 						dotLists.push(dots);
 						hF298s.push(LevelData.spcDefs[i].hF298 * 1000 / N);
 						hVap298s.push(LevelData.spcDefs[i].hVap298 * 1000 / N);
-						cpLiqs.push(LevelData.spcDefs[i].cpLiq);
-					} else {
-						console.log('Trying to record liquid enthalpy for species with insufficient data');
-						console.log(LevelData.spcDefs[i].spcName);
-					}
+						cpLiqs.push(LevelData.spcDefs[i].cpLiq / N);
+					} 
 				}
 				calcEnthalpy = function() {
 					var enthalpy = 0;
 					var numDots = 0;
 					var tempRel = tempList[tempList.length - 1] - 298.15;
 					for (var i=0; i<dotLists.length; i++) {
-						enthalpy += dotLists[i].length * (hFs[i] + cpLiqs[i] * tempRel - hVap298s[i]);
+						enthalpy += dotLists[i].length * (hF298s[i] + cpLiqs[i] * tempRel - hVap298s[i]);
 						numDots += dotLists[i].length;
 					}
 					return enthalpy * N / numDots;
@@ -333,7 +330,7 @@ WallMethods.wallDataHandler = {
 					var dots = this.dotManager.get({tag: this.handle, spcName: LevelData.spcDefs[i].spcName});
 					dotLists.push(dots);
 					hF298s.push(LevelData.spcDefs[i].hF298 * 1000 / N)
-					cvs.push(LevelData.spcDefs[i].cv)
+					cvs.push(LevelData.spcDefs[i].cv / N)
 						
 					
 				}	
@@ -342,7 +339,7 @@ WallMethods.wallDataHandler = {
 					var numDots = 0;
 					var tempRel = tempList[tempList.length - 1] - 298.15;
 					for (var i=0; i<dotLists.length; i++) {
-						enthalpy += dotLists[i].length * (hFs[i] + cvs[i] * tempRel);
+						enthalpy += dotLists[i].length * (hF298s[i] + cvs[i] * tempRel);
 						numDots += dotLists[i].length;
 					}
 					return enthalpy * N / numDots;

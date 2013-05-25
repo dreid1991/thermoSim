@@ -41,8 +41,7 @@ DrawingTools.prototype = {
 				c.strokeStyle = wall.col.hex;
 				c.moveTo(wall[0].x, wall[0].y);
 				for (var ptIdx=1; ptIdx<wall.length-1; ptIdx++){
-					var pt = wall[ptIdx];
-					c.lineTo(pt.x, pt.y);
+					c.lineTo(wall[ptIdx].x, wall[ptIdx].y);
 				}
 				c.closePath();
 				c.stroke();
