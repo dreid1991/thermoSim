@@ -50,7 +50,7 @@ DataDisplayer.prototype = {
 				if (isNaN(val) || val === undefined) 
 					valStr = ''
 				else
-					valStr = self.setDecPlaces(val, decPlaces);
+					valStr = val.toFixed(decPlaces);//oy - test this
 					
 				displayStr += valStr + ' ';
 				displayStr += units;
@@ -59,37 +59,6 @@ DataDisplayer.prototype = {
 		
 		}
 		return dataEntry;
-	},
-
-	setDecPlaces: function(val, decPlaces) {
-		var src = String(val);
-		var toReturn = '';
-		var idx = 0;
-		var decHit = false;
-		var numDec = 0;
-		var decIdx = src.indexOf('.');
-		if (decIdx == -1) {
-			src = String(src) + '.';
-			for (var i=0; i<decPlaces; i++) src += '0';
-			return src;
-		} else {
-			var roundFactor = Number('1e' + decPlaces);
-			var unround = Number(src.slice(0, decIdx + decPlaces + 2));
-			var round = String(Math.round(roundFactor * unround) / roundFactor);
-			var decIdx = round.indexOf('.');
-			var zerosToAdd;
-			if (decIdx == -1) {
-				round += '.';
-				zerosToAdd = decPlaces;
-			} else {
-				zerosToAdd = decIdx + decPlaces - round.length + 1;
-			}
-			for (var i=0; i<zerosToAdd; i++) {
-				round += '0';
-			}
-			return round;
-		}
-		
 	},
 	removeEntry: function(handle) {
 		if (this.entries[handle]) {

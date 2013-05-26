@@ -498,13 +498,10 @@ GraphBase = {
 		this.drawAllBG();
 	},
 	numToAxisVal: function(x) {
-		if ((x <= .1 || x >= 1000) && x != 0) {
-			var OOM = Math.floor(Math.log(x) / Math.LN10);
-			var significand = round(x / Math.pow(10, OOM), 1);
-			return significand + 'E' + OOM;
-			
+		if ((Math.abs(x) <= .1 || Math.abs(x) >= 1000) && x != 0) {
+			return x.toExponential();
 		} else {
-			return String(round(x, 1));
+			return x.toFixed(1);
 		}
 	},
 	getRange: function(axis){
