@@ -50,7 +50,7 @@ DataDisplayer.prototype = {
 				if (isNaN(val) || val === undefined) 
 					valStr = ''
 				else
-					valStr = val.toFixed(decPlaces);//oy - test this
+					valStr = val.toFixed(decPlaces);
 					
 				displayStr += valStr + ' ';
 				displayStr += units;

@@ -1,0 +1,15 @@
+EQ1:  PV=nRT
+EQ2:  \frac{3}{2}kT = avg(1/2m(v^2))
+EQ3:  \frac{3}{2}kT = avg KE = \frac{1}{2}m*rms(v)^{2}
+EQ4:  picture
+EQ5:  P = \frac{F}{A}
+EQ6:  F = \frac{m}{a}
+EQ7:  F\Delta T = m\Delta V = 2MV_{x}
+EQ8:  \frac{2mV_{x}}{A\Delta t}
+EQ9:  \Delta t = \frac{2L_{x}}{V_{x}}
+EQ10: P=\frac{mV_{x}^{2}}{AL_{x}}
+EQ11: P \propto \frac{1}{V}
+EQ12: P \propto n
+EQ13: P \propto T
+EQ14: P \propto \frac{nT}{V}
+EQ15: P = \frac{nRT}{V}

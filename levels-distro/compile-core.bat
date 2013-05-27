@@ -25,7 +25,6 @@ java -jar ../../compiler.jar ^
 --js ../Experiment.js ^
 --js ../ReactionHandler.js ^
 --js ../CollideHandler.js ^
---js ../DotMigrator.js ^
 --js ../Attractor.js ^
 --js ../DataHandler.js ^
 --js ../WallHandler.js ^
