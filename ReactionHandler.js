@@ -203,9 +203,9 @@ and it just so happens, it works!  Maybe I've stumbled upon the probability shap
 		return false;
 	},
 	react: function(a, b, prods) {
-		var hFRct = a.enthalpy() + b.enthalpy();
-		var hF298Prod = 0;
-		var cPProd = 0;
+		var uRct = a.internalEnergy() + b.internalEnergy();
+		var uF298Prod = 0;
+		var cVProd = 0;
 		var x = .5*(a.x + b.x);
 		var y = .5*(a.y + b.y);
 		var newDotsBySpc = [];
@@ -214,8 +214,8 @@ and it just so happens, it works!  Maybe I've stumbled upon the probability shap
 			var spc = this.spcs[name];
 			var prod = prods[prodIdx];
 			var spcDots = [];
-			hF298Prod += spc.hF298 * prod.count;
-			cPProd += this.spcs[name].cp * prod.count;
+			uF298Prod += spc.uF298 * prod.count;
+			cVProd += this.spcs[name].cv * prod.count;
 			for (var countIdx=0; countIdx<prod.count; countIdx++) {
 				var angle = Math.random()*2*Math.PI;
 				var UV = V(Math.sin(angle), Math.cos(angle));
@@ -225,9 +225,10 @@ and it just so happens, it works!  Maybe I've stumbled upon the probability shap
 			newDotsBySpc.push(spcDots);
 			
 		}
-		hF298Prod *= 1000 / N; //kj/mol -> j/molec;
-		cPProd /= N; //j/mol -> j/molec
-		var tempF = (hFRct - hF298Prod) / cPProd + 298.15;
+		uF298Prod *= 1000 / N; //kj/mol -> j/molec;
+		cVProd /= N; //j/mol -> j/molec
+		//kind of slopping between enthalpy and internal energy.  It should all be internal energy
+		var tempF = (uRct - uF298Prod) / cVProd + 298.15;
 		if (tempF > 0) {
 			this.dotManager.remove([a, b]);
 			for (var spcIdx=0; spcIdx<newDotsBySpc.length; spcIdx++) {

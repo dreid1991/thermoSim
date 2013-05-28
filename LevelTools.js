@@ -156,6 +156,16 @@ LevelTools = {
 			}
 		}
 	},
+	addUF298: function(spcDefs) {
+		for (var i=0; i<spcDefs.length; i++) {
+			spcDefs[i].uF298 = spcDefs[i].hF298 - R * 298.15 / 1000;
+		}
+	},
+	addCp: function(spcDefs) {
+		for (var i=0; i<spcDefs.length; i++) {
+			spcDefs[i].cp = spcDefs[i].cv + R;
+		}
+	},
 	addSpcs: function(defs, target, dotManager) {
 		for (var defIdx=0; defIdx<defs.length; defIdx++) {
 			var def = defs[defIdx];

@@ -140,7 +140,7 @@ LevelData = {
 				dataRecord: [
 					{wallInfo: 'secondWall', data: 'frac', attrs: {spcName: 'spc2', tag: 'secondWall'}},
 					{wallInfo: 'secondWall', data: 'Q'},
-					{wallInfo: 'secondWall', data: 'enthalpy'},
+					{wallInfo: 'secondWall', data: 'internalEnergy'},
 					//{wallInfo: 'firstWall', data: '
 				],
 				dataReadouts: [
@@ -159,7 +159,7 @@ LevelData = {
 				graphs: [
 							{type: 'Scatter', handle: 'EnthalpyFracVsTemp', xLabel: "Extent of rxn", yLabel: "Enthalpy", axesInit:{y:{min:110, step:10},x:{min:0, step:0.2}}, numGridLines: {x:6}, axesFixed:{x: true},
 								sets: [
-									{handle: 'moleFrac', label:'mole\nFrac', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '(enthalpy("secondWall") + 11500) / 40',x: 'frac("secondWall",{spcName:"spc2",tag: "secondWall"})'},trace: true, fillInPts: true, fillInPtsMin: 5}
+									{handle: 'moleFrac', label:'mole\nFrac', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '(internalEnergy("secondWall") + 11500) / 40',x: 'frac("secondWall",{spcName:"spc2",tag: "secondWall"})'},trace: true, fillInPts: true, fillInPtsMin: 5}
 								]
 							},
 							{type: 'Scatter', handle: 'convVsTemp', xLabel: "Extent of rxn", yLabel: "Temperature", axesInit:{y:{min:200, step:80},x:{min:0, step:0.2}}, numGridLines: {x:6}, axesFixed:{x: true},

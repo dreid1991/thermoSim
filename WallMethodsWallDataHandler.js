@@ -297,57 +297,63 @@ WallMethods.wallDataHandler = {
 		}
 		return dataObj;
 	},
-	recordEnthalpy: function() { //not going to make recording by spc possible right now
-		var cvs = [], hF298s = [], hVap298s = [], cpLiqs = [], calcEnthalpy, dotLists = [];
-		var dataObj = this.data.enthalpy;
+	recordEnthalpy: function() {
+		return this.recordEnergy('enthalpy', 'cp', 'hF298');
+	},
+	recordInternalEnergy: function() {
+		return this.recordEnergy('internalEnergy', 'cv', 'uF298');
+	},
+	recordEnergy: function(dataType, heatCapacity, heatOfFormation) { //not going to make recording by spc possible right now
+		var heatCapacities = [], heatsOfFormation = [], hVap298s = [], cpLiqs = [], calcEnergy, dotLists = [];
+		var dataObj = this.data[dataType];
 		if (!dataObj || !dataObj.recording()) {
-			this.data.enthalpy = new WallMethods.DataObj();
-			var dataObj = this.data.enthalpy;
-			this.setupStdDataObj(dataObj, 'enthalpy');
+			this.data[dataType] = new WallMethods.DataObj();
+			var dataObj = this.data[dataType];
+			this.setupStdDataObj(dataObj, dataType);
 			var tempList = this.getDataSrc('temp');
 			if (this.isLiquid) {
 				for (var i=0; i<LevelData.spcDefs.length; i++) {
-					if (LevelData.spcDefs[i].hVap298 !== undefined && LevelData.spcDefs[i].cpLiq !== undefined) {
+					if (LevelData.spcDefs[i][heatOfFormation] !== undefined && LevelData.spcDefs[i].cpLiq !== undefined) {
 						var dots = this.dotManager.get({tag: this.handle, spcName: LevelData.spcDefs[i].spcName});
 						dotLists.push(dots);
-						hF298s.push(LevelData.spcDefs[i].hF298 * 1000 / N);
+						heatsOfFormation.push(LevelData.spcDefs[i][heatOfFormation] * 1000 / N);
 						hVap298s.push(LevelData.spcDefs[i].hVap298 * 1000 / N);
 						cpLiqs.push(LevelData.spcDefs[i].cpLiq / N);
 					} 
 				}
-				calcEnthalpy = function() {
-					var enthalpy = 0;
+				calcEnergy = function() {
+					var energy = 0;
 					var numDots = 0;
 					var tempRel = tempList[tempList.length - 1] - 298.15;
 					for (var i=0; i<dotLists.length; i++) {
-						enthalpy += dotLists[i].length * (hF298s[i] + cpLiqs[i] * tempRel - hVap298s[i]);
+						energy += dotLists[i].length * (heatsOfFormation[i] + cpLiqs[i] * tempRel - hVap298s[i]);
 						numDots += dotLists[i].length;
 					}
-					return enthalpy * N / numDots;
+					return energy * N / numDots;
 				}
 			} else {
 				for (var i=0; i<LevelData.spcDefs.length; i++) {
 					var dots = this.dotManager.get({tag: this.handle, spcName: LevelData.spcDefs[i].spcName});
 					dotLists.push(dots);
-					hF298s.push(LevelData.spcDefs[i].hF298 * 1000 / N)
-					cvs.push(LevelData.spcDefs[i].cv / N)
+					heatsOfFormation.push(LevelData.spcDefs[i][heatOfFormation] * 1000 / N)
+					heatCapacities.push(LevelData.spcDefs[i][heatCapacity] / N)
 						
 					
 				}	
-				calcEnthalpy = function() {
-					var enthalpy = 0;
+				calcEnergy = function() {
+					var energy = 0;
 					var numDots = 0;
 					var tempRel = tempList[tempList.length - 1] - 298.15;
 					for (var i=0; i<dotLists.length; i++) {
-						enthalpy += dotLists[i].length * (hF298s[i] + cvs[i] * tempRel);
+						energy += dotLists[i].length * (heatsOfFormation[i] + heatCapacities[i] * tempRel);
 						numDots += dotLists[i].length;
 					}
-					return enthalpy * N / numDots;
+					return energy * N / numDots;
 				}	
 				
 			}
 		
-			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), calcEnthalpy, this, 'update');
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), calcEnergy, this, 'update');
 		}
 		return dataObj;
 	},

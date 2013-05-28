@@ -99,6 +99,8 @@ $(function(){
 
 	myCanvas.height = canvasHeight;
 	var questionId = 0;
+	LevelTools.addUF298(LevelData.spcDefs);
+	LevelTools.addCp(LevelData.spcDefs);
 	questionId = LevelTools.addImgsAndQuestionIds(LevelData.mainSequence, questionId);
 	LevelTools.setDefaultPromptVals(LevelData.mainSequence);
 	LevelTools.addTriggerCleanUp(LevelData.mainSequence);

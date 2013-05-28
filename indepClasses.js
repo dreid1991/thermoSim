@@ -27,6 +27,7 @@ function Dot(x, y, v, spcName, tag, elemId, returnTo) {
 	this.idNum = def.idNum;
 	//btdubs, try to be type-safe with members so V8 can optimize dot
 	this.hF298 = defaultTo(0, def.hF298 * 1000 / N);
+	this.uF298 = defaultTo(0, def.uF298 * 1000 / N);
 	this.hVap298 = defaultTo(0, def.hVap298 * 1000 / N);
 	this.sF298 = defaultTo(0, def.sF298 * 1000 / N);
 	this.cvKinetic = 1.5 * R / N;
@@ -60,6 +61,7 @@ function Species (spcName, mass, radius, color, idNum, cv, hF298, hVap298, sF298
 	this.cv = cv;
 	this.cp = cv + R;
 	this.hF298 = hF298;
+	this.uF298 = this.hF298 - R * 298.15 / 1000;
 	this.hVap298 = hVap298;
 	this.sF298 = sF298;
 	this.antoineCoeffs = antoineCoeffs;
@@ -113,7 +115,7 @@ Species.prototype = {
 		return (this.hF298 * 1000 + (this.cv + R) * (temp - 298.15)) / N;
 	},
 	internalEnergy: function(temp) {
-		return (this.hF298 * 1000 + this.cv * (temp - 298.15)) / N;
+		return (this.uF298 * 1000 + this.cv * (temp - 298.15)) / N;
 	},
 	tBoil: function(pressure) { //in bar
 		pressure /= MMHGTOBAR;
@@ -558,12 +560,9 @@ Dot.prototype = {
 	},
 	setTemp: function(newTemp) {
 		var curTemp = this.temp();
-		if (!curTemp) {
-			console.log('AAH');
-		}
 		//if (curTemp!=0) {
-			this.v.mult(Math.sqrt(newTemp / curTemp));
-			this.internalPotential *= newTemp / curTemp;
+		this.v.mult(Math.sqrt(newTemp / curTemp));
+		this.internalPotential *= newTemp / curTemp;
 		/*  SHOULD ZERO-TEMP CASE BECOME A THING, USE BELOW,  BUT AT CURRENT I DON'T THINK IT MUST
 		} else {
 			var v = Math.sqrt(2*newTemp/(this.tConst*this.m));
@@ -609,7 +608,7 @@ Dot.prototype = {
 		return (this.hF298 + (this.temp() - 298.15) * (this.cv + R / N));
 	},
 	internalEnergy: function() {
-		return (this.hF298 + (this.temp() - 298.15) * this.cv);
+		return (this.uF298 + (this.temp() - 298.15) * this.cv);
 	},
 	kineticEnergy: function() {
 		return this.temp() * this.cvKinetic;
