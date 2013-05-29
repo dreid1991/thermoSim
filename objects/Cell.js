@@ -40,6 +40,7 @@ function Cell(attrs) {
 	this.dotId = timeline.takeNumber();
 	this.addDots(center, this.innerWall, attrs.dots || {}, attrs.temp, this.dotId, this.cellMemberTag);
 	this.heatToTrans = 0;
+	this.energyBank = 0;
 	//transfer heat out => val > 0
 	this.calcHeatTransferListenerName = 'calcHeatTrans' + this.handle;
 	this.setupCalcHeatTransfer(this.calcHeatTransferListenerName, this.innerWall, walls[attrs.parentWallHandle]);
@@ -109,11 +110,11 @@ _.extend(Cell.prototype, objectFuncs, {
 			
 			if (dot.tag == selfTag) {
 				
-				var distNodeANodeB = nodeA.pos.VTo(nodeB.pos).dotProd(wallUV);
-				var distNodeADot = nodeA.pos.VTo(P(dot.x, dot.y)).dotProd(wallUV);
-				var distNodeBDot = -nodeB.pos.VTo(P(dot.x, dot.y)).dotProd(wallUV);
+				var distNodeANodeB = wallUV.dx * (nodeB.pos.x - nodeA.pos.x) + wallUV.dy * (nodeB.pos.y - nodeA.pos.y);//nodeA.pos.VTo(nodeB.pos).dotProd(wallUV);
+				var distNodeADot = wallUV.dx * (dot.x - nodeA.pos.x) + wallUV.dy * (dot.y - nodeA.pos.y);//nodeA.pos.VTo(P(dot.x, dot.y)).dotProd(wallUV);
+				var distNodeBDot = -wallUV.dx * (dot.x - nodeB.pos.x) - wallUV.dy * (dot.y - nodeB.pos.y);//-nodeB.pos.VTo(P(dot.x, dot.y)).dotProd(wallUV);
 				
-				var centerNodeANodeB = nodeA.pos.copy().movePt(wallUV.copy().mult(distNodeANodeB * .5));
+				var centerNodeANodeB = new Point(nodeA.pos.x + wallUV.dx * distNodeANodeB * .5, nodeA.pos.y + wallUV.dy * distNodeANodeB * .5);//nodeA.pos.copy().movePt(wallUV.copy().mult(distNodeANodeB * .5));
 				
 				var fracA = distNodeADot / distNodeANodeB;
 				var fracB = distNodeBDot / distNodeANodeB;
@@ -126,13 +127,12 @@ _.extend(Cell.prototype, objectFuncs, {
 				nodeB.v.dx -= vecNodeBPerp.dx;
 				nodeB.v.dy -= vecNodeBPerp.dy;				
 				
-				var vNodeAPerp_I = vecNodeAPerp.dotProd(perpUV);
-				var vNodeBPerp_I = vecNodeBPerp.dotProd(perpUV);
+				var vNodeAPerp_I = vecNodeAPerp.dx * perpUV.dx + vecNodeAPerp.dy * perpUV.dy;//vecNodeAPerp.dotProd(perpUV);
+				var vNodeBPerp_I = vecNodeBPerp.dx * perpUV.dx + vecNodeBPerp.dy * perpUV.dy;//vecNodeBPerp.dotProd(perpUV);
 				
-				
-				var vWallToDot_I = (1 - fracA) * vNodeAPerp_I + (1 - fracB) * vNodeBPerp_I;
-				
-				var vLineDot_I = perpV + vWallToDot_I;
+				//var vWallToDot_I = (1 - fracA) * vNodeAPerp_I + (1 - fracB) * vNodeBPerp_I;
+				//vWallToDot inlined
+				var vLineDot_I = perpV + (1 - fracA) * vNodeAPerp_I + (1 - fracB) * vNodeBPerp_I;
 				
 				var vWallTrans_I = -.5 * (vNodeAPerp_I + vNodeBPerp_I);
 				
@@ -140,7 +140,8 @@ _.extend(Cell.prototype, objectFuncs, {
 				var vNodeBRel_I = vNodeBPerp_I + vWallTrans_I;
 				
 				var IWall = nodeA.m * centerNodeANodeB.distSqrTo(nodeA.pos) + nodeB.m * centerNodeANodeB.distSqrTo(nodeB.pos);
-				var distCenterP = centerNodeANodeB.VTo(P(dot.x, dot.y)).dotProd(wallUV);
+				//centerNodeANodeB.VTo(P(dot.x, dot.y)).dotProd(wallUV); inlined
+				var distCenterP = wallUV.dx * (dot.x - centerNodeANodeB.x) + wallUV.dy * (dot.y - centerNodeANodeB.y)
 				
 				var j = -2 * vLineDot_I / (1/dot.m + 1/(nodeA.m + nodeB.m) + distCenterP * distCenterP / IWall);
 				
@@ -157,7 +158,7 @@ _.extend(Cell.prototype, objectFuncs, {
 				vWallTrans_F = vWallTrans_I - j / (nodeA.m + nodeB.m);
 				
 				var vNodeA_F = -(vWallTrans_F - vNodeARel_F);
-				var vNodeB_F = -(vWallTrans_F + vNodeBRel_F);
+				var vNodeB_F = -(vWallTrans_F + vNodeARel_F);
 				
 
 				nodeA.v.dx += perpUV.dx * vNodeA_F;
@@ -167,6 +168,10 @@ _.extend(Cell.prototype, objectFuncs, {
 				
 				dot.x += perpUV.dx;
 				dot.y += perpUV.dy;
+				//now doing eneregy transfer stuff.  all in one big function because this needs to be fast.  sorry.
+				
+				
+				
 				
 			} else if (dot.tag == oppositeTag) {
 				var handler = opposite.handlers[oppositeIdx];
@@ -271,7 +276,7 @@ _.extend(Cell.prototype, objectFuncs, {
 			var CpInner = innerWall.Cp();
 			var CpParent = parentWall.Cp();
 			var tempEquil = (CpInner * tempInner[tempInner.length - 1] + CpParent * tempParent[tempParent.length - 1]) / (CpInner + CpParent);
-			this.heatToTranstemp = (tempEquil - tempParent) * CpParent;
+			this.heatToTrans = (tempEquil - tempParent[tempParent.length - 1]) * CpParent;
 		}, this);
 		
 	},

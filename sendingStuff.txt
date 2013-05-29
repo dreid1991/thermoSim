@@ -1,0 +1,48 @@
+
+makeHttpObject() {
+	 try {return new XMLHttpRequest();}
+	 catch (error) {}
+	 try {return new ActiveXObject("Msxml2.XMLHTTP");}
+	 catch (error) {}
+	 try {return new ActiveXObject("Microsoft.XMLHTTP");}
+	 catch (error) {}
+
+	 throw new Error("Could not create HTTP request object.");
+   }
+   
+   //window.onload = function() {
+   function StartMyInterval(){
+   
+		   setInterval(function(){CheckServer()},2000);
+																   
+   }
+   
+   if (window.addEventListener) // W3C standard
+   {
+	 window.addEventListener('load', StartMyInterval, false); // NB *not* 'onload'
+   } 
+   else if (window.attachEvent) // Microsoft
+   {
+	 window.attachEvent('onload', StartMyInterval);
+   }
+
+   
+   function CheckServer(){
+		   var request = makeHttpObject();
+		   request.open("GET", "CW.php?goto=student_answer_questions&popup=1&is_new_question_available=1", false);
+		   request.send(null);
+		   
+		   if(request.responseText == "1"){
+				   
+				   //window.location.reload();
+				   setTimeout('document.location="CW.php?goto=student_answer_questions"' ,1);
+				   
+		   }
+				   
+   }
+}
+
+
+base URL inclused up to concept_warehouse/
+
+CW.php?goto=simulation&command=get_question_text&question_id=##
