@@ -25,6 +25,7 @@ function Cell(attrs) {
 	var center = initPos.copy().movePt(V(initRadius, initRadius));
 	var numCorners = Math.max(3, attrs.numCorners) || 8;
 	var membraneColor = attrs.col;
+	this.sideLenMin = 50;
 	this.guideNodes = this.makeGuideNodes(initPos, initRadius, numCorners, this.nodeMass);
 	var outerWallPts = this.makeOuterWallPts(this.guideNodes, thickness);
 	var innerWallPts = this.makeInnerWallPts(this.guideNodes, thickness);
@@ -35,7 +36,7 @@ function Cell(attrs) {
 	this.parentWallMemberTag = attrs.parentWallHandle;
 	this.cellMemberTag = this.innerWall.handle;
 	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall, this.parentWallMemberTag, this.cellMemberTag);
-	this.wallMoveListenerName = this.addWallMoveListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness);
+	this.wallMoveListenerName = this.addWallMoveListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness, this.sideLenMin);
 	this.dotId = timeline.takeNumber();
 	this.addDots(center, this.innerWall, attrs.dots || {}, attrs.temp, this.dotId, this.cellMemberTag);
 	window.dotMigrator.migrateDots(window.dotManager.get({tag:this.parentWallMemberTag}), [this.parentWallMemberTag], [this.outerWall.handle]);
@@ -170,7 +171,7 @@ _.extend(Cell.prototype, objectFuncs, {
 		}
 		walls.setSubWallHandler(self.handle, selfIdx, {func: hitFunc, obj: this});
 	},
-	addWallMoveListener: function(nodes, innerWall, outerWall, handle, thickness) {
+	addWallMoveListener: function(nodes, innerWall, outerWall, handle, thickness, sideLenMin) {
 		addListener(curLevel, 'wallMove', 'moveCell' + this.handle.toCapitalCamelCase(), function() {
 			var innerWallPtIdx = 0;
 			var outerWallPtIdx = outerWall.length - 2;
@@ -184,7 +185,8 @@ _.extend(Cell.prototype, objectFuncs, {
 				var perpFromNext = node.next.pos.VTo(node.pos).perp('ccw')
 				var UVPointingOut = perpFromPrev.add(perpFromNext).UV();
 				
-				this.addAngleForce(node, node.prev, node.next, new Vector(-UVPointingOut.dx, -UVPointingOut.dy));
+				//this.addAngleForce(node, node.prev, node.next, new Vector(-UVPointingOut.dx, -UVPointingOut.dy));
+				this.addExpansionForce(node, node.next, sideLenMin);
 				
 				outerWall[node.outerWallIdx + 1].x = node.pos.x + UVPointingOut.dx * thickness / 2;
 				outerWall[node.outerWallIdx + 1].y = node.pos.y + UVPointingOut.dy * thickness / 2;
@@ -206,6 +208,18 @@ _.extend(Cell.prototype, objectFuncs, {
 		node.v.dx -= UVPointingIn.dx * (angle - node.nativeAngle) 
 		node.v.dy -= UVPointingIn.dy * (angle - node.nativeAngle) 
 	},
+	addExpansionForce: function(a, b, sideLenMin) {
+		var vec = a.pos.VTo(b.pos);
+		var magSqr = vec.magSqr();
+		if (magSqr < sideLenMin * sideLenMin) {
+			var UV = vec.UV();
+			b.v.dx += UV.dx * .2;
+			b.v.dy += UV.dy * .2;
+			
+			a.v.dx -= UV.dx * .2;
+			a.v.dy -= UV.dy * .2;
+		}
+	},
 	angleBetweenPts: function(corner, a, b, UVPointingIn){
 		var anglePointingIn = Math.atan2(UVPointingIn.dy, UVPointingIn.dx);
 		var cornerA = corner.VTo(a);
@@ -216,8 +230,8 @@ _.extend(Cell.prototype, objectFuncs, {
 		return this.distBetweenAngles(angleA, anglePointingIn) + this.distBetweenAngles(anglePointingIn, angleB);
 	},
 	distBetweenAngles: function(a, b){
-		if(a<0){a+=Math.PI*2;}
-		if(b<0){b+=Math.PI*2;}
+		if (a<0) a+=Math.PI*2;
+		if (b<0) b+=Math.PI*2;
 		var diff = Math.max(a, b) - Math.min(a, b);
 		if (diff>Math.PI) {
 			return 2*Math.PI - diff;
@@ -248,10 +262,10 @@ _.extend(Cell.prototype, objectFuncs, {
 		}
 	},
 	populateRightTriangle: function(center, a, rightAnglePt, count, spc, temp, flatUV, tagAndReturnTo, elemId, spcName) {
-		var perpUV = flatUV.copy().perp('cw');
+		var perpUV = flatUV.copy().perp('cw');; 
 		if (rightAnglePt.VTo(a).dotProd(perpUV) < 0) {
 			perpUV = flatUV.copy().perp('ccw');
-		}
+		} 
 		var dots = [];
 		var yMax = rightAnglePt.distTo(a);
 		var xLen = center.distTo(rightAnglePt);
