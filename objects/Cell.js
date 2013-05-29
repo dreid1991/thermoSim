@@ -25,12 +25,12 @@ function Cell(attrs) {
 	var center = initPos.copy().movePt(V(initRadius, initRadius));
 	var numCorners = Math.max(3, attrs.numCorners) || 8;
 	var membraneColor = attrs.col;
-	this.sideLenMin = 50;
+	this.sideLenMin = 15;
 	this.guideNodes = this.makeGuideNodes(initPos, initRadius, numCorners, this.nodeMass);
 	var outerWallPts = this.makeOuterWallPts(this.guideNodes, thickness);
 	var innerWallPts = this.makeInnerWallPts(this.guideNodes, thickness);
 	this.outerWall = walls.addWall({pts: outerWallPts, handle: this.handle + 'outer', handler: 'staticAdiabatic', show: true, record: false, col: Col(0, 255, 0)});
-	this.innerWall = walls.addWall({pts: innerWallPts, handle: this.handle + 'inner', handler: 'staticAdiabatic', show: true, record: false, col: Col(255, 0,0 )});
+	this.innerWall = walls.addWall({pts: innerWallPts, handle: this.handle + 'inner', handler: 'staticAdiabatic', show: true, record: true, col: Col(255, 0,0 )});
 	this.innerWall.hitThreshold = -10;
 	this.outerWall.hitThreshold = -10;
 	this.parentWallMemberTag = attrs.parentWallHandle;
@@ -184,14 +184,18 @@ _.extend(Cell.prototype, objectFuncs, {
 				nodes[i].pos.x += nodes[i].v.dx;
 				nodes[i].pos.y += nodes[i].v.dy;
 				if (outerWall[nodes[i].prev.outerWallIdx].x < xMin) {
-					nodes[i].pos.x ++;
+					nodes[i].pos.x += 2;
+					nodes[i].v.dx = Math.abs(nodes[i].v.dx) + 4;
 				} else if (outerWall[nodes[i].prev.outerWallIdx].x > xMax) {
-					nodes[i].pos.x --;
+					nodes[i].pos.x -= 2;
+					nodes[i].v.dx = -Math.abs(nodes[i].v.dx) - 4;
 				}
 				if (outerWall[nodes[i].prev.outerWallIdx].y < yMin) {
-					nodes[i].pos.y ++;
+					nodes[i].pos.y += 2;
+					nodes[i].v.dy = Math.abs(nodes[i].v.dy) + 4;
 				} else if (outerWall[nodes[i].prev.outerWallIdx].y > yMax) {
-					nodes[i].pos.y --;
+					nodes[i].pos.y -= 2;
+					nodes[i].v.dy = -Math.abs(nodes[i].v.dy) - 4;
 				}
 			}
 			for (var i=0; i<nodes.length; i++) {

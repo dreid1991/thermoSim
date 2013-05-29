@@ -37,7 +37,7 @@ LevelData = {
 					// },
 					{
 						type: 'Cell',
-						attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 100, dots: {fairy: 200}, boundingCorner: P(50, 50), boundingVector: V(400, 350), numCorners: 4}
+						attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 100, dots: {fairy: 200}, boundingCorner: P(50, 50), boundingVector: V(400, 350), numCorners: 12}
 					},
 					// {
 						// type: 'ActivationEnergyPair',
