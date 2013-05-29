@@ -39,6 +39,10 @@ function Cell(attrs) {
 	this.wallMoveListenerName = this.addWallMoveListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness, this.sideLenMin, attrs.boundingCorner, attrs.boundingVector);
 	this.dotId = timeline.takeNumber();
 	this.addDots(center, this.innerWall, attrs.dots || {}, attrs.temp, this.dotId, this.cellMemberTag);
+	this.heatToTrans = 0;
+	//transfer heat out => val > 0
+	this.calcHeatTransferListenerName = 'calcHeatTrans' + this.handle;
+	this.setupCalcHeatTransfer(this.calcHeatTransferListenerName, this.innerWall, walls[attrs.parentWallHandle]);
 	window.dotMigrator.migrateDots(window.dotManager.get({tag:this.parentWallMemberTag}), [this.parentWallMemberTag], [this.outerWall.handle]);
 	this.setupStd();
 }
@@ -95,13 +99,13 @@ _.extend(Cell.prototype, objectFuncs, {
 	},
 	assignWallHandlers: function(guideNodes, innerWall, outerWall, parentWallMemberTag, cellMemberTag) {
 		for (var i=0; i<guideNodes.length; i++) {//OY - MAKE SURE YOU MEAN guideNodes[i].prev FOR THE OUTER WALL
-			this.assignWallHandler(innerWall, guideNodes[i].innerWallIdx, outerWall, guideNodes[i].outerWallIdx, guideNodes[i], guideNodes[i].next, cellMemberTag, parentWallMemberTag);
-			this.assignWallHandler(outerWall, guideNodes[i].outerWallIdx, innerWall, guideNodes[i].innerWallIdx, guideNodes[i].next, guideNodes[i], parentWallMemberTag, cellMemberTag);
+			this.assignWallHandler(innerWall, guideNodes[i].innerWallIdx, outerWall, guideNodes[i].outerWallIdx, guideNodes[i], guideNodes[i].next, cellMemberTag, parentWallMemberTag, -1);
+			this.assignWallHandler(outerWall, guideNodes[i].outerWallIdx, innerWall, guideNodes[i].innerWallIdx, guideNodes[i].next, guideNodes[i], parentWallMemberTag, cellMemberTag, 1);
 		}
 	},
 	assignWallHandler: function(self, selfIdx, opposite, oppositeIdx, nodeA, nodeB, selfTag, oppositeTag) {
 		var reflect = WallMethods.collideMethods.reflect;
-		var hitFunc = function(dot, wall, subWallIdx, wallUV, perpV, perpUV) {
+		var hitFunc = function(dot, wall, subWallIdx, wallUV, perpV, perpUV, heatTransferSign) {
 			
 			if (dot.tag == selfTag) {
 				
@@ -149,11 +153,11 @@ _.extend(Cell.prototype, objectFuncs, {
 				//inlined above three lines into one below
 				var vNodeARel_F = (vNodeARel_I / (.5 * distNodeANodeB) - distCenterP * j / IWall) * .5 * distNodeANodeB;
 				
-				var vNodeBRel_F = -vNodeARel_F;
+				//var vNodeBRel_F = -vNodeARel_F;
 				vWallTrans_F = vWallTrans_I - j / (nodeA.m + nodeB.m);
 				
 				var vNodeA_F = -(vWallTrans_F - vNodeARel_F);
-				var vNodeB_F = -(vWallTrans_F - vNodeBRel_F);
+				var vNodeB_F = -(vWallTrans_F + vNodeBRel_F);
 				
 
 				nodeA.v.dx += perpUV.dx * vNodeA_F;
@@ -257,6 +261,18 @@ _.extend(Cell.prototype, objectFuncs, {
 		} else {
 			return diff;
 		}
+		
+	},
+	setupCalcHeatTransfer: function(listenerName, innerWall, parentWall) {
+		var tempInner = innerWall.getDataSrc('temp');
+		var tempParent = parentWall.getDataSrc('temp');
+		
+		addListener(curLevel, 'data', listenerName, function() {
+			var CpInner = innerWall.Cp();
+			var CpParent = parentWall.Cp();
+			var tempEquil = (CpInner * tempInner[tempInner.length - 1] + CpParent * tempParent[tempParent.length - 1]) / (CpInner + CpParent);
+			this.heatToTranstemp = (tempEquil - tempParent) * CpParent;
+		}, this);
 		
 	},
 	addDots: function(center, innerWall, toAdd, temp, elemId, tagAndReturnTo) {
