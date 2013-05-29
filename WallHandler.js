@@ -566,12 +566,10 @@ WallMethods.main = {
 	distBetweenAngles: function(a, b){
 		if(a<0){a+=Math.PI*2;}
 		if(b<0){b+=Math.PI*2;}
-		var max = Math.max(a, b);
-		var min = Math.min(a, b);
-		var diff = max-min;
-		if(diff>Math.PI){
+		var diff = Math.max(a, b) - Math.min(a, b);;
+		if (diff>Math.PI) {
 			return 2*Math.PI - diff;
-		}else{
+		} else {
 			return diff;
 		}
 		

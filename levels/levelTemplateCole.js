@@ -2,9 +2,9 @@ LevelData = {
 	levelTitle: 'Work',
 	
 	spcDefs: [
-		{spcName: 'spc1', m: 4, r: 4, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1730.6, c: 233.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
-		{spcName: 'spc2', m: 3, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
-		{spcName: 'spc3', m: 3, r: 1, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3}
+		{spcName: 'spc1', m: 4, r: 4, col: Col(200, 0, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1730.6, c: 233.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
+		{spcName: 'spc2', m: 3, r: 2, col: Col(200, 0, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
+		{spcName: 'spc3', m: 3, r: 1, col: Col(150, 100, 100), cv: 1.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3}
 	],
 	mainSequence: [
 		
@@ -91,8 +91,8 @@ LevelData = {
 					{pts: [P(40,60), P(510,60), P(510,380), P(40,380)], handler: 'staticAdiabatic', handle: 'SecondWall', border: {type: 'open'}}
 				],
 				dots: [
-					{spcName: 'spc2', pos: P(55, 75), dims: V(450,300), count: 800, temp: 200, returnTo: 'SecondWall', tag: 'SecondWall'},
-					{spcName: 'spc3', pos: P(55, 75), dims: V(450,300), count: 800, temp: 200, returnTo: 'SecondWall', tag: 'SecondWall'}
+					{spcName: 'spc2', pos: P(55, 75), dims: V(450,300), count: 900, temp: 200, returnTo: 'SecondWall', tag: 'SecondWall'},
+					{spcName: 'spc3', pos: P(55, 75), dims: V(450,300), count: 900, temp: 200, returnTo: 'SecondWall', tag: 'SecondWall'}
 				],
 				objs: [
 					{type: 'Piston',
@@ -128,7 +128,7 @@ LevelData = {
 				},
 				{//Prompt 1
 					sceneData: undefined,
-						text: "The system had an initial temperature of 200 K and contains 1.6 moles of an ideal monatomic gas.  You wrote that get('WorkDoneAnswer','int') kJ of work were done.  What final temperature should the system have?",
+						text: "The system had an initial temperature of 200 K and contains 1.8 moles of an ideal monatomic gas.  You wrote that get('WorkDoneAnswer','int') kJ of work were done.  What final temperature should the system have?",
 						quiz: [
 							{type: 'textSmall', storeAs: 'TempAnswer', units: 'K', text: ''}
 						]
@@ -142,8 +142,8 @@ LevelData = {
 					{pts: [P(40,60), P(510,60), P(510,380), P(40,380)], handler: 'staticAdiabatic', handle: 'ThirdWall', border: {type: 'open'}}
 				],
 				dots: [
-					{spcName: 'spc2', pos: P(55, 75), dims: V(450,300), count: 800, temp: 200, returnTo: 'ThirdWall', tag: 'ThirdWall'},
-					{spcName: 'spc3', pos: P(55, 75), dims: V(450,300), count: 800, temp: 200, returnTo: 'ThirdWall', tag: 'ThirdWall'}
+					{spcName: 'spc2', pos: P(55, 75), dims: V(450,300), count: 900, temp: 200, returnTo: 'ThirdWall', tag: 'ThirdWall'},
+					{spcName: 'spc3', pos: P(55, 75), dims: V(450,300), count: 900, temp: 200, returnTo: 'ThirdWall', tag: 'ThirdWall'}
 				],
 				objs: [
 					{type: 'Piston',
@@ -187,7 +187,7 @@ LevelData = {
 				{//Prompt 1
 					sceneData: undefined,
 						cutScene: true,
-						text: "<center> ## nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p> If you'll notice, the T vs. V graph is linear.  Using the equation above, find what its slope should should be with 1.6 moles of an ideal monatomic gas.  Do the slopes from the equation and from the graph match?",
+						text: "<center> ## nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p> If you'll notice, the T vs. V graph is linear.  Using the equation above, find what its slope should should be with 1.8 moles of an ideal monatomic gas.  Do the slopes from the equation and from the graph match?",
 						quiz: [
 							{type: 'textSmall', label: 'Slope from graph', storeAs: 'slopeFromGraph', text: " "},
 							{type: 'textSmall', label: 'Slope from equation', storeAs: 'slopeFromEquation', text: " "},
@@ -197,7 +197,7 @@ LevelData = {
 				{//Prompt 2
 					sceneData: undefined,
 						cutScene: true,
-						text: "Now we'll look at expanding the same system of 1.6 moles with ## P_{ext} ## of 2 bar from 7.5L to 15 L. <p> How much work will the system do on its surroundings in this expansion, and what will its final temperature be?",
+						text: "Now we'll look at expanding the same system of 1.8 moles with ## P_{ext} ## of 2 bar from 7.5L to 15 L. <p> How much work will the system do on its surroundings in this expansion, and what will its final temperature be?",
 						quiz: [
 							{type: 'textSmall', label: "Work Done:",storeAs: 'workAnswer', text: " ", units: "kJ"},
 							{type: 'textSmall', label: 'Final Temperature:', storeAs: 'tempAnswer', text: " ", units: "K"}

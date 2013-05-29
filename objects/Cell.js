@@ -23,9 +23,8 @@ function Cell(attrs) {
 	this.nodeMass = attrs.nodeMass || 100;
 	var initRadius = attrs.rad;
 	var center = initPos.copy().movePt(V(initRadius, initRadius));
-	var numCorners = 8;
+	var numCorners = Math.max(3, attrs.numCorners) || 8;
 	var membraneColor = attrs.col;
-	var initDots = attrs.dots; //will need to work out timeline integration somehow OR just have dots clean up with membrane.  I don't think there are many reasonable cases where that will cause problems
 	this.guideNodes = this.makeGuideNodes(initPos, initRadius, numCorners, this.nodeMass);
 	var outerWallPts = this.makeOuterWallPts(this.guideNodes, thickness);
 	var innerWallPts = this.makeInnerWallPts(this.guideNodes, thickness);
@@ -38,7 +37,7 @@ function Cell(attrs) {
 	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall, this.parentWallMemberTag, this.cellMemberTag);
 	this.wallMoveListenerName = this.addWallMoveListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness);
 	this.dotId = timeline.takeNumber();
-	this.addDots(center, this.innerWall, attrs.dots, attrs.temp, this.dotId, this.cellMemberTag);
+	this.addDots(center, this.innerWall, attrs.dots || {}, attrs.temp, this.dotId, this.cellMemberTag);
 	window.dotMigrator.migrateDots(window.dotManager.get({tag:this.parentWallMemberTag}), [this.parentWallMemberTag], [this.outerWall.handle]);
 	this.setupStd();
 }
@@ -48,10 +47,11 @@ _.extend(Cell.prototype, objectFuncs, {
 		center = pos.copy().movePt(V(radius, radius));
 		var guideNodes = [];
 		var angle = 0;
+		var nativeAngle = Math.PI * (numCorners - 2) / numCorners;
 		var anglePerStep = 2 * Math.PI / numCorners;
 		for (var i=0; i<numCorners; i++) {
 			var nodePos = P(center.x + radius * Math.cos(angle), center.y + radius * Math.sin(angle));
-			guideNodes.push(new Cell.GuideNode(nodePos, nodeMass));
+			guideNodes.push(new Cell.GuideNode(nodePos, nodeMass, nativeAngle));
 			angle += anglePerStep;
 		}
 		for (var i=0; i<guideNodes.length; i++) {
@@ -183,6 +183,9 @@ _.extend(Cell.prototype, objectFuncs, {
 				var perpFromPrev = node.prev.pos.VTo(node.pos).perp('cw');
 				var perpFromNext = node.next.pos.VTo(node.pos).perp('ccw')
 				var UVPointingOut = perpFromPrev.add(perpFromNext).UV();
+				
+				this.addAngleForce(node, node.prev, node.next, new Vector(-UVPointingOut.dx, -UVPointingOut.dy));
+				
 				outerWall[node.outerWallIdx + 1].x = node.pos.x + UVPointingOut.dx * thickness / 2;
 				outerWall[node.outerWallIdx + 1].y = node.pos.y + UVPointingOut.dy * thickness / 2;
 				
@@ -196,7 +199,32 @@ _.extend(Cell.prototype, objectFuncs, {
 			innerWall[innerWall.length - 1].y = innerWall[0].y;
 			window.walls.setupWall(walls.indexOf(innerWall));
 			window.walls.setupWall(walls.indexOf(outerWall));
-		})
+		}, this)
+	},
+	addAngleForce: function(node, prev, next, UVPointingIn) {
+		var angle = this.angleBetweenPts(node.pos, prev.pos, next.pos, UVPointingIn);
+		node.v.dx -= UVPointingIn.dx * (angle - node.nativeAngle) 
+		node.v.dy -= UVPointingIn.dy * (angle - node.nativeAngle) 
+	},
+	angleBetweenPts: function(corner, a, b, UVPointingIn){
+		var anglePointingIn = Math.atan2(UVPointingIn.dy, UVPointingIn.dx);
+		var cornerA = corner.VTo(a);
+		var cornerB = corner.VTo(b);
+		var angleA = Math.atan2(cornerA.dy, cornerA.dx);
+		var angleB = Math.atan2(cornerB.dy, cornerB.dx);
+		
+		return this.distBetweenAngles(angleA, anglePointingIn) + this.distBetweenAngles(anglePointingIn, angleB);
+	},
+	distBetweenAngles: function(a, b){
+		if(a<0){a+=Math.PI*2;}
+		if(b<0){b+=Math.PI*2;}
+		var diff = Math.max(a, b) - Math.min(a, b);
+		if (diff>Math.PI) {
+			return 2*Math.PI - diff;
+		} else {
+			return diff;
+		}
+		
 	},
 	addDots: function(center, innerWall, toAdd, temp, elemId, tagAndReturnTo) {
 		for (var spcName in toAdd) {
@@ -247,7 +275,7 @@ _.extend(Cell.prototype, objectFuncs, {
 
 });
 
-Cell.GuideNode = function(pos, mass) {
+Cell.GuideNode = function(pos, mass, nativeAngle) {
 	this.pos = pos;
 	this.next = undefined;
 	this.prev = undefined;
@@ -255,6 +283,7 @@ Cell.GuideNode = function(pos, mass) {
 	this.m = mass;
 	this.innerWallIdx = undefined;
 	this.outerWallIdx = undefined;
+	this.nativeAngle = nativeAngle;
 }
 
 Cell.GuideNode.prototype = {
