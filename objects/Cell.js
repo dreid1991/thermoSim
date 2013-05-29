@@ -22,25 +22,29 @@ function Cell(attrs) {
 	var thickness = 10;
 	this.nodeMass = attrs.nodeMass || 100;
 	var initRadius = attrs.rad;
+	this.drawCanvas = attrs.drawCanvas || window.c;
 	var center = initPos.copy().movePt(V(initRadius, initRadius));
 	var numCorners = Math.max(3, attrs.numCorners) || 8;
-	var membraneColor = attrs.col;
+	this.membraneColor = attrs.col;
 	this.sideLenMin = 15;
+	this.energyTransferMax = .5;
 	this.guideNodes = this.makeGuideNodes(initPos, initRadius, numCorners, this.nodeMass);
 	var outerWallPts = this.makeOuterWallPts(this.guideNodes, thickness);
 	var innerWallPts = this.makeInnerWallPts(this.guideNodes, thickness);
-	this.outerWall = walls.addWall({pts: outerWallPts, handle: this.handle + 'outer', handler: 'staticAdiabatic', show: true, record: false, col: Col(0, 255, 0)});
-	this.innerWall = walls.addWall({pts: innerWallPts, handle: this.handle + 'inner', handler: 'staticAdiabatic', show: true, record: true, col: Col(255, 0,0 )});
+	this.outerWall = walls.addWall({pts: outerWallPts, handle: 'cell' + this.handle.toCapitalCamelCase() + 'Outer', handler: 'staticAdiabatic', show: false, record: false, col: Col(255, 255, 255)});
+	this.innerWall = walls.addWall({pts: innerWallPts, handle: 'cell' + this.handle.toCapitalCamelCase() + 'Inner', handler: 'staticAdiabatic', show: false, record: true, col: Col(255, 255, 255)});
 	this.innerWall.hitThreshold = -10;
 	this.outerWall.hitThreshold = -10;
 	this.parentWallMemberTag = attrs.parentWallHandle;
 	this.cellMemberTag = this.innerWall.handle;
-	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall, this.parentWallMemberTag, this.cellMemberTag);
-	this.wallMoveListenerName = this.addWallMoveListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness, this.sideLenMin, attrs.boundingCorner, attrs.boundingVector);
+	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall, this.parentWallMemberTag, this.cellMemberTag, this.energyTransferMax);
+	this.wallUpdateListenerName = this.addWallUpdateListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness, this.sideLenMin, attrs.boundingCorner, attrs.boundingVector, this.wallColor);
+	this.drawListenerName = this.addDrawListener(this.guideNodes, this.innerWall, this.outerWall, this.membraneColor, this.drawCanvas);
 	this.dotId = timeline.takeNumber();
 	this.addDots(center, this.innerWall, attrs.dots || {}, attrs.temp, this.dotId, this.cellMemberTag);
-	this.heatToTrans = 0;
+	this.energyToTransfer = 0;
 	this.energyBank = 0;
+	this.energyBankMax = 20;
 	//transfer heat out => val > 0
 	this.calcHeatTransferListenerName = 'calcHeatTrans' + this.handle;
 	this.setupCalcHeatTransfer(this.calcHeatTransferListenerName, this.innerWall, walls[attrs.parentWallHandle]);
@@ -98,15 +102,15 @@ _.extend(Cell.prototype, objectFuncs, {
 
 		return pts;	
 	},
-	assignWallHandlers: function(guideNodes, innerWall, outerWall, parentWallMemberTag, cellMemberTag) {
+	assignWallHandlers: function(guideNodes, innerWall, outerWall, parentWallMemberTag, cellMemberTag, energyTransferMax) {
 		for (var i=0; i<guideNodes.length; i++) {//OY - MAKE SURE YOU MEAN guideNodes[i].prev FOR THE OUTER WALL
-			this.assignWallHandler(innerWall, guideNodes[i].innerWallIdx, outerWall, guideNodes[i].outerWallIdx, guideNodes[i], guideNodes[i].next, cellMemberTag, parentWallMemberTag, -1);
-			this.assignWallHandler(outerWall, guideNodes[i].outerWallIdx, innerWall, guideNodes[i].innerWallIdx, guideNodes[i].next, guideNodes[i], parentWallMemberTag, cellMemberTag, 1);
+			this.assignWallHandler(innerWall, guideNodes[i].innerWallIdx, outerWall, guideNodes[i].outerWallIdx, guideNodes[i], guideNodes[i].next, cellMemberTag, parentWallMemberTag, -1, energyTransferMax);
+			this.assignWallHandler(outerWall, guideNodes[i].outerWallIdx, innerWall, guideNodes[i].innerWallIdx, guideNodes[i].next, guideNodes[i], parentWallMemberTag, cellMemberTag, 1, energyTransferMax);
 		}
 	},
-	assignWallHandler: function(self, selfIdx, opposite, oppositeIdx, nodeA, nodeB, selfTag, oppositeTag) {
+	assignWallHandler: function(self, selfIdx, opposite, oppositeIdx, nodeA, nodeB, selfTag, oppositeTag, energyTransferSign, energyTransferMax) {
 		var reflect = WallMethods.collideMethods.reflect;
-		var hitFunc = function(dot, wall, subWallIdx, wallUV, perpV, perpUV, heatTransferSign) {
+		var hitFunc = function(dot, wall, subWallIdx, wallUV, perpV, perpUV) {
 			
 			if (dot.tag == selfTag) {
 				
@@ -143,7 +147,7 @@ _.extend(Cell.prototype, objectFuncs, {
 				//centerNodeANodeB.VTo(P(dot.x, dot.y)).dotProd(wallUV); inlined
 				var distCenterP = wallUV.dx * (dot.x - centerNodeANodeB.x) + wallUV.dy * (dot.y - centerNodeANodeB.y)
 				
-				var j = -2 * vLineDot_I / (1/dot.m + 1/(nodeA.m + nodeB.m) + distCenterP * distCenterP / IWall);
+				var j = -2 * vLineDot_I / (1 / dot.m + 1 / (nodeA.m + nodeB.m) + distCenterP * distCenterP / IWall);
 				
 				dot.v.dx -= perpUV.dx * j / dot.m;
 				dot.v.dy -= perpUV.dy * j / dot.m;
@@ -170,7 +174,17 @@ _.extend(Cell.prototype, objectFuncs, {
 				dot.y += perpUV.dy;
 				//now doing eneregy transfer stuff.  all in one big function because this needs to be fast.  sorry.
 				
-				
+				var energyToTransfer = energyTransferSign * this.energyToTransfer;
+				if (energyToTransfer > 0) {
+					var energyAdded = Math.min(energyToTransfer, Math.min(this.energyBank, energyTransferMax))
+					dot.addEnergy(energyAdded);
+					this.energyBank -= energyAdded;
+					this.energyToTransfer -= energyAdded * energyTransferSign;
+				} else {
+					var energyRemoved = Math.min(this.energyBank - energyToTransfer, Math.min(this.energyBankMax - this.energyBank, Math.min(energyTransferMax, Math.max(0, (dot.temp() - 10) * dot.cv))));
+					dot.addEnergy(-energyRemoved);
+					this.energyBank += energyRemoved;
+				}
 				
 				
 			} else if (dot.tag == oppositeTag) {
@@ -180,7 +194,7 @@ _.extend(Cell.prototype, objectFuncs, {
 		}
 		walls.setSubWallHandler(self.handle, selfIdx, {func: hitFunc, obj: this});
 	},
-	addWallMoveListener: function(nodes, innerWall, outerWall, handle, thickness, sideLenMin, boundingCorner, boundingVector) {
+	addWallUpdateListener: function(nodes, innerWall, outerWall, handle, thickness, sideLenMin, boundingCorner, boundingVector) {
 		var xMin = boundingCorner.x;
 		var xMax = boundingCorner.x + boundingVector.dx;
 		var yMin = boundingCorner.y;
@@ -189,22 +203,35 @@ _.extend(Cell.prototype, objectFuncs, {
 		addListener(curLevel, 'wallMove', 'moveCell' + this.handle.toCapitalCamelCase(), function() {
 			var innerWallPtIdx = 0;
 			var outerWallPtIdx = outerWall.length - 2;
+			
 			for (var i=0; i<nodes.length; i++) {
 				nodes[i].pos.x += nodes[i].v.dx;
 				nodes[i].pos.y += nodes[i].v.dy;
 				if (outerWall[nodes[i].prev.outerWallIdx].x < xMin) {
 					nodes[i].pos.x += 2;
-					nodes[i].v.dx = Math.abs(nodes[i].v.dx) + 4;
+					nodes[i].v.dx = Math.abs(nodes[i].v.dx);
+					for (var j=0; j<nodes.length; j++) {
+						nodes[j].v.dx ++;
+					}
 				} else if (outerWall[nodes[i].prev.outerWallIdx].x > xMax) {
 					nodes[i].pos.x -= 2;
-					nodes[i].v.dx = -Math.abs(nodes[i].v.dx) - 4;
+					nodes[i].v.dx = -Math.abs(nodes[i].v.dx);
+					for (var j=0; j<nodes.length; j++) {
+						nodes[j].v.dx --;
+					}
 				}
 				if (outerWall[nodes[i].prev.outerWallIdx].y < yMin) {
 					nodes[i].pos.y += 2;
-					nodes[i].v.dy = Math.abs(nodes[i].v.dy) + 4;
+					nodes[i].v.dy = Math.abs(nodes[i].v.dy);
+					for (var j=0; j<nodes.length; j++) {
+						nodes[j].v.dy ++;
+					}
 				} else if (outerWall[nodes[i].prev.outerWallIdx].y > yMax) {
 					nodes[i].pos.y -= 2;
-					nodes[i].v.dy = -Math.abs(nodes[i].v.dy) - 4;
+					nodes[i].v.dy = -Math.abs(nodes[i].v.dy);
+					for (var j=0; j<nodes.length; j++) {
+						nodes[j].v.dy --;
+					}
 				}
 			}
 			for (var i=0; i<nodes.length; i++) {
@@ -212,7 +239,6 @@ _.extend(Cell.prototype, objectFuncs, {
 				var perpFromPrev = node.prev.pos.UVTo(node.pos).perp('cw');
 				var perpFromNext = node.next.pos.UVTo(node.pos).perp('ccw')
 				var UVPointingOut = perpFromPrev.add(perpFromNext).UV();
-				
 				this.addAngleForce(node, node.prev, node.next, new Vector(-UVPointingOut.dx, -UVPointingOut.dy));
 				this.addExpansionForce(node, node.next, sideLenMin);
 				
@@ -268,15 +294,24 @@ _.extend(Cell.prototype, objectFuncs, {
 		}
 		
 	},
+	addDrawListener: function(nodes, innerWall, outerWall, membraneColor, drawCanvas) {
+		addListener(curLevel, 'update', 'drawCell' + this.handle, function() {
+			for (var i=0; i<nodes.length; i++) {
+				var node = nodes[i];
+				var pts = [innerWall[node.innerWallIdx], innerWall[node.next.innerWallIdx], outerWall[node.outerWallIdx], outerWall[node.prev.outerWallIdx]];
+				window.draw.fillPts(pts, membraneColor, drawCanvas);
+			}
+		}, this);
+	},
 	setupCalcHeatTransfer: function(listenerName, innerWall, parentWall) {
 		var tempInner = innerWall.getDataSrc('temp');
 		var tempParent = parentWall.getDataSrc('temp');
 		
-		addListener(curLevel, 'data', listenerName, function() {
+		addListener(curLevel, 'update', listenerName, function() {
 			var CpInner = innerWall.Cp();
 			var CpParent = parentWall.Cp();
 			var tempEquil = (CpInner * tempInner[tempInner.length - 1] + CpParent * tempParent[tempParent.length - 1]) / (CpInner + CpParent);
-			this.heatToTrans = (tempEquil - tempParent[tempParent.length - 1]) * CpParent;
+			this.energyToTransfer = (tempEquil - tempParent[tempParent.length - 1]) * CpParent;
 		}, this);
 		
 	},
