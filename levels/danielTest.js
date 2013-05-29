@@ -14,10 +14,10 @@ LevelData = {
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: 'staticAdiabatic',/* temp: 298.15,*/ handle: 'wally', isothermalRate: 3/*, border: {type: 'open', thickness: 5, yMin: 30}*/}
+					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: 'cVIsothermal', temp: 298.15, handle: 'wally', isothermalRate: 3/*, border: {type: 'open', thickness: 5, yMin: 30}*/}
 				],
 				dots: [
-					//{spcName: 'spc1', pos: P(55, 55), dims: V(5, 10), count: 2, temp: 198.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'spc1', pos: P(55, 55), dims: V(5, 10), count: 1000, temp: 198.15, returnTo: 'wally', tag: 'wally'},
 					// {spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 0, temp: 398.15, returnTo: 'wally', tag: 'wally'},
 					
 					
@@ -37,7 +37,7 @@ LevelData = {
 					// },
 					{
 						type: 'Cell',
-						attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 100, dots: {fairy: 0}, numCorners: 3}
+						attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 100, dots: {fairy: 200}, boundingCorner: P(50, 50), boundingVector: V(400, 350), numCorners: 4}
 					},
 					// {
 						// type: 'ActivationEnergyPair',
@@ -80,7 +80,6 @@ LevelData = {
 				],
 				dataReadouts: [
 					{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
-					{label: 'enthalpy: ', expr: 'internalEnergy("wally")', units: 'K', decPlaces: 1, handle: 'enthalpy', readout: 'mainReadout'}
 					//{label: 'liq temp: ', expr: 'tempSmooth("liquidSwishy")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'}
 					// {label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},
 					// {label: 'Coll/sec: ', expr: 'collisions()', units: '', decPlaces: 0, handle: 'lala', readout: 'mainReadout'}
