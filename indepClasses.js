@@ -587,16 +587,6 @@ Dot.prototype = {
 		this.internalPotential *= tF / curTemp;
 		return (tF - curTemp) * this.cv;
 	},
-	setWall: function(wallHandle) {
-		this.setReturnTo(wallHandle);
-		this.setTag(wallHandle);
-	},
-	setReturnTo: function(wallHandle) {
-		this.returnTo = wallHandle;
-	},
-	setTag: function(wallHandle) {
-		this.tag = wallHandle;
-	},
 	adjTemp: function(delta) {
 		var curTemp = this.temp();
 		this.internalPotential += delta * (this.cv - this.cvKinetic) / this.N;

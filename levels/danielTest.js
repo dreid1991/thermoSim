@@ -37,7 +37,7 @@ LevelData = {
 					// },
 					{
 						type: 'Cell',
-						attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 100, dots: {fairy: 200}, boundingCorner: P(50, 50), boundingVector: V(400, 350), numCorners: 12, col: Col(0, 150, 0)}
+						attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 100, dots: {fairy: 200}, boundingCorner: P(50, 50), boundingVector: V(400, 350), numCorners: 12, col: Col(0, 150, 0), innerChanceTransport: {spc1: .7}, outerChanceTransport: {spc1: .2}}
 					},
 					// {
 						// type: 'ActivationEnergyPair',
@@ -74,7 +74,7 @@ LevelData = {
 					//{data: 'collisions'}
 				],
 				rxns: [
-					{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: .5, prods: {spc2: 2}},
+					//{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: .5, prods: {spc2: 2}},
 					// {handle: 'rxn2', rctA: 'c', rctB: 'd', activeE: 10, prods: {a: 1, b: 1}}
 					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				],
@@ -163,14 +163,6 @@ LevelData = {
 							// }
 						
 						// ],
-						// listeners: [
-							
-							// {dataSet: {wallInfo: 'wally', data: 'pExt'}, is: 'equalTo', checkVal: 1, alertUnsatisfied: 'booo', satisfyCmmds: [{type: 'DragWeights', handle: 'draggy', cmmd: 'freeze'}]}
-							
-						// ],
-						// dataDisplay: [
-							// {wallInfo: "wally", data:'temp', readout: 'mainReadout'}
-						// ]
 					},
 					quiz: [
 						{
@@ -213,58 +205,6 @@ LevelData = {
 						}
 					]
 				}
-				/*
-				{
-					sceneData: {
-						// cmmds: [
-							// "alert('woop')"
-						// ]
-					},
-					text: 'hello',
-					title: 'titley'
-				},
-				{
-					sceneData: {
-						// cmmds: [
-							// "alert('woop')"
-						// ]
-					},
-					text: 'prompt2',
-					title: 'titley'
-				},
-				{
-					sceneData: undefined,
-					cutScene: true,
-					title: 'hello',
-					text: ' checll I am the true lorf of winterfell and they will fear me I think.',
-				
-					quiz: [
-						{type: 'multChoice',
-							options:[
-								{text:"## W = -\\int_{V_{1}}^{V_{2}}P_{sys}dV ##", correct: false, message:"That's not correct"},
-								{text:"## W = - V\\Delta P_{ext} ##", correct: false, message:"That's not correct"},
-								{text:"## W = -P_{ext}\\Delta V ##", correct: true},
-								{text:"## W = -T\\Delta V ##", correct: false, message:"That's not correct"}
-							]
-						},
-						{type: 'multChoice',
-							options:[
-								{text:"fawe", message:"That's not correct"},
-								{text:"## W = - V\\Delta P_{ext} ##", message:"That's not correct"},
-								{text:"## W = -P_{ext}\\Delta V ##"},
-								{text:"## W = -T\\Delta V ##", message:"That's not correct"}
-							]
-						}
-					]
-					
-					
-				},
-				{
-					sceneData: undefined,
-					text: 'can we do another?',
-					title: 'titleynext'
-				}*/
-				
 			]
 		},
 		{

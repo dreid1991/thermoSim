@@ -76,12 +76,30 @@ DotManager.prototype = {
 				var newLists = this.getRelevantLists(dot);
 				for (var newListIdx=0; newListIdx<newLists.length; newListIdx++) {
 					dot.parentLists.push(newLists[newListIdx]);
-					dot.parentLists[dot.parentLists.length - 1].push(dot);
+					newLists[newListIdx].push(dot);
 				}
 			}
 		}
 		
 		
+	},
+	changeDotWall: function(dots, newWallHandle) {
+		var j, jj;
+		if (!(dots instanceof Array)) dots = [dots];
+		for (var i=0; i<dots.length; i++) {
+			var dot = dots[i];
+			dot.tag = newWallHandle;
+			dot.returnTo = newWallHandle;
+			for (j=0, jj=dot.parentLists.length; j<jj; j++) {
+				dot.parentLists[j].splice(dot.parentLists[j].indexOf(dot), 1);
+			}
+			dot.parentLists = [];
+			var newLists = this.getRelevantLists(dot);
+			for (j=0, jj=newLists.length; j<jj; j++) {
+				dot.parentLists.push(newLists[j]);
+				newLists[j].push(dot);
+			}
+		}
 	},
 	addSpcs: function(name) {
 		if (!this.lists[name]) {

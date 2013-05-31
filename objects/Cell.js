@@ -37,7 +37,9 @@ function Cell(attrs) {
 	this.outerWall.hitThreshold = -10;
 	this.parentWallMemberTag = attrs.parentWallHandle;
 	this.cellMemberTag = this.innerWall.handle;
-	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall, this.parentWallMemberTag, this.cellMemberTag, this.energyTransferMax);
+	var innerChanceTransport = attrs.innerChanceTransport || {};
+	var outerChanceTransport = attrs.outerChanceTransport || {};
+	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall, this.parentWallMemberTag, this.cellMemberTag, this.energyTransferMax, innerChanceTransport, outerChanceTransport, thickness);
 	this.wallUpdateListenerName = this.addWallUpdateListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness, this.sideLenMin, attrs.boundingCorner, attrs.boundingVector, this.wallColor);
 	this.drawListenerName = this.addDrawListener(this.guideNodes, this.innerWall, this.outerWall, this.membraneColor, this.drawCanvas);
 	this.dotId = timeline.takeNumber();
@@ -102,90 +104,93 @@ _.extend(Cell.prototype, objectFuncs, {
 
 		return pts;	
 	},
-	assignWallHandlers: function(guideNodes, innerWall, outerWall, parentWallMemberTag, cellMemberTag, energyTransferMax) {
+	assignWallHandlers: function(guideNodes, innerWall, outerWall, parentWallMemberTag, cellMemberTag, energyTransferMax, innerChanceTransport, outerChanceTransport, membraneThickness) {
 		for (var i=0; i<guideNodes.length; i++) {//OY - MAKE SURE YOU MEAN guideNodes[i].prev FOR THE OUTER WALL
-			this.assignWallHandler(innerWall, guideNodes[i].innerWallIdx, outerWall, guideNodes[i].outerWallIdx, guideNodes[i], guideNodes[i].next, cellMemberTag, parentWallMemberTag, -1, energyTransferMax);
-			this.assignWallHandler(outerWall, guideNodes[i].outerWallIdx, innerWall, guideNodes[i].innerWallIdx, guideNodes[i].next, guideNodes[i], parentWallMemberTag, cellMemberTag, 1, energyTransferMax);
+			this.assignWallHandler(innerWall, guideNodes[i].innerWallIdx, outerWall, guideNodes[i].outerWallIdx, guideNodes[i], guideNodes[i].next, cellMemberTag, parentWallMemberTag, -1, energyTransferMax, innerChanceTransport, membraneThickness);
+			this.assignWallHandler(outerWall, guideNodes[i].outerWallIdx, innerWall, guideNodes[i].innerWallIdx, guideNodes[i].next, guideNodes[i], parentWallMemberTag, cellMemberTag, 1, energyTransferMax, outerChanceTransport, membraneThickness);
 		}
 	},
-	assignWallHandler: function(self, selfIdx, opposite, oppositeIdx, nodeA, nodeB, selfTag, oppositeTag, energyTransferSign, energyTransferMax) {
+	assignWallHandler: function(self, selfIdx, opposite, oppositeIdx, nodeA, nodeB, selfTag, oppositeTag, energyTransferSign, energyTransferMax, chanceTransport, membraneThickness) {
 		var reflect = WallMethods.collideMethods.reflect;
 		var hitFunc = function(dot, wall, subWallIdx, wallUV, perpV, perpUV) {
 			
 			if (dot.tag == selfTag) {
-				
-				var distNodeANodeB = wallUV.dx * (nodeB.pos.x - nodeA.pos.x) + wallUV.dy * (nodeB.pos.y - nodeA.pos.y);//nodeA.pos.VTo(nodeB.pos).dotProd(wallUV);
-				var distNodeADot = wallUV.dx * (dot.x - nodeA.pos.x) + wallUV.dy * (dot.y - nodeA.pos.y);//nodeA.pos.VTo(P(dot.x, dot.y)).dotProd(wallUV);
-				var distNodeBDot = -wallUV.dx * (dot.x - nodeB.pos.x) - wallUV.dy * (dot.y - nodeB.pos.y);//-nodeB.pos.VTo(P(dot.x, dot.y)).dotProd(wallUV);
-				
-				var centerNodeANodeB = new Point(nodeA.pos.x + wallUV.dx * distNodeANodeB * .5, nodeA.pos.y + wallUV.dy * distNodeANodeB * .5);//nodeA.pos.copy().movePt(wallUV.copy().mult(distNodeANodeB * .5));
-				
-				var fracA = distNodeADot / distNodeANodeB;
-				var fracB = distNodeBDot / distNodeANodeB;
-				
-				vecNodeAPerp = perpUV.copy().mult(nodeA.v.dotProd(perpUV));
-				vecNodeBPerp = perpUV.copy().mult(nodeB.v.dotProd(perpUV));
-				
-				nodeA.v.dx -= vecNodeAPerp.dx;
-				nodeA.v.dy -= vecNodeAPerp.dy;
-				nodeB.v.dx -= vecNodeBPerp.dx;
-				nodeB.v.dy -= vecNodeBPerp.dy;				
-				
-				var vNodeAPerp_I = vecNodeAPerp.dx * perpUV.dx + vecNodeAPerp.dy * perpUV.dy;//vecNodeAPerp.dotProd(perpUV);
-				var vNodeBPerp_I = vecNodeBPerp.dx * perpUV.dx + vecNodeBPerp.dy * perpUV.dy;//vecNodeBPerp.dotProd(perpUV);
-				
-				//var vWallToDot_I = (1 - fracA) * vNodeAPerp_I + (1 - fracB) * vNodeBPerp_I;
-				//vWallToDot inlined
-				var vLineDot_I = perpV + (1 - fracA) * vNodeAPerp_I + (1 - fracB) * vNodeBPerp_I;
-				
-				var vWallTrans_I = -.5 * (vNodeAPerp_I + vNodeBPerp_I);
-				
-				var vNodeARel_I = vNodeAPerp_I + vWallTrans_I;
-				var vNodeBRel_I = vNodeBPerp_I + vWallTrans_I;
-				
-				var IWall = nodeA.m * centerNodeANodeB.distSqrTo(nodeA.pos) + nodeB.m * centerNodeANodeB.distSqrTo(nodeB.pos);
-				//centerNodeANodeB.VTo(P(dot.x, dot.y)).dotProd(wallUV); inlined
-				var distCenterP = wallUV.dx * (dot.x - centerNodeANodeB.x) + wallUV.dy * (dot.y - centerNodeANodeB.y)
-				
-				var j = -2 * vLineDot_I / (1 / dot.m + 1 / (nodeA.m + nodeB.m) + distCenterP * distCenterP / IWall);
-				
-				dot.v.dx -= perpUV.dx * j / dot.m;
-				dot.v.dy -= perpUV.dy * j / dot.m;
-				
-				// var omegaA_I = vNodeARel_I / (.5 * distNodeANodeB);
-				// var omegaA_F = omegaA_I - distCenterP * j / IWall;
-				// var vNodeARel_F = omegaA_F * .5 * distNodeANodeB;
-				//inlined above three lines into one below
-				var vNodeARel_F = (vNodeARel_I / (.5 * distNodeANodeB) - distCenterP * j / IWall) * .5 * distNodeANodeB;
-				
-				//var vNodeBRel_F = -vNodeARel_F;
-				vWallTrans_F = vWallTrans_I - j / (nodeA.m + nodeB.m);
-				
-				var vNodeA_F = -(vWallTrans_F - vNodeARel_F);
-				var vNodeB_F = -(vWallTrans_F + vNodeARel_F);
-				
-
-				nodeA.v.dx += perpUV.dx * vNodeA_F;
-				nodeA.v.dy += perpUV.dy * vNodeA_F;
-				nodeB.v.dx += perpUV.dx * vNodeB_F;
-				nodeB.v.dy += perpUV.dy * vNodeB_F;
-				
-				dot.x += perpUV.dx;
-				dot.y += perpUV.dy;
-				//now doing eneregy transfer stuff.  all in one big function because this needs to be fast.  sorry.
-				
-				var energyToTransfer = energyTransferSign * this.energyToTransfer;
-				if (energyToTransfer > 0) {
-					var energyAdded = Math.min(energyToTransfer, Math.min(this.energyBank, energyTransferMax))
-					dot.addEnergy(energyAdded);
-					this.energyBank -= energyAdded;
-					this.energyToTransfer -= energyAdded * energyTransferSign;
+				if (Math.random() < chanceTransport[dot.spcName]) {
+				//if (3 * activeEs[dot.spcName] < Math.abs(perpV) * perpV * dot.m * dot.cvKinetic * dot.tConst) { //3 is 1.5 / .5.  1.5 is from 2d->3d, .5 is just from KE eqn
+					this.transferDot(dot, oppositeTag, perpUV, membraneThickness);
 				} else {
-					var energyRemoved = Math.min(this.energyBank - energyToTransfer, Math.min(this.energyBankMax - this.energyBank, Math.min(energyTransferMax, Math.max(0, (dot.temp() - 10) * dot.cv))));
-					dot.addEnergy(-energyRemoved);
-					this.energyBank += energyRemoved;
+					var distNodeANodeB = wallUV.dx * (nodeB.pos.x - nodeA.pos.x) + wallUV.dy * (nodeB.pos.y - nodeA.pos.y);//nodeA.pos.VTo(nodeB.pos).dotProd(wallUV);
+					var distNodeADot = wallUV.dx * (dot.x - nodeA.pos.x) + wallUV.dy * (dot.y - nodeA.pos.y);//nodeA.pos.VTo(P(dot.x, dot.y)).dotProd(wallUV);
+					var distNodeBDot = -wallUV.dx * (dot.x - nodeB.pos.x) - wallUV.dy * (dot.y - nodeB.pos.y);//-nodeB.pos.VTo(P(dot.x, dot.y)).dotProd(wallUV);
+					
+					var centerNodeANodeB = new Point(nodeA.pos.x + wallUV.dx * distNodeANodeB * .5, nodeA.pos.y + wallUV.dy * distNodeANodeB * .5);//nodeA.pos.copy().movePt(wallUV.copy().mult(distNodeANodeB * .5));
+					
+					var fracA = distNodeADot / distNodeANodeB;
+					var fracB = distNodeBDot / distNodeANodeB;
+					
+					vecNodeAPerp = perpUV.copy().mult(nodeA.v.dotProd(perpUV));
+					vecNodeBPerp = perpUV.copy().mult(nodeB.v.dotProd(perpUV));
+					
+					nodeA.v.dx -= vecNodeAPerp.dx;
+					nodeA.v.dy -= vecNodeAPerp.dy;
+					nodeB.v.dx -= vecNodeBPerp.dx;
+					nodeB.v.dy -= vecNodeBPerp.dy;				
+					
+					var vNodeAPerp_I = vecNodeAPerp.dx * perpUV.dx + vecNodeAPerp.dy * perpUV.dy;//vecNodeAPerp.dotProd(perpUV);
+					var vNodeBPerp_I = vecNodeBPerp.dx * perpUV.dx + vecNodeBPerp.dy * perpUV.dy;//vecNodeBPerp.dotProd(perpUV);
+					
+					//var vWallToDot_I = (1 - fracA) * vNodeAPerp_I + (1 - fracB) * vNodeBPerp_I;
+					//vWallToDot inlined
+					var vLineDot_I = perpV + (1 - fracA) * vNodeAPerp_I + (1 - fracB) * vNodeBPerp_I;
+					
+					var vWallTrans_I = -.5 * (vNodeAPerp_I + vNodeBPerp_I);
+					
+					var vNodeARel_I = vNodeAPerp_I + vWallTrans_I;
+					var vNodeBRel_I = vNodeBPerp_I + vWallTrans_I;
+					
+					var IWall = nodeA.m * centerNodeANodeB.distSqrTo(nodeA.pos) + nodeB.m * centerNodeANodeB.distSqrTo(nodeB.pos);
+					//centerNodeANodeB.VTo(P(dot.x, dot.y)).dotProd(wallUV); inlined
+					var distCenterP = wallUV.dx * (dot.x - centerNodeANodeB.x) + wallUV.dy * (dot.y - centerNodeANodeB.y)
+					
+					var j = -2 * vLineDot_I / (1 / dot.m + 1 / (nodeA.m + nodeB.m) + distCenterP * distCenterP / IWall);
+					
+					dot.v.dx -= perpUV.dx * j / dot.m;
+					dot.v.dy -= perpUV.dy * j / dot.m;
+					
+					// var omegaA_I = vNodeARel_I / (.5 * distNodeANodeB);
+					// var omegaA_F = omegaA_I - distCenterP * j / IWall;
+					// var vNodeARel_F = omegaA_F * .5 * distNodeANodeB;
+					//inlined above three lines into one below
+					var vNodeARel_F = (vNodeARel_I / (.5 * distNodeANodeB) - distCenterP * j / IWall) * .5 * distNodeANodeB;
+					
+					//var vNodeBRel_F = -vNodeARel_F;
+					vWallTrans_F = vWallTrans_I - j / (nodeA.m + nodeB.m);
+					
+					var vNodeA_F = -(vWallTrans_F - vNodeARel_F);
+					var vNodeB_F = -(vWallTrans_F + vNodeARel_F);
+					
+
+					nodeA.v.dx += perpUV.dx * vNodeA_F;
+					nodeA.v.dy += perpUV.dy * vNodeA_F;
+					nodeB.v.dx += perpUV.dx * vNodeB_F;
+					nodeB.v.dy += perpUV.dy * vNodeB_F;
+					
+					dot.x += perpUV.dx;
+					dot.y += perpUV.dy;
+					//now doing eneregy transfer stuff.  all in one big function because this needs to be fast.  sorry.
+					
+					var energyToTransfer = energyTransferSign * this.energyToTransfer;
+					if (energyToTransfer > 0) {
+						var energyAdded = Math.min(energyToTransfer, Math.min(this.energyBank, energyTransferMax))
+						dot.addEnergy(energyAdded);
+						this.energyBank -= energyAdded;
+						this.energyToTransfer -= energyAdded * energyTransferSign;
+					} else {
+						var energyRemoved = Math.min(this.energyBank - energyToTransfer, Math.min(this.energyBankMax - this.energyBank, Math.min(energyTransferMax, Math.max(0, (dot.temp() - 10) * dot.cv))));
+						dot.addEnergy(-energyRemoved);
+						this.energyBank += energyRemoved;
+					}
 				}
-				
 				
 			} else if (dot.tag == oppositeTag) {
 				var handler = opposite.handlers[oppositeIdx];
@@ -193,6 +198,12 @@ _.extend(Cell.prototype, objectFuncs, {
 			}
 		}
 		walls.setSubWallHandler(self.handle, selfIdx, {func: hitFunc, obj: this});
+	},
+	transferDot: function(dot, targetWallHandle, perpUV, membraneThickness) {
+		var dist = 2 * dot.r + membraneThickness;
+		dot.x -= dist * perpUV.dx;
+		dot.y -= dist * perpUV.dy;
+		dotManager.changeDotWall(dot, targetWallHandle);
 	},
 	addWallUpdateListener: function(nodes, innerWall, outerWall, handle, thickness, sideLenMin, boundingCorner, boundingVector) {
 		var xMin = boundingCorner.x;
