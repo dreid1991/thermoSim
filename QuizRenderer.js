@@ -24,8 +24,8 @@ QuizRenderer.prototype = {
 	render: function(questions, appendTo) {
 		var quiz = new QuizRenderer.Quiz(questions);
 		if (this.checkQuizTyping(quiz)) {
-			$(appendTo).append(templater.br());
-			var wrapperHTML = templater.div({attrs: {id: ['quizWrapper']}, style: {display: 'inline-block'}});
+			//$(appendTo).append(templater.br());
+			var wrapperHTML = templater.div({attrs: {id: ['quizWrapper']}/*, style: {display: 'inline-block'}*/});
 			var contentHTML = templater.div({attrs: {id: ['quizContent'], 'class': ['niceFont', 'whiteFont']}});
 			var footerHTML = templater.div({attrs: {id: ['quizFooter']}});
 
@@ -77,14 +77,15 @@ QuizRenderer.prototype = {
 	},
 	renderMultChoice: function(question, appendTo) {
 		var options = question.options;
-		//do I even close this table?  What is going on?
-		var html = '<table width=100%<tr><td width=10%></td><td>';
+		var html = question.questionText === undefined ? '' : (interpreter.interp(question.questionText) + templater.br());
+		html += "<div style = 'padding-top:4px;'>";
 		for (var i=0; i<options.length; i++) {
 			var option = options[i];
 			var id = question.storeAs + String(i);
 			html += templater.div({attrs: {id: [id], class: ['multChoiceBlock']}, innerHTML: option.text})
 			
 		}
+		html += '</div>';
 		appendTo.append(html);
 		for (var i=0; i<options.length; i++) {
 			option = options[i];
@@ -203,6 +204,7 @@ QuizRenderer.prototype = {
 		$('#' + rightId).click(rightFunc);
 		addJQueryElems($('#' + leftId), 'button');
 		addJQueryElems($('#' + rightId), 'button');
+		$(appendTo).css('min-height', ($('#' + leftId).height() + 5) + 'px');
 	}
 }
 

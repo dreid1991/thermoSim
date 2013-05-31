@@ -97,6 +97,8 @@ textarea.sim {
 	color:white;
 	border:3px solid;
 	border-color:#b3b2b1;
+	margin-left:auto;
+	margin-right:auto;
 }
 .sim.displayLong{
 	height:500px;
