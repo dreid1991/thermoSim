@@ -72,7 +72,7 @@ function Heater(attrs){
 			},		
 			], this.sliderWrapper, this.sliderTitleWrapper);
 	}
-	this.init(this.wallHandleHeater);
+	this.init(this.wallHandleHeater, this.wall.handle);
 }
 
 _.extend(Heater.prototype, objectFuncs, {
@@ -198,10 +198,11 @@ _.extend(Heater.prototype, objectFuncs, {
 		steps['1']=up;
 		return steps;
 	},
-	init: function(wallHandleHeater){
+	init: function(wallHandleHeater, wallHandleParent){
 		addListener(curLevel, 'update', 'drawHeater'+this.handle, this.draw, '');
 		this.setupWalls(wallHandleHeater)
 		this.eAdded=0;
+		dotMigrator.migrateDots(dotManager.get({tag: wallHandleParent}), [wallHandleParent], [wallHandleHeater]);
 	},
 	setupWalls: function(wallHandleHeater){
 		var handler = {func:this.hit, obj:this};
@@ -231,7 +232,7 @@ _.extend(Heater.prototype, objectFuncs, {
 			var liqWall = liquid.getWallLiq();
 			liqWall.recordQ();
 			self.liquid = liquid;		
-		}, true, true) //once is fine, will be readded each time
+		}, true, true) //'once' being true is fine, will be readded each time
 	},
 	removeLiquid: function() {
 		this.liquid = undefined;
