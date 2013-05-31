@@ -58,6 +58,7 @@ function Heater(attrs){
 		this.setupLiquidHeat(attrs.liquidHandle);
 	}
 	this.wallHandleHeater = 'heater' + this.handle.toCapitalCamelCase();
+	this.hit = this.wrapHit(this.wall.getDataSrc('temp'));
 	this.setupStd();
 	if (this.makeSlider) {
 
@@ -203,30 +204,21 @@ _.extend(Heater.prototype, objectFuncs, {
 		this.eAdded=0;
 	},
 	setupWalls: function(wallHandleHeater){
-		if (this.wall) {
-			var handler = {func:this.hitAddQToWall, obj:this};
-		} else {
-			var handler = {func:this.hit, obj:this};
-		}
+		var handler = {func:this.hit, obj:this};
 		walls.addWall({pts:this.wallPts, handler:handler, handle: wallHandleHeater, record:false, show:false});
 		walls[wallHandleHeater].createSingleValDataObj('vol', function() {
 			return walls.wallVolume(wallHandleHeater);
 		})
 	},
-	hit: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){
-		walls.reflect(dot, wallUV, vPerp);
-		var temp = dot.temp();
-		if (this.qRate && temp > this.tempMax && temp < this.tempMin) {
-			var dE = dot.addEnergy(this.qRate) * .001;
-			this.eAdded += dE;
-		}
-	},
-	hitAddQToWall: function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV){
-		walls.reflect(dot, wallUV, vPerp);
-		if (this.qRate) {
-			var dE = dot.addEnergy(this.qRate) * .001;
-			this.eAdded += dE;
-			this.wall.q += dE;
+	wrapHit: function(tempList) {
+		return function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV) {
+			walls.reflect(dot, wallUV, vPerp);
+			var temp = dot.temp();
+			if ((this.qRate > 0 && tempList[tempList.length - 1] < this.tempMax) || (this.qRate < 0 && tempList[tempList.length - 1] > this.tempMin)) {
+				var dE = dot.addEnergy(this.qRate) * .001;
+				this.eAdded += dE;
+				this.wall.q += dE;
+			}
 		}
 	},
 	setupLiquidHeat: function(liquidHandle) {
