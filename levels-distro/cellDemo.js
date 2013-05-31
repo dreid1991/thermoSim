@@ -177,8 +177,6 @@ LevelData = {
 							type: 'textSmall',
 							label: 'foo',
 							text: 'hello',
-							questionText: 'woopydoo',
-							CWQuestionId: 1234,
 							messageWrong: 'hello',
 							storeAs: 'theAnswer'
 						
@@ -199,19 +197,7 @@ LevelData = {
 					}
 				},
 				{
-					text: 'hello',
-					quiz: [
-						{
-							type: 'multChoice',
-							CWQuestionId: 5499,
-							storeAs: 'bop',
-							options: [
-								{text: 'hello', CWAnswerId: 567567},
-								{text: 'chjas', CWAnswerId: 243523}
-					
-							]
-						}
-					]
+					text: 'hello'
 				}
 				/*
 				{

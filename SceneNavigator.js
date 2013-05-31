@@ -37,6 +37,7 @@ SceneNavigator.prototype = {
 			// if (curPrompt) {
 				// curPrompt.finished = true;
 			// }
+			this.sendAnswersToCW(window.curLevel.quiz);
 			if (checkDirs) {
 				var dirExpr = this.checkDirections(curPrompt.directions);
 			}
@@ -171,7 +172,11 @@ SceneNavigator.prototype = {
 			return true;
 		}
 	},
-
+	sendAnswersToCW: function(quiz) {
+		if (quiz) {
+			quiz.sendAnswersToCW();
+		}
+	},
 	prevPrompt: function(){
 		var prevIdxs = this.getPrevIdxs();
 		var now = timeline.now();

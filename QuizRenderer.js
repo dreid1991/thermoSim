@@ -146,10 +146,10 @@ QuizRenderer.prototype = {
 	},
 	renderTextBox: function(question, appendTo, rows, cols) {
 		var textAreaId = question.storeAs;
-		var boxText = defaultTo('Type your answer here.', question.text);
+		var boxText = defaultTo('Type your answer here.', question.boxText);
 		var textareaAttrs = {id: [textAreaId], rows: [rows], cols: [cols] , placeholder: [boxText]};
 		textareaHTML = templater.textarea({attrs: textareaAttrs});
-		var textBoxHTML = (question.preText === undefined ? '' : (interpreter.interp(question.preText) + templater.br())) + templater.table({attrs: {'class': ['niceFont', 'whiteFont']}, innerHTML:
+		var textBoxHTML = (question.questionText === undefined ? '' : (interpreter.interp(question.questionText) + templater.br())) + templater.table({attrs: {'class': ['niceFont', 'whiteFont']}, innerHTML:
 			templater.tr({innerHTML:
 				templater.td({innerHTML:
 					question.label
@@ -248,14 +248,21 @@ QuizRenderer.Quiz.prototype = {
 			
 			}
 		}
+	},
+	sendAnswersToCW: function() {
+		for (var i=0; i<this.questions.length; i++) {
+			this.questions[i].sendAnswerToCW();
+		}
 	}
 }
 
 QuizRenderer.Question = function(questionData) {
 	this.type = questionData.type;
 	this.label = questionData.label;
-	this.text = questionData.text;
-	this.preText = questionData.preText;
+	this.boxText = questionData.boxText || questionData.text;
+	this.CWQuestionId = questionData.CWQuestionId;
+	
+	this.questionText = this.getQuestionText(questionData.questionText || questionData.preText, this.CWQuestionId);
 	this.units = questionData.units;
 	this.message = questionData.message;
 	this.storeAs = questionData.storeAs;
@@ -273,9 +280,19 @@ QuizRenderer.Question.prototype = {
 		if (!options) return undefined;
 		var procdOptions = []
 		for (var i=0; i<options.length; i++) {
-			procdOptions.push(new QuizRenderer.MultChoiceOption(options[i]));
+			procdOptions.push(new QuizRenderer.MultChoiceOption(options[i], this.CWQuestionId));
 		}
 		return procdOptions;
+	},
+	getQuestionText: function(defaultText, CWQuestionId) {
+		if (CWQuestionId === undefined) return defaultText;
+		var request = new XMLHttpRequest();
+		var get = window.stringTogetherGET({'goto': 'simulation', command: 'get_question_text', question_id: CWQuestionId});
+		if (/^(http|https)/.test(document.URL)) {
+			request.open("GET", 'CW.php?' + get);
+			request.send(null);
+		}
+		return request.responseText ? atob(request.responseText) : defaultText;
 	},
 	hasCorrectAnswer: function() {
 		if ((this.type == 'text' || this.type == 'textSmall' || this.type == 'setVals') && this.answer !== undefined) {
@@ -286,13 +303,52 @@ QuizRenderer.Question.prototype = {
 			}
 		}
 		return false;
+	},
+	sendAnswerToCW: function() {
+		var request = new XMLHttpRequest(), get;
+		if (this.type == 'text' || this.type == 'textSmall' || this.type == 'setVals') {
+			var answerText = getStore(this.storeAs);
+			var answerText64 = btoa(answerText);
+			get = window.stringTogetherGET({'goto': 'simulation', command: 'send_answer', question_id: this.CWQuestionId, answer_text_64: answerText64});
+			if (/^(http|https)/.test(document.URL)) {
+				request.open("GET", 'CW.php?' + get);
+				request.send(null);
+			}
+		} else if (this.type == 'multChoice') {
+			for (var i=0; i<this.options.length; i++) {
+				if (this.options[i].selected) {
+					if (this.options[i].CWAnswerId !== undefined) {
+						get = window.stringTogetherGET({'goto': 'simulation', command: 'send_answer', question_id: this.CWQuestionId, answer_id: this.options[i].CWanswerId});
+						if (/^(http|https)/.test(document.URL)) {
+							request.open("GET", 'CW.php?' + get);
+							request.send(null);
+						} 
+					}
+				}
+			}
+		}
 	}
 }
 
-QuizRenderer.MultChoiceOption = function(option) {
+QuizRenderer.MultChoiceOption = function(option, CWQuestionId) {
+
+	this.CWAnswerId = option.CWAnswerId;
 	this.correct = option.correct || false;
-	this.text = option.text;
+	this.text = this.getAnswerText(option.text, CWQuestionId, this.CWAnswerId);
 	this.selected = false;
 	this.message = option.message;
 	this.div = undefined;
+}
+
+QuizRenderer.MultChoiceOption.prototype = {
+	getAnswerText: function(defaultText, CWQuestionId, CWAnswerId) {
+		if (CWQuestionId === undefined || CWAnswerId === undefined) return defaultText;
+		var request = new XMLHttpRequest();
+		var get = window.stringTogetherGET({'goto': 'simulation', command: 'get_answer_text', question_id: CWQuestionId, answer_id: CWAnswerId});
+		if (/^(http|https)/.test(document.URL)) {
+			request.open("GET", 'CW.php?' + get);
+			request.send(null);
+		}
+		return request.responseText ? atob(request.responseText) : defaultText;
+	}
 }
