@@ -32,8 +32,8 @@ LevelData = {
 								options:[
 									{text:"## W = -\\int_{V_{1}}^{V_{2}}P_{sys}dV ##", correct: false, message:"That's not correct", CWAnswerId: 0},
 									{text:"## W = - V\\Delta P_{ext} ##", correct: false, message:"That's not correct", CWAnswerId: 1},
-									{text:"## W = -P_{ext}\\Delta V ##", correct: true},
-									{text:"## W = -T\\Delta V ##", correct: false, message:"That's not correct"}
+									{text:"## W = -P_{ext}\\Delta V ##", correct: true, CWAnswerId: 2},
+									{text:"## W = -T\\Delta V ##", correct: false, message:"That's not correct", CWAnswerId: 3}
 								]
 							},
 						]
@@ -48,10 +48,10 @@ LevelData = {
 								questionText: 'For our adiabatic system, which of the following relations is correct, if we asume constant heat capacity?',
 								CWQuestionId: 1,
 								options:[
-									{text:"## nc_v\\Delta T = Q ##", correct: false, message:"That's not correct"},
-									{text:"##nc_v\\Delta T = -P_{ext}\\Delta V ##", correct: true},
-									{text:"##nc_p\\Delta T = -P_{ext}\\Delta V ##", correct: false, message:"That's not correct"},
-									{text:"None of these are correct", correct: false, message:"That's not correct"}
+									{text:"## nc_v\\Delta T = Q ##", correct: false, message:"That's not correct", CWAnswerId: 4},
+									{text:"##nc_v\\Delta T = -P_{ext}\\Delta V ##", correct: true, CWAnswerId: 5},
+									{text:"##nc_p\\Delta T = -P_{ext}\\Delta V ##", correct: false, message:"That's not correct", CWAnswerId: 6},
+									{text:"None of these are correct", correct: false, message:"That's not correct", CWAnswerId: 7}
 								]
 							}
 						]
@@ -189,9 +189,11 @@ LevelData = {
 							{handle: 'checkVol2', expr: 'vol("ThirdWall")<8', message: "Compress the system!", priority: 1}
 						]
 					},
-					text: "Previously you answered that the compression did get('WorkDoneAnswer','int') KJ on the system bringing it to a final temperature of get('TempAnswer','int') K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
+					text: "",
 					quiz: [
-						{type: 'text', CWQuestionId: 5, storeAs: 'DiscrepencyAnswer'}
+						{
+							questionText: "Previously you answered that the compression did get('WorkDoneAnswer','int') KJ on the system bringing it to a final temperature of get('TempAnswer','int') K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
+							type: 'text', CWQuestionId: 5, storeAs: 'DiscrepencyAnswer'}
 					]
 				},
 				{//Prompt 1
@@ -201,7 +203,7 @@ LevelData = {
 						quiz: [
 							{type: 'textSmall', CWQuestionId: 6, label: 'Slope from graph', storeAs: 'slopeFromGraph', text: " "},
 							{type: 'textSmall', CWQuestionId: 7, label: 'Slope from equation', storeAs: 'slopeFromEquation', text: " "},
-							{type: 'text', CWQuestionId: 8, preText: "Given our ## P_{ext} ## should the graph be linear or did something go wrong? Explain.", text: " "}
+							{type: 'text', CWQuestionId: 8, questionText: "Given our ## P_{ext} ## should the graph be linear or did something go wrong? Explain.", boxText: " "}
 						]
 				},
 				{//Prompt 2
@@ -232,9 +234,11 @@ LevelData = {
 				},
 				{//Prompt 4
 					sceneData:undefined, 
-					text: "The system has undergone a two-step process.  First it was compressed by adding a block.  Then it was expanded to its original volume by removing the block.  Before the compression, the system's temperature was 200K.  After the expansion, the temperature was get('Temp', 'int') K.  Why is the system temperature higher after going through this two-step process?",
+					text: "",
 					quiz: [
-						{type: 'text', CWQuestionId: 11, text: "Type your answer here."}
+						{
+							questionText: "The system has undergone a two-step process.  First it was compressed by adding a block.  Then it was expanded to its original volume by removing the block.  Before the compression, the system's temperature was 200K.  After the expansion, the temperature was get('Temp', 'int') K.  Why is the system temperature higher after going through this two-step process?",
+							type: 'text', CWQuestionId: 11, text: "Type your answer here."}
 					]
 				}
 			]

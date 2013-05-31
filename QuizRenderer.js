@@ -260,8 +260,8 @@ QuizRenderer.Quiz.prototype = {
 
 QuizRenderer.Question = function(questionData) {
 	this.type = questionData.type;
-	this.label = questionData.label;
-	this.boxText = questionData.boxText || questionData.text;
+	this.label = this.getQuestionLabel(questionData.label, this.CWQuestionId);
+	this.boxText = defaultTo(questionData.text, questionData.boxText);
 	this.CWQuestionId = questionData.CWQuestionId;
 	
 	this.questionText = this.getQuestionText(questionData.questionText || questionData.preText, this.CWQuestionId);
@@ -289,12 +289,22 @@ QuizRenderer.Question.prototype = {
 	getQuestionText: function(defaultText, CWQuestionId) {
 		if (CWQuestionId === undefined) return defaultText;
 		var request = new XMLHttpRequest();
-		var get = window.stringTogetherGET({'goto': 'simulation', command: 'get_question_text', question_id: CWQuestionId});
 		if (/^(http|https)/.test(document.URL)) {
+			var get = window.stringTogetherGET({'goto': 'simulation', command: 'get_question_text', question_id: CWQuestionId});
 			request.open("GET", 'CW.php?' + get);
 			request.send(null);
 		}
 		return request.responseText ? atob(request.responseText) : defaultText;
+	},
+	getQuestionLabel: function(defaultLabel, CWQuestionId) {
+		if (CWQuestionId === undefined) return defaultLabel;
+		var request = new XMLHttpRequest();
+		if (/^(http|https)/.test(document.URL)) {
+			var get = window.stringTogetherGET({'goto': 'simulation', command: 'get_question_label', question_id: CWQuestionId});
+			request.open("GET", 'CW.php?' + get);
+			request.send(null);
+		}
+		return requiest.responseText ? atob(request.responseText) : defaultText;
 	},
 	hasCorrectAnswer: function() {
 		if ((this.type == 'text' || this.type == 'textSmall' || this.type == 'setVals') && this.answer !== undefined) {
@@ -311,8 +321,8 @@ QuizRenderer.Question.prototype = {
 		if (this.type == 'text' || this.type == 'textSmall' || this.type == 'setVals') {
 			var answerText = getStore(this.storeAs);
 			var answerText64 = btoa(answerText);
-			get = window.stringTogetherGET({'goto': 'simulation', command: 'send_answer', question_id: this.CWQuestionId, answer_text_64: answerText64});
 			if (/^(http|https)/.test(document.URL)) {
+				get = window.stringTogetherGET({'goto': 'simulation', command: 'send_answer', question_id: this.CWQuestionId, answer_text_64: answerText64});
 				request.open("GET", 'CW.php?' + get);
 				request.send(null);
 			}
@@ -320,8 +330,8 @@ QuizRenderer.Question.prototype = {
 			for (var i=0; i<this.options.length; i++) {
 				if (this.options[i].selected) {
 					if (this.options[i].CWAnswerId !== undefined) {
-						get = window.stringTogetherGET({'goto': 'simulation', command: 'send_answer', question_id: this.CWQuestionId, answer_id: this.options[i].CWanswerId});
 						if (/^(http|https)/.test(document.URL)) {
+							get = window.stringTogetherGET({'goto': 'simulation', command: 'send_answer', question_id: this.CWQuestionId, answer_id: this.options[i].CWanswerId});
 							request.open("GET", 'CW.php?' + get);
 							request.send(null);
 						} 
