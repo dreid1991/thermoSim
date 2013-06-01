@@ -218,30 +218,33 @@ _.extend(Cell.prototype, objectFuncs, {
 			for (var i=0; i<nodes.length; i++) {
 				nodes[i].pos.x += nodes[i].v.dx;
 				nodes[i].pos.y += nodes[i].v.dy;
+				nodes[i].v.dx *= .999;
+				nodes[i].v.dy *= .999;
+				
 				if (outerWall[nodes[i].prev.outerWallIdx].x < xMin) {
 					nodes[i].pos.x += 2;
 					nodes[i].v.dx = Math.abs(nodes[i].v.dx);
 					for (var j=0; j<nodes.length; j++) {
-						nodes[j].v.dx ++;
+						nodes[j].v.dx += .5;
 					}
 				} else if (outerWall[nodes[i].prev.outerWallIdx].x > xMax) {
 					nodes[i].pos.x -= 2;
 					nodes[i].v.dx = -Math.abs(nodes[i].v.dx);
 					for (var j=0; j<nodes.length; j++) {
-						nodes[j].v.dx --;
+						nodes[j].v.dx -= .5;
 					}
 				}
 				if (outerWall[nodes[i].prev.outerWallIdx].y < yMin) {
 					nodes[i].pos.y += 2;
 					nodes[i].v.dy = Math.abs(nodes[i].v.dy);
 					for (var j=0; j<nodes.length; j++) {
-						nodes[j].v.dy ++;
+						nodes[j].v.dy += .5;
 					}
 				} else if (outerWall[nodes[i].prev.outerWallIdx].y > yMax) {
 					nodes[i].pos.y -= 2;
 					nodes[i].v.dy = -Math.abs(nodes[i].v.dy);
 					for (var j=0; j<nodes.length; j++) {
-						nodes[j].v.dy --;
+						nodes[j].v.dy -= .5;
 					}
 				}
 			}
