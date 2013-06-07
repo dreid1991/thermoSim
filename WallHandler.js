@@ -481,83 +481,79 @@ WallMethods.main = {
 				p1 = pts[ptIdx];
 				p2 = pts[ptIdx+1];
 			}
-			if(this.linesCross({p1:a, p2:b}, {p1:p1, p2:p2})){
+			if (this.linesCross(a, b, p1, p2)) {
 				return true;
-			}
+			}//{p1:a, p2:b}, {p1:p1, p2:p2}
 			
 		}
 		return false;
 	},
-	linesCross: function(a, b){
-		var vA = a.p1.VTo(a.p2);
-		var vB = b.p1.VTo(b.p2);
+	linesCross: function(aP1, aP2, bP1, bP2){
+		var vA = aP1.VTo(aP2);
+		var vB = bP1.VTo(bP2);
 		var magA = vA.mag();
 		var magB = vB.mag();
 		var UVA = vA.UV();
 		var UVB = vB.UV();
-		var dir1 = this.getDist(a, b, UVA, UVB, 'p1');
-		var dir2 = this.getDist(a, b, UVA.neg(), UVB.neg(), 'p2');
-		dir1.da = round(dir1.da,5);
-		dir1.db = round(dir1.db,5);
-		dir2.da = round(dir2.da,5);
-		dir2.db = round(dir2.db,5);
+		var dir1 = this.getDist(aP1, aP2, bP1, bP2, UVA, UVB, 'p1');
+		var dir2 = this.getDist(aP1, aP2, bP1, bP2, UVA.neg(), UVB.neg(), 'p2');
+		dir1.dx = round(dir1.dx,5);
+		dir1.dy = round(dir1.dy,5);
+		dir2.dx = round(dir2.dx,5);
+		dir2.dy = round(dir2.dy,5);
 		magA = round(magA,5);
 		magB = round(magB,5);
-		if(dir1.da>=magA || dir1.db>=magB || dir2.da>=magA || dir2.db>=magB){
-			return false;
-		}
-		return true;
+		return !(dir1.dx>=magA || dir1.dy>=magB || dir2.dx>=magA || dir2.dy>=magB);
+
 	},
-	getDist: function(line1, line2, UVA, UVB, from){
-		var a;
-		var b;
+	getDist: function(aP1, aP2, bP1, bP2, UVA, UVB, from){
 		if(from=='p1'){
-			a = line1.p1;
-			b = line2.p1;
+			a = aP1
+			b = bP1;
 		}else{
-			a = line1.p2;
-			b = line2.p2;
+			a = aP2;
+			b = bP2;
 		}
 		if(UVA.dx==0 && UVB.dx==0){
-			return {da:Infinity, db:Infinity};
+			return new Vector(Infinity, Infinity);
 		} else if (UVA.dx==0){
 			var dx = a.x-b.x;
 			var magMovement = Math.abs(dx/UVB.dx)
 			var hitPt = b.copy().movePt(UVB.copy().mult(magMovement));
-			return {da: a.distTo(hitPt), db:b.distTo(hitPt)};
+			return new Vector(a.distTo(hitPt), b.distTo(hitPt));
 		} else if (UVB.dx==0){
 			var dx = b.x-a.x;
 			var magMovement = Math.abs(dx/UVA.dx);
 			var hitPt = a.copy().movePt(UVA.copy().mult(magMovement));
-			return {da: a.distTo(hitPt), db:b.distTo(hitPt)};		
+			return new Vector(a.distTo(hitPt), b.distTo(hitPt));		
 		}
 		if(UVA.dy==0 && UVB.dy==0){
-			return {da:Infinity, db:Infinity};
+			return new Vector(Infinity, Infinity);
 		}else if(UVA.dy==0){
 			var dy = a.y-b.y;
 			var magMovement = Math.abs(dy/UVB.dy)
 			var hitPt = b.copy().movePt(UVB.copy().mult(magMovement));
-			return {da: a.distTo(hitPt), db:b.distTo(hitPt)};
+			return new Vector(a.distTo(hitPt), b.distTo(hitPt));
 		}else if(UVB.dy==0){
 			var dy = b.y-a.y;
 			var magMovement = Math.abs(dy/UVA.dy)
 			var hitPt = a.copy().movePt(UVA.copy().mult(magMovement));
-			return {da: a.distTo(hitPt), db:b.distTo(hitPt)};	
+			return new Vector(a.distTo(hitPt), b.distTo(hitPt));
 		}
 		var denom = UVB.dx*UVA.dy/UVA.dx - UVB.dy;
 		if(denom==0){
-			return {da:Infinity, db:Infinity};
+			return new Vector(Infinity, Infinity);
 		}
 		var num = b.y - a.y - UVA.dy*b.x/UVA.dx + a.x*UVA.dy/UVA.dx;
 		var db = num/denom;
 		var da = (b.x + UVB.dx*db - a.x)/UVA.dx;
-		return {da:da, db:db};
+		return new Vector(da, db);
 	},
 	angleBetweenPts: function(a, b, c, multiplier){
 		var ab = a.VTo(b).UV()
 		var ba = ab.copy().neg()
 		var bc = b.VTo(c).UV()
-		var center = ab.copy().add(bc).rotate(Math.PI/2*multiplier)
+		var center = ab.copy().add(bc).perp(multiplier == 1 ? 'cw' : 'ccw');
 		var angleBA = Math.atan2(ba.dy, ba.dx);
 		var angleBC = Math.atan2(bc.dy, bc.dx);
 		var angleCenter = Math.atan2(center.dy, center.dx);

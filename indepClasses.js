@@ -219,10 +219,9 @@ Vector.prototype = {
 		return this;
 	},
 	rotate: function(rad){
-		var dx = this.dx;
-		var dy = this.dy;
-		this.dx = dx*Math.cos(rad) - dy*Math.sin(rad);
-		this.dy = dx*Math.sin(rad) + dy*Math.cos(rad);
+		var dx = this.dx, dy = this.y, cos = Math.cos(rad), sin = Math.sin(rad);
+		this.dx = dx * cos - dy * sin;
+		this.dy = dx * sin + dy * cos;
 		return this;
 	},
 	perp: function(dir){

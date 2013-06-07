@@ -27,13 +27,13 @@ LevelData = {
 						quiz: [
 							{
 								type: 'multChoice',
-								CWQuestionId: 0,
+								CWQuestionId: 1,
 								questionText: '<p>If we compress the adiabatic system pictured to the right at a constant external pressure from state 1 to state 2, which of the following equations best represents the work done?</p>',
 								options:[
-									{text:"## W = -\\int_{V_{1}}^{V_{2}}P_{sys}dV ##", correct: false, message:"That's not correct", CWAnswerId: 0},
-									{text:"## W = - V\\Delta P_{ext} ##", correct: false, message:"That's not correct", CWAnswerId: 1},
-									{text:"## W = -P_{ext}\\Delta V ##", correct: true, CWAnswerId: 2},
-									{text:"## W = -T\\Delta V ##", correct: false, message:"That's not correct", CWAnswerId: 3}
+									{text:"## W = -\\int_{V_{1}}^{V_{2}}P_{sys}dV ##", correct: false, message:"That's not correct", CWAnswerId: 1},
+									{text:"## W = - V\\Delta P_{ext} ##", correct: false, message:"That's not correct", CWAnswerId: 2},
+									{text:"## W = -P_{ext}\\Delta V ##", correct: true, CWAnswerId: 3},
+									{text:"## W = -T\\Delta V ##", correct: false, message:"That's not correct", CWAnswerId: 4}
 								]
 							},
 						]
@@ -46,12 +46,12 @@ LevelData = {
 							{
 								type: 'multChoice',
 								questionText: 'For our adiabatic system, which of the following relations is correct, if we asume constant heat capacity?',
-								CWQuestionId: 1,
+								CWQuestionId: 2,
 								options:[
-									{text:"## nc_v\\Delta T = Q ##", correct: false, message:"That's not correct", CWAnswerId: 4},
-									{text:"##nc_v\\Delta T = -P_{ext}\\Delta V ##", correct: true, CWAnswerId: 5},
-									{text:"##nc_p\\Delta T = -P_{ext}\\Delta V ##", correct: false, message:"That's not correct", CWAnswerId: 6},
-									{text:"None of these are correct", correct: false, message:"That's not correct", CWAnswerId: 7}
+									{text:"## nc_v\\Delta T = Q ##", correct: false, message:"That's not correct", CWAnswerId: 5},
+									{text:"##nc_v\\Delta T = -P_{ext}\\Delta V ##", correct: true, CWAnswerId: 6},
+									{text:"##nc_p\\Delta T = -P_{ext}\\Delta V ##", correct: false, message:"That's not correct", CWAnswerId: 7},
+									{text:"None of these are correct", correct: false, message:"That's not correct", CWAnswerId: 8}
 								]
 							}
 						]
@@ -83,7 +83,7 @@ LevelData = {
 					quiz: [
 						{
 							questionText: "<center>##nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p>From the equation above we see that temperature increases as we do work by decreasing volume.  Temperature is an expression is molecular kinetic energy, so as the system is compressed, the molecules must speed up.  These ideal gas molecules can be thought of as perfectly elastic bouncy balls.  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?",
-							type: 'text', CWQuestionId: 2, storeAs: 'FirstSceneAnswer', Text: 'Type your answer here.'}
+							type: 'text', CWQuestionId: 3, storeAs: 'FirstSceneAnswer', Text: 'Type your answer here.'}
 					],
 					
 				},
@@ -133,14 +133,14 @@ LevelData = {
 						quiz: [
 							{
 								questionText: "Above is a well insulated piston cylinder assembly.  Place the block on top of the piston and observe the response.  Calculate the amount of work that the piston and block did on the system?",
-								CWQuestionId: 3, type: 'textSmall', storeAs: 'WorkDoneAnswer', units: 'kJ', boxText: ''}
+								CWQuestionId: 4, type: 'textSmall', storeAs: 'WorkDoneAnswer', units: 'kJ', boxText: ''}
 						]
 				},
 				{//Prompt 1
 					sceneData: undefined,
 						text: "The system had an initial temperature of 200 K and contains 1.8 moles of an ideal monatomic gas.  You wrote that get('WorkDoneAnswer','int') kJ of work were done.  What final temperature should the system have?",
 						quiz: [
-							{CWQuestionId: 4, type: 'textSmall', storeAs: 'TempAnswer', units: 'K', text: ''}
+							{CWQuestionId: 5, type: 'textSmall', storeAs: 'TempAnswer', units: 'K', text: ''}
 						]
 				},
 			]
@@ -193,7 +193,7 @@ LevelData = {
 					quiz: [
 						{
 							questionText: "Previously you answered that the compression did get('WorkDoneAnswer','int') KJ on the system bringing it to a final temperature of get('TempAnswer','int') K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
-							type: 'text', CWQuestionId: 5, storeAs: 'DiscrepencyAnswer'}
+							type: 'text', CWQuestionId: 6, storeAs: 'DiscrepencyAnswer'}
 					]
 				},
 				{//Prompt 1
@@ -201,9 +201,9 @@ LevelData = {
 						cutScene: true,
 						text: "<center> ## nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p> If you'll notice, the T vs. V graph is linear.  Using the equation above, find what its slope should should be with 1.8 moles of an ideal monatomic gas.  Do the slopes from the equation and from the graph match?",
 						quiz: [
-							{type: 'textSmall', CWQuestionId: 6, label: 'Slope from graph', storeAs: 'slopeFromGraph', text: " "},
-							{type: 'textSmall', CWQuestionId: 7, label: 'Slope from equation', storeAs: 'slopeFromEquation', text: " "},
-							{type: 'text', CWQuestionId: 8, questionText: "Given our ## P_{ext} ## should the graph be linear or did something go wrong? Explain.", boxText: " "}
+							{type: 'textSmall', CWQuestionId: 7, label: 'Slope from graph', storeAs: 'slopeFromGraph', text: " "},
+							{type: 'textSmall', CWQuestionId: 8, label: 'Slope from equation', storeAs: 'slopeFromEquation', text: " "},
+							{type: 'text', CWQuestionId: 9, questionText: "Given our ## P_{ext} ## should the graph be linear or did something go wrong? Explain.", boxText: " "}
 						]
 				},
 				{//Prompt 2
@@ -211,8 +211,8 @@ LevelData = {
 						cutScene: true,
 						text: "Now we'll look at expanding the same system of 1.8 moles with ## P_{ext} ## of 2 bar from 7.5L to 15 L. <p> How much work will the system do on its surroundings in this expansion, and what will its final temperature be?",
 						quiz: [
-							{type: 'textSmall', CWQuestionId: 9, label: "Work Done:",storeAs: 'workAnswer', text: " ", units: "kJ"},
-							{type: 'textSmall', CWQuestionId: 10, label: 'Final Temperature:', storeAs: 'tempAnswer', text: " ", units: "K"}
+							{type: 'textSmall', CWQuestionId: 10, label: "Work Done:",storeAs: 'workAnswer', text: " ", units: "kJ"},
+							{type: 'textSmall', CWQuestionId: 11, label: 'Final Temperature:', storeAs: 'tempAnswer', text: " ", units: "K"}
 						]
 				},
 				{//Prompt 3
@@ -238,7 +238,7 @@ LevelData = {
 					quiz: [
 						{
 							questionText: "The system has undergone a two-step process.  First it was compressed by adding a block.  Then it was expanded to its original volume by removing the block.  Before the compression, the system's temperature was 200K.  After the expansion, the temperature was get('Temp', 'int') K.  Why is the system temperature higher after going through this two-step process?",
-							type: 'text', CWQuestionId: 11, text: "Type your answer here."}
+							type: 'text', CWQuestionId: 12, text: "Type your answer here."}
 					]
 				}
 			]
