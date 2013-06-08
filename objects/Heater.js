@@ -69,7 +69,8 @@ function Heater(attrs){
 												this.parseSlider(event, ui)
 											}
 			},		
-			]
+			],
+		attrs.sliderIdx
 		)
 	}
 	this.init(this.wallHandleHeater, this.wall.handle);

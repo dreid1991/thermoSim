@@ -23,10 +23,24 @@ SliderManager.prototype = {
 	addSlider: function(title, handle, attrs, handlers, idx) {
 		idx = idx === undefined ? this.getMaxIdx(this.sliderGroupWrapper) + 1 : idx;
 		var sliderWrapper = this.insertSliderWrapper(this.containerId, this.sliderGroupWrapper, idx, handle)
-		var sliderInnerId = 'sliderInnerDash' + this.dashId + 'Handle' + handle;
+		var sliderPadding = this.insertSliderPadding(sliderWrapper);
+		var sliderInnerId = 'sliderInnerContainer' + this.containerId + 'Handle' + handle;
 		var sliderInnerSelector = '#' + this.containerId + ' #' + sliderInnerId;
-		var sliderWrappers = makeSlider(sliderWrapper, sliderWrapper, sliderInnerSelector, sliderInnerId, title, attrs, handlers)
-		return new SliderManager.Slider(this, $(sliderInnerSelector));
+		var sliderWrappers = makeSlider(sliderPadding, sliderPadding, sliderInnerSelector, sliderInnerId, title, attrs, handlers)
+		this.setWidths();
+		return new SliderManager.Slider(this, sliderWrapper, $(sliderInnerSelector));
+	},
+	setWidths: function() {
+		var children = this.sliderGroupWrapper.children();
+		if (children.length) {
+			var wrapperWidthPercent = 100 * 1.5 * children.length / (1 + 1.5 * children.length);
+			this.sliderGroupWrapper.css('width', wrapperWidthPercent + '%');
+			var childWidthPercent = 100 / children.length;
+			for (var i=0; i<children.length; i++) {
+				$(children[i]).css('width', childWidthPercent + '%');
+			}
+		}
+		
 	},
 	insertSliderWrapper: function(containerId, sliderGroupWrapper, idx, handle) {
 		var sliderId = 'sliderIdx' + idx + 'Handle' + handle;
@@ -35,7 +49,7 @@ SliderManager.prototype = {
 		for (var i=0; i<children.length; i++) {
 			var childIdx = $(children[i]).attr('sliderIdx');
 			if (childIdx !== undefined && idx <= childIdx) {
-				insertBefore = i;
+				insertBeforeIdx = i;
 				break;
 			}
 			
@@ -48,6 +62,12 @@ SliderManager.prototype = {
 			$(children[i]).before(divHTML);
 		}
 		return $('#' + containerId + ' #' + sliderId);
+	},
+	insertSliderPadding: function(sliderWrapper) {
+		var id = sliderWrapper.attr('id') + 'Padding'
+		var html = templater.div({attrs: {id: [id], 'class': ['sliderPadding']}});
+		sliderWrapper.append(html);
+		return $('#' + sliderWrapper.attr('id') + ' #' + id);
 	},
 	getMaxIdx: function(groupWrapper) {
 		var children = groupWrapper.children();
@@ -62,19 +82,26 @@ SliderManager.prototype = {
 	},
 	appendSliderGroupWrapper: function(containerId) {
 		var wrapperId = 'sliderWrapper'
-		$('#' + containerId).append(templater.div({attrs: {id: [wrapperId]}}));
+		$('#' + containerId).append(templater.div({attrs: {id: [wrapperId], 'class': ['sliderGroupWrapper']}}));
 		return $('#' + containerId + ' #' + wrapperId);
 	}
 }
 
-SliderManager.Slider = function(manager, slider) {
+SliderManager.Slider = function(manager, wrapper, slider) {
 	this.manager = manager;
+	this.wrapper = wrapper;//jquery elem
 	this.slider = slider;//jquery elem
 	this.selector = slider.selector;
+	this.removed = false;
 }
 
 SliderManager.Slider.prototype = {
 	remove: function() {
-	
+		if (!this.removed) {
+			this.wrapper.remove();
+			this.manager.setWidths();
+			this.removed = true;
+		}
+		
 	}
 }

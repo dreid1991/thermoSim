@@ -39,6 +39,8 @@ function Cell(attrs) {
 	this.cellMemberTag = this.innerWall.handle;
 	var innerChanceTransport = attrs.innerChanceTransport || {};
 	var outerChanceTransport = attrs.outerChanceTransport || {};
+	this.fillInUnspecdSpcs(innerChanceTransport);
+	this.fillInUnspecdSpcs(outerChanceTransport);
 	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall, this.parentWallMemberTag, this.cellMemberTag, this.energyTransferMax, innerChanceTransport, outerChanceTransport, thickness);
 	this.wallUpdateListenerName = this.addWallUpdateListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness, this.sideLenMin, attrs.boundingCorner, attrs.boundingVector, this.wallColor);
 	this.drawListenerName = this.addDrawListener(this.guideNodes, this.innerWall, this.outerWall, this.membraneColor, this.drawCanvas);
@@ -71,6 +73,15 @@ _.extend(Cell.prototype, objectFuncs, {
 			guideNodes[i].next = i == guideNodes.length - 1 ? guideNodes[0] : guideNodes[i + 1];
 		}
 		return guideNodes;
+	},
+	fillInUnspecdSpcs: function(chanceTransport) {
+		//this is so we're type-safe.  JIT compilers throw away machine code if there's a type change 
+		for (var i=0; i<LevelData.spcDefs.length; i++) {
+			var spcName = LevelData.spcDefs[i].spcName;
+			if (chanceTransport[spcName] === undefined) {
+				chanceTransport[spcName] = 0;
+			}
+		}
 	},
 	makeOuterWallPts: function(guideNodes, thickness) {
 		var pts = [];

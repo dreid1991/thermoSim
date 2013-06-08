@@ -48,7 +48,12 @@ LevelData = {
 						cleanUpWith: 'prompt1',
 						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
 					},
-				
+					{
+						type: 'Heater',
+						attrs: {wallInfo: 'wally', max: 3, handle: 'other', offset: V(70, 0), sliderIdx: 0}
+					
+					
+					}
 					// {
 						// type: 'QArrowsAmmt',
 						// attrs: {handle: 'arrowy', wallInfo: 'wally', scale: 1}
