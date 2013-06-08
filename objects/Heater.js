@@ -61,16 +61,16 @@ function Heater(attrs){
 	this.hit = this.wrapHit(this.wall.getDataSrc('temp'));
 	this.setupStd();
 	if (this.makeSlider) {
-
-		this.sliderSelector = this.addSlider('Heater', {value:50}, 
+		this.slider = sliderManager.addSlider('Heater', this.handle + 'Slider', {value:50},
 			[{eventType:'slide', obj:this, func:this.parseSlider},
 			{eventType:'slidestop', obj:this, func:function(event, ui){
-												$(this.sliderSelector).slider('option', {value:50});
+												$(this.slider.slider).slider('option', {value:50});
 												ui.value=50;
 												this.parseSlider(event, ui)
 											}
 			},		
-			], this.sliderWrapper, this.sliderTitleWrapper);
+			]
+		)
 	}
 	this.init(this.wallHandleHeater, this.wall.handle);
 }

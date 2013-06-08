@@ -15,24 +15,21 @@ Copyright (C) 2013  Daniel Reid
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function SliderManager(div, dashId) {
-	
-	this.container = div; //wrapper div must be empty
-	this.dashId = dashId;
-	this.sliderGroupWrapper = this.appendSliderGroupWrapper(this.container, this.dashId);
+function SliderManager(containerId) {
+	this.containerId = containerId; //container div must be empty
+	this.sliderGroupWrapper = this.appendSliderGroupWrapper(this.containerId);
 }
 SliderManager.prototype = {
 	addSlider: function(title, handle, attrs, handlers, idx) {
-		var sliderWrapper = this.insertSliderWrapper(this.sliderGroupWrapper, this.dashId, idx, handle)
-		var sliderSelector = '#slider' + handle.toCapitalCamelCase() + this.dashId;
-		var sliderWrapper = makeSlider(sliderTitleWrapper, sliderWrapper, sliderSelector, title, attrs, handlers)
-		if (!this.sliderWrapperSelectors) this.sliderWrapperSelectors = [];
-		this.sliderWrapperSelectors.push('.active #' + $(sliderTitleWrapper).attr('id'));
-		this.sliderWrapperSelectors.push('.active #' + $(sliderWrapper).attr('id'));
-		return sliderSelector;		
+		idx = idx === undefined ? this.getMaxIdx(this.sliderGroupWrapper) + 1 : idx;
+		var sliderWrapper = this.insertSliderWrapper(this.containerId, this.sliderGroupWrapper, idx, handle)
+		var sliderInnerId = 'sliderInnerDash' + this.dashId + 'Handle' + handle;
+		var sliderInnerSelector = '#' + this.containerId + ' #' + sliderInnerId;
+		var sliderWrappers = makeSlider(sliderWrapper, sliderWrapper, sliderInnerSelector, sliderInnerId, title, attrs, handlers)
+		return new SliderManager.Slider(this, $(sliderInnerSelector));
 	},
-	insertSliderWrapper: function(sliderGroupWrapper, dashId, idx, handle) {
-		var sliderId = 'sliderDashId' + dashId + 'Idx' + idx + 'Handle' + handle;
+	insertSliderWrapper: function(containerId, sliderGroupWrapper, idx, handle) {
+		var sliderId = 'sliderIdx' + idx + 'Handle' + handle;
 		var children = sliderGroupWrapper.children();
 		var insertBeforeIdx = -1;
 		for (var i=0; i<children.length; i++) {
@@ -40,23 +37,44 @@ SliderManager.prototype = {
 			if (childIdx !== undefined && idx <= childIdx) {
 				insertBefore = i;
 				break;
-				
 			}
 			
 		}
-		var divHTML = templater.div({attrs: {id: [sliderId]}})
+		var divHTML = templater.div({attrs: {id: [sliderId], handle: [handle], sliderIdx: [idx], 'class': ['sliderWrapper']}});//and some class 
 		if (insertBeforeIdx == -1) {
-			sliderGroupWrapper.append(divHTML);//and some class 
+			sliderGroupWrapper.append(divHTML);
 			
 		} else {
 			$(children[i]).before(divHTML);
 		}
-		return $('#' + sliderId);
+		return $('#' + containerId + ' #' + sliderId);
 	},
+	getMaxIdx: function(groupWrapper) {
+		var children = groupWrapper.children();
+		var max = -1;
+		for (var i=0; i<children.length; i++) {
+			var childIdx = $(children[i]).attr('sliderIdx');
+			if (childIdx !== undefined && !isNaN(childIdx)) {
+				max = Math.max(childIdx, max);
+			}
+		}
+		return max;
+	},
+	appendSliderGroupWrapper: function(containerId) {
+		var wrapperId = 'sliderWrapper'
+		$('#' + containerId).append(templater.div({attrs: {id: [wrapperId]}}));
+		return $('#' + containerId + ' #' + wrapperId);
+	}
+}
+
+SliderManager.Slider = function(manager, slider) {
+	this.manager = manager;
+	this.slider = slider;//jquery elem
+	this.selector = slider.selector;
+}
+
+SliderManager.Slider.prototype = {
+	remove: function() {
 	
-	appendSliderGroupWrapper: function(container, dashId) {
-		var wrapperId = 'sliderWrapper' + dashId;
-		container.append(templater.div({attrs: {id: [wrapperId]}}));
-		return $('#' + wrapperId);
 	}
 }

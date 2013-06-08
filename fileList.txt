@@ -33,6 +33,7 @@
 ../WallMethodsBorder.js
 ../ButtonManager.js
 ../QuizRenderer.js
+../SliderManager.js
 ../ActivationEnergySpcChanger.js
 ../ConditionManager.js
 ../objects/objectFuncs.js

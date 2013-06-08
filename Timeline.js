@@ -215,6 +215,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, condition
 	this.dashRunId = 'dashRun' + (window.dashRunId++);
 	this.dashRun = $('#dashRunBlank').clone(true).attr('id', this.dashRunId);
 	$('#dashRunWrapper').append(this.dashRun);
+	this.sliderManager = new SliderManager(this.dashRunId);
 	
 	this.motherTimeline = motherTimeline || this.timeline;
 	this.motherSection = motherSection || this;
@@ -224,7 +225,7 @@ Timeline.Section.prototype = {
 	showSection: function() {
 		//this.replaceDiv($('#dashRunWrapper'), $('#dashRun'), this.dashRunClone || this.dashRunBlank);
 		this.dashRun.show();
-		this.dashRun.attr('id', 'dashRun');
+		//this.dashRun.attr('id', 'dashRun');
 		this.dashRun.addClass('active');
 		this.replaceDiv($('#buttonManagerWrapper'), $('#buttonManager'), this.buttonManagerClone || this.buttonManagerBlank);
 		this.pushToGlobal();
@@ -240,7 +241,7 @@ Timeline.Section.prototype = {
 	},
 	restoreHTML: function() {
 		this.dashRun.show();
-		this.dashRun.attr('id', 'dashRun');
+		//this.dashRun.attr('id', 'dashRun');
 		this.dashRun.addClass('active');
 		this.replaceDiv($('#buttonManagerWrapper'), $('#buttonManager'), this.buttonManagerClone || this.buttonManagerBlank);
 		this.restoreGraphs();
@@ -587,6 +588,7 @@ Timeline.Section.prototype = {
 		window.dataDisplayer = this.dataDisplayer;
 		window.sliderList = this.sliderList;
 		window.buttonManager = this.buttonManager;
+		window.sliderManager = this.sliderManager;
 		window.dataHandler = this.dataHandler;
 		window.activationEnergySpcChanger = this.activationEnergySpcChanger;
 		window.conditionManager = this.conditionManager;
@@ -612,7 +614,7 @@ Timeline.Section.prototype = {
 			this.buttonManagerClone = $('#buttonManager').clone(true);
 			$('#buttonManager').html('');
 			$('#baseHeader').html('')
-			this.dashRun.attr('id', this.dashRunId);
+			//this.dashRun.attr('id', this.dashRunId);
 			this.dashRun.removeClass('active');
 			this.dashRun.hide();
 			//this.dashRunClone = $('#dashRun').clone(true);

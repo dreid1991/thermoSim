@@ -24,7 +24,7 @@ LevelData = {
 				objs: [
 					{
 						type: 'Cell',
-						attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 298, dots: {fairy: 200}, boundingCorner: P(50, 50), boundingVector: V(400, 350), numCorners: 12, col: Col(0, 150, 0), innerChanceTransport: {spc1: .7}, outerChanceTransport: {spc1: .2}}
+						attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 298, dots: {fairy: 200}, boundingCorner: P(50, 50), boundingVector: V(400, 350), numCorners: 12, col: Col(0, 150, 0), innerChanceTransport: {spc1: .7}/*, outerChanceTransport: {spc1: .2}*/}
 					},
 						
 				],
@@ -34,8 +34,16 @@ LevelData = {
 				dataReadouts: [
 					{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 					{label: 'cell temp: ', expr: 'tempSmooth("cellSquishyInner")', units: 'K', decPlaces: 1, handle: 'cell', readout: 'mainReadout'},
-					{label: 'cell frac: ', expr: 'frac("cellSquishyInner", {spcName: "spc1", tag: "cellSquishyInner"})', units: '', decPlaces: 2, handle: 'cellFrac', readout: 'mainReadout'}
+					{label: 'cell frac: ', expr: 'frac("cellSquishyInner", {spcName: "spc1", tag: "cellSquishyInner"})', units: '', decPlaces: 2, handle: 'cellFrac', readout: 'mainReadout'},
+					{label: 'cell vol: ', expr: 'vol("cellSquishyInner")', units: 'L', decPlaces: 2, handle: 'cellVol', readout: 'mainReadout'}
 				],
+				graphs: [
+					{type: 'Scatter', handle: 'eqConst', xLabel: "time (s)", yLabel: "vol", axesInit:{x:{min:0, step:10}, y:{min:0, step:.2}}, numGridLines: {y: 6}, 
+						sets:[
+							{handle:'frac', label:'eq\nconst', pointCol:Col(50,255,50), flashCol:Col(255,200,200), data:{x: 'time("cellSquishyInner")', y: "vol('cellSquishyInner')"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
+						]
+					},
+				]
 			},
 			prompts: [
 				{
@@ -104,6 +112,7 @@ LevelData = {
 					{label: 'temp: ', expr: 'tempSmooth("wally3")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 					{label: 'cell temp: ', expr: 'tempSmooth("cellSquishy3Inner")', units: 'K', decPlaces: 1, handle: 'cell', readout: 'mainReadout'},
 					{label: 'cell frac: ', expr: 'frac("cellSquishy3Inner", {spcName: "spc1", tag: "cellSquishy3Inner"})', units: '', decPlaces: 2, handle: 'cellFrac', readout: 'mainReadout'}
+			
 				],
 			},
 			prompts: [

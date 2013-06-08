@@ -20,7 +20,7 @@ function Cell(attrs) {
 	this.handle = attrs.handle;
 	var initPos = attrs.pos; // upper left corner
 	var thickness = 10;
-	this.nodeMass = attrs.nodeMass || 100;
+	this.nodeMass = attrs.nodeMass || 700;
 	var initRadius = attrs.rad;
 	this.drawCanvas = attrs.drawCanvas || window.c;
 	var center = initPos.copy().movePt(V(initRadius, initRadius));
@@ -218,8 +218,8 @@ _.extend(Cell.prototype, objectFuncs, {
 			for (var i=0; i<nodes.length; i++) {
 				nodes[i].pos.x += nodes[i].v.dx;
 				nodes[i].pos.y += nodes[i].v.dy;
-				nodes[i].v.dx *= .999;
-				nodes[i].v.dy *= .999;
+				nodes[i].v.dx *= .995;
+				nodes[i].v.dy *= .995;
 				
 				if (outerWall[nodes[i].prev.outerWallIdx].x < xMin) {
 					nodes[i].pos.x += 2;
@@ -273,8 +273,8 @@ _.extend(Cell.prototype, objectFuncs, {
 	},
 	addAngleForce: function(node, prev, next, UVPointingIn) {
 		var angle = this.angleBetweenPts(node.pos, prev.pos, next.pos, UVPointingIn);
-		node.v.dx -= UVPointingIn.dx * (angle - node.nativeAngle) 
-		node.v.dy -= UVPointingIn.dy * (angle - node.nativeAngle) 
+		node.v.dx -= 3 * UVPointingIn.dx * (angle - node.nativeAngle)
+		node.v.dy -= 3 * UVPointingIn.dy * (angle - node.nativeAngle) 
 	},
 	addExpansionForce: function(a, b, sideLenMin) {
 		var vec = a.pos.VTo(b.pos);

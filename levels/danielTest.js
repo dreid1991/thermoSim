@@ -35,19 +35,19 @@ LevelData = {
 						// type: 'DragWeights',
 						// attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 3}], weightScalar: 30, pInit: 2, cleanUpWith: 'prompt1'}
 					// },
-					{
-						type: 'Cell',
-						attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 100, dots: {fairy: 200}, boundingCorner: P(50, 50), boundingVector: V(400, 350), numCorners: 12, col: Col(0, 150, 0), innerChanceTransport: {spc1: .7}, outerChanceTransport: {spc1: .2}}
-					},
+					// {
+						// type: 'Cell',
+						// attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 100, dots: {fairy: 200}, boundingCorner: P(50, 50), boundingVector: V(400, 350), numCorners: 12, col: Col(0, 150, 0), innerChanceTransport: {spc1: .7}, outerChanceTransport: {spc1: .2}}
+					// },
 					// {
 						// type: 'ActivationEnergyPair',
 						// attrs: {spcNameLow: 'ugly', spcNameHigh: 'fairy', thresholdEnergy: 12}
 					// },
-					// {
-						// type: 'Heater',
-						// cleanUpWith: 'prompt1',
-						// attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
-					// },
+					{
+						type: 'Heater',
+						cleanUpWith: 'prompt1',
+						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
+					},
 				
 					// {
 						// type: 'QArrowsAmmt',
@@ -64,7 +64,7 @@ LevelData = {
 					// {handle: 'trumpet', expr: "pExt('wally') > 7", message: 'la', requiredFor: 'section'}
 				// ],
 				dataRecord: [
-					{wallInfo: 'wally', data: 'internalEnergy'}
+					//{wallInfo: 'wally', data: 'internalEnergy'}
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'a', tag: 'wally'}},
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'b', tag: 'wally'}},
@@ -79,8 +79,8 @@ LevelData = {
 					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				],
 				dataReadouts: [
-					{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
-					{label: 'cell temp: ', expr: 'tempSmooth("cellSquishyInner")', units: 'K', decPlaces: 1, handle: 'cell', readout: 'mainReadout'}
+					//{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
+					//{label: 'cell temp: ', expr: 'tempSmooth("cellSquishyInner")', units: 'K', decPlaces: 1, handle: 'cell', readout: 'mainReadout'}
 					//{label: 'liq temp: ', expr: 'tempSmooth("liquidSwishy")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'}
 					// {label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},
 					// {label: 'Coll/sec: ', expr: 'collisions()', units: '', decPlaces: 0, handle: 'lala', readout: 'mainReadout'}
