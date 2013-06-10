@@ -35,7 +35,10 @@ function Inlet (attrs) {
 	this.flows = this.processFlows(attrs.flows);
 	this.makeSlider = attrs.makeSlider;
 	if (this.makeSlider) {
-		this.sliderId = this.addSlider('Flow rate', {value: this.fracOpen*100}, [{eventType:'slide', obj:this, func:this.parseSlider}]);
+		this.slider = sliderManager.addSlider('Flow rate', this.handle + 'Slider',  {value: this.fracOpen*100},
+			[{eventType:'slide', obj:this, func:this.parseSlider}],
+		attrs.sliderIdx
+		)
 	}
 	this.setupStd();
 	this.arrows = [];
@@ -97,8 +100,8 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 		}, this) //maybe context should be this.  Will see if it's needed
 	},
 	remove: function() {
-		if (this.sliderId) {
-			this.removeSlider();
+		if (this.slider) {
+			this.slider.remove();
 		}
 		this.arrows.map(function(arrow){arrow.remove()});
 		removeListener(curLevel, 'update', this.type + this.handle);

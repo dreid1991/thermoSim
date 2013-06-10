@@ -68,6 +68,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		this.bins.store = this.makeStoreBins();
 		this.bins.piston = this.makePistonBins();
 		//this.dropAllstores();
+		this.savedWallHandler = this.wall.handlers[0];
 		walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);
 		if (!this.displayText) {
 			this.draw = this.drawNoText;
@@ -84,6 +85,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		this.wall.moveStop();
 		this.trackingPts.map(function(pt) {pt.trackStop();});
 		this.trackingPts.splice(0, this.trackingPts.length);
+		walls.setSubWallHandler(walls.indexOf(this.wall), 0, this.savedWallHandler);
 		removeListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo);
 		removeListener(curLevel, 'mousedown', 'weights' + this.wallInfo);
 	},

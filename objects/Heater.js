@@ -239,7 +239,7 @@ _.extend(Heater.prototype, objectFuncs, {
 		this.liquid = undefined;
 	},
 	remove: function(){
-		this.removeSlider();
+		this.slider.remove();
 		removeListener(curLevel, 'update', 'drawHeater'+this.handle);
 		if (window.walls && !walls.removed) {
 			walls.removeWall(this.wallHandleHeater);

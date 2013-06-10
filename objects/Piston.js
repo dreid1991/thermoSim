@@ -52,12 +52,17 @@ function Piston(attrs){
 	
 	this.wall.recordPExt();
 	this.wall.recordWork();
+	this.savedWallHandler = this.wall.handlers[0];
 	this.wallHandler = defaultTo('cPAdiabaticDamped', attrs.compMode);
-	walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);		
+	walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);
 	//this.wall.setDefaultReadout(this.readout);
 	if (this.makeSlider) {
-		this.sliderSelector = this.addSlider('Pressure', {value: this.pToPercent(pInit)}, [{eventType:'slide', obj:this, func:this.parseSlider}], this.sliderWrapper, this.sliderTitleWrapper);
-		this.slider = $(this.sliderSelector);
+		this.slider = sliderManager.addSlider('Pressure', this.handle + 'Slider',  {value: this.pToPercent(pInit)},
+			[{eventType:'slide', obj:this, func:this.parseSlider}],
+		attrs.sliderIdx
+		)
+	// this.sliderSelector = this.addSlider('Pressure', {value: this.pToPercent(pInit)}, [{eventType:'slide', obj:this, func:this.parseSlider}], this.sliderWrapper, this.sliderTitleWrapper);
+		// this.slider = $(this.sliderSelector);
 	}
 	
 	this.setupStd();
@@ -108,20 +113,20 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		var col = Col(150, 150, 150);
 		var dims = V(pistonWidth, plateHeight)
 		var platePos = shaftPos.copy().movePt({dy:length}).position({x:left});;
-		pts[0] = P(platePos.x,							platePos.y+dims.dy+1);
-		pts[1] = P(platePos.x+dims.dx*slantLeft, 		platePos.y);
-		pts[2] = P(shaftPos.x-dims.dx*slantLeft,		platePos.y);
-		pts[3] = P(shaftPos.x,							platePos.y-5*dims.dy*slantLeft);
-		pts[4] = P(shaftPos.x,							shaftPos.y);
-		pts[5] = P(shaftPos.x + shaftThickness,			shaftPos.y);
-		pts[6] = P(shaftPos.x + shaftThickness,			platePos.y-5*dims.dy*slantLeft);
-		pts[7] = P(shaftPos.x + shaftThickness+dims.dx*slantLeft,			platePos.y);
-		pts[8] = P(platePos.x+dims.dx*slantRight, 		platePos.y);
-		pts[9] = P(platePos.x+dims.dx, 					platePos.y+dims.dy+1);
-		pts[10] = P(platePos.x+dims.dx-plateThickness,			platePos.y+dims.dy+1);
-		pts[11] = P(platePos.x+dims.dx*slantRight-plateThickness, platePos.y+plateThickness);
+		pts[0] =  P(platePos.x,										platePos.y+dims.dy+1);
+		pts[1] =  P(platePos.x+dims.dx*slantLeft, 					platePos.y);
+		pts[2] =  P(shaftPos.x-dims.dx*slantLeft,					platePos.y);
+		pts[3] =  P(shaftPos.x,										platePos.y-5*dims.dy*slantLeft);
+		pts[4] =  P(shaftPos.x,										shaftPos.y);
+		pts[5] =  P(shaftPos.x + shaftThickness,					shaftPos.y);
+		pts[6] =  P(shaftPos.x + shaftThickness,					platePos.y-5*dims.dy*slantLeft);
+		pts[7] =  P(shaftPos.x + shaftThickness+dims.dx*slantLeft,	platePos.y);
+		pts[8] =  P(platePos.x+dims.dx*slantRight, 					platePos.y);
+		pts[9] =  P(platePos.x+dims.dx, 							platePos.y+dims.dy+1);
+		pts[10] = P(platePos.x+dims.dx-plateThickness,				platePos.y+dims.dy+1);
+		pts[11] = P(platePos.x+dims.dx*slantRight-plateThickness, 	platePos.y+plateThickness);
 		pts[12] = P(platePos.x+dims.dx*slantLeft+plateThickness, 	platePos.y+plateThickness);
-		pts[13] = P(platePos.x+plateThickness,					platePos.y+dims.dy+1);
+		pts[13] = P(platePos.x+plateThickness,						platePos.y+dims.dy+1);
 		var col = Col(150, 150, 150);
 		return {pts:pts, col:col};
 	},
@@ -152,7 +157,7 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		return this;
 	},
 	pToPercent: function(p) {
-		return 100 * (p - this.min)/(this.max - this.min);
+		return 100 * (p - this.min) / (this.max - this.min);
 	},
 	hide: function(){
 		removeListener(curLevel, 'update', 'drawPiston'+this.handle);
@@ -175,11 +180,11 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 	remove: function(){
 		this.wall.moveStop();
 		this.wall.unsetMass('piston' + this.handle);
+		walls.setSubWallHandler(walls.indexOf(this.wall), 0, this.savedWallHandler);
 		this.hide();
-		if (this.sliderId) {
-			this.removeSlider();
+		if (this.slider) {
+			this.slider.remove();
 		}
-		this.hideSliderDivs();
 		removeListener(curLevel, 'update', 'moveWalls');
 	}
 }
