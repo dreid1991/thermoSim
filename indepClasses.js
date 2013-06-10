@@ -219,7 +219,7 @@ Vector.prototype = {
 		return this;
 	},
 	rotate: function(rad){
-		var dx = this.dx, dy = this.y, cos = Math.cos(rad), sin = Math.sin(rad);
+		var dx = this.dx, dy = this.dy, cos = Math.cos(rad), sin = Math.sin(rad);
 		this.dx = dx * cos - dy * sin;
 		this.dy = dx * sin + dy * cos;
 		return this;

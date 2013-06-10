@@ -36,6 +36,7 @@ java -jar ../../compiler.jar ^
 --js ../WallMethodsBorder.js ^
 --js ../ButtonManager.js ^
 --js ../QuizRenderer.js ^
+--js ../SliderManager.js ^
 --js ../ActivationEnergySpcChanger.js ^
 --js ../ConditionManager.js ^
 --js ../objects/objectFuncs.js ^
