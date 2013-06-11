@@ -7,9 +7,10 @@ CanvasManager.prototype = {
 	draw: function() {
 		for (var i=0; i<this.canvases.length; i++) {
 			this.canvases[i].clear();
+			var canvas = this.canvases[i];
 			var listeners = this.canvases[i].listeners;
 			for (var j=0; j<listeners.length; j++) {
-				listeners[j].cb.apply(listeners[j].obj);
+				listeners[j].cb.apply(listeners[j].obj, [canvas.ctx]);
 			}
 		}
 	},

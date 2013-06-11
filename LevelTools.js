@@ -361,21 +361,21 @@ LevelTools = {
 		this.move();
 		collide.check();
 		walls.check();
-		this.drawRun();
+		// this.drawRun();
 	},
 	updateRunGravity: function() {
 		this.move();
 		collide.check();
 		this.doGravity();
 		walls.check();
-		this.drawRun();	
+		// this.drawRun();	
 	},
 	updateRunAttract: function() {
 		this.move();
 		collide.check();
 		attractor.attract();
 		walls.check();
-		this.drawRun();
+		// this.drawRun();
 	},
 	updateRunAttractAndGravity: function() {
 		this.move();
@@ -383,11 +383,11 @@ LevelTools = {
 		attractor.attract();
 		this.doGravity();
 		walls.check();
-		this.drawRun();		
+		// this.drawRun();		
 	},
-	drawRun: function(){
-		draw.dots();
-		draw.walls(walls);
+	drawRun: function(ctx){
+		draw.dots(ctx);
+		draw.walls(walls, ctx);
 	},
 	resetGraphs: function(){
 		for (var graphName in this.graphs){

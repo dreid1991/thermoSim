@@ -2,49 +2,42 @@ function DrawingTools(){};
 
 DrawingTools.prototype = {
 
-	clear: function(col) {
-		var width = myCanvas.width;
-		var height = myCanvas.height;
-		c.clearRect(0, 0, width, height);
-		c.fillStyle = col.hex;
-		c.fillRect(0,0, width, height);	
-	},
-	dots: function(){
+	dots: function(ctx){
 		for (var spcName in spcs) {
 			var dots = spcs[spcName].dots;
-			c.fillStyle = spcs[spcName].col.hex;
+			ctx.fillStyle = spcs[spcName].col.hex;
 			if (dots[0]) {
 				var r = dots[0].r;//from 5250ms/500 -> 4975 ms/500.  also don't define dot locally
 			}
 			for (var dotIdx = 0; dotIdx<dots.length; dotIdx++) {
-				c.beginPath();
-				c.arc(dots[dotIdx].x, dots[dotIdx].y, r, 0, Math.PI*2, true);
-				c.closePath();
-				c.fill();	
+				ctx.beginPath();
+				ctx.arc(dots[dotIdx].x, dots[dotIdx].y, r, 0, Math.PI*2, true);
+				ctx.closePath();
+				ctx.fill();	
 			}
 		}
 	},
-	dotsAsst: function(dots) {
+	dotsAsst: function(dots, ctx) {
 		for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
-			c.fillStyle = spcs[dots[dotIdx].spcName].col.hex;
-			c.beginPath();
-			c.arc(dots[dotIdx].x, dots[dotIdx].y, dots[dotIdx].r, 0, Math.PI * 2, true);
-			c.closePath();
-			c.fill();
+			ctx.fillStyle = spcs[dots[dotIdx].spcName].col.hex;
+			ctx.beginPath();
+			ctx.arc(dots[dotIdx].x, dots[dotIdx].y, dots[dotIdx].r, 0, Math.PI * 2, true);
+			ctx.closePath();
+			ctx.fill();
 		}
 	},
-	walls: function(walls, col){
+	walls: function(walls, ctx){
 		for (var wallIdx=0; wallIdx<walls.length; wallIdx++) {
 			var wall = walls[wallIdx];
 			if (wall.show) {
-				c.beginPath();
-				c.strokeStyle = wall.col.hex;
-				c.moveTo(wall[0].x, wall[0].y);
+				ctx.beginPath();
+				ctx.strokeStyle = wall.col.hex;
+				ctx.moveTo(wall[0].x, wall[0].y);
 				for (var ptIdx=1; ptIdx<wall.length-1; ptIdx++){
-					c.lineTo(wall[ptIdx].x, wall[ptIdx].y);
+					ctx.lineTo(wall[ptIdx].x, wall[ptIdx].y);
 				}
-				c.closePath();
-				c.stroke();
+				ctx.closePath();
+				ctx.stroke();
 			}
 		}
 	},
