@@ -22,7 +22,7 @@ function Cell(attrs) {
 	var thickness = 10;
 	this.nodeMass = attrs.nodeMass || 700;
 	var initRadius = attrs.rad;
-	this.drawCanvas = attrs.drawCanvas || window.c;
+	this.canvasHandle = attrs.canvasHandle || 'main';
 	var center = initPos.copy().movePt(V(initRadius, initRadius));
 	var numCorners = Math.max(3, attrs.numCorners) || 8;
 	this.membraneColor = attrs.col;
@@ -43,7 +43,7 @@ function Cell(attrs) {
 	this.fillInUnspecdSpcs(outerChanceTransport);
 	this.assignWallHandlers(this.guideNodes, this.innerWall, this.outerWall, this.parentWallMemberTag, this.cellMemberTag, this.energyTransferMax, innerChanceTransport, outerChanceTransport, thickness);
 	this.wallUpdateListenerName = this.addWallUpdateListener(this.guideNodes, this.innerWall, this.outerWall, this.handle, thickness, this.sideLenMin, attrs.boundingCorner, attrs.boundingVector, this.wallColor);
-	this.drawListenerName = this.addDrawListener(this.guideNodes, this.innerWall, this.outerWall, this.membraneColor, this.drawCanvas);
+	this.drawListenerName = this.addDrawListener(this.guideNodes, this.innerWall, this.outerWall, this.membraneColor, this.canvasHandle);
 	this.dotId = timeline.takeNumber();
 	this.addDots(center, this.innerWall, attrs.dots || {}, attrs.temp, this.dotId, this.cellMemberTag);
 	this.energyToTransfer = 0;
@@ -319,14 +319,14 @@ _.extend(Cell.prototype, objectFuncs, {
 		}
 		
 	},
-	addDrawListener: function(nodes, innerWall, outerWall, membraneColor, drawCanvas) {
-		addListener(curLevel, 'update', 'drawCell' + this.handle, function() {
+	addDrawListener: function(nodes, innerWall, outerWall, membraneColor, canvasHandle) {
+		canvasManager.addListener(canvasHandle, 'drawCell' + this.handle, function(ctx) {
 			for (var i=0; i<nodes.length; i++) {
 				var node = nodes[i];
 				var pts = [innerWall[node.innerWallIdx], innerWall[node.next.innerWallIdx], outerWall[node.outerWallIdx], outerWall[node.prev.outerWallIdx]];
-				window.draw.fillPts(pts, membraneColor, drawCanvas);
+				window.draw.fillPts(pts, membraneColor, ctx);
 			}
-		}, this);
+		}, this, 1);
 	},
 	setupCalcHeatTransfer: function(listenerName, innerWall, parentWall) {
 		var tempInner = innerWall.getDataSrc('temp');

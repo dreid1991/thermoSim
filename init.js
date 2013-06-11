@@ -36,7 +36,7 @@ $(function(){
 		Scatter: GraphScatter,
 		Hist: GraphHist,
 		PhaseTwoComp: GraphPhaseTwoComp,
-		// PhaseOneComp: GraphPhaseOneComp
+		PhaseOneComp: GraphPhaseOneComp
 	}
 	$('#mainHeader').html(LevelData.levelTitle);
 	//why are we even doing all this hiding?

@@ -21,7 +21,7 @@ function ArrowStatic(attrs) {
 	this.dims = attrs.dims.copy();
 	this.handle = attrs.handle;
 	this.pts = this.getPts();
-	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
+	this.canvasHandle = attrs.canvasHandle || 'main';
 	if (attrs.label) {
 			this.label = attrs.label;
 		} else {
@@ -40,30 +40,30 @@ function ArrowStatic(attrs) {
 }
 _.extend(ArrowStatic.prototype, objectFuncs, toInherit.ArrowFuncs, {
 	init: function() {
-		this.updateListenerName = unique(this.type + defaultTo('', this.handle), curLevel.updateListeners);
+		this.drawListenerName = 'arrowStatic' + this.handle;
 		if (this.label) {
-				addListener(curLevel, 'update', this.updateListenerName, this.runLabel, this);
+				canvasManager.addListener(this.canvasHandle, this.drawListenerName, this.runLabel, this, 2);
 			} else {
-				addListener(curLevel, 'update', this.updateListenerName, this.runNoLabel, this);
+				canvasManager.addListener(this.canvasHandle, this.drawListenerName, this.runNoLabel, this, 2);
 		}
 		this.setupStd();
 	},
-	runLabel: function() {
-		this.drawCanvas.save();
-		this.drawCanvas.translate(this.pos.x, this.pos.y);
-		this.drawCanvas.rotate(this.angle);
-		draw.fillPtsStroke(this.pts, this.fill, this.stroke, this.drawCanvas);
-		this.drawCanvas.translate(this.textOffset.dx, this.textOffset.dy);
-		this.drawCanvas.rotate(-this.angle);
-		draw.text(this.label, P(0,0), '13pt calibri', this.textCol, 'center', 0, this.drawCanvas);
-		this.drawCanvas.restore();
+	runLabel: function(ctx) {
+		ctx.save();
+		ctx.translate(this.pos.x, this.pos.y);
+		ctx.rotate(this.angle);
+		draw.fillPtsStroke(this.pts, this.fill, this.stroke, ctx);
+		ctx.translate(this.textOffset.dx, this.textOffset.dy);
+		ctx.rotate(-this.angle);
+		draw.text(this.label, P(0,0), '13pt calibri', this.textCol, 'center', 0, ctx);
+		ctx.restore();
 	},
-	runNoLabel: function() {
-		this.drawCanvas.save();
-		this.drawCanvas.translate(this.pos.x, this.pos.y);
-		this.drawCanvas.rotate(this.angle);
-		draw.fillPtsStroke(this.pts, this.fill, this.stroke, this.drawCanvas);
-		this.drawCanvas.restore();
+	runNoLabel: function(ctx) {
+		ctx.save();
+		ctx.translate(this.pos.x, this.pos.y);
+		ctx.rotate(this.angle);
+		draw.fillPtsStroke(this.pts, this.fill, this.stroke, ctx);
+		ctx.restore();
 	},
 	setTextOffset: function() {
 		this.textOffset = V(7 + 5*Math.sin(Math.abs(-this.angle)), Math.cos(this.angle)*5);
