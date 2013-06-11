@@ -41,119 +41,119 @@ DrawingTools.prototype = {
 			}
 		}
 	},
-	circle: function(pos, r, col, fill, drawCanvas) {
+	circle: function(pos, r, col, fill, ctx) {
 
 		
-		drawCanvas.beginPath();
-		drawCanvas.arc(pos.x, pos.y, r, 0, Math.PI*2, true);
-		drawCanvas.closePath();
+		ctx.beginPath();
+		ctx.arc(pos.x, pos.y, r, 0, Math.PI*2, true);
+		ctx.closePath();
 		if (fill) {
-			drawCanvas.fillStyle = col.hex;
-			drawCanvas.fill();	
+			ctx.fillStyle = col.hex;
+			ctx.fill();	
 		} else {
-			drawCanvas.strokeStyle = col.hex;
-			drawCanvas.stroke();
+			ctx.strokeStyle = col.hex;
+			ctx.stroke();
 		}
 	},
-	fillPts: function(pts, col, drawCanvas) {
-		drawCanvas.fillStyle = col.hex;
-		drawCanvas.beginPath();
-		drawCanvas.moveTo(pts[0].x, pts[0].y);
+	fillPts: function(pts, col, ctx) {
+		ctx.fillStyle = col.hex;
+		ctx.beginPath();
+		ctx.moveTo(pts[0].x, pts[0].y);
 		for (var ptIdx=1; ptIdx<pts.length; ptIdx++) {
-			drawCanvas.lineTo(pts[ptIdx].x, pts[ptIdx].y);
+			ctx.lineTo(pts[ptIdx].x, pts[ptIdx].y);
 		}
-		drawCanvas.closePath();
-		drawCanvas.fill();
+		ctx.closePath();
+		ctx.fill();
 	},
-	fillPtsAlpha: function(pts, col, alpha, drawCanvas) {
-		var prevAlpha = drawCanvas.globalAlpha;
-		drawCanvas.globalAlpha = alpha;
-		draw.fillPts(pts, col, drawCanvas);
-		drawCanvas.globalAlpha = prevAlpha;
+	fillPtsAlpha: function(pts, col, alpha, ctx) {
+		var prevAlpha = ctx.globalAlpha;
+		ctx.globalAlpha = alpha;
+		draw.fillPts(pts, col, ctx);
+		ctx.globalAlpha = prevAlpha;
 	},
-	fillPtsStroke: function(pts, fillCol, strokeCol, drawCanvas) {
-		drawCanvas.fillStyle = fillCol.hex
-		drawCanvas.strokeStyle = strokeCol.hex
-		drawCanvas.beginPath();
-		drawCanvas.moveTo(pts[0].x, pts[0].y);
+	fillPtsStroke: function(pts, fillCol, strokeCol, ctx) {
+		ctx.fillStyle = fillCol.hex
+		ctx.strokeStyle = strokeCol.hex
+		ctx.beginPath();
+		ctx.moveTo(pts[0].x, pts[0].y);
 		for (var ptIdx=1; ptIdx<pts.length; ptIdx++){
-			drawCanvas.lineTo(pts[ptIdx].x, pts[ptIdx].y);
+			ctx.lineTo(pts[ptIdx].x, pts[ptIdx].y);
 		}
-		drawCanvas.closePath();
-		drawCanvas.stroke();
-		drawCanvas.fill();
+		ctx.closePath();
+		ctx.stroke();
+		ctx.fill();
 	},
-	roundedRect: function(pos, dims, r, col, drawCanvas) {
+	roundedRect: function(pos, dims, r, col, ctx) {
 		var x = pos.x;
 		var y = pos.y;
 		var width = dims.dx;
 		var height = dims.dy;
-		drawCanvas.fillStyle = col.hex
-		drawCanvas.beginPath();
-		drawCanvas.moveTo(x+r, y);
-		this.curvedLine(P(x+width-r, y), P(x+width, y), P(x+width, y+r), drawCanvas);
-		this.curvedLine(P(x+width, y+height-r), P(x+width, y+height), P(x+width-r, y+height), drawCanvas);
-		this.curvedLine(P(x+r, y+height), P(x, y+height), P(x, y+height-r), drawCanvas);
-		this.curvedLine(P(x, y+r), P(x, y), P(x+r, y), drawCanvas);
-		drawCanvas.closePath();
-		drawCanvas.fill();
+		ctx.fillStyle = col.hex
+		ctx.beginPath();
+		ctx.moveTo(x+r, y);
+		this.curvedLine(P(x+width-r, y), P(x+width, y), P(x+width, y+r), ctx);
+		this.curvedLine(P(x+width, y+height-r), P(x+width, y+height), P(x+width-r, y+height), ctx);
+		this.curvedLine(P(x+r, y+height), P(x, y+height), P(x, y+height-r), ctx);
+		this.curvedLine(P(x, y+r), P(x, y), P(x+r, y), ctx);
+		ctx.closePath();
+		ctx.fill();
 		
 	},
-	fillRect: function(corner, dims, fillCol, drawCanvas) {
-		drawCanvas.fillStyle = fillCol.hex
-		drawCanvas.fillRect(corner.x, corner.y, dims.dx, dims.dy);
+	fillRect: function(corner, dims, fillCol, ctx) {
+		ctx.fillStyle = fillCol.hex
+		ctx.fillRect(corner.x, corner.y, dims.dx, dims.dy);
 	},
-	fillStrokeRect: function(corner, dims, fillCol, strokeCol, drawCanvas){
-		drawCanvas.strokeStyle = strokeCol.hex;
-		drawCanvas.fillStyle = fillCol.hex;
-		drawCanvas.fillRect(corner.x, corner.y, dims.dx, dims.dy);
-		drawCanvas.strokeRect(corner.x, corner.y, dims.dx, dims.dy);
+	fillStrokeRect: function(corner, dims, fillCol, strokeCol, ctx){
+		ctx.strokeStyle = strokeCol.hex;
+		ctx.fillStyle = fillCol.hex;
+		ctx.fillRect(corner.x, corner.y, dims.dx, dims.dy);
+		ctx.strokeRect(corner.x, corner.y, dims.dx, dims.dy);
 	},
-	strokeRect: function(corner, dims, col, drawCanvas) {
-		drawCanvas.strokeStyle = col.hex;
-		drawCanvas.strokeRect(corner.x, corner.y, dims.dx, dims.dy);
+	strokeRect: function(corner, dims, col, ctx) {
+		ctx.strokeStyle = col.hex;
+		ctx.strokeRect(corner.x, corner.y, dims.dx, dims.dy);
 	},
 
-	line: function(p1, p2, col, drawCanvas) {
-		drawCanvas.strokeStyle = col.hex;
-		drawCanvas.beginPath();
-		drawCanvas.moveTo(p1.x, p1.y);
-		drawCanvas.lineTo(p2.x, p2.y);
-		drawCanvas.closePath();
-		drawCanvas.stroke();
+	line: function(p1, p2, col, ctx) {
+		ctx.strokeStyle = col.hex;
+		ctx.beginPath();
+		ctx.moveTo(p1.x, p1.y);
+		ctx.lineTo(p2.x, p2.y);
+		ctx.closePath();
+		ctx.stroke();
 	},
-	curvedLine: function(line, curvePt, quadEnd, drawCanvas) {
-		drawCanvas.lineTo(line.x, line.y);
-		drawCanvas.quadraticCurveTo(curvePt.x, curvePt.y, quadEnd.x, quadEnd.y);
+	curvedLine: function(line, curvePt, quadEnd, ctx) {
+		ctx.lineTo(line.x, line.y);
+		ctx.quadraticCurveTo(curvePt.x, curvePt.y, quadEnd.x, quadEnd.y);
 	},
-	path: function(pts, col, drawCanvas) {
-		drawCanvas.strokeStyle = col.hex;
-		drawCanvas.beginPath();
-		drawCanvas.moveTo(pts[0].x, pts[0].y);
+	path: function(pts, col, ctx) {
+		ctx.strokeStyle = col.hex;
+		ctx.beginPath();
+		ctx.moveTo(pts[0].x, pts[0].y);
 		for(var ptIdx=1; ptIdx<pts.length; ptIdx++){
-			drawCanvas.lineTo(pts[ptIdx].x, pts[ptIdx].y);
+			ctx.lineTo(pts[ptIdx].x, pts[ptIdx].y);
 		}
-		drawCanvas.stroke();		
+		ctx.stroke();		
 	},
-	text: function(text, pos, font, col, align, rotation, drawCanvas) {
-		drawCanvas.save();
-		drawCanvas.translate(pos.x, pos.y);
-		drawCanvas.rotate(rotation);
-		drawCanvas.fillStyle = col.hex;
-		drawCanvas.font = font;
-		drawCanvas.textAlign = align;
+	text: function(text, pos, font, col, align, rotation, ctx) {
+		ctx.save();
+		ctx.translate(pos.x, pos.y);
+		ctx.rotate(rotation);
+		ctx.fillStyle = col.hex;
+		ctx.font = font;
+		ctx.textAlign = align;
 		var fontSize = parseFloat(font);
 		var yOffset = 0;
 		var breakIdx = text.indexOf('\n');
 		while (breakIdx!=-1){
 			var toPrint = text.slice(0, breakIdx);
-			drawCanvas.fillText(toPrint, 0, yOffset);
+			ctx.fillText(toPrint, 0, yOffset);
 			yOffset+=fontSize+2;
 			text = text.slice(breakIdx+1, text.length);
 			breakIdx = text.indexOf('\n');
 		}
-		drawCanvas.fillText(text, 0, yOffset);
-		drawCanvas.restore();
+		ctx.fillText(text, 0, yOffset);
+		ctx.restore();
 	},
 
 }

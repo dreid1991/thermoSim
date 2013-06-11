@@ -15,10 +15,10 @@ Copyright (C) 2013  Daniel Reid
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function Readout(handle, leftBound, rightBound, y, font, fontCol, align, level){
+function Readout(handle, leftBound, rightBound, y, font, fontCol, align, level, canvasHandle){
 	this.handle = handle;
 	this.align = defaultTo('left', align);
-	this.drawCanvas = c;
+	this.canvasHandle = canvasHandle || 'main';
 	this.font = defaultTo('13pt calibri', font);
 	this.fontCol = defaultTo(Col(255, 255, 255), fontCol);
 	this.leftBound = leftBound;
@@ -29,45 +29,22 @@ function Readout(handle, leftBound, rightBound, y, font, fontCol, align, level){
 }
 Readout.prototype = {
 
-	draw: function() {
-		this.drawCanvas.save();
-		this.drawCanvas.translate(this.leftBound, this.y);
+	draw: function(ctx) {
+		ctx.save();
+		ctx.translate(this.leftBound, this.y);
 		for (var entryIdx=0; entryIdx<this.entries.length; entryIdx++){
 			var entry = this.entries[entryIdx];
-			window.draw.text(entry.text, entry.pos, this.font, this.fontCol, this.align, 0, this.drawCanvas);
+			draw.text(entry.text, entry.pos, this.font, this.fontCol, this.align, 0, ctx);
 		}
-		this.drawCanvas.restore();
+		ctx.restore();
 	},
 	update: function(name, setPt) {
 		var entry = byAttr(this.entries, name, 'name');
 		var decPlaces = entry.decPlaces;
 		entry.val = round(setPt, decPlaces);
 	},
-	// tick: function(name, setPt) {
-		// var entry = byAttr(this.entries, name, 'name');
-		// if(isNaN(entry.val)){
-			// entry.val = setPt;
-		// }
-		// var init = entry.val
-		// var step = (setPt - init)/10;
-		// removeListener(curLevel, 'update', this.handle + entry.name +'tick');
-		// if(step!=0){
-			// var tickFunc = this.makeTickFunc(entry, step, setPt);
-			// addListener(curLevel, 'update', this.handle + entry.name +'tick', tickFunc, this);
-			
-		// }
-	// },
-	// makeTickFunc: function(entry, step, setPt) {
-		// return function(){
-			// entry.val = stepTowards(entry.val, setPt, step);
-			// var decPlaces = entry.decPlaces
-			// if(round(entry.val,decPlaces+1)==round(setPt,decPlaces+1)){
-				// removeListener(curLevel, 'update', this.handle + entry.name + 'tick');
-			// }
-		// }
-	// },
 	addEntry: function(handle, idx) {
-		var entry = new this.Entry(handle, '', this);
+		var entry = new Readout.Entry(handle, '', this);
 		if (idx) {
 			this.entries.splice(idx, 0, entry);
 		} else {
@@ -112,14 +89,14 @@ Readout.prototype = {
 			var center = this.leftBound + this.width/2;
 			var spaceNum = numEntries-1;
 			var sideSpace = spacing*spaceNum/2
-			for (var entryIdx=0; entryIdx<numEntries; entryIdx++){
+			for (var entryIdx=0; entryIdx<numEntries; entryIdx++) {
 				var entry = this.entries[entryIdx];
 				var x = spacing*(entryIdx+1);
 				var y = 0;
 				entry.pos = P(x,y);
 			}
-		} else if(this.align=='left') {
-			for (var entryIdx=0; entryIdx<numEntries; entryIdx++){
+		} else if (this.align=='left') {
+			for (var entryIdx=0; entryIdx<numEntries; entryIdx++) {
 				var entry = this.entries[entryIdx];
 				var x = spacing*entryIdx
 				var y = 0;
@@ -161,22 +138,24 @@ Readout.prototype = {
 	},
 	show: function(){
 		curLevel.readouts[this.handle] = this;
-		addListener(curLevel, 'update', 'drawReadout'+this.handle, this.draw, this);
+		canvasManager.addListener(this.canvasHandle, 'drawReadout'+this.handle, this.draw, this, 999);
 		return this;
 	},
 	hide: function(){
 		delete curLevel.readouts[this.handle];
+		canvasManager.removeListener(this.canvasHandle, 'drawReadout'+this.handle);
 		removeListener(curLevel, 'update', 'drawReadout'+this.handle);
 		return this;
-	},
-	Entry: function(handle, text, readout) {
-		this.handle = handle;
-		this.text = text;
-		this.pos = undefined;
-		this.readout = readout;
-	},
+	}
 }
-Readout.prototype.Entry.prototype = {
+
+Readout.Entry = function(handle, text, readout) {
+	this.handle = handle;
+	this.text = text;
+	this.pos = undefined;
+	this.readout = readout;
+}
+Readout.Entry.prototype = {
 	setText: function(text) {
 		this.text = text;
 	},

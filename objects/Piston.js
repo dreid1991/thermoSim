@@ -24,7 +24,6 @@ function Piston(attrs){
 	this.max = defaultTo(15, attrs.max);
 	this.makeSlider = defaultTo(false, attrs.makeSlider);
 
-	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	this.slant = .07;
 	
 	//must send neither or both of these.
@@ -90,15 +89,15 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		
 		
 		var self = this;
-		var drawFunc = function(){
-			if(self.readout){
+		var drawFunc = function(ctx){
+			if (self.readout) {
 				self.setReadoutY();
 			}
-			self.drawCanvas.save();
-			self.drawCanvas.translate(0, self.pistonPt.y);
-			draw.fillPts(self.pistonTop.pts, self.pistonTop.col, self.drawCanvas);
-			draw.fillRect(self.pistonBottom.pos, self.pistonBottom.dims, self.pistonBottom.col, self.drawCanvas);
-			self.drawCanvas.restore();
+			ctx.save();
+			ctx.translate(0, self.pistonPt.y);
+			draw.fillPts(self.pistonTop.pts, self.pistonTop.col, ctx);
+			draw.fillRect(self.pistonBottom.pos, self.pistonBottom.dims, self.pistonBottom.col, ctx);
+			ctx.restore();
 		}
 		return drawFunc;
 	},
@@ -152,7 +151,7 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		this.enabled = false;
 	},
 	show: function(){
-		addListener(curLevel, 'update', 'drawPiston'+this.handle, this.draw, '');
+		canvasManager.addListener('main', 'drawPiston' + this.handle, this.draw, undefined, 1);
 		this.readout.show();
 		return this;
 	},
@@ -160,11 +159,10 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		return 100 * (p - this.min) / (this.max - this.min);
 	},
 	hide: function(){
-		removeListener(curLevel, 'update', 'drawPiston'+this.handle);
+		canvasManger.removeListener('main', 'drawPiston' + this.handle);
 		this.readout.hide();
 	},
 	parseSlider: function(event, ui){
-	
 		this.setPressure(this.percentToVal(ui.value));
 	},
 	setPressure: function(pressure){
