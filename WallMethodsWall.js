@@ -178,7 +178,7 @@ WallMethods.wall = {
 		var lifespan = 50;
 		var arrowTurn = 0;
 		var handle = 'drawArrow'+round(pos.x,0)+round(pos.y,0);
-		var arrow = new ArrowLine(handle, arrowPts, Col(255,0,0), lifespan, c);
+		var arrow = new ArrowLine(handle, arrowPts, Col(255,0,0), lifespan, 'main');
 
 
 		var textPos = pos.copy().movePt(vf.mult(15));
@@ -196,7 +196,7 @@ WallMethods.wall = {
 		var lifespan = 50;
 		var arrowTurn = 0;
 		var handle = 'drawArrow'+round(pos.x,0)+round(pos.y,0);
-		var arrow = new ArrowLine(handle, arrowPts, Col(255,0,0), lifespan, c);
+		var arrow = new ArrowLine(handle, arrowPts, Col(255,0,0), lifespan, 'main');
 
 
 		var textPos = pos.copy().movePt(vf.mult(15));

@@ -58,7 +58,7 @@ function ArrowFly(attrs){
 		this.posFinal = this.pos.copy().movePt(this.UV.copy().mult(attrs.dist));
 		this.dist = attrs.dist;
 	}
-	this.drawCanvas = 			defaultTo(c, attrs.drawCanvas);
+	this.canvasHandle = 		attrs.canvasHandle || 'main';
 	this.dims = 				attrs.dims.copy();
 	this.dimsFinal = 			defaultTo(this.dims, attrs.dimsFinal);
 	this.fill = 				attrs.fill.copy();
@@ -108,17 +108,22 @@ _.extend(ArrowFly.prototype, objectFuncs, toInherit.ArrowFuncs, {
 
 	init: function(){
 		this.updateListenerName = unique(this.type + defaultTo('', this.handle), curLevel.updateListeners);
+		this.drawListenerName = this.updateListenerName + 'Draw';
+		canvasManager.addListener(this.canvasHandle, this.drawListenerName, this.draw, this, 998);
 		addListener(curLevel, 'update', this.updateListenerName, this.run, this);
 		this.setupStd();
 		return this;
 	},
+	draw: function(ctx) {
+		ctx.save();
+		ctx.globalAlpha = this.alpha;
+		ctx.translate(this.pos.x, this.pos.y);
+		ctx.rotate(this.dir);
+		draw.fillPtsStroke(this.pts, this.fill, this.stroke, ctx)
+		ctx.restore();	
+	},
 	run: function(){
-		this.drawCanvas.save();
-		this.drawCanvas.globalAlpha = this.alpha;
-		this.drawCanvas.translate(this.pos.x, this.pos.y);
-		this.drawCanvas.rotate(this.dir);
-		draw.fillPtsStroke(this.pts, this.fill, this.stroke, this.drawCanvas)
-		this.drawCanvas.restore();
+
 		this.takeStep();
 		this.age++;
 		if (this.age == this.lifespan) {
@@ -184,8 +189,7 @@ _.extend(ArrowFly.prototype, objectFuncs, toInherit.ArrowFuncs, {
 		this.alpha += this.alphaStep;
 	},
 	remove: function(){
+		canvasManager.removeListener(this.canvasHandle, this.drawListenerName);
 		removeListener(curLevel, 'update', this.updateListenerName);
-		this.removeCleanUp();
 	},
-}
-)
+})

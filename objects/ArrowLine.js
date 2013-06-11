@@ -15,12 +15,12 @@ Copyright (C) 2013  Daniel Reid
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function ArrowLine(handle, pts, col, lifespan, drawCanvas){
+function ArrowLine(handle, pts, col, lifespan, canvasHandle){
 	this.handle = handle;
 	var rotate = .5;
 	this.pts = {line:pts, arrow: new Array(3)}
 	this.col = col;
-	this.drawCanvas = defaultTo(c, drawCanvas);
+	this.canvasHandle = typeof canvasHandle === 'string' ? canvasHandle : 'main';
 	var ptLast = this.pts.line[this.pts.line.length-1];
 	var ptNextLast = this.pts.line[this.pts.line.length-2];
 	var dirBack = ptLast.VTo(ptNextLast).UV();
@@ -34,19 +34,20 @@ function ArrowLine(handle, pts, col, lifespan, drawCanvas){
 }	
 
 ArrowLine.prototype = {
-	draw: function(){
+	draw: function(ctx){
 		var shaft = this.pts.line;
 		for (var ptIdx=0; ptIdx<shaft.length-1; ptIdx++) {
-			draw.line(shaft[ptIdx], shaft[ptIdx+1], this.col, this.drawCanvas);
+			draw.line(shaft[ptIdx], shaft[ptIdx+1], this.col, ctx);
 		}
 		var arrow = this.pts.arrow;
 		
-		draw.line(arrow[0], arrow[1], this.col, this.drawCanvas);
-		draw.line(arrow[1], arrow[2], this.col, this.drawCanvas);
+		draw.line(arrow[0], arrow[1], this.col, ctx);
+		draw.line(arrow[1], arrow[2], this.col, ctx);
 	},
 	show: function(lifespan){//in ms
 		var turn = 0;
-		addListener(curLevel, 'update', 'drawArrow' + this.handle, this.makeDrawFunc(lifespan), this)
+		canvasManager.addListener(this.canvasHandle, 'drawArrow' + this.handle, this.draw, this, 2);
+		addListener(curLevel, 'update', 'updateArrow' + this.handle, this.makeDrawFunc(lifespan), this)
 		return this;
 	},
 	makeDrawFunc: function(lifespan){
@@ -55,18 +56,20 @@ ArrowLine.prototype = {
 		var drawListener = function(){
 			self.draw();
 		}
-		if(lifespan){
-			drawListener = extend(drawListener, function(){
-				turn++;
-					if(turn==lifespan){
-						removeListener(curLevel, 'update', 'drawArrow' + self.handle);
-					}
+		
+		if (lifespan !== undefined) {
+			return function() {
+				if (turn++ >= lifespan) {
+					canvasManager.removeListener(this.canvasHandle, 'drawArrow' + this.handle);
+					removeListener(curLevel, 'update', 'updateArrow' + this.handle);
 				}
-			)
+			}
+		} else {
+			return function(){};
 		}
-		return drawListener;
 	},
 	hide: function(){
-		removeListener(curLevel, 'update', 'drawArrow' + this.handle);
+		canvasManager.removeListener(this.handleHandle, 'drawArrow' + this.handle);
+		removeListener(curLevel, 'update', 'updateArrow' + this.handle);
 	}
 }
