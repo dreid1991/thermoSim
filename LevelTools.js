@@ -14,11 +14,15 @@ Copyright (C) 2013  Daniel Reid
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+LevelSettings = {
+	bgCol: Col(5, 17, 26)
+}
+
 
 LevelTools = {
 	setStds: function(){
 		this.graphs = {};
-		this.bgCol = Col(5, 17, 26);
+		this.bgCol = LevelSettings.bgCol.copy();
 		this.wallCol = Col(255,255,255);
 		this.numUpdates = 0;
 		this.wallSpeed = defaultTo(1, this.wallSpeed);
@@ -259,6 +263,7 @@ LevelTools = {
 		this.numUpdates++;
 		turn++;
 		this.updateRun();
+		canvasManager.draw();
 		for (var updateListener in this.updateListeners){
 			var listener = this.updateListeners[updateListener];
 			listener.func.apply(listener.obj);
@@ -381,7 +386,6 @@ LevelTools = {
 		this.drawRun();		
 	},
 	drawRun: function(){
-		draw.clear(this.bgCol);
 		draw.dots();
 		draw.walls(walls);
 	},

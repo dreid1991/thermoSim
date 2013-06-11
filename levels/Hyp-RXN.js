@@ -25,10 +25,10 @@ LevelData = {
 					{
 						objs: [
 							{type:'AuxImage',
-								attrs: {handle: 'piston1', imgFunc: 'img("img/work/block0Pic2.jpg")', slotNum: 1}
+								attrs: {handle: 'piston1', imgFunc: 'img("img/Hyp/1.jpg")', slotNum: 1}
 							},
 							{type:'AuxImage',
-								attrs: {handle: 'piston2', imgFunc: 'img("img/work/block0Pic1.jpg")', slotNum: 2}
+								attrs: {handle: 'piston2', imgFunc: 'img("img/Hyp/2.jpg")', slotNum: 2}
 							}	
 						]
 					},
@@ -93,7 +93,7 @@ LevelData = {
 						]
 					},
 					cutScene: false,
-					text: "The isothermal system above contains 1 mole of A and is held at 500 K.  The red colored Species A  can reversibly react to form the green species B.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  What is the sign of the enthalpy of reaction?",
+					text: "The isothermal system above contains 1 mole of A and is held at 500 K.  The red colored species A  can reversibly react to form the green species B.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  What is the sign of the enthalpy of reaction? Explain.",
 					quiz:[
 							{type: 'text',
 							storeAs:'realProcess',
@@ -140,7 +140,7 @@ LevelData = {
 				dataRecord: [
 					{wallInfo: 'secondWall', data: 'frac', attrs: {spcName: 'spc2', tag: 'secondWall'}},
 					{wallInfo: 'secondWall', data: 'Q'},
-					{wallInfo: 'secondWall', data: 'internalEnergy'},
+					{wallInfo: 'secondWall', data: 'enthalpy'},
 					//{wallInfo: 'firstWall', data: '
 				],
 				dataReadouts: [
@@ -159,7 +159,7 @@ LevelData = {
 				graphs: [
 							{type: 'Scatter', handle: 'EnthalpyFracVsTemp', xLabel: "Extent of rxn", yLabel: "Enthalpy", axesInit:{y:{min:110, step:10},x:{min:0, step:0.2}}, numGridLines: {x:6}, axesFixed:{x: true},
 								sets: [
-									{handle: 'moleFrac', label:'mole\nFrac', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '(internalEnergy("secondWall") + 11500) / 40',x: 'frac("secondWall",{spcName:"spc2",tag: "secondWall"})'},trace: true, fillInPts: true, fillInPtsMin: 5}
+									{handle: 'moleFrac', label:'mole\nFrac', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '(enthalpy("secondWall") + 11500) / 40',x: 'frac("secondWall",{spcName:"spc2",tag: "secondWall"})'},trace: true, fillInPts: true, fillInPtsMin: 5}
 								]
 							},
 							{type: 'Scatter', handle: 'convVsTemp', xLabel: "Extent of rxn", yLabel: "Temperature", axesInit:{y:{min:200, step:80},x:{min:0, step:0.2}}, numGridLines: {x:6}, axesFixed:{x: true},

@@ -23,6 +23,7 @@
 ../ReactionHandler.js
 ../CollideHandler.js
 ../DotMigrator.js
+../CanvasManager.js
 ../Attractor.js
 ../DataHandler.js
 ../WallHandler.js

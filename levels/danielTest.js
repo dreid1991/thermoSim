@@ -17,7 +17,7 @@ LevelData = {
 					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: 'cVIsothermal', temp: 298.15, handle: 'wally', isothermalRate: 3/*, border: {type: 'open', thickness: 5, yMin: 30}*/}
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(5, 10), count: 1000, temp: 198.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'spc1', pos: P(55, 55), dims: V(250, 250), count: 1000, temp: 198.15, returnTo: 'wally', tag: 'wally'},
 					// {spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 0, temp: 398.15, returnTo: 'wally', tag: 'wally'},
 					
 					

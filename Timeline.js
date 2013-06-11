@@ -207,6 +207,9 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, condition
 	LevelTools.addSpcs(LevelData.spcDefs, this.spcs, this.dotManager);
 	this.sliderList = [];//work on getting rid of this
 	this.dataDisplayer.setReadouts(this.level.readouts);
+	this.canvasManager = new CanvasManager();
+	this.canvasManager.addCanvas('main', myCanvas, c, LevelSettings.bgCol);
+	this.canvasManager.addListener('main', 'drawRun', LevelTools.drawRun, undefined, 0);
 	this.collide.setSpcs(this.spcs);
 	this.level.spcs = this.spcs;
 	this.level.dataHandler = this.dataHandler;
@@ -586,6 +589,7 @@ Timeline.Section.prototype = {
 		window.dotManager = this.dotManager;
 		window.spcs = this.spcs;
 		window.dataDisplayer = this.dataDisplayer;
+		window.canvasManager = this.canvasManager;
 		window.sliderList = this.sliderList;
 		window.buttonManager = this.buttonManager;
 		window.sliderManager = this.sliderManager;
