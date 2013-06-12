@@ -111,7 +111,7 @@ LevelData = {
 					}			
 				],
 				dataReadouts: [
-					{handle: 'pistonpext1', expr: 'pExt("SecondWall")', readout: 'pistonReadoutPistonOne', label: 'pExt: ', units: 'bar', sigFigs: 3}
+					{handle: 'pistonpext1', expr: 'pExt("SecondWall")', readout: 'pistonPistonOneLeft', label: 'pExt: ', units: 'bar', sigFigs: 3}
 				],
 				graphs: [
 					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:2}, y:{min:0, step:4}}, 
@@ -164,9 +164,9 @@ LevelData = {
 					}			
 				],
 				dataReadouts: [
-					{handle: 'pistonpext2', expr: 'pExt("ThirdWall")', readout: 'pistonReadoutPistonOne', label: 'pExt: ', units: 'bar', sigFigs: 2},
-					{handle: 'pistontemp1', expr: 'temp("ThirdWall")', readout: 'pistonReadoutPistonOne', label: 'temp: ', units: 'K', sigFigs: 3},
-					{handle: 'pistonwork1', expr: 'work("ThirdWall")', readout: 'pistonReadoutPistonOne', label: 'work: ', units: 'kJ', sigFigs: 3}
+					{handle: 'pistonpext2', expr: 'pExt("ThirdWall")', readout: 'pistonPistonOneLeft', label: 'pExt: ', units: 'bar', sigFigs: 2},
+					{handle: 'pistontemp1', expr: 'temp("ThirdWall")', readout: 'pistonPistonOneLeft', label: 'temp: ', units: 'K', sigFigs: 3},
+					{handle: 'pistonwork1', expr: 'work("ThirdWall")', readout: 'pistonPistonOneRight', label: 'work: ', units: 'kJ', sigFigs: 3}
 				],
 				graphs: [
 					{type: 'Scatter', handle: 'PvsVTwo', xLabel: "Volume (L)", yLabel: "Pressure (Bar)", axesInit:{x:{min:6, step:2}, y:{min:0, step:4}}, 

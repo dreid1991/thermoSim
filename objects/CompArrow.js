@@ -30,7 +30,7 @@ function CompArrow(attrs){
 	cols.inner = curLevel.bgCol.copy();
 	var dims = V(25, 15);
 	var handle = 'volDragger' + defaultTo('', attrs.handle);
-	var drawCanvas = c;
+	var canvasHandle = attrs.canvasHandle || 'main';
 	var canvasElement = canvas;
 	var listeners = {};
 	if (makeStops) {
@@ -40,7 +40,7 @@ function CompArrow(attrs){
 	listeners.onDown = function(){};
 	listeners.onMove = function(){wall.changeSetPt(this.pos.y, compMode, speed)};
 	listeners.onUp = function(){};
-	this.dragArrowFunc = this.makeDragArrowFunc(this.wall, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds);
+	this.dragArrowFunc = this.makeDragArrowFunc(this.wall, rotation, cols, dims, handle, canvasHandle, canvasElement, listeners, bounds);
 	this.dragArrow = this.dragArrowFunc();
 	this.setupStd();
 	
@@ -53,10 +53,10 @@ _.extend(CompArrow.prototype, objectFuncs, {
 			this.stops.remove();
 		}
 	},
-	makeDragArrowFunc: function(wall, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds) {
+	makeDragArrowFunc: function(wall, rotation, cols, dims, handle, canvasHandle, canvasElement, listeners, bounds) {
 		return function () {
 			var pos = wall[1].copy();
-			return new DragArrow(pos, rotation, cols, dims, handle, drawCanvas, canvasElement, listeners, bounds).show();
+			return new DragArrow(pos, rotation, cols, dims, handle, canvasHandle, canvasElement, listeners, bounds).show();
 		}
 	},
 	enable: function() {

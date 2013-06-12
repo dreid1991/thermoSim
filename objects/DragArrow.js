@@ -15,16 +15,16 @@ Copyright (C) 2013  Daniel Reid
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, listeners, bounds){
+function DragArrow(pos, rotation, cols, dims, handle, canvasHandle, canvasElement, listeners, bounds){
 	this.type = 'DragArrow';
 	this.pos = pos;
 	this.rotation = rotation;
-	this.posInit = this.pos.copy()
+	this.posInit = this.pos.copy();
 	this.cols = cols;
 	this.dims = dims
-	this.name = name;
+	this.handle = handle;
 	this.listeners = listeners;
-	this.drawCanvas = drawCanvas;
+	this.canvasHandle = canvasHandle || 'main';
 	this.canvasElement = canvasElement;
 	this.bounds = bounds;
 	if(this.bounds.x){
@@ -49,54 +49,56 @@ function DragArrow(pos, rotation, cols, dims, name, drawCanvas, canvasElement, l
 	this.pts.outer.push(P(width, 0));
 	this.pts.outer.push(P(.9*width, height/2));
 	this.pts.outer.push(P(0,0));
-	this.makeDrawFunc();
+	this.dirUV = V(Math.cos(this.rotation+Math.PI/2), Math.sin(this.rotation+Math.PI/2));
+	this.draw = this.makeDrawFunc();
 	this.clickListeners = this.makeListenerFuncs();
-	return this;
 }
 DragArrow.prototype = {
 
 	makeDrawFunc: function(){
-		this.dirUV = V(Math.cos(this.rotation+Math.PI/2), Math.sin(this.rotation+Math.PI/2));
-		this.draw = function(){};
+		var listeners;
+		
 		var self = this;
-		var init = function(){
-			self.drawCanvas.save();
-			self.drawCanvas.translate(self.pos.x, self.pos.y);
-			self.drawCanvas.rotate(self.rotation);
+		var init = function(ctx){
+			ctx.save();
+			ctx.translate(self.pos.x, self.pos.y);
+			ctx.rotate(self.rotation);
 		}
-		this.draw = extend(this.draw, init);
+		listeners = [init];
+		
 		if (this.cols.stroke) {
-			var strokeFill = function(){draw.fillPtsStroke(self.pts.outer, self.cols.outer, self.cols.stroke, self.drawCanvas)};
-			this.draw = extend(this.draw, strokeFill);
+			listeners.push(function(ctx){draw.fillPtsStroke(self.pts.outer, self.cols.outer, self.cols.stroke, ctx)});
 		} else {
-			var fill = function(){draw.fillPts(self.pts.outer, self.cols.outer, self.drawCanvas)};
-			this.draw = extend(this.draw, fill);
+			listeners.push(function(ctx){draw.fillPts(self.pts.outer, self.cols.outer, ctx)});
 		}
 		if (this.cols.inner || this.cols.onClick) {
 			for (var ptIdx=0; ptIdx<this.pts.outer.length; ptIdx++) {
 				var newPt = this.pts.outer[ptIdx].copy().movePt({dx:-this.dims.dx/2}).scale(P(0,0),.6).movePt({dx:this.dims.dx/2});
 				this.pts.inner.push(newPt)
 			}
-			if( this.cols.inner) {
+			if (this.cols.inner) {
 				this.cols.curInner = this.cols.inner;
 			} else {
 				this.cols.curInner = this.cols.outer;
 			}
 			
-			var fill = function(){draw.fillPts(self.pts.inner, self.cols.curInner, self.drawCanvas)};
-			this.draw = extend(this.draw, fill);
+			listeners.push(function(ctx){draw.fillPts(self.pts.inner, self.cols.curInner, ctx)});
 		}
-		var restore = function(){self.drawCanvas.restore()};
-		this.draw = extend(this.draw, restore);
+		var restore = function(ctx){ctx.restore()};
+		listeners.push(restore);
+		return function(ctx){
+			for (var i=0; i<listeners.length; i++) {
+				listeners[i](ctx);
+			}
+		};
 	},
-	
 	makeListenerFuncs: function(){
 		var listeners = this.listeners;
 		var self = this;
 		self.amSelected = new Boolean();
 		if(listeners.onDown||listeners.onMove||listeners.onUp){
 			var onClick = function(){}
-			var onDown = function(){
+			var onDown = function() {
 				self.amSelected = self.checkSelected();
 				if(self.amSelected){
 					self.posInit = self.pos.copy();
@@ -104,7 +106,7 @@ DragArrow.prototype = {
 					onClick();
 				}
 			}
-			if(self.cols.onClick){
+			if (self.cols.onClick) {
 				var changeInnerCol = function(){
 					self.cols.curInner = self.cols.onClick
 				}
@@ -115,7 +117,7 @@ DragArrow.prototype = {
 			var onMove = this.makeMoveListenerFunc(self);
 			onClick = extend(onClick, onMove)
 
-			if(listeners.onUp){
+			if (listeners.onUp) {
 				var onUp = this.makeUpListenerFunc(self);
 				onClick = extend(onClick, onUp)
 			}
@@ -139,13 +141,13 @@ DragArrow.prototype = {
 		if(listeners.onMove){
 			moveFunc = extend(moveFunc, function(){listeners.onMove.apply(self)});
 		}
-		var addMoveListeners = function(){addListener(curLevel, 'mousemove', 'dragArrow'+self.name, moveFunc, '')};
+		var addMoveListeners = function(){addListener(curLevel, 'mousemove', 'dragArrow'+self.handle, moveFunc, '')};
 		
 		var removeMoveListeners = function(){
-			addListener(curLevel, 'mouseup', 'dragArrow'+self.name+'RemoveMove',
+			addListener(curLevel, 'mouseup', 'dragArrow'+self.handle+'RemoveMove',
 				function(){
-					removeListener(curLevel, 'mousemove', 'dragArrow'+self.name);
-					removeListener(curLevel, 'mouseup', 'dragArrow'+self.name+'RemoveMove');
+					removeListener(curLevel, 'mousemove', 'dragArrow'+self.handle);
+					removeListener(curLevel, 'mouseup', 'dragArrow'+self.handle+'RemoveMove');
 				},
 			'');
 		}
@@ -160,11 +162,11 @@ DragArrow.prototype = {
 	},
 	makeUpListenerFunc: function(self){
 		var upFunc = function(){
-			addListener(curLevel, 'mouseup', 'mouseup'+self.name, function(){self.listeners.onUp.apply(self)}, '');
-			addListener(curLevel, 'mouseup', 'mouseup'+self.name+'remove', 
+			addListener(curLevel, 'mouseup', 'mouseup'+self.handle, function(){self.listeners.onUp.apply(self)}, '');
+			addListener(curLevel, 'mouseup', 'mouseup'+self.handle+'remove', 
 				function(){
-					removeListener(curLevel, 'mouseup', 'mouseup'+self.name);
-					removeListener(curLevel, 'mouseup', 'mouseup'+self.name+'remove');
+					removeListener(curLevel, 'mouseup', 'mouseup'+self.handle);
+					removeListener(curLevel, 'mouseup', 'mouseup'+self.handle+'remove');
 				},
 			'');
 		}
@@ -177,10 +179,10 @@ DragArrow.prototype = {
 				revertCols = extend(revertCols, function(){self.cols.curInner = self.cols.outer;});
 			}
 			var revertColsListener = function(){
-				addListener(curLevel, 'mouseup', 'revertCols'+self.name,
+				addListener(curLevel, 'mouseup', 'revertCols'+self.handle,
 					function(){
 						revertCols();
-						removeListener(curLevel, 'mouseup', 'revertCols'+self.name);
+						removeListener(curLevel, 'mouseup', 'revertCols'+self.handle);
 					},
 				'');
 			}
@@ -195,13 +197,13 @@ DragArrow.prototype = {
 		if (typeof pos.y == 'number') this.pos.y = pos.y;
 	},
 	show: function(){
-		addListener(curLevel, 'mousedown', 'dragArrow'+this.name, this.clickListeners, '');
-		addListener(curLevel, 'update', 'drawDragArrow'+this.name, this.draw, '');
+		addListener(curLevel, 'mousedown', 'dragArrow'+this.handle, this.clickListeners, '');
+		canvasManager.addListener(this.canvasHandle, 'drawDragArrow'+this.handle, this.draw, this, 2);
 		return this;
 	},
 	hide: function(){
-		removeListener(curLevel, 'mousedown', 'dragArrow'+this.name);
-		removeListener(curLevel, 'update', 'drawDragArrow'+this.name);	
+		removeListener(curLevel, 'mousedown', 'dragArrow'+this.handle);
+		canvasManager.removeListener(this.canvasHandle, 'drawDragArrow'+this.handle);
 		return this;
 	},
 	reset: function(){
@@ -210,8 +212,8 @@ DragArrow.prototype = {
 		return this;
 	},
 	remove: function(){
-		removeListener(curLevel, 'mousedown', 'dragArrow'+this.name);
-		removeListener(curLevel, 'update', 'drawDragArrow'+this.name);
+		removeListener(curLevel, 'mousedown', 'dragArrow'+this.handle);
+		removeListener(curLevel, 'update', 'drawDragArrow'+this.handle);
 	},
 	checkSelected: function(){
 		var mousePos = mouseOffset(this.canvasElement);

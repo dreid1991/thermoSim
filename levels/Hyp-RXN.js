@@ -153,7 +153,7 @@ LevelData = {
 					// }
 					{
 						type: 'Heater',
-						attrs: {wallInfo: 'secondWall', handle: 'heatyTHeater', max: 6, dims: V(80, 30)}
+						attrs: {wallInfo: 'secondWall', handle: 'heatyTHeater', max: 8, dims: V(100, 40)}
 					}
 				],
 				graphs: [
@@ -175,14 +175,20 @@ LevelData = {
 							{handle: 'hypPath1', expr: 'fracDiff(temp("secondWall"),298)<.01', message:"What should the temperature be at the end of your first step?"}
 						]
 					},
-				text:"Now we're going to carry out your hypothetical path.  Above is species A in the same initial state as the previous system.  You can use the buttons to the right to set whether the system is isothermal and whether the reaction occurs.  For this hypothetical process, the activation energy has been lowered so the reaction proceeds at 298 K and the reverse reaction has been disabled. <p> Take the first step in your hypothetical path.  "
+				text:"Now we're going to carry out your hypothetical path.  Above is species A in the same initial state as the previous system.  You can use the buttons to the right to set whether the system is isothermal and whether the reaction occurs.  For this hypothetical process, the activation energy has been lowered so the reaction proceeds at 298 K and the reverse reaction has been disabled. <p> Take the first step in your hypothetical path. How does the enthalpy change compare to the value you calculated?",
+				quiz: [
+					{type: 'text',
+					storeAs: 'hypAns1',
+					text: 'Type your answer here'
+					}
+				]
 				},
 				{sceneData: {
 						triggers:[
 							{handle:'hypPath2', expr: 'frac("secondWall", {tag:"secondWall", spcName:"spc2"})==1', message: "What should the extent of reaction be after the second step in your hypothetical path?", priority: 1}
 						]
 					},
-				text: "Take the next step in your hypothetical path.  How does the enthalpy change of this step compare to the value you calculated?   If you are reacting, you may want to have the system be isothermal at this step to make sure the enthalpy of reaction is equal to the tabulated value.",
+				text: "Take the next step in your hypothetical path.  How does the enthalpy change of this step compare to the value you calculated?   <p>If you are reacting, you may want to have the system be isothermal at this step to make sure the enthalpy of reaction is equal to the tabulated value.",
 				quiz: [
 					{type: 'text',
 					storeAs: 'hypAns2',
@@ -216,16 +222,16 @@ LevelData = {
 			]
 		},
 		{//Fourth Scene
-			sceneData: {
+			sceneData: {//Scene1
 				walls: [
-					{pts: [P(40,30), P(510,30), P(510,400), P(40,400)], handler: 'cVIsothermal', handle: 'thirdWall', border: {type: 'open'},},
+					{pts: [P(40,30), P(510,30), P(510,400), P(40,400)], handler: 'cVIsothermal', temp: 500, handle: 'thirdWall', border: {type: 'open'},},
 				],
 				dots: [
 					{spcName: 'spc1', pos: P(55, 50), dims: V(400,300), count: 1000, temp: 500, returnTo: 'thirdWall', tag: 'thirdWall'},
 				],
 				rxns: [
-					{handle: 'rxn1', rctA: 'spc1',rctB: 'spc1', activeE: 5, prods: {spc2:2}},
-					{handle: 'rxn2', rctA: 'spc2',rctB: 'spc2', activeE: 6, prods: {spc1:2}}
+					{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: 5, prods: {spc2:2}},
+					{handle: 'rxn2', rctA: 'spc2', rctB: 'spc2', activeE: 6, prods: {spc1:2}}
 				],
 				buttonGroups: [
 					{handle: 'hypoPath', label: 'hypPath', prefIdx: 1, isRadio: true,
@@ -244,18 +250,19 @@ LevelData = {
 				],
 				objs: [
 					{type: 'QArrowsAmmt',
-						attrs: {handle: 'arrow', wallInfo: 'thirdWall', scale: 1}
+								attrs: {handle: 'arrow', wallInfo: 'thirdWall', scale: 1}
 					}
 				]
 			},
 			prompts: [
 				{sceneData:undefined,
 				cutscene: true,
-				text: "Now that we know the enthalpy of reaction at 500 K, calculate how much heat will be released by the real process.  In the real process, the reaction went to X fractional conversion.",
+				text: "Now that we know the enthalpy of reaction at 500 K, perform the experiment and calculate the amount of heat that will be released during the process.",
 				quiz: [
-					{type: 'text',
+					{type: 'textSmall',
 					storeAs: 'finalAns',
-					text: 'Type your answer here'
+					text: ' ',
+					units: 'kJ'
 					}
 				]
 				},

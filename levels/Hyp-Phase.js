@@ -2,7 +2,7 @@ LevelData = {
 	levelTitle: 'Hypothetical Path: Phase Change',
 	
 	spcDefs: [
-		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 30, antoineCoeffs: {a: 1.07, b:1030.6, c: 273.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
+		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 1.07, b:1030.6, c: 273.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
 		{spcName: 'spc2', m: 3, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
 		{spcName: 'spc3', m: 3, r: 1, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3}
 	],
@@ -10,22 +10,25 @@ LevelData = {
 		{//First Scene
 			sceneData: {//Scene 0
 				walls: [
-					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'FirstWall', border: {type: 'open'},},
+					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'firstWall', border: {type: 'open'},},
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 0, temp: 300, returnTo: 'FirstWall', tag: 'FirstWall'},
+					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 0, temp: 300, returnTo: 'firstWall', tag: 'firstWall'},
 				],
 				objs: [
 					// {type: 'Piston',
 						// attrs: {handle: 'Piston', wallInfo: 'FirstWall', min:2, init: 3, max: 4}
 					// },
 					{type: 'Heater',
-						attrs: {handle: 'heaterOne', wallInfo: 'FirstWall', max: 1}
+						attrs: {handle: 'heaterOne', wallInfo: 'firstWall', max: 1}
 					},
 					{type: 'Liquid',
-						attrs: {wallInfo: 'FirstWall', handle: 'liq1', tempInit: 300, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}
+						attrs: {wallInfo: 'firstWall', handle: 'liq1', tempInit: 300, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}
 					}
-				]
+				],
+				dataReadouts: [
+					{label: 'Temperature: ', expr: 'tempSmooth("firstWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'}
+				],
 			},
 			prompts:[ 
 						{//Prompt 0
@@ -47,7 +50,7 @@ LevelData = {
 					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'secondWall', border: {type: 'open'},},
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 1, temp: 300, returnTo: 'secondWall', tag: 'secondWall'},
+					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 0, temp: 300, returnTo: 'secondWall', tag: 'secondWall'},
 				],
 				objs: [
 					// {type: 'Piston',

@@ -103,7 +103,7 @@ _.extend(Cell.prototype, objectFuncs, {
 		var pts = [];
 		var wallPtIdx = 0;
 		var node = guideNodes[0];
-		while(wallPtIdx < guideNodes.length) {
+		while (wallPtIdx < guideNodes.length) {
 			node.innerWallIdx = wallPtIdx;
 			var fromPrev = node.prev.pos.VTo(node.pos).perp('ccw');
 			var toNext = node.pos.VTo(node.next.pos).perp('ccw');
@@ -324,7 +324,7 @@ _.extend(Cell.prototype, objectFuncs, {
 			for (var i=0; i<nodes.length; i++) {
 				var node = nodes[i];
 				var pts = [innerWall[node.innerWallIdx], innerWall[node.next.innerWallIdx], outerWall[node.outerWallIdx], outerWall[node.prev.outerWallIdx]];
-				window.draw.fillPts(pts, membraneColor, ctx);
+				draw.fillPts(pts, membraneColor, ctx);
 			}
 		}, this, 1);
 	},
@@ -384,6 +384,11 @@ _.extend(Cell.prototype, objectFuncs, {
 		
 	},
 	remove: function() {
+		walls.removeWall(this.innerWall.handle);
+		walls.removeWall(this.outerWall.handle);
+		dotManager.removeByAttr('elemId', this.dotId);
+		removeListener(curLevel, 'update',  'moveCell' + this.handle.toCapitalCamelCase());
+		canvasManager.removeListener(this.canvasHandle, 'drawCell' + this.handle);
 	},
 
 

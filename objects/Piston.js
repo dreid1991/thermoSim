@@ -15,7 +15,7 @@ Copyright (C) 2013  Daniel Reid
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function Piston(attrs){
+function Piston(attrs) {
 	this.type = 'Piston';
 	this.handle = attrs.handle;
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
@@ -23,8 +23,10 @@ function Piston(attrs){
 	this.min = defaultTo(2, attrs.min);
 	this.max = defaultTo(15, attrs.max);
 	this.makeSlider = defaultTo(false, attrs.makeSlider);
+	this.shaftThickness = 30;
 
-	this.slant = .07;
+	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
+	this.slant = .04;
 	
 	//must send neither or both of these.
 	this.sliderWrapper = attrs.sliderWrapper;
@@ -37,16 +39,22 @@ function Piston(attrs){
 	this.setPressure(pInit);
 
 	this.height = 500;
+	this.pistonTop;
+	this.pistonBottom;
+	this.pistonAdjust = 9;
 	this.draw = this.makeDrawFunc(this.height, this.left, this.width);
 	this.dataSlotFont = '12pt Calibri';
 	this.dataSlotFontCol = Col(255,255,255);
 	this.pStep = .05;
-	var readoutLeft = this.left + this.width*this.slant;
-	var readoutRight = this.left + this.width - this.width*this.slant;
-	var readoutY = this.pistonBottom.pos.y-2+this.pistonPt.y;
+	var readoutLeftLeft = this.left + this.width*this.slant;
+	var readoutLeftRight = this.left + this.width / 2 - 15;
+	var readoutRightLeft = this.left + this.width / 2 + 15;
+	var readoutRightRight = this.left + this.width - this.width*this.slant;
+	var readoutY = this.pistonBottom.pos.y-this.pistonAdjust+this.pistonPt.y;
 	var readoutFont = '12pt calibri';
 	var readoutFontCol = Col(255, 255, 255);
-	this.readout = new Readout('pistonReadout' + this.handle.toCapitalCamelCase(), readoutLeft, readoutRight, readoutY, readoutFont, readoutFontCol, 'center', curLevel);
+	this.readoutLeft = new Readout('piston' + this.handle.toCapitalCamelCase() + 'Left', readoutLeftLeft, readoutLeftRight, readoutY, readoutFont, readoutFontCol, 'center', curLevel);
+	this.readoutRight = new Readout('piston' + this.handle.toCapitalCamelCase() + 'Right', readoutRightLeft, readoutRightRight, readoutY, readoutFont, readoutFontCol, 'center', curLevel);
 	this.wall.moveInit();
 	
 	this.wall.recordPExt();
@@ -71,12 +79,12 @@ function Piston(attrs){
 
 _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 	makeDrawFunc: function(height, left, pistonWidth){
-		var shaftThickness = 30;
-		var shaftLength = height - 45;
-		var plateTopHeight = 35;
-		var plateThickness = 10;
+		var headThickness = 15
+		var shaftLength = height - headThickness;
+		var plateThickness = 1/2*headThickness;
+		var plateTopHeight = headThickness - plateThickness;
 
-		this.pistonTop = this.makeTop(left, pistonWidth, shaftThickness, shaftLength, height, plateTopHeight, plateThickness);
+		this.pistonTop = this.makeTop(left, pistonWidth, this.shaftThickness, shaftLength, height, plateTopHeight, plateThickness);
 		
 		var plateTopY = -height + shaftLength
 		
@@ -85,9 +93,6 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		this.pistonBottom = this.makePlateBottom(P(left, plateBottomY), V(pistonWidth, plateThickness));
 		
 
-		
-		
-		
 		var self = this;
 		var drawFunc = function(ctx){
 			if (self.readout) {
@@ -105,27 +110,25 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		var slant = this.slant;
 		var slantLeft = slant;
 		var slantRight = 1-slant;
-		var pts = new Array(14);
+		var pts = [];
 		var shaftX = left + pistonWidth/2 - shaftThickness/2;
 		var shaftY = -yInit;
 		var shaftPos = P(shaftX, shaftY);
 		var col = Col(150, 150, 150);
 		var dims = V(pistonWidth, plateHeight)
 		var platePos = shaftPos.copy().movePt({dy:length}).position({x:left});;
-		pts[0] =  P(platePos.x,										platePos.y+dims.dy+1);
-		pts[1] =  P(platePos.x+dims.dx*slantLeft, 					platePos.y);
-		pts[2] =  P(shaftPos.x-dims.dx*slantLeft,					platePos.y);
-		pts[3] =  P(shaftPos.x,										platePos.y-5*dims.dy*slantLeft);
-		pts[4] =  P(shaftPos.x,										shaftPos.y);
-		pts[5] =  P(shaftPos.x + shaftThickness,					shaftPos.y);
-		pts[6] =  P(shaftPos.x + shaftThickness,					platePos.y-5*dims.dy*slantLeft);
-		pts[7] =  P(shaftPos.x + shaftThickness+dims.dx*slantLeft,	platePos.y);
-		pts[8] =  P(platePos.x+dims.dx*slantRight, 					platePos.y);
-		pts[9] =  P(platePos.x+dims.dx, 							platePos.y+dims.dy+1);
-		pts[10] = P(platePos.x+dims.dx-plateThickness,				platePos.y+dims.dy+1);
-		pts[11] = P(platePos.x+dims.dx*slantRight-plateThickness, 	platePos.y+plateThickness);
-		pts[12] = P(platePos.x+dims.dx*slantLeft+plateThickness, 	platePos.y+plateThickness);
-		pts[13] = P(platePos.x+plateThickness,						platePos.y+dims.dy+1);
+		pts.push(P(platePos.x,										platePos.y+dims.dy+1));
+		pts.push(P(platePos.x+dims.dx*slantLeft, 					platePos.y));
+		pts.push(P(shaftPos.x-dims.dx*slantLeft,					platePos.y));
+		pts.push(P(shaftPos.x,										platePos.y-15*dims.dy*slantLeft));
+		pts.push(P(shaftPos.x,										shaftPos.y));
+		pts.push(P(shaftPos.x + shaftThickness,					    shaftPos.y));
+		pts.push(P(shaftPos.x + shaftThickness,					    platePos.y-15*dims.dy*slantLeft));
+		pts.push(P(shaftPos.x + shaftThickness+dims.dx*slantLeft,	platePos.y));
+		pts.push(P(platePos.x+dims.dx*slantRight, 					platePos.y));
+		pts.push(P(platePos.x+dims.dx, 							    platePos.y+dims.dy+1));
+		pts.push(P(platePos.x+dims.dx-plateThickness,				platePos.y+dims.dy+1));
+		pts.push(P(platePos.x+plateThickness,						platePos.y+dims.dy+1));
 		var col = Col(150, 150, 150);
 		return {pts:pts, col:col};
 	},
@@ -151,16 +154,18 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		this.enabled = false;
 	},
 	show: function(){
-		canvasManager.addListener('main', 'drawPiston' + this.handle, this.draw, undefined, 1);
-		this.readout.show();
+		addListener(curLevel, 'update', 'drawPiston'+this.handle, this.draw, '');
+		this.readoutLeft.show();
+		this.readoutRight.show();
 		return this;
 	},
 	pToPercent: function(p) {
 		return 100 * (p - this.min) / (this.max - this.min);
 	},
 	hide: function(){
-		canvasManger.removeListener('main', 'drawPiston' + this.handle);
-		this.readout.hide();
+		removeListener(curLevel, 'update', 'drawPiston'+this.handle);
+		this.readoutLeft.hide();
+		this.readoutRight.hide();
 	},
 	parseSlider: function(event, ui){
 		this.setPressure(this.percentToVal(ui.value));
@@ -173,7 +178,8 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		this.wall.setMass('piston' + this.handle, this.mass);
 	},
 	setReadoutY: function(){
-		this.readout.position({y:this.pistonBottom.pos.y-2+this.pistonPt.y});
+		this.readoutLeft.position({y:this.pistonBottom.pos.y-this.pistonAdjust+this.pistonPt.y});
+		this.readoutRight.position({y:this.pistonBottom.pos.y-this.pistonAdjust+this.pistonPt.y});	
 	},
 	remove: function(){
 		this.wall.moveStop();
