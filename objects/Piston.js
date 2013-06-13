@@ -37,7 +37,7 @@ function Piston(attrs) {
 	this.pistonPt = this.wall[0];
 	var pInit = defaultTo(2, attrs.init)
 	this.setPressure(pInit);
-
+	this.canvasHandle = attrs.canvasHandle || 'main';
 	this.height = 500;
 	this.pistonTop;
 	this.pistonBottom;
@@ -95,9 +95,7 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 
 		var self = this;
 		var drawFunc = function(ctx){
-			if (self.readout) {
-				self.setReadoutY();
-			}
+			self.setReadoutY();
 			ctx.save();
 			ctx.translate(0, self.pistonPt.y);
 			draw.fillPts(self.pistonTop.pts, self.pistonTop.col, ctx);
@@ -154,7 +152,7 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		this.enabled = false;
 	},
 	show: function(){
-		addListener(curLevel, 'update', 'drawPiston'+this.handle, this.draw, '');
+		canvasManager.addListener(this.canvasHandle, 'drawPiston' + this.handle, this.draw, this, 1);
 		this.readoutLeft.show();
 		this.readoutRight.show();
 		return this;
@@ -163,7 +161,7 @@ _.extend(Piston.prototype, objectFuncs, compressorFuncs, {
 		return 100 * (p - this.min) / (this.max - this.min);
 	},
 	hide: function(){
-		removeListener(curLevel, 'update', 'drawPiston'+this.handle);
+		canvasManager.removeListener(this.canvasHandle, 'drawPiston' + this.handle)
 		this.readoutLeft.hide();
 		this.readoutRight.hide();
 	},

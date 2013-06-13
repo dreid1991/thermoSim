@@ -21,7 +21,8 @@ WallMethods.Border = function (attrs) {
 	this.yMin = attrs.yMin !== undefined ? attrs.yMin : this.wall[0].y;
 	this.col = attrs.col || this.wall.col.copy().adjust(-100, -100, -100);
 	this.thick = attrs.thickness || 5; //don't want to have value of zero anyway
-	this.update = this.pickGenerator(this.type)
+	this.update = this.pickGenerator(this.type);
+	this.canvasHandle = this.wall.canvasHandle || 'main';
 	this.update();
 	this.removed = false;
 }
@@ -32,7 +33,7 @@ WallMethods.Border = function (attrs) {
 WallMethods.Border.prototype = {
 	remove: function() {
 		this.removed = true;
-		removeListener(curLevel, 'update', this.listenerName);
+		canvasManager.removeListener(this.canvasHandle, this.listenerName);
 	},
 	pickGenerator: function(type) {
 		if (type == 'open') {
@@ -51,16 +52,15 @@ WallMethods.Border.prototype = {
 	},
 	genBorder: function(thick, col, firstPt, lastPt, bluntEnds) {
 		var self = this;
-		var drawCanvas = c;
 		this.listenerName = 'drawBorder' + this.wall.handle.toCapitalCamelCase();
 		return function() {
 			self.remove();
 			var segments = self.genSegs(firstPt, lastPt, thick, bluntEnds);
-			addListener(curLevel, 'update', self.listenerName, function() {
+			canvasManager.addListener(this.canvasHandle, self.listenerName, function(ctw) {
 				for (var segIdx=0; segIdx<segments.length; segIdx++) {
-					draw.fillPts(segments[segIdx], col, drawCanvas);
+					draw.fillPts(segments[segIdx], col, ctw);
 				}
-			})
+			}, this, 1)
 			self.removed = false;
 		};
 	},

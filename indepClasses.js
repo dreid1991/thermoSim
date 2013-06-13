@@ -557,7 +557,7 @@ Dot.prototype = {
 	hVap: function() {
 		return this.hVap298 + (this.temp() - 298.15) * (this.cv - this.cpLiq);
 	},
-	setTemp: function(newTemp) {
+	setTemp: function(newTemp) {	
 		var curTemp = this.temp();
 		//if (curTemp!=0) {
 		this.v.mult(Math.sqrt(newTemp / curTemp));

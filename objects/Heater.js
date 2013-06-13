@@ -38,7 +38,7 @@ function Heater(attrs){
 	this.wall.hitThreshold = -30;
 	this.makeSlider = defaultTo(true, attrs.makeSlider);
 	this.handle = attrs.handle;
-	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
+	this.canvasHandle = attrs.canvasHandle || 'main';
 	this.cornerRound = .2;
 	this.qRate = defaultTo(0, attrs.init);
 	this.qRateMax = defaultTo(1, attrs.max);
@@ -130,13 +130,13 @@ _.extend(Heater.prototype, objectFuncs, {
 		var colorSteps = this.getColorSteps(colMin, colDefault, colMax)
 		var self = this;
 		var pts = this.pts;
-		var drawFunc = function(){
+		var drawFunc = function(ctx){
 			var sign = getSign(self.qRate);
 			var steps = colorSteps[String(sign)];
 			var fracToEnd = sign*self.qRate/self.qRateMax;
 			
 			var curCol = colDefault.copy().adjust(steps[0]*fracToEnd, steps[1]*fracToEnd, steps[2]*fracToEnd);
-			draw.path(pts, curCol, self.drawCanvas);
+			draw.path(pts, curCol, ctx);
 		}
 		return drawFunc;
 	},
@@ -200,7 +200,7 @@ _.extend(Heater.prototype, objectFuncs, {
 		return steps;
 	},
 	init: function(wallHandleHeater, wallHandleParent){
-		addListener(curLevel, 'update', 'drawHeater'+this.handle, this.draw, '');
+		canvasManager.addListener(this.canvasHandle, 'drawHeater' + this.handle, this.draw, this, 1);
 		this.setupWalls(wallHandleHeater)
 		this.eAdded=0;
 		dotMigrator.migrateDots(dotManager.get({tag: wallHandleParent}), [wallHandleParent], [wallHandleHeater]);
@@ -240,7 +240,7 @@ _.extend(Heater.prototype, objectFuncs, {
 	},
 	remove: function(){
 		this.slider.remove();
-		removeListener(curLevel, 'update', 'drawHeater'+this.handle);
+		canvasManager.removeListener(this.canvasHandle, 'drawHeater' + this.handle)
 		if (window.walls && !walls.removed) {
 			walls.removeWall(this.wallHandleHeater);
 		}

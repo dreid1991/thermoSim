@@ -54,8 +54,8 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 		var UV = pos2.VTo(pos1).perp('cw').UV();
 		pos1.movePt(UV.copy().mult(5));
 		pos2.movePt(UV.copy().mult(5));
-		var arrow1 = new ArrowStatic({pos:pos1, dims:startingDims, fill: Col(175,0,0), stroke: Col(0,0,0), label:'Q', UV:UV});
-		var arrow2 = new ArrowStatic({pos:pos2, dims:startingDims, fill: Col(175,0,0), stroke: Col(0,0,0), label:'Q', UV:UV});
+		var arrow1 = new ArrowStatic({pos:pos1, dims:startingDims, fill: Col(175,0,0), stroke: Col(0,0,0), label:'Q', UV:UV, handle: this.handle + 'Left'});
+		var arrow2 = new ArrowStatic({pos:pos2, dims:startingDims, fill: Col(175,0,0), stroke: Col(0,0,0), label:'Q', UV:UV, handle: this.handle + 'Right'});
 
 		var redrawThreshold = qMax/(lengthMax-lengthMin);
 		this.qArrowsAmmt = [arrow1, arrow2];

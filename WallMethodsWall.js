@@ -631,7 +631,7 @@ WallMethods.wall = {
 		 
 	},
 	cleanUp: function() {
-		//HEY - I AM NOT SURE THIS EVEN EXISTS
+		//QArrowsAmmt uses this
 		var listeners = this.cleanUpListeners;
 		for (var listenerName in listeners) {
 			var listener = listeners[listenerName];

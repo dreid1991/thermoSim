@@ -25,7 +25,7 @@ function Tracer(attrs) {
 	this.listenerHandle = this.type + this.handle + 'Draw';
 	this.listenerHandleSearch = this.type + this.handle + 'Search';
 	this.setupStd();
-	this.drawCanvas = c;
+	this.canvasHandle = attrs.canvasHandle || 'main';
 	this.drawingTools = draw;
 	this.init();
 	
@@ -37,7 +37,7 @@ _.extend(Tracer.prototype, objectFuncs, {
 		this.pts = [];
 		if (this.dot) {
 			removeListener(curLevel, 'update', this.listenerHandleSearch);
-			addListener(curLevel, 'update', this.listenerHandle, this.draw, this);
+			canvasManager.addListener(this.canvasHandle, this.listenerHandle, this.draw, this, 3);
 		} else {
 			addListener(curLevel, 'update', this.listenerHandleSearch, this.init, this);
 		}
@@ -52,17 +52,18 @@ _.extend(Tracer.prototype, objectFuncs, {
 			}
 		}
 	},
-	draw: function() {
+	draw: function(ctx) {
 		if (this.dot.active) {
 			this.pts.push(P(this.dot.x, this.dot.y));
 			if (this.pts.length > this.lifespan) this.pts.splice(0, 1);
-			this.drawingTools.path(this.pts, this.col, this.drawCanvas);
+			this.drawingTools.path(this.pts, this.col, ctx);
 		} else {
+			canvasManager.removeListener(this.canvasHandle, this.listenerHandle);
 			this.init();
 		}
 	},
 	remove: function() {
 		removeListener(curLevel, 'update', this.listenerHandleSearch);
-		removeListener(curLevel, 'update', this.listenerHandle);
+		canvasManager.removeListener(this.canvasHandle, this.listenerHandle);
 	},
 })

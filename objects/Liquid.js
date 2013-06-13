@@ -36,7 +36,7 @@ function Liquid(attrs) {
 	this.isTwoComp = countAttrs(this.spcDefs) == 2;
 	this.spcA = getNth(this.spcDefs, 0);
 	if (this.isTwoComp) this.spcB = getNth(this.spcDefs, 1);
-	
+	this.canvasHandle = attrs.canvasHandle || 'main';
 	this.drivingForce = this.makeDrivingForce(this.spcDefs);
 	this.dotMgrLiq = this.makeDotManager(this.spcDefs);
 	this.wallLiq = this.makeWallLiq(this.spcDefs, spcCounts, this.wallGas, this.wallPtIdxs, this.dotMgrLiq);
@@ -237,7 +237,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 	setupUpdate: function(spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName, drawList, dotMgrLiq, wallLiq, numAbs, drivingForceSensitivity, numEjt, wallGas, wallGasIdxs, wallSurfAreaObj) {
 		this.calcCp = this.setupCalcCp(spcDefs, dotMgrLiq);
 		this.calcEquil = this.setupUpdateEquil(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, dotMgrLiq);
-		this.drawDots = this.setupDrawDots(drawList);
+		this.addDrawListener(drawList);
 		this.moveDots = this.setupMoveDots(dotMgrLiq, spcDefs, wallLiq, wallGas, wallGasIdxs);
 		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcDefs, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt);//you were making the liquid eject if df<0 whether hit or not
 		var sizeWall = this.setupSizeWall(wallLiq, wallGas, spcDefs, dotMgrLiq, wallGasIdxs, wallSurfAreaObj)
@@ -264,7 +264,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 					self.tempDisplay = self.temp;
 					calcCp();
 					calcEquil();
-					drawDots();
 					moveDots();
 					if (self.phaseChangeEnabled) ejectDots();
 					sizeWall();
@@ -278,7 +277,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 			self.tempDisplay = self.temp;
 			calcCp();
 			calcEquil();
-			drawDots();
 			moveDots();
 			sizeWall();	
 			turns ++;
@@ -406,10 +404,8 @@ _.extend(Liquid.prototype, objectFuncs, {
 			drivingForce[spcName] = pGas - pEq;
 		}
 	},
-	setupDrawDots: function(drawList) {
-		return function() {
-			window.draw.dotsAsst(drawList);
-		};
+	addDrawListener: function(drawList) {
+		canvasManager.addListener(this.canvasHandle, 'drawDots' + this.handle, function(ctx) {draw.dotsAsst(drawList, ctx)}, undefined, 0);
 	},
 	setupMoveDots: function(dotMgr, spcDefs, wallLiq, wallGas, wallGasIdxs) {
 		var self = this;
@@ -530,7 +526,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 			var hVap = dot.hVap();
 			dot.v.dy = -Math.abs(dot.v.dy);
 			dot.y = wallLiq[0].y - 1;
-			dot.setWall(wallGas.handle);
+				
+			dot.tag = wallGas.handle;
+			dot.returnTo = wallGas.handle;
 			drawList.splice(drawList.indexOf(dot), 1);
 			dotMgrLiq.remove(dot);
 			this.calcCp();
@@ -587,7 +585,8 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var dotMgrGas = window.dotManager; 
 		dotMgrGas.remove(dot);
 		drawList.splice(Math.floor(Math.random() * drawList.length), 0, dot);
-		dot.setWall(wallLiq.handle);
+		dot.tag = wallLiq.handle;
+		dot.returnTo = wallLiq.handle;
 		dotMgrLiq.add(dot);
 		
 		var tDotF = gasTemp[gasTemp.length - 1];
@@ -690,6 +689,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		return handler;
 	},
 	remove: function() {
+		canvasManager.removeListener(this.canvasHandle, 'drawDots' + this.handle);
 		removeListener(curLevel, 'update', this.updateListenerName);
 		this.wallGas.removeLiquid(this);
 		if (this.heater) this.heater.removeLiquid();

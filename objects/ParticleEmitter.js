@@ -60,6 +60,7 @@ function ParticleEmitter(attrs){
 	this.accel = defaultTo(.5, attrs.accel);
 	this.accelSpread = defaultTo(1, attrs.accelSpread);
 	this.dirSpread = defaultTo(0, attrs.dirSpread);
+	this.canvasHandle = attrs.canvasHandle || 'main';
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	this.makeBounds();
 	this.setupStd();
@@ -69,6 +70,8 @@ function ParticleEmitter(attrs){
 _.extend(ParticleEmitter.prototype, objectFuncs, {
 	init: function(){
 		this.runListenerName = unique('particle' + this.handle, curLevel.updateListeners);
+		this.drawListenerName = 'drawParticle' + this.handle;
+		canvasManager.addListener(this.canvasHandle, this.drawListenerName, this.draw, this, 2);
 		addListener(curLevel, 'update', this.runListenerName, this.run, this);
 		return this;
 	},
@@ -90,11 +93,9 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 	run: function(){
 		this.generateNew();
 		this.updateParticles();
-		this.draw();
 	},
 	trickleOut: function(){
 		this.updateParticles();
-		this.draw();
 		if (this.particles.length==0) {
 			this.remove();
 		}
@@ -139,15 +140,15 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 			}	
 		}
 	},
-	draw: function(){
-		this.drawCanvas.strokeStyle = this.col.hex;
+	draw: function(ctx){
+		ctx.strokeStyle = this.col.hex;
 		for (var particleIdx = 0; particleIdx<this.particles.length; particleIdx++){
 			var particle = this.particles[particleIdx];
-			c.beginPath();
-			c.moveTo(particle.pos.x, particle.pos.y);
-			c.lineTo(particle.pos.x+2, particle.pos.y+2);
+			ctx.beginPath();
+			ctx.moveTo(particle.pos.x, particle.pos.y);
+			ctx.lineTo(particle.pos.x+2, particle.pos.y+2);
 			//if lines start behaving strangely, not closing the path here may have something to do with it
-			c.stroke();
+			ctx.stroke();
 		}	
 	},
 	stopFlow: function(){
@@ -161,6 +162,7 @@ _.extend(ParticleEmitter.prototype, objectFuncs, {
 		if(this.parentList){
 			this.parentList.splice(_.indexOf(this.parentList, this), 1);
 		}
+		canvasManager.removeListener(this.canvasHandle, this.drawListenerName);
 		removeListener(curLevel, 'update', this.runListenerName);
 		this.removed = true;
 	},

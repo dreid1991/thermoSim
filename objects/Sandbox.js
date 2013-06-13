@@ -23,7 +23,7 @@ function Sandbox(attrs){
 	attrs = defaultTo({}, attrs);
 	this.bin = {};
 	this.sand = {};
-	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
+	this.canvasHandle = attrs.canvasHandle || 'main';
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.wall = walls[this.wallInfo];
 	//must send init as pressure
@@ -64,8 +64,8 @@ function Sandbox(attrs){
 _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 {
 	init: function(){	
-		this.drawListenerName = unique('drawSand' + this.handle, curLevel.updateListeners);
-		addListener(curLevel, 'update', this.drawListenerName, this.draw, this);
+		this.drawListenerName = 'drawSand' + this.handle;
+		canvasManager.addListener(this.canvasHandle, this.drawListenerName, this.draw, this, 2);
 		this.wall.moveInit();
 		this.wall.recordMass();
 		this.wall.recordPExt();
@@ -103,14 +103,14 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		$('#' + this.buttonAddId).remove();
 		$('#' + this.buttonRemoveId).remove();
 	},
-	draw: function(){
-		this.drawCanvas.save();
-		this.drawCanvas.translate(this.sand.pos.x, this.sand.pos.y);
+	draw: function(ctx){
+		ctx.save();
+		ctx.translate(this.sand.pos.x, this.sand.pos.y);
 		var scalar = Math.sqrt(this.mass*.4);
-		this.drawCanvas.scale(scalar, scalar)
-		draw.fillPts(this.sand.pts, this.sand.col, this.drawCanvas);
+		ctx.scale(scalar, scalar)
+		draw.fillPts(this.sand.pts, this.sand.col, ctx);
 		this.width = scalar * (this.sand.pts[this.sand.pts.length-1].x - this.sand.pts[0].x);
-		this.drawCanvas.restore();		
+		ctx.restore();		
 	},
 	getSandPts: function(){
 		var pts = new Array(4);
@@ -268,7 +268,7 @@ _.extend(Sandbox.prototype, compressorFuncs, objectFuncs,
 		this.trackingPts.map(function(pt) {pt.trackStop()});
 		this.trackingPts.splice(0, this.trackingPts.length);
 		this.removeButtons();
-		removeListener(curLevel, 'update', this.drawListenerName);
+		canvasManager.removeListener(this.canvasHandle, this.drawListenerName);
 		removeListener(curLevel, 'data', this.cleanUpEmittersListenerName);	
 		this.wall.moveStop();
 	},

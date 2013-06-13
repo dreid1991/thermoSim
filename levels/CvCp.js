@@ -49,7 +49,8 @@ LevelData = {
 					{spcName: 'ugly', pos: P(60, 60), dims: V(200, 350), count: 500, temp:150, returnTo: 'wally1', tag: 'wally1'},
 				],
 				objs: [
-					{type: 'Heater', attrs: {handle: 'heaterWally1', wallInfo: 'wally1', tempMax: 500, max: 5}},	
+					{type: 'Heater', attrs: {handle: 'heaterWally1', wallInfo: 'wally1', tempMax: 500, max: 5}},
+					{type: 'Tracer', attrs: {handle: 'tracey', info: {spcName: 'ugly', tag: 'wally1'}, col: Col(255, 182, 190), lifespan: 6}}
 				],			
 				dataReadouts: [			
 					{label: 'Heat: ', expr: 'q("wally1")', units: 'kJ', sigFigs: 2, handle: 'heating1', readout: 'mainReadout'},

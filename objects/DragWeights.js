@@ -50,7 +50,7 @@ function DragWeights(attrs){
 	this.font = '12pt Calibri';
 	this.fontCol = Col(255,255,255);
 	this.binThickness = 5;
-	
+	this.canvasHandle = attrs.canvasHandle || 'main';
 	this.trackingPts = [];
 	this.wall.setMass(this.massChunkName, this.massInit);
 	this.wall.recordPExt();
@@ -73,7 +73,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		if (!this.displayText) {
 			this.draw = this.drawNoText;
 		}
-		addListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo, this.draw, this);
+		canvasManager.addListener(this.canvasHandle, 'drawDragWeights' + this.wallInfo, this.draw, this, 1);
 		this.enable();
 		this.wall.moveInit();
 		this.dropAllIntoBins('instant');
@@ -86,7 +86,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		this.trackingPts.map(function(pt) {pt.trackStop();});
 		this.trackingPts.splice(0, this.trackingPts.length);
 		walls.setSubWallHandler(walls.indexOf(this.wall), 0, this.savedWallHandler);
-		removeListener(curLevel, 'update', 'drawDragWeights' + this.wallInfo);
+		canvasManager.removeListener(this.canvasHandle, 'drawDragWeights' + this.wallInfo);
 		removeListener(curLevel, 'mousedown', 'weights' + this.wallInfo);
 	},
 	getWeightDims: function(weightDefs){
