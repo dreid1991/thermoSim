@@ -26,12 +26,12 @@ function Stops(attrs){
 	this.wallInfo = defaultTo(0, attrs.wallInfo);
 	this.wall = walls[this.wallInfo];
 	this.pts = this.wall;
-	
-	if(stopPt.vol){
+	this.canvasHandle = attrs.canvasHandle || 'main';
+	if (stopPt.vol) {
 		var width = this.pts[0].distTo(this.pts[1]);
 		var length = stopPt.vol/(vConst*width);
 		this.height = this.pts[2].y-length;
-	}else if (stopPt.y){
+	} else if (stopPt.y) {
 		this.height = stopPt.height;
 	}
 	this.willDraw = defaultTo(true, attrs.draw);
@@ -51,9 +51,9 @@ _.extend(Stops.prototype, objectFuncs, {
 		var stopHeight = this.stopHeight;
 		var dims = V(stopWidth, stopHeight);
 		var borderColLocal = borderCol;
-		return function(){
-			draw.fillRect(pLeft, dims, borderColLocal, c);
-			draw.fillRect(pRight, dims, borderColLocal, c);
+		return function(ctx){
+			draw.fillRect(pLeft, dims, borderColLocal, ctx);
+			draw.fillRect(pRight, dims, borderColLocal, ctx);
 		}
 	},
 	init: function(){
@@ -70,7 +70,7 @@ _.extend(Stops.prototype, objectFuncs, {
 			walls[this.wallInfo].setBounds(this.height, undefined);
 		}
 		if (this.willDraw) {
-			addListener(curLevel, 'update', 'drawStops' + this.wallInfo, this.draw, '');
+			canvasManager.addListener(this.canvasHandle, 'drawStops' + this.wallInfo, this.draw, this, 1);
 		}
 		return this;
 	},
@@ -83,7 +83,7 @@ _.extend(Stops.prototype, objectFuncs, {
 			}
 		}
 		if (this.willDraw) {
-			removeListener(curLevel, 'update', 'drawStops' + this.wallInfo);
+			canvasManager.addListener(this.canvasHandle, 'drawStops' + this.wallInfo);
 		}
 		return this;
 	},
