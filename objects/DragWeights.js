@@ -429,48 +429,46 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		}
 		return count;
 	},
-	draw: function() {
-		this.drawWeights();
-		this.drawBins();
-		this.drawBinLabels();
+	draw: function(ctx) {
+		this.drawWeights(ctx);
+		this.drawBins(ctx);
+		this.drawBinLabels(ctx);
 	},
-	drawNoText: function() {
-		this.drawWeights();
-		this.drawBins();	
+	drawNoText: function(ctx) {
+		this.drawWeights(ctx);
+		this.drawBins(ctx);	
 	},
-	drawWeights: function(){
-		var drawCanvas = c;
+	drawWeights: function(ctx){
 		for (var group in this.weightGroups) {
 			var weightGroup = this.weightGroups[group]
 			var weights = weightGroup.weights;
 			var dims = weightGroup.dims;
 			if (this.img.loaded) {
 				for (var weightIdx=0; weightIdx<weights.length; weightIdx++) {
-					drawCanvas.save();
-					drawCanvas.scale(dims.dx / this.img.width, dims.dy / this.img.height);
-					drawCanvas.drawImage(this.img.img, weights[weightIdx].pos.x * this.img.width / dims.dx, weights[weightIdx].pos.y * this.img.height/ dims.dy);
-					drawCanvas.restore();
+					ctx.save();
+					ctx.scale(dims.dx / this.img.width, dims.dy / this.img.height);
+					ctx.drawImage(this.img.img, weights[weightIdx].pos.x * this.img.width / dims.dx, weights[weightIdx].pos.y * this.img.height/ dims.dy);
+					ctx.restore();
 				}
 			} else {
 				for (var weightIdx=0; weightIdx<weights.length; weightIdx++) {
-					draw.fillRect(weights[weightIdx].pos, dims, this.blockCol, drawCanvas);
+					draw.fillRect(weights[weightIdx].pos, dims, this.blockCol, ctx);
 				}
 			}
 		}
 	},
-	drawBins: function(){
-		var drawCanvas = c;
+	drawBins: function(ctx){
 		for (var binType in this.bins) {
 			var typeBins = this.bins[binType];
 			for (var binSize in typeBins) {
 				var bin = typeBins[binSize];
 				if (bin.visible) {
-					draw.fillPts(bin.pts, this.binCol, drawCanvas);
+					draw.fillPts(bin.pts, this.binCol, ctx);
 				}
 			}
 		}
 	},
-	drawBinLabels: function(){
+	drawBinLabels: function(ctx){
 		for (var binName in this.bins.store) {
 			var bin = this.bins.store[binName];
 			if (bin.visible) {
@@ -478,7 +476,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 				var y = bin.y - this.binHeight;
 				var mass = this.weightGroups[binName].pressure;
 				var text = mass + ' bar each';
-				draw.text(text, P(x, y), this.font, this.fontCol, 'center', 0, c);
+				draw.text(text, P(x, y), this.font, this.fontCol, 'center', 0, ctx);
 			}
 		}
 	},
