@@ -15,7 +15,7 @@ Copyright (C) 2013  Daniel Reid
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function DragWeights(attrs){
+function DragWeights(attrs) {
 	//Can probably remove energy bar stuff
 	this.type = 'DragWeights';
 	this.handle = 				attrs.handle;
@@ -37,7 +37,7 @@ function DragWeights(attrs){
 	this.moveSpeed =			defaultTo(20, attrs.moveSpeed);
 	this.weightScalar = 		defaultTo(70, attrs.weightScalar);//specific volume
 	this.displayText = 			defaultTo(true, attrs.displayText);
-	
+	this.imgSrc = 
 	this.binSlant = 1.3;
 	this.storeBinWidth = 110;
 	this.storeBinSpacing = 60;
@@ -45,6 +45,7 @@ function DragWeights(attrs){
 	this.pistonBinSpacing = 15;
 	this.blockSpacing = 2;
 	this.mass = this.massInit;
+	this.img = new DragWeights.Img('brickImg');
 	this.massChunkName = 'dragWeights';
 	this.weightsOnPiston = [];
 	this.font = '12pt Calibri';
@@ -443,8 +444,17 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 			var weightGroup = this.weightGroups[group]
 			var weights = weightGroup.weights;
 			var dims = weightGroup.dims;
-			for (var weightIdx=0; weightIdx<weights.length; weightIdx++) {
-				draw.fillRect(weights[weightIdx].pos, dims, this.blockCol, drawCanvas);
+			if (this.img.loaded) {
+				for (var weightIdx=0; weightIdx<weights.length; weightIdx++) {
+					drawCanvas.save();
+					drawCanvas.scale(dims.dx / this.img.width, dims.dy / this.img.height);
+					drawCanvas.drawImage(this.img.img, weights[weightIdx].pos.x * this.img.width / dims.dx, weights[weightIdx].pos.y * this.img.height/ dims.dy);
+					drawCanvas.restore();
+				}
+			} else {
+				for (var weightIdx=0; weightIdx<weights.length; weightIdx++) {
+					draw.fillRect(weights[weightIdx].pos, dims, this.blockCol, drawCanvas);
+				}
 			}
 		}
 	},
@@ -595,3 +605,17 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		this.enabled = true;
 	},
 })
+
+DragWeights.Img = function(srcId) {
+	var srcElem = document.getElementById(srcId);
+	this.loaded = true;
+	if (!srcElem) {
+		this.loaded = false;
+	}
+	var srcSrc = srcElem.src;
+	this.img = new Image();
+	this.img.src = srcSrc;
+	this.width = srcElem.width;
+	this.height = srcElem.height;
+	
+}

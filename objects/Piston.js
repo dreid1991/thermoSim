@@ -23,7 +23,6 @@ function Piston(attrs) {
 	this.min = defaultTo(2, attrs.min);
 	this.max = defaultTo(15, attrs.max);
 	this.makeSlider = defaultTo(false, attrs.makeSlider);
-	this.shaftThickness = 30;
 
 	this.drawCanvas = defaultTo(c, attrs.drawCanvas);
 	this.slant = .04;
@@ -34,6 +33,9 @@ function Piston(attrs) {
 	
 	this.left = this.wall[0].x;
 	this.width = this.wall[1].x-this.left;
+	var shaftThicknessMax = 30;
+	var shaftThicknessMin = 13
+	this.shaftThickness = shaftThicknessMin + (shaftThicknessMax - shaftThicknessMin) * Math.max(0, Math.min(1, (this.width - 200) / (500 - 200)));
 	this.pistonPt = this.wall[0];
 	var pInit = defaultTo(2, attrs.init)
 	this.setPressure(pInit);
@@ -46,10 +48,10 @@ function Piston(attrs) {
 	this.dataSlotFont = '12pt Calibri';
 	this.dataSlotFontCol = Col(255,255,255);
 	this.pStep = .05;
-	var readoutLeftLeft = this.left + this.width*this.slant;
-	var readoutLeftRight = this.left + this.width / 2 - 15;
-	var readoutRightLeft = this.left + this.width / 2 + 15;
-	var readoutRightRight = this.left + this.width - this.width*this.slant;
+	var readoutLeftLeft = this.left + this.width*this.slant * .1;
+	var readoutLeftRight = this.left + this.width / 2 - this.shaftThickness / 2;
+	var readoutRightLeft = this.left + this.width / 2 + this.shaftThickness / 2;
+	var readoutRightRight = this.left + this.width - this.width*this.slant * .1;
 	var readoutY = this.pistonBottom.pos.y-this.pistonAdjust+this.pistonPt.y;
 	var readoutFont = '12pt calibri';
 	var readoutFontCol = Col(255, 255, 255);

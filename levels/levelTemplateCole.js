@@ -165,7 +165,7 @@ LevelData = {
 				],
 				dataReadouts: [
 					{handle: 'pistonpext2', expr: 'pExt("ThirdWall")', readout: 'pistonPistonOneLeft', label: 'pExt: ', units: 'bar', sigFigs: 2},
-					{handle: 'pistontemp1', expr: 'temp("ThirdWall")', readout: 'pistonPistonOneLeft', label: 'temp: ', units: 'K', sigFigs: 3},
+					{handle: 'pistontemp1', expr: 'temp("ThirdWall")', readout: 'mainReadout', label: 'temp: ', units: 'K', sigFigs: 3},
 					{handle: 'pistonwork1', expr: 'work("ThirdWall")', readout: 'pistonPistonOneRight', label: 'work: ', units: 'kJ', sigFigs: 3}
 				],
 				graphs: [
