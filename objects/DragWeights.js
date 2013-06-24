@@ -25,7 +25,7 @@ function DragWeights(attrs) {
 	this.pistonPt =				defaultTo(this.wall[0], attrs.pistonPt); //this will not work with just data based levels.  If I want this, will need to store as {wallInfo, ptIdx}
 	this.pistonOffset =			defaultTo(undefined, attrs.pistonOffset);
 	this.wallHandler = 			defaultTo('cPAdiabaticDamped', attrs.compMode);
-	this.binY = 				defaultTo(myCanvas.height-15, attrs.binY);
+	this.storeBinY = 				defaultTo(myCanvas.height-15, attrs.storeBinY);
 	this.blockCol = 			defaultTo(Col(224, 165, 75), attrs.blockCol);
 	this.binCol = 				defaultTo(Col(150, 150, 150), attrs.binCol);
 	
@@ -58,18 +58,15 @@ function DragWeights(attrs) {
 	this.wall.recordMass();
 	
 	this.weightGroups = this.makeWeights(attrs.weightDefs);
-	
+	this.addWeights(this.weightGroups);
 	this.setupStd();
 	this.init(attrs.weightDefs);
 }
 
 _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
-	init: function(weightDefs){
+	init: function(){
 		
-		this.bins = new DragWeights.Bins(  );
-		this.bins.store = this.makeStoreBins();
-		this.bins.piston = this.makePistonBins();
-		//this.dropAllstores();
+		this.bins = new DragWeights.Bins(this, this.wall, this.weightGroups, this.storeBinSpacing, this.pistonBinSpacing, this.blockSpacing, this.pistonOffset, this.pistonPt, this.storeBinWidth, this.pistonBinWidth, this.storeBinY  );
 		this.savedWallHandler = this.wall.handlers[0];
 		walls.setSubWallHandler(this.wallInfo, 0, this.wallHandler);
 		if (!this.displayText) {
@@ -115,7 +112,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		return dims;
 	},
 	
-	nameWeights: function(weightDefs) {
+	addDefHandles: function(weightDefs) {
 		for (var weightIdx=0; weightIdx<weightDefs.length; weightIdx++) {
 			weightDefs[weightIdx].handle = 'grp' + weightIdx;
 		}
@@ -127,7 +124,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		}
 	},
 	makeWeights: function(weightDefs){
-		this.nameWeights(weightDefs);
+		this.addDefHandles(weightDefs);
 		var weightGroups = {};
 		this.assignMasses(weightDefs);
 		var weightDims = this.getWeightDims(weightDefs)
@@ -135,65 +132,29 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		for (var groupIdx=0; groupIdx<weightDefs.length; groupIdx++){
 			var weightDef = weightDefs[groupIdx];
 			var weightGroup = new DragWeights.WeightGroup(weightDef.handle, weightDef.pressure, weightDef.mass, weightsDims[weightDef.handle], weightDef.count);
-			for (var weightIdx=0; weightIdx<weightDef.count; weightIdx++){
-				weightGroup.weights.push(new DragWeights.Weight(P(300, 500), weightGroup.handle, '', weightId++);
-			}
-			
 			weightGroups[weightGroup.handle] = weightGroup;
 		}
 		return weightGroups;
 	},
-
-
-	getBinSlots: function(pt, weightGroup){
-
-		
-	},
-	//HEY - GENERALIZE THESE TWO
-	getPistonBinSlots: function(binPos, weightGroup){
-		var numSlots = weightGroup.weights.length;
-		var dims = weightGroup.dims;
-		var numCols = Math.floor(this.pistonBinWidth/(dims.dx + this.blockSpacing));
-		var usedWidth = numCols*(dims.dx+this.blockSpacing);
-		var unusedWidth = this.pistonBinWidth-usedWidth;
-		startX = binPos.x + unusedWidth/2;
-		var numRows = Math.ceil(numSlots/numCols);
-		var slots = [];
-		var yOffset = this.blockSpacing;
-		for (var rowIdx=0; rowIdx<numRows; rowIdx++){
-			var row = [];
-			var blockX = startX + this.blockSpacing;
-			for (var colIdx=0; colIdx<numCols; colIdx++){
-				var pos = P(blockX, 0).track({pt:binPos, offset:{dy:-(yOffset+dims.dy)}, noTrack:'x'});
-				this.trackingPts.push(pos);
-				var isFull = false;
-				row.push(this.newSlot(isFull, pos, weightGroup.name, 'piston', rowIdx, colIdx));
-				blockX += dims.dx+this.blockSpacing;
-			}
-			slots.push(row);
-			yOffset += dims.dy+this.blockSpacing;
+	addWeights: function(weightGroups) {
+		for (var groupHandle in weightGroups) {
+			var weightGroup = weightGroups[groupHandle];
+			for (var weightIdx=0; weightIdx<weightGroup.count; weightIdx++){
+				weightGroup.weights.push(new DragWeights.Weight(P(300, 500), weightGroup.handle, '', weightId++);
+			}		
 		}
-		return slots;
-		
-	},
 
-	binIsFull: function(type, size){
-		var bin = this.bins[type][size];
-		var rows = bin.slots;
-		for (rowIdx=0; rowIdx<rows.length; rowIdx++){
-			var row = rows[rowIdx];
-			for (var colIdx=0; colIdx<row.length; colIdx++){
-				var slot = row[colIdx]
-				if(!slot.isFull){
-					return false;
-				}
-			}
 			
-		}
-		return true;
+	
 	},
-	binIsEmpty: function(type, size){
-		var bin = this.bins[type][size];
+
+
+
+
+
+//four below are potentially handy external functions
+	binIsEmpty: function(type, handle){
+		var bin = this.bins[type][handle];
 		var rows = bin.slots;
 		for (rowIdx=0; rowIdx<rows.length; rowIdx++){
 			var row = rows[rowIdx];
@@ -207,16 +168,8 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		}
 		return true;			
 	},
-	allEmpty: function(type){
-		var allEmpty = new Boolean();
-		allEmpty = true;
-		for (var binName in this.bins[type]){
-			allEmpty = Math.min(allEmpty, this.binIsEmpty(type, binName));
-		}
-		return allEmpty;
-	},
-	weightCount: function(type, size){
-		var bin = this.bins[type][size];
+	weightCount: function(type, handle){
+		var bin = this.bins[type][handle];
 		var rows = bin.slots;
 		var count = 0;
 		for (rowIdx=0; rowIdx<rows.length; rowIdx++){
@@ -228,6 +181,28 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 			
 		}
 		return count;
+	},
+	binIsFull: function(type, handle){
+		var bin = this.bins[type][handle];
+		var rows = bin.slots;
+		for (rowIdx=0; rowIdx<rows.length; rowIdx++){
+			var row = rows[rowIdx];
+			for (var colIdx=0; colIdx<row.length; colIdx++){
+				var slot = row[colIdx]
+				if (!slot.isFull) {
+					return false;
+				}
+			}
+			
+		}
+		return true;
+	},
+	allEmpty: function(type){
+		var allEmpty = true;
+		for (var binHandle in this.bins[type]){
+			allEmpty = Math.min(allEmpty, this.binIsEmpty(type, binHandle));
+		}
+		return allEmpty;
 	},
 	getPistonMass: function(){
 		var totalMass=0;
@@ -493,7 +468,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	},
 	isOnTop: function(weight){
 		var slot = weight.slot;
-		var bin = this.bins[slot.type][weight.name]
+		var bin = this.bins[slot.type][weight.groupHandle]
 		var colIdx = slot.col;
 		for (var rowIdx=slot.row+1; rowIdx<bin.slots.length; rowIdx++){
 			var curSlot = bin.slots[rowIdx][colIdx]
@@ -525,16 +500,30 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 })
 
 
-DragWeights.Bins = function(dragWeights, wall, weightGroups, storeBinSpacing, pistonBinSpacing, blockSpacing, pistonPt, storeBinWidth, pistonBinWidth, storeBinY) {
-	this.piston = this.makePistonBins(  );
+DragWeights.Bins = function(dragWeights, wall, weightGroups, storeBinSpacing, pistonBinSpacing, blockSpacing, pistonOffset, pistonPt, storeBinWidth, pistonBinWidth, storeBinY) {
+	
+	this.piston = this.makePistonBins(dragWeights, wall, weightGroups, pistonBinWidth, pistonBinSpacing, pistonOffset, pistonPt);
+	
 	this.store = this.makeStoreBins(wall, weightGroups, storeBinWidth, storeBinSpacing, storeBinY);
 }
 
 DragWeights.Bins.prototype = {
-	makeStoreBins: function(wall, weightGroups, binWidth, binSpacing, binY) {
-		var center = (this.wall[0].x + this.wall[1].x) / 2;
+	makePistonBins: function(dragWeights, wall, weightGroups, binWidth, binSpacing, pistonOffset, pistonPt) {
+		var center = (wall[0].x + wall[1].x)/2;
 		var bins = {};
-		var numGroups = countAttrs(this.weightGroups);
+		var numGroups = countAttrs(weightGroups);
+		var posX = center - binWidth*(numGroups-1)/2 - binSpacing*(numGroups-1)/2;
+		for (var groupName in weightGroups){
+			var weightGroup = weightGroups[groupName];
+			bins[groupName] = new DragWeights.PistonBin(dragWeights, posX, weightGroup, pistonOffset, binWidth, blockSpacing, pistonPt);//this.makePistonBin(posX, weightGroup);
+			posX += binWidth + binSpacing;
+		}
+		return bins;		
+	},
+	makeStoreBins: function(wall, weightGroups, binWidth, binSpacing, binY) {
+		var center = (wall[0].x + wall[1].x) / 2;
+		var bins = {};
+		var numGroups = countAttrs(weightGroups);
 		var posX = center - binWidth * (numGroups - 1) / 2 - binSpacing * (numGroups - 1) / 2;
 		for (var groupHandle in weightGroups) {
 			var weightGroup = weightGroups[groupHandle];
@@ -544,6 +533,19 @@ DragWeights.Bins.prototype = {
 	
 }
 
+	// makePistonBins: function(){
+
+		// var center = (this.wall[0].x + this.wall[1].x)/2;
+		// var bins = {};
+		// var numGroups = countAttrs(this.weightGroups);
+		// var posX = center - this.pistonBinWidth*(numGroups-1)/2 - this.pistonBinSpacing*(numGroups-1)/2;
+		// for (var groupName in this.weightGroups){
+			// var weightGroup = this.weightGroups[groupName];
+			// bins[groupName] = new DragWeights.PistonBin(this, posX, weightGroup, this.pistonOffset, this.pistonBinWidth, this.blockSpacing, this.pistonPt);//this.makePistonBin(posX, weightGroup);
+			// posX+=this.pistonBinWidth + this.pistonBinSpacing;
+		// }
+		// return bins;	
+	// },
 
 
 	// makeStoreBins: function(){
@@ -567,19 +569,6 @@ DragWeights.Bins.prototype = {
 		// bin.visible = true;
 		// return bin;
 	// },
-	// makePistonBins: function(){
-
-		// var center = (this.wall[0].x + this.wall[1].x)/2;
-		// var bins = {};
-		// var numGroups = countAttrs(this.weightGroups);
-		// var posX = center - this.pistonBinWidth*(numGroups-1)/2 - this.pistonBinSpacing*(numGroups-1)/2;
-		// for (var groupName in this.weightGroups){
-			// var weightGroup = this.weightGroups[groupName];
-			// bins[groupName] = new DragWeights.PistonBin(this, posX, weightGroup, this.pistonOffset, this.pistonBinWidth, this.blockSpacing, this.pistonPt);//this.makePistonBin(posX, weightGroup);
-			// posX+=this.pistonBinWidth + this.pistonBinSpacing;
-		// }
-		// return bins;	
-	// },
 	// makePistonBin: function(posX, weightGroup){
 		// var bin = {};
 		// if (this.pistonOffset) {
@@ -594,12 +583,13 @@ DragWeights.Bins.prototype = {
 		// return bin
 	// },
 
-DragWeights.WeightGroup = function(handle, pressure, mass, dims) {
+DragWeights.WeightGroup = function(handle, pressure, mass, dims, count) {
 	this.handle = handle
 	this.pressure = pressure;
 	this.mass = mass;
 	this.dims = dims;
 	this.weights = [];
+	this.count = count;
 }
 
 DragWeights.Weight = function(pos, groupHandle, status, weightId) {
@@ -607,32 +597,56 @@ DragWeights.Weight = function(pos, groupHandle, status, weightId) {
 	this.groupHandle = groupHandle;
 	this.status = status;
 	this.id = weightId;
+	this.cameFrom;
+	this.origPos;
 }
 
 DragWeights.PistonBin = function(dragWeights, posX, weightGroup, pistonOffset, binWidth, blockSpacing, pistonPt) {
-		this.pos;
-		
-		if (this.pistonOffset) {
-			var xOffset = pistonOffset.dx
-			bin.pos = P(posX - binWidth/2, 0).movePt({dx:xOffset}).track({pt:pistonPt, noTrack:'x', offset:{dy: pistonOffset.dy}});
-		} else {
-			bin.pos = P(posX - binWidth/2, 0).track({pt: pistonPt, noTrack:'x'});
-		}
-		dragWeights.trackingPts.push(bin.pos);
-		bin.slots = this.getSlots(bin.pos, weightGroup);
-		bin.visible = false;
-		return bin
+	this.pos;
+	
+	if (this.pistonOffset) {
+		var xOffset = pistonOffset.dx
+		this.pos = P(posX - binWidth/2, 0).movePt({dx:xOffset}).track({pt:pistonPt, noTrack:'x', offset:{dy: pistonOffset.dy}});
+	} else {
+		this.pos = P(posX - binWidth/2, 0).track({pt: pistonPt, noTrack:'x'});
+	}
+	dragWeights.trackingPts.push(this.pos);
+	this.slots = this.getSlots(dragWeights this.pos, weightGroup, binWidth, blockSpacing);
+	this.visible = false;
 }
 
 DragWeights.PistonBin.prototype = {
-	getSlots: function(  ) {
-	
-	}
+	getSlots: function(dragWeights, pos, weightGroup, binWidth, blockSpacing) {
+		var numSlots = weightGroup.weights.length;
+		var dims = weightGroup.dims;
+		var numCols = Math.floor(binWidth/(dims.dx + blockSpacing));
+		var usedWidth = numCols * (dims.dx + blockSpacing);
+		var unusedWidth = binWidth-usedWidth;
+		startX = binPos.x + unusedWidth/2;
+		var numRows = Math.ceil(numSlots/numCols);
+		var slots = [];
+		var yOffset = blockSpacing;
+		for (var rowIdx=0; rowIdx<numRows; rowIdx++){
+			var row = [];
+			var blockX = startX + blockSpacing;
+			for (var colIdx=0; colIdx<numCols; colIdx++){
+				var pos = P(blockX, 0).track({pt:binPos, offset:{dy:-(yOffset+dims.dy)}, noTrack:'x'});
+				dragWeights.trackingPts.push(pos);
+				row.push(new DragWeights.Slot(false, pos, weightGroup.handle, 'piston', rowIdx, colIdx));
+				blockX += dims.dx + blockSpacing;
+			}
+			slots.push(row);
+			yOffset += dims.dy + blockSpacing;
+		}
+		return slots;
+		
+	},	
 }
 
 DragWeights.StoreBin = function(pos, bins, binWidth, blockSpacing) {
 	this.pos = pos;
 	this.slots = this.getSlots(pos, binWidth, blockSpacing);
+	this.visible = true;
 }
 
 DragWeights.StoreBin.prototype = {
@@ -650,7 +664,7 @@ DragWeights.StoreBin.prototype = {
 			var row = [];
 			var x = pt.x + blockSpacing;
 			for (var colIdx=0; colIdx<numCols; colIdx++){
-				row.push(new DragWeights.Slot(false, P(x, y), weightGroup.name, 'store', rowIdx, colIdx));
+				row.push(new DragWeights.Slot(false, P(x, y), weightGroup.handle, 'store', rowIdx, colIdx));
 				x += dims.dx+this.blockSpacing;
 			}
 			slots.push(row);
