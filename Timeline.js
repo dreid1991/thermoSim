@@ -742,6 +742,16 @@ Timeline.Section.prototype = {
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
 			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');			
 		}
+		
+		if (prompt.noReset === true || prompt.noRefresh === true) {
+			id = timeline.takeNumber();
+			spawnFunc = function() {$('#resetExp').hide()};
+			removeFunc = function() {$('#resetExp').show()};
+			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
+			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
+			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');
+		}
+		
 		var arrangeHTMLSpawn = function() {
 			interpreter.renderMath();
 			section.buttonManager.arrangeGroupWrappers();
@@ -767,6 +777,7 @@ Timeline.Section.prototype = {
 			this.applySpanToMoments(timeline, moments, elems, sceneData.graphs, 'objs', timestamp, Timeline.stateFuncs.graphs.spawn, Timeline.stateFuncs.graphs.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.rxns, 'objs', timestamp, Timeline.stateFuncs.rxns.spawn, Timeline.stateFuncs.rxns.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.buttonGroups, 'objs', timestamp, Timeline.stateFuncs.buttonGrps.spawn, Timeline.stateFuncs.buttonGrps.remove);
+			
 			this.applyCmmdsToMoments(timeline, moments, elems, sceneData.cmmds, 'cmmds', timestamp);
 
 		}

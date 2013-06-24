@@ -102,7 +102,8 @@ LevelData = {
 							storeAs: 'Ans1'
 						}
 					],
-					title: 'Current Step'		
+					title: 'Current Step',
+					noRefresh: true
 				},
 				{
 					sceneData: undefined,

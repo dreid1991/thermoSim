@@ -152,7 +152,7 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 			var row = rows[rowIdx];
 			for (var colIdx=0; colIdx<row.length; colIdx++){
 				var slot = row[colIdx]
-				if(slot.isFull){
+				if (slot.isFull) {
 					return false;
 				}
 			}
@@ -542,8 +542,8 @@ DragWeights.Weight = function(pos, groupHandle, status, weightId) {
 	this.groupHandle = groupHandle;
 	this.status = status;
 	this.id = weightId;
-	this.cameFrom;
-	this.origPos;
+	this.cameFrom = undefined;
+	this.origPos = undefined;
 }
 
 DragWeights.PistonBin = function(dragWeights, posX, weightGroup, pistonOffset, binWidth, blockSpacing, pistonPt, dims, binSlant, thickness) {
