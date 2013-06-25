@@ -16,10 +16,13 @@ Copyright (C) 2013  Daniel Reid
 */
 
 // rxnCnts = {aa: 0, ab: 0, bb: 0};
-//this is a change to test pull requests
-function ReactionHandler(collide, rxns, activeRxns, pausedRxns) {
+
+function ReactionHandler(collide, dotManager, rxns, tConst, activeRxns, pausedRxns) {
 	this.collide = collide;
+	this.dotManager = dotManager;
+	this.tConst = tConst
 	this.rxns = rxns;
+	this.spcs = undefined; //set in collide's setSpcs func
 	this.activeRxns = activeRxns;
 	this.pausedRxns = pausedRxns;
 }
@@ -257,8 +260,8 @@ ReactionHandler.Reaction = function(attrs) { //prods as {name1: count, name2, co
 		this.parent = attrs.parent;
 		this.rctA = attrs.rctA || attrs.rctB; //spcName
 		this.rctB = attrs.rctA && attrs.rctB ? attrs.rctB : undefined; //spcName
-		this.rctADef = this.parent.collide.spcs[this.rctA];
-		this.rctBDef = this.parent.collide.spcs[this.rctB];
+		this.rctADef = this.parent.spcs[this.rctA];
+		this.rctBDef = this.parent.spcs[this.rctB];
 		this.activeE = attrs.activeE * 1000 / N; // in joules of collision
 		//this.hRxn = attrs.hRxn * 1000 / N; //only used if hRxn fixed
 		
@@ -267,7 +270,7 @@ ReactionHandler.Reaction = function(attrs) { //prods as {name1: count, name2, co
 		
 		this.prods = this.reformatProds(attrs.prods);
 		this.prodCount = this.countProds(this.prods);
-		this.sRxn298 = this.calcSRxn([new ReactionHandler.ReactionComponent(this.rctA, 1), new ReactionHandler.ReactionComponent(this.rctB, 1)], this.prods, this.parent.collide.spcs); 
+		this.sRxn298 = this.calcSRxn([new ReactionHandler.ReactionComponent(this.rctA, 1), new ReactionHandler.ReactionComponent(this.rctB, 1)], this.prods, this.parent.spcs); 
 
 	},
 
