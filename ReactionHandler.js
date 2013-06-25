@@ -17,7 +17,14 @@ Copyright (C) 2013  Daniel Reid
 
 // rxnCnts = {aa: 0, ab: 0, bb: 0};
 
-ReactionHandler = {
+function ReactionHandler(collide, rxns, activeRxns, pausedRxns) {
+	this.collide = collide;
+	this.rxns = rxns;
+	this.activeRxns = activeRxns;
+	this.pausedRxns = pausedRxns;
+}
+
+ReactionHandler.prototype = {
 	addReaction: function(attrs){ //rctA, rctB, hRxn, activeE, prods)
 		attrs.parent = this;
 		var rxn = new ReactionHandler.Reaction(attrs);
@@ -55,7 +62,7 @@ ReactionHandler = {
 			}
 			if (removedRxn) {
 				if (spcRxns.length == 0) {
-					this.setHandlerByIdStr(rxnId, {func:this.impactStd, obj:this})
+					this.collide.setHandlerByIdStr(rxnId, {func:this.collide.impactStd, obj:this.collide})
 				} else if (spcRxns.length ==1) {
 					var rxn = spcRxns[0];
 					this.initPair(rxn, true);
@@ -81,25 +88,23 @@ ReactionHandler = {
 	},
 	
 	removeAllReactions: function(){
-		this.setDefaultHandler({func:this.impactStd, obj:this});
+		this.setDefaultHandler({func:this.collide.impactStd, obj:this});
 	},
-	getIdStr: function(defA, defB) {
-		return defA.idNum < defB.idNum ? defA.idNum + '-' + defB.idNum : defB.idNum + '-' + defA.idNum;
-	},
+
 	//end public
 	initPair: function(rxn) {
 		//rctA, rctB, rctDefA, rctDefB, activeTemp, hRxn, prods
 		
-		var idStr = this.getIdStr(rxn.rctADef, rxn.rctBDef);
+		var idStr = this.collide.getIdStr(rxn.rctADef, rxn.rctBDef);
 		
 		this.rxns[idStr] ? this.rxns[idStr].push(rxn) : this.rxns[idStr] = [rxn];
 		
 		var isMultiple = this.rxns[idStr].length > 1;
 
 		if (isMultiple) {
-			this.setHandler(rxn.rctA, rxn.rctB, {func:this.rctHandlerMultPairs(idStr), obj:this});
+			this.collide.setHandler(rxn.rctA, rxn.rctB, {func:this.rctHandlerMultPairs(idStr), obj:this});
 		} else {
-			this.setHandler(rxn.rctA, rxn.rctB, {func:this.rctHandlerSinglePair(idStr), obj:this});
+			this.collide.setHandler(rxn.rctA, rxn.rctB, {func:this.rctHandlerSinglePair(idStr), obj:this});
 		}	
 	},
 	countProds: function(prods) {
@@ -133,6 +138,7 @@ and it just so happens, it works!  Maybe I've stumbled upon the probability shap
 	rctHandlerSinglePair: function(idStr) {
 		var rxn = this.rxns[idStr][0];
 		var activeE = rxn.activeE;
+		var collide = this.collide;
 		var prods = rxn.prods;
 		return function(a, b, UVAB, perpAB, perpBA) {
 			// if (a.spcName == 'ugly' && b.spcName == 'ugly') {
@@ -147,18 +153,18 @@ and it just so happens, it works!  Maybe I've stumbled upon the probability shap
 			var hitE = this.hitE(a, b, perpAB, -perpBA);
 			if (Math.random() < this.probFunc(hitE, activeE, rxn.sRxn298)) {
 				if (!this.react(a, b, prods)) {
-					return this.impactStd(a, b, UVAB, perpAB, perpBA);
+					return collide.impactStd(a, b, UVAB, perpAB, perpBA);
 				}
 				return false;
 			}
-			return this.impactStd(a, b, UVAB, perpAB, perpBA);
+			return collide.impactStd(a, b, UVAB, perpAB, perpBA);
 		
 		};
 		
 	},
 	rctHandlerMultPairs: function(idStr) {
 		var rxns = this.rxns[idStr];
-		
+		var collide = this.collide;
 		return function(a, b, UVAB, perpAB, perpBA) {
 			// if (a.spcName == 'ugly' && b.spcName == 'ugly') {
 				// rxnCnts.aa++;
@@ -181,9 +187,9 @@ and it just so happens, it works!  Maybe I've stumbled upon the probability shap
 			var rxnIdx = this.pickRxnIdx(probs, normalFact);
 			
 			if (rxnIdx===false) {
-				return this.impactStd(a, b, UVAB, perpAB, perpBA);
+				return collide.impactStd(a, b, UVAB, perpAB, perpBA);
 			} else if (!this.react(a, b, rxns[rxnIdx].prods)){
-				return this.impactStd(a, b, UVAB, perpAB, perpBA);
+				return collide.impactStd(a, b, UVAB, perpAB, perpBA);
 			} else {
 				return false;
 			}
@@ -251,8 +257,8 @@ ReactionHandler.Reaction = function(attrs) { //prods as {name1: count, name2, co
 		this.parent = attrs.parent;
 		this.rctA = attrs.rctA || attrs.rctB; //spcName
 		this.rctB = attrs.rctA && attrs.rctB ? attrs.rctB : undefined; //spcName
-		this.rctADef = this.parent.spcs[this.rctA];
-		this.rctBDef = this.parent.spcs[this.rctB];
+		this.rctADef = this.parent.collide.spcs[this.rctA];
+		this.rctBDef = this.parent.collide.spcs[this.rctB];
 		this.activeE = attrs.activeE * 1000 / N; // in joules of collision
 		//this.hRxn = attrs.hRxn * 1000 / N; //only used if hRxn fixed
 		
@@ -261,7 +267,7 @@ ReactionHandler.Reaction = function(attrs) { //prods as {name1: count, name2, co
 		
 		this.prods = this.reformatProds(attrs.prods);
 		this.prodCount = this.countProds(this.prods);
-		this.sRxn298 = this.calcSRxn([new ReactionHandler.ReactionComponent(this.rctA, 1), new ReactionHandler.ReactionComponent(this.rctB, 1)], this.prods, this.parent.spcs); 
+		this.sRxn298 = this.calcSRxn([new ReactionHandler.ReactionComponent(this.rctA, 1), new ReactionHandler.ReactionComponent(this.rctB, 1)], this.prods, this.parent.collide.spcs); 
 
 	},
 

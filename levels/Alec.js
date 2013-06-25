@@ -11,22 +11,22 @@ LevelData = {
 	],	
 
 	mainSequence: [
-		// {
-			// sceneData: undefined,
-			// prompts: [
-				// {
-					// cutScene: true,
-					// text: '<p>In these experiments, we will explore what makes a process irreversible and what makes a process reversible.</p><p>Before we get to the experiment, please first describe what you think the difference between an irreversible and a reversible process is.</p>',
-					// quiz:[
-						// {
-							// type: 'text',
-							// text: 'type your answer here',
-						// }
-					// ]
-				// },
-			// ],	
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
+					text: '<p>In these experiments, we will explore what makes a process irreversible and what makes a process reversible.</p><p>Before we get to the experiment, please first describe what you think the difference between an irreversible and a reversible process is.</p>',
+					quiz:[
+						{
+							type: 'text',
+							text: 'type your answer here',
+						}
+					]
+				},
+			],	
 			
-		// },
+		},
 		{
 			sceneData: {
 				walls: [
@@ -102,8 +102,7 @@ LevelData = {
 							storeAs: 'Ans1'
 						}
 					],
-					title: 'Current Step',
-					noRefresh: true
+					title: 'Current Step'		
 				},
 				{
 					sceneData: undefined,

@@ -3,7 +3,7 @@ LevelData = {
 	
 	spcDefs: [
 		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 30,sF298: 15, antoineCoeffs: {a: 8.07, b:1730.6, c: 233.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
-		{spcName: 'spc2', m: 4, r: 2, col: Col(0, 200, 0), cv: 2.5 * R, hF298: -11, hVap298: 10, sF298: 15, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 4.5* R, spcVolLiq: .3},
+		{spcName: 'spc2', m: 4, r: 2, col: Col(0, 200, 0), cv: 3.5 * R, hF298: -12, hVap298: 10, sF298: 15, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 4.5* R, spcVolLiq: .3},
 		{spcName: 'spc3', m: 3, r: 1, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10,sF298: 15, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3}
 	],
 	mainSequence: [
@@ -11,7 +11,8 @@ LevelData = {
 			sceneData: {//Scene 0
 			},
 			prompts:[ 
-				{sceneData: undefined,
+				{//Prompt 0
+				sceneData: undefined,
 							cutScene: true,
 							text:" The use of hypothetical paths relies upon state functions. Identify the distinguishing characteristic that makes something a state function.<p>",
 							quiz:[
@@ -21,7 +22,8 @@ LevelData = {
 									}
 								]	
 				},
-				{sceneData:
+				{//Prompt 1
+				sceneData:
 					{
 						objs: [
 							{type:'AuxImage',
@@ -33,7 +35,7 @@ LevelData = {
 						]
 					},
 					cutScene: true,
-					text: "Over spring break Dr. Koretsky hiked up Eagle’s Peak near San Francisco. The two routes he could take are seen to the left. How would the amounts of work required to complete the two routes compare? How would the potential energy change compare?<p>",
+					text: "Over spring break Dr. Koretsky hiked up Eagle's Peak near San Francisco. The two routes he could take are seen to the right. How would the amounts of work required to complete the two routes compare? How would the potential energy change compare?<p>",
 					quiz:[
 									{type: 'text',
 									storeAs:'2ndans',
@@ -58,10 +60,10 @@ LevelData = {
 					{handle: 'rxn2', rctA: 'spc2', rctB: 'spc2', activeE: 6, prods: {spc1:2}}
 				],
 				buttonGroups: [
-					{handle: 'hypoPath', label: 'hypPath', prefIdx: 1, isRadio: true,
+					{handle: 'hypoPath', label: 'Reaction', prefIdx: 1, isRadio: true,
 						buttons: [
-							{handle: 'rxn1go', label: 'Enable RXN', exprs: ['collide.enableRxn("rxn1")','collide.enableRxn("rxn2")']},
-							{handle: 'rxn1stop', label: 'Disable RXN', isDown: true, exprs: ['collide.disableRxn("rxn1")','collide.disableRxn("rxn2")']}
+							{handle: 'rxn1go', label: 'Enable RXN', exprs: ['collide.rxnHandler.enableRxn("rxn1")','collide.rxnHandler.enableRxn("rxn2")']},
+							{handle: 'rxn1stop', label: 'Disable RXN', isDown: true, exprs: ['collide.rxnHandler.disableRxn("rxn1")','collide.rxnHandler.disableRxn("rxn2")']}
 						]
 					}
 				],
@@ -79,7 +81,8 @@ LevelData = {
 				]
 			},
 			prompts: [
-				{sceneData: 
+				{//Prompt 0
+				sceneData: 
 					{
 						graphs: [
 							{type: 'Scatter', handle: 'molFracVsTime', xLabel: "Time (s)", yLabel: "Extent of rxn", axesInit:{x:{min:0, step:1},y:{min:0, step:0.2}}, numGridLines: {y:6}, axesFixed:{y: true},
@@ -101,33 +104,35 @@ LevelData = {
 							}
 						]
 				},
-				{sceneData: undefined,
+				{//Prompt 1
+				sceneData: undefined,
 					cutScene: true,
-					text: "We can use hypothetical paths to calculate physical properties at states where data is unavailable.  In this case, we don't have the enthalpy of reaction at 500 K, but we have the following data:<p> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A</td><td>2.5*R</td></tr><tr><td>B</td><td>3.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>60</td></tr></table></p></center>An enthalpy of reaction is the energy change/released for the reaction going to full conversion at constant pressure.  For example, in a reaction of A##\\rightarrow##B, the enthalpy of reaction would describe the heat released after consuming one mole of A at constant pressure.  If the reaction were 2A##\\rightarrow##B, the enthalpy of reaction would describe the heat released after consuming two moles of A at constant pressure."
+					text: "We can use hypothetical paths to calculate physical properties at states where data is unavailable.  In this case, we don't have the enthalpy of reaction at 500 K, but we have the following data:<p> <center><table class= 'data'><tr><th>Species</th><th>##c_{v}##(J/mol-K)</th></tr><tr><td>A</td><td>2.5*R</td></tr><tr><td>B</td><td>3.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center>An enthalpy of reaction is the energy change/released for the reaction going to full conversion at constant pressure.  For example, in a reaction of A##\\rightarrow##B, the enthalpy of reaction would describe the heat released after consuming one mole of A at constant pressure.  If the reaction were 2A##\\rightarrow##B, the enthalpy of reaction would describe the heat released after consuming two moles of A at constant pressure."
 				},
-				{sceneData: undefined,
+				{//Prompt 2
+				sceneData: undefined,
 					cutScene: true,
-					text: "<center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A</td><td>2.5*R</td></tr><tr><td>B</td><td>3.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>60</td></tr></table></p></center> <p> Using this data, construct a hypothetical path that will allow you to calculate the enthalpy of reaction for the previous process.  Calculate the enthalpy change for each step in your hypothetical path and record the values on a separate sheet of paper. <p> the process is: <p> 1 mole A (500 K)##\\rightarrow## 1 mole B (500 K)"
+					text: "<center><table class= 'data'><tr><th>Species</th><th>##c_{v}##(J/mol-K)</th></tr><tr><td>A</td><td>2.5*R</td></tr><tr><td>B</td><td>3.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center> <p> Using this data, construct a hypothetical path that will allow you to calculate the enthalpy of reaction for the previous process.  Calculate the enthalpy change for each step in your hypothetical path and record the values on a separate sheet of paper. <p> the process is: <p> 1 mole A (500 K)##\\rightarrow## 1 mole B (500 K)"
 				}
 			]
 		},
 		{//Third Scene
 			sceneData: {//Scene2
 				walls: [
-					{pts: [P(40,30), P(510,30), P(510,400), P(40,400)], handler: 'cVIsothermal', handle: 'secondWall', temp: 500, border: {type: 'open'},},
+					{pts: [P(40,30), P(510,30), P(510,400), P(40,400)], handler: 'cVIsothermal', isothermalRate: 3, handle: 'secondWall', temp: 500, border: {type: 'open'},},
 				],
 				dots: [
 					{spcName: 'spc1', pos: P(55, 75), dims: V(400,300), count: 1000, temp: 500, returnTo: 'secondWall', tag: 'secondWall'},
 				],
 				rxns: [
 					{handle: 'rxn1', rctA: 'spc1',rctB: 'spc1', activeE: 3, prods: {spc2:2}},
-					{handle: 'rxn2', rctA: 'spc1', rctB: 'spc2', activeE: 3, prods: {spc2:2}}
+					{handle: 'rxn2', rctA: 'spc1', rctB: 'spc2', activeE: 2, prods: {spc2:2}}
 				],
 				buttonGroups: [
 					{handle: 'Reaction', label: 'Reaction', prefIdx: 1, isRadio: true,
 						buttons: [
-							{handle: 'rxn1go', label: 'Enable RXN', exprs: ['collide.enableRxn("rxn1")']},
-							{handle: 'rxn1stop', label: 'Disable RXN', isDown: true, exprs: ['collide.disableRxn("rxn1")']},
+							{handle: 'rxn1go', label: 'Enable RXN', exprs: ['collide.rxnHandler.enableRxn("rxn1")']},
+							{handle: 'rxn1stop', label: 'Disable RXN', isDown: true, exprs: ['collide.rxnHandler.disableRxn("rxn1")']},
 						]
 					},
 					{handle: 'Heat', label: 'Heat', prefIdx: 1, isRadio: true,
@@ -159,7 +164,7 @@ LevelData = {
 				graphs: [
 							{type: 'Scatter', handle: 'EnthalpyFracVsTemp', xLabel: "Extent of rxn", yLabel: "Enthalpy", axesInit:{y:{min:110, step:10},x:{min:0, step:0.2}}, numGridLines: {x:6}, axesFixed:{x: true},
 								sets: [
-									{handle: 'moleFrac', label:'mole\nFrac', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '(enthalpy("secondWall") + 11500) / 40',x: 'frac("secondWall",{spcName:"spc2",tag: "secondWall"})'},trace: true, fillInPts: true, fillInPtsMin: 5}
+									{handle: 'moleFrac', label:'mole\nFrac', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '(enthalpy("secondWall") + 11500) / 1000',x: 'frac("secondWall",{spcName:"spc2",tag: "secondWall"})'},trace: true, fillInPts: true, fillInPtsMin: 5}
 								]
 							},
 							{type: 'Scatter', handle: 'convVsTemp', xLabel: "Extent of rxn", yLabel: "Temperature", axesInit:{y:{min:200, step:80},x:{min:0, step:0.2}}, numGridLines: {x:6}, axesFixed:{x: true},
@@ -170,59 +175,63 @@ LevelData = {
 						],
 			},
 			prompts: [
-				{sceneData: {
+				{//Prompt 0
+				sceneData: {
 						triggers:[
 							{handle: 'hypPath1', expr: 'fracDiff(temp("secondWall"),298)<.01', message:"What should the temperature be at the end of your first step?"}
 						]
 					},
-				text:"Now we're going to carry out your hypothetical path.  Above is species A in the same initial state as the previous system.  You can use the buttons to the right to set whether the system is isothermal and whether the reaction occurs.  For this hypothetical process, the activation energy has been lowered so the reaction proceeds at 298 K and the reverse reaction has been disabled. <p> Take the first step in your hypothetical path. How does the enthalpy change compare to the value you calculated?",
-				quiz: [
-					{type: 'text',
-					storeAs: 'hypAns1',
-					text: 'Type your answer here'
-					}
-				]
+					text:"Now we're going to carry out your hypothetical path.  Above is species A in the same initial state as the previous system.  You can use the buttons to the right to set whether the system is isothermal and whether the reaction occurs.  For this hypothetical process, the activation energy has been lowered so the reaction proceeds at 298 K and the reverse reaction has been disabled. <p> Take the first step in your hypothetical path. How does the enthalpy change compare to the value you calculated?",
+					quiz: [
+						{type: 'text',
+						storeAs: 'hypAns1',
+						text: 'Type your answer here'
+						}
+					]
 				},
-				{sceneData: {
-						triggers:[
-							{handle:'hypPath2', expr: 'frac("secondWall", {tag:"secondWall", spcName:"spc2"})==1', message: "What should the extent of reaction be after the second step in your hypothetical path?", priority: 1}
-						]
-					},
-				text: "Take the next step in your hypothetical path.  How does the enthalpy change of this step compare to the value you calculated?   <p>If you are reacting, you may want to have the system be isothermal at this step to make sure the enthalpy of reaction is equal to the tabulated value.",
-				quiz: [
-					{type: 'text',
-					storeAs: 'hypAns2',
-					text: 'Type your answer here'
-					}
-				]
+				{//Prompt 1
+				sceneData: {
+					triggers:[
+						{handle:'hypPath2', expr: 'frac("secondWall", {tag:"secondWall", spcName:"spc2"})==1', message: "What should the extent of reaction be after the second step in your hypothetical path?", priority: 1}
+					]
 				},
-				{sceneData: {
-						triggers: [
-						{handle: 'hypPath1', expr: 'fracDiff(temp("secondWall"),500)<.01', message:"What should the temperature be at the end of your hypothetical path?"}
-						]
-					},
-				text: "Take the final step in your hypothetical path. Input the enthalpy change.",
-				quiz:[
-					{type: 'text',
-					storeAs: 'hypAns3',
-					text: 'Type your answer here'
-					}
-				]
+					text: "Take the next step in your hypothetical path.  How does the enthalpy change of this step compare to the value you calculated?   <p>If you are reacting, you may want to have the system be isothermal at this step to make sure the enthalpy of reaction is equal to the tabulated value.",
+					quiz: [
+						{type: 'text',
+						storeAs: 'hypAns2',
+						text: 'Type your answer here'
+						}
+					]
 				},
-				{sceneData: undefined,
-				cutScene: true,
-				text: "How does the enthalpy change of the process compare to the value you predicted?  Can you explain any differences?",
-				quiz:[
-					{type: 'text',
-					storeAs: 'hypAns4',
-					text: 'Type your answer here'
-					}
-				]
+				{//Prompt 2
+				sceneData: {
+					triggers: [
+					{handle: 'hypPath1', expr: 'fracDiff(temp("secondWall"),500)<.01', message:"What should the temperature be at the end of your hypothetical path?"}
+					]
+				},
+					text: "Take the final step in your hypothetical path. Input the enthalpy change.",
+					quiz:[
+						{type: 'text',
+						storeAs: 'hypAns3',
+						text: 'Type your answer here'
+						}
+					]
+				},
+				{//Prompt 3
+				sceneData: undefined,
+					cutScene: true,
+					text: "How does the enthalpy change of the process compare to the value you predicted?  Can you explain any differences?",
+					quiz:[
+						{type: 'text',
+						storeAs: 'hypAns4',
+						text: 'Type your answer here'
+						}
+					]
 				}
 			]
 		},
 		{//Fourth Scene
-			sceneData: {//Scene1
+			sceneData: {//Scene 3
 				walls: [
 					{pts: [P(40,30), P(510,30), P(510,400), P(40,400)], handler: 'cVIsothermal', temp: 500, handle: 'thirdWall', border: {type: 'open'},},
 				],
@@ -234,10 +243,10 @@ LevelData = {
 					{handle: 'rxn2', rctA: 'spc2', rctB: 'spc2', activeE: 6, prods: {spc1:2}}
 				],
 				buttonGroups: [
-					{handle: 'hypoPath', label: 'hypPath', prefIdx: 1, isRadio: true,
+					{handle: 'hypoPath', label: 'Reaction ', prefIdx: 1, isRadio: true,
 						buttons: [
-							{handle: 'rxn1go', label: 'Enable RXN', exprs: ['collide.enableRxn("rxn1")','collide.enableRxn("rxn2")']},
-							{handle: 'rxn1stop', label: 'Disable RXN', isDown: true, exprs: ['collide.disableRxn("rxn1")','collide.disableRxn("rxn2")']}
+							{handle: 'rxn1go', label: 'Enable RXN', exprs: ['collide.rxnHandler.enableRxn("rxn1")','collide.rxnHandler.enableRxn("rxn2")']},
+							{handle: 'rxn1stop', label: 'Disable RXN', isDown: true, exprs: ['collide.rxnHandler.disableRxn("rxn1")','collide.rxnHandler.disableRxn("rxn2")']}
 						]
 					}
 				],
@@ -255,21 +264,33 @@ LevelData = {
 				]
 			},
 			prompts: [
-				{sceneData:undefined,
-				cutscene: true,
-				text: "Now that we know the enthalpy of reaction at 500 K, perform the experiment and calculate the amount of heat that will be released during the process.",
-				quiz: [
-					{type: 'textSmall',
-					storeAs: 'finalAns',
-					text: ' ',
-					units: 'kJ'
-					}
-				]
-				},
-				{sceneData: undefined,
-				text: "hey"
+				{//Prompt 0
+					sceneData:{
+						triggers: [
+								{handle: 'lastReaction', expr: 'frac("thirdWall", {tag:"thirdWall", spcName:"spc2"})>0.5', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 
+							]
+					},
+						cutscene: true,
+						text: "Now that we know the enthalpy of reaction at 500 K, perform the experiment and calculate the amount of heat that will be released during the process.",
+						quiz: [
+							{type: 'textSmall',
+							storeAs: 'finalAns',
+							text: ' ',
+							units: 'kJ'
+							}
+						]
 				}
 			]
+		},
+		{//Prompt 1
+			sceneData: undefined,
+				prompts: [
+					{
+						cutScene: true,
+						title: '',
+						text: 'You have completed the simulation.'
+					}
+				]
 		}
 	]
 }

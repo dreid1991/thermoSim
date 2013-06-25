@@ -1033,7 +1033,7 @@ Timeline.stateFuncs = {
 	},
 	rxns: {
 		spawn: function(section, elems, id, rxnDatum) {
-			var rxn = section.collide.addReaction(rxnDatum);
+			var rxn = section.collide.rxnHandler.addReaction(rxnDatum);
 			elems[id] = rxn;
 		},
 		remove: function(section, elems, id) {

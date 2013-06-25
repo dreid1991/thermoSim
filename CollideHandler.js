@@ -27,15 +27,15 @@ function CollideHandler(dotManager){
 	this.breakUpStore = this.breakUp;
 	this.recordingHits = false;
 	this.recordCleanUpListenerName = 'recordCollideHits';
+	this.rxnHandler = new ReactionHandler(this, this.rxns, this.activeRxns, this.pausedRxns);
 	
 }
-_.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
+_.extend(CollideHandler.prototype, toInherit.gridder, {
 	setSpcs: function(spcs) {
 		this.spcs = spcs;
 		this.setDefaultHandler({func: this.impactStd, obj: this}, this.spcs);
 		this.setup(this.spcs);
 	},
-	
 	setDefaultHandler: function(handler, spcs){
 		var numSpcs = countAttrs(spcs);
 		for (var i=0; i<numSpcs; i++){
@@ -45,6 +45,9 @@ _.extend(CollideHandler.prototype, ReactionHandler, toInherit.gridder, {
 			}
 		}
 	
+	},
+	getIdStr: function(defA, defB) {
+		return defA.idNum < defB.idNum ? defA.idNum + '-' + defB.idNum : defB.idNum + '-' + defA.idNum;
 	},
 	setHandler: function(aName, bName, handler){
 		var idStr = this.getIdStr(this.spcs[aName], this.spcs[bName]);

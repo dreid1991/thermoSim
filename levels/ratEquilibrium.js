@@ -96,10 +96,10 @@ LevelData = {
 						// {handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}
 					// ]},
 					{handle: 'rxnControl', label: 'Rxn control', isRadio: true, buttons: [
-						{groupHandle: 'rxnControl', handle: 'rxn1On', isRadio: true, label: 'Enable reaction', exprs: ['collide.enableRxn("rxn1")']},
-						{groupHandle: 'rxnControl', handle: 'rxn1Off', isRadio: true, label: 'Disable reaction', isDown: true, exprs: ['collide.disableRxn("rxn1")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.enableRxn("rxn2")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.disableRxn("rxn2")']}
+						{groupHandle: 'rxnControl', handle: 'rxn1On', isRadio: true, label: 'Enable reaction', exprs: ['collide.rxnHandler.enableRxn("rxn1")']},
+						{groupHandle: 'rxnControl', handle: 'rxn1Off', isRadio: true, label: 'Disable reaction', isDown: true, exprs: ['collide.rxnHandler.disableRxn("rxn1")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.rxnHandler.enableRxn("rxn2")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.rxnHandler.disableRxn("rxn2")']}
 					]}
 				],
 				// cmmds: [
@@ -241,10 +241,10 @@ LevelData = {
 						// {handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}
 					// ]},
 					{handle: 'rxnControl', label: 'Rxn control', isRadio: true, buttons: [
-						{groupHandle: 'rxnControl', handle: 'rxn1On', isDown: true, label: 'Forward on', exprs: ['collide.enableRxn("rxn1")']},
-						{groupHandle: 'rxnControl', handle: 'rxn1Off', label: 'Forward off', exprs: ['collide.disableRxn("rxn1")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.enableRxn("rxn2")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.disableRxn("rxn2")']}
+						{groupHandle: 'rxnControl', handle: 'rxn1On', isRadio: true, label: 'Enable reaction', exprs: ['collide.rxnHandler.enableRxn("rxn1")']},
+						{groupHandle: 'rxnControl', handle: 'rxn1Off', isRadio: true, label: 'Disable reaction', isDown: true, exprs: ['collide.rxnHandler.disableRxn("rxn1")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.rxnHandler.enableRxn("rxn2")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.rxnHandler.disableRxn("rxn2")']}
 					]}
 				],
 				// cmmds: [
@@ -406,10 +406,10 @@ LevelData = {
 						// {handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}
 					// ]},
 					// {handle: 'rxnControl', label: 'Rxn control', isRadio: true, buttons: [
-						// {groupHandle: 'rxnControl', handle: 'rxn1On', isDown: true, label: 'Forward on', exprs: ['collide.enableRxn("rxn1")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn1Off', label: 'Forward off', exprs: ['collide.disableRxn("rxn1")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.enableRxn("rxn2")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.disableRxn("rxn2")']}
+						// {groupHandle: 'rxnControl', handle: 'rxn1On', isDown: true, label: 'Forward on', exprs: ['collide.rxnHandler.enableRxn("rxn1")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn1Off', label: 'Forward off', exprs: ['collide.rxnHandler.disableRxn("rxn1")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.rxnHandler.enableRxn("rxn2")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.rxnHandler.disableRxn("rxn2")']}
 				// ],
 				// cmmds: [
 					// 'walls.wally.isothermalStop()',
@@ -525,10 +525,10 @@ LevelData = {
 						// {handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}
 					// ]},
 					// {handle: 'rxnControl', label: 'Rxn control', isRadio: true, buttons: [
-						// {groupHandle: 'rxnControl', handle: 'rxn1On', isDown: true, label: 'Forward on', exprs: ['collide.enableRxn("rxn1")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn1Off', label: 'Forward off', exprs: ['collide.disableRxn("rxn1")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.enableRxn("rxn2")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.disableRxn("rxn2")']}
+						// {groupHandle: 'rxnControl', handle: 'rxn1On', isDown: true, label: 'Forward on', exprs: ['collide.rxnHandler.enableRxn("rxn1")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn1Off', label: 'Forward off', exprs: ['collide.rxnHandler.disableRxn("rxn1")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.rxnHandler.enableRxn("rxn2")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.rxnHandler.disableRxn("rxn2")']}
 				// ],
 				// cmmds: [
 					// 'walls.wally.isothermalStop()',
@@ -686,10 +686,10 @@ LevelData = {
 						// {handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}
 					// ]},
 					{handle: 'rxnControl', label: 'Rxn control', isRadio: true, buttons: [
-						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Forward on', exprs: ['collide.enableRxn("rxn1")']},
-						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Forward off', exprs: ['collide.disableRxn("rxn1")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.enableRxn("rxn2")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.disableRxn("rxn2")']}
+						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Forward on', exprs: ['collide.rxnHandler.enableRxn("rxn1")']},
+						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Forward off', exprs: ['collide.rxnHandler.disableRxn("rxn1")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.rxnHandler.enableRxn("rxn2")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.rxnHandler.disableRxn("rxn2")']}
 						],
 					}
 					],	
@@ -865,10 +865,10 @@ LevelData = {
 						// {handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}
 					// ]},
 					{handle: 'rxnControl', label: 'Rxn control', isRadio: true, buttons: [
-						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Forward on', exprs: ['collide.enableRxn("rxn1")']},
-						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Forward off', exprs: ['collide.disableRxn("rxn1")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.enableRxn("rxn2")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.disableRxn("rxn2")']}
+						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Forward on', exprs: ['collide.rxnHandler.enableRxn("rxn1")']},
+						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Forward off', exprs: ['collide.rxnHandler.disableRxn("rxn1")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.rxnHandler.enableRxn("rxn2")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.rxnHandler.disableRxn("rxn2")']}
 						],
 					}
 					],	
@@ -1020,10 +1020,10 @@ LevelData = {
 						// {handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}
 					// ]},
 					{handle: 'rxnControl', label: 'Rxn control', isRadio: true, buttons: [
-						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Forward on', exprs: ['collide.enableRxn("rxn1")']},
-						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Forward off', exprs: ['collide.disableRxn("rxn1")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.enableRxn("rxn2")']},
-						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.disableRxn("rxn2")']}
+						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Forward on', exprs: ['collide.rxnHandler.enableRxn("rxn1")']},
+						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Forward off', exprs: ['collide.rxnHandler.disableRxn("rxn1")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.rxnHandler.enableRxn("rxn2")']},
+						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.rxnHandler.disableRxn("rxn2")']}
 						],
 					}
 				],	
