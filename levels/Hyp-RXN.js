@@ -62,8 +62,8 @@ LevelData = {
 				buttonGroups: [
 					{handle: 'hypoPath', label: 'Reaction', prefIdx: 1, isRadio: true,
 						buttons: [
-							{handle: 'rxn1go', label: 'Enable RXN', exprs: ['collide.rxnHandler.enableRxn("rxn1")','collide.rxnHandler.enableRxn("rxn2")']},
-							{handle: 'rxn1stop', label: 'Disable RXN', isDown: true, exprs: ['collide.rxnHandler.disableRxn("rxn1")','collide.rxnHandler.disableRxn("rxn2")']}
+							{handle: 'rxn1go', label: 'Enable RXN', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn1")','collide.rxnHandlerEmergent.enableRxn("rxn2")']},
+							{handle: 'rxn1stop', label: 'Disable RXN', isDown: true, exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn1")','collide.rxnHandlerEmergent.disableRxn("rxn2")']}
 						]
 					}
 				],
@@ -131,8 +131,8 @@ LevelData = {
 				buttonGroups: [
 					{handle: 'Reaction', label: 'Reaction', prefIdx: 1, isRadio: true,
 						buttons: [
-							{handle: 'rxn1go', label: 'Enable RXN', exprs: ['collide.rxnHandler.enableRxn("rxn1")']},
-							{handle: 'rxn1stop', label: 'Disable RXN', isDown: true, exprs: ['collide.rxnHandler.disableRxn("rxn1")']},
+							{handle: 'rxn1go', label: 'Enable RXN', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn1")']},
+							{handle: 'rxn1stop', label: 'Disable RXN', isDown: true, exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn1")']},
 						]
 					},
 					{handle: 'Heat', label: 'Heat', prefIdx: 1, isRadio: true,
@@ -245,8 +245,8 @@ LevelData = {
 				buttonGroups: [
 					{handle: 'hypoPath', label: 'Reaction ', prefIdx: 1, isRadio: true,
 						buttons: [
-							{handle: 'rxn1go', label: 'Enable RXN', exprs: ['collide.rxnHandler.enableRxn("rxn1")','collide.rxnHandler.enableRxn("rxn2")']},
-							{handle: 'rxn1stop', label: 'Disable RXN', isDown: true, exprs: ['collide.rxnHandler.disableRxn("rxn1")','collide.rxnHandler.disableRxn("rxn2")']}
+							{handle: 'rxn1go', label: 'Enable RXN', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn1")','collide.rxnHandlerEmergent.enableRxn("rxn2")']},
+							{handle: 'rxn1stop', label: 'Disable RXN', isDown: true, exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn1")','collide.rxnHandlerEmergent.disableRxn("rxn2")']}
 						]
 					}
 				],
