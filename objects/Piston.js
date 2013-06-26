@@ -53,7 +53,7 @@ function Piston(attrs) {
 	var readoutRightLeft = this.left + this.width / 2 + this.shaftThickness / 2;
 	var readoutRightRight = this.left + this.width - this.width*this.slant * .1;
 	var readoutY = this.pistonBottom.pos.y-this.pistonAdjust+this.pistonPt.y;
-	var readoutFont = '12pt calibri';
+	var readoutFont = '8pt calibri';
 	var readoutFontCol = Col(255, 255, 255);
 	this.readoutLeft = new Readout('piston' + this.handle.toCapitalCamelCase() + 'Left', readoutLeftLeft, readoutLeftRight, readoutY, readoutFont, readoutFontCol, 'center', curLevel);
 	this.readoutRight = new Readout('piston' + this.handle.toCapitalCamelCase() + 'Right', readoutRightLeft, readoutRightRight, readoutY, readoutFont, readoutFontCol, 'center', curLevel);
