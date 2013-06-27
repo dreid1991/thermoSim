@@ -381,8 +381,9 @@ WallMethods.wallDataHandler = {
 		var dots = this.dotManager.createIfNotExists(info);
 		if (!this.data.moles) this.data.moles = [];
 		//list is okay.  Will use getDataObj func
-		if (this.getDataObj('moles', info)) {
-			dataObj = this.getDataObj('moles', info);
+		var storedDataObj = this.getDataObj('moles', info);
+		if (storedDataObj) {
+			return storedDataObj;
 		} else {
 			this.data.moles.push(new WallMethods.DataObj());
 			dataObj = this.data.moles[this.data.moles.length-1];
