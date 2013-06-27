@@ -83,7 +83,7 @@ LevelData = {
 					{label: 'Q: ', expr: 'q("left")', units: 'kJ', decPlaces: 1, handle: 'heatReadout', readout: 'mainReadout'},
 					{label: 'Pint: ', expr: 'pInt("left")', units: 'bar', decPlaces: 1, handle: 'pIntReadout', readout: 'pistonRightPistonLeft'},
 					{label: 'Vol: ', expr: 'vol("left")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
-					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
+					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonRight'}
 				],
 				triggers: [
 					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Place the block on the piston', requiredFor: 'prompt0', checkOn:'conditions'},

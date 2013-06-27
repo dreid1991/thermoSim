@@ -78,18 +78,20 @@ LevelData = {
 				],
 				dataRecord: [
 					{wallInfo: 'wallo', data: 'frac', attrs: {spcName: 'spc3', tag: 'wallo'}},
-					{wallInfo: 'wallo', data: 'enthalpy', attrs: {spcName: 'spc3', tag: 'wallo'}},
+					{wallInfo: 'wallo', data: 'moles', attrs: {spcName: 'spc3', tag:'wallo'}},
+					{wallInfo: 'wallo', data: 'enthalpy'},
 				],
 				// graphs: [
 					// {type: 'Scatter', handle: 'hTGraph', xLabel: 'Enthalpy (kJ)', yLabel: 'Temperature (K)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
 						// sets:[
 							// {handle: 'enthalpyTemperature', label: 'Phase Change', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
-							// data: {x: 'enthalpy("left")', y: 'tempSmooth("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+							// data: {x: 'enthalpy("wallo")', y: 'tempSmooth("wallo")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
 						// ]
 					// }
 				// ],	
 				dataReadouts: [
 					{label: 'Vol: ', expr: 'vol("wallo")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
+					// {label: 'Enthalpy: ', expr: 'enthalpy("wallo")', units: 'kJ', decPlaces: 2, handle: 'hReadout', readout: 'mainReadout'},
 					{label: 'Gas Temp: ', expr: 'tempSmooth("wallo")', units: 'K', decPlaces: 0, handle: 'tempGasReadout', readout: 'mainReadout'},
 					{label: 'Liquid Temp: ', expr:  'tempSmooth("liquidWater")', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
@@ -97,6 +99,12 @@ LevelData = {
 			},
 			prompts: [
 				{//prompt0
+					sceneData: 
+						{
+							triggers: [
+								{handle: 'initialSetup', expr: 'pExt("wallo")==1', satisfyCmmds: ['curLevel.heaterHeater1.disable()'], priority: 1},
+							]
+						},
 					quiz: [
 						{	
 							type: 'text',							
@@ -241,21 +249,31 @@ LevelData = {
 				walls: [
 					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 423.15, handle: 'wallo', vol: 13.5, isothermalRate: 4, border: {type: 'open', width: 10, yMin: 40} },
 				],
-				dots: [
-					{spcName: 'spc4', pos: P(45,100), dims: V(465,240), count: 400, temp:423.15, returnTo: 'wallo', tag: 'wallo'},
-				],	
+				// dots: [
+					// {spcName: 'spc4', pos: P(45,100), dims: V(465,240), count: 400, temp:423.15, returnTo: 'wallo', tag: 'wallo'},
+				// ],	
 				objs: [
 					{
 						type: 'Piston',
 						attrs: {
 							handle: 'RightPiston',
 							wallInfo: 'wallo',
-							min: 1,
-							init: 1,
+							min: 0.5,
+							init: 0.5,
 							max: 20,
-							makeSlider: true,	
+							makeSlider: false,	
 							compMode: 'cPAdiabaticDamped',
 						}	
+					},
+					{
+						type: 'Sandbox',
+						attrs: {
+							handle: 'mrSandMan',
+							wallInfo: 'wallo',
+							min: 0.5,
+							max: 9,
+							init: 0.5,
+						}
 					},
 					// {
 						// type: 'DragWeights',
@@ -275,7 +293,7 @@ LevelData = {
 							wallInfo: 'wallo',
 							handle: 'water',
 							tempInit: 423.15,
-							spcCounts: {spc4: 1},
+							spcCounts: {spc4: 400},
 							actCoeffType: 'twoSfxMrg',
 							actCoeffInfo: {a: 3000},
 							makePhaseDiagram: false,
@@ -343,5 +361,15 @@ LevelData = {
 				},
 			]
 		},
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
+					title: '',
+					text: 'You have completed the simulation.'
+				}
+			]
+		}
 	]
 }
