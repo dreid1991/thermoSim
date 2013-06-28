@@ -23,7 +23,9 @@ java -jar ../../compiler.jar ^
 --js ../DataDisplayer.js ^
 --js ../DataGetFuncs.js ^
 --js ../Experiment.js ^
---js ../ReactionHandler.js ^
+--js ../ReactionFuncs.js ^
+--js ../ReactionHandlerEmergent.js ^
+--js ../ReactionHandlerNonEmergent.js ^
 --js ../CollideHandler.js ^
 --js ../DotMigrator.js ^
 --js ../Attractor.js ^

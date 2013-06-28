@@ -16,80 +16,27 @@ Copyright (C) 2013  Daniel Reid
 */
 
 // rxnCnts = {aa: 0, ab: 0, bb: 0};
-//this is a change to test pull requests
-function ReactionHandler(collide, rxns, activeRxns, pausedRxns) {
+
+function ReactionHandlerEmergent(collide, dotManager, rxns, tConst, activeRxns, pausedRxns) {
 	this.collide = collide;
+	this.dotManager = dotManager;
+	this.tConst = tConst
 	this.rxns = rxns;
+	this.spcs = undefined; //set in collide's setSpcs func
 	this.activeRxns = activeRxns;
 	this.pausedRxns = pausedRxns;
 }
 
-ReactionHandler.prototype = {
+_.extend(ReactionHandlerEmergent.prototype, ReactionFuncs, {
 	addReaction: function(attrs){ //rctA, rctB, hRxn, activeE, prods)
 		attrs.parent = this;
-		var rxn = new ReactionHandler.Reaction(attrs);
+		var rxn = new ReactionHandlerEmergent.Reaction(attrs);
 		
 		this.initRxn(rxn);
 		return rxn;
 
 	},
-	rxnIsEnabled: function(handle) {
-		var active = this.getRxn(this.activeRxns, handle);
-		return active ? true : false;
-	},
-	disableRxn: function(handle) {
-		this.removeRxn(handle);
-	},
-	enableRxn: function(handle) {
-		var rxn = this.getRxn(this.pausedRxns, handle);
-		if (rxn) {
-			this.pausedRxns.splice(this.pausedRxns.indexOf(rxn), 1);
-			this.initRxn(rxn);
-		}
-	},
-	removeRxn: function(handle) {
-		for (var rxnId in this.rxns) {
-			var spcRxns = this.rxns[rxnId];
-			var removedRxn = false;
-			for (var spcRxnIdx=spcRxns.length - 1; spcRxnIdx>=0; spcRxnIdx--) {
-				var spcRxn = spcRxns[spcRxnIdx];
-				if (spcRxn.handle == handle) {
-					spcRxns.splice(spcRxnIdx, 1);
-					removedRxn = true;
-				
-				}
-			
-			}
-			if (removedRxn) {
-				if (spcRxns.length == 0) {
-					this.collide.setHandlerByIdStr(rxnId, {func:this.collide.impactStd, obj:this.collide})
-				} else if (spcRxns.length ==1) {
-					var rxn = spcRxns[0];
-					this.initPair(rxn, true);
-				}
-			}
-		}
-		var rxn = this.getRxn(this.activeRxns, handle);
-		if (rxn) {
-			this.activeRxns.splice(this.activeRxns.indexOf(rxn), 1);
-			this.pausedRxns.push(rxn);
-		}
-	},
-	getRxn: function(rxns, handle) {
-		for (var i=0; i<rxns.length; i++) {
-			if (handle == rxns[i].handle) return rxns[i];
-		}
-	},
-	initRxn: function(rxn) {
-		this.initPair(rxn)
 
-		this.activeRxns.push(rxn);
-		
-	},
-	
-	removeAllReactions: function(){
-		this.setDefaultHandler({func:this.collide.impactStd, obj:this});
-	},
 
 	//end public
 	initPair: function(rxn) {
@@ -102,10 +49,28 @@ ReactionHandler.prototype = {
 		var isMultiple = this.rxns[idStr].length > 1;
 
 		if (isMultiple) {
-			this.collide.setHandler(rxn.rctA, rxn.rctB, {func:this.rctHandlerMultPairs(idStr), obj:this});
+			if (this.rxnTypesSame(this.rxns[idStr])) {
+				this.collide.setHandler(rxn.rctA, rxn.rctB, {func:this.rctHandlerMultPairs(idStr), obj:this});
+			} else {
+				console.log('Cannot mix reaction types.');
+				console.log('Failed to add reaction: ');
+				console.log(rxn);
+			}
 		} else {
 			this.collide.setHandler(rxn.rctA, rxn.rctB, {func:this.rctHandlerSinglePair(idStr), obj:this});
 		}	
+	},
+	rxnTypesSame: function(rxns) {
+		if (rxns.length) {
+			for (var i=1; i<rxns.length; i++) {
+				if (rxns[i].constructor != rxns[0].constructor) {
+					return false;
+				}
+			}
+			return true;
+		} else {
+			return true;
+		}
 	},
 	countProds: function(prods) {
 		var count = 0;
@@ -249,16 +214,16 @@ and it just so happens, it works!  Maybe I've stumbled upon the probability shap
 		return false;
 		
 	}
-}
+})
 
-ReactionHandler.Reaction = function(attrs) { //prods as {name1: count, name2, count2}  hRxn in kj/mol, activeE in kj/mol, convert to j/dot
+ReactionHandlerEmergent.Reaction = function(attrs) { //prods as {name1: count, name2, count2}  hRxn in kj/mol, activeE in kj/mol, convert to j/dot
 		this.attrs = attrs;
 		this.handle = attrs.handle;
 		this.parent = attrs.parent;
 		this.rctA = attrs.rctA || attrs.rctB; //spcName
 		this.rctB = attrs.rctA && attrs.rctB ? attrs.rctB : undefined; //spcName
-		this.rctADef = this.parent.collide.spcs[this.rctA];
-		this.rctBDef = this.parent.collide.spcs[this.rctB];
+		this.rctADef = this.parent.spcs[this.rctA];
+		this.rctBDef = this.parent.spcs[this.rctB];
 		this.activeE = attrs.activeE * 1000 / N; // in joules of collision
 		//this.hRxn = attrs.hRxn * 1000 / N; //only used if hRxn fixed
 		
@@ -267,11 +232,11 @@ ReactionHandler.Reaction = function(attrs) { //prods as {name1: count, name2, co
 		
 		this.prods = this.reformatProds(attrs.prods);
 		this.prodCount = this.countProds(this.prods);
-		this.sRxn298 = this.calcSRxn([new ReactionHandler.ReactionComponent(this.rctA, 1), new ReactionHandler.ReactionComponent(this.rctB, 1)], this.prods, this.parent.collide.spcs); 
+		this.sRxn298 = this.calcSRxn([new ReactionHandlerEmergent.ReactionComponent(this.rctA, 1), new ReactionHandlerEmergent.ReactionComponent(this.rctB, 1)], this.prods, this.parent.spcs); 
 
 	},
 
-ReactionHandler.Reaction.prototype = {
+ReactionHandlerEmergent.Reaction.prototype = {
 	copy: function() {
 		var copy = new this.parent.Reaction(this.attrs);
 		return copy; //no mutable values from attrs are used directly, so this should be safe.
@@ -286,8 +251,8 @@ ReactionHandler.Reaction.prototype = {
 	calcSRxn: function(rcts, prods, spcs) {
 		var sRxn = 0;
 		//kJ/mol
-		for (var i=0; i<prods.length; i++) sRxn += spcs[prods[i].name].sF298;
-		for (var i=0; i<rcts.length; i++) sRxn -= spcs[rcts[i].name].sF298;
+		for (var i=0; i<prods.length; i++) sRxn += spcs[prods[i].name].sF298 * prods[i].count;
+		for (var i=0; i<rcts.length; i++) sRxn -= spcs[rcts[i].name].sF298 * prods[i].count;
 		return sRxn;
 		
 	},
@@ -301,14 +266,14 @@ ReactionHandler.Reaction.prototype = {
 				break;
 			}
 		}
-		if (!isEntry) this.prods.push(new ReactionHandler.ReactionComponent(spcName, increaseBy));
+		if (!isEntry) this.prods.push(new ReactionHandlerEmergent.ReactionComponent(spcName, increaseBy));
 		this.prodCount += increaseBy;
 		return this;
 	},
 	reformatProds: function(prods) {
 		var reformat = [];
 		for (var name in prods) {
-			reformat.push(new ReactionHandler.ReactionComponent(name, prods[name]));
+			reformat.push(new ReactionHandlerEmergent.ReactionComponent(name, prods[name]));
 		}
 		return reformat;	
 	},
@@ -324,7 +289,7 @@ ReactionHandler.Reaction.prototype = {
 	}
 }
 
-ReactionHandler.ReactionComponent = function(name, count) {
+ReactionHandlerEmergent.ReactionComponent = function(name, count) {
 	this.name = name;
 	this.count = count;
 }

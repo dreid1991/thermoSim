@@ -27,13 +27,15 @@ function CollideHandler(dotManager){
 	this.breakUpStore = this.breakUp;
 	this.recordingHits = false;
 	this.recordCleanUpListenerName = 'recordCollideHits';
-	this.rxnHandler = new ReactionHandler(this, this.rxns, this.activeRxns, this.pausedRxns);
+	this.rxnHandlerEmergent = new ReactionHandlerEmergent(this, this.dotManager, this.rxns, this.tConst, this.activeRxns, this.pausedRxns);
+	this.rxnHandlerNonEmergent = new ReactionHandlerNonEmergent(this, this.dotManager, this.rxns, this.tConst, this.activeRxns, this.pausedRxns);
 	
 }
 _.extend(CollideHandler.prototype, toInherit.gridder, {
 	setSpcs: function(spcs) {
 		this.spcs = spcs;
 		this.setDefaultHandler({func: this.impactStd, obj: this}, this.spcs);
+		this.rxnHandlerEmergent.spcs = spcs;
 		this.setup(this.spcs);
 	},
 	setDefaultHandler: function(handler, spcs){
