@@ -389,13 +389,15 @@ Experiment.Results.prototype = {
 	},
 	makeEqData: function(spcDefs) {
 		var temp = this.finalTemp;
-		var h3 = spcDefs[3].hF298 * 1000 + spcDefs[3].cv * (temp - 298.15);
-		var h2 = spcDefs[2].hF298 * 1000 + spcDefs[2].cv * (temp - 298.15);
-		var h1 = spcDefs[1].hF298 * 1000 + spcDefs[1].cv * (temp - 298.15);
-		var h0 = spcDefs[0].hF298 * 1000 + spcDefs[0].cv * (temp - 298.15);
+		var h3 = spcDefs[3].hF298 * 1000 + spcDefs[3].cp * (temp - 298.15);
+		var h2 = spcDefs[2].hF298 * 1000 + spcDefs[2].cp * (temp - 298.15);
+		var h1 = spcDefs[1].hF298 * 1000 + spcDefs[1].cp * (temp - 298.15);
+		var h0 = spcDefs[0].hF298 * 1000 + spcDefs[0].cp * (temp - 298.15);
+		var sRxn298 = (spcDefs[2].sF298 + spcDefs[3].sF298 - spcDefs[1].sF298 - spcDefs[0].sF298);
 		var hRxn298 = 1000 * (spcDefs[2].hF298 + spcDefs[3].hF298 - (spcDefs[1].hF298 + spcDefs[0].hF298));
-		var hRxn = h3 + h2 - (h1 + h0);//SHOULD I JUST USE 298?  LOOK HERE: http://www.chem.ufl.edu/~itl/4411/lectures/lec_v.html
-		var eqConst = Math.exp(-hRxn298 / (R * 298.15)) * Math.exp(-(hRxn / R) * (1 / temp - 1/298.15)); // no entropy right now
+		//var hRxn = h3 + h2 - (h1 + h0);//SHOULD I JUST USE 298?  LOOK HERE: http://www.chem.ufl.edu/~itl/4411/lectures/lec_v.html
+		//I did the math.  You should just use hRxn298 since linear hRxn change with temp doesn't affect eq const.
+		var eqConst = Math.exp(-(hRxn298-298*sRxn298) / (R * 298.15)) * Math.exp(-(hRxn298 / R) * (1 / temp - 1/298.15)); 
 		var testFrac;
 		for (var i=0; i<=1; i+=.1) {
 			var testFrac = Newton(eqConst + ' - (x*x)/((1-x)*(1-x))', {x: i}, 'x');
