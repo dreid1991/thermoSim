@@ -13,6 +13,7 @@ _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 	addReaction: function(attrs) {
 		attrs.parent = this;
 		var rxn = new ReactionHandlerNonEmergent.Reaction(attrs);
+		rxn.init();
 	}
 	
 })
@@ -30,22 +31,26 @@ ReactionHandlerNonEmergent.Reaction = function(attrs) {
 	this.parent = attrs.parent;
 	this.handle = attrs.handle;
 	this.enqueueListenerHandle = this.handle + 'Enqueue';
-	checkRxnSideCount(attrs.rcts);
-	checkRxnSideCount(attrs.prods);
+	this.checkRxnSideCount(attrs.rcts);
+	this.checkRxnSideCount(attrs.prods);
 	this.rcts = this.reformatSide(attrs.rcts, LevelData.spcDefs);
 	this.prods = this.reformatSide(attrs.prods, LevelData.spcDefs);
-	this.sRxn298 = this.calcSRxn298(this.rcts, this.prods, this.parent.spcs);
+	this.sRxn298 = this.calcSRxn298(this.rcts, this.prods);
 	this.preExpForward = attrs.preExpForward;
 	this.activeEForward = attrs.activeEForward;
 	this.wallGroups = this.makeWallGroups(window.walls, [], this.rcts, this.prods);
-	var updateQueue = this.wrapUpdateQueue();
+	this.updateQueue = this.wrapUpdateQueue();
 	this.updateListenerHandle = this.handle + 'CheckQueueEmpty';
 	this.checkWallGroupListenerHandle = this.handle + 'CheckWallGroups';
-	this.initWallGroupCheck(this.rcts, this.prods, window.walls, this.checkWallGroupListenerHandle);
-	this.initQueueCheck(updateQueue, this.wallGroups, this.updateListenerHandle);
+
 }
 
 ReactionHandlerNonEmergent.Reaction.prototype = {
+	init: function() {
+		this.initWallGroupCheck(this.rcts, this.prods, window.walls, this.checkWallGroupListenerHandle);
+		this.initQueueCheck(this.updateQueue, this.wallGroups, this.updateListenerHandle);	
+		//among other things, like defining collision cbs
+	},
 	initWallGroupCheck: function(rcts, prods, walls, listenerHandle) {
 		addListener(curLevel, 'data', listenerHandle, function() {
 			this.wallGroups = this.makeWallGroups(walls, this.wallGroups, rcts, prods);
@@ -54,6 +59,7 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 	initQueueCheck: function(updateQueue, listenerHandle) {
 		addListener(curLevel, 'update', listenerHandle, function() {
 			var wallGroups = this.wallGroups;
+			//should reset automatically on some interval to prevent reaction from getting stuck
 			for (var i=0; i<wallGroups.length; i++) {
 				if (wallGroups[i].queue.rcts == 0 && wallGroups[i].queue.prods == 0) {
 					updateQueue(wallGroups[i]);
@@ -71,12 +77,12 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		var hRxn298 = this.calcHRxn298(this.rcts, this.prods);
 		var kEq298 = Math.exp(-(hRxn298 - 298.15 * sRxn298) / (8.314 * 298.15)); 
 		return function(wallGroup) {
-			var temp = wallGroup.temp[wallGroup.temp - 1];
+			var temp = wallGroup.temp[wallGroup.temp.length - 1];
 			var kEq = kEq298 * Math.exp(-hRxn298 / 8.314 * (1/temp - 1/298.15));
 			var rateConstForward = preExpForward * Math.exp(-activeEForward / (8.314 * temp));
 			var rateConstBackward = rateConstForward / kEq;
 			var numForward = Math.round(self.getNumInDir(rateConstForward, self.rcts, wallGroup.moles, wallGroup.vol[wallGroup.vol.length - 1]));
-			var numBackard = Math.round(self.getNumInDir(rateConstBackward, self.prods, wallGroup.moles, wallGroup.vol[wallGroup.vol.length - 1]));
+			var numBackward = Math.round(self.getNumInDir(rateConstBackward, self.prods, wallGroup.moles, wallGroup.vol[wallGroup.vol.length - 1]));
 			wallGroup.queue.rcts = numForward; 
 			wallGroup.queue.prods = numBackward;
 		}
@@ -90,7 +96,7 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		return num;
 	},
 	checkRxnSideCount: function(rxnSide) {
-		if (this.countRxnSide(attrs.rcts) > 2 || this.countRxnSide(attrs.rcts) <= 0) {
+		if (this.countRxnSide(rxnSide) > 2 || this.countRxnSide(rxnSide) <= 0) {
 			console.log('Bad number of products or reactions for non-emergent reaction');
 			console.log('Reaction will not work');
 			console.log(rxnSide);
@@ -98,8 +104,8 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 	},
 	calcHRxn298: function(rcts, prods) {
 		var hRxn = 0;
-		for (var i=0; i<prods.length; i++) hRxn += prods[i].hF298 + prods[i].cp * (temp - 298.15);
-		for (var i=0; i<rcts.length; i++) hRxn -= rcts[i].hF298 + rcts[i].cp * (temp - 298.15);
+		for (var i=0; i<prods.length; i++) hRxn += prods[i].hF298;
+		for (var i=0; i<rcts.length; i++) hRxn -= rcts[i].hF298;
 		return hRxn;
 	},
 	makeWallGroups: function(walls, wallGroups, rcts, prods) {
@@ -111,14 +117,14 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 				if (existingGroup) {
 					updatedGroups.push(existingGroup);
 				} else {
-					updatedGroups.push(new ReactionHandlerNonEmergent.WallGroup(wall, wall.handle, rcts, prods);
+					updatedGroups.push(new ReactionHandlerNonEmergent.WallGroup(wall, wall.handle, rcts, prods));
 				}
 			}
 		}
 		return updatedGroups;
 	},
-	getWallGroups: function(wallGroups, wallHandle) {
-		for (var i=0; i<wallGroups.length; i++) wallGroups[i].wallHandle == wallHandle && return wallGroups[i];
+	getWallGroup: function(wallGroups, wallHandle) {
+		for (var i=0; i<wallGroups.length; i++) if (wallGroups[i].wallHandle == wallHandle) return wallGroups[i];
 		return undefined;
 	},
 	makeQueues: function(walls, lastQueues) {
@@ -138,18 +144,18 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		return x;
 	},
 	reformatSide: function(side, spcDefs) {
-		var asList = [];
+		var typedSpcs = [];
 	
 		for (var i=0; i<side.length; i++) {
-			var def = spcDefs[side[i].spcName];
-			asList.push(new ReactionHandlerNonEmergent.ReactionComponent(side[i].spcName, side[i].count, def.hF298, def.cp));
+			var def = _.find(spcDefs, function(spcDef) {return spcDef.spcName == side[i].spcName});
+			typedSpcs.push(new ReactionHandlerNonEmergent.ReactionComponent(side[i].spcName, side[i].count, def.hF298, def.cp, def.sF298));
 		}
-		return asList;
+		return typedSpcs;
 	},
-	calcSRxn298: function(rcts, prods, spcs) {
+	calcSRxn298: function(rcts, prods) {
 		var sRxn = 0;
-		for (var i=0; i<prods.length; i++) sRxn += spcs[prods[i].name].sF298 * prods[i].count;
-		for (var i=0; i<rcts.length; i++) sRxn -= spcs[rcts[i].name].sF298 * rcts[i].count;
+		for (var i=0; i<prods.length; i++) sRxn += prods[i].sF298 * prods[i].count;
+		for (var i=0; i<rcts.length; i++) sRxn -= rcts[i].sF298 * rcts[i].count;
 		return sRxn;
 	},
 }
@@ -168,17 +174,18 @@ ReactionHandlerNonEmergent.WallGroup = function(wall, tag, rcts, prods) {
 ReactionHandlerNonEmergent.WallGroup.prototype = {
 	populateMoles: function(wall, tag, moles, rxnSide) {
 		for (var i=0; i<rxnSide.length; i++) {
-			var spcMoles = wall.recordFrac({tag: tag, spcName: rxnSide[i].spcName});
-			moles[rxnSide[i].spcName] = moles;
+			var spcMoles = wall.recordMoles({tag: tag, spcName: rxnSide[i].spcName}).src();
+			moles[rxnSide[i].spcName] = spcMoles;
 		}
 	},
 }
 
-ReactionHandlerNonEmergent.ReactionComponent = function(name, count, hF298, cp) {
-	this.name = name;
+ReactionHandlerNonEmergent.ReactionComponent = function(spcName, count, hF298, cp, sF298) {
+	this.spcName = spcName;
 	this.count = count; //how many are being produced, corresponds to order
 	this.hF298 = hF298 * 1000; //to J / mol
 	this.cp = cp;
+	this.sF298 = sF298;
 }
 ReactionHandlerNonEmergent.Queue = function() {
 	this.rcts = 0;

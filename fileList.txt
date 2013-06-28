@@ -20,6 +20,7 @@
 ../DataDisplayer.js
 ../DataGetFuncs.js
 ../Experiment.js
+../ReactionFuncs.js
 ../ReactionHandlerEmergent.js
 ../ReactionHandlerNonEmergent.js
 ../CollideHandler.js
