@@ -48,7 +48,7 @@ _.extend(ReactionHandlerEmergent.prototype, ReactionFuncs, {
 		var isMultiple = this.rxns[idStr].length > 1;
 
 		if (isMultiple) {
-			if (this.rxnsAreType(this.rxns[idStr], ReactionHandlerEmergent.Reaction)) {
+			if (this.rxnsAreType(this.rxns[idStr], ReactionHandlerEmergent.Reaction)) {//make sure this works
 				this.collide.setHandler(rxn.rctA, rxn.rctB, {func:this.rctHandlerMultPairs(idStr), obj:this});
 			} else {
 				console.log('Cannot mix reaction types.');
