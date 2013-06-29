@@ -197,6 +197,11 @@ function removeListener(object, typeName, funcName){
 }
 
 
+function Listener(func, obj) {
+	this.func = func;
+	this.obj = obj;
+}
+
 function removeListenerByName(object, typeName, pieceToRemoveBy){
 	var didDelete = false;
 	var funcName = getListenerByName(object, typeName, pieceToRemoveBy);

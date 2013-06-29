@@ -60,18 +60,6 @@ _.extend(ReactionHandlerEmergent.prototype, ReactionFuncs, {
 			this.collide.setHandler(rxn.rctA, rxn.rctB, {func:this.rctHandlerSinglePair(idStr), obj:this});
 		}	
 	},
-	rxnTypesSame: function(rxns) {
-		if (rxns.length) {
-			for (var i=1; i<rxns.length; i++) {
-				if (rxns[i].constructor != rxns[0].constructor) {
-					return false;
-				}
-			}
-			return true;
-		} else {
-			return true;
-		}
-	},
 	countProds: function(prods) {
 		var count = 0;
 		for (var prod in prods) {
@@ -106,15 +94,6 @@ and it just so happens, it works!  Maybe I've stumbled upon the probability shap
 		var collide = this.collide;
 		var prods = rxn.prods;
 		return function(a, b, UVAB, perpAB, perpBA) {
-			// if (a.spcName == 'ugly' && b.spcName == 'ugly') {
-				// rxnCnts.aa++;
-			// } else if (a.spcName == 'ugly' && b.spcName == 'uglier') {
-				// rxnCnts.ab++;
-			// } else if (a.spcName == 'uglier' && b.spcName == 'ugly') {
-				// rxnCnts.ab++;
-			// } else if (a.spcName == 'uglier' && b.spcName == 'uglier') {
-				// rxnCnts.bb++;
-			// }
 			var hitE = this.hitE(a, b, perpAB, -perpBA);
 			if (Math.random() < this.probFunc(hitE, activeE, rxn.sRxn298)) {
 				if (!this.react(a, b, prods)) {

@@ -13,6 +13,18 @@ ReactionFuncs = {
 			this.initRxn(rxn);
 		}
 	},
+	rxnTypesSame: function(rxns) {
+		if (rxns.length) {
+			for (var i=1; i<rxns.length; i++) {
+				if (rxns[i].constructor != rxns[0].constructor) {
+					return false;
+				}
+			}
+			return true;
+		} else {
+			return true;
+		}
+	},
 	removeRxn: function(handle) {
 		for (var rxnId in this.rxns) {
 			var spcRxns = this.rxns[rxnId];
