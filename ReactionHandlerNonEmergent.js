@@ -1,4 +1,12 @@
 
+/*
+The structure of the emergent and non-emergent reactions is slightly different.  In the emergent reactions, a reaction is a single pair of reacting 
+species.  The possible reacting pairs go in the collide handler's list for that pair.
+The non-emergent reaction handler's reaction escompasses all the collision pairs that could be involved in a 2->2, 1->2, 1->1 reaction.  There are potentially many
+reacting pairs for a reaction.
+The non-emergent reaction will add its pairs, not itself, to the collide handler's reaction list.  
+*/
+
 function ReactionHandlerNonEmergent(collide, dotManager, rxns, tConst, activeRxns, pausedRxns) {
 	this.collide = collide;
 	this.dotManager = dotManager;
@@ -70,7 +78,8 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		var numRcts = this.countRxnSide(rctsNet);
 		var numProds = this.countRxnSide(prodsNet);
 		if (numRcts == 2 && numProds == 2) {
-			
+			this.pushRxn(allRxns, new ReactionHandlerNonEmergent.ReactivePair(this, this.copyRxnSide(rctsNet), this.copyRxnSide(prodsNet), 'chanceForward', 'rctQueue');
+			this.pushRxn(allRxns, new ReactionHandlerNonEmergent.ReactivePair(this, this.copyRxnSide(prodsNet), this.copyRxnSide(rctsNet), 'chanceBackward', 'prodQueue');
 		} else if (numRcts == 1 && numProds == 1) {
 			
 		} else if (numRcts == 1 && numProds == 2) {
@@ -79,16 +88,30 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			
 		}
 	},
-	initSingleRxnPair: function(allRxns, rxn, rcts, prods, queueName, chanceName, collide, spcs) {
-		var rctNames = this.flattenSpcNames(rcts);
+	readyRxn: function(allRxns, idStr) {
+		var pairs = allRxns[idStr];
+		if (this.rxnTypesSame(pairs) && pairs[0].constructor == ) {
+			if (pairs.length == 1)
+		}
+	},
+	copyRxnSide: function(rxnSide) {
+		var copy = [];
+		for (var i=0; i<rxnSide.length; i++) {
+			copy.push(rxnSide[i].copy());
+		}
+		return copy;
+	},
+	initSingleRxnPair: function(allRxns, reactivePair, collide) {
+		var rctNames = this.flattenSpcNames(reactivePair.rcts);
 		var idStr = collide.getIdStr(spcs[rctNames[0]], spcs[rctNames[1]]);
-		allRxns[idStr] = [this];
+		var parent = this.parent;
+		allRxns[idStr] = [reactivePair];
 		collide.setHandler(rctNames[0], rctNames[1], new Listener(function(a, b, UVAB, perpAB, perpBA) {
 			var wallGroup = this.wallGroups[a.tag];
-			var queue = wallGroup[queueName];
-			if (Math.random() < wallGroup[chanceName]) {
-				if (queue.now >= 0) {
-					if (!this.react(a, b, prods)) {
+			var queue = wallGroup[reactivePair.queueName];
+			if (Math.random() < wallGroup[reactivePair.chanceName]) {
+				if (queue.now > 0) {
+					if (!parent.react(a, b, reactionPair.prods)) { //prods is list of ReactionComponents
 						return collide.impactStd(a, b, UVAB, perpAB, perpBA);
 					}
 				}
@@ -99,6 +122,9 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 				return collide.impactStd(a, b, UVAB, perpAB, perpBA);
 			}
 		}, this));
+	},
+	initMultRxnPairs: function(allRxns, reactivePair, collide) {
+		
 	},
 	wrapUpdateQueue: function() {
 		var self = this;
@@ -167,9 +193,9 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 	},
 	calcHRxn298: function(rcts, prods) {
 		var hRxn = 0;
-		for (var i=0; i<prods.length; i++) hRxn += prods[i].hF298;
-		for (var i=0; i<rcts.length; i++) hRxn -= rcts[i].hF298;
-		return hRxn;
+		for (var i=0; i<prods.length; i++) hRxn += prods[i].def.hF298;
+		for (var i=0; i<rcts.length; i++) hRxn -= rcts[i].def.hF298;
+		return hRxn * 1000; //to Joules from kJ
 	},
 	makeWallGroups: function(walls, wallGroups, rcts, prods) {
 		var updatedGroups = [];
@@ -218,15 +244,15 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		var typedSpcs = [];
 	
 		for (var i=0; i<side.length; i++) {
-			var def = _.find(spcDefs, function(spcDef) {return spcDef.spcName == side[i].spcName});
-			typedSpcs.push(new ReactionHandlerNonEmergent.ReactionComponent(side[i].spcName, side[i].count, def.hF298, def.cp, def.sF298));
+			var def = spcDefByName(spcName);
+			typedSpcs.push(new ReactionHandlerNonEmergent.ReactionComponent(side[i].spcName, side[i].count, def));
 		}
 		return typedSpcs;
 	},
 	calcSRxn298: function(rcts, prods) {
 		var sRxn = 0;
-		for (var i=0; i<prods.length; i++) sRxn += prods[i].sF298 * prods[i].count;
-		for (var i=0; i<rcts.length; i++) sRxn -= rcts[i].sF298 * rcts[i].count;
+		for (var i=0; i<prods.length; i++) sRxn += prods[i].def.sF298 * prods[i].count;
+		for (var i=0; i<rcts.length; i++) sRxn -= rcts[i].def.sF298 * rcts[i].count;
 		return sRxn;
 	},
 }
@@ -255,27 +281,17 @@ ReactionHandlerNonEmergent.WallGroup.prototype = {
 	},
 }
 
-ReactionHandlerNonEmergent.ReactionComponent = function(spcName, count, hF298, cp, sF298) {
-	this.spcName = spcName;
-	this.count = count; //how many are being produced, corresponds to order.
-	this.hF298 = hF298 * 1000; //to J / mol
-	this.cp = cp;
-	this.sF298 = sF298;
-}
 
-ReactionHandlerNonEmergent.ReactionComponent.prototype = {
-	copy: function() {
-		return new ReactionHandlerNonEmergent.ReactionComponent(this.spcName, this.count, this.hF298 / 1000, this.cp, this.sF298);
-	},
-	flattenSpcNames: function() {
-		var spcsFlat = [];
-		for (var i=0; i<this.count; i++) spcsFlat.push(this.spcName);
-		return spcsFlat;
-	},
-}
 ReactionHandlerNonEmergent.Queue = function() {
 	this.timeEnqueue = undefined;
 	this.init = 0;
 	this.now = 0;
 }
 
+ReactionHandlerNonEmergent.ReactivePair = function(rxn, rcts, prods, chancePath, queuePath) {
+	this.rxn = rxn;
+	this.rcts = rcts; //rcts and prods are lists of ReactionComponents
+	this.prods = prods;
+	this.chancePath = chancePath;
+	this.queuePath = queuePath;
+}
