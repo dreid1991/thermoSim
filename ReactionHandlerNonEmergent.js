@@ -49,6 +49,10 @@ ReactionHandlerNonEmergent.Reaction = function(attrs, allRxns) {
 	this.preExpForward = attrs.preExpForward;
 	this.activeEForward = attrs.activeEForward;
 	this.wallGroups = this.makeWallGroups(window.walls, [], this.rctsNet, this.prodsNet);
+	this.wallGroupsMap = {};
+	for (var i=0; i<this.wallGroups.length; i++) {
+		this.wallGroupsMap[this.wallGroups[i].wallHandle] = this.wallGroups[i];
+	}
 	this.updateQueue = this.wrapUpdateQueue();
 	this.listenerHandle = this.handle + 'CheckQueueEmpty';
 	//this.checkWallGroupListenerHandle = this.handle + 'CheckWallGroups';
@@ -71,6 +75,9 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 				this.updateQueue(this.wallGroups[i]);
 			}
 		}, this);
+		for (var i=0; i<this.wallGroups.length; i++) {
+			this.updateQueue(this.wallGroups[i]);
+		}
 		this.addCollisionPairs(this.collide, this.rctsNet, this.prodsNet, this.allRxns, window.dotManager, window.spcs); 
 		
 	},
@@ -79,7 +86,7 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		var numProds = this.countRxnSide(prodsNet);
 		if (numRcts == 2 && numProds == 2) {
 			var pairFoward = new ReactionHandlerNonEmergent.ReactivePair(this, collide, this.copyRxnSide(rctsNet), this.copyRxnSide(prodsNet), 'chanceForward', 'rctQueue');
-			var pairBackard = new ReactionHandlerNonEmergent.ReactivePair(this, collide, this.copyRxnSide(prodsNet), this.copyRxnSide(rctsNet), 'chanceBackward', 'prodQueue');
+			var pairBackward = new ReactionHandlerNonEmergent.ReactivePair(this, collide, this.copyRxnSide(prodsNet), this.copyRxnSide(rctsNet), 'chanceBackward', 'prodQueue');
 			this.pushPair(collide, allRxns, spcs, pairFoward);
 			this.pushPair(collide, allRxns, spcs, pairBackward);
 			this.readyRxn(collide, allRxns, pairFoward.idStr);
@@ -93,13 +100,13 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		}
 	},
 	pushPair: function(collide, allRxns, spcs, pair) {
-		idStr = pair.idStr;
+		var idStr = pair.idStr;
 		allRxns[idStr] == undefined ? allRxns[idStr] = [pair] : allRxns[idStr].push(pair);
 		
 	},
 	readyRxn: function(collide, allRxns, idStr) {
 		var pairs = allRxns[idStr];
-		if (this.rxnsAreType(pairs, ReactionHandlerNonEmergent.ReactivePair)) {
+		if (this.parent.rxnsAreType(pairs, ReactionHandlerNonEmergent.ReactivePair)) {
 			if (pairs.length == 1) {
 				this.initSingleRxnPair(allRxns[idStr][0], collide);
 			} else if (pairs.length > 1) {
@@ -121,9 +128,9 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		var idStr = reactivePair.idStr;
 		var parent = this.parent;
 		collide.setHandler(rctNames[0], rctNames[1], new Listener(function(a, b, UVAB, perpAB, perpBA) {
-			var wallGroup = this.wallGroups[a.tag];
-			var queue = wallGroup[reactivePair.queueName];
-			if (Math.random() < wallGroup[reactivePair.chanceName]) {
+			var wallGroup = this.wallGroupsMap[a.tag];
+			var queue = wallGroup[reactivePair.queuePath];
+			if (Math.random() < wallGroup[reactivePair.chancePath]) {
 				if (queue.now > 0) {
 					if (!parent.react(a, b, reactionPair.prods)) { //prods is list of ReactionComponents
 						return collide.impactStd(a, b, UVAB, perpAB, perpBA);
@@ -157,13 +164,13 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var rctsLeft = rctQueue.now;
 			var prodsInit = prodQueue.init;
 			var prodsLeft = prodQueue.now;
-			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft / rctsInit);//or some constant, find a good one
-			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, prodsLeft / prodsInit);
+			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, (rctsLeft / rctsInit) || 0);//or some constant, find a good one
+			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, (prodsLeft / prodsInit) || 0); // || 0 to deal with prodsInit = 0
 
 			if 
 				(
-					(1 - chanceReactForward < .99 && rctsLeft > 0 && rctsLeft / rctsInit > .1) || 
-					(1 - chanceReactBackward < .99 && prodsLeft > 0 && prodsLeft / prodsInit > .1)
+					(1 - wallGroup.chanceForward < .99 && rctsLeft > 0 && rctsLeft / rctsInit > .1) || 
+					(1 - wallGroup.chanceBackward < .99 && prodsLeft > 0 && prodsLeft / prodsInit > .1)
 				) 
 			{
 				wallGroup.rateScalar = self.moveAlongSigmoid(wallGroup.rateScalar, -.3);
@@ -175,8 +182,8 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var kEq = kEq298 * Math.exp(-hRxn298 / 8.314 * (1 / temp - 1 / 298.15));
 			var rateConstForward = wallGroup.rateScalar * preExpForward * Math.exp(-activeEForward / (8.314 * temp));
 			var rateConstBackward = rateConstForward / kEq;
-			var numForward = Math.max(0, Math.round(self.getNumInDir(rateConstForward, self.rcts, wallGroup.moles, wallGroup.vol[wallGroup.vol.length - 1])) + Math.random() - .5);
-			var numBackward = Math.max(0, Math.round(self.getNumInDir(rateConstBackward, self.prods, wallGroup.moles, wallGroup.vol[wallGroup.vol.length - 1])), + Math.random() - .5);
+			var numForward = Math.max(0, Math.round(self.getNumInDir(rateConstForward, self.rctsNet, wallGroup.moles, wallGroup.vol[wallGroup.vol.length - 1])) + Math.random() - .5);
+			var numBackward = Math.max(0, Math.round(self.getNumInDir(rateConstBackward, self.prodsNet, wallGroup.moles, wallGroup.vol[wallGroup.vol.length - 1])), + Math.random() - .5);
 			
 			rctQueue.init  = numForward;
 			rctQueue.now   = numForward; 
@@ -185,7 +192,7 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		}
 	},
 	moveAlongSigmoid: function(yo, dx) {
-		var y = 1 / (1 + (1 / yo) * Math.exp(-dx)); //solve for y val corresponding to yo, xNew = xo + dx
+		var y = 1 / (1 + (1 / yo - 1) * Math.exp(-dx)); //solve for y val corresponding to yo, xNew = xo + dx
 		return 	y == 1 ? .999 :
 				y == 0 ? .001 :
 				y;
