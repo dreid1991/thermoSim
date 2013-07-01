@@ -58,10 +58,10 @@ LevelData = {
 						// type: 'QArrowsAmmt',
 						// attrs: {handle: 'arrowy', wallInfo: 'wally', scale: 1}
 					// }
-					{
-						type: 'Piston',
-						attrs: {handle: 'pistony', wallInfo: 'wally', min: 2, init: 4, max: 6, makeSlider: true}
-					}
+					// {
+						// type: 'Piston',
+						// attrs: {handle: 'pistony', wallInfo: 'wally', min: 2, init: 4, max: 6, makeSlider: true}
+					// }
 
 						
 				],

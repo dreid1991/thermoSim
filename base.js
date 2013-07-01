@@ -202,12 +202,6 @@ function Listener(func, obj) {
 	this.obj = obj;
 }
 
-function spcDefByName(spcName) {
-	for (var i=0; i<LevelData.spcDefs; i++) {
-		if (LevelData.spcDefs[i].spcName == spcName) return LevelData.spcDefs[i];
-	}
-}
-
 function removeListenerByName(object, typeName, pieceToRemoveBy){
 	var didDelete = false;
 	var funcName = getListenerByName(object, typeName, pieceToRemoveBy);

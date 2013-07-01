@@ -114,16 +114,16 @@ ReactionFuncs = {
 ReactionComponent = function(spcName, count, def) {
 	this.spcName = spcName;
 	this.count = count; //how many are being produced, corresponds to order.
-	this.def = spcDefByName(spcName);
+	this.def = window.spcs[spcName];
 }
 
 ReactionComponent.prototype = {
 	copy: function() {
 		return new ReactionComponent(this.spcName, this.count);
 	},
-	flattenSpcNames: function() {
-		var spcsFlat = [];
-		for (var i=0; i<this.count; i++) spcsFlat.push(this.spcName);
-		return spcsFlat;
+	flatten: function(path) {
+		var flat = [];
+		for (var i=0; i<this.count; i++) flat.push(this[path]);
+		return flat;
 	},
 }
