@@ -141,14 +141,15 @@ WallMethods.wallDataHandler = {
 		this.recordVol();
 	},
 	recordTime: function() {
-		this.data.time = new WallMethods.DataObj();
-		var dataObj = this.data.time;
-		this.setupStdDataObj(dataObj, 'time');
-		var tInit = Date.now();
 		var getTime = function() {
 			return (Date.now() - tInit) / 1000;
 		}
-		recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), getTime, this, 'update');
+		this.data.time = new WallMethods.DataObj();
+		var dataObj = this.data.time;
+		var listener = new Listener(getTime, this)
+		this.setupStdDataObj(dataObj, 'time', listener);
+		var tInit = Date.now();
+		recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), listener, 'update');
 	},
 	
 	recordTemp: function(tempFunc) {
@@ -156,8 +157,6 @@ WallMethods.wallDataHandler = {
 		if (!dataObj || !dataObj.recording()) {
 			this.data.temp = new WallMethods.DataObj();
 			var dataObj = this.data.temp;
-			this.setupStdDataObj(dataObj, 'temp');
-			var dots = this.dotManager.getWithLog({tag: this.handle});
 			if (!tempFunc) { 
 				tempFunc = function () {
 					var sumKE = 0;
@@ -167,7 +166,10 @@ WallMethods.wallDataHandler = {
 					return dots.length ? tConst * sumKE / dots.length : 0;
 				}
 			}
-			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), tempFunc, this, 'update');
+			var listener = new Listener(tempFunc, this);
+			this.setupStdDataObj(dataObj, 'temp', listener);
+			var dots = this.dotManager.getWithLog({tag: this.handle});
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), listener, 'update');
 		}
 		return this;
 	},
@@ -211,10 +213,11 @@ WallMethods.wallDataHandler = {
 		if (!dataObj || !dataObj.recording()) {
 			this.data.pInt = new WallMethods.DataObj();
 			var dataObj = this.data.pInt;
-			this.setupStdDataObj(dataObj, 'pInt');
+			var listener = new Listener(this.pInt, this);
+			this.setupStdDataObj(dataObj, 'pInt', listener);
 			this.pIntList = new Array();
 			this.pIntIdx = 0;
-			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), this.pInt, this, 'update');
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), listener, 'update');
 			
 		}
 
@@ -223,20 +226,22 @@ WallMethods.wallDataHandler = {
 	recordPExt: function() {
 		var dataObj = this.data.pExt;
 		if (!dataObj || !dataObj.recording()) {
+			var listener = new Listener(this.pExt, this);
 			this.data.pExt = new WallMethods.DataObj();
 			var dataObj = this.data.pExt;
-			this.setupStdDataObj(dataObj, 'pExt');
-			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), this.pExt, this, 'update');
+			this.setupStdDataObj(dataObj, 'pExt', listener);
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), listener, 'update');
 		}
 		return dataObj;
 	},
 	recordVol: function() {
 		var dataObj = this.data.vol;
 		if (!dataObj || !dataObj.recording()) {
+			var listener = new Listener(function() {return this.parent.wallVolume(this.handle)}, this);
 			this.data.vol = new WallMethods.DataObj();
 			var dataObj = this.data.vol;
-			this.setupStdDataObj(dataObj, 'vol');
-			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function() {return this.parent.wallVolume(this.handle)}, this, 'update');
+			this.setupStdDataObj(dataObj, 'vol', listener);
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), listener, 'update');
 		} 
 		return dataObj;
 	},
@@ -245,7 +250,6 @@ WallMethods.wallDataHandler = {
 		if (!dataObj || !dataObj.recording()) {
 			this.data.work = new WallMethods.DataObj();
 			var dataObj = this.data.work;
-			this.setupStdDataObj(dataObj, 'work');
 			
 			this.work = 0;
 			var LTOM3LOCAL = LtoM3;
@@ -272,8 +276,9 @@ WallMethods.wallDataHandler = {
 					return 0;
 				}
 			}
-
-			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), calcWork, this, 'update');
+			var listener = new Listener(calcWork, this);
+			this.setupStdDataObj(dataObj, 'work', listener);
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), listener, 'update');
 		}
 		return dataObj;
 	},
@@ -281,9 +286,10 @@ WallMethods.wallDataHandler = {
 		var dataObj = this.data.mass;
 		if (!dataObj || !dataObj.recording()) {
 			this.data.mass = new WallMethods.DataObj();
+			var listener = new Listener(function() {return this.mass}, this);
 			var dataObj = this.data.mass;
-			this.setupStdDataObj(dataObj, 'mass');
-			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function(){return this.mass}, this, 'update');	
+			this.setupStdDataObj(dataObj, 'mass', listener);
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), listener, 'update');	
 		}
 		return dataObj;			
 	},
@@ -292,8 +298,9 @@ WallMethods.wallDataHandler = {
 		if (!dataObj || !dataObj.recording()) {
 			this.data.q = new WallMethods.DataObj();
 			var dataObj = this.data.q;
-			this.setupStdDataObj(dataObj, 'q');
-			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function(){return this.q}, this, 'update');
+			var listener = new Listener(function() {return this.q}, this);
+			this.setupStdDataObj(dataObj, 'q', listener);
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), listener, 'update');
 		}
 		return dataObj;
 	},
@@ -309,7 +316,6 @@ WallMethods.wallDataHandler = {
 		if (!dataObj || !dataObj.recording()) {
 			this.data[dataType] = new WallMethods.DataObj();
 			var dataObj = this.data[dataType];
-			this.setupStdDataObj(dataObj, dataType);
 			var tempList = this.getDataSrc('temp');
 			if (this.isLiquid) {
 				for (var i=0; i<LevelData.spcDefs.length; i++) {
@@ -352,8 +358,10 @@ WallMethods.wallDataHandler = {
 				}	
 				
 			}
+			var listener = new Listener(calcEnergy, this);
+			this.setupStdDataObj(dataObj, dataType, listener);
 		
-			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), calcEnergy, this, 'update');
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), listener, 'update');
 		}
 		return dataObj;
 	},
@@ -364,7 +372,6 @@ WallMethods.wallDataHandler = {
 		if (!this.getDataObj('vDist', info)) {
 			this.data.vDist.push(new WallMethods.DataObj());
 			var dataObj = this.data.vDist[this.data.vDist.length-1];
-			this.setupInfoDataObj(dataObj, 'vDist', info);
 			var dataFunc = function() {
 				var vs = [];
 				for (var dotIdx=0; dotIdx<dots.length; dotIdx++) {
@@ -372,7 +379,10 @@ WallMethods.wallDataHandler = {
 				}
 				return vs;
 			}
-			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), dataFunc, this, 'update');
+			var listener = new Listener(dataFunc, this);
+			this.setupInfoDataObj(dataObj, 'vDist', info, listener);
+			
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), listener, 'update');
 		
 		}
 	},
@@ -387,8 +397,9 @@ WallMethods.wallDataHandler = {
 		} else {
 			this.data.moles.push(new WallMethods.DataObj());
 			dataObj = this.data.moles[this.data.moles.length-1];
-			this.setupInfoDataObj(dataObj, 'moles', info);
-			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function() {return dots.length / N}, this, 'update');
+			var listener = new Listener(function() {return dots.length / N}, this);
+			this.setupInfoDataObj(dataObj, 'moles', info, listener);
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), listener, 'update');
 		}
 		return dataObj;
 	},
@@ -403,30 +414,28 @@ WallMethods.wallDataHandler = {
 		} else {
 			this.data.frac.push(new WallMethods.DataObj());
 			dataObj = this.data.frac[this.data.frac.length-1];
+			var listener = new Listener(function() {return countList.length / (totalList.length || 1)}, this);
 			this.setupInfoDataObj(dataObj, 'frac', info);
 
-			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), function() {
-				// if (false) {
-					// console.log('woop!');
-				// }
-				return countList.length / (totalList.length || 1);
-			}, this, 'update');
+			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), listener, 'update');
 		}
 		return dataObj;		
 	},
-	setupStdDataObj: function(dataObj, id) {
+	setupStdDataObj: function(dataObj, id, listener) {
 		
 		dataObj.recording(true);
 		dataObj.recordStop(this.recordStop);
 		dataObj.id(id);
 		dataObj.type(id);
+		dataObj.listener(listener);
 		dataObj.wallHandle(this.handle);
 	},
-	setupInfoDataObj: function(dataObj, type, info) {
+	setupInfoDataObj: function(dataObj, type, info, listener) {
 		dataObj.recording(true);
 		dataObj.recordStop(this.recordStopDestroy);
 		dataObj.id(type + (info.spcName || '').toCapitalCamelCase() + (info.tag || '').toCapitalCamelCase());
 		dataObj.wallHandle(this.handle);
+		dataObj.listener(listener);
 		dataObj.type(type);
 		dataObj.idArgs(info);
 	},

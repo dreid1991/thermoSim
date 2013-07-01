@@ -66,6 +66,15 @@ _.extend(CollideHandler.prototype, toInherit.gridder, {
 			console.log('bad id string ' + idStr);
 		}
 	},
+	resetHandlerByIdStr: function(idStr) {
+		if (this.isIdStr(idStr)) {
+			this.rxns[idStr] = [];
+			this.setHandlerByIdStr(idStr, new Listener(this.impactStd, this));
+		} else {
+			console.log('Bad id str ' + idStr);
+		}
+
+	},
 	isIdStr: function(idStr) {
 		return /^[0-9]+\-[0-9]+$/.test(idStr)
 	},

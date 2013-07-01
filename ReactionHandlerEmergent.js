@@ -15,7 +15,6 @@ Copyright (C) 2013  Daniel Reid
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// rxnCnts = {aa: 0, ab: 0, bb: 0};
 
 function ReactionHandlerEmergent(collide, dotManager, rxns, tConst, activeRxns, pausedRxns) {
 	this.collide = collide;
@@ -49,7 +48,7 @@ _.extend(ReactionHandlerEmergent.prototype, ReactionFuncs, {
 		var isMultiple = this.rxns[idStr].length > 1;
 
 		if (isMultiple) {
-			if (this.rxnTypesSame(this.rxns[idStr])) {
+			if (this.rxnsAreType(this.rxns[idStr], ReactionHandlerEmergent.Reaction)) {//make sure this works
 				this.collide.setHandler(rxn.rctA, rxn.rctB, {func:this.rctHandlerMultPairs(idStr), obj:this});
 			} else {
 				console.log('Cannot mix reaction types.');
@@ -60,18 +59,6 @@ _.extend(ReactionHandlerEmergent.prototype, ReactionFuncs, {
 			this.collide.setHandler(rxn.rctA, rxn.rctB, {func:this.rctHandlerSinglePair(idStr), obj:this});
 		}	
 	},
-	rxnTypesSame: function(rxns) {
-		if (rxns.length) {
-			for (var i=1; i<rxns.length; i++) {
-				if (rxns[i].constructor != rxns[0].constructor) {
-					return false;
-				}
-			}
-			return true;
-		} else {
-			return true;
-		}
-	},
 	countProds: function(prods) {
 		var count = 0;
 		for (var prod in prods) {
@@ -79,9 +66,9 @@ _.extend(ReactionHandlerEmergent.prototype, ReactionFuncs, {
 		}
 		return count;
 	},
-	//Input prods as {name:count, ...}
+	//Input prods as {name:count, ...}  
 	//reformatting since looping through array is faster than looping through obj
-	//internally formatted as [{name:'...', count:#}..]
+	//internally formatted as [{spcName:'...', count:#}..]
 
 	hitE: function(a, b, perpAB, perpBA){
 		return .5*(Math.abs(perpAB)*perpAB*a.m*a.cvKinetic + Math.abs(perpBA)*perpBA*b.m*b.cvKinetic)*this.tConst;
@@ -106,15 +93,6 @@ and it just so happens, it works!  Maybe I've stumbled upon the probability shap
 		var collide = this.collide;
 		var prods = rxn.prods;
 		return function(a, b, UVAB, perpAB, perpBA) {
-			// if (a.spcName == 'ugly' && b.spcName == 'ugly') {
-				// rxnCnts.aa++;
-			// } else if (a.spcName == 'ugly' && b.spcName == 'uglier') {
-				// rxnCnts.ab++;
-			// } else if (a.spcName == 'uglier' && b.spcName == 'ugly') {
-				// rxnCnts.ab++;
-			// } else if (a.spcName == 'uglier' && b.spcName == 'uglier') {
-				// rxnCnts.bb++;
-			// }
 			var hitE = this.hitE(a, b, perpAB, -perpBA);
 			if (Math.random() < this.probFunc(hitE, activeE, rxn.sRxn298)) {
 				if (!this.react(a, b, prods)) {
@@ -173,47 +151,7 @@ and it just so happens, it works!  Maybe I've stumbled upon the probability shap
 		}
 		return false;
 	},
-	react: function(a, b, prods) {
-		var uRct = a.internalEnergy() + b.internalEnergy();
-		var uF298Prod = 0;
-		var cVProd = 0;
-		var x = .5*(a.x + b.x);
-		var y = .5*(a.y + b.y);
-		var newDotsBySpc = [];
-		for (var prodIdx=0; prodIdx<prods.length; prodIdx++) {
-			var name = prods[prodIdx].name;
-			var spc = this.spcs[name];
-			var prod = prods[prodIdx];
-			var spcDots = [];
-			uF298Prod += spc.uF298 * prod.count;
-			cVProd += this.spcs[name].cv * prod.count;
-			for (var countIdx=0; countIdx<prod.count; countIdx++) {
-				var angle = Math.random()*2*Math.PI;
-				var UV = V(Math.sin(angle), Math.cos(angle));
-				
-				spcDots.push(D(x+UV.dx*3, y+UV.dy*3, UV, name, a.tag, a.elemId, a.returnTo)); 
-			}
-			newDotsBySpc.push(spcDots);
-			
-		}
-		uF298Prod *= 1000 / N; //kj/mol -> j/molec;
-		cVProd /= N; //j/mol -> j/molec
-		//kind of slopping between enthalpy and internal energy.  It should all be internal energy
-		var tempF = (uRct - uF298Prod) / cVProd + 298.15;
-		if (tempF > 0) {
-			this.dotManager.remove([a, b]);
-			for (var spcIdx=0; spcIdx<newDotsBySpc.length; spcIdx++) {
-				var spcDots = newDotsBySpc[spcIdx];
-				this.dotManager.add(spcDots);
-				for (var dotIdx=0; dotIdx<spcDots.length; dotIdx++) {
-					spcDots[dotIdx].setTemp(tempF);
-				}
-			}
-			return true;
-		}
-		return false;
-		
-	}
+
 })
 
 ReactionHandlerEmergent.Reaction = function(attrs) { //prods as {name1: count, name2, count2}  hRxn in kj/mol, activeE in kj/mol, convert to j/dot
@@ -232,7 +170,7 @@ ReactionHandlerEmergent.Reaction = function(attrs) { //prods as {name1: count, n
 		
 		this.prods = this.reformatProds(attrs.prods);
 		this.prodCount = this.countProds(this.prods);
-		this.sRxn298 = this.calcSRxn([new ReactionHandlerEmergent.ReactionComponent(this.rctA, 1), new ReactionHandlerEmergent.ReactionComponent(this.rctB, 1)], this.prods, this.parent.spcs); 
+		this.sRxn298 = this.calcSRxn([new ReactionComponent(this.rctA, 1), new ReactionComponent(this.rctB, 1)], this.prods, this.parent.spcs); 
 
 	},
 
@@ -251,8 +189,8 @@ ReactionHandlerEmergent.Reaction.prototype = {
 	calcSRxn: function(rcts, prods, spcs) {
 		var sRxn = 0;
 		//kJ/mol
-		for (var i=0; i<prods.length; i++) sRxn += spcs[prods[i].name].sF298 * prods[i].count;
-		for (var i=0; i<rcts.length; i++) sRxn -= spcs[rcts[i].name].sF298 * prods[i].count;
+		for (var i=0; i<prods.length; i++) sRxn += spcs[prods[i].spcName].sF298 * prods[i].count;
+		for (var i=0; i<rcts.length; i++) sRxn -= spcs[rcts[i].spcName].sF298 * prods[i].count;
 		return sRxn;
 		
 	},
@@ -260,20 +198,20 @@ ReactionHandlerEmergent.Reaction.prototype = {
 		var isEntry = false;
 		for (var prodIdx=0; prodIdx<this.prods.length; prodIdx++) {
 			var prod = this.prods[prodIdx];
-			if (prod.name == spcName) {
+			if (prod.spcName == spcName) {
 				prod.count += increaseBy;
 				isEntry = true;
 				break;
 			}
 		}
-		if (!isEntry) this.prods.push(new ReactionHandlerEmergent.ReactionComponent(spcName, increaseBy));
+		if (!isEntry) this.prods.push(new ReactionComponent(spcName, increaseBy));
 		this.prodCount += increaseBy;
 		return this;
 	},
 	reformatProds: function(prods) {
 		var reformat = [];
-		for (var name in prods) {
-			reformat.push(new ReactionHandlerEmergent.ReactionComponent(name, prods[name]));
+		for (var spcName in prods) {
+			reformat.push(new ReactionComponent(spcName, prods[spcName]));
 		}
 		return reformat;	
 	},
@@ -289,7 +227,3 @@ ReactionHandlerEmergent.Reaction.prototype = {
 	}
 }
 
-ReactionHandlerEmergent.ReactionComponent = function(name, count) {
-	this.name = name;
-	this.count = count;
-}

@@ -17,11 +17,12 @@ Copyright (C) 2013  Daniel Reid
 
 WallMethods.DataObj = function() {
 	this.srcVal = [];
-	this.idVal;
-	this.typeVal;
-	this.idArgsVal;
-	this.wallHandleVal;
+	this.idVal = undefined;
+	this.typeVal = undefined;
+	this.idArgsVal = undefined;
+	this.wallHandleVal = undefined;
 	this.recordingVal = false;
+	this.listenerVal = undefined
 	//this.displayingVal = false;
 	this.recordStopVal = undefined;
 	//this.displayStopVal = undefined;
@@ -29,9 +30,16 @@ WallMethods.DataObj = function() {
 }
 
 WallMethods.DataObj.prototype = {
+	recordVal: function() {
+		this.srcVal.push(this.listenerVal.func.apply(this.listenerVal.obj));
+	},
 	id: function(id) {
 		if (id) this.idVal = id;
 		return this.idVal;
+	},
+	listener: function(listener) {
+		if (listener) this.listenerVal = listener;
+		return this.listenerVal;
 	},
 	type: function(type) {
 		if (type) this.typeVal = type;
