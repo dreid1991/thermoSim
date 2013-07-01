@@ -15,6 +15,7 @@ function ReactionHandlerNonEmergent(collide, dotManager, rxns, tConst, activeRxn
 	this.spcs = undefined; //set in collide's setSpcs func
 	this.activeRxns = activeRxns;
 	this.pausedRxns = pausedRxns;
+	//GIVE ME A SPCS ATTRIBUTE.  SEE REACT FUNC
 }
 
 _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
@@ -132,7 +133,7 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var queue = wallGroup[reactivePair.queuePath];
 			if (Math.random() < wallGroup[reactivePair.chancePath]) {
 				if (queue.now > 0) {
-					if (!parent.react(a, b, reactionPair.prods)) { //prods is list of ReactionComponents
+					if (!parent.react(a, b, reactivePair.prods)) { //prods is list of ReactionComponents
 						return collide.impactStd(a, b, UVAB, perpAB, perpBA);
 					}
 				}
@@ -182,8 +183,8 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var kEq = kEq298 * Math.exp(-hRxn298 / 8.314 * (1 / temp - 1 / 298.15));
 			var rateConstForward = wallGroup.rateScalar * preExpForward * Math.exp(-activeEForward / (8.314 * temp));
 			var rateConstBackward = rateConstForward / kEq;
-			var numForward = Math.max(0, Math.round(self.getNumInDir(rateConstForward, self.rctsNet, wallGroup.moles, wallGroup.vol[wallGroup.vol.length - 1])) + Math.random() - .5);
-			var numBackward = Math.max(0, Math.round(self.getNumInDir(rateConstBackward, self.prodsNet, wallGroup.moles, wallGroup.vol[wallGroup.vol.length - 1])), + Math.random() - .5);
+			var numForward = Math.max(0, Math.round(self.getNumInDir(rateConstForward, self.rctsNet, wallGroup.moles, wallGroup.vol[wallGroup.vol.length - 1]) + Math.random() - .5));
+			var numBackward = Math.max(0, Math.round(self.getNumInDir(rateConstBackward, self.prodsNet, wallGroup.moles, wallGroup.vol[wallGroup.vol.length - 1]) + Math.random() - .5));
 			
 			rctQueue.init  = numForward;
 			rctQueue.now   = numForward; 
@@ -198,7 +199,7 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 				y;
 	},
 	getNumInDir: function(rateConst, rxnSide, moleCounts, vol) {
-		var num = N * rateConst;
+		var num = N * rateConst * dataInterval * 1e-3;
 		for (var i=0; i<rxnSide.length; i++) {
 			num *= moleCounts[rxnSide[i].spcName] / vol;
 			if (rxnSide[i].count == 2) num *= moleCounts[rxnSide[i].spcName] / vol;
@@ -296,8 +297,9 @@ ReactionHandlerNonEmergent.WallGroup = function(wall, tag, rcts, prods) {
 ReactionHandlerNonEmergent.WallGroup.prototype = {
 	populateMoles: function(wall, tag, moles, rxnSide) {
 		for (var i=0; i<rxnSide.length; i++) {
-			var spcMoles = wall.recordMoles({tag: tag, spcName: rxnSide[i].spcName}).src();
-			moles[rxnSide[i].spcName] = spcMoles;
+			var spcMolesObj = wall.recordMoles({tag: tag, spcName: rxnSide[i].spcName});
+			spcMolesObj.recordVal();
+			moles[rxnSide[i].spcName] = spcMolesObj.src();
 		}
 	},
 }
