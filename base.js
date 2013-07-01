@@ -332,9 +332,11 @@ function deepCopyStep(object, stack, copies) {
 
 
 
-function recordData(handle, list, func, obj, listenerType){
+function recordData(handle, list, listener, listenerType){
 	var listenerType = defaultTo('record', listenerType)
 	store('record' + handle, listenerType);
+	var func = listener.func;
+	var obj = listener.obj;
 	addListener(curLevel, listenerType, handle, function(){list.push(func.apply(obj))}, obj); //was pushnumber.  Changed away so I could push lists. 
 }
 function recordDataStop(handle){
