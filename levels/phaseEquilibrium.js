@@ -48,8 +48,8 @@ LevelData = {
 							wallInfo: 'wallo',
 							min: 1,
 							init: 1,
-							max: 4,
-							makeSlider: false,	
+							max: 6,
+							makeSlider: true,	
 							compMode: 'cPAdiabaticDamped',
 						}	
 					},
@@ -62,7 +62,9 @@ LevelData = {
 							spcCounts: {spc3: 400},
 							actCoeffType: 'twoSfxMrg',
 							actCoeffInfo: {a: 3000},
-							makePhaseDiagram: false,
+							makePhaseDiagram: true,
+							triplePointTemp: 273.16,
+							criticalPointTemp: 647.1,
 						},
 					},
 					{
@@ -249,9 +251,9 @@ LevelData = {
 				walls: [
 					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 423.15, handle: 'wallo', vol: 13.5, isothermalRate: 4, border: {type: 'open', width: 10, yMin: 40} },
 				],
-				// dots: [
-					// {spcName: 'spc4', pos: P(45,100), dims: V(465,240), count: 400, temp:423.15, returnTo: 'wallo', tag: 'wallo'},
-				// ],	
+				dots: [
+					{spcName: 'spc3', pos: P(45,100), dims: V(465,240), count: 396, temp:423.15, returnTo: 'wallo', tag: 'wallo'},
+				],	
 				objs: [
 					{
 						type: 'Piston',
@@ -261,7 +263,7 @@ LevelData = {
 							min: 0.5,
 							init: 0.5,
 							max: 20,
-							makeSlider: false,	
+							makeSlider: true,	
 							compMode: 'cPAdiabaticDamped',
 						}	
 					},
@@ -293,10 +295,12 @@ LevelData = {
 							wallInfo: 'wallo',
 							handle: 'water',
 							tempInit: 423.15,
-							spcCounts: {spc4: 400},
+							spcCounts: {spc3: 4},
 							actCoeffType: 'twoSfxMrg',
 							actCoeffInfo: {a: 3000},
-							makePhaseDiagram: false,
+							makePhaseDiagram: true,
+							triplePointTemp: 273.16,
+							criticalPointTemp: 647.1,
 						},
 					},
 				],
