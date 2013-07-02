@@ -164,7 +164,7 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var prodsInit = prodQueue.init;
 			var prodsLeft = prodQueue.now;
 			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft * .1);//or some constant, find a good one
-			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, rctsLeft * .1); 
+			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, prodsLeft * .1); 
 
 			if 
 				(
@@ -191,10 +191,9 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		}
 	},
 	moveAlongSigmoid: function(yo, dx) {
-		var y = 1 / (1 + (1 / yo - 1) * Math.exp(-dx)); //solve for y val corresponding to yo, xNew = xo + dx
-		return 	y == 1 ? .999 :
-				y == 0 ? .001 :
-				y;
+		//solve for y val corresponding to yo, xNew = xo + dx
+		//bounding value so it can slide back
+		return Math.min(Math.max(1e-4, 1 / (1 + (1 / yo - 1) * Math.exp(-dx))), 1 - 1e-4);
 	},
 	getNumInDir: function(rateConst, rxnSide, moleCounts, vol) {
 		var num = N * rateConst * dataInterval * 1e-3;
@@ -283,8 +282,8 @@ ReactionHandlerNonEmergent.WallGroup = function(wall, tag, rcts, prods) {
 	this.vol = wall.getDataSrc('vol');
 	this.moles = {};
 	this.wallHandle = wall.handle;
-	this.chanceForward = .8; //can't do one or sigmoid shifting won't work
-	this.chanceBackward = .8;
+	this.chanceForward = .1; //can't do one or sigmoid shifting won't work
+	this.chanceBackward = .1;
 	this.rateScalar = .8;
 	this.rctQueue = new ReactionHandlerNonEmergent.Queue();
 	this.prodQueue = new ReactionHandlerNonEmergent.Queue();
