@@ -15,7 +15,6 @@ function ReactionHandlerNonEmergent(collide, dotManager, rxns, tConst, activeRxn
 	this.spcs = undefined; //set in collide's setSpcs func
 	this.activeRxns = activeRxns;
 	this.pausedRxns = pausedRxns;
-	//GIVE ME A SPCS ATTRIBUTE.  SEE REACT FUNC
 }
 
 _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
@@ -132,13 +131,12 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var wallGroup = this.wallGroupsMap[a.tag];
 			var queue = wallGroup[reactivePair.queuePath];
 			if (Math.random() < wallGroup[reactivePair.chancePath]) {
-				if (queue.now > 0) {
-					if (!parent.react(a, b, reactivePair.prods)) { //prods is list of ReactionComponents
-						return collide.impactStd(a, b, UVAB, perpAB, perpBA);
-					}
-				}
-				
 				queue.now--;
+				if (queue.now >= 0 && parent.react(a, b, reactivePair.prods)) { //prods is list of ReactionComponents
+					return false;
+				} else {
+					return collide.impactStd(a, b, UVAB, perpAB, perpBA);
+				}
 				
 			} else {
 				return collide.impactStd(a, b, UVAB, perpAB, perpBA);
@@ -165,8 +163,8 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var rctsLeft = rctQueue.now;
 			var prodsInit = prodQueue.init;
 			var prodsLeft = prodQueue.now;
-			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, (rctsLeft / rctsInit) || 0);//or some constant, find a good one
-			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, (prodsLeft / prodsInit) || 0); // || 0 to deal with prodsInit = 0
+			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft * .1);//or some constant, find a good one
+			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, rctsLeft * .1); 
 
 			if 
 				(
@@ -201,8 +199,9 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 	getNumInDir: function(rateConst, rxnSide, moleCounts, vol) {
 		var num = N * rateConst * dataInterval * 1e-3;
 		for (var i=0; i<rxnSide.length; i++) {
-			num *= moleCounts[rxnSide[i].spcName] / vol;
-			if (rxnSide[i].count == 2) num *= moleCounts[rxnSide[i].spcName] / vol;
+			var moleList = moleCounts[rxnSide[i].spcName];
+			num *= moleList[moleList.length - 1] / vol;
+			if (rxnSide[i].count == 2) num *= moleList[moleList.length - 1] / vol;
 		}
 		return num;
 	},
@@ -306,7 +305,6 @@ ReactionHandlerNonEmergent.WallGroup.prototype = {
 
 
 ReactionHandlerNonEmergent.Queue = function() {
-	this.timeEnqueue = undefined;
 	this.init = 0;
 	this.now = 0;
 }
