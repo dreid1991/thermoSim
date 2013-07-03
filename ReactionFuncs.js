@@ -79,12 +79,12 @@ ReactionFuncs = {
 			var prod = prods[prodIdx];
 			var spcDots = [];
 			uF298Prod += prod.def.uF298 * prod.count;
-			cVProd += this.spcs[spcName].cv * prod.count;
+			cVProd += this.spcs[prod.spcName].cv * prod.count;
 			for (var countIdx=0; countIdx<prod.count; countIdx++) {
 				var angle = Math.random()*2*Math.PI;
 				var UV = V(Math.sin(angle), Math.cos(angle));
 				
-				spcDots.push(D(x+UV.dx*3, y+UV.dy*3, UV, spcName, a.tag, a.elemId, a.returnTo)); 
+				spcDots.push(D(x+UV.dx*3, y+UV.dy*3, UV, prod.spcName, a.tag, a.elemId, a.returnTo)); 
 			}
 			newDotsBySpc.push(spcDots);
 			
