@@ -36,7 +36,7 @@ _.extend(CollideHandler.prototype, toInherit.gridder, {
 		this.spcs = spcs;
 		this.setDefaultHandler({func: this.impactStd, obj: this}, this.spcs);
 		this.rxnHandlerEmergent.spcs = spcs;
-		this.rxnHandlerNonEmergent.spcs = spcs;
+		this.rxnHandlerNonEmergent.setSpcs(spcs); // need to map chanceMap
 		this.setup(this.spcs);
 	},
 	setDefaultHandler: function(handler, spcs){
