@@ -22,7 +22,10 @@ function ReactionHandlerNonEmergent(collide, dotManager, rxns, tConst, activeRxn
 _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 	setSpcs: function(spcs) {
 		this.spcs = spcs;
-		this.chanceMap = new ReactionHandlerNonEmergent.ChanceMap(spcs);
+		this.chanceMap = {};
+		for (var a in this.rxns) {
+			this.chanceMap[a] = {} //map of wall handles to WallPairObjs
+		}
 	},
 	addReaction: function(attrs) {
 		attrs.parent = this;
@@ -78,6 +81,7 @@ ReactionHandlerNonEmergent.Reaction = function(attrs, allRxns) {
 	activeEForward: val, j/(mol K)
 	*/
 	this.parent = attrs.parent;
+	this.chanceMap = this.parent.chanceMap;
 	this.collide = this.parent.collide;
 	this.handle = attrs.handle;
 	this.enqueueListenerHandle = this.handle + 'Enqueue';
@@ -106,12 +110,16 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		var walls = window.walls;
 		var rcts = this.rctsNet;
 		var prods = this.prodsNet;
-		
+		var chanceMap = this.chanceMap;
 		addListener(curLevel, 'data', this.listenerHandle, function() {
 			this.wallGroups = this.makeWallGroups(walls, this.wallGroups, rcts, prods);
 			this.wallGroupsMap = {};
 			for (var i=0; i<this.wallGroups.length; i++) {
-				this.wallGroupsMap[this.wallGroups[i].wallHandle] = this.wallGroups[i];
+				var wallHandle = this.wallGroups[i].wallHandle;
+				this.wallGroupsMap[wallHandle] = this.wallGroups[i];
+				for (var a in chanceMap) {
+					if (chanceMap[a][wallHandle] === undefined) chanceMap[a][wallHandle] = new ReactionHandlerNonEmergent.WallChanceObj();
+				}
 			}
 			for (var i=0; i<this.wallGroups.length; i++) {
 				this.updateQueue(this.wallGroups[i]);
@@ -162,8 +170,8 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			prods = !reverseRxn ? this.copyRxnSide(prodsNet) : this.copyRxnSide(rctsNet);
 
 			
-			this.addToRxnSide(rcts, spcName 1);
-			this.addToRxnSide(prods, spcName 1);
+			this.addToRxnSide(rcts, spcName, 1);
+			this.addToRxnSide(prods, spcName, 1);
 			var pairFoward = new ReactionHandlerNonEmergent.ReactivePair(this, collide, rcts, prods, chanceForward, rctQueue);
 			var pairBackward = new ReactionHandlerNonEmergent.ReactivePair(this, collide, rcts, prods, chanceBackward, prodQueue);
 			this.pushPair(collide, allRxns, spcs, pairForward);
@@ -200,7 +208,7 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 				return;
 			}
 		}
-		rxnSide.push(new ReactionComponent(spcName, count);
+		rxnSide.push(new ReactionComponent(spcName, count));
 	},
 
 	copyRxnSide: function(rxnSide) {
@@ -220,7 +228,16 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		var prods = this.prodsNet;
 		var hRxn298 = this.calcHRxn298(this.rctsNet, this.prodsNet);
 		var kEq298 = Math.exp(-(hRxn298 - 298.15 * sRxn298) / (8.314 * 298.15)); 
-		return function(wallGroup) {
+		
+		var updateChanceMap = function(wallGroup, chanceMap) {  
+			for (var i=0; i<wallGroup.pairs.length; i++) {
+				var pair = wallGroup.pairs[i];
+				chanceMap[pair.idStr][wallGroup.wallHandle].updatePairChance(pair, wallGroup[pair.chancePath]);
+			}
+		}
+		
+		return function(wallGroup, chanceMap) {
+			var lastChances = [];
 			var rctQueue = wallGroup.rctQueue;
 			var prodQueue = wallGroup.prodQueue;
 			//queue.now goes below zero.  When it gets to zero, they won't react, but ones that roll right will decrement the counter
@@ -229,9 +246,10 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var rctsLeft = rctQueue.now;
 			var prodsInit = prodQueue.init;
 			var prodsLeft = prodQueue.now;
+			
 			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft * .1);//or some constant, find a good one
 			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, prodsLeft * .1); 
-
+			
 			if 
 				(
 					(1 - wallGroup.chanceForward < .99 && rctsLeft > 0 && rctsLeft / rctsInit > .1) || 
@@ -254,6 +272,9 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			rctQueue.now   = numForward; 
 			prodQueue.init = numBackward;
 			prodQueue.now  = numBackward;
+			
+			updateChanceMap(wallGroup, chanceMap);
+			
 		}
 	},
 	moveAlongSigmoid: function(yo, dx) {
@@ -384,24 +405,41 @@ ReactionHandlerNonEmergent.ReactivePair = function(rxn, collide, rcts, prods, ch
 	this.idStr = collide.getIdStr(rctDefs[0], rctDefs[1]);
 }
 
-// ReactionHandlerNonEmergent.ChanceMap = function(allRxns) {
-	// this.rxnChances = {};
-	// this.totals = {};
-	// for (var a in allRxns) {
-		// this.rxnChances[a] = [];
-		// this.totals[a] = 0;
-	// }
-// }
+ReactionHandlerNonEmergent.WallChanceObj = function(allRxns) {
+	this.total = 0;
+	this.pairChances = []
+}
 
-// ReactionHandlerNonEmergent.ChanceMap.prototype = {
-	// updatePairChance: function(pair, chance) {
-		// this.totals[pair.idStr] += chance - pair.rxn[pair.chancePath];
+ReactionHandlerNonEmergent.WallChanceObj.prototype = {
+	updatePairChance: function(pair, chance) {
+		var exists = false;
+		for (var i=0; i<this.pairChances.length; i++) {
+			if (this.pairChances[i].pair == pair) {
+				this.pairChances[i].chance = chance;
+				exists = true;
+			}
+		}
+		if (!exists) {
+			this.pairChances.push(new ReactionHandlerNonEmergent.PairChances(pair, chance));
+		}
+		this.updateTotal();
 		
-	// }
-// }
+	},
+	removePair: function(pair) {
+	
+	},
+	updateTotal: function() {
+		this.total = 0;
+		for (var i=0; i<this.pairChances.length; i++) {
+			this.total += this.pairChances[i].chance;
+		}
+	}
+}
 
 
-// ReactionHandlerNonEmergent.PairChances = function(pair, ceil) {
-	// this.pair = pair;
-	// this.chance = chance;
-// }
+
+
+ReactionHandlerNonEmergent.PairChances = function(pair, chance) {
+	this.pair = pair;
+	this.chance = chance;
+}
