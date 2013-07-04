@@ -31,27 +31,28 @@ _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 		attrs.parent = this;
 		var rxn = new ReactionHandlerNonEmergent.Reaction(attrs, this.rxns);
 		rxn.init();
-		this.readyHandlers(this.collide, this.rxns, rxn);
+		this.readyHandlers(this.collide, this.rxns, rxn, this.chanceMap);
 	},
-	readyHandlers: function(collide, allRxns, rxn) {
+	readyHandlers: function(collide, allRxns, rxn, chanceMap) {
 		for (var i=0; i<rxn.pairs.length; i++) {
 			var idStr = rxn.pairs[i].idStr
 			pairRxns = allRxns[idStr];
 			if (pairRxns.length == 1) {
 				this.initSingleRxnPair(pairRxns[0], idStr, collide);
 			} else if (pairRxns.length > 1) {
-				this.initMultiRxnPair(pairRxns, idStr, collide);
+				this.initMultiRxnPair(pairRxns, idStr, collide, chanceMap);
 			} 
 		}
 	},
 	initSingleRxnPair: function(reactivePair, idStr, collide) {
-		var idStr = reactivePair.idStr;
+		var pair = reactivePair;
+		var idStr = pair.idStr;
 		collide.setHandlerByIdStr(idStr, new Listener(function(a, b, UVAB, perpAB, perpBA) {
-			var wallGroup = reactivePair.rxn.wallGroupsMap[a.tag];
-			var queue = wallGroup[reactivePair.queuePath];
-			if (Math.random() < wallGroup[reactivePair.chancePath]) {
+			var wallGroup = pair.rxn.wallGroupsMap[a.tag];
+			var queue = wallGroup[pair.queuePath];
+			if (Math.random() < wallGroup[pair.chancePath]) {
 				queue.now--;
-				if (queue.now >= 0 && this.react(a, b, reactivePair.prods)) { //prods is list of ReactionComponents
+				if (queue.now >= 0 && this.react(a, b, pair.prods)) { //prods is list of ReactionComponents
 					return false;
 				} else {
 					return collide.impactStd(a, b, UVAB, perpAB, perpBA);
@@ -62,10 +63,29 @@ _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 			}
 		}, this));
 	},
-	initMultiRxnPair: function(reactivePairs, idStr, collide) {
+	initMultiRxnPair: function(reactivePairs, idStr, collide, chanceMap) {
 		collide.setHandlerByIdStr(idStr, new Listener(function(a, b, UVAB, perpAB, perpBA) {
-			var sumChance = 0;
+			var chanceObj = chanceMap[idStr][a.tag];
+			var chanceScalar = 1 / Math.max(1, chanceObj.total);
+			var roll = Math.random();
+			if (chanceObj.total < roll) {
+				return collide.impactStd(a, b, UVAB, perpAB, perpBA);
+			}
+			var sum = 0;
 			for (var i=0; i<reactivePairs.length; i++) {
+				var pair = reactivePairs[i];
+				var wallGroup = pair.rxn.wallGroupsMap[a.tag];
+				sum += chanceScalar * wallGroup[pair.chancePath];
+				if (sum >= roll) {
+					var queue = wallGroup[pair.queuePath];
+					queue.now--;
+					if (queue.now >=0 && this.react(a, b, pair.prods)) {
+						return false
+					} else {
+						return collide.impactStd(a, b, UVAB, perpAB, perpBA);
+					}
+				}
+				
 			}
 		}, this));
 	},	
