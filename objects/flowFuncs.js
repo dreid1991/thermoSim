@@ -47,7 +47,7 @@ var flowFuncs = {
 		var stepAdvance = ptVec.copy().UV().copy().mult(ptVec.mag()/(arrowCount + 1));
 		for (var ctIdx=0; ctIdx<arrowCount; ctIdx++) {
 			pos.movePt(stepAdvance);
-			arrows.push(new ArrowStatic({pos: pos, dims: this.arrowDims, UV: UV.copy(), fill: this.arrowFill, stroke: this.arrowStroke, cleanUpWith: this.cleanUpWith}));
+			arrows.push(new ArrowStatic({pos: pos, dims: this.arrowDims, UV: UV.copy(), handle: this.handle + 'Idx' + ctIdx, fill: this.arrowFill, stroke: this.arrowStroke, cleanUpWith: this.cleanUpWith}));
 		}
 		return arrows;
 	}

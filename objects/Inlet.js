@@ -33,7 +33,7 @@ function Inlet (attrs) {
 	this.ptIdxs = attrs.ptIdxs;
 	this.fracOffset = defaultTo(.5, attrs.fracOffset);
 	this.flows = this.processFlows(attrs.flows);
-	this.makeSlider = attrs.makeSlider;
+	this.makeSlider = defaultTo(true, attrs.makeSlider);
 	if (this.makeSlider) {
 		this.slider = sliderManager.addSlider('Flow rate', this.handle + 'Slider',  {value: this.fracOpen*100},
 			[{eventType:'slide', obj:this, func:this.parseSlider}],
