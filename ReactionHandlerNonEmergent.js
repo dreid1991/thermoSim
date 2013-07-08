@@ -182,24 +182,30 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		if (this.countRxnSide(prodsNet) == 1) {
 			reverseRxn = true;
 		}
-		
+		//so if it's a 2 -> 1 reaction, we flip it
+		//the resulting reaction will always be 1 -> 2
 		var chanceForward = !reverseRxn ? 'chanceForward' : 'chanceBackward';
 		var chanceBackward = !reverseRxn ? 'chanceBackward' : 'chanceFoward';
 		var rctQueue = !reverseRxn ? 'rctQueue' : 'prodQueue';
 		var prodQueue = !reverseRxn ? 'prodQueue' : 'rctQueue';
+		
+		rcts =  !reverseRxn ? this.copyRxnSide(rctsNet)  : this.copyRxnSide(prodsNet);
+		prods = !reverseRxn ? this.copyRxnSide(prodsNet) : this.copyRxnSide(rctsNet);
+		
 		for (var spcName in spcs) {
-			rcts =  !reverseRxn ? this.copyRxnSide(rctsNet)  : this.copyRxnSide(prodsNet);
-			prods = !reverseRxn ? this.copyRxnSide(prodsNet) : this.copyRxnSide(rctsNet);
-
-			this.addToRxnSide(rcts, spcName, 1);
-			this.addToRxnSide(prods, spcName, 1);
-			var pairFoward = new ReactionHandlerNonEmergent.ReactivePair(this, collide, rcts, prods, chanceForward, rctQueue);
-			var pairBackward = new ReactionHandlerNonEmergent.ReactivePair(this, collide, rcts, prods, chanceBackward, prodQueue);
+			var rctsForward = this.copyRxnSide(rcts);
+			var prodsForward = this.copyRxnSide(prods);			
+			var rctsBackward = this.copyRxnSide(prods);
+			var prodsBackward = this.copyRxnSide(rcts);
+			
+			this.addToRxnSide(rctsForward, spcName, 1);
+			this.addToRxnSide(prodsForward, spcName, 1); //only adding to side w/ 1 rct.
+			
+			var pairForward = new ReactionHandlerNonEmergent.ReactivePair(this, collide, rctsForward, prodsForward, chanceForward, rctQueue);
 			this.pushPair(collide, allRxns, spcs, pairForward);
-			this.pushPair(collide, allRxns, spcs, pairBackward);
-			//this.readyRxn(collide, allRxns, pairForward.idStr);
-			//this.readyRxn(collide, allRxns, pairForward.idStr);
 		}
+		var pairBackward = new ReactionHandlerNonEmergent.ReactivePair(this, collide, this.copyRxnSide(prods), this.copyRxnSide(rcts), chanceBackward, prodQueue);
+		this.pushPair(collide, allRxns, spcs, pairBackward);
 	},
 	addTwoTwo: function(spcs, allRxns, collide, rcts, prods, chanceMap) {
 		var pairFoward = new ReactionHandlerNonEmergent.ReactivePair(this, collide, rcts, prods, 'chanceForward', 'rctQueue');
@@ -268,8 +274,8 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var prodsInit = prodQueue.init;
 			var prodsLeft = prodQueue.now;
 			
-			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft * .1);//or some constant, find a good one
-			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, prodsLeft * .1); 
+			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft !== 0 ? .2 * Math.sqrt(Math.abs(rctsLeft)) * Math.abs(rctsLeft) / rctsLeft : 0);//or some constant, find a good one
+			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, prodsLeft !== 0 ? .2 * Math.sqrt(Math.abs(prodsLeft)) * Math.abs(prodsLeft) / prodsLeft : 0); 
 			
 			if 
 				(

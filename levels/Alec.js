@@ -56,7 +56,7 @@ LevelData = {
 							weightDefs: [{count: 1, pressure:2}],
 							pInit: 1,
 							weightScalar: 100,
-							pistonOffset: V(0,-25),
+							pistonOffset: V(0,-35),
 							displayText: true,
 						}
 					},

@@ -549,11 +549,11 @@ DragWeights.Weight = function(pos, groupHandle, status, weightId) {
 DragWeights.PistonBin = function(dragWeights, posX, weightGroup, pistonOffset, binWidth, blockSpacing, pistonPt, dims, binSlant, thickness) {
 	this.pos;
 	
-	if (this.pistonOffset) {
+	if (pistonOffset) {
 		var xOffset = pistonOffset.dx
-		this.pos = P(posX - binWidth/2, 0).movePt({dx:xOffset}).track({pt:pistonPt, noTrack:'x', offset:{dy: pistonOffset.dy}});
+		this.pos = P(posX - binWidth/2, 0).movePt(V(xOffset, 0)).track({pt:pistonPt, offset:{dy: pistonOffset.dy}}); //had noTrack: 'x' in both of these track calls
 	} else {
-		this.pos = P(posX - binWidth/2, 0).track({pt: pistonPt, noTrack:'x'});
+		this.pos = P(posX - binWidth/2, 0).track({pt: pistonPt});
 	}
 	this.pts = []; //should do something to draw piston bins if desired
 	dragWeights.trackingPts.push(this.pos);

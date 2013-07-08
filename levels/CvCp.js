@@ -49,7 +49,7 @@ LevelData = {
 					{spcName: 'ugly', pos: P(60, 60), dims: V(200, 350), count: 500, temp:150, returnTo: 'wally1', tag: 'wally1'},
 				],
 				objs: [
-					{type: 'Heater', attrs: {handle: 'heaterWally1', wallInfo: 'wally1', tempMax: 500, max: 5}}
+					{type: 'Heater', attrs: {handle: 'heaterWally1', wallInfo: 'wally1', tempMax: 500, max: 2}}
 				],			
 				dataReadouts: [			
 					{label: 'Heat: ', expr: 'q("wally1")', units: 'kJ', sigFigs: 2, handle: 'heating1', readout: 'mainReadout'},
@@ -101,7 +101,7 @@ LevelData = {
 								{spcName: 'ugly', pos: P(310, 220), dims: V(200, 180), count: 500, temp:150, returnTo: 'wally2', tag: 'wally2'},
 							],
 						objs: [
-								{type: 'Heater', attrs: {handle: 'heaterWally2', cleanUpWith: 'section', wallInfo: 'wally2'}},
+								{type: 'Heater', attrs: {handle: 'heaterWally2', cleanUpWith: 'section', wallInfo: 'wally2', max: 2}},
 								{type: 'Piston', attrs: {handle: 'pistony', cleanUpWith: 'section', wallInfo: 'wally2', makeSlider: false, init: 1.5}},								
 							],
 						dataReadouts: [								
