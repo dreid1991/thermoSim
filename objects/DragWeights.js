@@ -439,14 +439,14 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 	getClicked: function(){
 		for(var group in this.weightGroups){
 			var group = this.weightGroups[group];
-			for(var weightIdx=0; weightIdx<group.weights.length; weightIdx++){
+			for (var weightIdx=0; weightIdx<group.weights.length; weightIdx++) {
 				var weight = group.weights[weightIdx];
 				var clickedOn = inRect(weight.pos, group.dims, myCanvas);
-				if(clickedOn){
-					if(weight.status=='inTransit'){
+				if (clickedOn) {
+					if (weight.status=='inTransit') {
 						return weight;
-					}else{
-						if(this.isOnTop(weight)){
+					} else {
+						if (this.isOnTop(weight)) {
 							return weight;
 						}
 					}
@@ -616,7 +616,7 @@ DragWeights.StoreBin.prototype = {
 				x += dims.dx + blockSpacing;
 			}
 			slots.push(row);
-			y -= dims.dy+this.blockSpacing;
+			y -= dims.dy + blockSpacing;
 		}
 		return slots;
 	}
