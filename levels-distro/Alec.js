@@ -1,7 +1,6 @@
-
 canvasHeight = 450;
 LevelData = {
-	levelTitle: 'Reversible and Irreversible Processes',
+	levelTitle: 'Reversibility',
 
 		
 	spcDefs: [
@@ -12,23 +11,22 @@ LevelData = {
 	],	
 
 	mainSequence: [
-		
-		// {
-			// sceneData: undefined,
-			// // prompts: [
-				// // {
-					// // cutScene: true,
-					// // text: '<p>In these experiments, we will explore what makes a process irreversible and what makes a process reversible.</p><p>Before we get to the experiment, please first describe what you think the difference between an irreversible and a reversible process is.</p>',
-					// // quiz:[
-						// // {
-							// // type: 'text',
-							// // text: 'type your answer here',
-						// // }
-					// // ]
-				// // },
-			// // ],	
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
+					text: '<p>In these experiments, we will explore what makes a process irreversible and what makes a process reversible.</p><p>Before we get to the experiment, please first describe what you think the difference between an irreversible and a reversible process is.</p>',
+					quiz:[
+						{
+							type: 'text',
+							text: 'type your answer here',
+						}
+					]
+				},
+			],	
 			
-		// // },
+		},
 		{
 			sceneData: {
 				walls: [
@@ -50,15 +48,6 @@ LevelData = {
 							compMode: 'cPAdiabaticDamped',
 						}	
 					},
-					// {
-						// type: 'Blob',
-						// cleanUpWith: "prompt0",
-						// attrs: {
-							// handle: 'Blobby',
-							// fillCol: Col(150, 200, 150),
-							// pts: [P(150, 150), P(300, 150), P(300, 300), P(150, 300)],
-						// }
-					// },
 					{
 						type: 'DragWeights',
 						attrs: {
@@ -66,7 +55,8 @@ LevelData = {
 							wallInfo: 'left',
 							weightDefs: [{count: 1, pressure:2}],
 							pInit: 1,
-							pistonOffset: V(130,-41),
+							weightScalar: 100,
+							pistonOffset: V(0,-10),
 							displayText: true,
 						}
 					},
@@ -76,11 +66,11 @@ LevelData = {
 					}	
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'External Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
+					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
 						sets:[
-							{handle: 'externalPressure', label: 'P ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
+							{handle: 'externalPressure', label: 'P Ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
 							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
-							{handle: 'internalPressure', label: 'P int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
+							{handle: 'internalPressure', label: 'P Int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
 							data: {x: 'vol("left")', y: 'pInt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]
 					}
@@ -91,9 +81,9 @@ LevelData = {
 				dataReadouts: [
 					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', decPlaces: 0, handle: 'tempReadout', readout: 'mainReadout'},
 					{label: 'Q: ', expr: 'q("left")', units: 'kJ', decPlaces: 1, handle: 'heatReadout', readout: 'mainReadout'},
-					{label: 'Pint: ', expr: 'pInt("left")', units: 'bar', decPlaces: 1, handle: 'pIntReadout', readout: 'pistonReadoutRightPiston'},
+					{label: 'Pint: ', expr: 'pInt("left")', units: 'bar', decPlaces: 1, handle: 'pIntReadout', readout: 'pistonRightPistonLeft'},
 					{label: 'Vol: ', expr: 'vol("left")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
-					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'mainReadout'}
+					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonRight'}
 				],
 				triggers: [
 					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Place the block on the piston', requiredFor: 'prompt0', checkOn:'conditions'},
@@ -171,7 +161,7 @@ LevelData = {
 							wallInfo: 'left',
 							weightDefs: [{count: 2, pressure:1}],
 							pInit: 1,
-							pistonOffset: V(130,-41),
+							pistonOffset: V(0,-10),
 							displayText: true,
 						}
 					},
@@ -181,11 +171,11 @@ LevelData = {
 					}	
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'External Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
+					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
 						sets:[
-							{handle: 'externalPressure', label: 'P ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
+							{handle: 'externalPressure', label: 'P Ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
 							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
-							{handle: 'internalPressure', label: 'P int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
+							{handle: 'internalPressure', label: 'P Int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
 							data: {x: 'vol("left")', y: 'pInt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]
 					}
@@ -196,9 +186,9 @@ LevelData = {
 				dataReadouts: [
 					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', sigFigs: 3, handle: 'tempReadout', readout: 'mainReadout'},
 					{label: 'Q: ', expr: 'q("left")', units: 'kJ', sigFigs: 1, handle: 'heatReadout', readout: 'mainReadout'},
-					{label: 'Pint: ', expr: 'pInt("left")', units: 'bar', sigFigs: 2, handle: 'pIntReadout', readout: 'pistonReadoutRightPiston'},
+					{label: 'Pint: ', expr: 'pInt("left")', units: 'bar', sigFigs: 2, handle: 'pIntReadout', readout: 'pistonRightPistonRight'},
 					{label: 'Vol: ', expr: 'vol("left")', units: 'L', sigFigs: 3, handle: 'volReadout', readout: 'mainReadout'},
-					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'mainReadout'}
+					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
 				],
 				triggers: [
 					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Place the blocks on the piston', requiredFor: 'prompt0', checkOn:'conditions'},
@@ -285,11 +275,11 @@ LevelData = {
 					}	
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'External Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
+					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
 						sets:[
-							{handle: 'externalPressure', label: 'P ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
+							{handle: 'externalPressure', label: 'P Ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
 							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
-							{handle: 'internalPressure', label: 'P int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
+							{handle: 'internalPressure', label: 'P Int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
 							data: {x: 'vol("left")', y: 'pInt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]
 					}
@@ -300,9 +290,9 @@ LevelData = {
 				dataReadouts: [
 					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', sigFigs: 3, handle: 'tempReadout', readout: 'mainReadout'},
 					{label: 'Q: ', expr: 'q("left")', units: 'kJ', decPlaces: 1, handle: 'heatReadout', readout: 'mainReadout'},
-					//{label: 'Pint: ', expr: 'pInt("left")', units: 'bar', sigFigs: 2, handle: 'pIntReadout', readout: 'pistonReadoutRightPiston'},
+					{label: 'pInt: ', expr: 'pInt("left")', units: 'bar', sigFigs: 2, handle: 'pIntReadout', readout: 'pistonRightPistonRight'},
 					{label: 'Vol: ', expr: 'vol("left")', units: 'L', sigFigs: 3, handle: 'volReadout', readout: 'mainReadout'},
-					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'mainReadout'}
+					{label: 'pExt: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
 				],
 				triggers: [
 					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Add mass to the system', requiredFor: 'prompt0', checkOn:'conditions'},
