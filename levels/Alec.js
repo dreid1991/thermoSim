@@ -1,6 +1,6 @@
 canvasHeight = 450;
 LevelData = {
-	levelTitle: 'Reversibility Template',
+	levelTitle: 'Reversibility',
 
 		
 	spcDefs: [
