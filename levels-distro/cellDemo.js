@@ -4,9 +4,9 @@ LevelData = {
 
 	spcDefs: [
 		//add antoine coefs, cvLiq, hvap
-		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'spc1', m: 2, r: 2, col: Col(200, 0, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
 		{spcName: 'spc2', m: 4, r: 1, col: Col(150, 100, 255), cv: 1.5 * R, hF298: -12, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.213, b: 1652.27, c: 231.48-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
-		{spcName: 'fairy', m: 4, r: 1, col: Col(250, 250, 250), cv: 1.5 * R, hF298: -12, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
+		{spcName: 'fairy', m: 2, r: 1, col: Col(250, 250, 250), cv: 1.5 * R, hF298: -12, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'heavy', m: 10, r: 4, col: Col(0, 0, 200), cv: 1.5 * R, hF298: -12, hVap298: 10, sF298: -1, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
 	],
 	mainSequence: [
@@ -34,8 +34,16 @@ LevelData = {
 				dataReadouts: [
 					{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 					{label: 'cell temp: ', expr: 'tempSmooth("cellSquishyInner")', units: 'K', decPlaces: 1, handle: 'cell', readout: 'mainReadout'},
-					{label: 'cell frac: ', expr: 'frac("cellSquishyInner", {spcName: "spc1", tag: "cellSquishyInner"})', units: '', decPlaces: 2, handle: 'cellFrac', readout: 'mainReadout'}
+					{label: 'cell frac: ', expr: 'frac("cellSquishyInner", {spcName: "spc1", tag: "cellSquishyInner"})', units: '', decPlaces: 2, handle: 'cellFrac', readout: 'mainReadout'},
+					{label: 'cell vol: ', expr: 'vol("cellSquishyInner")', units: 'L', decPlaces: 2, handle: 'cellVol', readout: 'mainReadout'}
 				],
+				graphs: [
+					{type: 'Scatter', handle: 'eqConst', xLabel: "time (s)", yLabel: "vol", axesInit:{x:{min:0, step:10}, y:{min:0, step:.2}}, numGridLines: {y: 6}, 
+						sets:[
+							{handle:'frac', label:'eq\nconst', pointCol:Col(50,255,50), flashCol:Col(255,200,200), data:{x: 'time("cellSquishyInner")', y: "vol('cellSquishyInner')"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
+						]
+					},
+				]
 			},
 			prompts: [
 				{
@@ -104,6 +112,7 @@ LevelData = {
 					{label: 'temp: ', expr: 'tempSmooth("wally3")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 					{label: 'cell temp: ', expr: 'tempSmooth("cellSquishy3Inner")', units: 'K', decPlaces: 1, handle: 'cell', readout: 'mainReadout'},
 					{label: 'cell frac: ', expr: 'frac("cellSquishy3Inner", {spcName: "spc1", tag: "cellSquishy3Inner"})', units: '', decPlaces: 2, handle: 'cellFrac', readout: 'mainReadout'}
+			
 				],
 			},
 			prompts: [

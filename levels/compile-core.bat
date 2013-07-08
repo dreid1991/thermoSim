@@ -28,6 +28,7 @@ java -jar ../../compiler.jar ^
 --js ../ReactionHandlerNonEmergent.js ^
 --js ../CollideHandler.js ^
 --js ../DotMigrator.js ^
+--js ../CanvasManager.js ^
 --js ../Attractor.js ^
 --js ../DataHandler.js ^
 --js ../WallHandler.js ^

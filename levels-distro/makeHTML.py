@@ -89,6 +89,7 @@ def makeHTML(levelDataFileName, fileListName):
 
 		<div id='baseDash' class='sim bottomRound noSelect'></div>
 	</div>
+	<img id='brickImg' src='img/brick.bmp' style='visibility:hidden'></img>
 	<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 	"""
 	for fileName in files:

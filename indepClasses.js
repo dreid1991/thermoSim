@@ -457,72 +457,32 @@ Point.prototype = {
 		return this.x!==undefined && !isNaN(this.x) && this.y!==undefined && !isNaN(this.y);
 	},
 	track: function(trackData){
+		var pt, offset, noTrackX, noTrackY, xMult, yMult;
+		
 		if (trackData instanceof Point) {
 			pt = trackData;
-			offset = false;
+			offset = V(0, 0);
 			noTrackX = false;
 			noTrackY = false;
+			
+			
+			
 		} else {
-			var pt = trackData.pt;
-			var offset = trackData.offset;
-			var noTrack = defaultTo('',trackData.noTrack);
-			var noTrackX = noTrack.indexOf('x')+1;// so is 0 if not there
-			var noTrackY = noTrack.indexOf('y')+1;
+			pt = trackData.pt;
+			offset = trackData.offset == undefined ? V(0, 0) : V(trackData.offset.dx || 0, trackData.offset.dy || 0);
+			noTrackX = /x/i.test(trackData.noTrack);
+			noTrackY = /y/i.test(trackData.noTrack);
 		}
-
+		xMult = !noTrackX ? 1 : 0;
+		yMult = !noTrackY ? 1 : 0;
+		var trackFunc = function() {
+			this.x = this.x + xMult * (pt.x - this.x + offset.dx);
+			this.y = this.y + yMult * (pt.y - this.y + offset.dy);
+		}
+		
 		this.trackListenerId = unique(this.x+','+this.y+'tracksWithUniqueId', curLevel.updateListeners);
-		if (isNaN(this.x) || isNaN(this.y)) {
-			console.log('Trying to track NaN!');
-			console.trace();
-		}
-		if (!noTrackX && !noTrackY) {
-			if (!offset) {
-				var trackFunc = function() {
-					this.x = pt.x;
-					this.y = pt.y;
-				}
-			} else if (offset.dx) {
-				var trackFunc = function() {
-					this.x = pt.x + offset.dx;
-					this.y = pt.y;
-				}
-			} else if (offset.dy) {
-				var trackFunc = function(){
-					this.x = pt.x;
-					this.y = pt.y + offset.dy;
-				}
-			} else if (offset.dy && offset.dx) {
-				var trackFunc = function() {
-					this.x = pt.x + offset.dx;
-					this.y = pt.y + offset.dy;
-				}
-			}
-		} else if (noTrackX) {
-			if (!offset) {
-				var trackFunc = function() {
-					this.y = pt.y;
-				}
-			} else if (offset.dy) {
-				var trackFunc = function() {
-					this.y = pt.y + offset.dy;
-				}
-			}			
-		} else if (noTrackY) {
-			if (!offset) {
-				var trackFunc = function() {
-					this.x = pt.x;
-				}
-			} else if(offset.dx) {
-				var trackFunc = function() {
-					this.x = pt.x + offset.dx;
-				}
-			}		
-		}
-		// if (trackFunc) {
+		
 		addListener(curLevel, 'update', this.trackListenerId, trackFunc, this);
-			// this.cleanUpWith = defaultTo(currentSetupType, trackData.cleanUpWith)
-			// addListener(curLevel, this.cleanUpWith + 'CleanUp', this.trackListenerId, this.trackStop, this);
-		// } else {
 		if (!trackFunc) {
 			console.log('tried to track ' + this.trackListenerId + " but input wasn't right");
 			console.trace();

@@ -76,17 +76,15 @@ ReactionFuncs = {
 		var y = .5*(a.y + b.y);
 		var newDotsBySpc = [];
 		for (var prodIdx=0; prodIdx<prods.length; prodIdx++) {
-			var spcName = prods[prodIdx].spcName;
-			var spc = this.spcs[spcName];
 			var prod = prods[prodIdx];
 			var spcDots = [];
-			uF298Prod += spc.uF298 * prod.count;
-			cVProd += this.spcs[spcName].cv * prod.count;
+			uF298Prod += prod.def.uF298 * prod.count;
+			cVProd += this.spcs[prod.spcName].cv * prod.count;
 			for (var countIdx=0; countIdx<prod.count; countIdx++) {
 				var angle = Math.random()*2*Math.PI;
 				var UV = V(Math.sin(angle), Math.cos(angle));
 				
-				spcDots.push(D(x+UV.dx*3, y+UV.dy*3, UV, spcName, a.tag, a.elemId, a.returnTo)); 
+				spcDots.push(D(x+UV.dx*3, y+UV.dy*3, UV, prod.spcName, a.tag, a.elemId, a.returnTo)); 
 			}
 			newDotsBySpc.push(spcDots);
 			
@@ -111,7 +109,7 @@ ReactionFuncs = {
 }
 
 
-ReactionComponent = function(spcName, count, def) {
+ReactionComponent = function(spcName, count) {
 	this.spcName = spcName;
 	this.count = count; //how many are being produced, corresponds to order.
 	this.def = window.spcs[spcName];
