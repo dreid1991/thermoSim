@@ -68,7 +68,7 @@ LevelData = {
 				],
 				objs: [
 					{type: 'CompArrow',
-						attrs: {handle: 'compArrow', wallInfo: 'FirstWall', speed: 2, bounds: {y: {max:380, min: 30}}, stops: true}
+						attrs: {handle: 'compArrow', wallInfo: 'FirstWall', speed: 2, bounds: {y: {max:320, min: 30}}, stops: true}
 					}
 				]
 			},
@@ -107,7 +107,7 @@ LevelData = {
 						attrs: {handle: 'PistonOne', wallInfo: 'SecondWall', min: 2, init: 0, max: 20, makeSlider: false}
 					},
 					{type: 'DragWeights',
-						attrs: {handle: 'DragsOne', wallInfo: 'SecondWall', weightDefs: [{count:1, pressure:13}], weightScalar: 10, pInit: 2, pistonOffset: V(130,-41), displayText: false}
+						attrs: {handle: 'DragsOne', wallInfo: 'SecondWall', weightDefs: [{count:1, pressure:13}], weightScalar: 10, pInit: 2, pistonOffset: V(0,-10), displayText: false}
 					}			
 				],
 				dataReadouts: [
@@ -160,7 +160,7 @@ LevelData = {
 						attrs: {handle: 'PistonOne', wallInfo: 'ThirdWall', min: 2, init: 0, max: 20, makeSlider: false}
 					},
 					{type: 'DragWeights',
-						attrs: {handle: 'DragsTwo', wallInfo: 'ThirdWall', weightDefs: [{count:1, pressure:13}], weightScalar: 10, pInit: 2, pistonOffset: V(130,-41), displayText: false}
+						attrs: {handle: 'DragsTwo', wallInfo: 'ThirdWall', weightDefs: [{count:1, pressure:13}], weightScalar: 10, pInit: 2, pistonOffset: V(0,-10), displayText: false}
 					}			
 				],
 				dataReadouts: [

@@ -23,7 +23,7 @@ SliderManager.prototype = {
 	addSlider: function(title, handle, attrs, handlers, idx) {
 		idx = idx === undefined ? this.getMaxIdx(this.sliderGroupWrapper) + 1 : idx;
 		var sliderWrapper = this.insertSliderWrapper(this.containerId, this.sliderGroupWrapper, idx, handle)
-		var sliderPadding = this.insertSliderPadding(sliderWrapper);
+		var sliderPadding = this.insertSliderPadding(this.containerId, sliderWrapper);
 		var sliderInnerId = 'sliderInnerContainer' + this.containerId + 'Handle' + handle;
 		var sliderInnerSelector = '#' + this.containerId + ' #' + sliderInnerId;
 		var sliderWrappers = makeSlider(sliderPadding, sliderPadding, sliderInnerSelector, sliderInnerId, title, attrs, handlers)
@@ -63,11 +63,11 @@ SliderManager.prototype = {
 		}
 		return $('#' + containerId + ' #' + sliderId);
 	},
-	insertSliderPadding: function(sliderWrapper) {
+	insertSliderPadding: function(containerId, sliderWrapper) {
 		var id = sliderWrapper.attr('id') + 'Padding'
 		var html = templater.div({attrs: {id: [id], 'class': ['sliderPadding']}});
 		sliderWrapper.append(html);
-		return $('#' + sliderWrapper.attr('id') + ' #' + id);
+		return $('#' + containerId + ' #' + sliderWrapper.attr('id') + ' #' + id);
 	},
 	getMaxIdx: function(groupWrapper) {
 		var children = groupWrapper.children();

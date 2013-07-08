@@ -193,7 +193,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, condition
 
 	//sort moments here
 	this.level = new LevelInstance();
-	this.mainReadout = new Readout('mainReadout', 30, myCanvas.width-125, 25, '13pt calibri', Col(255,255,255), 'left', this.level);
+	this.mainReadout = new Readout('mainReadout', 30, myCanvas.width-125, 25, '11pt calibri', Col(255,255,255), 'left', this.level);
 	this.dotManager = new DotManager();
 	this.collide = new CollideHandler(this.dotManager);
 	this.walls = WallHandler();
