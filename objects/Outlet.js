@@ -22,7 +22,7 @@ function Outlet(attrs) {
 	this.type = 'Outlet';
 	this.handle = attrs.handle;
 	//if depth is 0, just have it not add any pointsa
-	this.width = defaultTo(30, attrs.height);
+	this.width = defaultTo(30, attrs.width);
 	this.depth = defaultTo(20, attrs.depth) || 20; //can't be zero, need to set a wall handler
 	this.fracOpen = defaultTo(1, attrs.fracOpen);
 	this.makePts = this.depth;
@@ -31,6 +31,7 @@ function Outlet(attrs) {
 	this.ptIdxs = attrs.ptIdxs;
 	this.fracOffset = defaultTo(.5, attrs.fracOffset);
 	this.arrows = [];
+	this.setupStd();
 	this.init();
 }
 

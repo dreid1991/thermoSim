@@ -104,7 +104,7 @@ WallMethods.main = {
 		for (var subWallIdx=0; subWallIdx<this[wallIdx].length; subWallIdx++){
 			var subWall = this[wallIdx][subWallIdx];
 			if (typeof handler == 'string') {
-				this[wallIdx].handlers[subWallIdx] = {obj: this, func: this[handler]};
+				this[wallIdx].handlers[subWallIdx] = new Listener(this[handler], this);
 			} else if (typeof handler == 'object') {
 				this[wallIdx].handlers[subWallIdx] = handler;
 			}
@@ -123,7 +123,7 @@ WallMethods.main = {
 	},
 	getSubWallHandler: function(wallInfo, subWallIdx) {
 		var wallIdx = this.idxByInfo(wallInfo);
-		return this[wallIdx + '-' + subWallIdx];
+		return this[wallIdx].handlers[subWallIdx];
 	},
 	setupWall: function(wallIdx){
 		this[wallIdx].wallUVs = this.getWallUV(wallIdx);

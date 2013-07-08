@@ -558,7 +558,7 @@ WallMethods.wall = {
 		for (var movedPtIdx=spliceIdx + toAdd.length; movedPtIdx<this.length; movedPtIdx++) {
 			this.parent.setSubWallHandler(this.handle, movedPtIdx, oldHandlers[movedPtIdx - toAdd.length - spliceIdx]);
 		}
-		var newHandler = oldHandlers[0] || this.parent[id + '-' + (spliceIdx - 1)];
+		var newHandler = oldHandlers[0] || this.handlers[spliceIdx - 1];
 		for (var newPtIdx=spliceIdx; newPtIdx<spliceIdx + toAdd.length; newPtIdx++) {
 			this.parent.setSubWallHandler(this.handle, newPtIdx, newHandler)
 		}

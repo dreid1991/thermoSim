@@ -54,6 +54,14 @@ LevelData = {
 					
 					
 					},
+					{
+						type: 'Inlet',
+						attrs: {handle: 'inny', wallInfo: 'wally', width: 40, depth: 25, flows: [{spcName: 'spc1', temp:200, nDotMax: .05, tag: 'wally'}], ptIdxs: [3, 4], fracOffset: .2}
+					},
+					{
+						type: 'Outlet',
+						attrs: {handle: 'thor', wallInfo: 'wally', width: 70, depth: 30, ptIdxs: [1, 2], fracOffset: .4}
+					}
 					// {
 						// type: 'QArrowsAmmt',
 						// attrs: {handle: 'arrowy', wallInfo: 'wally', scale: 1}
