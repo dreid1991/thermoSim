@@ -35,7 +35,7 @@ function Heater(attrs){
 
 	if (attrs.offset) this.pos.movePt(attrs.offset);
 	this.wall.recordQ();
-	this.wall.hitThreshold = -30;
+	this.wall.hitThreshold = 30;
 	this.makeSlider = defaultTo(true, attrs.makeSlider);
 	this.handle = attrs.handle;
 	this.canvasHandle = attrs.canvasHandle || 'main';

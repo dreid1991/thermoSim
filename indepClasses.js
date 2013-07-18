@@ -190,7 +190,7 @@ Vector.prototype = {
 	dotProd: function(b){
 		return this.dx*b.dx + this.dy*b.dy;
 	},
-	perpDotProd: function(b) {
+	crossProd: function(b) {
 		return this.dx * b.dy - this.dy * b.dx;
 	},
 	magSqr: function(){

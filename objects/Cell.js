@@ -33,8 +33,8 @@ function Cell(attrs) {
 	var innerWallPts = this.makeInnerWallPts(this.guideNodes, thickness);
 	this.outerWall = walls.addWall({pts: outerWallPts, handle: 'cell' + this.handle.toCapitalCamelCase() + 'Outer', handler: 'staticAdiabatic', show: false, record: false, col: Col(255, 255, 255)});
 	this.innerWall = walls.addWall({pts: innerWallPts, handle: 'cell' + this.handle.toCapitalCamelCase() + 'Inner', handler: 'staticAdiabatic', show: false, record: true, col: Col(255, 255, 255)});
-	this.innerWall.hitThreshold = -10;
-	this.outerWall.hitThreshold = -10;
+	this.innerWall.hitThreshold = 10;
+	this.outerWall.hitThreshold = 10;
 	this.parentWallMemberTag = attrs.parentWallHandle;
 	this.cellMemberTag = this.innerWall.handle;
 	var innerChanceTransport = attrs.innerChanceTransport || {};

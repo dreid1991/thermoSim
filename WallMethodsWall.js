@@ -84,9 +84,9 @@ WallMethods.wall = {
 		
 		
 		var dotVec = V(dot.x + dot.v.dx - perpUV.dx*dot.r - this[wallPtIdx].x, dot.y + dot.v.dy - perpUV.dy*dot.r - this[wallPtIdx].y);
-		var distFromWall = perpUV.dotProd(dotVec);
+		var distPastWall = -perpUV.dotProd(dotVec);
 		var perpV = -perpUV.dotProd(dot.v);
-		if (distFromWall<0 && distFromWall>this.hitThreshold && this.isBetween(dot, wallPtIdx, wallUV)){
+		if (distPastWall>=0 && distPastWall<=this.hitThreshold && this.isBetween(dot, wallPtIdx, wallUV, perpUV, distPastWall)){
 			this['didHit'+this.hitMode](dot, wallPtIdx, wallUV, perpV, perpUV);
 			return true;
 		}
@@ -99,27 +99,18 @@ WallMethods.wall = {
 		var handler = this.handlers[subWallIdx];
 		handler.func.apply(handler.obj, [dot, this, subWallIdx, wallUV, perpV, perpUV]);		
 	},
-	isBetween: function(dot, wallPtIdx, wallUV){
-		var wallAdjust = dot.v.dotProd(wallUV);
-		var xAdj = wallAdjust*wallUV.dx;
-		var yAdj = wallAdjust*wallUV.dy;
-		var wallPtA = P(this[wallPtIdx].x+xAdj, this[wallPtIdx].y+yAdj);
-		var wallPtB = P(this[wallPtIdx+1].x+xAdj, this[wallPtIdx+1].y+yAdj);
-		var reverseWallUV = V(-wallUV.dx, -wallUV.dy);
-		var dotVecA = V(dot.x-wallPtA.x, dot.y-wallPtA.y);
-		var dotVecB = V(dot.x-wallPtB.x, dot.y-wallPtB.y);
-		return dotVecA.dotProd(wallUV)>=0 && dotVecB.dotProd(reverseWallUV)>=0;
+	isBetween: function(dot, wallPtIdx, wallUV, perpUV, distPastWall){
+		var perpComponent = -dot.v.dotProd(perpUV); 
+		var numVsPast = perpComponent == 0 ? 0 : distPastWall / perpComponent;
+		var dotPosAdj = new Point(dot.x - numVsPast * dot.v.dx, dot.y - numVsPast * dot.v.dy);
 		
-		//var wallAdjust = Math.abs(dot.v.dotProd(wallUV);
-		// var xAdj = (Math.abs(dot.v.dx) + dot.r) * wallUV.dx;
-		// var yAdj = (Math.abs(dot.v.dy) + dot.r) * wallUV.dy;
-		// //hey, so I'm just going to extend the wall by R and V, because I'd rather overextend the wall than have leaks
-		// var wallPtA = new Point(this[wallPtIdx].x - xAdj , this[wallPtIdx].y - yAdj);
-		// var wallPtB = new Point(this[wallPtIdx+1].x + xAdj, this[wallPtIdx+1].y + yAdj);
-		// var reverseWallUV = new Vector(-wallUV.dx, -wallUV.dy);
-		// var dotVecA = new Vector(dot.x + dot.v.dx - wallPtA.x, dot.y + dot.v.dy - wallPtA.y);
-		// var dotVecB = new Vector(dot.x + dot.v.dx - wallPtB.x, dot.y + dot.v.dy - wallPtB.y);
-		// return dotVecA.dotProd(wallUV)>=0 && dotVecB.dotProd(reverseWallUV)>=0;
+		var wallPtA = new Point(this[wallPtIdx].x - wallUV.dx * dot.r, this[wallPtIdx].y - wallUV.dy * dot.r);
+		var wallPtB = new Point(this[wallPtIdx + 1].x + wallUV.dx * dot.r, this[wallPtIdx + 1].y + wallUV.dy * dot.r);
+		
+		var aToDot = new Vector(dotPosAdj.x - wallPtA.x, dotPosAdj.y - wallPtA.y); //inlining VTo
+		var bToDot = new Vector(dotPosAdj.x - wallPtB.x, dotPosAdj.y - wallPtB.y);
+		return (aToDot.dotProd(wallUV) >= 0 && bToDot.dotProd(wallUV) <= 0);
+		
 	},
 	didHitArrowDV: function(dot, subWallIdx, wallUV, perpV, perpUV) {
 		var vo = dot.v.copy();
@@ -207,9 +198,9 @@ WallMethods.wall = {
 		);
 	},
 	changeSetPt: function(dest, compType, speed){
-		if(compType.indexOf('isothermal')!=-1){
+		if (/isothermal/i.test(compType)) {
 			var wallMoveMethod = 'cVIsothermal';
-		} else if (compType.indexOf('adiabatic')!=-1){
+		} else if (/adiabatic/i.test(compType)) {
 			var wallMoveMethod = 'cVAdiabatic';
 		}
 		removeListener(curLevel, 'wallMove', 'cV' + this.handle);

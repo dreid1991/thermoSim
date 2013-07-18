@@ -115,8 +115,8 @@ WallMethods.main = {
 		var wallIdx = this.idxByInfo(wallInfo);
 		if (typeof handler == 'string') {
 			this[wallIdx][subWallIdx].isothermal = /isothermal/i.test(handler); 
-			
-			this[wallIdx].handlers[subWallIdx] = {obj: this, func: this[handler]};
+			//wall handlers are addressed by string
+			this[wallIdx].handlers[subWallIdx] = new Listener(this[handler], this);
 		} else if (typeof handler == 'object') {
 			this[wallIdx].handlers[subWallIdx] = handler;
 		}		
@@ -190,7 +190,7 @@ WallMethods.main = {
 		this[wallIdx].liquids = {};
 		this[wallIdx].data = {};
 		this[wallIdx].q = 0;
-		this[wallIdx].hitThreshold = -15;
+		this[wallIdx].hitThreshold = 15;
 		this[wallIdx].handlers = [];
 		this[wallIdx].pIntLen = 35;
 		this[wallIdx].surfAreaAdj = {};

@@ -81,7 +81,7 @@ WallMethods.collideMethods ={
 		// dot.v.dy*=ratio;
 		wall.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
 	},	
-	cPAdiabatic: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV){
+	cPAdiabatic: function(dot, wall, subWallIdx, wallUV, perpV, perpUV){
 		var tempO = dot.temp();
 		var dotVyF;
 		var vo = dot.v.copy();

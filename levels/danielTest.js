@@ -14,10 +14,10 @@ LevelData = {
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: 'staticAdiabatic', handle: 'wally', /*, border: {type: 'open', thickness: 5, yMin: 30}*/}
+					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: 'cVIsothermal', temp: 298.15, handle: 'wally', /*, border: {type: 'open', thickness: 5, yMin: 30}*/}
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(250, 250), count: 1000, temp: 198.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'spc1', pos: P(55, 55), dims: V(250, 250), count: 1, temp: 198.15, returnTo: 'wally', tag: 'wally'},
 					// {spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 0, temp: 398.15, returnTo: 'wally', tag: 'wally'},
 					
 					
@@ -37,7 +37,7 @@ LevelData = {
 					// },
 					// {
 						// type: 'Cell',
-						// attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 100, dots: {fairy: 200}, boundingCorner: P(50, 50), boundingVector: V(400, 350), numCorners: 12, col: Col(0, 150, 0), innerChanceTransport: {spc1: .7}, outerChanceTransport: {spc1: .2}}
+						// attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 100, dots: {fairy: 0}, boundingCorner: P(50, 50), boundingVector: V(400, 350), numCorners: 12, col: Col(0, 150, 0), innerChanceTransport: {spc1: .7}, outerChanceTransport: {spc1: .2}}
 					// },
 					// {
 						// type: 'ActivationEnergyPair',
@@ -54,14 +54,14 @@ LevelData = {
 					
 					
 					},
-					{
-						type: 'Inlet',
-						attrs: {handle: 'inny', wallInfo: 'wally', width: 40, depth: 25, flows: [{spcName: 'spc1', temp:200, nDotMax: .05, tag: 'wally'}], ptIdxs: [3, 4], fracOffset: .2}
-					},
-					{
-						type: 'Outlet',
-						attrs: {handle: 'thor', wallInfo: 'wally', width: 70, depth: 30, ptIdxs: [1, 2], fracOffset: .4}
-					}
+					// {
+						// type: 'Inlet',
+						// attrs: {handle: 'inny', wallInfo: 'wally', width: 40, depth: 25, flows: [{spcName: 'spc1', temp:200, nDotMax: .05, tag: 'wally'}], ptIdxs: [3, 4], fracOffset: .2}
+					// },
+					// {
+						// type: 'Outlet',
+						// attrs: {handle: 'thor', wallInfo: 'wally', width: 70, depth: 30, ptIdxs: [1, 2], fracOffset: .4}
+					// }
 					// {
 						// type: 'QArrowsAmmt',
 						// attrs: {handle: 'arrowy', wallInfo: 'wally', scale: 1}
