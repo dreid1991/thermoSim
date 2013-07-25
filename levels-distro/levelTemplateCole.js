@@ -82,7 +82,7 @@ LevelData = {
 					text: "",
 					quiz: [
 						{
-							questionText: "<center>##nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p>From the equation above we see that temperature increases as we do work by decreasing volume.  Temperature is an expression is molecular kinetic energy, so as the system is compressed, the molecules must speed up.  These ideal gas molecules can be thought of as perfectly elastic bouncy balls.  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?",
+							questionText: "<center>##nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p>From the equation above we see that temperature increases as we do work by decreasing volume.  Temperature is an expression of molecular kinetic energy, so as the system is compressed, the molecules must speed up.  These ideal gas molecules can be thought of as perfectly elastic bouncy balls.  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?",
 							type: 'text', CWQuestionId: 3, storeAs: 'FirstSceneAnswer', Text: 'Type your answer here.'}
 					],
 					
@@ -199,7 +199,7 @@ LevelData = {
 				{//Prompt 1
 					sceneData: undefined,
 						cutScene: true,
-						text: "<center> ## nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p> If you'll notice, the T vs. V graph is linear.  Using the equation above, find what its slope should should be with 1.8 moles of an ideal monatomic gas.  Do the slopes from the equation and from the graph match?",
+						text: "<center> ## nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p> If you'll notice, the T vs. V graph is linear.  Using the equation above, find what its slope should be with 1.8 moles of an ideal monatomic gas.  Do the slopes from the equation and from the graph match?",
 						quiz: [
 							{type: 'textSmall', CWQuestionId: 7, label: 'Slope from graph', storeAs: 'slopeFromGraph', text: " "},
 							{type: 'textSmall', CWQuestionId: 8, label: 'Slope from equation', storeAs: 'slopeFromEquation', text: " "},
