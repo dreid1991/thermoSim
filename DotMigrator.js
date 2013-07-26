@@ -16,12 +16,26 @@ Copyright (C) 2013  Daniel Reid
 */
 
 function DotMigrator(){
-	this.numRows = 40;
-	this.numCols = 40;
-
+	this.numRows = 100;
+	this.numCols = 100;
+	this.queue = [];
 }
 
 DotMigrator.prototype = {
+	equeueDots: function(dots, allowedWallHandles, disallowedWallHandles) {
+		for (var i=0; i<dots.length; i++) {
+			this.queue.push(new DotMigrator.MigratingDot(dots[i], allowedWallHandles, disallowedWallHandles));
+		}
+	},
+	flushQueue: function() {
+		this.width = document.getElementById('myCanvas').width;
+		this.height = document.getElementById('myCanvas').height;
+		this.colWidth = this.width / (this.numCols - 1);
+		this.rowHeight = this.height / (this.numRows - 1);
+		this.offset = .12345; //because who even wants to deal with grid points being on wall points?
+		this.expandedMap = this.makeExpandedMap(window.walls);
+		
+	},
 	migrateDots: function(dots, allowedWallHandles, disallowedWallHandles) {
 		this.width = $('#myCanvas').width(); //this stuff is here rather than in the constructor so the canvas can have non-zero dimensions when checked
 		this.height = $('#myCanvas').height();
@@ -73,6 +87,50 @@ DotMigrator.prototype = {
 			}
 		}
 	},
+
+	expandGrid: function(grid) {
+		var expanded = this.makeWallGrid(grid.length, grid[0].length);
+		for (var y=0; y<grid.length; y++) {
+			for (var x=0; x<grid[0].length; x++) {
+				if (grid[y][x] || grid[y][x+1] || (grid[y-1] ? grid[y-1][x] : false) || (grid[y+1] ? grid[y+1][x] : false)) {
+					expanded[y][x] = true;
+				}				
+			}
+		}
+		return expanded;
+	},
+	contractGrid: function(grid) {
+		var contracted = this.makeWallGrid(grid.length, grid[0].length);
+		for (var y=0; y<grid.length; y++) {
+			for (var x=0; x<grid[0].length; x++) {
+				if (grid[y][x] && grid[y][x+1] && (grid[y-1] ? grid[y-1][x] : true) && (grid[y+1] ? grid[y+1][x] : true)) {
+					contracted[y][x] = true;
+				}
+			}
+		}
+		return contracted;
+	},
+}
+
+DotMigrator.WallMap = function(wall, numRows, numCols) {
+	this.wall = wall;
+	this.handle = handle;
+	this.grid = this.makeGrid(numRows, numCols);
+	this.mapOntoGrid(wall, this.grid);
+}
+
+DotMigrator.WallMap.prototype = {
+	makeGrid: function(numRows, numCols) {
+		var grid = new Array(numCols)
+		for (var colIdx=0; colIdx<numCols; colIdx++) {
+			var col = new Array(numRows)
+			for (var rowIdx=0; rowIdx<numRows;rowIdx++) {
+				col[rowIdx] = false;
+			}
+			grid[colIdx] = col;
+		}
+		return grid;			
+	},
 	mapWallOnToGrid: function(wall, grid) {
 		var nodes = [];
 		var i, j;
@@ -105,37 +163,16 @@ DotMigrator.prototype = {
 			}
 		}
 	},
-	expandGrid: function(grid) {
-		var expanded = this.makeWallGrid(grid.length, grid[0].length);
-		for (var y=0; y<grid.length; y++) {
-			for (var x=0; x<grid[0].length; x++) {
-				if (grid[y][x] || grid[y][x+1] || (grid[y-1] ? grid[y-1][x] : false) || (grid[y+1] ? grid[y+1][x] : false)) {
-					expanded[y][x] = true;
-				}				
-			}
-		}
-		return expanded;
+	expand: function() {
+		var grid = this.grid;
 	},
-	contractGrid: function(grid) {
-		var contracted = this.makeWallGrid(grid.length, grid[0].length);
-		for (var y=0; y<grid.length; y++) {
-			for (var x=0; x<grid[0].length; x++) {
-				if (grid[y][x] && grid[y][x+1] && (grid[y-1] ? grid[y-1][x] : true) && (grid[y+1] ? grid[y+1][x] : true)) {
-					contracted[y][x] = true;
-				}
-			}
-		}
-		return contracted;
+	contract: function() {
+	
 	},
-	makeWallGrid: function(numRows, numCols) {
-		var grid = new Array(numCols)
-		for (var colIdx=0; colIdx<numCols; colIdx++) {
-			var col = new Array(numRows)
-			for (var rowIdx=0; rowIdx<numRows;rowIdx++) {
-				col[rowIdx] = false;
-			}
-			grid[colIdx] = col;
-		}
-		return grid;		
-	},
+}
+
+DotMigrator.MigratingDot = function(dot, allowedWallHandles, disallowedWallHandles) {
+	this.dot = dot;
+	this.allowedWallHandles = allowedWallHandles;
+	this.disallowedWallHandles = disallowedWallHandles
 }

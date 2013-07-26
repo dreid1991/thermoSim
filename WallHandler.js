@@ -183,7 +183,11 @@ WallMethods.main = {
 		this[wallIdx].show = defaultTo(true, show);
 		if (close !== false) {
 			this.closeWall(this[wallIdx]);
+			this[wallIdx].closed = true;
+		} else {
+			this[wallIdx].closed = false;
 		}
+		
 		this[wallIdx].ptsInit = this.copyWallPts(this[wallIdx]);
 		this[wallIdx].g = g;
 		this[wallIdx].pConst = pConst;
