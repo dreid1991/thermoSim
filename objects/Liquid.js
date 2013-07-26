@@ -363,7 +363,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 	updateEquilAllVap: function(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, dotMgrLiq) {
 		var tDew = this.tDew(this.spcA, this.spcB, dataGas, this.equilData);
 		var temp = dataGas.temp[dataGas.temp.length - 1];
-		var dF = temp > tDew ? -10 : 0;  //very low chance of condensing at dF = -10
+		var dF = tDew - temp;//temp > tDew ? -10 : 0;  //very low chance of condensing at dF = -10
 		for (var spcName in spcDefs) {
 			drivingForce[spcName] = dF;   
 		}
@@ -455,8 +455,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 			for (var spcName in spcDefs) {
 				var dF = drivingForce[spcName];
 				var abs = numAbs[spcName];
+				
 				numAbs[spcName] = 0;
-								
+
 				if (dF > 0) { 
 					numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
 				} else if (dF < 0) {
@@ -469,8 +470,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 				
 				if (flr) {
 					self.eject(dotMgrLiq, window.dotManager, spcDefs, spcName, flr, wallGas, drawList, wallLiq);
-					numEjt[spcName] = 0;
 				}
+				//console.log('absorbed ' + abs + ' with dF ' + dF + ',\n ejecting ' + flr);
+				numEjt[spcName] = 0;
 			}
 		}
 	},
@@ -509,8 +511,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 	},
 	eject: function(dotMgrLiq, dotMgrGas, spcDefs, spcName, numEject, wallGas, drawList, wallLiq) {
 		//going to take energy out of ejected dot rather than liquid. 
-		var CpOld = this.Cp;
-		var dHLiq = 0;
 		var dotList = dotMgrLiq.get({spcName: spcName})
 		var sliceIdx = Math.min(dotList.length, numEject);
 
@@ -543,6 +543,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			}
 		}
 		dotMgrGas.add(toTransfer);
+
 	},
 	getPPure: function(a, b, c, T) {
 		return Math.pow(10, a - b / (T + c)) * MMHGTOBAR; //C is Kelvin
@@ -565,7 +566,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			var chanceZero = this.chanceZeroDf;
 			var a = chanceZero / (1 - chanceZero);
 			var chanceAbs = a / (a + Math.exp(-dF[dot.spcName] * this.drivingForceSensitivity));
-			if (chanceAbs > Math.random()) {
+			if (chanceAbs > Math.random() && this.dataGas.temp.length) {
 				return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcDefs, this.dataGas.temp);
 			}
 		}
@@ -575,24 +576,23 @@ _.extend(Liquid.prototype, objectFuncs, {
 		} else {
 			WallMethods.collideMethods.reflect(dot, wallUV, perpV);
 		}
+
 	
 	},
 	hitNoPhaseChange: function(dot, wallIdx, subWallIdx, wallUV, perpV, perpUV, extras){
 		this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
 	},
 	absorbDot: function(dot, drawList, dotMgrLiq, wallLiq, spcDefs, gasTemp) {
-		
 		var dotMgrGas = window.dotManager; 
 		dotMgrGas.remove(dot);
 		drawList.splice(Math.floor(Math.random() * drawList.length), 0, dot);
 		dot.tag = wallLiq.handle;
 		dot.returnTo = wallLiq.handle;
-		dotMgrLiq.add(dot);
-		
 		var tDotF = gasTemp[gasTemp.length - 1];
 		this.energyForDots += (dot.temp() - tDotF) * dot.cv;
 		dot.setTemp(tDotF);
 		var CpLiqOld = this.Cp;
+		dotMgrLiq.add(dot);
 		this.calcCp();
 		this.temp = (this.temp * CpLiqOld + dot.tempCondense() * dot.cpLiq) / this.Cp;
 		this.numAbs[dot.spcName]++;
@@ -623,6 +623,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			dot.v.mult(vRatio);
 			dot.internalPotential *= tDotTarget / tDot;
 		}
+
 		WallMethods.collideMethods.reflect(dot, wallUV, perpV * vRatio);
 	},
 	getWallLiq: function() {

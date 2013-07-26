@@ -15,7 +15,10 @@ LevelData = {
 		{//First Scene
 			sceneData: {
 				walls: [
-					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'staticAdiabatic', handle: 'wallo', vol: 0.5, isothermalRate: 4, border: {type: 'open', width: 10, yMin: 40} },
+					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'staticAdiabatic', handle: 'wallo', vol: 12, border: {type: 'open', width: 10, yMin: 40} },
+				],
+				dots: [
+					{spcName: 'spc3', pos: P(42,57), dims: V(440, 290), temp: 373.15, tag: 'wallo', returnTo: 'wallo', count: 396}
 				],
 				objs: [
 					{
@@ -35,8 +38,8 @@ LevelData = {
 						attrs:{
 							wallInfo: 'wallo',
 							handle: 'water',
-							tempInit: 363.15,
-							spcCounts: {spc3: 400},
+							tempInit: 423.15,
+							spcCounts: {spc3: 4},
 							actCoeffType: 'twoSfxMrg',
 							actCoeffInfo: {a: 3000},
 							makePhaseDiagram: true,
