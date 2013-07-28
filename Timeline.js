@@ -661,7 +661,8 @@ Timeline.Section.prototype = {
 	populateMoments: function(timeline, elems, moments, sectionData) {
 		moments.push(new Timeline.Moment(-2)); //dummy moment to start on
 		//walls pare data cmmd
-		this.addSceneDataToMoments(timeline, elems, moments, {cmmds: [{type: 'point', spawn: 'addListener(curLevel, "data", "pareWallsData", walls.pareData, walls)', oneWay: false}]}, -1, undefined);
+		//not paring data.  Doesn't make performance difference, makes it more difficult to look at data
+		//this.addSceneDataToMoments(timeline, elems, moments, {cmmds: [{type: 'point', spawn: 'addListener(curLevel, "data", "pareWallsData", walls.pareData, walls)', oneWay: false}]}, -1, undefined);
 		this.addSceneDataToMoments(timeline, elems, moments, sectionData.sceneData, -1, undefined);
 		var prompts = sectionData.prompts;
 		for (var promptIdx=0; promptIdx<prompts.length; promptIdx++) {

@@ -233,7 +233,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			force[spcName] = 0;
 		}
 		return force;
-	},
+	}, 
 	setupUpdate: function(spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, listenerName, drawList, dotMgrLiq, wallLiq, numAbs, drivingForceSensitivity, numEjt, wallGas, wallGasIdxs, wallSurfAreaObj) {
 		this.calcCp = this.setupCalcCp(spcDefs, dotMgrLiq);
 		this.calcEquil = this.setupUpdateEquil(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, dotMgrLiq);
@@ -248,6 +248,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		var turns = 0;
 		var self = this;
 		addListener(curLevel, 'update', listenerName, function() {
+
 			if (turns == 5) {
 				var checkUpdateEquilAndPhaseDiagram;
 				if (self.isTwoComp) {
@@ -261,11 +262,35 @@ _.extend(Liquid.prototype, objectFuncs, {
 					if (0 < self.Cp && self.Cp < 2.5) {
 						fixLiquidTemp();
 					}
+					//special thing
+					var hGas = walls[0].data.enthalpyTotal.srcVal[walls[0].data.enthalpyTotal.srcVal.length - 1];
+					var hLiq = walls[1].data.enthalpyTotal.srcVal[walls[1].data.enthalpyTotal.srcVal.length - 1];
+					
+					console.log(hGas + ', ' + hLiq + ', ' + (hGas + hLiq));
+					
+					
+					// var dots = dotManager.lists.ALLDOTS;
+					// var vol = walls[0].data.vol.srcVal[walls[0].data.vol.srcVal.length - 1];
+					// var pExt = walls[0].data.pExt.srcVal[walls[0].data.pExt.srcVal.length - 1];
+					// var tempGas = walls[0].data.temp.srcVal[walls[0].data.temp.srcVal.length - 1];
+					// var uGas = dots[0].cv * tempGas * dots.length;
+					
+					// var pEPiston = pExt * vol * 1e2
+					
+					// var kEPiston = .5 * curLevel.pistonRightPiston.mass * walls[0].vs[0].dy * walls[0].vs[0].dy;
+					
+					// var tempLiq = self.temp;
+					// var dotsLiq = dotMgrLiq.lists.ALLDOTS;
+					// var uLiq = (dots[0].cv * 298.15 - dots[0].hVap298 + dots[0].cpLiq * (tempLiq - 298.15)) * dots.length;
+					// console.log(uGas + ', ' + uLiq + ', ' + (uGas + uLiq));
+					
+					//end special thing					
+	
 					self.tempDisplay = self.temp;
 					calcCp();
 					calcEquil();
 					moveDots();
-					if (self.phaseChangeEnabled) ejectDots();
+					//if (self.phaseChangeEnabled) ejectDots();
 					sizeWall();
 					checkUpdateEquilAndPhaseDiagram();
 					if (self.addEnergyToDots(window.dotManager.lists.ALLDOTS, self.energyForDots)) {
@@ -561,6 +586,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 	},
 	hit: function(dot, wall, subWallIdx, wallUV, perpV, perpUV, extras){
 		//it's a sigmoid!
+		/*
 		var dF = this.drivingForce;
 		if (dF[dot.spcName] !== undefined) {
 			var chanceZero = this.chanceZeroDf;
@@ -570,12 +596,12 @@ _.extend(Liquid.prototype, objectFuncs, {
 				return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcDefs, this.dataGas.temp);
 			}
 		}
-		
-		if (this.dotMgrLiq.count) {
-			this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
-		} else {
+		*/
+		//if (this.dotMgrLiq.count) {
+		//	this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
+		//} else {
 			WallMethods.collideMethods.reflect(dot, wallUV, perpV);
-		}
+		//}
 
 	
 	},
@@ -638,7 +664,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			var temp = this.temp;
 			q = Math.min(Cp * (3000 - temp), Math.max((-temp + 10) * Cp, q));
 			this.temp += q / Cp;
-			this.wallLiq.q += q;
+			this.wallLiq.q += q * 1e-3;
 		}
 	},
 	wrapMakePhaseDiagram: function(liquid, spcDefs, actCoeffFuncs, handle, primaryKey, makeGasMarker, makeSystemMarker, makeLiquidMarker, pressure) {

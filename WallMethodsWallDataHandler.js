@@ -304,13 +304,20 @@ WallMethods.wallDataHandler = {
 		}
 		return dataObj;
 	},
+	recordEnthalpyTotal: function() {
+		return this.recordEnergy('enthalpyTotal', 'cp', 'hF298', false);
+	},
+	recordInternalEnergyTotal: function() {
+		return this.recordEnergy('internalEnergyTotal', 'cv', 'uF298', false);
+	},
 	recordEnthalpy: function() {
-		return this.recordEnergy('enthalpy', 'cp', 'hF298');
+		return this.recordEnergy('enthalpy', 'cp', 'hF298', true);
 	},
 	recordInternalEnergy: function() {
-		return this.recordEnergy('internalEnergy', 'cv', 'uF298');
+		return this.recordEnergy('internalEnergy', 'cv', 'uF298', true);
 	},
-	recordEnergy: function(dataType, heatCapacity, heatOfFormation) { //not going to make recording by spc possible right now
+	recordEnergy: function(dataType, heatCapacity, heatOfFormation, normalize) { //not going to make recording by spc possible right now
+		normalize = defaultTo(true, normalize); //normalize to per mole
 		var heatCapacities = [], heatsOfFormation = [], hVap298s = [], cpLiqs = [], calcEnergy, dotLists = [];
 		var dataObj = this.data[dataType];
 		if (!dataObj || !dataObj.recording()) {
@@ -335,7 +342,7 @@ WallMethods.wallDataHandler = {
 						energy += dotLists[i].length * (heatsOfFormation[i] + cpLiqs[i] * tempRel - hVap298s[i]);
 						numDots += dotLists[i].length;
 					}
-					return energy * N / numDots;
+					return normalize ? energy * N / numDots : energy;
 				}
 			} else {
 				for (var i=0; i<LevelData.spcDefs.length; i++) {
@@ -354,7 +361,7 @@ WallMethods.wallDataHandler = {
 						energy += dotLists[i].length * (heatsOfFormation[i] + heatCapacities[i] * tempRel);
 						numDots += dotLists[i].length;
 					}
-					return energy * N / numDots;
+					return normalize ? energy * N / numDots : energy;
 				}	
 				
 			}

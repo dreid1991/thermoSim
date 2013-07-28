@@ -54,9 +54,10 @@ $(function(){
 	R = 8.314;
 	KB = R / N;
 	extraIntervals = {};
-	vConst = 1/10000;
+	vConst = 1e-4;
 	//pConst = 16.1423; //for atm
 	pConst = 16.3562; //for bar
+	simToJoules = (vConst * 1e-3) * (pConst * 1e5);
 	tConst = 20;
 	LtoM3 = .001;
 	ATMtoPA = 101325;

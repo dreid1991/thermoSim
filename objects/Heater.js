@@ -217,7 +217,7 @@ _.extend(Heater.prototype, objectFuncs, {
 			walls.reflect(dot, wallUV, vPerp);
 			var temp = dot.temp();
 			if ((this.qRate > 0 && tempList[tempList.length - 1] < this.tempMax) || (this.qRate < 0 && tempList[tempList.length - 1] > this.tempMin)) {
-				var dE = dot.addEnergy(this.qRate) * .001;
+				var dE = dot.addEnergy(this.qRate) * .001; //to kJ
 				this.eAdded += dE;
 				this.wall.q += dE;
 			}

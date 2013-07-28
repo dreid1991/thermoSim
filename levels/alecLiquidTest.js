@@ -18,7 +18,7 @@ LevelData = {
 					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'staticAdiabatic', handle: 'wallo', vol: 12, border: {type: 'open', width: 10, yMin: 40} },
 				],
 				dots: [
-					{spcName: 'spc3', pos: P(42,57), dims: V(440, 290), temp: 373.15, tag: 'wallo', returnTo: 'wallo', count: 396}
+					{spcName: 'spc3', pos: P(42,107), dims: V(440, 140), temp: 373.15, tag: 'wallo', returnTo: 'wallo', count: 200}
 				],
 				objs: [
 					{
@@ -38,8 +38,8 @@ LevelData = {
 						attrs:{
 							wallInfo: 'wallo',
 							handle: 'water',
-							tempInit: 423.15,
-							spcCounts: {spc3: 4},
+							tempInit: 373.15,
+							spcCounts: {spc3: 200},
 							actCoeffType: 'twoSfxMrg',
 							actCoeffInfo: {a: 3000},
 							makePhaseDiagram: true,
@@ -61,7 +61,8 @@ LevelData = {
 				dataRecord: [
 					{wallInfo: 'wallo', data: 'frac', attrs: {spcName: 'spc3', tag: 'wallo'}},
 					{wallInfo: 'wallo', data: 'moles', attrs: {spcName: 'spc3', tag:'wallo'}},
-					{wallInfo: 'wallo', data: 'enthalpy'},
+					{wallInfo: 'wallo', data: 'enthalpyTotal'},
+					{wallInfo: 'liquidWater', data: 'enthalpyTotal'}
 				],
 				// graphs: [
 					// {type: 'Scatter', handle: 'hTGraph', xLabel: 'Enthalpy (kJ)', yLabel: 'Temperature (K)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
