@@ -259,14 +259,18 @@ _.extend(Liquid.prototype, objectFuncs, {
 				}
 				removeListener(curLevel, 'update', listenerName);
 				addListener(curLevel, 'update', listenerName, function() {
-					if (0 < self.Cp && self.Cp < 2.5) {
-						fixLiquidTemp();
-					}
+					// if (0 < self.Cp && self.Cp < 2.5) {
+						// fixLiquidTemp();
+					// }
 					//special thing
-					var hGas = walls[0].data.enthalpyTotal.srcVal[walls[0].data.enthalpyTotal.srcVal.length - 1];
-					var hLiq = walls[1].data.enthalpyTotal.srcVal[walls[1].data.enthalpyTotal.srcVal.length - 1];
-					
-					console.log(hGas + ', ' + hLiq + ', ' + (hGas + hLiq));
+					if (!(turn % 5)) {
+						var hGas = walls[0].data.enthalpyTotal.srcVal[walls[0].data.enthalpyTotal.srcVal.length - 1];
+						var hLiq = walls[1].data.enthalpyTotal.srcVal[walls[1].data.enthalpyTotal.srcVal.length - 1];
+						var qGas = walls[0].data.q.srcVal[walls[0].data.q.srcVal.length - 1] * 1e3;
+						var qLiq = walls[1].data.q.srcVal[walls[1].data.q.srcVal.length - 1] * 1e3;
+						foo = [hGas + hLiq, qGas + qLiq, hGas + hLiq - (qGas + qLiq)];
+						console.log(foo.join(', '));
+					}
 					
 					
 					// var dots = dotManager.lists.ALLDOTS;
@@ -290,7 +294,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 					calcCp();
 					calcEquil();
 					moveDots();
-					//if (self.phaseChangeEnabled) ejectDots();
+					if (self.phaseChangeEnabled) ejectDots();
 					sizeWall();
 					checkUpdateEquilAndPhaseDiagram();
 					if (self.addEnergyToDots(window.dotManager.lists.ALLDOTS, self.energyForDots)) {
@@ -586,7 +590,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 	},
 	hit: function(dot, wall, subWallIdx, wallUV, perpV, perpUV, extras){
 		//it's a sigmoid!
-		/*
+		
 		var dF = this.drivingForce;
 		if (dF[dot.spcName] !== undefined) {
 			var chanceZero = this.chanceZeroDf;
@@ -596,12 +600,12 @@ _.extend(Liquid.prototype, objectFuncs, {
 				return this.absorbDot(dot, this.drawList, this.dotMgrLiq, this.wallLiq, this.spcDefs, this.dataGas.temp);
 			}
 		}
-		*/
-		//if (this.dotMgrLiq.count) {
-		//	this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
-		//} else {
+		
+		if (this.dotMgrLiq.count) {
+			this.adjTemps(dot, wallUV, perpV, this.dataGas, this.dataLiq, this.temp, window.dotManager.spcLists, this.spcDefs);
+		} else {
 			WallMethods.collideMethods.reflect(dot, wallUV, perpV);
-		//}
+		}
 
 	
 	},
