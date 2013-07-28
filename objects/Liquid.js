@@ -258,38 +258,12 @@ _.extend(Liquid.prototype, objectFuncs, {
 					checkUpdateEquilAndPhaseDiagram = function(){};
 				}
 				removeListener(curLevel, 'update', listenerName);
+				var liqDots = self.dotMgrLiq.lists.ALLDOTS;
 				addListener(curLevel, 'update', listenerName, function() {
-					if (0 < self.Cp && self.Cp < 2.5) {
+					if (0 < liqDots.length && liqDots.length < 75) {
 						fixLiquidTemp();
 					}
-					//special thing
-					if (!(turn % 5)) {
-						var hGas = walls[0].data.enthalpyTotal.srcVal[walls[0].data.enthalpyTotal.srcVal.length - 1];
-						var hLiq = walls[1].data.enthalpyTotal.srcVal[walls[1].data.enthalpyTotal.srcVal.length - 1];
-						var qGas = walls[0].data.q.srcVal[walls[0].data.q.srcVal.length - 1] * 1e3;
-						var qLiq = walls[1].data.q.srcVal[walls[1].data.q.srcVal.length - 1] * 1e3;
-						foo = [hGas + hLiq, qGas + qLiq, hGas + hLiq - (qGas + qLiq)];
-						console.log(foo.join(', '));
-					}
-					
-					
-					// var dots = dotManager.lists.ALLDOTS;
-					// var vol = walls[0].data.vol.srcVal[walls[0].data.vol.srcVal.length - 1];
-					// var pExt = walls[0].data.pExt.srcVal[walls[0].data.pExt.srcVal.length - 1];
-					// var tempGas = walls[0].data.temp.srcVal[walls[0].data.temp.srcVal.length - 1];
-					// var uGas = dots[0].cv * tempGas * dots.length;
-					
-					// var pEPiston = pExt * vol * 1e2
-					
-					// var kEPiston = .5 * curLevel.pistonRightPiston.mass * walls[0].vs[0].dy * walls[0].vs[0].dy;
-					
-					// var tempLiq = self.temp;
-					// var dotsLiq = dotMgrLiq.lists.ALLDOTS;
-					// var uLiq = (dots[0].cv * 298.15 - dots[0].hVap298 + dots[0].cpLiq * (tempLiq - 298.15)) * dots.length;
-					// console.log(uGas + ', ' + uLiq + ', ' + (uGas + uLiq));
-					
-					//end special thing					
-	
+
 					self.tempDisplay = self.temp;
 					calcCp();
 					calcEquil();
@@ -299,9 +273,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 					checkUpdateEquilAndPhaseDiagram();
 					
 					self.energyForDots = self.addEnergyToDots(window.dotManager.lists.ALLDOTS, self.energyForDots);
-					// if (self.addEnergyToDots(window.dotManager.lists.ALLDOTS, self.energyForDots)) {
-						// self.energyForDots = 0;
-					// }
 				})
 				
 			} 
@@ -500,7 +471,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var abs = numAbs[spcName];
 				
 				numAbs[spcName] = 0;
-
 				if (dF > 0) { 
 					numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
 				} else if (dF < 0) {
@@ -514,7 +484,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 				if (flr) {
 					self.eject(dotMgrLiq, window.dotManager, spcDefs, spcName, flr, wallGas, drawList, wallLiq);
 				}
-				//console.log('absorbed ' + abs + ' with dF ' + dF + ',\n ejecting ' + flr);
 				numEjt[spcName] = 0;
 			}
 		}
