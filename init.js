@@ -66,6 +66,7 @@ $(function(){
 	JtoKJ = .001;
 	//To get nice numbers with this, 1 mass in here coresponds to weight of 10 g/mol 
 	pxToE = Math.sqrt(tConst); //gotten for a dot... T = 1/2*m*(v*pxToE)^2.  For energy conservation in attraction. 
+	//I don't think pxToE is correct.  Check before using.
 	ACTUALN = 6.022e23;
 	g = 1.75;
 	gInternal = .01;
