@@ -32,7 +32,7 @@ function Dot(x, y, v, spcName, tag, elemId, returnTo) {
 	this.sF298 = defaultTo(0, def.sF298 * 1000 / N);
 	this.cvKinetic = 1.5 * R / N;
 	this.cv = def.cv / N;
-	this.cp = this.cv + R;
+	this.cp = this.cv + R / N;
 	this.cpLiq = defaultTo(this.cv, def.cpLiq / N);
 	this.spcVolLiq = defaultTo(1e-3, def.spcVolLiq / N); //L/molec
 	this.tag = tag;

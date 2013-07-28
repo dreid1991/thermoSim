@@ -259,9 +259,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 				}
 				removeListener(curLevel, 'update', listenerName);
 				addListener(curLevel, 'update', listenerName, function() {
-					// if (0 < self.Cp && self.Cp < 2.5) {
-						// fixLiquidTemp();
-					// }
+					if (0 < self.Cp && self.Cp < 2.5) {
+						fixLiquidTemp();
+					}
 					//special thing
 					if (!(turn % 5)) {
 						var hGas = walls[0].data.enthalpyTotal.srcVal[walls[0].data.enthalpyTotal.srcVal.length - 1];
@@ -297,9 +297,11 @@ _.extend(Liquid.prototype, objectFuncs, {
 					if (self.phaseChangeEnabled) ejectDots();
 					sizeWall();
 					checkUpdateEquilAndPhaseDiagram();
-					if (self.addEnergyToDots(window.dotManager.lists.ALLDOTS, self.energyForDots)) {
-						self.energyForDots = 0;
-					}
+					
+					self.energyForDots = self.addEnergyToDots(window.dotManager.lists.ALLDOTS, self.energyForDots);
+					// if (self.addEnergyToDots(window.dotManager.lists.ALLDOTS, self.energyForDots)) {
+						// self.energyForDots = 0;
+					// }
 				})
 				
 			} 
@@ -321,6 +323,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			//var dewWeight = .9;
 			var sign = getSign(tGas - tDew);
 			var tLiqF = tDew + sign * Math.min(15, sign * (tGas - tDew));
+			console.log('from ' + Math.round(self.temp) + ' to ' + Math.round(tLiqF)); 
 			//var tLiqF = dewWeight * tDew + (1 - dewWeight) * tGas;  //so liquid is near dew pt but is moving in the direction the gas would push it in thermal equilibrium
 			var dE = (tLiqF - self.temp) * self.Cp;
 			self.temp = tLiqF;
@@ -345,18 +348,29 @@ _.extend(Liquid.prototype, objectFuncs, {
 			return spcA.tBoil(dataGas.pExt ? dataGas.pExt[dataGas.pExt.length - 1] : dataGas.pInt[dataGas.pInt.length - 1]);
 		}		
 	},
-	addEnergyToDots: function(dots, energy) {
-		if (dots.length && energy) {
-			var addTo = Math.min(dots.length, 20);
-			var i = Math.max(0, Math.floor(Math.random() * dots.length - addTo));
-			var ePer = energy / addTo;
-			for (var ceil = addTo + i; i<ceil; i++) {
-				dots[i].addEnergy(ePer);
+	addEnergyToDots: function(dots, eToAdd) {
+		//returns how much energy is left to be added.  Not all will be added if it's looped through all of the dots and there is still more to add
+		if (dots.length && eToAdd) {
+			var dotsModified = 0;
+			var eAddedTotal = 0;
+			var sign = getSign(eToAdd);
+			//var addTo = Math.min(dots.length, 20);
+			var i = Math.floor(Math.random() * dots.length);
+			while (Math.abs(eAddedTotal) < Math.abs(eToAdd) && dotsModified < dots.length) {
+				//capping temp change at ~50 K for gas of cv = 1.5 R
+				eAddedTotal += dots[i].addEnergy(sign * Math.min(Math.abs(eToAdd - eAddedTotal), .5)); 
+				//have to count how much is actually added/removed because dot may have less energy than is being removed
+				i++;
+				dotsModified++;
+				if (i == dots.length) i = 0;
 			}
-			return true;
+
+			return eToAdd - eAddedTotal;
 			
+		} else {
+			return eToAdd;
 		}
-		return false;
+		
 	},
 	setupCalcCp: function(spcDefs, dotMgrLiq) {
 		var self = this;
