@@ -110,12 +110,12 @@ WallMethods.collideMethods ={
 		if (wall.eToAdd) {
 			var eAddSign = getSign(wall.eToAdd);
 			var inTemp = dot.temp();
-			var eToAdd = eAddSign * Math.min(Math.abs(wall.eToAdd), dot.cv * 20 * wall.isothermalRate);
-			if (eToAdd < 0 && inTemp  <= 20 * wall.isothermalRate) 
-				eToAdd = -(Math.max(0, inTemp - 1)) * dot.cv;
+			var eToDot = eAddSign * Math.min(Math.abs(wall.eToAdd), dot.cv * 20 * wall.isothermalRate);
+			if (eToDot < 0 && inTemp  <= 20 * wall.isothermalRate) 
+				eToDot = -(Math.max(0, inTemp - 1)) * dot.cv;
 
-			wall.eToAdd -= eToAdd;
-			var outTemp = inTemp + eToAdd / dot.cv;
+			wall.eToAdd -= eToDot;
+			var outTemp = inTemp + eToDot / dot.cv;
 			var spdRatio = Math.sqrt(outTemp/inTemp);
 			var outPerpV = perpV*spdRatio;
 			this.reflect(dot, wallUV, perpV, distPastWall);
@@ -123,7 +123,7 @@ WallMethods.collideMethods ={
 			dot.v.dy*=spdRatio;
 			dot.internalPotential *= outTemp / inTemp;
 			wall.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(outPerpV));
-			wall.q += eToAdd*JtoKJ;
+			wall.q += eToDot*JtoKJ;
 		} else {
 			wall.forceInternal += 2 * dot.m * Math.abs(perpV);
 			this.reflect(dot, wallUV, perpV, distPastWall);
