@@ -83,16 +83,17 @@ WallMethods.wall = {
 		// }
 		
 		
-		var dotVec = new Vector(dot.x + dot.v.dx - perpUV.dx*dot.r - this[wallPtIdx].x, dot.y + dot.v.dy - perpUV.dy*dot.r - this[wallPtIdx].y);
+		var dotVec = V(dot.x + dot.v.dx - perpUV.dx*dot.r - this[wallPtIdx].x, dot.y + dot.v.dy - perpUV.dy*dot.r - this[wallPtIdx].y);
 		var distPastWall = -perpUV.dotProd(dotVec);
 		var perpV = -perpUV.dotProd(dot.v);
-		if (distPastWall>=0 && distPastWall<=this.hitThreshold && this.isBetween(dot, wallPtIdx, wallUV, perpUV, perpV, distPastWall)){
+		if (distPastWall>=0 && distPastWall<=this.hitThreshold && this.isBetween(dot, wallPtIdx, wallUV, perpUV, distPastWall)){
 			this[this.hitMode](dot, wallPtIdx, wallUV, perpV, perpUV, distPastWall);
 			return true;
 		}
 		return false;
 	},
-	isBetween: function(dot, wallPtIdx, wallUV, perpUV, perpComponent, distPastWall){
+	isBetween: function(dot, wallPtIdx, wallUV, perpUV, distPastWall){
+		var perpComponent = -dot.v.dotProd(perpUV); 
 		var numVsPast = perpComponent == 0 ? 0 : distPastWall / perpComponent;
 		var dotPosAdj = new Point(dot.x - numVsPast * dot.v.dx, dot.y - numVsPast * dot.v.dy);
 		
