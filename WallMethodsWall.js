@@ -413,6 +413,7 @@ WallMethods.wall = {
 			}
 		}
 		this.eToAdd = 0;
+		var activeDots = dotManager.get({tag: this.handle});
 		var tempData = this.data.temp.src();
 		//hey - this is called for each wall that is isothermal, but that's okay, it only inits once.  The listener would over overwritten anyway
 		if (!this.isothermal) {
