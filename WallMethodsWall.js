@@ -86,67 +86,58 @@ WallMethods.wall = {
 		var dotVec = new Vector(dot.x + dot.v.dx - perpUV.dx*dot.r - this[wallPtIdx].x, dot.y + dot.v.dy - perpUV.dy*dot.r - this[wallPtIdx].y);
 		var distPastWall = -perpUV.dotProd(dotVec);
 		var perpV = -perpUV.dotProd(dot.v);
-<<<<<<< HEAD
 		if (distPastWall>=0 && distPastWall<=this.hitThreshold && this.isBetween(dot, wallPtIdx, wallUV, perpUV, perpV, distPastWall)){
 			this[this.hitMode](dot, wallPtIdx, wallUV, perpV, perpUV, distPastWall);
-=======
-		if (distPastWall>=0 && distPastWall<=this.hitThreshold && this.isBetween(dot, wallPtIdx, wallUV, perpUV, distPastWall)){
-			this['didHit'+this.hitMode](dot, wallPtIdx, wallUV, perpV, perpUV);
->>>>>>> parent of 5a1e49d... working on wall collision detection
 			return true;
 		}
 		return false;
 	},
-<<<<<<< HEAD
 	isBetween: function(dot, wallPtIdx, wallUV, perpUV, perpComponent, distPastWall){
-=======
-////////////////////////////////////////////////////////////
-//WALL HIT HANDLER WRAPPERS
-////////////////////////////////////////////////////////////	
-	didHitStd: function(dot, subWallIdx, wallUV, perpV, perpUV) {
-		var handler = this.handlers[subWallIdx];
-		handler.func.apply(handler.obj, [dot, this, subWallIdx, wallUV, perpV, perpUV]);		
-	},
-	isBetween: function(dot, wallPtIdx, wallUV, perpUV, distPastWall){
-		var perpComponent = -dot.v.dotProd(perpUV); 
->>>>>>> parent of 5a1e49d... working on wall collision detection
 		var numVsPast = perpComponent == 0 ? 0 : distPastWall / perpComponent;
 		var dotPosAdj = new Point(dot.x - numVsPast * dot.v.dx, dot.y - numVsPast * dot.v.dy);
 		
 		var wallPtA = new Point(this[wallPtIdx].x - wallUV.dx * dot.r, this[wallPtIdx].y - wallUV.dy * dot.r);
 		var wallPtB = new Point(this[wallPtIdx + 1].x + wallUV.dx * dot.r, this[wallPtIdx + 1].y + wallUV.dy * dot.r);
 		
-		var aToDot = new Vector(dotPosAdj.x - wallPtA.x, dotPosAdj.y - wallPtA.y); //inlining VTo
+		var aToDot = new Vector(dotPosAdj.x - wallPtA.x, dotPosAdj.y - wallPtA.y); //inlining VTo for fasterness
 		var bToDot = new Vector(dotPosAdj.x - wallPtB.x, dotPosAdj.y - wallPtB.y);
 		return (aToDot.dotProd(wallUV) >= 0 && bToDot.dotProd(wallUV) <= 0);
 		
 	},
-	didHitArrowDV: function(dot, subWallIdx, wallUV, perpV, perpUV) {
+////////////////////////////////////////////////////////////
+//WALL HIT HANDLER WRAPPERS
+////////////////////////////////////////////////////////////	
+	didHitStd: function(dot, subWallIdx, wallUV, perpV, perpUV, distPastWall) {
+		var handler = this.handlers[subWallIdx];
+		handler.func.apply(handler.obj, [dot, this, subWallIdx, wallUV, perpV, perpUV, distPastWall]);		
+	},
+
+	didHitArrowDV: function(dot, subWallIdx, wallUV, perpV, perpUV, distPastWall) {
 		var vo = dot.v.copy();
 		var handler = this.handlers[subWallIdx];
-		handler.func.apply(handler.obj, [dot, this, subWallIdx, wallUV, perpV, perpUV]);
+		handler.func.apply(handler.obj, [dot, this, subWallIdx, wallUV, perpV, perpUV, distPastWall]);
 		var pos = P(dot.x, dot.y);
 		var vf = dot.v.copy();
 		var perpVf = -perpUV.dotProd(dot.v);
 		this.drawArrowV(pos, vo, vf, perpV, perpVf);  
 	},
-	didHitArrowSpd: function(dot, subWallIdx, wallUV, perpV, perpUV) {
+	didHitArrowSpd: function(dot, subWallIdx, wallUV, perpV, perpUV, distPastWall) {
 		var vo = dot.v.copy();
 		var handler = this.handlers[subWallIdx];
-		handler.func.apply(handler.obj, [dot, this, subWallIdx, wallUV, perpV, perpUV]);
+		handler.func.apply(handler.obj, [dot, this, subWallIdx, wallUV, perpV, perpUV, distPastWall]);
 		var pos = P(dot.x, dot.y);
 		var vf = dot.v.copy();
 		var perpVf = -perpUV.dotProd(dot.v);
 		this.drawArrowSpd(pos, vo, vf, perpV, perpVf);  
 	},
-	didHitGravity: function(dot, subWallIdx, wallUV, perpV, perpUV) {
+	didHitGravity: function(dot, subWallIdx, wallUV, perpV, perpUV, distPastWall) {
 		var handler = this.handlers[subWallIdx];
-		if (wallUV.dx!=0) {
+		if (wallUV.dx != 0) {
 			var yo = dot.y;
 			var dyo = dot.v.dy;
 		}
-		handler.func.apply(handler.obj, [dot, this, subWallIdx, wallUV, perpV, perpUV])
-		if (wallUV.dx!=0) {
+		handler.func.apply(handler.obj, [dot, this, subWallIdx, wallUV, perpV, perpUV, distPastWall])
+		if (wallUV.dx != 0) {
 			//v^2 = vo^2 + 2ax;
 			var discrim = dot.v.dy*dot.v.dy + 2*gInternal * (dot.y-yo);
 			if (discrim>=0) { 
@@ -387,7 +378,7 @@ WallMethods.wall = {
 	},
 
 	setHitMode: function(inputMode){
-		(/^[sS]td$/.test(inputMode) || /^[aA]rrowDV$/.test(inputMode) || /^[aA]rrowSpd$/.test(inputMode) || /^[gG]ravity$$/.test(inputMode)) ? this.hitMode = inputMode.toCapitalCamelCase() : console.log('bad hitMode ' + inputMode);
+		(/^[sS]td$/.test(inputMode) || /^[aA]rrowDV$/.test(inputMode) || /^[aA]rrowSpd$/.test(inputMode) || /^[gG]ravity$$/.test(inputMode)) ? this.hitMode = 'didHit' + inputMode.toCapitalCamelCase() : console.log('bad hitMode ' + inputMode);
 	},
 	setDefaultReadout: function(readout){
 		this.defaultReadout = readout;
