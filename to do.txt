@@ -1,33 +1,11 @@
-HEY - for wall collision, just do like if if dotProd with perp of now * dotProd of perp with next < 0, reflect!
-
-check out comment it LevelTools.gravity.  There may be a problem with gravity.
-attracting is gaining energy in at least cvcp - response: seems stable with ~200 dots in static container
-
-Stuff to do
--hypo path
--loading graphs (command?)
+implement dot migrator queue
+fix wall collision to make dots not get trapped in heater
 
 
 performance notes - .apply() is trivially slower than just calling the function.  However
-.apply(someVar) is ~ 20% slower.  Same if you just use undefined.  May be lookup time or something.  Still takes trivially little time (400 - 800 ms per million.  ~400 for apply(), ~800 for apply(someVar))
+.apply(someVar) is ~ 20% slower.  Same if you just use undefined since it's looking up the variable undefined Still takes trivially little time (400 - 800 ms per million.  ~400 for apply(), ~800 for apply(someVar))
 
 Make slow down time thing by multiplying v (and piston motion, dividing by const for pInt) by const
-Make buttons smaller
 
 
 
-do some gridding on graphs to make each layer item have its erase and draw closer together
-
-do something in liquid update to update phase diagram if pressure changed
-
-make it so you can fix axes more precisely.  Maybe have {min step max} and set num grid lines based on that
-
-make custom button column
-
-many activity coeffs more flexible
-
-get rid of 'hit mode' (32 vs std) thing
-
-fix cVAdiabatic for variable heat capacity
-
-make isothermal init make option to hold at current temp

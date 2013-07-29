@@ -172,7 +172,7 @@ WallMethods.main = {
 		this[wallIdx] = pts;
 		_.extend(this[wallIdx], WallMethods.wall, WallMethods.wallDataHandler);	
 		this[wallIdx].handle = handle;
-		this[wallIdx].hitMode = 'Std';
+		this[wallIdx].hitMode = 'didHitStd';
 		this[wallIdx].vs = this.makeWallVs(pts); //this is only used for piston/compression arrow stuff.  Cell uses guide node velocities
 		this[wallIdx].bounds = bounds;
 		this[wallIdx].dotManager = dotMgr || dotManager; //global gas dot manager

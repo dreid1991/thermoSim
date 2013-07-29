@@ -122,7 +122,6 @@ _.extend(Cell.prototype, objectFuncs, {
 		}
 	},
 	assignWallHandler: function(self, selfIdx, opposite, oppositeIdx, nodeA, nodeB, selfTag, oppositeTag, energyTransferSign, energyTransferMax, chanceTransport, membraneThickness) {
-		var reflect = WallMethods.collideMethods.reflect;
 		var hitFunc = function(dot, wall, subWallIdx, wallUV, perpV, perpUV) {
 			
 			if (dot.tag == selfTag) {
