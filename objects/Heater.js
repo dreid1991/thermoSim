@@ -213,8 +213,8 @@ _.extend(Heater.prototype, objectFuncs, {
 		})
 	},
 	wrapHit: function(tempList) {
-		return function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV, distPastWall) {
-			walls.reflect(dot, wallUV, vPerp, distPastWall);
+		return function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV) {
+			walls.reflect(dot, wallUV, vPerp);
 			var temp = dot.temp();
 			if ((this.qRate > 0 && tempList[tempList.length - 1] < this.tempMax) || (this.qRate < 0 && tempList[tempList.length - 1] > this.tempMin)) {
 				var dE = dot.addEnergy(this.qRate) * .001; //to kJ
