@@ -259,8 +259,9 @@ _.extend(Liquid.prototype, objectFuncs, {
 				}
 				removeListener(curLevel, 'update', listenerName);
 				var liqDots = self.dotMgrLiq.lists.ALLDOTS;
+				var gasDots = dotManager.lists.ALLDOTS;
 				addListener(curLevel, 'update', listenerName, function() {
-					if (0 < liqDots.length && liqDots.length < 75) {
+					if (0 < liqDots.length && liqDots.length < Math.min(75*walls[0].pExt(),0.95*(liqDots.length + gasDots.length))) {
 						fixLiquidTemp();
 					}
 
