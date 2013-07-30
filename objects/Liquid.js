@@ -247,6 +247,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		calcCp();
 		var turns = 0;
 		var self = this;
+		var pressureSrc = wallGas.getDataSrc('pExt', undefined, true) || wallGas.getDataSrc('pInt', undefined, true);
 		addListener(curLevel, 'update', listenerName, function() {
 
 			if (turns == 5) {
@@ -261,7 +262,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var liqDots = self.dotMgrLiq.lists.ALLDOTS;
 				var gasDots = dotManager.lists.ALLDOTS;
 				addListener(curLevel, 'update', listenerName, function() {
-					if (0 < liqDots.length && liqDots.length < Math.min(75*walls[0].pExt(),0.95*(liqDots.length + gasDots.length))) {
+					if (0 < liqDots.length && liqDots.length < Math.min(75*pressureSrc[pressureSrc.length - 1] ,0.95*(liqDots.length + gasDots.length))) {
 						fixLiquidTemp();
 					}
 
