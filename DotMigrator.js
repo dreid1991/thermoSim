@@ -23,119 +23,202 @@ function DotMigrator(){
 
 DotMigrator.prototype = {
 	equeueDots: function(dots, allowedWallHandles, disallowedWallHandles) {
+		var queueLen = this.queue.length;
 		for (var i=0; i<dots.length; i++) {
-			this.queue.push(new DotMigrator.MigratingDot(dots[i], allowedWallHandles, disallowedWallHandles));
-		}
-	},
-	flushQueue: function() {
-		this.width = document.getElementById('myCanvas').width;
-		this.height = document.getElementById('myCanvas').height;
-		this.colWidth = this.width / (this.numCols - 1);
-		this.rowHeight = this.height / (this.numRows - 1);
-		this.offset = .12345; //because who even wants to deal with grid points being on wall points?
-		this.expandedMap = this.makeExpandedMap(window.walls);
-		
-	},
-	migrateDots: function(dots, allowedWallHandles, disallowedWallHandles) {
-		this.width = $('#myCanvas').width(); //this stuff is here rather than in the constructor so the canvas can have non-zero dimensions when checked
-		this.height = $('#myCanvas').height();
-		this.colWidth = this.width / (this.numCols - 1);
-		this.rowHeight = this.height / (this.numRows - 1);
-		this.offset = .12345; //because who even wants to deal with grid points being on wall points?
-		
-		var allowedWalls = window.walls.getWallsByHandles(allowedWallHandles);
-		var disallowedWalls = window.walls.getWallsByHandles(disallowedWallHandles);
-		var allowedGrid = this.makeWallGrid(this.numRows, this.numCols);
-		var disallowedGrid = this.makeWallGrid(this.numRows, this.numCols);
-		this.mapWallsOnToGrid(allowedWalls, allowedGrid);
-		this.mapWallsOnToGrid(disallowedWalls, disallowedGrid);
-		disallowedGrid = this.expandGrid(disallowedGrid); //just being careful;
-		allowedGrid = this.contractGrid(allowedGrid);
-		this.subtractGrid(allowedGrid, disallowedGrid);
-		this.placeDots(dots, allowedGrid, this.gridToPtList(allowedGrid, this.colWidth, this.rowHeight, this.offset));
-		
-	},
-	placeDots: function(dots, grid, validPts) {
-		for (var i=0; i<dots.length; i++) {
-			var row = Math.floor((dots[i].y - this.offset) / this.rowHeight);
-			var col = Math.floor((dots[i].x - this.offset) / this.colWidth);
-			if (!grid[row][col]) {
-				var gridPos = validPts[Math.floor(Math.random() * validPts.length)].copy();
-				dots[i].x = gridPos.x + Math.random() * this.colWidth;
-				dots[i].y = gridPos.y + Math.random() * this.rowHeight;
+			var dotIdx = this.getDotIdx(this.queue, dots[i], queueLen);
+			if (dotIdx > -1) {
+				this.mergeDotWalls(this.queue[i], allowedWallHandles, disallowedWallHandles);
+			} else {
+				this.queue.push(new DotMigrator.MigratingDot(dots[i], allowedWallHandles, disallowedWallHandles));
 			}
 		}
 	},
-	gridToPtList: function(grid, colWidth, rowHeight, offset) {
-		var validPts = [];
-		for (var i=0; i<grid.length; i++) {
-			for (var j=0, jj=grid[0].length; j<jj; j++) {
-				if (grid[i][j]) validPts.push(P(offset + j * colWidth, offset + i * rowHeight));
+	mergeDotWalls: function(migratingDot, allowedWallHandles, disallowedWallHandles) {
+		for (var i=disallowedWallHandles.length - 1; i>=0; i--) {
+			//disallowed takes priority
+			var allowedIdx = allowedWallHandles.indexOf(disallowedWallHandles[i]);
+			if (allowedIdx > -1) {
+				allowedWallHandles.splice(allowedIdx, 1);
 			}
 		}
-		return validPts;
+		this.mergeWallPermissions(migratingDot.allowedWallHandles, allowedWallHandles, disallowedWallHandles);
+		this.mergeWallPermissions(migratingDot.disallowedWallHandles, disallowedWallHandles, allowedWallHandles);
 	},
-	mapWallsOnToGrid: function(walls, grid) {
-		for (var i=0; i<walls.length; i++) {
-			this.mapWallOnToGrid(walls[i], grid);
-		}
-	},
-	subtractGrid: function(a, b) {
-		for (var i=0; i<a.length; i++) {
-			for (var j=0; j<a[0].length; j++) {
-				a[i][j] = Math.min(a[i][j], !b[i][j]);
-			}
-		}
-	},
-
-	expandGrid: function(grid) {
-		var expanded = this.makeWallGrid(grid.length, grid[0].length);
-		for (var y=0; y<grid.length; y++) {
-			for (var x=0; x<grid[0].length; x++) {
-				if (grid[y][x] || grid[y][x+1] || (grid[y-1] ? grid[y-1][x] : false) || (grid[y+1] ? grid[y+1][x] : false)) {
-					expanded[y][x] = true;
-				}				
-			}
-		}
-		return expanded;
-	},
-	contractGrid: function(grid) {
-		var contracted = this.makeWallGrid(grid.length, grid[0].length);
-		for (var y=0; y<grid.length; y++) {
-			for (var x=0; x<grid[0].length; x++) {
-				if (grid[y][x] && grid[y][x+1] && (grid[y-1] ? grid[y-1][x] : true) && (grid[y+1] ? grid[y+1][x] : true)) {
-					contracted[y][x] = true;
+	mergeWallPermissions: function(existing, toAdd, opposite) {
+		//new overwrites opposite
+		for (var i=0; i<toAdd.length; i++) {
+			if (existing.indexOf(toAdd[i]) == -1) {
+				existing.push(toAdd[i]);
+				var oppositeIdx = opposite.indexOf(toAdd[i]);
+				if (oppositeIdx > -1) {
+					opposite.splice(oppositeIdx, 1);
 				}
 			}
 		}
-		return contracted;
 	},
+	getDotIdx: function(queue, dot, checkToIdx) {
+		checkToIdx = checkToIdx === undefined ? queue.length : checkToIdx;
+		for (var i=0; i<checkToIdx; i++) {
+			if (queue[i].dot == dot) return i;
+		}
+		return -1;
+	},
+	flushQueue: function() {
+		var width = document.getElementById('myCanvas').width;
+		var height = document.getElementById('myCanvas').height;
+		var colWidth = width / (this.numCols - 1);
+		var rowHeight = height / (this.numRows - 1);
+		var offset = .12345; //because who even wants to deal with grid points being on wall points?
+		var allowedMap = this.makeModifiedMap(window.walls, 'expand', offset, colWidth, rowHeight);
+		var disallowedMap = this.makeModifiedMap(window.walls, 'contract', offset, colWidth, rowHeight);
+		var queue = this.queue;
+		
+		var numCols = this.numCols;
+		var numRows = this.numRows;
+		for (var i=0; i<queue.length; i++) {
+			var migratingDot = queue[i];
+			var curColIdx = Math.floor((migratingDot.dot.x + offset) / colWidth);
+			var curRowIdx = Math.floor((migratingDot.dot.y + offset) / rowHeight);
+			var curSquareAllowed = allowedMap[curColIdx][curRowIdx];
+			var curSquareDisallowed = disallowedMap[curColIdx][curRowIdx];
+			var inValidSquare = this.dotInValidSquare(migratingDot, curSquareAllowed, curSquareDisallowed);
+
+			if (!inValidSquare) {
+				this.migrateDot(migratingDot, allowedMap, disallowedMap, offset, numCols, numRows, colWidth, rowHeight);
+			}
+
+		}
+		this.queue = [];
+	},
+	dotInValidSquare: function(migratingDot, allowedWallHandles, disallowedWallHandles) {
+		var inValidSquare = true;
+		for (var i=0; i<migratingDot.disallowedWallHandles.length; i++) {
+			if (curSquareDisallowed.indexOf(migratingDot.disallowedWallHandles[i]) > -1) {
+				inValidSquare = false;
+				break;
+			}
+		}
+		return inValidSquare;
+		//this bit would make dots not in squares not explicitly allowed be moved.  I don't *think* I want this because it could mess with placing dots near wall edges
+		// if (inValidSquare) {
+			// for (var i=0; i<migratingDot.allowedWallHandles.length; i++) {
+				// if (curSquareAllowed.indexOf(migratingDot.dallowedWallHandles[i]) < 0) {
+					// inValidSquare = false;
+					// break;
+				// }
+			// }				
+		// }		
+	},
+	migrateDot: function(migratingDot, allowedMap, disallowedMap, offset, numCols, numRows, colWidth, rowHeight) {
+		var foundValidSquare = false;
+		//danger of infinite loop, but only if there are no valid squares.  But whose fault is that?
+		while (!foundValidSquare) {
+			var colIdx = Math.floor(Math.random() * numCols);
+			var rowIdx = Math.floor(Math.random() * numRows);
+			var allowedSquare = allowedMap[colIdx][rowIdx];
+			var disallowedSquare = disallowedMap[colIdx][rowIdx];
+			if (this.squareValid(migratingDot, allowedSquare, disallowedSquare)) {
+				foundValidSquare = true;
+				migratingDot.dot.x = offset + (colIdx + Math.random()) * colWidth;
+				migratingDot.dot.y = offset + (rowIdx + Math.random()) * rowHeight;
+				
+			}
+		}
+	},
+	squareValid: function(migratingDot, allowedSquare, disallowedSquare) {
+		var hasAllowed = false;
+		var hasDisallwed = false;
+		for (var i=0; i<migratingDot.allowedWallHandles.length; i++) {
+			if (allowedSquare.indexOf(migratingDot.allowedWallHandles[i]) > -1) {
+				hasAllowed = true;
+				break;
+			}
+		}
+		for (var i=0; i<migratingDot.disallowedWallHandles.length; i++) {
+			if (disallowedSquare.indexOf(migratingDot.disallowedWallHandles[i]) > -1) {
+				hasDisallowed = true;
+				break;
+			}
+		}
+		
+		return hasAllowed && !hasDisallowed;
+	},
+	makeModifiedMap: function(walls, modifier, offset, colWidth, rowHeight) {//modifier being expand or contract
+		var listMap = this.makeGrid(this.numCols, this.numRows);
+		var wallBoolMaps = [];
+		for (var i=0; i<walls.length; i++) {
+			var wallMap = new DotMigrator.WallMap(walls[i], this.numCols, this.numRows, offset, colWidth, rowHeight);
+			wallMap[modifier]();
+			wallBoolMaps.push(wallMap);
+		}
+		for (var i=0; i<this.numCols; i++) {
+			for (var j=0; j<this.numRows; j++) {
+				for (var a=0; a<wallBoolMaps.length; a++) {
+					if (wallBoolMaps[a].grid[i][j]) {
+						listMap[i][j].push(wallBoolMaps[a].wall.handle);
+					}
+				}
+			}
+		}
+	},
+	// gridToPtList: function(grid, colWidth, rowHeight, offset) {
+		// var validPts = [];
+		// for (var i=0; i<grid.length; i++) {
+			// for (var j=0, jj=grid[0].length; j<jj; j++) {
+				// if (grid[i][j]) validPts.push(P(offset + j * colWidth, offset + i * rowHeight));
+			// }
+		// }
+		// return validPts;
+	// },
+	// mapWallsOnToGrid: function(walls, grid) {
+		// for (var i=0; i<walls.length; i++) {
+			// this.mapWallOnToGrid(walls[i], grid);
+		// }
+	// },
+	// subtractGrid: function(a, b) {
+		// for (var i=0; i<a.length; i++) {
+			// for (var j=0; j<a[0].length; j++) {
+				// a[i][j] = Math.min(a[i][j], !b[i][j]);
+			// }
+		// }
+	// },
+	makeGrid: function(numCols, numRows) {
+		var grid = new Array(numCols); //I think this grid is addressed as [x][y]
+		for (var colIdx=0; colIdx<numCols; colIdx++) {
+			var col = new Array(numRows)
+			for (var rowIdx=0; rowIdx<numRows; rowIdx++) {
+				col[rowIdx] = [];
+			}
+			grid[colIdx] = col;
+		}
+		return grid;		
+	},
+
 }
 
-DotMigrator.WallMap = function(wall, numRows, numCols) {
+DotMigrator.WallMap = function(wall, numCols, numRows, offset, colWidth, rowHeight) {
 	this.wall = wall;
-	this.handle = handle;
-	this.grid = this.makeGrid(numRows, numCols);
-	this.mapOntoGrid(wall, this.grid);
+	this.grid = this.makeGrid(numCols, numRows);
+	this.mapOntoGrid(wall, this.grid, offset, colWidth, rowHeight);
 }
 
 DotMigrator.WallMap.prototype = {
-	makeGrid: function(numRows, numCols) {
-		var grid = new Array(numCols)
+	makeGrid: function(numCols, numRows) {
+		var grid = new Array(numCols); //I think this grid is addressed as [x][y]
 		for (var colIdx=0; colIdx<numCols; colIdx++) {
 			var col = new Array(numRows)
-			for (var rowIdx=0; rowIdx<numRows;rowIdx++) {
+			for (var rowIdx=0; rowIdx<numRows; rowIdx++) {
 				col[rowIdx] = false;
 			}
 			grid[colIdx] = col;
 		}
 		return grid;			
 	},
-	mapWallOnToGrid: function(wall, grid) {
+	mapWallOnToGrid: function(wall, grid, offset, colWidth, rowHeight) {
 		var nodes = [];
 		var i, j;
 		for (var yGridIdx=0; yGridIdx<grid.length; yGridIdx++) {
-			var yVal = this.offset + this.rowHeight * (yGridIdx + .5);
+			var yVal = offset + rowHeight * (yGridIdx + .5);
 			var nodeXs = [];
 			for (i=0, j=wall.length-1; i<wall.length; i++) {
 				if ((wall[i].y < yVal && wall[j].y >= yVal) || wall[j].y < yVal && wall[i].y >= yVal) {
@@ -157,7 +240,7 @@ DotMigrator.WallMap.prototype = {
 			}
 			for (i=0; i<nodeXs.length; i+=2) {
 				for (j=nodeXs[i]; j<nodeXs[i+1]; j+=5) {
-					xGridIdx = Math.floor((j - this.offset) / this.colWidth);
+					xGridIdx = Math.floor((j - offset) / colWidth);
 					grid[yGridIdx][xGridIdx] = true;
 				}
 			}
@@ -165,9 +248,27 @@ DotMigrator.WallMap.prototype = {
 	},
 	expand: function() {
 		var grid = this.grid;
+		var expanded = this.makeGrid(grid.length, grid[0].length);
+		for (var y=0; y<grid.length; y++) {
+			for (var x=0; x<grid[0].length; x++) {
+				if (grid[y][x] || grid[y][x+1] || (grid[y-1] ? grid[y-1][x] : false) || (grid[y+1] ? grid[y+1][x] : false)) {
+					expanded[y][x] = true;
+				}				
+			}
+		}
+		this.grid = expanded;
 	},
 	contract: function() {
-	
+		var grid = this.grid;
+		var contracted = this.makeGrid(grid.length, grid[0].length);
+		for (var y=0; y<grid.length; y++) {
+			for (var x=0; x<grid[0].length; x++) {
+				if (grid[y][x] && grid[y][x+1] && (grid[y-1] ? grid[y-1][x] : true) && (grid[y+1] ? grid[y+1][x] : true)) {
+					contracted[y][x] = true;
+				}
+			}
+		}
+		this.grid = contracted;
 	},
 }
 
