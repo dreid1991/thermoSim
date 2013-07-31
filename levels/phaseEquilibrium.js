@@ -205,7 +205,7 @@ LevelData = {
 							type: 'text',
 							preText: 'Heat the vapor until it reaches 150 C. Is the system saturated at this new temperature?',
 							text: '',
-							storeAs: 'Ans7',
+							storeAs: 'Ans9',
 						}
 					],
 				},
@@ -240,7 +240,7 @@ LevelData = {
 							type: 'textSmall',
 							text: '',
 							units: 'bar',
-							storeAs: 'Ans8',
+							storeAs: 'Ans10',
 						}	
 					],
 				},
@@ -350,7 +350,7 @@ LevelData = {
 							preText:'Condense the vapor. How much heat was removed?',
 							text: '',
 							units: 'kJ',
-							storeAs: 'Ans3'
+							storeAs: 'Ans11'
 						}
 					],
 				},
@@ -360,6 +360,7 @@ LevelData = {
 						{
 							type: 'text',
 							preText: 'Vaporizing the liquid at 100 C took 2257 kJ/kg and condensing at 150 C took 2114 kJ/kg. Do these values agree with your prediction?',
+							storeAs: 'Ans12'
 						}
 					]
 				},
