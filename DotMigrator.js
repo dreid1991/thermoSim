@@ -71,6 +71,7 @@ DotMigrator.prototype = {
 		var offset = .12345; //because who even wants to deal with grid points being on wall points?
 		var allowedMap = this.makeModifiedMap(window.walls, 'expand', offset, colWidth, rowHeight);
 		var disallowedMap = this.makeModifiedMap(window.walls, 'contract', offset, colWidth, rowHeight);
+		var allowedCoords = this.mapToCoordList(window.walls, allowedMap);
 		var queue = this.queue;
 		
 		var numCols = this.numCols;
@@ -84,11 +85,25 @@ DotMigrator.prototype = {
 			var inValidSquare = this.dotInValidSquare(migratingDot, curSquareAllowed, curSquareDisallowed);
 
 			if (!inValidSquare) {
-				this.migrateDot(migratingDot, allowedMap, disallowedMap, offset, numCols, numRows, colWidth, rowHeight);
+				this.migrateDot(migratingDot, allowedMap, disallowedMap, allowedCoords, offset, numCols, numRows, colWidth, rowHeight);
 			}
 
 		}
 		this.queue = [];
+	},
+	mapToCoordList: function(walls, map) {
+		var coords = {};
+		for (var i=0; i<walls.length; i++) coord[walls[i].handle] = [];
+		//making hashmap of wall handles to lists of points where it exists on the map
+		for (var x=0; x<map.length; x++) {
+			for (var y=0; y<map[0].length; y++) {
+				var square = maps[x][y];
+				for (var i=0; i<square.length; i++) {
+					coords[square[i]].push(P(x, y));
+				}
+			}
+		}
+		return coords;
 	},
 	dotInValidSquare: function(migratingDot, allowedWallHandles, disallowedWallHandles) {
 		var inValidSquare = true;
@@ -109,21 +124,30 @@ DotMigrator.prototype = {
 			// }				
 		// }		
 	},
-	migrateDot: function(migratingDot, allowedMap, disallowedMap, offset, numCols, numRows, colWidth, rowHeight) {
-		var foundValidSquare = false;
-		//danger of infinite loop, but only if there are no valid squares.  But whose fault is that?
-		while (!foundValidSquare) {
-			var colIdx = Math.floor(Math.random() * numCols);
-			var rowIdx = Math.floor(Math.random() * numRows);
-			var allowedSquare = allowedMap[colIdx][rowIdx];
-			var disallowedSquare = disallowedMap[colIdx][rowIdx];
-			if (this.squareValid(migratingDot, allowedSquare, disallowedSquare)) {
-				foundValidSquare = true;
-				migratingDot.dot.x = offset + (colIdx + Math.random()) * colWidth;
-				migratingDot.dot.y = offset + (rowIdx + Math.random()) * rowHeight;
-				
+	migrateDot: function(migratingDot, allowedMap, disallowedMap, allowedCoords, offset, numCols, numRows, colWidth, rowHeight) {
+		var allowedHandles = migratingDot.allowedWallHandles;
+		var i = Math.floor(Math.random() * allowedHandles.length;
+		var numTried = 0;
+		placingLoop:
+			while (numTried<allowedHandles.length) {
+				var handleCoords = allowedCoords[allowedHandles[i]];
+				for (var j=0; j<handleCoords.length; j++) {
+					var coord = handleCoords[j];
+					var disallowedSquare = disallowedMap[coord.x][coord.y];
+					for (var k=0; k<migratingDot.disallowedWallHandles.length; k++) {
+						if (disallowedSquare.indexOf(migratingDot.disallowedWallHandles[k]) == -1) {
+							migratingDot.x = offset + (coord.x + Math.random()) * colWidth;
+							migratingDot.y = offset + (coord.y + Math.random()) * rowHeight;
+							break placingLoop;
+						}
+						
+					}
+				}
+				i++;
+				numTried++;
+				if (i == allowedHandles.length) i = 0;
 			}
-		}
+		
 	},
 	squareValid: function(migratingDot, allowedSquare, disallowedSquare) {
 		var hasAllowed = false;
