@@ -126,7 +126,7 @@ DotMigrator.prototype = {
 	},
 	migrateDot: function(migratingDot, allowedMap, disallowedMap, allowedCoords, offset, numCols, numRows, colWidth, rowHeight) {
 		var allowedHandles = migratingDot.allowedWallHandles;
-		var i = Math.floor(Math.random() * allowedHandles.length;
+		var i = Math.floor(Math.random() * allowedHandles.length);
 		var numTried = 0;
 		placingLoop:
 			while (numTried<allowedHandles.length) {
