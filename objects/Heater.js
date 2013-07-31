@@ -203,7 +203,7 @@ _.extend(Heater.prototype, objectFuncs, {
 		canvasManager.addListener(this.canvasHandle, 'drawHeater' + this.handle, this.draw, this, 1);
 		this.setupWalls(wallHandleHeater)
 		this.eAdded=0;
-		//dotMigrator.migrateDots(dotManager.get({tag: wallHandleParent}), [wallHandleParent], [wallHandleHeater]);
+		dotMigrator.enqueueDots(dotManager.get({tag: wallHandleParent}), [wallHandleParent], [wallHandleHeater]);
 	},
 	setupWalls: function(wallHandleHeater){
 		var handler = {func:this.hit, obj:this};

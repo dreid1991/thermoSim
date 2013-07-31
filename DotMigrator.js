@@ -22,7 +22,7 @@ function DotMigrator(){
 }
 
 DotMigrator.prototype = {
-	equeueDots: function(dots, allowedWallHandles, disallowedWallHandles) {
+	enqueueDots: function(dots, allowedWallHandles, disallowedWallHandles) {
 		var queueLen = this.queue.length;
 		for (var i=0; i<dots.length; i++) {
 			var dotIdx = this.getDotIdx(this.queue, dots[i], queueLen);
@@ -66,11 +66,11 @@ DotMigrator.prototype = {
 	flushQueue: function() {
 		var width = document.getElementById('myCanvas').width;
 		var height = document.getElementById('myCanvas').height;
-		var colWidth = width / (this.numCols - 1);
-		var rowHeight = height / (this.numRows - 1);
+		var colWidth = width / this.numCols;
+		var rowHeight = height / this.numRows;
 		var offset = .12345; //because who even wants to deal with grid points being on wall points?
-		var allowedMap = this.makeModifiedMap(window.walls, 'expand', offset, colWidth, rowHeight);
-		var disallowedMap = this.makeModifiedMap(window.walls, 'contract', offset, colWidth, rowHeight);
+		var allowedMap = this.makeModifiedMap(window.walls, 'contract', offset, colWidth, rowHeight);
+		var disallowedMap = this.makeModifiedMap(window.walls, 'expand', offset, colWidth, rowHeight);
 		var allowedCoords = this.mapToCoordList(window.walls, allowedMap);
 		var queue = this.queue;
 		
@@ -93,11 +93,11 @@ DotMigrator.prototype = {
 	},
 	mapToCoordList: function(walls, map) {
 		var coords = {};
-		for (var i=0; i<walls.length; i++) coord[walls[i].handle] = [];
+		for (var i=0; i<walls.length; i++) coords[walls[i].handle] = [];
 		//making hashmap of wall handles to lists of points where it exists on the map
 		for (var x=0; x<map.length; x++) {
 			for (var y=0; y<map[0].length; y++) {
-				var square = maps[x][y];
+				var square = map[x][y];
 				for (var i=0; i<square.length; i++) {
 					coords[square[i]].push(P(x, y));
 				}
@@ -108,7 +108,7 @@ DotMigrator.prototype = {
 	dotInValidSquare: function(migratingDot, allowedWallHandles, disallowedWallHandles) {
 		var inValidSquare = true;
 		for (var i=0; i<migratingDot.disallowedWallHandles.length; i++) {
-			if (curSquareDisallowed.indexOf(migratingDot.disallowedWallHandles[i]) > -1) {
+			if (disallowedWallHandles.indexOf(migratingDot.disallowedWallHandles[i]) > -1) {
 				inValidSquare = false;
 				break;
 			}
@@ -127,24 +127,27 @@ DotMigrator.prototype = {
 	migrateDot: function(migratingDot, allowedMap, disallowedMap, allowedCoords, offset, numCols, numRows, colWidth, rowHeight) {
 		var allowedHandles = migratingDot.allowedWallHandles;
 		var i = Math.floor(Math.random() * allowedHandles.length);
-		var numTried = 0;
+		var numWallsTried = 0;
 		placingLoop:
-			while (numTried<allowedHandles.length) {
+			while (numWallsTried<allowedHandles.length) {
 				var handleCoords = allowedCoords[allowedHandles[i]];
-				for (var j=0; j<handleCoords.length; j++) {
+				var j = Math.floor(Math.random() * handleCoords.length);
+				var numCoordsTried = 0;
+				while (numCoordsTried < handleCoords.length) {
 					var coord = handleCoords[j];
 					var disallowedSquare = disallowedMap[coord.x][coord.y];
 					for (var k=0; k<migratingDot.disallowedWallHandles.length; k++) {
 						if (disallowedSquare.indexOf(migratingDot.disallowedWallHandles[k]) == -1) {
-							migratingDot.x = offset + (coord.x + Math.random()) * colWidth;
-							migratingDot.y = offset + (coord.y + Math.random()) * rowHeight;
+							migratingDot.dot.x = offset + (coord.x + Math.random()) * colWidth;
+							migratingDot.dot.y = offset + (coord.y + Math.random()) * rowHeight;
 							break placingLoop;
 						}
 						
 					}
+					j++; numCoordsTried++;
+					if (j == handleCoords.length) j = 0;
 				}
-				i++;
-				numTried++;
+				i++; numWallsTried++;
 				if (i == allowedHandles.length) i = 0;
 			}
 		
@@ -184,6 +187,7 @@ DotMigrator.prototype = {
 				}
 			}
 		}
+		return listMap;
 	},
 	// gridToPtList: function(grid, colWidth, rowHeight, offset) {
 		// var validPts = [];
@@ -223,7 +227,7 @@ DotMigrator.prototype = {
 DotMigrator.WallMap = function(wall, numCols, numRows, offset, colWidth, rowHeight) {
 	this.wall = wall;
 	this.grid = this.makeGrid(numCols, numRows);
-	this.mapOntoGrid(wall, this.grid, offset, colWidth, rowHeight);
+	this.mapWallOntoGrid(wall, this.grid, offset, colWidth, rowHeight);
 }
 
 DotMigrator.WallMap.prototype = {
@@ -238,7 +242,7 @@ DotMigrator.WallMap.prototype = {
 		}
 		return grid;			
 	},
-	mapWallOnToGrid: function(wall, grid, offset, colWidth, rowHeight) {
+	mapWallOntoGrid: function(wall, grid, offset, colWidth, rowHeight) {
 		var nodes = [];
 		var i, j;
 		for (var yGridIdx=0; yGridIdx<grid.length; yGridIdx++) {
@@ -265,7 +269,7 @@ DotMigrator.WallMap.prototype = {
 			for (i=0; i<nodeXs.length; i+=2) {
 				for (j=nodeXs[i]; j<nodeXs[i+1]; j+=5) {
 					xGridIdx = Math.floor((j - offset) / colWidth);
-					grid[yGridIdx][xGridIdx] = true;
+					grid[xGridIdx][yGridIdx] = true;
 				}
 			}
 		}

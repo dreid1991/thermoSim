@@ -15,10 +15,9 @@ Copyright (C) 2013  Daniel Reid
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//need to interp all this stuff before rendering, yo
 function Timeline(parent, buttonManagerBlank, isSectionsBranch, isPromptsBranch) { //make it so it can inherit blanks as well
 	this.parent = parent;
-	//cloning return jquery reference rather than deepcopy if done before page fully loaded
+	//cloning returns jquery reference rather than deepcopy if done before page fully loaded
 	this.buttonManagerBlank = buttonManagerBlank || document.getElementById('buttonManager').outerHTML;
 	this.isSectionsBranch = isSectionsBranch || false;
 	this.isPromptsBranch = isPromptsBranch || false;
@@ -879,19 +878,19 @@ Timeline.Section.prototype = {
 		}
 	},
 	getTimestampType: function(timestamp) {
-		if (timestamp % 1 == .8) {
+		if (timestamp % 1 - .8 < 1e-5) {
 			return 'tailhtml';
-		} else if (Math.abs(timestamp % 1 - .9) <1e-5) {
+		} else if (Math.abs(timestamp % 1 - .9) < 1e-5) {
 			return 'tail';
-		} else if (Math.abs(timestamp % 1 - .1) <1e-5) {
+		} else if (Math.abs(timestamp % 1 - .1) < 1e-5) {
 			return 'setup';
-		} else if (Math.abs(timestamp % 1 - .2) <1e-5) {
+		} else if (Math.abs(timestamp % 1 - .2) < 1e-5) {
 			return 'headhtml';
-		} else if (Math.abs(timestamp % 1 - .0) <1e-5) {
+		} else if (Math.abs(timestamp % 1 - .0) < 1e-5) {
 			return 'head';
-		} else if (Math.abs(timestamp % 1 - .85) <1e-5) {
+		} else if (Math.abs(timestamp % 1 - .85) < 1e-5) {
 			'branchPreClean';
-		} else if (Math.abs(timestamp % 1 - .95) <1e-5) {
+		} else if (Math.abs(timestamp % 1 - .95) < 1e-5) {
 			'branchPostClean';
 		}
 	},

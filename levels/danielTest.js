@@ -14,10 +14,11 @@ LevelData = {
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: 'cVIsothermal', temp: 298.15, handle: 'wally', /*, border: {type: 'open', thickness: 5, yMin: 30}*/}
+					{pts: [P(50, 50), P(150, 50), P(150, 400), P(50, 400)], handler: 'cVIsothermal', temp: 298.15, handle: 'wally', /*, border: {type: 'open', thickness: 5, yMin: 30}*/},
+					{pts: [P(200, 50), P(350, 50), P(350, 400), P(200, 400), P(60, 400), P(60, 200), P(200, 200)], handler: 'cVIsothermal', temp: 298.15, handle: 'two', /*, border: {type: 'open', thickness: 5, yMin: 30}*/}
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(250, 250), count: 1000, temp: 198.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'spc1', pos: P(55, 55), dims: V(100, 250), count: 30, temp: 198.15, returnTo: 'wally', tag: 'wally'},
 					// {spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 0, temp: 398.15, returnTo: 'wally', tag: 'wally'},
 					
 					
@@ -35,25 +36,25 @@ LevelData = {
 						// type: 'DragWeights',
 						// attrs: {handle: 'draggy', wallInfo: 'wally', weightDefs: [{count: 2, pressure: 3}], weightScalar: 30, pInit: 2, cleanUpWith: 'prompt1'}
 					// },
-					{
-						type: 'Cell',
-						attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 100, dots: {fairy: 100}, boundingCorner: P(50, 50), boundingVector: V(400, 350), numCorners: 12, col: Col(0, 150, 0), innerChanceTransport: {spc1: 0}, outerChanceTransport: {spc1: 0}}
-					},
+					// {
+						// type: 'Cell',
+						// attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 100, dots: {fairy: 100}, boundingCorner: P(50, 50), boundingVector: V(400, 350), numCorners: 12, col: Col(0, 150, 0), innerChanceTransport: {spc1: 0}, outerChanceTransport: {spc1: 0}}
+					// },
 					// {
 						// type: 'ActivationEnergyPair',
 						// attrs: {spcNameLow: 'ugly', spcNameHigh: 'fairy', thresholdEnergy: 12}
 					// },
-					{
-						type: 'Heater',
-						cleanUpWith: 'prompt1',
-						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
-					},
-					{
-						type: 'Heater',
-						attrs: {wallInfo: 'wally', max: 3, handle: 'other', offset: V(70, 0), sliderIdx: 0}
+					// {
+						// type: 'Heater',
+						// cleanUpWith: 'prompt1',
+						// attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
+					// },
+					// {
+						// type: 'Heater',
+						// attrs: {wallInfo: 'wally', max: 3, handle: 'other', offset: V(70, 0), sliderIdx: 0}
 					
 					
-					},
+					// },
 					// {
 						// type: 'Inlet',
 						// attrs: {handle: 'inny', wallInfo: 'wally', width: 40, depth: 25, flows: [{spcName: 'spc1', temp:200, nDotMax: .05, tag: 'wally'}], ptIdxs: [3, 4], fracOffset: .2}
