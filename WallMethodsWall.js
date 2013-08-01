@@ -100,14 +100,16 @@ WallMethods.wall = {
 		handler.func.apply(handler.obj, [dot, this, subWallIdx, wallUV, perpV, perpUV]);		
 	},
 	isBetween: function(dot, wallPtIdx, wallUV, perpUV, perpV, distPastWall){
-		var numVsPast = perpV == 0 ? 0 : distPastWall / perpV;
-		var dotPosAdj = new Point(dot.x - numVsPast * dot.v.dx, dot.y - numVsPast * dot.v.dy);
+		// var numVsPast = perpV == 0 ? 0 : distPastWall / perpV;
+		// var dotPosAdj = new Point(dot.x - numVsPast * dot.v.dx, dot.y - numVsPast * dot.v.dy);
 		
 		var wallPtA = new Point(this[wallPtIdx].x - wallUV.dx * dot.r, this[wallPtIdx].y - wallUV.dy * dot.r);
 		var wallPtB = new Point(this[wallPtIdx + 1].x + wallUV.dx * dot.r, this[wallPtIdx + 1].y + wallUV.dy * dot.r);
 		
-		var aToDot = new Vector(dotPosAdj.x - wallPtA.x, dotPosAdj.y - wallPtA.y); //inlining VTo
-		var bToDot = new Vector(dotPosAdj.x - wallPtB.x, dotPosAdj.y - wallPtB.y);
+		// var aToDot = new Vector(dotPosAdj.x - wallPtA.x, dotPosAdj.y - wallPtA.y); //inlining VTo
+		// var bToDot = new Vector(dotPosAdj.x - wallPtB.x, dotPosAdj.y - wallPtB.y);
+		var aToDot = new Vector(dot.x - wallPtA.x, dot.y - wallPtA.y);
+		var bToDot = new Vector(dot.x - wallPtB.x, dot.y - wallPtB.y);
 		return (aToDot.dotProd(wallUV) >= 0 && bToDot.dotProd(wallUV) <= 0);
 		
 	},
