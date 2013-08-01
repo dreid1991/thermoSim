@@ -93,7 +93,7 @@ ReactionFuncs = {
 		cVProd /= N; //j/mol -> j/molec
 		var tempF = (uRct - uF298Prod) / cVProd + 298.15;
 		if (tempF > 0) {
-			this.dotManager.remove([a, b]);
+			this.dotManager.remove([a, b], true);
 			for (var spcIdx=0; spcIdx<newDotsBySpc.length; spcIdx++) {
 				var spcDots = newDotsBySpc[spcIdx];
 				this.dotManager.add(spcDots);

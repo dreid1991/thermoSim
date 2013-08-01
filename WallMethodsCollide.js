@@ -154,6 +154,6 @@ WallMethods.collideMethods ={
 		dot.y += wallUV.dx
 	},
 	outlet: function(dot) {
-		dotManager.remove(dot);
+		dotManager.remove(dot, true);
 	}
 }

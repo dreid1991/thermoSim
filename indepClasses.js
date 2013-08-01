@@ -562,15 +562,15 @@ Dot.prototype = {
 	kineticEnergy: function() {
 		return this.temp() * this.cvKinetic;
 	},
-	speed: function(){
+	speed: function() {
 		return this.v.mag()*this.pxToMS;
 		//return pxToMS*Math.sqrt(this.temp()/(this.m*10));
 	},
-	kill: function(){
+	kill: function(deactivate) {
 		for (var listIdx=0; listIdx<this.parentLists.length; listIdx++) {
 			this.parentLists[listIdx].splice(this.parentLists[listIdx].indexOf(this), 1);
 		}
 		this.parentLists.splice(0, this.parentLists.length);
-		this.active = false;
+		if (deactivate) this.active = false;
 	}
 }

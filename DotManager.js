@@ -31,15 +31,16 @@ DotManager.prototype = {
 		}
 		this.execAllCombos(this.addFunc, dot);
 	},
-	remove: function(dot) {//can send as list or single dot
+	remove: function(dot, deactivateDots) {//can send as list or single dot
+		deactivateDots = deactiveDots === undefined ? true : deactivateDots;
 		if (dot instanceof Array) {
 			this.count -= dot.length;
 			for (var dotIdx=0; dotIdx<dot.length;dotIdx++) {
-				dot[dotIdx].kill();
+				dot[dotIdx].kill(deactivateDots);
 			}
 		} else {
 			this.count --;
-			dot.kill();
+			dot.kill(deactivateDots);
 		}
 	},
 	removeByAttr: function(attr, val) {

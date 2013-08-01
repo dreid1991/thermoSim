@@ -198,7 +198,7 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, condition
 	this.walls = WallHandler();
 	this.dataHandler = new DataHandler();
 	this.dataDisplayer = new DataDisplayer();
-	
+	this.dotMigrator = new DotMigrator(this.walls);
 	this.conditionManager = conditionManager ? conditionManager.stripForInheritance() : new ConditionManager();
 	this.activationEnergySpcChanger = new ActivationEnergySpcChanger(this.collide);
 	this.buttonManager = new ButtonManager('buttonManager');
@@ -578,6 +578,7 @@ Timeline.Section.prototype = {
 		this.sliderList = section.sliderList;
 		this.buttonManager = section.buttonManager;
 		this.dataHandler = section.dataHandler;
+		this.dotMigrator = section.dotMigrator;
 		this.activationEnergySpcChanger = section.activationEnergySpcChanger;
 		//not inheriting condition manager.  That is prompt index specific and not really part of the state
 	},
@@ -593,6 +594,7 @@ Timeline.Section.prototype = {
 		window.buttonManager = this.buttonManager;
 		window.sliderManager = this.sliderManager;
 		window.dataHandler = this.dataHandler;
+		window.dotMigrator = this.dotMigrator;
 		window.activationEnergySpcChanger = this.activationEnergySpcChanger;
 		window.conditionManager = this.conditionManager;
 

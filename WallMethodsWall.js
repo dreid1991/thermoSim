@@ -87,7 +87,7 @@ WallMethods.wall = {
 		var distPastWall = -perpUV.dotProd(dotVec);
 		var perpV = -perpUV.dotProd(dot.v);
 		if (distPastWall>=0 && distPastWall<=this.hitThreshold && this.isBetween(dot, wallPtIdx, wallUV, perpUV, distPastWall)){
-			this['didHit'+this.hitMode](dot, wallPtIdx, wallUV, perpV, perpUV);
+			this[this.hitMode](dot, wallPtIdx, wallUV, perpV, perpUV);
 			return true;
 		}
 		return false;
@@ -378,7 +378,7 @@ WallMethods.wall = {
 	},
 
 	setHitMode: function(inputMode){
-		(/^[sS]td$/.test(inputMode) || /^[aA]rrowDV$/.test(inputMode) || /^[aA]rrowSpd$/.test(inputMode) || /^[gG]ravity$$/.test(inputMode)) ? this.hitMode = inputMode.toCapitalCamelCase() : console.log('bad hitMode ' + inputMode);
+		(/^[sS]td$/.test(inputMode) || /^[aA]rrowDV$/.test(inputMode) || /^[aA]rrowSpd$/.test(inputMode) || /^[gG]ravity$$/.test(inputMode)) ? this.hitMode = 'didHit' + inputMode.toCapitalCamelCase() : console.log('bad hitMode ' + inputMode);
 	},
 	setDefaultReadout: function(readout){
 		this.defaultReadout = readout;

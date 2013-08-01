@@ -544,7 +544,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			dot.tag = wallGas.handle;
 			dot.returnTo = wallGas.handle;
 			drawList.splice(drawList.indexOf(dot), 1);
-			dotMgrLiq.remove(dot);
+			dotMgrLiq.remove(dot, false);
 			this.calcCp();
 			this.temp -= hVap / this.Cp;
 			if (this.Cp == 0) {
@@ -599,7 +599,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 	},
 	absorbDot: function(dot, drawList, dotMgrLiq, wallLiq, spcDefs, gasTemp) {
 		var dotMgrGas = window.dotManager; 
-		dotMgrGas.remove(dot);
+		dotMgrGas.remove(dot, false);
 		drawList.splice(Math.floor(Math.random() * drawList.length), 0, dot);
 		dot.tag = wallLiq.handle;
 		dot.returnTo = wallLiq.handle;

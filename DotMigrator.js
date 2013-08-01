@@ -15,9 +15,10 @@ Copyright (C) 2013  Daniel Reid
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function DotMigrator(){
+function DotMigrator(sectionWalls){
 	this.numRows = 100;
 	this.numCols = 100;
+	this.sectionWalls;
 	this.queue = [];
 }
 
@@ -63,15 +64,16 @@ DotMigrator.prototype = {
 		}
 		return -1;
 	},
-	flushQueue: function() {
+	migrate: function() {
+		this.removeInactives(this.queue);
 		var width = document.getElementById('myCanvas').width;
 		var height = document.getElementById('myCanvas').height;
 		var colWidth = width / this.numCols;
 		var rowHeight = height / this.numRows;
 		var offset = .12345; //because who even wants to deal with grid points being on wall points?
-		var allowedMap = this.makeModifiedMap(window.walls, 'contract', offset, colWidth, rowHeight);
-		var disallowedMap = this.makeModifiedMap(window.walls, 'expand', offset, colWidth, rowHeight);
-		var allowedCoords = this.mapToCoordList(window.walls, allowedMap);
+		var allowedMap = this.makeModifiedMap(this.sectionWalls, 'contract', offset, colWidth, rowHeight);
+		var disallowedMap = this.makeModifiedMap(this.sectionWalls, 'expand', offset, colWidth, rowHeight);
+		var allowedCoords = this.mapToCoordList(this.sectionWalls, allowedMap);
 		var queue = this.queue;
 		
 		var numCols = this.numCols;
@@ -89,11 +91,18 @@ DotMigrator.prototype = {
 			}
 
 		}
-		this.queue = [];
 	},
-	mapToCoordList: function(walls, map) {
+	removeInactives: function(queue) {
+		for (var i=queue.length - 1; i>=0; i--) {
+			if (!queue[i].dot.active) queue.splice(i, 1);
+		}
+	},
+	enptyQueue: function() {
+		this.queue.splice(0, this.queue.length);
+	},
+	mapToCoordList: function(sectionWalls, map) {
 		var coords = {};
-		for (var i=0; i<walls.length; i++) coords[walls[i].handle] = [];
+		for (var i=0; i<sectionWalls.length; i++) coords[sectionWalls[i].handle] = [];
 		//making hashmap of wall handles to lists of points where it exists on the map
 		for (var x=0; x<map.length; x++) {
 			for (var y=0; y<map[0].length; y++) {
@@ -170,11 +179,11 @@ DotMigrator.prototype = {
 		
 		return hasAllowed && !hasDisallowed;
 	},
-	makeModifiedMap: function(walls, modifier, offset, colWidth, rowHeight) {//modifier being expand or contract
+	makeModifiedMap: function(sectionWalls, modifier, offset, colWidth, rowHeight) {//modifier being expand or contract
 		var listMap = this.makeGrid(this.numCols, this.numRows);
 		var wallBoolMaps = [];
-		for (var i=0; i<walls.length; i++) {
-			var wallMap = new DotMigrator.WallMap(walls[i], this.numCols, this.numRows, offset, colWidth, rowHeight);
+		for (var i=0; i<sectionWalls.length; i++) {
+			var wallMap = new DotMigrator.WallMap(sectionWalls[i], this.numCols, this.numRows, offset, colWidth, rowHeight);
 			wallMap[modifier]();
 			wallBoolMaps.push(wallMap);
 		}
@@ -189,27 +198,6 @@ DotMigrator.prototype = {
 		}
 		return listMap;
 	},
-	// gridToPtList: function(grid, colWidth, rowHeight, offset) {
-		// var validPts = [];
-		// for (var i=0; i<grid.length; i++) {
-			// for (var j=0, jj=grid[0].length; j<jj; j++) {
-				// if (grid[i][j]) validPts.push(P(offset + j * colWidth, offset + i * rowHeight));
-			// }
-		// }
-		// return validPts;
-	// },
-	// mapWallsOnToGrid: function(walls, grid) {
-		// for (var i=0; i<walls.length; i++) {
-			// this.mapWallOnToGrid(walls[i], grid);
-		// }
-	// },
-	// subtractGrid: function(a, b) {
-		// for (var i=0; i<a.length; i++) {
-			// for (var j=0; j<a[0].length; j++) {
-				// a[i][j] = Math.min(a[i][j], !b[i][j]);
-			// }
-		// }
-	// },
 	makeGrid: function(numCols, numRows) {
 		var grid = new Array(numCols); //I think this grid is addressed as [x][y]
 		for (var colIdx=0; colIdx<numCols; colIdx++) {
