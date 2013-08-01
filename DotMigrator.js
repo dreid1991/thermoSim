@@ -18,148 +18,105 @@ Copyright (C) 2013  Daniel Reid
 function DotMigrator(sectionWalls){
 	this.numRows = 100;
 	this.numCols = 100;
-	this.sectionWalls;
-	this.queue = [];
 }
 
 DotMigrator.prototype = {
-	enqueueDots: function(dots, allowedWallHandles, disallowedWallHandles) {
-		var queueLen = this.queue.length;
-		for (var i=0; i<dots.length; i++) {
-			var dotIdx = this.getDotIdx(this.queue, dots[i], queueLen);
-			if (dotIdx > -1) {
-				this.mergeDotWalls(this.queue[i], allowedWallHandles, disallowedWallHandles);
-			} else {
-				this.queue.push(new DotMigrator.MigratingDot(dots[i], allowedWallHandles, disallowedWallHandles));
-			}
-		}
-	},
-	mergeDotWalls: function(migratingDot, allowedWallHandles, disallowedWallHandles) {
-		for (var i=disallowedWallHandles.length - 1; i>=0; i--) {
-			//disallowed takes priority
-			var allowedIdx = allowedWallHandles.indexOf(disallowedWallHandles[i]);
-			if (allowedIdx > -1) {
-				allowedWallHandles.splice(allowedIdx, 1);
-			}
-		}
-		this.mergeWallPermissions(migratingDot.allowedWallHandles, allowedWallHandles, disallowedWallHandles);
-		this.mergeWallPermissions(migratingDot.disallowedWallHandles, disallowedWallHandles, allowedWallHandles);
-	},
-	mergeWallPermissions: function(existing, toAdd, opposite) {
-		//new overwrites opposite
-		for (var i=0; i<toAdd.length; i++) {
-			if (existing.indexOf(toAdd[i]) == -1) {
-				existing.push(toAdd[i]);
-				var oppositeIdx = opposite.indexOf(toAdd[i]);
-				if (oppositeIdx > -1) {
-					opposite.splice(oppositeIdx, 1);
-				}
-			}
-		}
-	},
-	getDotIdx: function(queue, dot, checkToIdx) {
-		checkToIdx = checkToIdx === undefined ? queue.length : checkToIdx;
-		for (var i=0; i<checkToIdx; i++) {
-			if (queue[i].dot == dot) return i;
-		}
-		return -1;
-	},
-	migrate: function() {
-		this.removeInactives(this.queue);
+/*
+There are two maps - positive and negative.  You check positive if you want to know if a dot is allowed to go in a square,
+negative if you want to check if it's disallowed there.  The resolution of the grid is not perfect, so the allowed one is contracted by
+one square and the disallowed one is expanded by one.  
+*/
+	migrateDots: function(dots, allowedWallHandles, allowedOrderType, disallowedWallHandles, disallowedOrderType) { //type -> 'any', 'all'
+	
 		var width = document.getElementById('myCanvas').width;
 		var height = document.getElementById('myCanvas').height;
 		var colWidth = width / this.numCols;
 		var rowHeight = height / this.numRows;
 		var offset = .12345; //because who even wants to deal with grid points being on wall points?
-		var allowedMap = this.makeModifiedMap(this.sectionWalls, 'contract', offset, colWidth, rowHeight);
-		var disallowedMap = this.makeModifiedMap(this.sectionWalls, 'expand', offset, colWidth, rowHeight);
-		var allowedCoords = this.mapToCoordList(this.sectionWalls, allowedMap);
-		var queue = this.queue;
-		
+		var closedWalls = this.spliceOpenWalls(window.walls)
+		var sortedWalls = _.sortBy(closedWalls, function(wall) {return wall.handle});
+		allowedWallHandles = _.sortBy(allowedWallHandles, function(a) {return a});
+		disallowedWallHandles = _.sortBy(disallowedWallHandles, function(a) {return a});
+		var positiveMap = this.makeModifiedMap(sortedWalls, 'contract', offset, colWidth, rowHeight);
+		var negativeMap = this.makeModifiedMap(sortedWalls, 'expand', offset, colWidth, rowHeight);
+		var disallowedBoolMap = this.makeBooleanMap(negativeMap, disallowedWallHandles, disallowedOrderType);
+		var allowedBoolMap = this.makeBooleanMap(positiveMap, allowedWallHandles, allowedOrderType);
+		this.subtractBooleanMap(allowedBoolMap, disallowedBoolMap);
+
+		var allowedCoords = this.mapToCoordList(allowedBoolMap);
+
+		if (!allowedCoords.length) return false;
+		//expected behavior: If a dot is is disallowed it will be moved to allowed.  If it is in neither disallowed or allowed, it will not be moved.  
+		//Trying to make effects of migrating dots not accidentally overreach.
 		var numCols = this.numCols;
 		var numRows = this.numRows;
-		for (var i=0; i<queue.length; i++) {
-			var migratingDot = queue[i];
-			var curColIdx = Math.floor((migratingDot.dot.x + offset) / colWidth);
-			var curRowIdx = Math.floor((migratingDot.dot.y + offset) / rowHeight);
-			var curSquareAllowed = allowedMap[curColIdx][curRowIdx];
-			var curSquareDisallowed = disallowedMap[curColIdx][curRowIdx];
-			var inValidSquare = this.dotInValidSquare(migratingDot, curSquareAllowed, curSquareDisallowed);
-
-			if (!inValidSquare) {
-				this.migrateDot(migratingDot, allowedMap, disallowedMap, allowedCoords, offset, numCols, numRows, colWidth, rowHeight);
+		
+		for (var i=0; i<dots.length; i++) {
+			
+			var curColIdx = Math.floor((dots[i].x + offset) / colWidth);
+			var curRowIdx = Math.floor((dots[i].y + offset) / rowHeight);
+			
+			if (disallowedBoolMap[curColIdx][curRowIdx]) {
+				this.migrateDot(migratingDot, allowedCoords, offset, numCols, numRows, colWidth, rowHeight);
 			}
 
 		}
 	},
-	removeInactives: function(queue) {
-		for (var i=queue.length - 1; i>=0; i--) {
-			if (!queue[i].dot.active) queue.splice(i, 1);
+	spliceOpenWalls: function(allWalls) {
+		var closed = [];
+		for (var i=0; i<allWalls.length; i++) {
+			if (allWalls[i].closed) closed.push(allWalls[i]);
 		}
+		return closed;
 	},
-	enptyQueue: function() {
-		this.queue.splice(0, this.queue.length);
-	},
-	mapToCoordList: function(sectionWalls, map) {
-		var coords = {};
-		for (var i=0; i<sectionWalls.length; i++) coords[sectionWalls[i].handle] = [];
-		//making hashmap of wall handles to lists of points where it exists on the map
+	mapToCoordList: function(boolMap) {
+		var coords = [];
 		for (var x=0; x<map.length; x++) {
 			for (var y=0; y<map[0].length; y++) {
-				var square = map[x][y];
-				for (var i=0; i<square.length; i++) {
-					coords[square[i]].push(P(x, y));
-				}
+				if (map[x][y]) coords.push(P(x, y));
 			}
 		}
 		return coords;
 	},
-	dotInValidSquare: function(migratingDot, allowedWallHandles, disallowedWallHandles) {
-		var inValidSquare = true;
-		for (var i=0; i<migratingDot.disallowedWallHandles.length; i++) {
-			if (disallowedWallHandles.indexOf(migratingDot.disallowedWallHandles[i]) > -1) {
-				inValidSquare = false;
-				break;
+	migrateDot: function(migratingDot, allowedCoords, offset, numCols, numRows, colWidth, rowHeight) {
+		var coord = allowedCoords[Math.floor(Math.random() * allowedCoords.length)];
+		migratingDot.dot.x = offset + (coord.x + Math.random()) * colWidth;
+		migratingDot.dot.y = offset + (coord.y + Math.random()) * rowHeight;
+	},
+	makeBooleanMap: function(map, handles, type) {//all sorted by handle
+		var allowedMap = this.makeGridBoolean(this.numCols, this.numRows);
+		for (var x=0, xx=map.length; x<xx; x++) {
+			for (var y=0, yy=map[0].length; y<yy; y++) {
+				allowedMap[x][y] = this.listsOverlap(map[x][y], handles, type);
 			}
 		}
-		return inValidSquare;
-		//this bit would make dots not in squares not explicitly allowed be moved.  I don't *think* I want this because it could mess with placing dots near wall edges
-		// if (inValidSquare) {
-			// for (var i=0; i<migratingDot.allowedWallHandles.length; i++) {
-				// if (curSquareAllowed.indexOf(migratingDot.dallowedWallHandles[i]) < 0) {
-					// inValidSquare = false;
-					// break;
-				// }
-			// }				
-		// }		
 	},
-	migrateDot: function(migratingDot, allowedMap, disallowedMap, allowedCoords, offset, numCols, numRows, colWidth, rowHeight) {
-		var allowedHandles = migratingDot.allowedWallHandles;
-		var i = Math.floor(Math.random() * allowedHandles.length);
-		var numWallsTried = 0;
-		placingLoop:
-			while (numWallsTried<allowedHandles.length) {
-				var handleCoords = allowedCoords[allowedHandles[i]];
-				var j = Math.floor(Math.random() * handleCoords.length);
-				var numCoordsTried = 0;
-				while (numCoordsTried < handleCoords.length) {
-					var coord = handleCoords[j];
-					var disallowedSquare = disallowedMap[coord.x][coord.y];
-					for (var k=0; k<migratingDot.disallowedWallHandles.length; k++) {
-						if (disallowedSquare.indexOf(migratingDot.disallowedWallHandles[k]) == -1) {
-							migratingDot.dot.x = offset + (coord.x + Math.random()) * colWidth;
-							migratingDot.dot.y = offset + (coord.y + Math.random()) * rowHeight;
-							break placingLoop;
-						}
-						
-					}
-					j++; numCoordsTried++;
-					if (j == handleCoords.length) j = 0;
-				}
-				i++; numWallsTried++;
-				if (i == allowedHandles.length) i = 0;
+	listsOverlap: function(a, b, overlapType) {
+		//a, b both sorted alphabetically
+		if (overlapType == 'all') {
+			for (var i=0; i<a.length; i++) {
+				if (b.indexOf(a[i]) < 0) return false;
 			}
-		
+			return true;
+		} else if (overlapType == 'only') {
+			if (a.length != b.length) return false;
+			for (var i=0; i<a.length; i++) {
+				if (a[i] != b[i]) return false;
+			}
+			return true;
+		} else if (overlapType == 'any') {
+			for (var i=0; i<a.length; i++) {
+				if (b.indexOf(a[i]) > -1) return true;
+			}
+			return false
+		}
+	},
+	subtractBooleanMap: function(a, b) {
+		for (var x=0, xx=a.length; x<xx; x++) {
+			for (var y=0, yy=a[0].length; y<yy; y++) {
+				a[x][y] = Math.min(a[x][y], b[x][y]);
+			}
+		}
 	},
 	squareValid: function(migratingDot, allowedSquare, disallowedSquare) {
 		var hasAllowed = false;
@@ -182,7 +139,7 @@ DotMigrator.prototype = {
 	makeModifiedMap: function(sectionWalls, modifier, offset, colWidth, rowHeight) {//modifier being expand or contract
 		var listMap = this.makeGrid(this.numCols, this.numRows);
 		var wallBoolMaps = [];
-		for (var i=0; i<sectionWalls.length; i++) {
+		for (var i=0; i<sectionWalls.length; i++) { //sectionWalls is sorted by handle, so the listMap will be sorted as well
 			var wallMap = new DotMigrator.WallMap(sectionWalls[i], this.numCols, this.numRows, offset, colWidth, rowHeight);
 			wallMap[modifier]();
 			wallBoolMaps.push(wallMap);
@@ -208,6 +165,17 @@ DotMigrator.prototype = {
 			grid[colIdx] = col;
 		}
 		return grid;		
+	},
+	makeGridBoolean: function(numCols, numRows) {
+		var grid = new Array(numCols); //I think this grid is addressed as [x][y]
+		for (var colIdx=0; colIdx<numCols; colIdx++) {
+			var col = new Array(numRows)
+			for (var rowIdx=0; rowIdx<numRows; rowIdx++) {
+				col[rowIdx] = false;
+			}
+			grid[colIdx] = col;
+		}
+		return grid;			
 	},
 
 }
