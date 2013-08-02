@@ -87,7 +87,7 @@ WallMethods.wall = {
 		var distPastWall = -perpUV.dotProd(dotVec);
 		var perpV = -perpUV.dotProd(dot.v);
 		if (distPastWall>=0 && distPastWall<=this.hitThreshold && this.isBetween(dot, wallPtIdx, wallUV, perpUV, distPastWall)){
-			this[this.hitMode](dot, wallPtIdx, wallUV, perpV, perpUV);
+			this['didHit'+this.hitMode](dot, wallPtIdx, wallUV, perpV, perpUV);
 			return true;
 		}
 		return false;
@@ -103,14 +103,14 @@ WallMethods.wall = {
 		var perpComponent = -dot.v.dotProd(perpUV); 
 		var numVsPast = perpComponent == 0 ? 0 : distPastWall / perpComponent;
 		var dotPosAdj = new Point(dot.x - numVsPast * dot.v.dx, dot.y - numVsPast * dot.v.dy);
-		
+
 		var wallPtA = new Point(this[wallPtIdx].x - wallUV.dx * dot.r, this[wallPtIdx].y - wallUV.dy * dot.r);
 		var wallPtB = new Point(this[wallPtIdx + 1].x + wallUV.dx * dot.r, this[wallPtIdx + 1].y + wallUV.dy * dot.r);
-		
+
 		var aToDot = new Vector(dotPosAdj.x - wallPtA.x, dotPosAdj.y - wallPtA.y); //inlining VTo
 		var bToDot = new Vector(dotPosAdj.x - wallPtB.x, dotPosAdj.y - wallPtB.y);
 		return (aToDot.dotProd(wallUV) >= 0 && bToDot.dotProd(wallUV) <= 0);
-		
+
 	},
 	didHitArrowDV: function(dot, subWallIdx, wallUV, perpV, perpUV) {
 		var vo = dot.v.copy();
@@ -378,7 +378,7 @@ WallMethods.wall = {
 	},
 
 	setHitMode: function(inputMode){
-		(/^[sS]td$/.test(inputMode) || /^[aA]rrowDV$/.test(inputMode) || /^[aA]rrowSpd$/.test(inputMode) || /^[gG]ravity$$/.test(inputMode)) ? this.hitMode = 'didHit' + inputMode.toCapitalCamelCase() : console.log('bad hitMode ' + inputMode);
+		(/^[sS]td$/.test(inputMode) || /^[aA]rrowDV$/.test(inputMode) || /^[aA]rrowSpd$/.test(inputMode) || /^[gG]ravity$$/.test(inputMode)) ? this.hitMode = ('didHit' + inputMode.toCapitalCamelCase()) : console.log('bad hitMode ' + inputMode);
 	},
 	setDefaultReadout: function(readout){
 		this.defaultReadout = readout;
