@@ -26,7 +26,7 @@ There are two maps - positive and negative.  You check positive if you want to k
 negative if you want to check if it's disallowed there.  The resolution of the grid is not perfect, so the allowed one is contracted by
 one square and the disallowed one is expanded by one.  
 */
-	migrateDots: function(dots, allowedWallHandles, allowedOrderType, disallowedWallHandles, disallowedOrderType) { //type -> 'any', 'all'
+	migrateDots: function(dots, allowedWallHandles, allowedOrderType, disallowedWallHandles, disallowedOrderType) { //type -> 'and', 'or', 'only'
 	
 		var width = document.getElementById('myCanvas').width;
 		var height = document.getElementById('myCanvas').height;
@@ -57,7 +57,7 @@ one square and the disallowed one is expanded by one.
 			var curRowIdx = Math.floor((dots[i].y + offset) / rowHeight);
 			
 			if (disallowedBoolMap[curColIdx][curRowIdx]) {
-				this.migrateDot(migratingDot, allowedCoords, offset, numCols, numRows, colWidth, rowHeight);
+				this.migrateDot(dots[i], allowedCoords, offset, numCols, numRows, colWidth, rowHeight);
 			}
 
 		}
@@ -71,29 +71,31 @@ one square and the disallowed one is expanded by one.
 	},
 	mapToCoordList: function(boolMap) {
 		var coords = [];
-		for (var x=0; x<map.length; x++) {
-			for (var y=0; y<map[0].length; y++) {
-				if (map[x][y]) coords.push(P(x, y));
+		for (var x=0; x<boolMap.length; x++) {
+			for (var y=0; y<boolMap[0].length; y++) {
+				if (boolMap[x][y]) coords.push(P(x, y));
 			}
 		}
 		return coords;
 	},
-	migrateDot: function(migratingDot, allowedCoords, offset, numCols, numRows, colWidth, rowHeight) {
+	migrateDot: function(dot, allowedCoords, offset, numCols, numRows, colWidth, rowHeight) {
 		var coord = allowedCoords[Math.floor(Math.random() * allowedCoords.length)];
-		migratingDot.dot.x = offset + (coord.x + Math.random()) * colWidth;
-		migratingDot.dot.y = offset + (coord.y + Math.random()) * rowHeight;
+		dot.x = offset + (coord.x + Math.random()) * colWidth;
+		dot.y = offset + (coord.y + Math.random()) * rowHeight;
 	},
 	makeBooleanMap: function(map, handles, type) {//all sorted by handle
-		var allowedMap = this.makeGridBoolean(this.numCols, this.numRows);
+		var boolMap = this.makeGridBoolean(this.numCols, this.numRows);
 		for (var x=0, xx=map.length; x<xx; x++) {
 			for (var y=0, yy=map[0].length; y<yy; y++) {
-				allowedMap[x][y] = this.listsOverlap(map[x][y], handles, type);
+				boolMap[x][y] = this.listsOverlap(handles, map[x][y], type);
 			}
 		}
+		return boolMap;
 	},
 	listsOverlap: function(a, b, overlapType) {
-		//a, b both sorted alphabetically
-		if (overlapType == 'all') {
+		//a, b both sorted alphabetically, a is the user specified ones, b is wall handles in map.  How do plurals even work in that case?  is -> are, probably.
+
+		if (overlapType == 'and') {
 			for (var i=0; i<a.length; i++) {
 				if (b.indexOf(a[i]) < 0) return false;
 			}
@@ -104,17 +106,18 @@ one square and the disallowed one is expanded by one.
 				if (a[i] != b[i]) return false;
 			}
 			return true;
-		} else if (overlapType == 'any') {
+		} else if (overlapType == 'or') {
 			for (var i=0; i<a.length; i++) {
 				if (b.indexOf(a[i]) > -1) return true;
 			}
 			return false
 		}
+
 	},
 	subtractBooleanMap: function(a, b) {
 		for (var x=0, xx=a.length; x<xx; x++) {
 			for (var y=0, yy=a[0].length; y<yy; y++) {
-				a[x][y] = Math.min(a[x][y], b[x][y]);
+				a[x][y] = a[x][y] && !b[x][y];
 			}
 		}
 	},
