@@ -31,8 +31,8 @@ DotManager.prototype = {
 		}
 		this.execAllCombos(this.addFunc, dot);
 	},
-	remove: function(dot, deactiveDots) {//can send as list or single dot
-		deactivateDots = deactiveDots === undefined ? true : deactiveDots;
+	remove: function(dot, deactivateDots) {//can send as list or single dot
+		deactivateDots = deactivateDots === undefined ? true : deactivateDots;
 		if (dot instanceof Array) {
 			this.count -= dot.length;
 			for (var dotIdx=0; dotIdx<dot.length;dotIdx++) {
