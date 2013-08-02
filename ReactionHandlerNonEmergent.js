@@ -97,9 +97,9 @@ ReactionHandlerNonEmergent.Reaction = function(attrs, allRxns) {
 	to specify non-emergent reaction, you need...
 	rcts: [{spcName: 'name', count: #},]
 	prods: [{spcName: 'name', count: #},]
-	both must be <=2
+	totals of both rcts and prods must be <=2
 	preExpForward: val, L^n/(mol^m sec)
-	activeEForward: val, j/(mol K)
+	activeEForward: val, j/mol
 	*/
 	this.parent = attrs.parent;
 	this.chanceMap = this.parent.chanceMap;
@@ -274,8 +274,8 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var prodsInit = prodQueue.init;
 			var prodsLeft = prodQueue.now;
 			
-			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft !== 0 ? .2 * Math.sqrt(Math.abs(rctsLeft)) * Math.abs(rctsLeft) / rctsLeft : 0);//or some constant, find a good one
-			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, prodsLeft !== 0 ? .2 * Math.sqrt(Math.abs(prodsLeft)) * Math.abs(prodsLeft) / prodsLeft : 0); 
+			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft !== 0 ? .2 * rctsLeft / (rctsInit > 0 ? rctsInit : 1) : 0);//or some constant, find a good one
+			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, prodsLeft !== 0 ? .2 * prodsLeft / (prodsInit > 0 ? prodsInit : 1) : 0); 
 			
 			if 
 				(

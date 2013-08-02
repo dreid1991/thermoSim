@@ -14,7 +14,7 @@ LevelData = {
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(350, 50), P(350, 400), P(50, 400)], handler: 'cVIsothermal', temp: 298.15, handle: 'wally', /*, border: {type: 'open', thickness: 5, yMin: 30}*/}
+					{pts: [P(50, 50), P(350, 50), P(350, 400), P(50, 400)], handler: 'cVIsothermal', temp: 398.15, handle: 'wally', /*, border: {type: 'open', thickness: 5, yMin: 30}*/}
 				],
 				dots: [
 					{spcName: 'spc1', pos: P(55, 55), dims: V(300, 325), count: 1000, temp: 198.15, returnTo: 'wally', tag: 'wally'},
