@@ -117,7 +117,7 @@ ReactionHandlerNonEmergent.Reaction = function(attrs, allRxns) {
 	this.activeEForward = attrs.activeEForward;
 	this.updateWalls();
 	this.updateQueue = this.wrapUpdateQueue();
-	this.listenerHandle = this.handle + 'CheckQueueEmpty';
+	this.listenerHandle = this.handle + 'UpdateQueue';
 	//this.checkWallGroupListenerHandle = this.handle + 'CheckWallGroups';
 
 }
