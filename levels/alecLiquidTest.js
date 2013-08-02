@@ -15,31 +15,53 @@ LevelData = {
 		{//First Scene
 			sceneData: {
 				walls: [
-					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'staticAdiabatic', handle: 'wallo', vol: 12, border: {type: 'open', width: 10, yMin: 40} },
+					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 423.15, handle: 'wallo', vol: 13.5, isothermalRate: 4, border: {type: 'open', width: 10, yMin: 40} },
 				],
 				dots: [
-					{spcName: 'spc3', pos: P(42,107), dims: V(440, 140), temp: 373.15, tag: 'wallo', returnTo: 'wallo', count: 200}
-				],
+					{spcName: 'spc3', pos: P(45,100), dims: V(465,240), count: 396, temp:423.15, returnTo: 'wallo', tag: 'wallo'},
+				],	
 				objs: [
 					{
 						type: 'Piston',
 						attrs: {
 							handle: 'RightPiston',
 							wallInfo: 'wallo',
-							min: 1,
-							init: 1,
-							max: 6,
+							min: 0.5,
+							init: 0.5,
+							max: 20,
 							makeSlider: true,	
 							compMode: 'cPAdiabaticDamped',
 						}	
 					},
 					{
+						type: 'Sandbox',
+						attrs: {
+							handle: 'mrSandMan',
+							wallInfo: 'wallo',
+							min: 0.5,
+							max: 9,
+							init: 0.5,
+						}
+					},
+					// {
+						// type: 'DragWeights',
+						// attrs: {
+							// handle: 'Weight1',
+							// wallInfo: 'wallo',
+							// weightDefs: [{count: 5, pressure:1}],
+							// pInit: 0,
+							// weightScalar: 100,
+							// pistonOffset: V(130,-41),
+							// displayText: true,
+						// }
+					// },
+					{
 						type: 'Liquid',
 						attrs:{
 							wallInfo: 'wallo',
 							handle: 'water',
-							tempInit: 373.15,
-							spcCounts: {spc3: 200},
+							tempInit: 423.15,
+							spcCounts: {spc3: 4},
 							actCoeffType: 'twoSfxMrg',
 							actCoeffInfo: {a: 3000},
 							makePhaseDiagram: true,
@@ -47,34 +69,21 @@ LevelData = {
 							criticalPointTemp: 647.1,
 						},
 					},
-					{
-						type: 'Heater',
-						attrs: {
-							handle: 'heater1',
-							wallInfo: 'wallo',
-							liquidHandle: 'water',
-							temp: 363.15,
-							max: 2,
-						},
-					},
 				],
 				dataRecord: [
 					{wallInfo: 'wallo', data: 'frac', attrs: {spcName: 'spc3', tag: 'wallo'}},
-					{wallInfo: 'wallo', data: 'moles', attrs: {spcName: 'spc3', tag:'wallo'}},
-					{wallInfo: 'wallo', data: 'enthalpyTotal'},
-					{wallInfo: 'liquidWater', data: 'enthalpyTotal'}
+					{wallInfo: 'wallo', data: 'enthalpy', attrs: {spcName: 'spc3', tag: 'wallo'}},
 				],
 				// graphs: [
 					// {type: 'Scatter', handle: 'hTGraph', xLabel: 'Enthalpy (kJ)', yLabel: 'Temperature (K)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
 						// sets:[
 							// {handle: 'enthalpyTemperature', label: 'Phase Change', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
-							// data: {x: 'enthalpy("wallo")', y: 'tempSmooth("wallo")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+							// data: {x: 'enthalpy("left")', y: 'tempSmooth("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
 						// ]
 					// }
 				// ],	
 				dataReadouts: [
 					{label: 'Vol: ', expr: 'vol("wallo")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
-					// {label: 'Enthalpy: ', expr: 'enthalpy("wallo")', units: 'kJ', decPlaces: 2, handle: 'hReadout', readout: 'mainReadout'},
 					{label: 'Gas Temp: ', expr: 'tempSmooth("wallo")', units: 'K', decPlaces: 0, handle: 'tempGasReadout', readout: 'mainReadout'},
 					{label: 'Liquid Temp: ', expr:  'tempSmooth("liquidWater")', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
@@ -83,17 +92,9 @@ LevelData = {
 			prompts: [
 				{//prompt0
 					sceneData: undefined,
-					quiz: [
-						{	
-							type: 'text',							
-							preText: "Nothing",
-							text: 'Type your response here', 
-							storeAs: 'Ans1'
-						}
-					],
-					title: 'Current Step'		
+					text: 'Now increase the pressure to bring the system to saturation with the temperature held constant at 150 C.'		
 				},
-			]
-		},
+			]		
+		}
 	]
-}
+}	
