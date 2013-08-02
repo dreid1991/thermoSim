@@ -52,7 +52,7 @@ function Cell(attrs) {
 	//transfer heat out => val > 0
 	this.calcHeatTransferListenerName = 'calcHeatTrans' + this.handle;
 	this.setupCalcHeatTransfer(this.calcHeatTransferListenerName, this.innerWall, walls[attrs.parentWallHandle]);
-	window.dotMigrator.migrateDots(window.dotManager.get({tag:this.parentWallMemberTag}), [this.parentWallMemberTag], [this.outerWall.handle]);
+	window.dotMigrator.migrateDots(window.dotManager.get({tag:this.parentWallMemberTag}), [this.parentWallMemberTag], 'only', [this.outerWall.handle], 'or');
 	this.setupStd();
 }
 

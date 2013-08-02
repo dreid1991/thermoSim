@@ -201,16 +201,19 @@ _.extend(Heater.prototype, objectFuncs, {
 	},
 	init: function(wallHandleHeater, wallHandleParent){
 		canvasManager.addListener(this.canvasHandle, 'drawHeater' + this.handle, this.draw, this, 1);
-		this.setupWalls(wallHandleHeater)
+		this.setupWalls(wallHandleHeater, wallHandleParent);
+		
+
+
 		this.eAdded=0;
-		dotMigrator.enqueueDots(dotManager.get({tag: wallHandleParent}), [wallHandleParent], [wallHandleHeater]);
 	},
-	setupWalls: function(wallHandleHeater){
+	setupWalls: function(wallHandleHeater, wallHandleParent){
 		var handler = {func:this.hit, obj:this};
 		walls.addWall({pts:this.wallPts, handler:handler, handle: wallHandleHeater, record:false, show:false});
 		walls[wallHandleHeater].createSingleValDataObj('vol', function() {
 			return walls.wallVolume(wallHandleHeater);
 		})
+		window.dotMigrator.migrateDots(window.dotManager.get({tag: wallHandleParent}), [wallHandleParent], 'only', [wallHandleHeater], 'or');
 	},
 	wrapHit: function(tempList) {
 		return function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV) {

@@ -14,11 +14,10 @@ LevelData = {
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(150, 50), P(150, 400), P(50, 400)], handler: 'cVIsothermal', temp: 298.15, handle: 'wally', /*, border: {type: 'open', thickness: 5, yMin: 30}*/},
-					{pts: [P(200, 50), P(350, 50), P(350, 400), P(200, 400), P(60, 400), P(60, 200), P(200, 200)], handler: 'cVIsothermal', temp: 298.15, handle: 'two', /*, border: {type: 'open', thickness: 5, yMin: 30}*/}
+					{pts: [P(50, 50), P(350, 50), P(350, 400), P(50, 400)], handler: 'cVIsothermal', temp: 298.15, handle: 'wally', /*, border: {type: 'open', thickness: 5, yMin: 30}*/}
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(100, 250), count: 30, temp: 198.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'spc1', pos: P(55, 55), dims: V(300, 325), count: 1000, temp: 198.15, returnTo: 'wally', tag: 'wally'},
 					// {spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 0, temp: 398.15, returnTo: 'wally', tag: 'wally'},
 					
 					
@@ -44,11 +43,11 @@ LevelData = {
 						// type: 'ActivationEnergyPair',
 						// attrs: {spcNameLow: 'ugly', spcNameHigh: 'fairy', thresholdEnergy: 12}
 					// },
-					// {
-						// type: 'Heater',
-						// cleanUpWith: 'prompt1',
-						// attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
-					// },
+					{
+						type: 'Heater',
+						cleanUpWith: 'prompt1',
+						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
+					},
 					// {
 						// type: 'Heater',
 						// attrs: {wallInfo: 'wally', max: 3, handle: 'other', offset: V(70, 0), sliderIdx: 0}
