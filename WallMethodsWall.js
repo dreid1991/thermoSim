@@ -87,7 +87,7 @@ WallMethods.wall = {
 		var distPastWall = -perpUV.dotProd(dotVec);
 		var perpV = -perpUV.dotProd(dot.v);
 		if (distPastWall>=0 && distPastWall<=this.hitThreshold && this.isBetween(dot, wallPtIdx, wallUV)){
-			this['didHit'+this.hitMode](dot, wallPtIdx, wallUV, perpV, perpUV);
+			this[this.hitMode](dot, wallPtIdx, wallUV, perpV, perpUV);
 			return true;
 		}
 		return false;
