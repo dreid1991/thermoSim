@@ -94,7 +94,12 @@ GraphPhaseOneComp.prototype = {
 			for (var i=Math.max(0, pList.length - 30); i<pList.length; i++) {
 				sum += pList[i];
 			}
-			var pAvg = sum / Math.min(pList.length, 30); //* fracDataSrc[fracDataSrc.length - 1];
+			if (fracDataSrc[fracDataSrc.length - 1]) {
+				var molFrac = fracDataSrc[fracDataSrc.length - 1];
+			} else {
+				var molFrac = 1;
+			}
+			var pAvg = sum / Math.min(pList.length, 30) * molFrac;
 			return pAvg;
 		}
 		
