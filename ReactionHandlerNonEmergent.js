@@ -273,9 +273,9 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var rctsLeft = rctQueue.now;
 			var prodsInit = prodQueue.init;
 			var prodsLeft = prodQueue.now;
-			
-			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft !== 0 ? .2 * rctsLeft / (rctsInit > 0 ? rctsInit : 1) : 0);//or some constant, find a good one
-			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, prodsLeft !== 0 ? .2 * prodsLeft / (prodsInit > 0 ? prodsInit : 1) : 0); 
+			//want to adjust chances so we definitely hit zero, otherwise we may not hit equilibrium, so adjusting chance to be higher than what would exactly produce equilibrium
+			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft !== 0 ? .2 * (rctsLeft + 2) / (rctsInit > 0 ? Math.sqrt(rctsInit) : 1) : 0);//or some constant, find a good one
+			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, prodsLeft !== 0 ? .2 * (prodsLeft + 2) / (prodsInit > 0 ? Math.sqrt(prodsInit) : 1) : 0); 
 			
 			if 
 				(
