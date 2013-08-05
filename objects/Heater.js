@@ -112,13 +112,16 @@ _.extend(Heater.prototype, objectFuncs, {
 		wallPts.splice(maxIdx + 1, 0, P(avgX, wallPts[maxIdx].y - 5));
 	},
 	disable: function() {
-		var slider = $(this.sliderSelector);
-		if (slider.length) $(slider).slider('disable');
+		if (this.slider) {
+			$(this.slider.selector).slider('disable');
+		}
 		this.enabled = false;
+		
 	},
 	enable: function() {
-		var slider = $(this.sliderSelector);
-		if (slider.length) $(slider).slider('enable');
+		if (this.slider) {
+			$(this.slider.selector).slider('enable');
+		}
 		this.enabled = true;
 	},
 	makeDrawFunc: function(colMin, colDefault, colMax){
