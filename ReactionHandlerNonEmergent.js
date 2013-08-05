@@ -109,8 +109,8 @@ ReactionHandlerNonEmergent.Reaction = function(attrs, allRxns) {
 	this.checkRxnSideCount(attrs.rcts);
 	this.checkRxnSideCount(attrs.prods);
 	this.allRxns = allRxns;
-	this.rctsNet = this.reformatSide(attrs.rcts, window.spcs);
-	this.prodsNet = this.reformatSide(attrs.prods, window.spcs);
+	this.rctsNet = this.reformatSide(attrs.rcts);
+	this.prodsNet = this.reformatSide(attrs.prods);
 	this.sRxn298 = this.calcSRxn298(this.rctsNet, this.prodsNet);
 	this.pairs = [];
 	this.preExpForward = attrs.preExpForward;
@@ -118,7 +118,6 @@ ReactionHandlerNonEmergent.Reaction = function(attrs, allRxns) {
 	this.updateWalls();
 	this.updateQueue = this.wrapUpdateQueue();
 	this.listenerHandle = this.handle + 'UpdateQueue';
-	//this.checkWallGroupListenerHandle = this.handle + 'CheckWallGroups';
 
 }
 
@@ -263,6 +262,10 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 				chanceMap[pair.idStr][wallGroup.wallHandle].updatePairChance(pair, wallGroup[pair.chancePath]);
 			}
 		}
+		var forwardInit = [];
+		var backwardInit = [];
+		var forwardLeft = [];
+		var backwardLeft = [];
 		
 		return function(wallGroup, chanceMap) {
 			var rctQueue = wallGroup.rctQueue;
@@ -273,6 +276,16 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var rctsLeft = rctQueue.now;
 			var prodsInit = prodQueue.init;
 			var prodsLeft = prodQueue.now;
+			
+			forwardInit.push(rctsInit);
+			backwardInit.push(prodsInit);
+			forwardLeft.push(rctsLeft);
+			backwardLeft.push(prodsLeft);
+			console.log('forwardInit ' + self.avgLast(forwardInit, 3));
+			console.log('forwardLeft ' + self.avgLast(forwardLeft, 3));
+			console.log('backwardInit ' + self.avgLast(backwardInit, 3));
+			console.log('backwardLeft ' + self.avgLast(backwardLeft, 3));
+			
 			//want to adjust chances so we definitely hit zero, otherwise we may not hit equilibrium, so adjusting chance to be higher than what would exactly produce equilibrium
 			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft !== 0 ? .2 * (rctsLeft + 2) / (rctsInit > 0 ? Math.sqrt(rctsInit) : 1) : 0);//or some constant, find a good one
 			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, prodsLeft !== 0 ? .2 * (prodsLeft + 2) / (prodsInit > 0 ? Math.sqrt(prodsInit) : 1) : 0); 
@@ -290,6 +303,12 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			
 			var temp = wallGroup.temp[wallGroup.temp.length - 1];
 			var kEq = kEq298 * Math.exp(-hRxn298 / 8.314 * (1 / temp - 1 / 298.15));
+			
+			console.log('kEq ' + kEq);
+			console.log(Math.pow(wallGroup.moles.spc2[wallGroup.moles.spc2.length - 1] / wallGroup.moles.spc1[wallGroup.moles.spc1.length - 1], 2) + '\n');
+			
+			
+			
 			var rateConstForward = wallGroup.rateScalar * preExpForward * Math.exp(-activeEForward / (8.314 * temp));
 			var rateConstBackward = rateConstForward / kEq;
 			var numForward = Math.max(0, Math.round(self.getNumInDir(rateConstForward, self.rctsNet, wallGroup.moles, wallGroup.vol[wallGroup.vol.length - 1]) + Math.random() - .5));
@@ -304,6 +323,14 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			
 		}
 	},
+	avgLast: function(list, num) {
+		var sum = 0;
+		num = Math.min(num, list.length);
+		for (var i=list.length - num; i<list.length; i++) {
+			sum += list[i];
+		}
+		return sum / num;
+	},
 	moveAlongSigmoid: function(yo, dx) {
 		//solve for y val corresponding to yo, xNew = xo + dx
 		//bounding value so it can slide back
@@ -313,8 +340,10 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		var num = N * rateConst * dataInterval * 1e-3;
 		for (var i=0; i<rxnSide.length; i++) {
 			var moleList = moleCounts[rxnSide[i].spcName];
-			num *= moleList[moleList.length - 1] / vol;
-			if (rxnSide[i].count == 2) num *= moleList[moleList.length - 1] / vol;
+			var conc = moleList[moleList.length - 1] / vol;
+			num *= rxnSide[i].count * Math.pow(conc, rxnSide[i].count)
+			//num *= moleList[moleList.length - 1] / vol;
+			//if (rxnSide[i].count == 2) num *= moleList[moleList.length - 1] / vol;
 		}
 		return num;
 	},
@@ -374,12 +403,11 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		return flat;
 		
 	},
-	reformatSide: function(side, spcDefs) {
+	reformatSide: function(side) {
 		var typedSpcs = [];
 	
 		for (var i=0; i<side.length; i++) {
-			var def = spcDefs[side[i].spcName];
-			typedSpcs.push(new ReactionComponent(side[i].spcName, side[i].count, def));
+			typedSpcs.push(new ReactionComponent(side[i].spcName, side[i].count));
 		}
 		return typedSpcs;
 	},

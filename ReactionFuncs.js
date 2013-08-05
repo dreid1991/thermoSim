@@ -111,7 +111,7 @@ ReactionFuncs = {
 
 ReactionComponent = function(spcName, count) {
 	this.spcName = spcName;
-	this.count = count; //how many are being produced, corresponds to order.
+	this.count = count; //how many are being produced
 	this.def = window.spcs[spcName];
 }
 
