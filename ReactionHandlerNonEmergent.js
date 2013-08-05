@@ -51,10 +51,15 @@ _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 			var wallGroup = pair.rxn.wallGroupsMap[a.tag];
 			var queue = wallGroup[pair.queuePath];
 			if (Math.random() < wallGroup[pair.chancePath]) {
-				queue.now--;
-				if (queue.now >= 0 && this.react(a, b, pair.prods)) { //prods is list of ReactionComponents
+				if (queue.now > 0 && this.react(a, b, pair.prods)) { //prods is list of ReactionComponents
+					queue.now--; 
 					return false;
+/*
+danger zone - can only subtract from queue once we know the reactants have enough energy to make the products.  
+Should also only subtract below zero if there's enough energy.  This applies to to multiple pair rxns as well
+*/					
 				} else {
+					if (this.canReact(a, b, pair.prods)) queue.now--;
 					return collide.impactStd(a, b, UVAB, perpAB, perpBA);
 				}
 				
@@ -78,10 +83,11 @@ _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 				sum += chanceScalar * wallGroup[pair.chancePath];
 				if (sum >= roll) {
 					var queue = wallGroup[pair.queuePath];
-					queue.now--;
-					if (queue.now >=0 && this.react(a, b, pair.prods)) {
+					if (queue.now > 0 && this.react(a, b, pair.prods)) {
+						queue.now--;
 						return false
 					} else {
+						if (this.canReact(a, b, pair.prods)) queue.now--;
 						return collide.impactStd(a, b, UVAB, perpAB, perpBA);
 					}
 				}
@@ -305,7 +311,8 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var kEq = kEq298 * Math.exp(-hRxn298 / 8.314 * (1 / temp - 1 / 298.15));
 			
 			console.log('kEq ' + kEq);
-			console.log(Math.pow(wallGroup.moles.spc2[wallGroup.moles.spc2.length - 1] / wallGroup.moles.spc1[wallGroup.moles.spc1.length - 1], 2) + '\n');
+			var vol = wallGroup.vol[wallGroup.vol.length - 1];
+			console.log(Math.pow(wallGroup.moles.spc2[wallGroup.moles.spc2.length - 1] / vol, 2) / Math.pow(wallGroup.moles.spc1[wallGroup.moles.spc1.length - 1] / vol, 1) + '\n');
 			
 			
 			
@@ -340,8 +347,7 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		var num = N * rateConst * dataInterval * 1e-3;
 		for (var i=0; i<rxnSide.length; i++) {
 			var moleList = moleCounts[rxnSide[i].spcName];
-			var conc = moleList[moleList.length - 1] / vol;
-			num *= rxnSide[i].count * Math.pow(conc, rxnSide[i].count)
+			num *= Math.pow(moleList[moleList.length - 1] / vol, rxnSide[i].count)
 			//num *= moleList[moleList.length - 1] / vol;
 			//if (rxnSide[i].count == 2) num *= moleList[moleList.length - 1] / vol;
 		}

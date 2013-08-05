@@ -105,6 +105,21 @@ ReactionFuncs = {
 		}
 		return false;
 		
+	},
+	canReact: function(a, b, prods) {
+		var uRct = a.internalEnergy() + b.internalEnergy();
+		var uF298Prod = 0;
+		var cVProd = 0;
+		for (var prodIdx=0; prodIdx<prods.length; prodIdx++) {
+			var prod = prods[prodIdx];
+			uF298Prod += prod.def.uF298 * prod.count;
+			cVProd += this.spcs[prod.spcName].cv * prod.count;
+		}
+		uF298Prod *= 1000 / N; //kj/mol -> j/molec;
+		cVProd /= N; //j/mol -> j/molec
+		var tempF = (uRct - uF298Prod) / cVProd + 298.15;
+		return tempF > 0;
+			
 	}
 }
 
