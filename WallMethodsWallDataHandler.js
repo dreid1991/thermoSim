@@ -421,7 +421,9 @@ WallMethods.wallDataHandler = {
 		} else {
 			this.data.frac.push(new WallMethods.DataObj());
 			dataObj = this.data.frac[this.data.frac.length-1];
-			var listener = new Listener(function() {return countList.length / (totalList.length || 1)}, this);
+			var listener = new Listener(function() {
+				return !totalList.length ? 1 : countList.length / (totalList.length || 1)
+			}, this);
 			this.setupInfoDataObj(dataObj, 'frac', info);
 
 			recordData(dataObj.id() + dataObj.wallHandle(), dataObj.src(), listener, 'update');

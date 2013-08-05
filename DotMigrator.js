@@ -27,7 +27,10 @@ negative if you want to check if it's disallowed there.  The resolution of the g
 one square and the disallowed one is expanded by one.  
 */
 	migrateDots: function(dots, allowedWallHandles, allowedOrderType, disallowedWallHandles, disallowedOrderType) { //type -> 'and', 'or', 'only'
-	
+		if (!allowedOrderType || !disallowedOrderType) {
+			console.log("One or more of the order types wasn't sent to the dot migrator");
+			console.trace(); console.log(allowedOrderType); console.log(disallowedOrderType);
+		}
 		var width = document.getElementById('myCanvas').width;
 		var height = document.getElementById('myCanvas').height;
 		var colWidth = width / this.numCols;
@@ -120,24 +123,6 @@ one square and the disallowed one is expanded by one.
 				a[x][y] = a[x][y] && !b[x][y];
 			}
 		}
-	},
-	squareValid: function(migratingDot, allowedSquare, disallowedSquare) {
-		var hasAllowed = false;
-		var hasDisallwed = false;
-		for (var i=0; i<migratingDot.allowedWallHandles.length; i++) {
-			if (allowedSquare.indexOf(migratingDot.allowedWallHandles[i]) > -1) {
-				hasAllowed = true;
-				break;
-			}
-		}
-		for (var i=0; i<migratingDot.disallowedWallHandles.length; i++) {
-			if (disallowedSquare.indexOf(migratingDot.disallowedWallHandles[i]) > -1) {
-				hasDisallowed = true;
-				break;
-			}
-		}
-		
-		return hasAllowed && !hasDisallowed;
 	},
 	makeModifiedMap: function(sectionWalls, modifier, offset, colWidth, rowHeight) {//modifier being expand or contract
 		var listMap = this.makeGrid(this.numCols, this.numRows);

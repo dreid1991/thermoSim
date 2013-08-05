@@ -97,9 +97,9 @@ ReactionHandlerNonEmergent.Reaction = function(attrs, allRxns) {
 	to specify non-emergent reaction, you need...
 	rcts: [{spcName: 'name', count: #},]
 	prods: [{spcName: 'name', count: #},]
-	both must be <=2
+	totals of both rcts and prods must be <=2
 	preExpForward: val, L^n/(mol^m sec)
-	activeEForward: val, j/(mol K)
+	activeEForward: val, j/mol
 	*/
 	this.parent = attrs.parent;
 	this.chanceMap = this.parent.chanceMap;
@@ -117,7 +117,7 @@ ReactionHandlerNonEmergent.Reaction = function(attrs, allRxns) {
 	this.activeEForward = attrs.activeEForward;
 	this.updateWalls();
 	this.updateQueue = this.wrapUpdateQueue();
-	this.listenerHandle = this.handle + 'CheckQueueEmpty';
+	this.listenerHandle = this.handle + 'UpdateQueue';
 	//this.checkWallGroupListenerHandle = this.handle + 'CheckWallGroups';
 
 }
@@ -273,9 +273,9 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var rctsLeft = rctQueue.now;
 			var prodsInit = prodQueue.init;
 			var prodsLeft = prodQueue.now;
-			
-			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft !== 0 ? .2 * Math.sqrt(Math.abs(rctsLeft)) * Math.abs(rctsLeft) / rctsLeft : 0);//or some constant, find a good one
-			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, prodsLeft !== 0 ? .2 * Math.sqrt(Math.abs(prodsLeft)) * Math.abs(prodsLeft) / prodsLeft : 0); 
+			//want to adjust chances so we definitely hit zero, otherwise we may not hit equilibrium, so adjusting chance to be higher than what would exactly produce equilibrium
+			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft !== 0 ? .2 * (rctsLeft + 2) / (rctsInit > 0 ? Math.sqrt(rctsInit) : 1) : 0);//or some constant, find a good one
+			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, prodsLeft !== 0 ? .2 * (prodsLeft + 2) / (prodsInit > 0 ? Math.sqrt(prodsInit) : 1) : 0); 
 			
 			if 
 				(
