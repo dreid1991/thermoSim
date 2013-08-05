@@ -93,20 +93,32 @@ LevelData = {
 				// ],	
 				dataReadouts: [
 					{label: 'Vol: ', expr: 'vol("wallo")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
+					// {label: 'frac: ', expr: 'frac("wallo")', units: '', decPlaces: 1, handle: 'fracReadout', readout: 'mainReadout'},
+					{label: 'moles: ', expr: 'moles("wallo")', units: 'mol', decPlaces: 2, handle: 'molReadout', readout: 'mainReadout'},
 					// {label: 'Enthalpy: ', expr: 'enthalpy("wallo")', units: 'kJ', decPlaces: 2, handle: 'hReadout', readout: 'mainReadout'},
 					{label: 'Gas Temp: ', expr: 'tempSmooth("wallo")', units: 'K', decPlaces: 0, handle: 'tempGasReadout', readout: 'mainReadout'},
 					{label: 'Liquid Temp: ', expr:  'tempSmooth("liquidWater")', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
 				],
+				triggers: [
+					{handle: 'trigger1', expr: 'curLevel.liquidWater.temp > 371', message: 'Heat the liquid', priority: 1, checkOn: 'conditions', requiredFor: 'prompt1'},
+					{handle: 'freeze1', expr: 'curLevel.liquidWater.temp >= 373', satisfyCmmds: ['curLevel.heaterHeater1.disable()'], requiredFor: 'prompt1'},
+					{handle: 'trigger2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length <= 200', message: 'Vaporize the liquid', checkOn: 'conditions', requiredFor: 'prompt2'},
+					{handle: 'freeze2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length <= 200', satisfyCmmds: ['curLevel.heaterHeater1.disable()'], requiredFor: 'prompt2'},
+					{handle: 'trigger3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length < 10', message: 'Fully vaporize the liquid', checkOn: 'conditions', requiredFor: 'prompt5'},
+					{handle: 'freeze3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['curLevel.heaterHeater1.disable()'], requiredFor: 'prompt5'},
+					{handle: 'trigger4', expr: 'temp("wallo") > 423', message: 'Heat the vapor', requiredFor: 'prompt8', satisfyCmmds: ['curLevel.heaterHeater1.disable()'], checkOn: 'conditions'},
+					{handle: 'freeze4', expr: 'temp("wallo") > 423', requiredFor: 'prompt8', satisfyCmmds: ['curLevel.heaterHeater1.disable()']},
+					
+				]
 			},
 			prompts: [
 				{//prompt0
-					sceneData: 
-						{
-							triggers: [
-								{handle: 'initialSetup', expr: 'pExt("wallo")==1', satisfyCmmds: ['curLevel.heaterHeater1.disable()'], priority: 1},
-							]
-						},
+					sceneData: {
+						cmmds: [
+							'curLevel.heaterHeater1.disable()'
+						]	
+					},
 					quiz: [
 						{	
 							type: 'text',							
@@ -118,7 +130,11 @@ LevelData = {
 					title: 'Current Step'		
 				},
 				{//prompt1
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'curLevel.heaterHeater1.enable()'
+						]
+					},
 					quiz: [
 						{
 							type: 'textSmall',
@@ -130,7 +146,11 @@ LevelData = {
 					],
 				},
 				{//prompt2
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'curLevel.heaterHeater1.enable()'
+						]
+					},
 					quiz: [
 						{
 							type: 'textSmall',
@@ -164,7 +184,11 @@ LevelData = {
 					],
 				},	
 				{//prompt5
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'curLevel.heaterHeater1.enable()'
+						]
+					},
 					quiz: [
 						{
 							type: 'textSmall',
@@ -199,7 +223,11 @@ LevelData = {
 					],
 				},
 				{//prompt8
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'curLevel.heaterHeater1.enable()'
+						]
+					},
 					quiz: [
 						{
 							type: 'text',
