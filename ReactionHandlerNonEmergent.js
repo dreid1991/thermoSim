@@ -15,6 +15,7 @@ function ReactionHandlerNonEmergent(collide, dotManager, rxns, tConst, activeRxn
 	this.rxns = rxns;
 	this.spcs = undefined; //collide calls setSpcs
 	this.chanceMap = undefined;
+	//the chance map exists so the sum of the chances doesn't need to be calculated each time dots w/ 2+ possible pairs collide
 	this.activeRxns = activeRxns;
 	this.pausedRxns = pausedRxns;
 	
@@ -30,17 +31,19 @@ _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 		}
 	},
 	addReaction: function(attrs) {
+		var self = this;
 		attrs.parent = this;
 		var rxn = new ReactionHandlerNonEmergent.Reaction(attrs, this.rxns);
-		rxn.init();
-		this.readyHandlers(this.collide, this.rxns, rxn, this.chanceMap);
 		this.activeRxns.push(rxn);
+		addListenerOnce(curLevel, 'update', 'initRxn' + rxn.handle, function() {
+			rxn.init();
+			self.readyHandlers(self.collide, self.rxns, rxn, self.chanceMap);
+		}, undefined)
 	},
 	disableRxn: function(handle) {
 		this.removeRxn(handle);
 	},
 	removeRxn: function(handle) {
-		//think about how I need to change chance map
 		var rxn = this.getRxn(this.activeRxns, handle);
 		if (rxn) {
 			var pairs = rxn.pairs;
@@ -343,11 +346,11 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		
 		return function(wallGroup, chanceMap) {
 			var temp;
-			if (wallGroup.temp.length) {
-				temp = wallGroup.temp[wallGroup.temp.length - 1];
-			} else {
-				temp = self.getWallTemp(wallGroup);
-			}
+			// if (wallGroup.temp.length) {
+			temp = wallGroup.temp[wallGroup.temp.length - 1];
+			// } else {
+				// temp = self.getWallTemp(wallGroup);
+			// }
 			var rctQueue = wallGroup.rctQueue;
 			var prodQueue = wallGroup.prodQueue;
 			//queue.now goes below zero.  When it gets to zero, they won't react, but ones that roll right will decrement the counter
