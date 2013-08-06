@@ -7,8 +7,7 @@ reacting pairs for a reaction.
 The non-emergent reaction will add its pairs, not itself, to the collide handler's reaction list.  
 */
 
-
-//AHEM - SET UP REMOVING REACTIONS
+//Emergent and non-emergent reactions cannot mix.
 function ReactionHandlerNonEmergent(collide, dotManager, rxns, tConst, activeRxns, pausedRxns) {
 	this.collide = collide;
 	this.dotManager = dotManager;
@@ -22,6 +21,7 @@ function ReactionHandlerNonEmergent(collide, dotManager, rxns, tConst, activeRxn
 }
 
 _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
+
 	setSpcs: function(spcs) {
 		this.spcs = spcs;
 		this.chanceMap = {};
@@ -34,6 +34,58 @@ _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 		var rxn = new ReactionHandlerNonEmergent.Reaction(attrs, this.rxns);
 		rxn.init();
 		this.readyHandlers(this.collide, this.rxns, rxn, this.chanceMap);
+		this.activeRxns.push(rxn);
+	},
+	disableRxn: function(handle) {
+		this.removeRxn(handle);
+	},
+	removeRxn: function(handle) {
+		//think about how I need to change chance map
+		var rxn = this.getRxn(this.activeRxns, handle);
+		if (rxn) {
+			var pairs = rxn.pairs;
+			var chanceMap = this.chanceMap;
+			var allRxns = this.rxns;
+			rxn.removeListener();
+			this.splicePairsFromRxns(pairs, allRxns);
+			this.splicePairsFromChanceMap(pairs, chanceMap);
+			
+			this.activeRxns.splice(this.activeRxns.indexOf(rxn), 1);
+			this.pausedRxns.push(rxn);
+			this.readyHandlers(this.collide, this.rxns, rxn, this.chanceMap);
+		}
+	},
+	enableRxn: function(handle) {
+		var rxn = this.getRxn(this.pausedRxns, handle);
+		if (rxn) {
+			rxn.init();
+			this.pausedRxns.splice(this.pausedRxns.indexOf(rxn), 1);
+			this.activeRxns.push(rxn);
+			this.readyHandlers(this.collide, this.rxns, rxn, this.chanceMap);
+		}
+	},
+	splicePairsFromRxns: function(pairs, allRxns) {
+		for (var idStr in allRxns) {
+			var idStrRxns = allRxns[idStr];
+			for (var i=0; i<pairs.length; i++) {
+		
+				var idx = idStrRxns.indexOf(pairs[i]);
+				if (idx >= 0) {
+					idStrRxns.splice(idx, 1);
+				}
+			}
+		}	
+	},
+	splicePairsFromChanceMap: function(pairs, chanceMap) {
+		for (var idStr in chanceMap) {
+			var strPairs = chanceMap[idStr];
+			for (var wallHandle in strPairs) {
+				var chanceObj = strPairs[wallHandle];
+				for (var i=0; i<pairs.length; i++) {
+					chanceObj.removePair(pairs[i]);
+				}
+			}
+		}
 	},
 	readyHandlers: function(collide, allRxns, rxn, chanceMap) {
 		for (var i=0; i<rxn.pairs.length; i++) {
@@ -43,7 +95,9 @@ _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 				this.initSingleRxnPair(pairRxns[0], idStr, collide);
 			} else if (pairRxns.length > 1) {
 				this.initMultiRxnPair(pairRxns, idStr, collide, chanceMap);
-			} 
+			} else if (pairRxns.length == 0) {
+				collide.resetHandlerByIdStr(idStr);
+			}
 		}
 	},
 	initSingleRxnPair: function(reactivePair, idStr, collide) {
@@ -147,6 +201,9 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			this.updateQueue(this.wallGroups[i], chanceMap);
 		}
 		
+	},
+	removeListener: function() { 
+		removeListener(curLevel, 'data', this.listenerHandle);
 	},
 	updateWalls: function() {
 		var chanceMap = this.chanceMap;
@@ -470,7 +527,10 @@ ReactionHandlerNonEmergent.WallChanceObj.prototype = {
 		
 	},
 	removePair: function(pair) {
-	
+		for (var i=this.pairChances.length - 1; i>=0; i--) {
+			if (this.pairChances[i].pair == pair) this.pairChances.splice(i, 1);
+		}
+		this.updateTotal();
 	},
 	updateTotal: function() {
 		this.total = 0;
