@@ -14,7 +14,7 @@ LevelData = {
 				{//p0, q0
 					sceneData:undefined,
 					cutScene:true,
-					text:"<p>Today we're going to investigate heat capacities.  Using your own words, how would you explain heat capacity to a high school senior?</p>",
+					text:"<p>Today we're going to investigate heat capacities.  Using your own words, how would you explain the concept of a heat capacity to a high school senior?</p>",
 					quiz:[
 						{
 							storeAs: 'foo1', 
@@ -83,7 +83,7 @@ LevelData = {
 				},
 				{//p1, q3
 				cutScene: true, 
-				text: "<p>Now we're going to look at heating in a constant pressure system. This means the volume will no longer be held constant. <p>If we increase its temperature by 100 K, how do you think the system's energy 'cost' will compare to that of the constant volume system?  Explain.</p>", 
+				text: "<p>Now we're going to look at heating in a constant pressure system. This means the volume will no longer be held constant. <p>If we increase its temperature by 100 K, how will the system's energy 'cost' compare to that of the constant volume system? Explain.</p>", 
 				quiz:[
 						{
 							storeAs: 'foo4', 
