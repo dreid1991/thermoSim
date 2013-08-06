@@ -7,6 +7,7 @@ reacting pairs for a reaction.
 The non-emergent reaction will add its pairs, not itself, to the collide handler's reaction list.  
 */
 
+//Emergent and non-emergent reactions cannot mix.
 function ReactionHandlerNonEmergent(collide, dotManager, rxns, tConst, activeRxns, pausedRxns) {
 	this.collide = collide;
 	this.dotManager = dotManager;
@@ -14,12 +15,14 @@ function ReactionHandlerNonEmergent(collide, dotManager, rxns, tConst, activeRxn
 	this.rxns = rxns;
 	this.spcs = undefined; //collide calls setSpcs
 	this.chanceMap = undefined;
+	//the chance map exists so the sum of the chances doesn't need to be calculated each time dots w/ 2+ possible pairs collide
 	this.activeRxns = activeRxns;
 	this.pausedRxns = pausedRxns;
 	
 }
 
 _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
+
 	setSpcs: function(spcs) {
 		this.spcs = spcs;
 		this.chanceMap = {};
@@ -28,10 +31,64 @@ _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 		}
 	},
 	addReaction: function(attrs) {
+		var self = this;
 		attrs.parent = this;
 		var rxn = new ReactionHandlerNonEmergent.Reaction(attrs, this.rxns);
-		rxn.init();
-		this.readyHandlers(this.collide, this.rxns, rxn, this.chanceMap);
+		this.activeRxns.push(rxn);
+		addListenerOnce(curLevel, 'update', 'initRxn' + rxn.handle, function() {
+			rxn.init();
+			self.readyHandlers(self.collide, self.rxns, rxn, self.chanceMap);
+		}, undefined)
+	},
+	disableRxn: function(handle) {
+		this.removeRxn(handle);
+	},
+	removeRxn: function(handle) {
+		var rxn = this.getRxn(this.activeRxns, handle);
+		if (rxn) {
+			var pairs = rxn.pairs;
+			var chanceMap = this.chanceMap;
+			var allRxns = this.rxns;
+			rxn.removeListener();
+			this.splicePairsFromRxns(pairs, allRxns);
+			this.splicePairsFromChanceMap(pairs, chanceMap);
+			
+			this.activeRxns.splice(this.activeRxns.indexOf(rxn), 1);
+			this.pausedRxns.push(rxn);
+			this.readyHandlers(this.collide, this.rxns, rxn, this.chanceMap);
+		}
+	},
+	enableRxn: function(handle) {
+		var rxn = this.getRxn(this.pausedRxns, handle);
+		if (rxn) {
+			rxn.init();
+			this.pausedRxns.splice(this.pausedRxns.indexOf(rxn), 1);
+			this.activeRxns.push(rxn);
+			this.readyHandlers(this.collide, this.rxns, rxn, this.chanceMap);
+		}
+	},
+	splicePairsFromRxns: function(pairs, allRxns) {
+		for (var idStr in allRxns) {
+			var idStrRxns = allRxns[idStr];
+			for (var i=0; i<pairs.length; i++) {
+		
+				var idx = idStrRxns.indexOf(pairs[i]);
+				if (idx >= 0) {
+					idStrRxns.splice(idx, 1);
+				}
+			}
+		}	
+	},
+	splicePairsFromChanceMap: function(pairs, chanceMap) {
+		for (var idStr in chanceMap) {
+			var strPairs = chanceMap[idStr];
+			for (var wallHandle in strPairs) {
+				var chanceObj = strPairs[wallHandle];
+				for (var i=0; i<pairs.length; i++) {
+					chanceObj.removePair(pairs[i]);
+				}
+			}
+		}
 	},
 	readyHandlers: function(collide, allRxns, rxn, chanceMap) {
 		for (var i=0; i<rxn.pairs.length; i++) {
@@ -41,7 +98,9 @@ _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 				this.initSingleRxnPair(pairRxns[0], idStr, collide);
 			} else if (pairRxns.length > 1) {
 				this.initMultiRxnPair(pairRxns, idStr, collide, chanceMap);
-			} 
+			} else if (pairRxns.length == 0) {
+				collide.resetHandlerByIdStr(idStr);
+			}
 		}
 	},
 	initSingleRxnPair: function(reactivePair, idStr, collide) {
@@ -51,10 +110,15 @@ _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 			var wallGroup = pair.rxn.wallGroupsMap[a.tag];
 			var queue = wallGroup[pair.queuePath];
 			if (Math.random() < wallGroup[pair.chancePath]) {
-				queue.now--;
-				if (queue.now >= 0 && this.react(a, b, pair.prods)) { //prods is list of ReactionComponents
+				if (queue.now > 0 && this.react(a, b, pair.prods)) { //prods is list of ReactionComponents
+					queue.now--; 
 					return false;
+/*
+danger zone - can only subtract from queue once we know the reactants have enough energy to make the products.  
+Should also only subtract below zero if there's enough energy.  This applies to to multiple pair rxns as well
+*/					
 				} else {
+					if (this.canReact(a, b, pair.prods)) queue.now--;
 					return collide.impactStd(a, b, UVAB, perpAB, perpBA);
 				}
 				
@@ -78,10 +142,11 @@ _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 				sum += chanceScalar * wallGroup[pair.chancePath];
 				if (sum >= roll) {
 					var queue = wallGroup[pair.queuePath];
-					queue.now--;
-					if (queue.now >=0 && this.react(a, b, pair.prods)) {
+					if (queue.now > 0 && this.react(a, b, pair.prods)) {
+						queue.now--;
 						return false
 					} else {
+						if (this.canReact(a, b, pair.prods)) queue.now--;
 						return collide.impactStd(a, b, UVAB, perpAB, perpBA);
 					}
 				}
@@ -109,8 +174,8 @@ ReactionHandlerNonEmergent.Reaction = function(attrs, allRxns) {
 	this.checkRxnSideCount(attrs.rcts);
 	this.checkRxnSideCount(attrs.prods);
 	this.allRxns = allRxns;
-	this.rctsNet = this.reformatSide(attrs.rcts, window.spcs);
-	this.prodsNet = this.reformatSide(attrs.prods, window.spcs);
+	this.rctsNet = this.reformatSide(attrs.rcts);
+	this.prodsNet = this.reformatSide(attrs.prods);
 	this.sRxn298 = this.calcSRxn298(this.rctsNet, this.prodsNet);
 	this.pairs = [];
 	this.preExpForward = attrs.preExpForward;
@@ -118,7 +183,6 @@ ReactionHandlerNonEmergent.Reaction = function(attrs, allRxns) {
 	this.updateWalls();
 	this.updateQueue = this.wrapUpdateQueue();
 	this.listenerHandle = this.handle + 'UpdateQueue';
-	//this.checkWallGroupListenerHandle = this.handle + 'CheckWallGroups';
 
 }
 
@@ -140,6 +204,22 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			this.updateQueue(this.wallGroups[i], chanceMap);
 		}
 		
+	},
+	getWallTemp: function(wallGroup) {
+		var dataObj = window.walls[wallGroup.wallHandle].data.temp;
+		var src = dataObj.src();
+		if (src.length) {
+			return src[src.length - 1];
+		} else {
+			var listener = dataObj.listener();
+			return listener.func.apply(listener.obj);
+		}
+	},
+	remove: function() {
+		this.parent.removeRxn(this.handle);
+	},
+	removeListener: function() { 
+		removeListener(curLevel, 'data', this.listenerHandle);
 	},
 	updateWalls: function() {
 		var chanceMap = this.chanceMap;
@@ -185,7 +265,7 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		//so if it's a 2 -> 1 reaction, we flip it
 		//the resulting reaction will always be 1 -> 2
 		var chanceForward = !reverseRxn ? 'chanceForward' : 'chanceBackward';
-		var chanceBackward = !reverseRxn ? 'chanceBackward' : 'chanceFoward';
+		var chanceBackward = !reverseRxn ? 'chanceBackward' : 'chanceForward';
 		var rctQueue = !reverseRxn ? 'rctQueue' : 'prodQueue';
 		var prodQueue = !reverseRxn ? 'prodQueue' : 'rctQueue';
 		
@@ -265,6 +345,12 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		}
 		
 		return function(wallGroup, chanceMap) {
+			var temp;
+			// if (wallGroup.temp.length) {
+			temp = wallGroup.temp[wallGroup.temp.length - 1];
+			// } else {
+				// temp = self.getWallTemp(wallGroup);
+			// }
 			var rctQueue = wallGroup.rctQueue;
 			var prodQueue = wallGroup.prodQueue;
 			//queue.now goes below zero.  When it gets to zero, they won't react, but ones that roll right will decrement the counter
@@ -273,23 +359,18 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var rctsLeft = rctQueue.now;
 			var prodsInit = prodQueue.init;
 			var prodsLeft = prodQueue.now;
-			//want to adjust chances so we definitely hit zero, otherwise we may not hit equilibrium, so adjusting chance to be higher than what would exactly produce equilibrium
-			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft !== 0 ? .2 * (rctsLeft + 2) / (rctsInit > 0 ? Math.sqrt(rctsInit) : 1) : 0);//or some constant, find a good one
-			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, prodsLeft !== 0 ? .2 * (prodsLeft + 2) / (prodsInit > 0 ? Math.sqrt(prodsInit) : 1) : 0); 
 			
-			if 
-				(
-					(1 - wallGroup.chanceForward < .99 && rctsLeft > 0 && rctsLeft / rctsInit > .1) || 
-					(1 - wallGroup.chanceBackward < .99 && prodsLeft > 0 && prodsLeft / prodsInit > .1)
-				) 
-			{
+			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft !== 0 ? .2 * rctsLeft / (rctsInit > 0 ? Math.sqrt(rctsInit) : 1) : 0);
+			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, prodsLeft !== 0 ? .2 * prodsLeft / (prodsInit > 0 ? Math.sqrt(prodsInit) : 1) : 0); 
+			
+			if (wallGroup.chanceForward > 1 - 1e-3 || wallGroup.chanceBackward > 1 - 1e-3) {
 				wallGroup.rateScalar = self.moveAlongSigmoid(wallGroup.rateScalar, -.3);
-			} else if (wallGroup.rateScalar < .7) {
+			} else {
 				wallGroup.rateScalar = self.moveAlongSigmoid(wallGroup.rateScalar, .3);
 			}
 			
-			var temp = wallGroup.temp[wallGroup.temp.length - 1];
 			var kEq = kEq298 * Math.exp(-hRxn298 / 8.314 * (1 / temp - 1 / 298.15));
+			
 			var rateConstForward = wallGroup.rateScalar * preExpForward * Math.exp(-activeEForward / (8.314 * temp));
 			var rateConstBackward = rateConstForward / kEq;
 			var numForward = Math.max(0, Math.round(self.getNumInDir(rateConstForward, self.rctsNet, wallGroup.moles, wallGroup.vol[wallGroup.vol.length - 1]) + Math.random() - .5));
@@ -304,6 +385,14 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			
 		}
 	},
+	avgLast: function(list, num) {
+		var sum = 0;
+		num = Math.min(num, list.length);
+		for (var i=list.length - num; i<list.length; i++) {
+			sum += list[i];
+		}
+		return sum / num;
+	},
 	moveAlongSigmoid: function(yo, dx) {
 		//solve for y val corresponding to yo, xNew = xo + dx
 		//bounding value so it can slide back
@@ -313,8 +402,9 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		var num = N * rateConst * dataInterval * 1e-3;
 		for (var i=0; i<rxnSide.length; i++) {
 			var moleList = moleCounts[rxnSide[i].spcName];
-			num *= moleList[moleList.length - 1] / vol;
-			if (rxnSide[i].count == 2) num *= moleList[moleList.length - 1] / vol;
+			num *= Math.pow(moleList[moleList.length - 1] / vol, rxnSide[i].count)
+			//num *= moleList[moleList.length - 1] / vol;
+			//if (rxnSide[i].count == 2) num *= moleList[moleList.length - 1] / vol;
 		}
 		return num;
 	},
@@ -374,12 +464,11 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		return flat;
 		
 	},
-	reformatSide: function(side, spcDefs) {
+	reformatSide: function(side) {
 		var typedSpcs = [];
 	
 		for (var i=0; i<side.length; i++) {
-			var def = spcDefs[side[i].spcName];
-			typedSpcs.push(new ReactionComponent(side[i].spcName, side[i].count, def));
+			typedSpcs.push(new ReactionComponent(side[i].spcName, side[i].count));
 		}
 		return typedSpcs;
 	},
@@ -396,9 +485,9 @@ ReactionHandlerNonEmergent.WallGroup = function(wall, tag, rcts, prods) {
 	this.vol = wall.getDataSrc('vol');
 	this.moles = {};
 	this.wallHandle = wall.handle;
-	this.chanceForward = .1; //can't do one or sigmoid shifting won't work
+	this.chanceForward = .1; //must be  0<x<1 or sigmoid won't work
 	this.chanceBackward = .1;
-	this.rateScalar = .8;
+	this.rateScalar = 1 - 1e-4; //if reaction is too fast, this will slow it down so chanceRxn can be 0<x<1 and rxn hits equil
 	this.rctQueue = new ReactionHandlerNonEmergent.Queue();
 	this.prodQueue = new ReactionHandlerNonEmergent.Queue();
 	this.populateMoles(wall, tag, this.moles, rcts);
@@ -453,7 +542,10 @@ ReactionHandlerNonEmergent.WallChanceObj.prototype = {
 		
 	},
 	removePair: function(pair) {
-	
+		for (var i=this.pairChances.length - 1; i>=0; i--) {
+			if (this.pairChances[i].pair == pair) this.pairChances.splice(i, 1);
+		}
+		this.updateTotal();
 	},
 	updateTotal: function() {
 		this.total = 0;

@@ -100,6 +100,20 @@ LevelTools = {
 		}
 		return questionId;
 	},
+	assumeDefaultRxnType: function(sections) { //.rxns should be phased out.  Make new ones be rxnsEmergent or rxnsNonEmergent
+		for (var sIdx=0; sIdx<sections.length; sIdx++) {
+			var section = sections[sIdx];
+			if (section.sceneData) { //old reactions were all emergent, so they will be under rxns key
+				if (section.sceneData.rxnsEmergent) section.sceneData.rxnsEmergent = section.sceneData.rxns; 
+			}
+			for (var pIdx=0; pIdx<section.prompts.length; pIdx++) {
+				var sceneData = section.prompts[pIdx].sceneData;
+				if (sceneData) {
+					if (!sceneData.rxnsEmergent) sceneData.rxnsEmergent = sceneData.rxns; 
+				}
+			}
+		}
+	},
 	transferObjCleanUp: function(sections) {
 		for (var sectionIdx=0; sectionIdx<sections.length; sectionIdx++) {
 			var section = sections[sectionIdx];

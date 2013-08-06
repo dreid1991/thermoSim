@@ -3,16 +3,6 @@ ReactionFuncs = {
 		var active = this.getRxn(this.activeRxns, handle);
 		return active ? true : false;
 	},
-	disableRxn: function(handle) {
-		this.removeRxn(handle);
-	},
-	enableRxn: function(handle) {
-		var rxn = this.getRxn(this.pausedRxns, handle);
-		if (rxn) {
-			this.pausedRxns.splice(this.pausedRxns.indexOf(rxn), 1);
-			this.initRxn(rxn);
-		}
-	},
 	rxnsAreType: function(rxns, type) {
 		if (rxns.length) {
 			for (var i=1; i<rxns.length; i++) {
@@ -25,48 +15,10 @@ ReactionFuncs = {
 			return true;
 		}
 	},
-	removeRxn: function(handle) {
-		for (var rxnId in this.rxns) {
-			var spcRxns = this.rxns[rxnId];
-			var removedRxn = false;
-			for (var spcRxnIdx=spcRxns.length - 1; spcRxnIdx>=0; spcRxnIdx--) {
-				var spcRxn = spcRxns[spcRxnIdx];
-				if (spcRxn.handle == handle) {
-					spcRxns.splice(spcRxnIdx, 1);
-					removedRxn = true;
-				
-				}
-			
-			}
-			if (removedRxn) {
-				if (spcRxns.length == 0) {
-					this.collide.setHandlerByIdStr(rxnId, {func:this.collide.impactStd, obj:this.collide})
-				} else if (spcRxns.length ==1) {
-					var rxn = spcRxns[0];
-					this.initPair(rxn, true);
-				}
-			}
-		}
-		var rxn = this.getRxn(this.activeRxns, handle);
-		if (rxn) {
-			this.activeRxns.splice(this.activeRxns.indexOf(rxn), 1);
-			this.pausedRxns.push(rxn);
-		}
-	},
 	getRxn: function(rxns, handle) {
 		for (var i=0; i<rxns.length; i++) {
 			if (handle == rxns[i].handle) return rxns[i];
 		}
-	},
-	initRxn: function(rxn) {
-		this.initPair(rxn)
-
-		this.activeRxns.push(rxn);
-		
-	},
-	
-	removeAllReactions: function(){
-		this.collide.setDefaultHandler({func:this.collide.impactStd, obj:this});
 	},
 	react: function(a, b, prods) {
 		var uRct = a.internalEnergy() + b.internalEnergy();
@@ -105,13 +57,28 @@ ReactionFuncs = {
 		}
 		return false;
 		
+	},
+	canReact: function(a, b, prods) {
+		var uRct = a.internalEnergy() + b.internalEnergy();
+		var uF298Prod = 0;
+		var cVProd = 0;
+		for (var prodIdx=0; prodIdx<prods.length; prodIdx++) {
+			var prod = prods[prodIdx];
+			uF298Prod += prod.def.uF298 * prod.count;
+			cVProd += this.spcs[prod.spcName].cv * prod.count;
+		}
+		uF298Prod *= 1000 / N; //kj/mol -> j/molec;
+		cVProd /= N; //j/mol -> j/molec
+		var tempF = (uRct - uF298Prod) / cVProd + 298.15;
+		return tempF > 0;
+			
 	}
 }
 
 
 ReactionComponent = function(spcName, count) {
 	this.spcName = spcName;
-	this.count = count; //how many are being produced, corresponds to order.
+	this.count = count; //how many are being produced
 	this.def = window.spcs[spcName];
 }
 

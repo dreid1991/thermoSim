@@ -15,9 +15,9 @@ Copyright (C) 2013  Daniel Reid
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function Timeline(parent, buttonManagerBlank, isSectionsBranch, isPromptsBranch) { //make it so it can inherit blanks as well
+function Timeline(parent, buttonManagerBlank, isSectionsBranch, isPromptsBranch) { 
 	this.parent = parent;
-	//cloning returns jquery reference rather than deepcopy if done before page fully loaded
+	//cloning before page fully loaded returns jquery reference rather than deep copy
 	this.buttonManagerBlank = buttonManagerBlank || document.getElementById('buttonManager').outerHTML;
 	this.isSectionsBranch = isSectionsBranch || false;
 	this.isPromptsBranch = isPromptsBranch || false;
@@ -179,7 +179,6 @@ Timeline.prototype = {
 }
 
 Timeline.Section = function(timeline, sectionData, buttonManagerBlank, conditionManager, motherTimeline, motherSection) {
-//need to make clean up listeners still
 	this.timeline = timeline;
 	this.inited = false
 	this.promptIdx = -1;
@@ -190,7 +189,6 @@ Timeline.Section = function(timeline, sectionData, buttonManagerBlank, condition
 	this.populateMoments(timeline, timeline.elems, this.moments, this.sectionData);
 	this.sortMoments();
 
-	//sort moments here
 	this.level = new LevelInstance();
 	this.mainReadout = new Readout('mainReadout', 30, myCanvas.width-125, 25, '11pt calibri', Col(255,255,255), 'left', this.level);
 	this.dotManager = new DotManager();
@@ -774,7 +772,8 @@ Timeline.Section.prototype = {
 			this.applySpanToMoments(timeline, moments, elems, sceneData.dataReadouts, 'objs', timestamp, Timeline.stateFuncs.dataReadouts.spawn, Timeline.stateFuncs.dataReadouts.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.triggers, 'objs', timestamp, Timeline.stateFuncs.triggers.spawn, Timeline.stateFuncs.triggers.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.graphs, 'objs', timestamp, Timeline.stateFuncs.graphs.spawn, Timeline.stateFuncs.graphs.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.rxns, 'objs', timestamp, Timeline.stateFuncs.rxns.spawn, Timeline.stateFuncs.rxns.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.rxnsEmergent, 'objs', timestamp, Timeline.stateFuncs.rxnsEmergent.spawn, Timeline.stateFuncs.rxnsEmergent.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.rxnsNonEmergent, 'objs', timestamp, Timeline.stateFuncs.rxnsNonEmergent.spawn, Timeline.stateFuncs.rxnsNonEmergent.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.buttonGroups, 'objs', timestamp, Timeline.stateFuncs.buttonGrps.spawn, Timeline.stateFuncs.buttonGrps.remove);
 			
 			this.applyCmmdsToMoments(timeline, moments, elems, sceneData.cmmds, 'cmmds', timestamp);
@@ -1030,7 +1029,7 @@ Timeline.stateFuncs = {
 			elems[id] = undefined;
 		}		
 	},
-	rxns: {
+	rxnsEmergent: {
 		spawn: function(section, elems, id, rxnDatum) {
 			var rxn = section.collide.rxnHandlerEmergent.addReaction(rxnDatum);
 			elems[id] = rxn;
@@ -1040,6 +1039,17 @@ Timeline.stateFuncs = {
 			rxn.remove();
 			elems[id] = undefined;
 		}		
+	},
+	rxnsNonEmergent: {
+		spawn: function(section, elems, id, rxnDatum) {
+			var rxn = section.collide.rxnHandlerNonEmergent.addReaction(rxnDatum);
+			elems[id] = rxn;
+		},
+		remove: function(second, elems, id) {
+			var rxn = elems[id];
+			rxn.remove();
+			elems[id] = undefined;
+		}
 	},
 	buttonGrps: {
 		spawn: function(section, elems, id, grpDatum) {
