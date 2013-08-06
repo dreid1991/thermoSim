@@ -7,6 +7,8 @@ reacting pairs for a reaction.
 The non-emergent reaction will add its pairs, not itself, to the collide handler's reaction list.  
 */
 
+
+//AHEM - SET UP REMOVING REACTIONS
 function ReactionHandlerNonEmergent(collide, dotManager, rxns, tConst, activeRxns, pausedRxns) {
 	this.collide = collide;
 	this.dotManager = dotManager;
@@ -190,7 +192,7 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		//so if it's a 2 -> 1 reaction, we flip it
 		//the resulting reaction will always be 1 -> 2
 		var chanceForward = !reverseRxn ? 'chanceForward' : 'chanceBackward';
-		var chanceBackward = !reverseRxn ? 'chanceBackward' : 'chanceFoward';
+		var chanceBackward = !reverseRxn ? 'chanceBackward' : 'chanceForward';
 		var rctQueue = !reverseRxn ? 'rctQueue' : 'prodQueue';
 		var prodQueue = !reverseRxn ? 'prodQueue' : 'rctQueue';
 		
@@ -268,10 +270,6 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 				chanceMap[pair.idStr][wallGroup.wallHandle].updatePairChance(pair, wallGroup[pair.chancePath]);
 			}
 		}
-		var forwardInit = [];
-		var backwardInit = [];
-		var forwardLeft = [];
-		var backwardLeft = [];
 		
 		return function(wallGroup, chanceMap) {
 			var rctQueue = wallGroup.rctQueue;
@@ -282,15 +280,6 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			var rctsLeft = rctQueue.now;
 			var prodsInit = prodQueue.init;
 			var prodsLeft = prodQueue.now;
-			
-			forwardInit.push(rctsInit);
-			backwardInit.push(prodsInit);
-			forwardLeft.push(rctsLeft);
-			backwardLeft.push(prodsLeft);
-			console.log('forwardInit ' + self.avgLast(forwardInit, 3));
-			console.log('forwardLeft ' + self.avgLast(forwardLeft, 3));
-			console.log('backwardInit ' + self.avgLast(backwardInit, 3));
-			console.log('backwardLeft ' + self.avgLast(backwardLeft, 3));
 			
 			//want to adjust chances so we definitely hit zero, otherwise we may not hit equilibrium, so adjusting chance to be higher than what would exactly produce equilibrium
 			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft !== 0 ? .2 * (rctsLeft + 2) / (rctsInit > 0 ? Math.sqrt(rctsInit) : 1) : 0);//or some constant, find a good one
@@ -309,12 +298,6 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			
 			var temp = wallGroup.temp[wallGroup.temp.length - 1];
 			var kEq = kEq298 * Math.exp(-hRxn298 / 8.314 * (1 / temp - 1 / 298.15));
-			
-			console.log('kEq ' + kEq);
-			var vol = wallGroup.vol[wallGroup.vol.length - 1];
-			console.log(Math.pow(wallGroup.moles.spc2[wallGroup.moles.spc2.length - 1] / vol, 2) / Math.pow(wallGroup.moles.spc1[wallGroup.moles.spc1.length - 1] / vol, 1) + '\n');
-			
-			
 			
 			var rateConstForward = wallGroup.rateScalar * preExpForward * Math.exp(-activeEForward / (8.314 * temp));
 			var rateConstBackward = rateConstForward / kEq;
