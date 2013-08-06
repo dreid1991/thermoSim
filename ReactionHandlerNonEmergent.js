@@ -110,9 +110,13 @@ _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 			var wallGroup = pair.rxn.wallGroupsMap[a.tag];
 			var queue = wallGroup[pair.queuePath];
 			if (Math.random() < wallGroup[pair.chancePath]) {
-				if (queue.now > 0 && this.react(a, b, pair.prods)) { //prods is list of ReactionComponents
-					queue.now--; 
-					return false;
+				if (queue.now > 0) {
+					if (this.react(a, b, pair.prods)) { //prods is list of ReactionComponents
+						queue.now--; 
+						return false;
+					} else {
+						return collide.impactStd(a, b, UVAB, perpAB, perpBA);
+					}
 /*
 danger zone - can only subtract from queue once we know the reactants have enough energy to make the products.  
 Should also only subtract below zero if there's enough energy.  This applies to to multiple pair rxns as well
@@ -142,9 +146,13 @@ Should also only subtract below zero if there's enough energy.  This applies to 
 				sum += chanceScalar * wallGroup[pair.chancePath];
 				if (sum >= roll) {
 					var queue = wallGroup[pair.queuePath];
-					if (queue.now > 0 && this.react(a, b, pair.prods)) {
-						queue.now--;
-						return false
+					if (queue.now > 0) {
+						if (this.react(a, b, pair.prods)) {
+							queue.now--;
+							return false
+						} else {
+							return collide.impactStd(a, b, UVAB, perpAB, perpBA);
+						}
 					} else {
 						if (this.canReact(a, b, pair.prods)) queue.now--;
 						return collide.impactStd(a, b, UVAB, perpAB, perpBA);
@@ -345,12 +353,8 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		}
 		
 		return function(wallGroup, chanceMap) {
-			var temp;
-			// if (wallGroup.temp.length) {
-			temp = wallGroup.temp[wallGroup.temp.length - 1];
-			// } else {
-				// temp = self.getWallTemp(wallGroup);
-			// }
+			var temp = wallGroup.temp[wallGroup.temp.length - 1];
+
 			var rctQueue = wallGroup.rctQueue;
 			var prodQueue = wallGroup.prodQueue;
 			//queue.now goes below zero.  When it gets to zero, they won't react, but ones that roll right will decrement the counter
