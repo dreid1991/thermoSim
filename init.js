@@ -102,6 +102,7 @@ $(function(){
 	LevelTools.addUF298(LevelData.spcDefs);
 	LevelTools.addCp(LevelData.spcDefs);
 	questionId = LevelTools.addImgsAndQuestionIds(LevelData.mainSequence, questionId);
+	LevelTools.assumeDefaultRxnType(LevelData.mainSequence);
 	LevelTools.setDefaultPromptVals(LevelData.mainSequence);
 	LevelTools.addTriggerCleanUp(LevelData.mainSequence);
 	LevelTools.addStoreAs(LevelData.mainSequence);
@@ -114,6 +115,7 @@ $(function(){
 		questionId = LevelTools.addImgsAndQuestionIds(auxSections, questionId);
 		auxSections.id = branchId;
 		branchId ++;
+		LevelTools.assumeDefaultRxnType(auxSections);
 		LevelTools.setDefaultPromptVals(auxSections);
 		LevelTools.addTriggerCleanUp(auxSections);
 		LevelTools.addStoreAs(auxSections);
@@ -123,14 +125,15 @@ $(function(){
 	for (var auxPromptsName in LevelData.auxPrompts) {
 		var auxPrompts = LevelData.auxPrompts[auxPromptsName];
 		auxPrompts = auxPrompts instanceof Array ? auxPrompts : [auxPrompts];
-		var asSection = {prompts: auxPrompts};
-		questionId = LevelTools.addImgsAndQuestionIds(asSection, questionId);
+		var asSections = [{prompts: auxPrompts}];
+		questionId = LevelTools.addImgsAndQuestionIds(asSections, questionId);
 		auxPrompts.id = branchId;
 		branchId ++;
-		LevelTools.setDefaultPromptVals(asSection);
-		LevelTools.addTriggerCleanUp(asSection);
-		LevelTools.addStoreAs(asSection);
-		LevelTools.transferObjCleanUp(asSection);	
+		LevelTools.assumeDefaultRxnType(asSections);
+		LevelTools.setDefaultPromptVals(asSections);
+		LevelTools.addTriggerCleanUp(asSections);
+		LevelTools.addStoreAs(asSections);
+		LevelTools.transferObjCleanUp(asSections);	
 	}
 
 	for (var sectionIdx=0; sectionIdx<LevelData.mainSequence.length; sectionIdx++) {

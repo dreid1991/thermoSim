@@ -86,10 +86,13 @@ LevelData = {
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
 					//{data: 'collisions'}
 				],
-				rxns: [
+				rxnsEmergent: [
 					//{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: .5, prods: {spc2: 2}},
 					// {handle: 'rxn2', rctA: 'c', rctB: 'd', activeE: 10, prods: {a: 1, b: 1}}
 					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
+				],
+				rxnsNonEmergent: [
+					{rcts: [{spcName: 'spc1', count: 1}], prods: [{spcName: 'spc2', count: 1}], preExpForward: 1, activeEForward: 200, handle: 'reacty7'}
 				],
 				dataReadouts: [
 					{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},

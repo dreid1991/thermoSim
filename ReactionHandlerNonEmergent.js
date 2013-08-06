@@ -202,6 +202,19 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		}
 		
 	},
+	getWallTemp: function(wallGroup) {
+		var dataObj = window.walls[wallGroup.wallHandle].data.temp;
+		var src = dataObj.src();
+		if (src.length) {
+			return src[src.length - 1];
+		} else {
+			var listener = dataObj.listener();
+			return listener.func.apply(listener.obj);
+		}
+	},
+	remove: function() {
+		this.parent.removeRxn(this.handle);
+	},
 	removeListener: function() { 
 		removeListener(curLevel, 'data', this.listenerHandle);
 	},
@@ -329,6 +342,12 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		}
 		
 		return function(wallGroup, chanceMap) {
+			var temp;
+			if (wallGroup.temp.length) {
+				temp = wallGroup.temp[wallGroup.temp.length - 1];
+			} else {
+				temp = self.getWallTemp(wallGroup);
+			}
 			var rctQueue = wallGroup.rctQueue;
 			var prodQueue = wallGroup.prodQueue;
 			//queue.now goes below zero.  When it gets to zero, they won't react, but ones that roll right will decrement the counter
@@ -342,18 +361,12 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 			wallGroup.chanceForward = self.moveAlongSigmoid(wallGroup.chanceForward, rctsLeft !== 0 ? .2 * (rctsLeft + 2) / (rctsInit > 0 ? Math.sqrt(rctsInit) : 1) : 0);//or some constant, find a good one
 			wallGroup.chanceBackward = self.moveAlongSigmoid(wallGroup.chanceBackward, prodsLeft !== 0 ? .2 * (prodsLeft + 2) / (prodsInit > 0 ? Math.sqrt(prodsInit) : 1) : 0); 
 			
-			if 
-				(
-					(1 - wallGroup.chanceForward < .99 && rctsLeft > 0 && rctsLeft / rctsInit > .1) || 
-					(1 - wallGroup.chanceBackward < .99 && prodsLeft > 0 && prodsLeft / prodsInit > .1)
-				) 
-			{
+			if (wallGroup.chanceForward > 1 - 1e-3 || wallGroup.chanceBackward > 1 - 1e-3) {
 				wallGroup.rateScalar = self.moveAlongSigmoid(wallGroup.rateScalar, -.3);
-			} else if (wallGroup.rateScalar < .7) {
+			} else {
 				wallGroup.rateScalar = self.moveAlongSigmoid(wallGroup.rateScalar, .3);
 			}
 			
-			var temp = wallGroup.temp[wallGroup.temp.length - 1];
 			var kEq = kEq298 * Math.exp(-hRxn298 / 8.314 * (1 / temp - 1 / 298.15));
 			
 			var rateConstForward = wallGroup.rateScalar * preExpForward * Math.exp(-activeEForward / (8.314 * temp));
@@ -470,9 +483,9 @@ ReactionHandlerNonEmergent.WallGroup = function(wall, tag, rcts, prods) {
 	this.vol = wall.getDataSrc('vol');
 	this.moles = {};
 	this.wallHandle = wall.handle;
-	this.chanceForward = .1; //can't do one or sigmoid shifting won't work
+	this.chanceForward = .1; //must be  0<x<1 or sigmoid won't work
 	this.chanceBackward = .1;
-	this.rateScalar = .8;
+	this.rateScalar = 1 - 1e-4; //if reaction is too fast, this will slow it down so chanceRxn can be 0<x<1 and rxn hits equil
 	this.rctQueue = new ReactionHandlerNonEmergent.Queue();
 	this.prodQueue = new ReactionHandlerNonEmergent.Queue();
 	this.populateMoles(wall, tag, this.moles, rcts);
