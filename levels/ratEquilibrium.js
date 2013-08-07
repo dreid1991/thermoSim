@@ -5,7 +5,8 @@ LevelData = {
 		{spcName: 'spc1', m: 4, r: 2, sF298: 0, col: Col(200, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, 
 		{spcName: 'ugly', m: 4, r: 2, sF298: 0, col: Col(52, 90, 224), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'uglier', m: 4, r: 2, sF298: 20, col: Col(255, 30, 62), cv: 3 * R, hF298: -12, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
-		{spcName: 'duckling', m: 4, r: 2, sF298: 0, col: Col(255, 255, 255), cv: 3 * R, hF298: -11, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
+		{spcName: 'duckling', m: 4, r: 2, sF298: 0, col: Col(255, 255, 255), cv: 3 * R, hF298: -11, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1},
+		{spcName: 'ugliest', m: 4, r: 2, sF298: 0, col: Col(255, 30, 62), cv: 3 * R, hF298: -11, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
 	],
 	mainSequence: [
 		{//S0	
@@ -133,7 +134,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: 'We first consider the case where A can react to form B, but B cannot react in "reverse" to form A. A will be represented by a blue molecule and B by a red molecule. The isothermal system above is held at 300 K. You can start the reaction by clicking "enable reaction" How long does it take for 75% of the A to be consumed?', 
+					text: '<p>We first consider the case where A can react to form B, but B cannot react in "reverse" to form A. A will be represented by a blue molecule and B by a red molecule.</p><p> The isothermal system above is held at 300 K. You can start the reaction by clicking "enable reaction." How long does it take for 75% of the A to be consumed?</p>', 
 					quiz:[
 							{
 								storeAs: 'foo2', 
@@ -158,7 +159,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: "Now let's try to make the reaction happen faster. Enter a temperature you'd like to conduct this experiment at to speed it up and click 'submit'.", 
+					text: "Now let's try to make the reaction happen faster. Enter a temperature at which you would like to conduct the experiment in order to speed it up and click 'submit'.", 
 					quiz:[
 							{
 								storeAs: 'foo4', 
@@ -310,7 +311,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Let's consider why the rate changes with temperature (or the reactivity of A). The activation energy of this reaction is 10 kJ/mol and the pre-exponential constant is Y. Using the Arrhenius equation, graph the reaction rate constant with respect to temperature from 0 to 1000 K. Do you have any ideas as to why the rate behaves this way with respect to temperature?", 
+					text: "Let's consider why the rate changes with temperature (or the reactivity of A). Using the Arrhenius equation, graph the reaction rate constant with respect to temperature from 0 to 1000 K. $$ k = Ae^{\\frac{-E_{a}}{RT}} $$ The activation energy of this reaction is 10 kJ/mol and the pre-exponential constant is Y. Do you have any ideas as to why the rate behaves this way with respect to temperature?", 
 					quiz:[
 							{
 								storeAs: 'foo7', 
@@ -456,7 +457,7 @@ LevelData = {
 		{//S7
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'staticAdiabatic', temp: 300, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
+					{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'staticAdiabatic', temp: 50, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
 				],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
@@ -603,7 +604,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Now let's introduce the reverse reaction, B --> A, to our system. The enthalpy and entropy of reaction for A --> B are -5 kJ/mol and -50 J/mol-K respectively. With the isothermal system held at 500 K, what will the equilibrium mole fraction of A be?", 
+					text: "Now let's introduce the reverse reaction, B --> A, to our system. The enthalpy and entropy of reaction for A --> B are -5 kJ/mol and -50 J/mol-K respectively. With the isothermal system held at 300 K, what will the equilibrium mole fraction of A be?", 
 					quiz:[
 							{
 								storeAs: 'foo13', 
@@ -618,7 +619,7 @@ LevelData = {
 		{//S9
 			sceneData: {
 				walls: [
-						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'staticAdiabatic', temp: 500, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
+						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'staticAdiabatic', temp: 300, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
 					],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
@@ -664,7 +665,7 @@ LevelData = {
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
-					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'duckling', tag: 'wally'}}
+					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugliest', tag: 'wally'}}
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
 					//{data: 'collisions'}
 				],
@@ -686,8 +687,8 @@ LevelData = {
 						// {handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}
 					// ]},
 					{handle: 'rxnControl', label: 'Rxn control', isRadio: true, buttons: [
-						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Forward on', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn1")']},
-						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Forward off', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn1")']},
+						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Enable', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn1")']},
+						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Disable', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn1")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn2")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn2")']}
 						],
@@ -698,13 +699,13 @@ LevelData = {
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				// ],
 				rxns: [
-					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 2, prods: {duckling: 2}},
-					{handle: 'rxn2', rctA: 'duckling', rctB: 'duckling', activeE: 3, prods: {ugly: 2}}
+					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 5, prods: {ugliest: 2}},
+					{handle: 'rxn2', rctA: 'ugliest', rctB: 'ugliest', activeE: 6, prods: {ugly: 2}}
 				],
 				graphs: [
 					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Time (s)", yLabel: "Product Mole Fraction", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
-							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'duckling', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
+							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'ugliest', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
 						]
 					},
 					// {type: 'Scatter', handle: 'tempvstime', xLabel: "vol", yLabel: "pExt (K)", axesInit:{x:{min:0, step:3}, y:{min:0, step:2}}, numGridLines: {x: 3, y: 10},
@@ -724,7 +725,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: "Let's perform an experiment with both a forward and reverse reaction. Click 'enable' to start the reaction. How long does it take for the system to reach the equilibrium mole fraction of A?", 
+					text: "Let's perform an experiment with both a forward and reverse reaction. Click 'enable' to start the reaction. How long does it take for the system at 300 K to reach the equilibrium mole fraction of A?", 
 					quiz:[
 							{
 								storeAs: 'foo14', 
@@ -783,7 +784,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "At 300 K, it took <x> seconds to reach equilibrium.  How do you think this will compare to the time required to reach equilibrium at 500 K?", 
+					text: "At 300 K, it took get('foo18', 'string', 'noValue') seconds to reach equilibrium.  How do you think this will compare to the time required to reach equilibrium at 500 K?", 
 					quiz:[
 							{
 								storeAs: 'foo18', 
@@ -801,7 +802,7 @@ LevelData = {
 					],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(70, 100), dims: V(400, 250), count: 600, temp: 300, returnTo: 'wally', tag: 'wally'}
+					{spcName: 'ugly', pos: P(70, 100), dims: V(400, 250), count: 600, temp: 500, returnTo: 'wally', tag: 'wally'}
 					//{spcName: 'duckling', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
@@ -843,7 +844,7 @@ LevelData = {
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
-					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'duckling', tag: 'wally'}}
+					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugliest', tag: 'wally'}}
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
 					//{data: 'collisions'}
 				],
@@ -865,8 +866,8 @@ LevelData = {
 						// {handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}
 					// ]},
 					{handle: 'rxnControl', label: 'Rxn control', isRadio: true, buttons: [
-						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Forward on', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn1")']},
-						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Forward off', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn1")']},
+						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Enable', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn1")']},
+						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Disable', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn1")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn2")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn2")']}
 						],
@@ -877,13 +878,13 @@ LevelData = {
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				// ],
 				rxns: [
-					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 5, prods: {duckling: 2}},
-					{handle: 'rxn2', rctA: 'duckling', rctB: 'duckling', activeE: 6, prods: {ugly: 2}}
+					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 5, prods: {ugliest: 2}},
+					{handle: 'rxn2', rctA: 'ugliest', rctB: 'ugliest', activeE: 6, prods: {ugly: 2}}
 				],
 				graphs: [
 					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Time (s)", yLabel: "Product Mole Fraction", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
-							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'duckling', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
+							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'ugliest', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
 						]
 					},
 					// {type: 'Scatter', handle: 'tempvstime', xLabel: "vol", yLabel: "pExt (K)", axesInit:{x:{min:0, step:3}, y:{min:0, step:2}}, numGridLines: {x: 3, y: 10},
@@ -902,7 +903,7 @@ LevelData = {
 			prompts: [
 				{
 					sceneData: undefined, 
-					text: 'Let’s find out. Above is the same isothermal setup except at 500 K.  Click ‘enable’ to start the reaction.  You wrote it took get("foo18", "string", noValue) seconds to reach equilibrium at 300 K.  How long does it take at 500 K?',
+					text: 'Let’s find out. Above is the same isothermal setup except at 500 K.  Click ‘enable’ to start the reaction.  You wrote it took get("foo18", "string", "noValue") seconds to reach equilibrium at 300 K.  How long does it take at 500 K?',
 					quiz:[
 							{
 								storeAs: 'foo19', 
@@ -913,7 +914,7 @@ LevelData = {
 				},
 				{
 					sceneData: undefined, 					
-					text: 'Does the equilibrium mole fraction match your predicted value of get("foo16", "string", noValue)',
+					text: 'Does the equilibrium mole fraction match your predicted value of get("foo16", "string", "noValue")',
 					quiz:[
 							{
 								storeAs: 'foo20', 
@@ -998,7 +999,7 @@ LevelData = {
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
-					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'duckling', tag: 'wally'}}
+					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugliest', tag: 'wally'}}
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
 					//{data: 'collisions'}
 				],
@@ -1020,8 +1021,8 @@ LevelData = {
 						// {handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}
 					// ]},
 					{handle: 'rxnControl', label: 'Rxn control', isRadio: true, buttons: [
-						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Forward on', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn1")']},
-						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Forward off', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn1")']},
+						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Enable', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn1")']},
+						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Disable', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn1")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn2")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn2")']}
 						],
@@ -1032,13 +1033,13 @@ LevelData = {
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				// ],
 				rxns: [
-					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 5, prods: {duckling: 2}},
-					{handle: 'rxn2', rctA: 'duckling', rctB: 'duckling', activeE: 6, prods: {ugly: 2}}
+					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 5, prods: {ugliest: 2}},
+					{handle: 'rxn2', rctA: 'ugliest', rctB: 'ugliest', activeE: 6, prods: {ugly: 2}}
 				],
 				graphs: [
 					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Time (s)", yLabel: "Product Mole Fraction", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
-							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'duckling', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
+							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'ugliest', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
 						]
 					},
 					// {type: 'Scatter', handle: 'tempvstime', xLabel: "vol", yLabel: "pExt (K)", axesInit:{x:{min:0, step:3}, y:{min:0, step:2}}, numGridLines: {x: 3, y: 10},
@@ -1084,7 +1085,7 @@ LevelData = {
 					quiz:[
 							{
 								storeAs: 'foo25', 
-								type:'textSmall',
+								type:'text',
 								text:'', 
 							},
 					]
