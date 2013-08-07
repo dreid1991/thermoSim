@@ -1,6 +1,6 @@
 ../underscore-min.js
-../js/jquery-2.0.0.min.js
-../js/jquery-ui-1.9.2.custom.min.js
+../js/jquery-2.0.3.min.js
+../js/jquery-ui-1.10.3.custom.min.js
 ../ExpressionInterpreter.js
 ../SceneNavigator.js
 ../Templater.js

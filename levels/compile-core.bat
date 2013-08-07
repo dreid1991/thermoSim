@@ -2,8 +2,8 @@ java -jar ../../compiler.jar ^
 --compilation_level SIMPLE_OPTIMIZATIONS ^
 --language_in ECMASCRIPT5 ^
 --js ../underscore-min.js ^
---js ../js/jquery-2.0.0.min.js ^
---js ../js/jquery-ui-1.9.2.custom.min.js ^
+--js ../js/jquery-2.0.3.min.js ^
+--js ../js/jquery-ui-1.10.3.custom.min.js ^
 --js ../ExpressionInterpreter.js ^
 --js ../SceneNavigator.js ^
 --js ../Templater.js ^
