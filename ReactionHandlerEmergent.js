@@ -238,7 +238,7 @@ ReactionHandlerEmergent.Reaction.prototype = {
 		var sRxn = 0;
 		//kJ/mol
 		for (var i=0; i<prods.length; i++) sRxn += spcs[prods[i].spcName].sF298 * prods[i].count;
-		for (var i=0; i<rcts.length; i++) sRxn -= spcs[rcts[i].spcName].sF298 * prods[i].count;
+		for (var i=0; i<rcts.length; i++) sRxn -= spcs[rcts[i].spcName].sF298 * rcts[i].count;
 		return sRxn;
 		
 	},
