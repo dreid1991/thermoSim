@@ -14,7 +14,7 @@ LevelData = {
 			{//p0, q0
 				sceneData:undefined,
 				cutScene:true,
-				text:"<p>In this simulation we're going to investigate the distinction between chemical reaction rate and equilibrium. In your own words, how would you explain the difference between the reaction rate and equilibrium?</p>",
+				text:"<p>In this simulation we're going to investigate the distinction between chemical reaction rate and equilibrium. In your own words, how would you explain the difference between reaction rate and equilibrium?</p>",
 				quiz:[
 					{
 						storeAs: 'foo1', 
@@ -32,7 +32,7 @@ LevelData = {
 				],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(70, 100), dims: V(400, 250), count: 600, temp: 600, returnTo: 'wally', tag: 'wally'}
+					{spcName: 'ugly', pos: P(70, 100), dims: V(400, 250), count: 600, temp: 300, returnTo: 'wally', tag: 'wally'}
 					//{spcName: 'duckling', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
@@ -107,7 +107,7 @@ LevelData = {
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				// ],
 				rxns: [
-					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 9, prods: {uglier: 2}},
+					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 6, prods: {uglier: 2}},
 					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				],
 				graphs: [
@@ -133,7 +133,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: 'We first consider the case where A can react to form B, but B cannot react in "reverse" to form A. A will be represented by a red molecule and B by a blue molecule. The isothermal system above is held at 300 K. You can start the reaction by clicking "enable reaction" How long does it take for 75% of the A to be consumed?', 
+					text: 'We first consider the case where A can react to form B, but B cannot react in "reverse" to form A. A will be represented by a blue molecule and B by a red molecule. The isothermal system above is held at 300 K. You can start the reaction by clicking "enable reaction" How long does it take for 75% of the A to be consumed?', 
 					quiz:[
 							{
 								storeAs: 'foo2', 
@@ -146,7 +146,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: 'In your experiment, do the A molecules react every time they collide with another molecule? Explain.', 
+					text: 'Do you believe the A molecules react every time they collide with another molecule? Explain.', 
 					quiz:[
 							{
 								storeAs: 'foo3', 
@@ -217,7 +217,7 @@ LevelData = {
 					//{handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: false}
 				],
 				dataRecord: [
-					{wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
+					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugly', tag: 'wally'}}
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
 					//{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'uglier', tag: 'wally'}}
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
@@ -252,13 +252,13 @@ LevelData = {
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				// ],
 				rxns: [
-					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 5, prods: {uglier: 2}},
+					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 6, prods: {uglier: 2}},
 					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'molAtime', xLabel: "time", yLabel: "mole fraction of A", axesInit:{x:{min:0, step:80}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'molAtime', xLabel: "time", yLabel: "mole fraction of A", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
-							{handle:'moles', label:'moles A', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "time('wally')", y: "moles('wally')"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
+							{handle:'moles', label:'frac A', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "time('wally')", y: "frac('wally', {spcName: 'ugly', tag: 'wally'})"}, trace: true, showPts: false, fillInPtsMin: 5}
 						]
 					},
 					// {type: 'Scatter', handle: 'tempvstime', xLabel: "vol", yLabel: "pExt (K)", axesInit:{x:{min:0, step:3}, y:{min:0, step:2}}, numGridLines: {x: 3, y: 10},
@@ -482,7 +482,7 @@ LevelData = {
 					},
 					{
 						type: 'Heater',
-						attrs:{wallInfo: 'wally', tempMax: 5, handle: 'heaty', max: 5, makeSlider: true}
+						attrs:{wallInfo: 'wally', temp: 0, handle: 'heaty', max: 5, makeSlider: true}
 					},
 
 					// {
@@ -644,7 +644,7 @@ LevelData = {
 					// },
 					{
 						type: 'Heater',
-						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty', max: 2.5, makeSlider: true}
+						attrs:{wallInfo: 'wally', temp: 0, handle: 'heaty', max: 2.5, makeSlider: true}
 					},
 
 					// {
@@ -823,7 +823,7 @@ LevelData = {
 					// },
 					{
 						type: 'Heater',
-						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty', max: 2.5, makeSlider: true}
+						attrs:{wallInfo: 'wally', temp: 0, handle: 'heaty', max: 2.5, makeSlider: true}
 					},
 
 					// {
@@ -978,7 +978,7 @@ LevelData = {
 					// },
 					{
 						type: 'Heater',
-						attrs:{wallInfo: 'wally', tempMax: .1, handle: 'heaty', max: 2.5, makeSlider: true}
+						attrs:{wallInfo: 'wally', temp: 0, handle: 'heaty', max: 2.5, makeSlider: true}
 					},
 
 					// {
