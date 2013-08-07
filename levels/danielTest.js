@@ -87,13 +87,14 @@ LevelData = {
 					//{data: 'collisions'}
 				],
 				rxnsEmergent: [
-					//{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: .5, prods: {spc2: 2}},
+					{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: .5, prods: {spc2: 2}},
+					{handle: 'rxn2', rctA: 'spc2', rctB: 'spc2', activeE: 1.5, prods: {spc1: 2}}
 					// {handle: 'rxn2', rctA: 'c', rctB: 'd', activeE: 10, prods: {a: 1, b: 1}}
 					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				],
-				rxnsNonEmergent: [
-					{rcts: [{spcName: 'spc1', count: 2}], prods: [{spcName: 'spc2', count: 1}], preExpForward: 10, activeEForward: 200, handle: 'reacty7'}
-				],
+				// rxnsNonEmergent: [
+					// {rcts: [{spcName: 'spc1', count: 2}], prods: [{spcName: 'spc2', count: 1}], preExpForward: 10, activeEForward: 200, handle: 'reacty7'}
+				// ],
 				dataReadouts: [
 					{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 					//{label: 'cell temp: ', expr: 'tempSmooth("cellSquishyInner")', units: 'K', decPlaces: 1, handle: 'cell', readout: 'mainReadout'}
