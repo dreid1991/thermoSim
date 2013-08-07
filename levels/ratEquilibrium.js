@@ -5,8 +5,8 @@ LevelData = {
 		{spcName: 'spc1', m: 4, r: 2, sF298: 0, col: Col(200, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, 
 		{spcName: 'ugly', m: 4, r: 2, sF298: 0, col: Col(52, 90, 224), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'uglier', m: 4, r: 2, sF298: 20, col: Col(255, 30, 62), cv: 3 * R, hF298: -12, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
-		{spcName: 'duckling', m: 4, r: 2, sF298: 0, col: Col(255, 255, 255), cv: 3 * R, hF298: -11, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1},
-		{spcName: 'ugliest', m: 4, r: 2, sF298: 0, col: Col(255, 30, 62), cv: 3 * R, hF298: -11, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
+		{spcName: 'duckling', m: 4, r: 2, sF298: 0, col: Col(255, 255, 255), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: 0.3},
+		{spcName: 'ugliest', m: 4, r: 2, sF298: -5, col: Col(255, 30, 62), cv: 3 * R, hF298: -15, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
 	],
 	mainSequence: [
 		{//S0	
@@ -311,7 +311,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Let's consider why the rate changes with temperature (or the reactivity of A). Using the Arrhenius equation, graph the reaction rate constant with respect to temperature from 0 to 1000 K. $$ k = Ae^{\\frac{-E_{a}}{RT}} $$ The activation energy of this reaction is 10 kJ/mol and the pre-exponential constant is Y. Do you have any ideas as to why the rate behaves this way with respect to temperature?", 
+					text: "Let's consider why the rate changes with temperature (or the reactivity of A). Using the Arrhenius equation, graph the reaction rate constant with respect to temperature from 0 to 1000 K. $$ k = Ae^{\\frac{-E_{a}}{RT}} $$ The activation energy of this reaction is something kJ/mol and the pre-exponential constant is somethingelse. Do you have any ideas as to why the rate behaves this way with respect to temperature?", 
 					quiz:[
 							{
 								storeAs: 'foo7', 
@@ -562,7 +562,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: 'Now try heating the system until it reaches 700 K. Describe how the xHot changes with temperature.', 
+					text: 'Now try heating the system until it reaches 700 K. Describe how the fraction of excited molecules changes with temperature.', 
 					quiz:[
 							{
 								storeAs: 'foo10', 
@@ -574,7 +574,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: 'How does the graph of xHot vs. temperature compare to your graph of reaction rate vs. temperature?', 
+					text: 'How does the graph of fraction of excited molecules vs. temperature compare to your graph of reaction rate vs. temperature?', 
 					quiz:[
 							{
 								storeAs: 'foo11', 
