@@ -92,9 +92,9 @@ LevelData = {
 					// // {handle: 'rxn2', rctA: 'c', rctB: 'd', activeE: 10, prods: {a: 1, b: 1}}
 					// //{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				// ],
-				// rxnsNonEmergent: [
-					// {rcts: [{spcName: 'spc1', count: 2}], prods: [{spcName: 'spc2', count: 1}], preExpForward: 10, activeEForward: .2, handle: 'reacty7'}
-				// ],
+				rxnsNonEmergent: [
+					{rcts: [{spcName: 'spc1', count: 2}], prods: [{spcName: 'spc2', count: 1}], preExpForward: 10, activeEForward: .2, handle: 'reacty7'}
+				],
 				dataReadouts: [
 					{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 					//{label: 'cell temp: ', expr: 'tempSmooth("cellSquishyInner")', units: 'K', decPlaces: 1, handle: 'cell', readout: 'mainReadout'}
@@ -127,10 +127,11 @@ LevelData = {
 						// ]
 					// }
 				// ],
-				triggers: [
-					{handle: 'trumpet', expr: "temp('wally') > 205", satisfyCmmds: ['curLevel.heaterHeaty.disable()'], alertUnsatisfied: 'la', requiredForAdvance: false}
-				],
+				// triggers: [
+					// {handle: 'trumpet', expr: "temp('wally') > 205", satisfyCmmds: ['curLevel.heaterHeaty.disable()'], alertUnsatisfied: 'la', requiredForAdvance: false}
+				// ],
 				cmmds: [
+					//"collide.rxnHandlerNonEmergent.disableRxn('reacty7')"
 					// //'walls.wally.isothermalStop()',
 					//'spcs.spc1.place([{pos: P(150, 200)/*P(230, 116.0)*/, dir: V(1, 1), temp: 40, tag: "wally", returnTo: "wally"}])'
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}

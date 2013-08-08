@@ -46,6 +46,7 @@ _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 	removeRxn: function(handle) {
 		var rxn = this.getRxn(this.activeRxns, handle);
 		if (rxn) {
+			if (!rxn.inited) removeListener(curLevel, 'update', 'initRxn' + rxn.handle);
 			var pairs = rxn.pairs;
 			var chanceMap = this.chanceMap;
 			var allRxns = this.rxns;
@@ -194,6 +195,7 @@ ReactionHandlerNonEmergent.Reaction = function(attrs, allRxns) {
 	this.updateWalls();
 	this.updateQueue = this.wrapUpdateQueue();
 	this.listenerHandle = this.handle + 'UpdateQueue';
+	this.inited = false;
 
 }
 
@@ -203,6 +205,7 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		var rcts = this.rctsNet;
 		var prods = this.prodsNet;
 		var chanceMap = this.chanceMap;
+		this.inited = true;
 		addListener(curLevel, 'data', this.listenerHandle, function() {
 			this.updateWalls();
 			for (var i=0; i<this.wallGroups.length; i++) {
