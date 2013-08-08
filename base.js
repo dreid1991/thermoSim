@@ -167,20 +167,20 @@ function unique(name, obj){
 	}
 }
 
-function addListener(object, typeName, funcName, func, destObj){
-	object[typeName + 'Listeners'][funcName] = {func:func, obj:destObj};
+function addListener(object, typeName, funcName, func, obj) {
+	object[typeName + 'Listeners'][funcName] = new Listener(func, obj);
 
 }
-function addListenerOnce(object, typeName, funcName, func, destObj){
-	var removeFunc = function(){
+function addListenerOnce(object, typeName, funcName, func, obj) {
+	var execOnce = function() {
+		func.apply(obj);
 		removeListener(object, typeName, funcName);
-		removeListener(object, typeName, funcName+'Remove');
-	}
-	object[typeName + 'Listeners'][funcName] = {func:func, obj:destObj};
-	object[typeName + 'Listeners'][funcName + 'Remove'] = {func:removeFunc, obj:''};
+	};
+	object[typeName + 'Listeners'][funcName] = new Listener(execOnce, undefined);
 }
-function addInterval(funcHandle, func, destObj, interval) {
-	extraIntervals[funcHandle] = window.setInterval(function(){func.apply(destObj)}, interval);
+
+function addInterval(funcHandle, func, obj, interval) {
+	extraIntervals[funcHandle] = window.setInterval(function(){func.apply(obj)}, interval);
 }
 function removeInterval(funcHandle) {
 	if (extraIntervals[funcHandle]) {
@@ -207,7 +207,7 @@ function removeListenerByName(object, typeName, pieceToRemoveBy){
 	var funcName = getListenerByName(object, typeName, pieceToRemoveBy);
 	while (funcName!==undefined){
 		didDelete = true;
-		delete object[typeName+'Listeners'][funcName];
+		delete object[typeName + 'Listeners'][funcName];
 		funcName = getListenerByName(object, typeName, pieceToRemoveBy);
 	}
 	return didDelete
