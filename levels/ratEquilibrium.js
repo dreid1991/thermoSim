@@ -703,8 +703,8 @@ LevelData = {
 					// {handle: 'rxn2', rctA: 'ugliest', rctB: 'ugliest', activeE: 1, prods: {ugly: 2}}
 				// ],
 				rxnsNonEmergent: [
-					{rcts: [{spcName: 'ugly', count: 2}], prods: [{spcName: 'ugliest', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty7'},
-					{rcts: [{spcName: 'ugliest', count: 2}], prods: [{spcName: 'ugly', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty8'},
+					{rcts: [{spcName: 'ugly', count: 2}], prods: [{spcName: 'ugliest', count: 2}], preExpForward: 4, activeEForward: .08, handle: 'reacty7'},
+					// {rcts: [{spcName: 'ugliest', count: 2}], prods: [{spcName: 'ugly', count: 2}], preExpForward: 1, activeEForward: .08, handle: 'reacty8'},
 				],
 				graphs: [
 					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Time (s)", yLabel: "Product Mole Fraction", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
@@ -894,8 +894,8 @@ LevelData = {
 					// {handle: 'rxn2', rctA: 'ugliest', rctB: 'ugliest', activeE: 6, prods: {ugly: 2}}
 				// ],
 				rxnsNonEmergent: [
-					{rcts: [{spcName: 'ugly', count: 2}], prods: [{spcName: 'ugliest', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty3'},
-					{rcts: [{spcName: 'ugliest', count: 2}], prods: [{spcName: 'ugly', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty4'},
+					{rcts: [{spcName: 'ugly', count: 2}], prods: [{spcName: 'ugliest', count: 2}], preExpForward: 4, activeEForward: .08, handle: 'reacty3'},
+					// {rcts: [{spcName: 'ugliest', count: 2}], prods: [{spcName: 'ugly', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty4'},
 				],
 				graphs: [
 					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Time (s)", yLabel: "Product Mole Fraction", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
@@ -1048,13 +1048,13 @@ LevelData = {
 					// 'walls.wally.isothermalStop()',
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				// ],
-				rxns: [
-					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 5, prods: {ugliest: 2}},
-					{handle: 'rxn2', rctA: 'ugliest', rctB: 'ugliest', activeE: 6, prods: {ugly: 2}}
-				],
+				// rxns: [
+					// {handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 5, prods: {ugliest: 2}},
+					// {handle: 'rxn2', rctA: 'ugliest', rctB: 'ugliest', activeE: 6, prods: {ugly: 2}}
+				// ],
 				rxnsNonEmergent: [
-					{rcts: [{spcName: 'ugly', count: 2}], prods: [{spcName: 'ugliest', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty5'},
-					{rcts: [{spcName: 'ugliest', count: 2}], prods: [{spcName: 'ugly', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty6'},
+					{rcts: [{spcName: 'ugly', count: 2}], prods: [{spcName: 'ugliest', count: 2}], preExpForward: 4, activeEForward: .08, handle: 'reacty5'},
+					// {rcts: [{spcName: 'ugliest', count: 2}], prods: [{spcName: 'ugly', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty6'},
 				],
 				graphs: [
 					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Time (s)", yLabel: "Product Mole Fraction", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},

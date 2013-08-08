@@ -9,6 +9,23 @@ LevelData = {
 	mainSequence: [
 		{//First Scene
 			sceneData: {//Scene 0
+			},
+			prompts:[ 
+				{//Prompt 0
+				sceneData: undefined,
+							cutScene: true,
+							text:" <p>Today we're going to examine hypothetical paths and how they can be used to determine unknown thermodynamic process values.</p><p>The use of hypothetical paths is entirely dependent on state functions. Please identify here what you believe are the distinguishing characteristics that make a thermodynamic property a state function.</p>",
+							quiz:[
+									{type: 'text',
+									storeAs:'HypAns',
+									text: 'Type your answer here.'
+									}
+								]	
+				},
+			]
+		},		
+		{//First Scene
+			sceneData: {//Scene 0
 				walls: [
 					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'firstWall', border: {type: 'open'},},
 				],

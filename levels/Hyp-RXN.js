@@ -14,7 +14,7 @@ LevelData = {
 				{//Prompt 0
 				sceneData: undefined,
 							cutScene: true,
-							text:" The use of hypothetical paths relies upon state functions. Identify the distinguishing characteristic that makes something a state function.<p>",
+							text:" <p>Today we're going to examine hypothetical paths and how they can be used to determine unknown thermodynamic process values.</p><p>The use of hypothetical paths is entirely dependent on state functions. Please identify here what you believe are the distinguishing characteristics that make a thermodynamic property a state function.</p>",
 							quiz:[
 									{type: 'text',
 									storeAs:'HypAns',
@@ -35,7 +35,7 @@ LevelData = {
 						]
 					},
 					cutScene: true,
-					text: "Over spring break Dr. Koretsky hiked up Eagle's Peak near San Francisco. The two routes he could take are seen to the right. How would the amounts of work required to complete the two routes compare? How would the potential energy change compare?<p>",
+					text: "Over spring break Dr. Koretsky hiked up Eagle's Peak near San Francisco. The two routes he could take are seen to the right. How would the amounts of work required to complete the two routes compare? How would the potential energy change compare? Which of these two things, work or potential energy, is independent of path?<p>",
 					quiz:[
 									{type: 'text',
 									storeAs:'2ndans',
@@ -72,7 +72,9 @@ LevelData = {
 					{wallInfo: 'firstWall', data: 'Q'}
 				],
 				dataReadouts: [
-					{label: 'x-rxn: ', expr: 'frac("firstWall", {tag:"firstWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'extrxn', readout: 'mainReadout'}
+					{label: 'Extent of reaction: ', expr: 'frac("firstWall", {tag:"firstWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'extrxn', readout: 'mainReadout'},
+					{label: 'Heat: ', expr: 'q("firstWall")', units: 'kJ', decPlaces: 2, handle: 'hRxn', readout: 'mainReadout'},
+					{label: 'Pressure: ', expr: 'pInt("firstWall")', units: 'bars', decPlaces: 2, handle: 'pInt', readout: 'mainReadout'}
 				],
 				objs: [
 					{type: 'QArrowsAmmt',
@@ -96,7 +98,7 @@ LevelData = {
 						]
 					},
 					cutScene: false,
-					text: "The isothermal system above contains 1 mole of A and is held at 500 K.  The red colored species A  can reversibly react to form the green species B.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  What is the sign of the enthalpy of reaction? Explain.",
+					text: "The isothermal system above is held at 500 K contains 1 mole of A.  The red colored species A  can reversibly react to form the green species B.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  What is the sign of the enthalpy of reaction? Explain.",
 					quiz:[
 							{type: 'text',
 							storeAs:'realProcess',
