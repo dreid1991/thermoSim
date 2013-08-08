@@ -7,7 +7,7 @@ LevelData = {
 		//add antoine coefs, cvLiq, hvap
 		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
 		{spcName: 'spc2', m: 4, r: 2, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
-		{spcName: 'spc3', m: 4, r: 1, col: Col(115, 250, 98), cv: 2.5 * R, hF298: -260, hVap298: 40.6, antoineCoeffs: {a: 8.07, b:1730.6, c:233.426-273.15}, cpLiq: 75.34, spcVolLiq: 1},
+		{spcName: 'spc3', m: 4, r: 1, col: Col(27, 181, 224), cv: 3.37 * R, hF298: -260, hVap298: 40.6, antoineCoeffs: {a: 8.07, b:1730.6, c:233.426-273.15}, cpLiq: 75.34, spcVolLiq: 1},
 		{spcName: 'spc4', m: 4, r: 1, col: Col(115, 250, 98), cv: 2.5 * R, hF298: -260, hVap298: 40.6, antoineCoeffs: {a: 8.14, b:1810.94, c:244.485-273.15}, cpLiq: 75.34, spcVolLiq: 1}
 	],	
 
@@ -49,7 +49,7 @@ LevelData = {
 							min: 1,
 							init: 1,
 							max: 6,
-							makeSlider: true,	
+							makeSlider: false,	
 							compMode: 'cPAdiabaticDamped',
 						}	
 					},
@@ -93,20 +93,34 @@ LevelData = {
 				// ],	
 				dataReadouts: [
 					{label: 'Vol: ', expr: 'vol("wallo")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
+					{label: 'Heat: ', expr: 'q("wallo") + q("liquidWater")', units: 'kJ', decPlaces: 1, handle: 'qReadout', readout: 'mainReadout'},
+					// {label: 'frac: ', expr: 'frac("wallo")', units: '', decPlaces: 1, handle: 'fracReadout', readout: 'mainReadout'},
+					// {label: 'moles: ', expr: 'moles("wallo")', units: 'mol', decPlaces: 2, handle: 'molReadout', readout: 'mainReadout'},
 					// {label: 'Enthalpy: ', expr: 'enthalpy("wallo")', units: 'kJ', decPlaces: 2, handle: 'hReadout', readout: 'mainReadout'},
 					{label: 'Gas Temp: ', expr: 'tempSmooth("wallo")', units: 'K', decPlaces: 0, handle: 'tempGasReadout', readout: 'mainReadout'},
 					{label: 'Liquid Temp: ', expr:  'tempSmooth("liquidWater")', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
 				],
+				triggers: [
+					{handle: 'trigger1', expr: 'curLevel.liquidWater.temp > 371', message: 'Heat the liquid', priority: 1, checkOn: 'conditions', requiredFor: 'prompt1'},
+					{handle: 'freeze1', expr: 'curLevel.liquidWater.temp >= 371', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(373)'], requiredFor: 'prompt1'},
+					{handle: 'trigger2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length <= 200', message: 'Vaporize the liquid', checkOn: 'conditions', requiredFor: 'prompt2'},
+					{handle: 'freeze2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length <= 200', satisfyCmmds: ['curLevel.heaterHeater1.disable()'], requiredFor: 'prompt2'},
+					// {handle: 'unfreeze2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length > 200', satisfyCmmds: ['curLevel.heaterHeater1.enable()'], requiredFor: 'prompt2'},
+					{handle: 'trigger3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length < 10', message: 'Fully vaporize the liquid', checkOn: 'conditions', requiredFor: 'prompt5'},
+					{handle: 'freeze3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(374)'], requiredFor: 'prompt5'},
+					{handle: 'trigger4', expr: 'temp("wallo") >= 405', message: 'Heat the vapor', requiredFor: 'prompt8', checkOn: 'conditions'},
+					{handle: 'freeze4', expr: 'temp("wallo") > 423 && curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', requiredFor: 'prompt8', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(423)']},
+					
+				]
 			},
 			prompts: [
 				{//prompt0
-					sceneData: 
-						{
-							triggers: [
-								{handle: 'initialSetup', expr: 'pExt("wallo")==1', satisfyCmmds: ['curLevel.heaterHeater1.disable()'], priority: 1},
-							]
-						},
+					sceneData: {
+						cmmds: [
+							'curLevel.heaterHeater1.disable()',
+						]	
+					},
 					quiz: [
 						{	
 							type: 'text',							
@@ -118,11 +132,16 @@ LevelData = {
 					title: 'Current Step'		
 				},
 				{//prompt1
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'curLevel.heaterHeater1.enable()',
+							'curLevel.liquidWater.disablePhaseChange()'
+						]
+					},
 					quiz: [
 						{
 							type: 'textSmall',
-							preText:'Determine the energy you have to add to the system in order to reach a saturated liquid state. Heat the system by this amount',
+							preText:'The system contains 0.4 moles of liquid water molecules. Determine the energy you have to add to the system in order to reach a saturated liquid state. Heat the system by this amount',
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans2'
@@ -130,7 +149,13 @@ LevelData = {
 					],
 				},
 				{//prompt2
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'curLevel.heaterHeater1.enable()',
+							'curLevel.liquidWater.enablePhaseChange()',
+							'walls["wallo"].isothermalStop()'
+						]
+					},
 					quiz: [
 						{
 							type: 'textSmall',
@@ -164,7 +189,11 @@ LevelData = {
 					],
 				},	
 				{//prompt5
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'curLevel.heaterHeater1.enable()'
+						]
+					},
 					quiz: [
 						{
 							type: 'textSmall',
@@ -199,7 +228,12 @@ LevelData = {
 					],
 				},
 				{//prompt8
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'curLevel.heaterHeater1.enable()',
+							'walls["wallo"].isothermalStop()'
+						]
+					},
 					quiz: [
 						{
 							type: 'text',
@@ -220,7 +254,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'multChoice',
-							questionText: '<p>Now we want to return the system to saturation while keeping the temperature constant at 150 C. Which of the following will accomplish this goal.</p>',
+							questionText: '<p>Now we want to return the system to saturation while keeping the temperature constant at 150 C. Which of the following will accomplish this goal?</p>',
 							options:[
 										{text:"Decrease Pressure", correct: false, message:"That's not correct"},
 										{text:"Increase Pressure", correct: true},
@@ -252,7 +286,7 @@ LevelData = {
 					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 423.15, handle: 'wallo', vol: 13.5, isothermalRate: 4, border: {type: 'open', width: 10, yMin: 40} },
 				],
 				dots: [
-					{spcName: 'spc3', pos: P(45,100), dims: V(465,240), count: 396, temp:423.15, returnTo: 'wallo', tag: 'wallo'},
+					{spcName: 'spc3', pos: P(45,100), dims: V(465,240), count: 2000, temp:423.15, returnTo: 'wallo', tag: 'wallo'}, //count 396
 				],	
 				objs: [
 					{
@@ -322,6 +356,10 @@ LevelData = {
 					{label: 'Liquid Temp: ', expr:  'tempSmooth("liquidWater")', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
 				],
+				triggers: [
+					{handle: 'triggery1', expr: 'pExt("wallo") >= 4.8', message: 'Add Pressure to the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt1'},
+					//{handle: 'triggery1', expr: 'pExt("wallo") >= 4.9', satisfyCmmds: [], priority: 1, checkOn: 'conditions', requiredFor: 'prompt1'},
+				]
 			},
 			prompts: [
 				{//prompt0
