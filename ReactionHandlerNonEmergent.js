@@ -421,8 +421,8 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 	},
 	calcHRxn298: function(rcts, prods) {
 		var hRxn = 0;
-		for (var i=0; i<prods.length; i++) hRxn += prods[i].def.hF298;
-		for (var i=0; i<rcts.length; i++) hRxn -= rcts[i].def.hF298;
+		for (var i=0; i<prods.length; i++) hRxn += prods[i].def.hF298*prods[i].count;
+		for (var i=0; i<rcts.length; i++) hRxn -= rcts[i].def.hF298*rcts[i].count;
 		return hRxn * 1000; //to Joules from kJ
 	},
 	makeWallGroups: function(walls, wallGroups, rcts, prods) {
