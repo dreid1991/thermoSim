@@ -14,7 +14,7 @@ LevelData = {
 				{//p0, q0
 					sceneData:undefined,
 					cutScene:true,
-					text:"<p>Today we're going to investigate heat capacities.  Using your own words, how would you explain heat capacity to a high school senior?</p>",
+					text:"<p>Today we're going to investigate heat capacities.  Using your own words, how would you explain the concept of a heat capacity to a high school senior?</p>",
 					quiz:[
 						{
 							storeAs: 'foo1', 
@@ -26,7 +26,7 @@ LevelData = {
 				{//p1, q1
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "<p>We'll start by heating a constant volume system.  It contains 0.5 mole of an ideal monotomic gas.  How much energy should heating this system by 100 K 'cost'?</p>",
+					text: "<p>We'll start by heating a constant volume system.  It contains 0.5 moles of an ideal monotomic gas.  How much energy should heating this system by 100 K 'cost'?</p>",
 					quiz:[						
 					{
 						type: 'textSmall', 
@@ -54,6 +54,10 @@ LevelData = {
 				dataReadouts: [			
 					{label: 'Heat: ', expr: 'q("wally1")', units: 'kJ', sigFigs: 2, handle: 'heating1', readout: 'mainReadout'},
 					{label: 'Temp: ', expr: 'temp("wally1")', units: 'K', sigFigs: 1, handle: 'temperature1', readout: 'mainReadout'}, 												
+				],
+				triggers: [
+					{handle: 'triggery1', expr: 'temp("wally1") >= 245', message: 'Heat the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
+					{handle: 'triggery2', expr: 'temp("wally1") <= 255', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'}
 				]
 					// triggers: [
 							// {handle: 'heatcheck', expr: 'fracDiff(temp("wally1"), 250) < 0.05', message: 'Heat the system by 100 K', priorityUnsatisfied:1},
@@ -68,7 +72,7 @@ LevelData = {
 									// ],
 						// },											
 					cutScene:false,
-					text: "Now let's perform an experiment.  You wrote that this heating would 'cost' get('foo2', 'string', 'noValue') kJ.  The system shown above contains our 0.5 mol of ideal monatomic gas.   You can add energy by using the slider to activate the heater.  Increase the temperature by 100 K. Note that you can cool the system if its temperature increases too much.<p>How does your prediction for the heating amount compare to the experimental result? Explain.</p>",
+					text: "Now let's perform an experiment.  You wrote that this heating would 'cost' get('foo2', 'string', 'noValue') kJ.  The system shown above contains our 0.5 moles of ideal monatomic gas.   You can add energy by using the slider to activate the heater.  Increase the temperature by 100 K. Note that you can also cool the system if its temperature increases too much.<p>How does your prediction for the heating amount compare to the experimental result? Explain.</p>",
 					quiz:[
 						{
 							storeAs: 'foo3', 
@@ -79,7 +83,7 @@ LevelData = {
 				},
 				{//p1, q3
 				cutScene: true, 
-				text: "<p>Now we're going to look at heating in a constant pressure system. This means the volume is no longer constant. <p>If we increase its temperature by 100 K, how do you think the energy 'cost' will compare to heating the constant volume system?  Explain.</p>", 
+				text: "<p>Now we're going to look at heating in a constant pressure system. This means the volume will no longer be held constant. <p>If we increase its temperature by 100 K, how will the system's energy 'cost' compare to that of the constant volume system? Explain.</p>", 
 				quiz:[
 						{
 							storeAs: 'foo4', 
@@ -109,12 +113,16 @@ LevelData = {
 								{label: 'Temp: ', expr: 'tempSmooth("wally2")', units: 'K', sigFigs: 1, handle: 'temperature2', readout: 'mainReadout'},
 								{label: 'pExt: ', expr: 'pExt("wally2")', units: 'bar', sigFigs: 2, handle: 'pressure2', readout: 'pistonPistonyLeft'},																
 							],
+						triggers: [
+							{handle: 'triggery3', expr: 'temp("wally2") >= 238', message: 'Heat the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
+							{handle: 'triggery4', expr: 'temp("wally2") <= 262', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
+						],
 						cmmds: [
 							'curLevel.heaterHeaterWally1.disable()'
 						],
 					},
 					cutScene:false, 
-					text: "Here is the constant pressure version of the system filled with one mole of the ideal monatomic gas.  Heat the system by 100 K.  How does the value compare to the constant volume heating value of get('foo20', 'string', 'noValue') kJ?",
+					text: "Here is the constant pressure version of the system filled with one mole of the ideal monatomic gas.  Heat the system by 100 K.  How does the value compare to the constant volume heating value of get('foo2', 'string', 'noValue') kJ?",
 					quiz:[
 						{
 							storeAs: 'foo', 
@@ -130,7 +138,7 @@ LevelData = {
 			prompts:[
 				{//p0, q5
 				cutScene:true, 
-				text: "<p>The system had a constant external pressure of 3 bar, contained one mole of an ideal monatomic gas, and was heated by 100 K.</p>  From the first law, what should the change in system volume have been?<br>", 
+				text: "<p>The system had a constant external pressure of 3 bar, contained one mole of an ideal monatomic gas, and was heated by 100 K.</p>  Using the First Law of Thermodynamics, what should the change in system volume have been?<br>", 
 				quiz:[						
 					{
 						type: 'textSmall', 
@@ -172,7 +180,11 @@ LevelData = {
 							{label: 'pExt: ', expr: 'pExt("wally3")', units: 'bar', sigFigs: 2, handle: 'external pressure', readout: 'pistonPistony3Left'},
 							{label: 'work: ', expr: 'work("wally3")', units: 'kJ', sigFigs: 2, handle: 'work', readout: 'mainReadout'},
 																
-						],
+					],
+					triggers: [
+						{handle: 'triggery5', expr: 'temp("wally3") >= 238', message: 'Heat the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
+						{handle: 'triggery6', expr: 'temp("wally3") <= 262', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
+					]
 			},			
 			prompts: [					
 						{//p0, q6
@@ -186,8 +198,13 @@ LevelData = {
 							]
 						}, 
 						{//p1, q7
-						text: "We've established that when you expand at constant pressure, the system does work on its surroundings.  Can you use this idea to explain why a system's heat capacity is higher at constant pressure than at constant volume?",
-						quiz:[
+							sceneData: {
+								cmmds: [
+									'curLevel.heaterHeaterWally3.disable()'
+								]
+							},
+							text: "We've established that when you expand at constant pressure, the system does work on its surroundings.  Can you use this idea to explain why a system's heat capacity is higher at constant pressure than at constant volume?",
+							quiz:[
 								{
 									storeAs: 'foo8', 
 									type:'text', 
@@ -202,7 +219,7 @@ LevelData = {
 			prompts:[
 				{
 				cutScene:true, 
-				text: "<p>The heat capacity per mole of gas can be described at the heat per temperature change, or ##\\frac{dq}{dT} ##.</p><p> We know that the constant volume heat capacity of an ideal monatomic gas is ##\\frac{3}{2}R##. </p><p>From the first law, solve for what the ##\\frac{dq}{dt}##, or heat capacity, would be for this system at constant pressure. </p><p>How does the result relate to your conceptual understanding of how constant pressure systems behave?  Explain.</p>", 
+				text: "<p>The heat capacity per mole of gas can be described as the energy added through heat per temperature change, or ##\\frac{dq}{dT} ##.</p><p> We know that the constant volume heat capacity of an ideal monatomic gas is ##\\frac{3}{2}R##. </p><p>From the first law, solve for what the ##\\frac{dq}{dt}##, or heat capacity, would be for this system at constant pressure. </p><p>How does the result relate to your conceptual understanding of how constant pressure systems behave?  Explain.</p>", 
 				quiz:[
 						{
 							storeAs: 'foo9', 
