@@ -58,6 +58,9 @@ _.extend(ReactionHandlerNonEmergent.prototype, ReactionFuncs, {
 			this.readyHandlers(this.collide, this.rxns, rxn, this.chanceMap);
 		}
 	},
+	rxnIsEnabled: function(handle) {
+		return this.getRxn(this.activeRxns, handle) ? true : false;
+	},
 	enableRxn: function(handle) {
 		var rxn = this.getRxn(this.pausedRxns, handle);
 		if (rxn) {
@@ -172,7 +175,7 @@ ReactionHandlerNonEmergent.Reaction = function(attrs, allRxns) {
 	prods: [{spcName: 'name', count: #},]
 	totals of both rcts and prods must be <=2
 	preExpForward: val, L^n/(mol^m sec)
-	activeEForward: val, j/mol
+	activeEForward: val, kJ/mol
 	*/
 	this.parent = attrs.parent;
 	this.chanceMap = this.parent.chanceMap;
@@ -187,7 +190,7 @@ ReactionHandlerNonEmergent.Reaction = function(attrs, allRxns) {
 	this.sRxn298 = this.calcSRxn298(this.rctsNet, this.prodsNet);
 	this.pairs = [];
 	this.preExpForward = attrs.preExpForward;
-	this.activeEForward = attrs.activeEForward;
+	this.activeEForward = attrs.activeEForward * 1000; //sent in kJ/mol
 	this.updateWalls();
 	this.updateQueue = this.wrapUpdateQueue();
 	this.listenerHandle = this.handle + 'UpdateQueue';

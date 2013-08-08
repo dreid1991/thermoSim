@@ -81,12 +81,14 @@ _.extend(Heater.prototype, objectFuncs, {
 		this.setQRate(ui.value);
 	},
 	setQRate: function(val){		
-		this.qRate = .02*(val-50)*this.qRateMax;
-		if (this.liquid) {
-			if (val != 50) {
-				addListener(curLevel, 'update', 'heatLiquid' + this.handle, this.heatLiq, this);
-			} else {
-				removeListener(curLevel, 'update', 'heatLiquid' + this.handle);
+		if (this.enabled) {
+			this.qRate = .02 * this.qRateMax * (val - 50);
+			if (this.liquid) {
+				if (val != 50) {
+					addListener(curLevel, 'update', 'heatLiquid' + this.handle, this.heatLiq, this);
+				} else {
+					removeListener(curLevel, 'update', 'heatLiquid' + this.handle);
+				}
 			}
 		}
 		
@@ -115,6 +117,7 @@ _.extend(Heater.prototype, objectFuncs, {
 		if (this.slider) {
 			$(this.slider.selector).slider('disable');
 		}
+		this.setQRate(50);
 		this.enabled = false;
 		
 	},
