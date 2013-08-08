@@ -247,5 +247,4 @@ _.extend(CollideHandler.prototype, toInherit.gridder, {
 		}
 		return maxR;	
 	},
-}
-)
+})

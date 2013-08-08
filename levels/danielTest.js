@@ -93,7 +93,7 @@ LevelData = {
 					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				],
 				// rxnsNonEmergent: [
-					// {rcts: [{spcName: 'spc1', count: 2}], prods: [{spcName: 'spc2', count: 1}], preExpForward: 10, activeEForward: 200, handle: 'reacty7'}
+					// {rcts: [{spcName: 'spc1', count: 2}], prods: [{spcName: 'spc2', count: 1}], preExpForward: 10, activeEForward: .2, handle: 'reacty7'}
 				// ],
 				dataReadouts: [
 					{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
