@@ -14,10 +14,10 @@ LevelData = {
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(350, 50), P(350, 400), P(50, 400)], handler: 'cVIsothermal', temp: 398.15, handle: 'wally', /*, border: {type: 'open', thickness: 5, yMin: 30}*/}
+					{pts: [P(50, 50), P(350, 50), P(350, 400), P(50, 400)], handler: 'staticAdiabatic',/* temp: 398.15,*/ handle: 'wally', /*, border: {type: 'open', thickness: 5, yMin: 30}*/}
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(300, 325), count: 1000, temp: 398.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'spc1', pos: P(55, 55), dims: V(300, 325), count: 1000, temp: 198.15, returnTo: 'wally', tag: 'wally'},
 					// {spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 0, temp: 398.15, returnTo: 'wally', tag: 'wally'},
 					
 					
@@ -86,12 +86,12 @@ LevelData = {
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
 					//{data: 'collisions'}
 				],
-				rxnsEmergent: [
-					{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: .5, prods: {spc2: 2}},
-					{handle: 'rxn2', rctA: 'spc2', rctB: 'spc2', activeE: 1.5, prods: {spc1: 2}}
-					// {handle: 'rxn2', rctA: 'c', rctB: 'd', activeE: 10, prods: {a: 1, b: 1}}
-					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
-				],
+				// rxnsEmergent: [
+					// {handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: .5, prods: {spc2: 2}},
+					// {handle: 'rxn2', rctA: 'spc2', rctB: 'spc2', activeE: 1.5, prods: {spc1: 2}}
+					// // {handle: 'rxn2', rctA: 'c', rctB: 'd', activeE: 10, prods: {a: 1, b: 1}}
+					// //{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
+				// ],
 				// rxnsNonEmergent: [
 					// {rcts: [{spcName: 'spc1', count: 2}], prods: [{spcName: 'spc2', count: 1}], preExpForward: 10, activeEForward: .2, handle: 'reacty7'}
 				// ],
@@ -127,6 +127,9 @@ LevelData = {
 						// ]
 					// }
 				// ],
+				triggers: [
+					{handle: 'trumpet', expr: "temp('wally') > 205", satisfyCmmds: ['curLevel.heaterHeaty.disable()'], alertUnsatisfied: 'la', requiredForAdvance: false}
+				],
 				cmmds: [
 					// //'walls.wally.isothermalStop()',
 					//'spcs.spc1.place([{pos: P(150, 200)/*P(230, 116.0)*/, dir: V(1, 1), temp: 40, tag: "wally", returnTo: "wally"}])'
