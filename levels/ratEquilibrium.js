@@ -1,12 +1,12 @@
 LevelData = {
 	levelTitle: 'Chemical reaction rate and equilibrium',
-
+//Make the reactions non emergent. Calculations don't work out well.
 	spcDefs: [
 		{spcName: 'spc1', m: 4, r: 2, sF298: 0, col: Col(200, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, 
 		{spcName: 'ugly', m: 4, r: 2, sF298: 0, col: Col(52, 90, 224), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'uglier', m: 4, r: 2, sF298: 20, col: Col(255, 30, 62), cv: 3 * R, hF298: -12, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'duckling', m: 4, r: 2, sF298: 0, col: Col(255, 255, 255), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: 0.3},
-		{spcName: 'ugliest', m: 4, r: 2, sF298: -16.6667, col: Col(255, 30, 62), cv: 3 * R, hF298: -15, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
+		{spcName: 'ugliest', m: 4, r: 2, sF298: -3.3, col: Col(255, 30, 62), cv: 3 * R, hF298: -12.5, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
 	],
 	mainSequence: [
 		{//S0	
@@ -619,7 +619,7 @@ LevelData = {
 		{//S9
 			sceneData: {
 				walls: [
-						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'staticAdiabatic', temp: 300, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
+						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 300, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
 					],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
@@ -669,14 +669,14 @@ LevelData = {
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
 					//{data: 'collisions'}
 				],
-				// dataReadouts: [
-					// {label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
+				dataReadouts: [
+					{label: 'Temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 					// {label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},
 					// {label: 'Coll/sec: ', expr: 'collisions()', units: '', decPlaces: 0, handle: 'lala', readout: 'mainReadout'}
 					// {label: 'pInt: ', expr: 'pInt("wally")', units: 'bar', decPlaces: 1, handle: 'intintnit', readout: 'mainReadout'},
 					// {label: 'pExt: ', expr: 'pExt("wally")', units: 'bar', decPlaces: 1, handle: 'extextext', readout: 'mainReadout'}
 					// {label: 'RCT: ', expr: 'frac("wally", {spcName: "spc1", tag: "wally"}) + frac("wally", {spcName: "ugly", tag: "wally"})', sigFigs: 2, handle: 'coalseamgas', readout: 'mainReadout'}
-				// ],
+				],
 				buttonGroups: [
 					// {handle: 'heaterState', label: 'Heater', prefIdx: 1, isRadio: true, buttons: [
 						// {handle: 'on', label: 'On', isDown: true, exprs: ['curLevel.heaterHeaty.enable()']},
@@ -687,20 +687,24 @@ LevelData = {
 						// {handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}
 					// ]},
 					{handle: 'rxnControl', label: 'Rxn control', isRadio: true, buttons: [
-						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Enable', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn1")']},
-						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Disable', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn1")']},
+						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Enable', exprs: ['collide.rxnHandlerNonEmergent.enableRxn("reacty7")', 'collide.rxnHandlerNonEmergent.enableRxn("reacty8")']},
+						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Disable', exprs: ['collide.rxnHandlerNonEmergent.disableRxn("reacty7")', 'collide.rxnHandlerNonEmergent.disableRxn("reacty8")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn2")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn2")']}
 						],
 					}
-					],	
+				],	
 				// cmmds: [
 					// 'walls.wally.isothermalStop()',
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				// ],
-				rxns: [
-					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 1, prods: {ugliest: 2}},
-					{handle: 'rxn2', rctA: 'ugliest', rctB: 'ugliest', activeE: 1, prods: {ugly: 2}}
+				// rxns: [
+					// {handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 1, prods: {ugliest: 2}},
+					// {handle: 'rxn2', rctA: 'ugliest', rctB: 'ugliest', activeE: 1, prods: {ugly: 2}}
+				// ],
+				rxnsNonEmergent: [
+					{rcts: [{spcName: 'ugly', count: 2}], prods: [{spcName: 'ugliest', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty7'},
+					{rcts: [{spcName: 'ugliest', count: 2}], prods: [{spcName: 'ugly', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty8'},
 				],
 				graphs: [
 					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Time (s)", yLabel: "Product Mole Fraction", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
@@ -723,7 +727,15 @@ LevelData = {
 			},
 			prompts:[
 				{
-					sceneData: undefined, 
+					sceneData: {
+						cmmds: [
+							// 'collide.rxnHandlerNonEmergent.enableRxn("reacty7")',
+							// 'collide.rxnHandlerNonEmergent.enableRxn("reacty8")',
+							// 'console.log("Hello!!!")',
+							'collide.rxnHandlerNonEmergent.disableRxn("reacty7")',
+							'collide.rxnHandlerNonEmergent.disableRxn("reacty8")'
+						]
+					},
 					cutScene: false, 
 					text: "Let's perform an experiment with both a forward and reverse reaction. Click 'enable' to start the reaction. How long does it take for the system at 300 K to reach the equilibrium mole fraction of A?", 
 					quiz:[
@@ -798,7 +810,7 @@ LevelData = {
 		{//S11
 			sceneData: {
 				walls: [
-						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'staticAdiabatic', temp: 500, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
+						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 500, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
 					],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
@@ -866,8 +878,8 @@ LevelData = {
 						// {handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}
 					// ]},
 					{handle: 'rxnControl', label: 'Rxn control', isRadio: true, buttons: [
-						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Enable', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn1")']},
-						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Disable', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn1")']},
+						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Enable', exprs: ['collide.rxnHandlerNonEmergent.enableRxn("reacty3")', 'collide.rxnHandlerNonEmergent.enableRxn("reacty4")']},
+						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Disable', exprs: ['collide.rxnHandlerNonEmergent.disableRxn("reacty3")', 'collide.rxnHandlerNonEmergent.disableRxn("reacty4")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn2")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn2")']}
 						],
@@ -877,9 +889,13 @@ LevelData = {
 					// 'walls.wally.isothermalStop()',
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				// ],
-				rxns: [
-					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 5, prods: {ugliest: 2}},
-					{handle: 'rxn2', rctA: 'ugliest', rctB: 'ugliest', activeE: 6, prods: {ugly: 2}}
+				// rxns: [
+					// {handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 5, prods: {ugliest: 2}},
+					// {handle: 'rxn2', rctA: 'ugliest', rctB: 'ugliest', activeE: 6, prods: {ugly: 2}}
+				// ],
+				rxnsNonEmergent: [
+					{rcts: [{spcName: 'ugly', count: 2}], prods: [{spcName: 'ugliest', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty3'},
+					{rcts: [{spcName: 'ugliest', count: 2}], prods: [{spcName: 'ugly', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty4'},
 				],
 				graphs: [
 					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Time (s)", yLabel: "Product Mole Fraction", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
@@ -953,7 +969,7 @@ LevelData = {
 		{//S12
 			sceneData: {
 				walls: [
-						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'staticAdiabatic', temp: 100, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
+						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 100, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
 					],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
@@ -1021,8 +1037,8 @@ LevelData = {
 						// {handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}
 					// ]},
 					{handle: 'rxnControl', label: 'Rxn control', isRadio: true, buttons: [
-						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Enable', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn1")']},
-						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Disable', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn1")']},
+						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Enable', exprs: ['collide.rxnHandlerNonEmergent.enableRxn("reacty5")', 'collide.rxnHandlerNonEmergent.enableRxn("reacty6")']},
+						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Disable', exprs: ['collide.rxnHandlerNonEmergent.disableRxn("reacty5")', 'collide.rxnHandlerNonEmergent.disableRxn("reacty6")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn2")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn2")']}
 						],
@@ -1035,6 +1051,10 @@ LevelData = {
 				rxns: [
 					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 5, prods: {ugliest: 2}},
 					{handle: 'rxn2', rctA: 'ugliest', rctB: 'ugliest', activeE: 6, prods: {ugly: 2}}
+				],
+				rxnsNonEmergent: [
+					{rcts: [{spcName: 'ugly', count: 2}], prods: [{spcName: 'ugliest', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty5'},
+					{rcts: [{spcName: 'ugliest', count: 2}], prods: [{spcName: 'ugly', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty6'},
 				],
 				graphs: [
 					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Time (s)", yLabel: "Product Mole Fraction", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},

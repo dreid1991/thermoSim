@@ -6,7 +6,7 @@ LevelData = {
 		{spcName: 'ugly', m: 4, r: 2, sF298: 0, col: Col(52, 90, 224), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'uglier', m: 4, r: 2, sF298: 20, col: Col(255, 30, 62), cv: 3 * R, hF298: -12, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'duckling', m: 4, r: 2, sF298: 0, col: Col(255, 255, 255), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: 0.3},
-		{spcName: 'ugliest', m: 4, r: 2, sF298: -5, col: Col(255, 30, 62), cv: 3 * R, hF298: -12.5, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
+		{spcName: 'ugliest', m: 4, r: 2, sF298: 2, col: Col(255, 30, 62), cv: 3 * R, hF298: -8, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
 	],
 	mainSequence: [
 		{//S0	
