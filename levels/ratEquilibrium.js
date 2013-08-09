@@ -152,7 +152,7 @@ LevelData = {
 							{
 								storeAs: 'foo3', 
 								type:'text', 
-								text:'Type your thoughts here.', 
+								text:'Type your response here.', 
 							}, 
 					]
 				},
@@ -311,7 +311,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Let's consider why the rate changes with temperature (or the reactivity of A). Using the Arrhenius equation, graph the reaction rate constant with respect to temperature from 0 to 1000 K. $$ k = Ae^{-E_{a}/{RT}} $$ The activation energy of this reaction is something kJ/mol and the pre-exponential constant is somethingelse. Do you have any ideas as to why the rate behaves this way with respect to temperature?", 
+					text: "Let's consider why the rate changes with temperature (or the reactivity of A). Using the Arrhenius equation, graph the reaction rate constant with respect to temperature from 0 to 1000 K. $$ k = Ae^{-E_{a}/{RT}} $$ The activation energy of this reaction is something kJ/mol and the pre-exponential constant is somethingelse. Why do you believe the rate behaves this way with respect to temperature?", 
 					quiz:[
 							{
 								storeAs: 'foo7', 
@@ -324,7 +324,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Now we’re going to turn off the reaction, so there will be no production of B.  However, when a molecule’s kinetic energy is above the activation energy for A --> B, we’re going to turn it white.  How to do think the fraction of white molecules will change with temperature?", 
+					text: "<p>Now we’re going to turn off the reaction, so there will be no production of B.  However, when a molecule’s kinetic energy is above the activation energy for A --> B, we’re going to turn it white.</p><p>How to do think the fraction of white molecules will change with temperature?</p>", 
 					quiz:[
 							{
 								storeAs: 'foo8', 
@@ -443,12 +443,12 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: 'Here is a system of A at 50 K. When a molecule reaches the activation energy, it will turn white. The mole fraction of white excited molecules is graphed with respect to temperature. Why do you not see many white excited molecules at this temperature?', 
+					text: 'Here is a system of A at 50 K. When a molecule reaches the activation energy, it will turn white. The mole fraction of white excited molecules is graphed with respect to temperature. Why are there not many white excited molecules at this temperature?', 
 					quiz:[
 							{
 								storeAs: 'foo9', 
 								type:'text', 							
-								text:'', 
+								text:'Type your answer here', 
 							}, 
 					]
 				},
@@ -567,7 +567,7 @@ LevelData = {
 							{
 								storeAs: 'foo10', 
 								type:'text', 
-								text:'', 
+								text:'Type your answer here', 
 							}, 
 					]
 				},
@@ -579,7 +579,7 @@ LevelData = {
 							{
 								storeAs: 'foo11', 
 								type:'text', 
-								text:'', 
+								text:'Type your answer here', 
 							}, 
 					]
 				},
@@ -591,7 +591,7 @@ LevelData = {
 							{
 								storeAs: 'foo12', 
 								type:'text', 
-								text:'', 
+								text:'Type your answer here', 
 							}, 
 					]
 				},
@@ -604,7 +604,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Now let's introduce the reverse reaction, B --> A, to our system. For the reaction of A --> B ##\\Delta{h}_{rxn} = -2.5\\frac{kJ}{mol}## and ##\\Delta{s}_{rxn} = -3.3\\frac{J}{mol-K}##. With the isothermal system held at 300 K, what will the equilibrium mole fraction of A be?", 
+					text: "Now let's introduce the reverse reaction, ##B \\Rightarrow A##, to our system. For the reaction of ##A \\Rightarrow B##, ##\\Delta{h}_{rxn} = -2.5\\frac{kJ}{mol}## and ##\\Delta{s}_{rxn} = -3.3\\frac{J}{mol-K}##. With the isothermal system held at 300 K, what will be the equilibrium mole fraction of B?", 
 					quiz:[
 							{
 								storeAs: 'foo13', 
@@ -727,22 +727,14 @@ LevelData = {
 			},
 			prompts:[
 				{
-					sceneData: {
-						cmmds: [
-							// 'collide.rxnHandlerNonEmergent.enableRxn("reacty7")',
-							// 'collide.rxnHandlerNonEmergent.enableRxn("reacty8")',
-							// 'console.log("Hello!!!")',
-							'collide.rxnHandlerNonEmergent.disableRxn("reacty7")',
-							'collide.rxnHandlerNonEmergent.disableRxn("reacty8")'
-						]
-					},
+					sceneData: undefined,
 					cutScene: false, 
-					text: "Let's perform an experiment with both a forward and reverse reaction. Click 'enable' to start the reaction. How long does it take for the system at 300 K to reach the equilibrium mole fraction of A?", 
+					text: "Let's perform an experiment with both a forward and reverse reaction. Click 'enable' to start the reaction. How long does it take for the system at 300 K to reach the equilibrium mole fraction of the product B?", 
 					quiz:[
 							{
 								storeAs: 'foo14', 
 								type:'textSmall',
-								units:'s',
+								units:'seconds',
 								text:'', 
 							},
 					
@@ -751,7 +743,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false,
-					text: "What can you say about the rates of the forward and reverse reaction now that the system is at equilibrium?",
+					text: "What can you say about the rates of the forward and reverse reactions now that the system is at equilibrium?",
 					quiz:[
 							{
 								storeAs: 'foo15', 
@@ -770,12 +762,12 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Next we’re going to conduct the reaction at 500 K.  What will the equilibrium mole fraction of A be at this temperature?", 
+					text: "<p>Next we’re going to conduct the reaction at 500 K.  What will the equilibrium mole fraction of B be at this temperature?</p><p>Enter the fraction as a decimal between 0 and 1</p>", 
 					quiz:[
 							{
 								storeAs: 'foo16', 
 								type:'textSmall',
-								text:'Enter the fraction as a decimal between 0 and 1.', 
+								text:'', 
 							},
 					
 					]
@@ -783,7 +775,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "How does this compare to the equilibrium concentration of <x> at 300 K?  Explain why the equilibrium concentrations might be different.", 
+					text: "How does this compare to the equilibrium concentration of 0.64 at 300 K?  Explain why the equilibrium concentrations might be different.", 
 					quiz:[
 							{
 								storeAs: 'foo17', 
@@ -796,7 +788,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "At 300 K, it took get('foo18', 'string', 'noValue') seconds to reach equilibrium.  How do you think this will compare to the time required to reach equilibrium at 500 K?", 
+					text: "At 300 K, it took get('foo14', 'string', 'noValue') seconds to reach equilibrium.  How do you think this will compare to the time required to reach equilibrium at 500 K?", 
 					quiz:[
 							{
 								storeAs: 'foo18', 
@@ -919,35 +911,36 @@ LevelData = {
 			prompts: [
 				{
 					sceneData: undefined, 
-					text: 'Let’s find out. Above is the same isothermal setup except at 500 K.  Click ‘enable’ to start the reaction.  You wrote it took get("foo18", "string", "noValue") seconds to reach equilibrium at 300 K.  How long does it take at 500 K?',
+					text: 'Let’s find out. Above is the same isothermal system but now at 500 K.  Click ‘enable’ to start the reaction.  You wrote it took get("foo14", "string", "noValue") seconds to reach equilibrium at 300 K.  How long does it take at 500 K?',
 					quiz:[
 							{
 								storeAs: 'foo19', 
 								type:'textSmall',
-								text:'Type your answer here.', 
+								text:'', 
+								units: 'seconds'
 							},
 					]
 				},
 				{
 					sceneData: undefined, 					
-					text: 'Does the equilibrium mole fraction match your predicted value of get("foo16", "string", "noValue")',
+					text: 'Does the equilibrium mole fraction match your predicted value of get("foo16", "string", "noValue")?',
 					quiz:[
 							{
 								storeAs: 'foo20', 
-								type:'textSmall',
-								text:'Type your answer here.', 
+								type:'text',
+								text:'Type your answer here', 
 							},
 					]
 				},
 				{
 					sceneData: undefined, 
 					cutScene: true,
-					text: "Now let’s lower the temperature to 100 K.  What will the equilibrium mole fraction of A be at this temperature?",
+					text: "Now let’s lower the temperature to 100 K.  What will be the equilibrium mole fraction of product B at this temperature?",
 					quiz:[
 							{
 								storeAs: 'foo21', 
 								type:'textSmall',
-								text:'Type your answer here.', 
+								text:'', 
 							},
 					
 					]
@@ -1078,7 +1071,7 @@ LevelData = {
 			prompts: [
 				{
 					sceneData: undefined,
-					text: "Click 'Enable' to start the reaction",
+					text: "Click 'Enable' to start the reaction.",
 				},
 				{
 					sceneData: undefined, 
@@ -1093,7 +1086,7 @@ LevelData = {
 				},
 				{
 					sceneData: undefined, 
-					text: 'What will the mole fraction of A be if you wait for a very long time?',
+					text: 'Although it appears nothing is happening, there is a nonzero rate constant in the forward direction. What will be the mole fraction of A if you wait for a very long time?',
 					quiz:[
 							{
 								storeAs: 'foo24', 
@@ -1110,10 +1103,20 @@ LevelData = {
 							{
 								storeAs: 'foo25', 
 								type:'text',
-								text:'', 
+								text:'Type your answer here', 
 							},
 					]
 				},
+			]
+		},
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
+					title: '',
+					text: 'You have completed the simulation.'
+				}
 			]
 		}
 	]
