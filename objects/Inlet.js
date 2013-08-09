@@ -18,6 +18,9 @@ Copyright (C) 2013  Daniel Reid
 	//wallInfo, flows(array), ptIdxs, fracOffset, makeSlider, fracOpen
 	//flows as [{spcName: , nDotMax: , temp: }]
 function Inlet (attrs) {
+	//flow has {spcName, temp, tag, returnTo, handle, nDotMax}
+	//have sliderGrps attrs: list of {handle: '', flowHandles: [], title: '', fracOpen: #}
+	//if not frac open is specified by binding a flow to a slider, it will be 1
 	this.arrowDims = V(15, 20);
 	this.arrowFill = Col(200, 0, 0);
 	this.arrowStroke = Col(100, 100, 100);
@@ -25,21 +28,23 @@ function Inlet (attrs) {
 	this.handle = attrs.handle;
 	this.width = defaultTo(30, attrs.width);
 	this.depth = defaultTo(20, attrs.depth);
-	this.fracOpen = defaultTo(1, attrs.fracOpen);
-	//if depth is 0, just have it not add any pointsa
+	//this.fracOpen = defaultTo(1, attrs.fracOpen);  depricated
+	//if depth is 0, just have it not add any points
 	this.makePts = this.depth;
 	this.wallInfo = attrs.wallInfo;
 	this.wall = walls[this.wallInfo];
 	this.ptIdxs = attrs.ptIdxs;
-	this.fracOffset = defaultTo(.5, attrs.fracOffset);
+	this.fracOffset = defaultTo(.5, attrs.fracOffset); 
 	this.flows = this.processFlows(attrs.flows);
-	this.makeSlider = defaultTo(true, attrs.makeSlider);
-	if (this.makeSlider) {
-		this.slider = sliderManager.addSlider(attrs.title || 'Flow rate', this.handle + 'Slider',  {value: this.fracOpen*100},
-			[{eventType:'slide', obj:this, func:this.parseSlider}],
-		attrs.sliderIdx
-		)
-	}
+	this.flowGroupSliders = this.addSliders(attrs.sliders, this.flows);
+	// this.makeSlider = defaultTo(true, attrs.makeSlider);
+	
+	// if (this.makeSlider) {
+		// this.slider = sliderManager.addSlider(attrs.title || 'Flow rate', this.handle + 'Slider',  {value: this.fracOpen*100},
+			// [{eventType:'slide', obj:this, func:this.parseSlider}],
+		// attrs.sliderIdx
+		// )
+	// }
 	this.setupStd();
 	this.arrows = [];
 	this.init();
@@ -60,18 +65,41 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 		this.makeInlet(inletLine, this.flows);
 	},
 
-
 	processFlows: function(flows) {
 		var procdFlows = [];
 		for (var flowIdx=0; flowIdx<flows.length; flowIdx++) {
 			var flow = flows[flowIdx];
-			procdFlows.push({spc: spcs[flow.spcName], temp: flow.temp, nDotMax: flow.nDotMax, returnTo: this.wallInfo, tag: flow.tag})
-			procdFlows[procdFlows.length-1].nDotMax *= 1000 / updateInterval;
+			procdFlows.push(new Inlet.Flow(flow.spcName, flow.temp, flow.nDotMax * 1000 / updateInterval, flow.handle, flow.returnTo || flow.tag, flow.tag || flow.returnTo));
 		}
 		return procdFlows;
 	},
 	parseSlider: function(event, ui){
 		this.fracOpen = ui.value / 100;
+	},
+	addSliders: function(attrSliders, flows) {
+		var sliders = [];
+		for (var i=0; i<attrSliders.length; i++) {
+			var attrSlider = attrSliders[i];
+			var flows = attrSlider.flows;
+			var handle = attrSlider.handle;
+			var title = attrSlider.title;
+			var fracOpen = attrSlider.fracOpen;
+			var sliderIdx = attrsSlider.sliderIdx;
+			var sliderGroup = new Inlet.FlowGroupSlider(title, handle, flows);
+			var slider = sliderManager.addSlider(title, this.handle + 'Slider' + handle.toCapitalCamelCase(),  {value: fracOpen*100},
+				[{eventType:'slide', obj: sliderGroup, func: sliderGroup.parseSlider}],
+			sliderGroup
+			)
+			sliderGroup.slider = slider;
+			sliders.push(sliderGroup);
+		}
+		return sliders;
+	},
+	getSlider: function(handle) {
+		for (var i=0; i<this.flowGroupSliders.length; i++) {
+			if (this.flowGroupSliders[i].handle == handle) return this.flowGroupSliders;
+		}
+		return false;
 	},
 	makeInlet: function(inletLine, flows) {
 		var inletPos = inletLine.pos;
@@ -97,7 +125,7 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 					dotBank[flowIdx] -= toMake;
 				}
 			}
-		}, this) //maybe context should be this.  Will see if it's needed
+		}, this) 
 	},
 	remove: function() {
 		if (this.slider) {
@@ -110,3 +138,24 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 
 
 })
+
+Inlet.Flow = function(spc, temp, nDotMax, handle, returnTo, tag) {
+	this.spcName = spcName;
+	this.spc = window.spcs[spcName];
+	this.temp = temp;
+	this.nDotMax = nDotMax;
+	this.handle = handle;
+	this.returnTo = returnTo;
+	this.tag = tag;
+	this.fracOpen = 1;
+}
+
+Inlet.FlowGroupSlider = function(title, handle, flows) {
+	this.title = title;
+	this.handle = handle;
+	this.slider = undefined;
+	this.flows = flows;
+}
+
+Inlet.FlowGroupSlider.prototype = {
+}
