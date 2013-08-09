@@ -311,7 +311,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Let's consider why the rate changes with temperature (or the reactivity of A). Using the Arrhenius equation, graph the reaction rate constant with respect to temperature from 0 to 1000 K. $$ k = Ae^{\\frac{-E_{a}}{RT}} $$ The activation energy of this reaction is something kJ/mol and the pre-exponential constant is somethingelse. Do you have any ideas as to why the rate behaves this way with respect to temperature?", 
+					text: "Let's consider why the rate changes with temperature (or the reactivity of A). Using the Arrhenius equation, graph the reaction rate constant with respect to temperature from 0 to 1000 K. $$ k = Ae^{-E_{a}/{RT}} $$ The activation energy of this reaction is something kJ/mol and the pre-exponential constant is somethingelse. Do you have any ideas as to why the rate behaves this way with respect to temperature?", 
 					quiz:[
 							{
 								storeAs: 'foo7', 
@@ -604,7 +604,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Now let's introduce the reverse reaction, B --> A, to our system. The enthalpy and entropy of reaction for A --> B are -5 kJ/mol and -50 J/mol-K respectively. With the isothermal system held at 300 K, what will the equilibrium mole fraction of A be?", 
+					text: "Now let's introduce the reverse reaction, B --> A, to our system. For the reaction of A --> B ##\\Delta{h}_{rxn} = -2.5\\frac{kJ}{mol}## and ##\\Delta{s}_{rxn} = -3.3\\frac{J}{mol-K}##. With the isothermal system held at 300 K, what will the equilibrium mole fraction of A be?", 
 					quiz:[
 							{
 								storeAs: 'foo13', 
@@ -643,10 +643,10 @@ LevelData = {
 						// type: 'ActivationEnergyPair',
 						// attrs: {spcNameLow: 'ugly', spcNameHigh: 'duckling', activationEnergy: 4}
 					// },
-					{
-						type: 'Heater',
-						attrs:{wallInfo: 'wally', temp: 0, handle: 'heaty', max: 2.5, makeSlider: true}
-					},
+					// {
+						// type: 'Heater',
+						// attrs:{wallInfo: 'wally', temp: 0, handle: 'heaty', max: 2.5, makeSlider: true}
+					// },
 
 					// {
 						// type: 'QArrowsAmmt',
@@ -703,7 +703,7 @@ LevelData = {
 					// {handle: 'rxn2', rctA: 'ugliest', rctB: 'ugliest', activeE: 1, prods: {ugly: 2}}
 				// ],
 				rxnsNonEmergent: [
-					{rcts: [{spcName: 'ugly', count: 2}], prods: [{spcName: 'ugliest', count: 2}], preExpForward: 4, activeEForward: .08, handle: 'reacty7'},
+					{rcts: [{spcName: 'ugly', count: 2}], prods: [{spcName: 'ugliest', count: 2}], preExpForward: 100, activeEForward: 8, handle: 'reacty7'},
 					// {rcts: [{spcName: 'ugliest', count: 2}], prods: [{spcName: 'ugly', count: 2}], preExpForward: 1, activeEForward: .08, handle: 'reacty8'},
 				],
 				graphs: [
@@ -834,10 +834,10 @@ LevelData = {
 						// type: 'ActivationEnergyPair',
 						// attrs: {spcNameLow: 'ugly', spcNameHigh: 'duckling', activationEnergy: 4}
 					// },
-					{
-						type: 'Heater',
-						attrs:{wallInfo: 'wally', temp: 0, handle: 'heaty', max: 2.5, makeSlider: true}
-					},
+					// {
+						// type: 'Heater',
+						// attrs:{wallInfo: 'wally', temp: 0, handle: 'heaty', max: 2.5, makeSlider: true}
+					// },
 
 					// {
 						// type: 'QArrowsAmmt',
@@ -894,7 +894,7 @@ LevelData = {
 					// {handle: 'rxn2', rctA: 'ugliest', rctB: 'ugliest', activeE: 6, prods: {ugly: 2}}
 				// ],
 				rxnsNonEmergent: [
-					{rcts: [{spcName: 'ugly', count: 2}], prods: [{spcName: 'ugliest', count: 2}], preExpForward: 4, activeEForward: .08, handle: 'reacty3'},
+					{rcts: [{spcName: 'ugly', count: 2}], prods: [{spcName: 'ugliest', count: 2}], preExpForward: 100, activeEForward: 8, handle: 'reacty3'},
 					// {rcts: [{spcName: 'ugliest', count: 2}], prods: [{spcName: 'ugly', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty4'},
 				],
 				graphs: [
@@ -993,10 +993,10 @@ LevelData = {
 						// type: 'ActivationEnergyPair',
 						// attrs: {spcNameLow: 'ugly', spcNameHigh: 'duckling', activationEnergy: 4}
 					// },
-					{
-						type: 'Heater',
-						attrs:{wallInfo: 'wally', temp: 0, handle: 'heaty', max: 2.5, makeSlider: true}
-					},
+					// {
+						// type: 'Heater',
+						// attrs:{wallInfo: 'wally', temp: 0, handle: 'heaty', max: 2.5, makeSlider: true}
+					// },
 
 					// {
 						// type: 'QArrowsAmmt',
@@ -1053,7 +1053,7 @@ LevelData = {
 					// {handle: 'rxn2', rctA: 'ugliest', rctB: 'ugliest', activeE: 6, prods: {ugly: 2}}
 				// ],
 				rxnsNonEmergent: [
-					{rcts: [{spcName: 'ugly', count: 2}], prods: [{spcName: 'ugliest', count: 2}], preExpForward: 4, activeEForward: .08, handle: 'reacty5'},
+					{rcts: [{spcName: 'ugly', count: 2}], prods: [{spcName: 'ugliest', count: 2}], preExpForward: 10, activeEForward: 8, handle: 'reacty5'},
 					// {rcts: [{spcName: 'ugliest', count: 2}], prods: [{spcName: 'ugly', count: 2}], preExpForward: 0.8, activeEForward: .0008, handle: 'reacty6'},
 				],
 				graphs: [
@@ -1076,6 +1076,10 @@ LevelData = {
 				],
 			},
 			prompts: [
+				{
+					sceneData: undefined,
+					text: "Click 'Enable' to start the reaction",
+				},
 				{
 					sceneData: undefined, 
 					text: 'Why is the reaction not proceeding?',

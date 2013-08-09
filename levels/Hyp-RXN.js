@@ -169,6 +169,7 @@ LevelData = {
 				],
 				dataReadouts: [
 					{label: 'Temperature: ', expr: 'tempSmooth("secondWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'Change in Enthalpy: ', expr: 'enthalpy("secondWall") + 4126.37', units: 'kJ', decPlaces: 2, handle: 'H', readout: 'mainReadout'},
 					{label: 'x-rxn: ', expr: 'frac("secondWall", {tag:"secondWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'liqTemp', readout: 'mainReadout'}
 				],
 				objs: [
