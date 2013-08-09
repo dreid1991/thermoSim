@@ -37,12 +37,13 @@ LevelData = {
 						attrs: {
 							handle: 'inlet1',
 							wallInfo: 'left',
-							// width: 40,
-							// depth: 25,
+							width: 40,
+							depth: 25,
 							flows: [{spcName: 'spc3', temp: 273, nDotMax: .05, tag: 'left'}],
 							ptIdxs: [3,4],
 							fracOffset: 0.5,
-							makeSlider: true
+							makeSlider: true,
+							title: 'test'
 						}
 					},
 					{
@@ -51,6 +52,9 @@ LevelData = {
 							handle: 'outlet1',
 							wallInfo: 'left',
 							ptIdxs: [1,2],
+							width: 200,
+							depth: 25,
+							pressureFloor: 1,
 							fracOffset: 0.5,
 							makeSlider: true
 							

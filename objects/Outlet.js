@@ -31,6 +31,8 @@ function Outlet(attrs) {
 	this.ptIdxs = attrs.ptIdxs;
 	this.fracOffset = defaultTo(.5, attrs.fracOffset);
 	this.arrows = [];
+	this.pFloor = attrs.pressureFloor || 0;
+	this.pList = this.wall.getDataSrc('pInt');
 	this.setupStd();
 	this.init();
 }
@@ -43,7 +45,15 @@ _.extend(Outlet.prototype, flowFuncs, objectFuncs, {
 		}
 		var subWallIdx = Math.min(this.ptIdxs[0], this.ptIdxs[1]) + 2;
 		this.arrows = this.addArrows(this.pts[1].VTo(this.pts[2]).UV().perp('cw'));
-		walls.setSubWallHandler(this.wallInfo, subWallIdx, 'outlet');
+		walls.setSubWallHandler(this.wallInfo, subWallIdx, new Listener(this.hit, this));
+	},
+	hit: function(dot, wall, subWallIdx, wallUV, perpV, perpUV) {
+		//using this so pFloor can be changed, should that become a thing
+		if (this.pList[this.pList.length - 1] > this.pFloor) {
+			return dotManager.remove(dot, true);
+		} else {
+			return WallMethods.collideMethods.reflect(dot, wallUV, perpV);
+		}
 	},
 	remove: function() {
 		this.arrows.map(function(arrow) {arrow.remove()});

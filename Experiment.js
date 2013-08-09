@@ -14,7 +14,6 @@ Copyright (C) 2013  Daniel Reid
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-window.BCollide = 1.5;
 function Experiment() {
 	this.mutables = {
 		eAF: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.rxns[0].activeE'),
@@ -25,11 +24,10 @@ function Experiment() {
 		hFD: new Experiment.Mutable('LevelData.spcDefs[3].hF298'),		
 		tempDots1: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.dots[0].temp'),
 		tempDots2: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.dots[1].temp'),
-		tempWalls: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.walls[0].temp'),
-		BCollide: new Experiment.Mutable('window.BCollide')
+		tempWalls: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.walls[0].temp')
 	}
 	this.data = { 
-		nA: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "a", tag: "wally"})'),
+		nA: new Experiment.Data('walls.wally.getDataSrc("vol")'),
 		nB: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "b", tag: "wally"})'),
 		nC: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "c", tag: "wally"})'),
 		nD: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "d", tag: "wally"})'),
