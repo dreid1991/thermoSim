@@ -39,7 +39,8 @@ LevelData = {
 							wallInfo: 'left',
 							width: 40,
 							depth: 25,
-							flows: [{spcName: 'spc3', temp: 273, nDotMax: .05, tag: 'left'}],
+							flows: [{spcName: 'spc3', nDotMax: .05, handle: 'for3'}, {spcName: 'spc1', nDotMat: .05, handle: 'for1'}],
+							sliders: [{flowHandles: ['spc3'], handle: 
 							ptIdxs: [3,4],
 							fracOffset: 0.5,
 							makeSlider: true,

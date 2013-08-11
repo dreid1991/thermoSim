@@ -32,6 +32,7 @@ function Outlet(attrs) {
 	this.fracOffset = defaultTo(.5, attrs.fracOffset);
 	this.arrows = [];
 	this.pFloor = attrs.pressureFloor || 0;
+	//should probably scale probability to leaving based on dist from pFloor
 	this.pList = this.wall.getDataSrc('pInt');
 	this.setupStd();
 	this.init();
