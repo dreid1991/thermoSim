@@ -25,7 +25,8 @@ function Inlet (attrs) {
 	this.arrowFill = Col(200, 0, 0);
 	this.arrowStroke = Col(100, 100, 100);
 	this.type = 'Inlet';
-	this.temp = attrs.temp;
+	this.temp = attrs.temp; 
+	if (!this.temp) console.log('No/zero temperature sent to inlet ' + this.handle);
 	//temp slider?
 	this.handle = attrs.handle;
 	this.width = defaultTo(30, attrs.width);
@@ -93,7 +94,7 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 			var handle = attrSlider.handle;
 			var title = attrSlider.title;
 			var fracOpen = attrSlider.fracOpen;
-			var sliderIdx = attrsSlider.sliderIdx;
+			var sliderIdx = attrSlider.sliderIdx;
 			var sliderGroup = new Inlet.FlowGroupSlider(title, handle, sliderFlows);
 			var slider = sliderManager.addSlider(title, this.handle + 'Slider' + handle.toCapitalCamelCase(),  {value: fracOpen*100},
 				[{eventType:'slide', obj: sliderGroup, func: sliderGroup.parseSlider}],
@@ -109,7 +110,7 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 		
 		init = Math.min(Math.max(min, init), max);
 		return sliderManager.addSlider(title, this.handle + 'TempSlider', {value: 100 * this.tempToFrac(min, max, init)},
-			[{eventType: 'slider', obj: this, func: this.parseTempSlider}],
+			[{eventType: 'slide', obj: this, func: this.parseTempSlider}],
 		undefined
 		)
 		
@@ -119,10 +120,13 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 		if (slider) slider.setFracOpenExternal(bound(fracOpen, 0, 1));
 	},
 	parseTempSlider: function(event, ui) {
-		this.setTemp(this.fracToTemp(ui.value / 100));
+		this.setTemp(this.fracToTemp(this.tempMin, this.tempMax, ui.value / 100), false);
 	},
-	setTemp: function(temp) {
+	setTemp: function(temp, setSlider) {
 		this.temp = bound(temp, this.tempMin, this.tempMax);
+		if (setSlider !== false && this.tempSlider) {
+			this.tempSlider.slider.slider('value', 100 * this.tempToFrac(this.tempMin, this.tempMax, temp));
+		}
 	},
 	fracToTemp: function(min, max, frac) {
 		return min + (max - min) * frac;
@@ -134,13 +138,13 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 		var plucked = [];
 		for (var i=0; i<flowHandles.length; i++) {
 			var flow = _.find(flows, function(flow) {return flow.handle == flowHandles[i]});
-			if (flow) plucked.push(flow);
+			flow ? plucked.push(flow) : console.log('Could not find flow ' + flowHandles[i] + ' for inlet slider');
 		}
 		return plucked;
 	},
 	getSlider: function(handle) {
 		for (var i=0; i<this.flowGroupSliders.length; i++) {
-			if (this.flowGroupSliders[i].handle == handle) return this.flowGroupSliders;
+			if (this.flowGroupSliders[i].handle == handle) return this.flowGroupSliders[i];
 		}
 		return false;
 	},
@@ -174,6 +178,7 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 	remove: function() {
 		for (var i=0; i<this.flowGroupSliders.length; i++) 	this.flowGroupSliders[i].slider.remove();
 		for (var i=0; i<this.arrows.length; i++) 			this.arrows[i].remove();
+		if (this.tempSlider) 								this.tempSlider.remove();
 		removeListener(curLevel, 'update', this.type + this.handle);
 	
 	}
@@ -181,7 +186,7 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 
 })
 
-Inlet.Flow = function(spc, nDotMax, handle) {
+Inlet.Flow = function(spcName, nDotMax, handle) {
 	this.spcName = spcName;
 	this.spc = window.spcs[spcName];
 	this.nDotMax = nDotMax;
@@ -208,6 +213,7 @@ Inlet.FlowGroupSlider.prototype = {
 	},
 	setFracOpenExternal: function(fracOpen) {
 		this.setFracOpen(fracOpen);
-		this.slider.slider('value', fracOpen * 100);
+		this.slider.slider.slider('value', fracOpen * 100); 
+		//I am so sorry.  it's the slider member of the flow group slider class, which is a slider manager slider, which has a slider attribute, which is the actual slider, which has a slider method
 	}
 }

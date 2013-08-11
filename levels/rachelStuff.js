@@ -39,12 +39,15 @@ LevelData = {
 							wallInfo: 'left',
 							width: 40,
 							depth: 25,
-							flows: [{spcName: 'spc3', nDotMax: .05, handle: 'for3'}, {spcName: 'spc1', nDotMat: .05, handle: 'for1'}],
-							sliders: [{flowHandles: ['spc3'], handle: 
+							temp: 298,
+							makeTempSlider: true,
+							tempMin: 100,
+							tempMax: 400,
+							flows: [{spcName: 'spc3', nDotMax: .05, handle: 'for3'}, {spcName: 'spc1', nDotMax: .05, handle: 'for1'}],
+							sliders: [{flowHandles: ['for3', 'for1'], handle: 'slidery1', fracOpen: 1, title: 'thing1'}, {flowHandles: ['for1'], handle: 'rootCanal', fracOpen: .5, title: 'thing2'}],
 							ptIdxs: [3,4],
 							fracOffset: 0.5,
-							makeSlider: true,
-							title: 'test'
+							makeSlider: true
 						}
 					},
 					{

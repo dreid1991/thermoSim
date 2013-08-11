@@ -100,8 +100,7 @@ _.extend(ArrowStatic.prototype, objectFuncs, toInherit.ArrowFuncs, {
 		this.stroke = stroke.copy();
 	},
 	remove: function() {
-		removeListener(curLevel, 'update', this.updateListenerName);
-		this.removeCleanUp();
+		canvasManager.removeListener(this.canvasHandle, this.drawListenerName);
 	},
 	
 
