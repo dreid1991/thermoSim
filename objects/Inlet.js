@@ -27,7 +27,6 @@ function Inlet (attrs) {
 	this.type = 'Inlet';
 	this.temp = attrs.temp; 
 	if (!this.temp) console.log('No/zero temperature sent to inlet ' + this.handle);
-	//temp slider?
 	this.handle = attrs.handle;
 	this.width = defaultTo(30, attrs.width);
 	this.depth = defaultTo(20, attrs.depth);
@@ -39,7 +38,7 @@ function Inlet (attrs) {
 	this.ptIdxs = attrs.ptIdxs;
 	this.fracOffset = defaultTo(.5, attrs.fracOffset); 
 	this.flows = this.processFlows(attrs.flows);
-	this.flowGroupSliders = this.addFlowSliders(attrs.sliders, this.flows);
+	this.flowGroupSliders = this.addFlowSliders(attrs.sliders || [], this.flows);
 	this.tempSlider = undefined;
 	if (attrs.makeTempSlider) {
 		this.tempMin = attrs.tempMin;
