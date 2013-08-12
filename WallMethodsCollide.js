@@ -152,8 +152,6 @@ WallMethods.collideMethods ={
 		// }
 		dot.x -= wallUV.dy
 		dot.y += wallUV.dx
-	},
-	outlet: function(dot) {
-		dotManager.remove(dot, true);
 	}
+
 }

@@ -21,7 +21,7 @@ function SliderManager(containerId) {
 }
 SliderManager.prototype = {
 	addSlider: function(title, handle, attrs, handlers, idx) {
-		idx = idx === undefined ? this.getMaxIdx(this.sliderGroupWrapper) + 1 : idx;
+		idx = (typeof idx != 'number' && idx >= 0) ? this.getMaxIdx(this.sliderGroupWrapper) + 1 : idx;
 		var sliderWrapper = this.insertSliderWrapper(this.containerId, this.sliderGroupWrapper, idx, handle)
 		var sliderPadding = this.insertSliderPadding(this.containerId, sliderWrapper);
 		var sliderInnerId = 'sliderInnerContainer' + this.containerId + 'Handle' + handle;
@@ -103,5 +103,11 @@ SliderManager.Slider.prototype = {
 			this.removed = true;
 		}
 		
+	},
+	enable: function() {
+		$(this.selector).slider('enable');
+	},
+	disable: function() {
+		$(this.selector).slider('disable');
 	}
 }
