@@ -121,6 +121,23 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 	parseTempSlider: function(event, ui) {
 		this.setTemp(this.fracToTemp(this.tempMin, this.tempMax, ui.value / 100), false);
 	},
+	enableSlider: function(handle) {
+		if (/temp/i.test(handle)) {
+			if (this.tempSlider) this.tempSlider.enable();
+		} else {
+			var slider = this.getSlider(handle);
+			if (slider) slider.slider.enable();
+		}
+	},
+	disableSlider: function(handle) {
+		if (/temp/i.test(handle)) {
+			if (this.tempSlider) this.tempSlider.disable();
+		} else {
+			var slider = this.getSlider(handle);
+			if (slider) slider.slider.disable();
+		}
+	},
+	
 	setTemp: function(temp, setSlider) {
 		this.temp = bound(temp, this.tempMin, this.tempMax);
 		if (setSlider !== false && this.tempSlider) {
@@ -203,6 +220,9 @@ Inlet.FlowGroupSlider = function(title, handle, flows) {
 Inlet.FlowGroupSlider.prototype = {
 	parseSlider: function(event, ui) {
 		this.setFracOpen(ui.value / 100);
+	},
+	disable: function() {
+	
 	},
 	setFracOpen: function(fracOpen) {
 		var flows = this.flows;

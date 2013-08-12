@@ -103,5 +103,11 @@ SliderManager.Slider.prototype = {
 			this.removed = true;
 		}
 		
+	},
+	enable: function() {
+		$(this.selector).slider('enable');
+	},
+	disable: function() {
+		$(this.selector).slider('disable');
 	}
 }

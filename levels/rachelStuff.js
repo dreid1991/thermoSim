@@ -44,10 +44,9 @@ LevelData = {
 							tempMin: 100,
 							tempMax: 400,
 							flows: [{spcName: 'spc3', nDotMax: .05, handle: 'for3'}, {spcName: 'spc1', nDotMax: .05, handle: 'for1'}],
-							sliders: [{flowHandles: ['for3', 'for1'], handle: 'slidery1', fracOpen: 1, title: 'thing1'}, {flowHandles: ['for1'], handle: 'rootCanal', fracOpen: .5, title: 'thing2'}],
+							sliders: [{flowHandles: ['for3'], handle: 'slidery1', fracOpen: 1, title: 'Red things'}, {flowHandles: ['for1'], handle: 'rootCanal', fracOpen: .5, title: 'White things'}],
 							ptIdxs: [3,4],
 							fracOffset: 0.5,
-							makeSlider: true
 						}
 					},
 					{

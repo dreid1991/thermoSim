@@ -115,7 +115,7 @@ _.extend(Heater.prototype, objectFuncs, {
 	},
 	disable: function() {
 		if (this.slider) {
-			$(this.slider.selector).slider('disable');
+			this.slider.disable();
 		}
 		this.setQRate(50);
 		this.enabled = false;
@@ -123,7 +123,7 @@ _.extend(Heater.prototype, objectFuncs, {
 	},
 	enable: function() {
 		if (this.slider) {
-			$(this.slider.selector).slider('enable');
+			this.slider.enable();
 		}
 		this.enabled = true;
 	},
