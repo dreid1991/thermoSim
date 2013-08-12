@@ -42,8 +42,7 @@ LevelData = {
 									text: 'Type your answer here.'
 									}
 						]
-				}
-				
+				},
 			]
 								
 		},
@@ -98,7 +97,7 @@ LevelData = {
 						]
 					},
 					cutScene: false,
-					text: "The isothermal system above is held at 500 K contains 1 mole of A.  The red colored species A  can reversibly react to form the green species B.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  What is the sign of the enthalpy of reaction? Explain.",
+					text: "The isothermal system above is held at 500 K and contains 1 mole of A.  The red colored species A  can reversibly react to form the green species B.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  What is the sign of the enthalpy of reaction? Explain.",
 					quiz:[
 							{type: 'text',
 							storeAs:'realProcess',
@@ -109,12 +108,17 @@ LevelData = {
 				{//Prompt 1
 				sceneData: undefined,
 					cutScene: true,
-					text: "We can use hypothetical paths to calculate physical properties at states where data is unavailable.  In this case, we don't have the enthalpy of reaction at 500 K, but we have the following data:<p> <center><table class= 'data'><tr><th>Species</th><th>##c_{v}##(J/mol-K)</th></tr><tr><td>A</td><td>2.5*R</td></tr><tr><td>B</td><td>3.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center>The enthalpy of reaction can be defined as the heat absorbed by a system undergoing a full conversion reaction at constant temperature and pressure.  For example, in a reaction of A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming one mole of A at constant temperature and pressure.  If the reaction were 2A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming two moles of A at constant temperature and pressure."
+					text: "We can use hypothetical paths to calculate physical properties at states where data is unavailable. In this case, we don't have the enthalpy of reaction at 500 K, but we have the following data:<p> <center><table class= 'data'><tr><th>Species</th><th>##c_{v}##(J/mol-K)</th></tr><tr><td>A</td><td>2.5*R</td></tr><tr><td>B</td><td>3.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center>The enthalpy of reaction can be defined as the heat absorbed by a system undergoing a full conversion reaction at constant temperature and pressure.  For example, in a reaction of A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming one mole of A at constant temperature and pressure.  If the reaction were 2A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming two moles of A at constant temperature and pressure."
 				},
 				{//Prompt 2
 				sceneData: undefined,
 					cutScene: true,
-					text: "<center><table class= 'data'><tr><th>Species</th><th>##c_{v}##(J/mol-K)</th></tr><tr><td>A</td><td>2.5*R</td></tr><tr><td>B</td><td>3.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center> <p> Using this data, construct a hypothetical path that will allow you to calculate the enthalpy of reaction for the previous process.  Calculate the enthalpy change for each step in your hypothetical path and record the values on a separate sheet of paper. <p> the process is: <p> 1 mole A (500 K)##\\rightarrow## 1 mole B (500 K)",
+					text: "<center><table class= 'data'><tr><th>Species</th><th>##c_{v}##(J/mol-K)</th></tr><tr><td>A</td><td>2.5*R</td></tr><tr><td>B</td><td>3.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center> <p> Using this data, construct a hypothetical path that will allow you to calculate the enthalpy of reaction for the previous process.  Calculate the enthalpy change for each step in your hypothetical path and record the values on a separate sheet of paper. <p> The process is: <p> 1 mole A (500 K) ##\\rightarrow## 1 mole B (500 K)",
+				},
+				{//Prompt 3
+				scendeData: undefined,
+					text: "<p>Write the enthalpy change of each of your steps here.",
+					cutScene: true,
 					quiz: [
 						{type: 'textSmall',
 						storeAs: 'step1',

@@ -1,8 +1,8 @@
 LevelData = {
-	levelTitle: 'Hypothetical Path: Phase Change',
+	levelTitle: 'Hypothetical Paths: Phase Change',
 	
 	spcDefs: [
-		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 2, antoineCoeffs: {a: 1.07, b:1030.6, c: 273.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
+		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 2, antoineCoeffs: {a: 5.6413, b:1030.6, c: 273.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
 		{spcName: 'spc2', m: 3, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
 		{spcName: 'spc3', m: 3, r: 1, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3}
 	],
@@ -44,7 +44,9 @@ LevelData = {
 					}
 				],
 				dataReadouts: [
-					{label: 'Temperature: ', expr: 'tempSmooth("firstWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'}
+					{label: 'Temperature: ', expr: 'tempSmooth("firstWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'Liquid Temp: ', expr: 'tempSmooth("liquidLiq1")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
+					{label: 'Pressure: ', expr: 'pExt("firstWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'}
 				],
 			},
 			prompts:[ 
