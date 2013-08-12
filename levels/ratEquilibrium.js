@@ -70,7 +70,7 @@ LevelData = {
 						
 				],
 				triggers: [
-					//{handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: false}
+					{handle: 'trigger1', expr: "dotManager.lists.uglier.length > 450", message: 'Turn on the reaction and allow it to react.', checkOn: 'conditions', requiredFor: 'prompt0'}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}},
@@ -215,7 +215,7 @@ LevelData = {
 						
 				],
 				triggers: [
-					//{handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: false}
+					{handle: 'trigger2', expr: "dotManager.lists.uglier.length >= 450", message: 'Turn on the reaction and allow it to react.', requiredFor: 'prompt0', checkOn: 'conditions'}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugly', tag: 'wally'}}
@@ -498,7 +498,7 @@ LevelData = {
 						
 				],
 				triggers: [
-					//{handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: false}
+					{handle: 'trigger3', expr: "temp('wally') >= 698", message: 'Heat the system to 700 K.', requiredFor: 'prompt0', checkOn: 'conditions'}
 				],
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
@@ -604,7 +604,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Now let's introduce the reverse reaction, ##B \\Rightarrow A##, to our system. For the reaction of ##A \\Rightarrow B##, ##\\Delta{h}_{rxn} = -2.5\\frac{kJ}{mol}## and ##\\Delta{s}_{rxn} = -3.3\\frac{J}{mol-K}##. With the isothermal system held at 300 K, what will be the equilibrium mole fraction of B?", 
+					text: "Now let's introduce the reverse reaction, ##B \\rightarrow A##, to our system. For the reaction of ##A \\rightarrow B##, ##\\Delta{h}_{rxn} = -2.5\\frac{kJ}{mol}## and ##\\Delta{s}_{rxn} = -3.3\\frac{J}{mol-K}##. With the isothermal system held at 300 K, what will be the equilibrium mole fraction of B?", 
 					quiz:[
 							{
 								storeAs: 'foo13', 
@@ -660,7 +660,7 @@ LevelData = {
 						
 				],
 				triggers: [
-					//{handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: false}
+					{handle: 'trigger5', expr: "dotManager.lists.ugliest.length >= 362", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'}
 				],
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
@@ -843,7 +843,7 @@ LevelData = {
 						
 				],
 				triggers: [
-					//{handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: false}
+					{handle: 'trigger6', expr: "dotManager.lists.ugliest.length >= 320", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'}
 				],
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
@@ -1003,7 +1003,7 @@ LevelData = {
 						
 				],
 				triggers: [
-					//{handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: false}
+					{handle: 'trigger7', expr: "collide.rxnHandlerNonEmergent.rxnIsEnabled('reacty5')",message: 'Enable the reaction', requiredFor: 'prompt0', checkOn:'conditions'}
 				],
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
@@ -1086,7 +1086,7 @@ LevelData = {
 				},
 				{
 					sceneData: undefined, 
-					text: 'Although it appears nothing is happening, there is a nonzero rate constant in the forward direction. What will be the mole fraction of A if you wait for a very long time?',
+					text: 'Although it appears nothing is happening, there is a non-zero rate constant in the forward direction. What will be the mole fraction of A if you wait for a very long time?',
 					quiz:[
 							{
 								storeAs: 'foo24', 
@@ -1098,10 +1098,34 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true,
-					text: '<br>In a couple of sentences, describe how reaction rate and equilibrium change with temperature in an exothermic reaction.<br>',
+					text: '<br>Describe how the reaction equilibrium changed with temperature for the exothermic reaction ##A \\rightarrow B##.<br>',
 					quiz:[
 							{
 								storeAs: 'foo25', 
+								type:'text',
+								text:'Type your answer here', 
+							},
+					]
+				},
+				{
+					sceneData: undefined, 
+					cutScene: true,
+					text: '<br>Describe how the reaction rate changed with temperature for the exothermic reaction ##A \\rightarrow B##.<br>',
+					quiz:[
+							{
+								storeAs: 'foo26', 
+								type:'text',
+								text:'Type your answer here', 
+							},
+					]
+				},
+				{
+					sceneData: undefined, 
+					cutScene: true,
+					text: '<br>In a couple of sentences, explain the difference between reaction rate and equilibrium.<br>',
+					quiz:[
+							{
+								storeAs: 'foo27', 
 								type:'text',
 								text:'Type your answer here', 
 							},
