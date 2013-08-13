@@ -2,7 +2,7 @@ LevelData = {
 	levelTitle: 'Hypothetical Paths: Phase Change',
 	
 	spcDefs: [
-		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 2, antoineCoeffs: {a: 5.6413, b:1030.6, c: 273.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
+		{spcName: 'spc1', m: 4, r: 2, col: Col(252, 0, 177), cv: 2.5 * R, hF298: -10, hVap298: 2, antoineCoeffs: {a: 5.64, b:1030.1, c: 273.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
 		{spcName: 'spc2', m: 3, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
 		{spcName: 'spc3', m: 3, r: 1, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3}
 	],
@@ -17,7 +17,7 @@ LevelData = {
 							text:" <p>Today we're going to examine hypothetical paths and how they can be used to determine unknown thermodynamic process values.</p><p>The use of hypothetical paths is entirely dependent on state functions. Please identify here what you believe are the distinguishing characteristics that make a thermodynamic property a state function.</p>",
 							quiz:[
 									{type: 'text',
-									storeAs:'HypAns',
+									storeAs:'HypAns1',
 									text: 'Type your answer here.'
 									}
 								]	
@@ -27,10 +27,10 @@ LevelData = {
 		{//First Scene
 			sceneData: {//Scene 0
 				walls: [
-					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'firstWall', border: {type: 'open'},},
+					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'firstWall', vol: 0.395, border: {type: 'open', yMin: 40},},
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 0, temp: 300, returnTo: 'firstWall', tag: 'firstWall'},
+					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 0, temp: 350, returnTo: 'firstWall', tag: 'firstWall'},
 				],
 				objs: [
 					{type: 'Piston',
@@ -40,19 +40,33 @@ LevelData = {
 						attrs: {handle: 'heaterOne', wallInfo: 'firstWall', max: 1, liquidHandle: 'liq1'}
 					},
 					{type: 'Liquid',
-						attrs: {wallInfo: 'firstWall', handle: 'liq1', tempInit: 300, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}
+						attrs: {wallInfo: 'firstWall', handle: 'liq1', tempInit: 350, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}
 					}
 				],
 				dataReadouts: [
 					{label: 'Temperature: ', expr: 'tempSmooth("firstWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
 					{label: 'Liquid Temp: ', expr: 'tempSmooth("liquidLiq1")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
-					{label: 'Pressure: ', expr: 'pExt("firstWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'}
+					// {label: 'Pressure: ', expr: 'pExt("firstWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'}
 				],
 			},
 			prompts:[ 
 						{//Prompt 0
 							sceneData: undefined,
-							text: " Above is a constant pressure system containing 1 mole of species A in the liquid phase at 300 K.  Heat the system until it reaches 450 K and all of species A is vaporized.",
+							text: " Above is a constant pressure system containing 1 mole of species A in the liquid phase at 350 K.  Heat the system until it reaches 450 K and all of species A is vaporized.",
+						},
+						{
+							sceneData: undefined,
+							cutScene: true,
+							text: '<p>The liquid in the process vaporized at 450 K. Using the Antoine Equation calculate the pressure at which the process took place.',
+							quiz: [
+								{
+									type: 'textSmall',
+									preText: 'The Antoine coefficients are: ##A = 5.64, B = 1030.1, C = 0.25##',
+									text: '',
+									units: 'bar',
+									storeAs: 'HypAns2'
+								}
+							]
 						},
 						{//Prompt 1
 							sceneData: undefined,
@@ -66,7 +80,7 @@ LevelData = {
 		{//Second Scene
 			sceneData: {//Scene1
 				walls: [
-					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'secondWall', border: {type: 'open'},},
+					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', vol: 0.395, handle: 'secondWall', border: {type: 'open', yMin: 40},},
 				],
 				dots: [
 					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 0, temp: 300, returnTo: 'secondWall', tag: 'secondWall'},
@@ -86,16 +100,120 @@ LevelData = {
 					{handle: 'hypoPath', label: 'hypPath', prefIdx: 1, isRadio: true,
 						buttons: [
 							{handle: 'iso', label: 'Isothermal', isDown:true, exprs: ['walls.secondWall.isothermalStop()']},
-							{handle: 'phaseChange', label: 'Phase Change', isDown: true, exprs: ['collide.enablephas']}//CHANGE EXPRESSION!!
+							{handle: 'phaseChange', label: 'Phase Change', isDown: true, exprs: ['collide.enablePhaseChange']}//CHANGE EXPRESSION!!
 						]
 					}
 				] 
 			},
 			prompts:[
 				{//Prompt 0
-							sceneData: undefined,
-							text: " Now we're going to carry out your hypothetical path.  Above is species A in the same initial state as the previous system. You can use the buttons to the right to set whether the system is isothermal and whether phase change occurs.<p> Take the first step in your hypothetical path. How does the enthalpy change compare to the value you calculated.   ",
+					sceneData: undefined,
+					text: " Now we're going to carry out your hypothetical path.  Above is species A in the same initial state as the previous system. You can use the buttons to the right to set whether the system is isothermal and whether phase change occurs.<p> Take the first step in your hypothetical path.",
+					quiz:[
+						{
+							type: 'text',
+							preText: 'How does the enthalpy change compare to the value you calculated?',
+							text: 'Type your answer here',
+							storeAs: 'HypAns3'
+						}
+					]
 				},
+				{//Prompt 1
+					sceneData: undefined,
+					text: '<p>Take the next step in your hypothetical path. If you are vaporizing, you may want to have the system be isothermal at this step to make sure the enthalpy of vaporization is equal to the tabulated value.',
+					quiz: [
+						{
+							type: 'text',
+							preText: 'How does the enthalpy change of this step compare to the value you calculated?',
+							storeAs: 'HypAns4',
+							text: 'Type your answer here'
+						}
+					]
+				},
+				{//Prompt 2
+					sceneData: undefined, 
+					text: '<p>Take the final step in your hypothetical path.',
+					quiz: [
+						{
+							type: 'text',
+							preText: 'How does the enthalpy change of this step compare to the value you calculated?',
+							storeAs: 'HypAns5',
+							text: 'Type your answer here'
+						}
+					]
+				},
+				{//Prompt 3
+					sceneData: undefined,
+					cutScene: true,
+					text: 'How does the experimental enthalpy of vaporization compare to the value you predicted? Can you explain any differences?',
+					quiz: [
+						{
+							type: 'text',
+							storeAs: 'HypAns6',
+							text: 'Type your answer here'
+						}
+					]
+				}
+			]
+		},
+		{//Third Scene
+			sceneData: {},
+			prompts: [
+				{//Prompt 0
+					sceneData: undefined,
+					cutScene: true,
+					text: "Now that we know the enthalpy of vaporization at 400 K is xxxx kJ, calculate the heat required for the real process. <p><br> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>25</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{vap}## (kJ/mol)</th></tr><tr><td>425</td><td>2</td></tr></table> </center></br></p>",
+				}
+			]
+		},
+		{//Fourth Scene
+			sceneData: {
+				walls: [
+					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'firstWall', vol: 0.395, border: {type: 'open', yMin: 40},},
+				],
+				dots: [
+					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 0, temp: 350, returnTo: 'firstWall', tag: 'firstWall'},
+				],
+				objs: [
+					{type: 'Piston',
+						attrs: {handle: 'Piston', wallInfo: 'firstWall', min:2, init: 3, max: 4}
+					},
+					{type: 'Heater',
+						attrs: {handle: 'heaterOne', wallInfo: 'firstWall', max: 1, liquidHandle: 'liq1'}
+					},
+					{type: 'Liquid',
+						attrs: {wallInfo: 'firstWall', handle: 'liq1', tempInit: 350, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}
+					}
+				],
+				dataReadouts: [
+					{label: 'Temperature: ', expr: 'tempSmooth("firstWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'Liquid Temp: ', expr: 'tempSmooth("liquidLiq1")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
+					{label: 'Pressure: ', expr: 'pExt("firstWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'}
+				],
+			},
+			prompts: [
+				{//Prompt 0
+					sceneData: undefined,
+					text: 'Let`s perform the process again. This time the enthalpy change of the process is displayed and graphed. As before heat the system from 300 K to 450 K.',
+					quiz: [
+						{
+							type: 'text',
+							preText: 'How does the enthalpy of the real process compare to that which you calculated?',
+							storeAs: 'HypAns7',
+							text: 'Type your answer here'
+						}
+					]
+				}
+			]
+		},
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
+					title: '',
+					text: 'You have completed the simulation.'
+				}
 			]
 		}
 	]

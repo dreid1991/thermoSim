@@ -113,27 +113,27 @@ LevelData = {
 				{//Prompt 2
 				sceneData: undefined,
 					cutScene: true,
-					text: "<center><table class= 'data'><tr><th>Species</th><th>##c_{v}##(J/mol-K)</th></tr><tr><td>A</td><td>2.5*R</td></tr><tr><td>B</td><td>3.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center> <p> Using this data, construct a hypothetical path that will allow you to calculate the enthalpy of reaction for the previous process.  Calculate the enthalpy change for each step in your hypothetical path and record the values on a separate sheet of paper. <p> The process is: <p> 1 mole A (500 K) ##\\rightarrow## 1 mole B (500 K)",
+					text: "<center><table class= 'data'><tr><th>Species</th><th>##c_{v}##(J/mol-K)</th></tr><tr><td>A</td><td>2.5*R</td></tr><tr><td>B</td><td>3.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center> <p> Using this data, construct a hypothetical path in three steps that will allow you to calculate the enthalpy of reaction for the previous process.  Calculate the enthalpy change for each step and record the values on a separate sheet of paper. <p> The process is: <p> 1 mole A (500 K) ##\\rightarrow## 1 mole B (500 K)",
 				},
 				{//Prompt 3
 				scendeData: undefined,
-					text: "<p>Write the enthalpy change of each of your steps here.",
+					text: "<p>Record the change in enthalpy for each of your steps here.",
 					cutScene: true,
 					quiz: [
 						{type: 'textSmall',
 						storeAs: 'step1',
 						units: 'kJ',
-						preText: 'Enthalpy change of step 1: ',
+						preText: 'Change in enthalpy of step 1: ',
 						text: ''},
 						{type: 'textSmall',
 						storeAs:'step2',
 						units: 'kJ',
-						preText: 'Enthalpy change of step 2: ',
+						preText: 'Change in enthalpy of step 2: ',
 						text: '',},
 						{type: 'textSmall',
 						storeAs: 'step3',
 						units: 'kJ',
-						preText: 'Enthalpy change of step 3: ',
+						preText: 'Change in enthalpy of step 3: ',
 						text: '',}
 					]
 				}
