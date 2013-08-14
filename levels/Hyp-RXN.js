@@ -108,7 +108,7 @@ LevelData = {
 				{//Prompt 1
 				sceneData: undefined,
 					cutScene: true,
-					text: "We can use hypothetical paths to calculate physical properties at states where data is unavailable. In this case, we don't have the enthalpy of reaction at 500 K, but we have the following data:<p> <center><table class= 'data'><tr><th>Species</th><th>##c_{v}##(J/mol-K)</th></tr><tr><td>A</td><td>2.5*R</td></tr><tr><td>B</td><td>3.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center>The enthalpy of reaction can be defined as the heat absorbed by a system undergoing a full conversion reaction at constant temperature and pressure.  For example, in a reaction of A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming one mole of A at constant temperature and pressure.  If the reaction were 2A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming two moles of A at constant temperature and pressure."
+					text: "We can use hypothetical paths to calculate physical properties at states where data is unavailable. In this case, we don't have the enthalpy of reaction at 500 K, but we have the following data:<p> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A</td><td>3.5*R</td></tr><tr><td>B</td><td>4.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center>The enthalpy of reaction can be defined as the heat absorbed by a system undergoing a full conversion reaction at constant temperature and pressure.  For example, in a reaction of A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming one mole of A at constant temperature and pressure.  If the reaction were 2A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming two moles of A at constant temperature and pressure."
 				},
 				{//Prompt 2
 				sceneData: undefined,
@@ -173,7 +173,7 @@ LevelData = {
 				],
 				dataReadouts: [
 					{label: 'Temperature: ', expr: 'tempSmooth("secondWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
-					{label: 'Change in Enthalpy: ', expr: '(enthalpy("secondWall") + 4126.37)/1000', units: 'kJ', decPlaces: 2, handle: 'H', readout: 'mainReadout'},
+					{label: 'Change in Enthalpy: ', expr: '(enthalpy("secondWall") + 4122)/1000', units: 'kJ', decPlaces: 2, handle: 'H', readout: 'mainReadout'},
 					{label: 'x-rxn: ', expr: 'frac("secondWall", {tag:"secondWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'liqTemp', readout: 'mainReadout'}
 				],
 				objs: [
@@ -186,9 +186,9 @@ LevelData = {
 					}
 				],
 				graphs: [
-							{type: 'Scatter', handle: 'EnthalpyFracVsTemp', xLabel: "Extent of rxn", yLabel: "Enthalpy", axesInit:{y:{min:110, step:10},x:{min:0, step:0.2}}, numGridLines: {x:6}, axesFixed:{x: true},
+							{type: 'Scatter', handle: 'EnthalpyFracVsTemp', xLabel: "Extent of rxn", yLabel: "Enthalpy", axesInit:{y:{min:-9, step:3},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 6}, axesFixed:{x: true, y: true},
 								sets: [
-									{handle: 'moleFrac', label:'mole\nFrac', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '(enthalpy("secondWall") + 11500) / 1000',x: 'frac("secondWall",{spcName:"spc2",tag: "secondWall"})'},trace: true, fillInPts: true, fillInPtsMin: 5}
+									{handle: 'moleFrac', label:'mole\nFrac', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '(enthalpy("secondWall") + 4122) / 1000',x: 'frac("secondWall",{spcName:"spc2",tag: "secondWall"})'},trace: true, fillInPts: true, fillInPtsMin: 5}
 								]
 							},
 							{type: 'Scatter', handle: 'convVsTemp', xLabel: "Extent of rxn", yLabel: "Temperature", axesInit:{y:{min:200, step:80},x:{min:0, step:0.2}}, numGridLines: {x:6}, axesFixed:{x: true},
@@ -202,7 +202,7 @@ LevelData = {
 				{//Prompt 0
 				sceneData: {
 						triggers:[
-							{handle: 'hypPath1', expr: 'fracDiff(temp("secondWall"),298)<.01', message:"What should the temperature be at the end of your first step?"}
+							// {handle: 'hypPath1', expr: 'fracDiff(temp("secondWall"),298)<.01', message:"What should the temperature be at the end of your first step?"}
 						]
 					},
 					text:"Now we're going to carry out the hypothetical path.  Above is species A in the same initial state as the previous system.  You can use the buttons to the right to set whether the system is isothermal and whether the reaction occurs.  For this hypothetical process, the activation energy has been lowered so the reaction proceeds at 298 K and the reverse reaction has been disabled. <p> Take the first step in the hypothetical path. How does the enthalpy change compare to the value you calculated?",
@@ -216,7 +216,7 @@ LevelData = {
 				{//Prompt 1
 				sceneData: {
 					triggers:[
-						{handle:'hypPath2', expr: 'frac("secondWall", {tag:"secondWall", spcName:"spc2"})==1', message: "What should the extent of reaction be after the second step in your hypothetical path?", priority: 1}
+						// {handle:'hypPath2', expr: 'frac("secondWall", {tag:"secondWall", spcName:"spc2"})==1', message: "What should the extent of reaction be after the second step in your hypothetical path?", priority: 1}
 					]
 				},
 					text: "Take the next step in the hypothetical path.  How does the enthalpy change of this step compare to the value you calculated?   <p>If you are reacting, you will want to have the system be isothermal at this step to make sure the enthalpy of reaction is equal to the tabulated value.",
@@ -230,7 +230,7 @@ LevelData = {
 				{//Prompt 2
 				sceneData: {
 					triggers: [
-					{handle: 'hypPath1', expr: 'fracDiff(temp("secondWall"),500)<.01', message:"What should the temperature be at the end of your hypothetical path?"}
+					// {handle: 'hypPath1', expr: 'fracDiff(temp("secondWall"),500)<.01', message:"What should the temperature be at the end of your hypothetical path?"}
 					]
 				},
 					text: "Take the final step in the hypothetical path. Input the enthalpy change.",
@@ -291,7 +291,7 @@ LevelData = {
 				{//Prompt 0
 					sceneData:{
 						triggers: [
-								{handle: 'lastReaction', expr: 'frac("thirdWall", {tag:"thirdWall", spcName:"spc2"})>0.5', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 
+								// {handle: 'lastReaction', expr: 'frac("thirdWall", {tag:"thirdWall", spcName:"spc2"})>0.5', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 
 							]
 					},
 						cutscene: true,

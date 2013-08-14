@@ -230,6 +230,7 @@ LevelData = {
 					{label: 'Temperature: ', expr: 'tempSmooth("thirdWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
 					{label: 'Liquid Temp: ', expr: 'tempSmooth("liquidLiq1")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
 					{label: 'Pressure: ', expr: 'pExt("thirdWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'},
+					// {label: 'q: ', expr: 'q("thirdWall")', units: 'kJ', decPlaces: 1, handle: 'qwer', readout: 'mainReadout'},
 					{label: 'H: ', expr: '((enthalpy("thirdWall") + 11341)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 350)*25*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000)) / 1000 || (temp("liquidLiq1") - 350)*25*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000) / 1000', units: 'kJ', decPlaces: 1, handle: 'h', readout: 'mainReadout'},
 				],
 				dataRecord: [
