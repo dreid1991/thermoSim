@@ -14,7 +14,7 @@ LevelData = {
 				{//Prompt 0
 				sceneData: undefined,
 							cutScene: true,
-							text:" The use of hypothetical paths relies upon state functions. Identify the distinguishing characteristic that makes something a state function.<p>",
+							text:" <p>Today we're going to examine hypothetical paths and how they can be used to determine unknown thermodynamic process values.</p><p>The use of hypothetical paths is entirely dependent on state functions. Please identify here what you believe are the distinguishing characteristics that make a thermodynamic property a state function.</p>",
 							quiz:[
 									{type: 'text',
 									storeAs:'HypAns',
@@ -35,15 +35,14 @@ LevelData = {
 						]
 					},
 					cutScene: true,
-					text: "Over spring break Dr. Koretsky hiked up Eagle's Peak near San Francisco. The two routes he could take are seen to the right. How would the amounts of work required to complete the two routes compare? How would the potential energy change compare?<p>",
+					text: "Over spring break Dr. Koretsky hiked up Eagle's Peak near San Francisco. The two routes he could take are seen to the right. How would the amounts of work required to complete the two routes compare? How would the potential energy change compare? Which of these two things, work or potential energy, is independent of path?<p>",
 					quiz:[
 									{type: 'text',
 									storeAs:'2ndans',
 									text: 'Type your answer here.'
 									}
 						]
-				}
-				
+				},
 			]
 								
 		},
@@ -72,7 +71,9 @@ LevelData = {
 					{wallInfo: 'firstWall', data: 'Q'}
 				],
 				dataReadouts: [
-					{label: 'x-rxn: ', expr: 'frac("firstWall", {tag:"firstWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'extrxn', readout: 'mainReadout'}
+					{label: 'Extent of reaction: ', expr: 'frac("firstWall", {tag:"firstWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'extrxn', readout: 'mainReadout'},
+					{label: 'Heat: ', expr: 'q("firstWall")', units: 'kJ', decPlaces: 2, handle: 'hRxn', readout: 'mainReadout'},
+					{label: 'Pressure: ', expr: 'pInt("firstWall")', units: 'bars', decPlaces: 2, handle: 'pInt', readout: 'mainReadout'}
 				],
 				objs: [
 					{type: 'QArrowsAmmt',
@@ -96,7 +97,7 @@ LevelData = {
 						]
 					},
 					cutScene: false,
-					text: "The isothermal system above contains 1 mole of A and is held at 500 K.  The red colored species A  can reversibly react to form the green species B.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  What is the sign of the enthalpy of reaction? Explain.",
+					text: "The isothermal system above is held at 500 K and contains 1 mole of A.  The red colored species A  can reversibly react to form the green species B.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  What is the sign of the enthalpy of reaction? Explain.",
 					quiz:[
 							{type: 'text',
 							storeAs:'realProcess',
@@ -107,12 +108,34 @@ LevelData = {
 				{//Prompt 1
 				sceneData: undefined,
 					cutScene: true,
-					text: "We can use hypothetical paths to calculate physical properties at states where data is unavailable.  In this case, we don't have the enthalpy of reaction at 500 K, but we have the following data:<p> <center><table class= 'data'><tr><th>Species</th><th>##c_{v}##(J/mol-K)</th></tr><tr><td>A</td><td>2.5*R</td></tr><tr><td>B</td><td>3.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center>An enthalpy of reaction is the energy change/released for the reaction going to full conversion at constant pressure.  For example, in a reaction of A##\\rightarrow##B, the enthalpy of reaction would describe the heat released after consuming one mole of A at constant pressure.  If the reaction were 2A##\\rightarrow##B, the enthalpy of reaction would describe the heat released after consuming two moles of A at constant pressure."
+					text: "We can use hypothetical paths to calculate physical properties at states where data is unavailable. In this case, we don't have the enthalpy of reaction at 500 K, but we have the following data:<p> <center><table class= 'data'><tr><th>Species</th><th>##c_{v}##(J/mol-K)</th></tr><tr><td>A</td><td>2.5*R</td></tr><tr><td>B</td><td>3.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center>The enthalpy of reaction can be defined as the heat absorbed by a system undergoing a full conversion reaction at constant temperature and pressure.  For example, in a reaction of A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming one mole of A at constant temperature and pressure.  If the reaction were 2A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming two moles of A at constant temperature and pressure."
 				},
 				{//Prompt 2
 				sceneData: undefined,
 					cutScene: true,
-					text: "<center><table class= 'data'><tr><th>Species</th><th>##c_{v}##(J/mol-K)</th></tr><tr><td>A</td><td>2.5*R</td></tr><tr><td>B</td><td>3.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center> <p> Using this data, construct a hypothetical path that will allow you to calculate the enthalpy of reaction for the previous process.  Calculate the enthalpy change for each step in your hypothetical path and record the values on a separate sheet of paper. <p> the process is: <p> 1 mole A (500 K)##\\rightarrow## 1 mole B (500 K)"
+					text: "<center><table class= 'data'><tr><th>Species</th><th>##c_{v}##(J/mol-K)</th></tr><tr><td>A</td><td>2.5*R</td></tr><tr><td>B</td><td>3.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center> <p> Using this data, construct a hypothetical path in three steps that will allow you to calculate the enthalpy of reaction for the previous process.  Calculate the enthalpy change for each step and record the values on a separate sheet of paper. <p> The process is: <p> 1 mole A (500 K) ##\\rightarrow## 1 mole B (500 K)",
+				},
+				{//Prompt 3
+				scendeData: undefined,
+					text: "<p>Record the change in enthalpy for each of your steps here.",
+					cutScene: true,
+					quiz: [
+						{type: 'textSmall',
+						storeAs: 'step1',
+						units: 'kJ',
+						preText: 'Change in enthalpy of step 1: ',
+						text: ''},
+						{type: 'textSmall',
+						storeAs:'step2',
+						units: 'kJ',
+						preText: 'Change in enthalpy of step 2: ',
+						text: '',},
+						{type: 'textSmall',
+						storeAs: 'step3',
+						units: 'kJ',
+						preText: 'Change in enthalpy of step 3: ',
+						text: '',}
+					]
 				}
 			]
 		},
@@ -150,6 +173,7 @@ LevelData = {
 				],
 				dataReadouts: [
 					{label: 'Temperature: ', expr: 'tempSmooth("secondWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'Change in Enthalpy: ', expr: 'enthalpy("secondWall") + 4126.37', units: 'kJ', decPlaces: 2, handle: 'H', readout: 'mainReadout'},
 					{label: 'x-rxn: ', expr: 'frac("secondWall", {tag:"secondWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'liqTemp', readout: 'mainReadout'}
 				],
 				objs: [
@@ -181,7 +205,7 @@ LevelData = {
 							{handle: 'hypPath1', expr: 'fracDiff(temp("secondWall"),298)<.01', message:"What should the temperature be at the end of your first step?"}
 						]
 					},
-					text:"Now we're going to carry out your hypothetical path.  Above is species A in the same initial state as the previous system.  You can use the buttons to the right to set whether the system is isothermal and whether the reaction occurs.  For this hypothetical process, the activation energy has been lowered so the reaction proceeds at 298 K and the reverse reaction has been disabled. <p> Take the first step in your hypothetical path. How does the enthalpy change compare to the value you calculated?",
+					text:"Now we're going to carry out the hypothetical path.  Above is species A in the same initial state as the previous system.  You can use the buttons to the right to set whether the system is isothermal and whether the reaction occurs.  For this hypothetical process, the activation energy has been lowered so the reaction proceeds at 298 K and the reverse reaction has been disabled. <p> Take the first step in the hypothetical path. How does the enthalpy change compare to the value you calculated?",
 					quiz: [
 						{type: 'text',
 						storeAs: 'hypAns1',
@@ -195,7 +219,7 @@ LevelData = {
 						{handle:'hypPath2', expr: 'frac("secondWall", {tag:"secondWall", spcName:"spc2"})==1', message: "What should the extent of reaction be after the second step in your hypothetical path?", priority: 1}
 					]
 				},
-					text: "Take the next step in your hypothetical path.  How does the enthalpy change of this step compare to the value you calculated?   <p>If you are reacting, you may want to have the system be isothermal at this step to make sure the enthalpy of reaction is equal to the tabulated value.",
+					text: "Take the next step in the hypothetical path.  How does the enthalpy change of this step compare to the value you calculated?   <p>If you are reacting, you will want to have the system be isothermal at this step to make sure the enthalpy of reaction is equal to the tabulated value.",
 					quiz: [
 						{type: 'text',
 						storeAs: 'hypAns2',
@@ -209,7 +233,7 @@ LevelData = {
 					{handle: 'hypPath1', expr: 'fracDiff(temp("secondWall"),500)<.01', message:"What should the temperature be at the end of your hypothetical path?"}
 					]
 				},
-					text: "Take the final step in your hypothetical path. Input the enthalpy change.",
+					text: "Take the final step in the hypothetical path. Input the enthalpy change.",
 					quiz:[
 						{type: 'text',
 						storeAs: 'hypAns3',
@@ -255,7 +279,7 @@ LevelData = {
 					{wallInfo: 'thirdWall', data: 'Q'}
 				],
 				dataReadouts: [
-					{label: 'x-rxn: ', expr: 'frac("thirdWall", {tag:"thirdWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'extrxn', readout: 'mainReadout'}
+					{label: 'Extent of reaction: ', expr: 'frac("thirdWall", {tag:"thirdWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'extrxn', readout: 'mainReadout'}
 				],
 				objs: [
 					{type: 'QArrowsAmmt',

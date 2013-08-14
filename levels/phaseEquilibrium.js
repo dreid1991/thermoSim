@@ -7,7 +7,7 @@ LevelData = {
 		//add antoine coefs, cvLiq, hvap
 		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
 		{spcName: 'spc2', m: 4, r: 2, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
-		{spcName: 'spc3', m: 4, r: 1, col: Col(27, 181, 224), cv: 3.37 * R, hF298: -260, hVap298: 40.6, antoineCoeffs: {a: 8.07, b:1730.6, c:233.426-273.15}, cpLiq: 75.34, spcVolLiq: 1},
+		{spcName: 'spc3', m: 4, r: 2, col: Col(27, 181, 224), cv: 3.37 * R, hF298: -260, hVap298: 40.6, antoineCoeffs: {a: 8.07, b:1730.6, c:233.426-273.15}, cpLiq: 75.34, spcVolLiq: 1},
 		{spcName: 'spc4', m: 4, r: 1, col: Col(115, 250, 98), cv: 2.5 * R, hF298: -260, hVap298: 40.6, antoineCoeffs: {a: 8.14, b:1810.94, c:244.485-273.15}, cpLiq: 75.34, spcVolLiq: 1}
 	],	
 
@@ -102,15 +102,15 @@ LevelData = {
 					{label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
 				],
 				triggers: [
-					{handle: 'trigger1', expr: 'curLevel.liquidWater.temp > 371', message: 'Heat the liquid', priority: 1, checkOn: 'conditions', requiredFor: 'prompt1'},
-					{handle: 'freeze1', expr: 'curLevel.liquidWater.temp >= 371', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(373)'], requiredFor: 'prompt1'},
-					{handle: 'trigger2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length <= 200', message: 'Vaporize the liquid', checkOn: 'conditions', requiredFor: 'prompt2'},
-					{handle: 'freeze2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length <= 200', satisfyCmmds: ['curLevel.heaterHeater1.disable()'], requiredFor: 'prompt2'},
+					{handle: 'trigger1', expr: 'curLevel.liquidWater.temp > 371', message: 'Heat the liquid', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
+					{handle: 'freeze1', expr: 'curLevel.liquidWater.temp >= 371', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(373)'], requiredFor: 'prompt2'},
+					{handle: 'trigger2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length <= 200 || !curLevel.heaterHeater1.enabled', message: 'Vaporize the liquid', checkOn: 'conditions', requiredFor: 'prompt4'},
+					{handle: 'freeze2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length <= 200', satisfyCmmds: ['curLevel.heaterHeater1.disable()'], requiredFor: 'prompt4'},
 					// {handle: 'unfreeze2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length > 200', satisfyCmmds: ['curLevel.heaterHeater1.enable()'], requiredFor: 'prompt2'},
-					{handle: 'trigger3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length < 10', message: 'Fully vaporize the liquid', checkOn: 'conditions', requiredFor: 'prompt5'},
-					{handle: 'freeze3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(374)'], requiredFor: 'prompt5'},
-					{handle: 'trigger4', expr: 'temp("wallo") >= 405', message: 'Heat the vapor', requiredFor: 'prompt8', checkOn: 'conditions'},
-					{handle: 'freeze4', expr: 'temp("wallo") > 423 && curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', requiredFor: 'prompt8', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(423)']},
+					{handle: 'trigger3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length < 10', message: 'Fully vaporize the liquid', checkOn: 'conditions', requiredFor: 'prompt8'},
+					{handle: 'freeze3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(374)'], requiredFor: 'prompt8'},
+					{handle: 'trigger4', expr: 'temp("wallo") >= 405', message: 'Heat the vapor', requiredFor: 'prompt11', checkOn: 'conditions'},
+					{handle: 'freeze4', expr: 'temp("wallo") > 423 && curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', requiredFor: 'prompt11', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(423)']},
 					
 				]
 			},
@@ -132,16 +132,11 @@ LevelData = {
 					title: 'Current Step'		
 				},
 				{//prompt1
-					sceneData: {
-						cmmds: [
-							'curLevel.heaterHeater1.enable()',
-							'curLevel.liquidWater.disablePhaseChange()'
-						]
-					},
+					sceneData: undefined,
 					quiz: [
 						{
 							type: 'textSmall',
-							preText:'The system contains 0.4 moles of liquid water molecules. Determine the energy you have to add to the system in order to reach a saturated liquid state. Heat the system by this amount',
+							preText:'The system contains 0.4 moles of liquid water molecules. Determine the energy you have to add to the system in order to reach a saturated liquid state.',
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans2'
@@ -152,21 +147,34 @@ LevelData = {
 					sceneData: {
 						cmmds: [
 							'curLevel.heaterHeater1.enable()',
-							'curLevel.liquidWater.enablePhaseChange()',
-							'walls["wallo"].isothermalStop()'
+							'curLevel.liquidWater.disablePhaseChange()'
 						]
 					},
+					text: 'Heat the system until it reaches the saturated liquid state. Compare the energy required to what you calculated.'
+				},
+				{//prompt3
+					sceneData: undefined,
 					quiz: [
 						{
 							type: 'textSmall',
-							preText:'<p>Determine the energy required to vaporize half the liquid. Heat the system by this amount.</p><p>The enthalpy of vaporization for water is 40.68 kJ/mol</p>',
+							preText:'<p>Determine the energy required to vaporize half the liquid. The enthalpy of vaporization for water is 40.68 kJ/mol</p>',
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans3'
 						}
 					],
 				},
-				{//prompt3
+				{//prompt4
+					sceneData: {
+						cmmds: [
+							'curLevel.heaterHeater1.enable()',
+							'curLevel.liquidWater.enablePhaseChange()',
+							'walls["wallo"].isothermalStop()'
+						]
+					},
+					text: 'Vaporize half the liquid. Compare the energy required to what you calculated.'
+				},
+				{//prompt5
 					sceneData: undefined,
 					quiz: [
 						{
@@ -177,7 +185,7 @@ LevelData = {
 						}
 					],
 				},
-				{//prompt4
+				{//prompt6
 					sceneData: undefined,
 					quiz: [
 						{
@@ -188,23 +196,27 @@ LevelData = {
 						}
 					],
 				},	
-				{//prompt5
-					sceneData: {
-						cmmds: [
-							'curLevel.heaterHeater1.enable()'
-						]
-					},
+				{//prompt7
+					sceneData: undefined,
 					quiz: [
 						{
 							type: 'textSmall',
-							preText: 'Determine the energy required to fully bring the system to the saturated vapor state. Heat the system by this amount.',
+							preText: 'Determine the energy required to fully bring the system to the saturated vapor state.',
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans6',
 						}
 					],
 				},
-				{//prompt6
+				{//prompt8
+					sceneData: {
+						cmmds: [
+							'curLevel.heaterHeater1.enable()'
+						]
+					},
+					text: 'Fully vaporize the liquid. Compare the energy required to what you calculated.'
+				},
+				{//prompt9
 					sceneData: undefined,
 					quiz: [
 						{
@@ -215,7 +227,7 @@ LevelData = {
 						}
 					],
 				},
-				{//prompt7
+				{//prompt10
 					sceneData: undefined,
 					quiz: [
 						{
@@ -227,7 +239,7 @@ LevelData = {
 						}
 					],
 				},
-				{//prompt8
+				{//prompt11
 					sceneData: {
 						cmmds: [
 							'curLevel.heaterHeater1.enable()',
@@ -286,7 +298,7 @@ LevelData = {
 					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 423.15, handle: 'wallo', vol: 13.5, isothermalRate: 4, border: {type: 'open', width: 10, yMin: 40} },
 				],
 				dots: [
-					{spcName: 'spc3', pos: P(45,100), dims: V(465,240), count: 2000, temp:423.15, returnTo: 'wallo', tag: 'wallo'}, //count 396
+					{spcName: 'spc3', pos: P(45,100), dims: V(465,240), count: 396, temp:423.15, returnTo: 'wallo', tag: 'wallo'}, //count 396
 				],	
 				objs: [
 					{
