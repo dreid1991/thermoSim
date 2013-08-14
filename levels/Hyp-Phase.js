@@ -80,7 +80,7 @@ LevelData = {
 						{//Prompt 1
 							sceneData: undefined,
 							cutScene: true,
-							text: "We wish to calculate the change in enthalpy for the previous process, but only have the following: <p><br> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>25</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>2</td></tr></table> </center></br></p> The heat capacities can assumed to be constant over process's temperature range.   The enthalpy of vaporization can be assumed to be constant with respect to pressure. <p>Construct a hypothetical path that will allow you to calculate the change in system enthalpy of the previous process.  Calculate the enthalpy change for each step in your hypothetical path and record the values on a separate sheet of paper. </p> The process is: 1 mole A (liq) 400 K##\\rightarrow## 1 mole A (gas) 400 K "
+							text: "We wish to calculate the change in enthalpy for the previous process, but only have the following: <p><br> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>25</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>2</td></tr></table> </center></br></p> The heat capacities can assumed to be constant over the entire temperature range of the process.   The enthalpy of vaporization can be assumed to be constant with respect to pressure. <p>Construct a hypothetical path that will allow you to calculate the change in system enthalpy of the previous process.  Calculate the enthalpy change for each step in your hypothetical path and record the values on a separate sheet of paper. </p> The process is: 1 mole A (liq) 400 K##\\rightarrow## 1 mole A (gas) 400 K "
 						}
 					]
 						
@@ -106,10 +106,16 @@ LevelData = {
 					}
 				],
 				buttonGroups: [
-					{handle: 'hypoPath', label: 'hypPath', prefIdx: 1, isRadio: true,
+					{handle: 'Phase', label: 'Phase', prefIdx: 1, isRadio: true,
 						buttons: [
-							{handle: 'iso', label: 'Heating', isDown:true, exprs: ['walls.secondWall.isothermalStop()', 'curLevel.liquidLiq1.disablePhaseChange()']},
-							{handle: 'phaseChange', label: 'Phase Change', isDown: false, exprs: ['curLevel.liquidLiq1.enablePhaseChange()', 'walls.secondWall.isothermalInit(curLevel.liquidLiq1.temp)']}//CHANGE EXPRESSION!!
+							{handle: 'enablePhase', label: 'Enable Phase Change', isDown: false, exprs: ['curLevel.liquidLiq1.enablePhaseChange()']},
+							{handle: 'disablePhase', label: 'Disable Phase Change', isDown: true, exprs: ['curLevel.liquidLiq1.disablePhaseChange()']}//CHANGE EXPRESSION!!
+						]
+					},
+					{handle: 'Heat', label: 'Heat', prefIdx: 1, isRadio: true,
+						buttons: [
+							{handle: 'iso', label: 'Isothermal', isDown: true, exprs: ['walls.secondWall.isothermalInit(curLevel.liquidLiq1.temp || temp("secondWall"))']},
+							{handle: 'adiabatic', label: 'Adiabatic', isDown: false, exprs: ['walls.secondWall.isothermalStop()']}//CHANGE EXPRESSION!!
 						]
 					}
 				],
@@ -125,7 +131,7 @@ LevelData = {
 				],
 				graphs: [
 					{
-						type: 'Scatter', handle: 'EnthalpyVsFracGas', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Enthalpy', axesInit:{y:{min:0, step:4},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 5}, axesFixed:{x: true, y: true},
+						type: 'Scatter', handle: 'EnthalpyVsFracGas', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Enthalpy', axesInit:{y:{min:0, step:2},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 5}, axesFixed:{x: true, y: true},
 							sets: [
 								{handle: 'fracVH', label: 'frac\nGas', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '((enthalpy("secondWall") + 10090)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 400)*25*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000)) / 1000 || (temp("liquidLiq1") - 400)*25*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000) / 1000 ', x: 'dotManager.lists.ALLDOTS.length/(dotManager.lists.ALLDOTS.length + curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length)'},trace: true, fillInPts: true, fillInPtsMin: 5}
 							]
@@ -189,7 +195,7 @@ LevelData = {
 				{//Prompt 0
 					sceneData: undefined,
 					cutScene: true,
-					text: "Now that we know the enthalpy of vaporization at 400 K is xxxx kJ, calculate the heat required for the real process. <p><br> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>25</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{vap}## (kJ/mol)</th></tr><tr><td>425</td><td>2</td></tr></table> </center></br></p>",
+					text: "Now that we know the enthalpy of vaporization at 400 K is 2.2 kJ, calculate the heat required for the real process. <p><br> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>25</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>2.0</td></tr></table> </center></br></p>",
 					quiz: [
 						{
 							type: 'textSmall',
@@ -204,27 +210,40 @@ LevelData = {
 		{//Fourth Scene
 			sceneData: {
 				walls: [
-					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'firstWall', vol: 0.89, border: {type: 'open', yMin: 40},},
+					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'thirdWall', vol: 0.89, border: {type: 'open', yMin: 40},},
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 0, temp: 350, returnTo: 'firstWall', tag: 'firstWall'},
+					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 0, temp: 350, returnTo: 'thirdWall', tag: 'thirdWall'},
 				],
 				objs: [
 					{type: 'Piston',
-						attrs: {handle: 'Piston', wallInfo: 'firstWall', min:2, init: 3, max: 4}
+						attrs: {handle: 'Piston', wallInfo: 'thirdWall', min:2, init: 3, max: 4}
 					},
 					{type: 'Heater',
-						attrs: {handle: 'heaterOne', wallInfo: 'firstWall', max: 1, liquidHandle: 'liq1'}
+						attrs: {handle: 'heaterOne', wallInfo: 'thirdWall', max: 1, liquidHandle: 'liq1'}
 					},
 					{type: 'Liquid',
-						attrs: {wallInfo: 'firstWall', handle: 'liq1', tempInit: 350, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}
+						attrs: {wallInfo: 'thirdWall', handle: 'liq1', tempInit: 350, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}
 					}
 				],
 				dataReadouts: [
-					{label: 'Temperature: ', expr: 'tempSmooth("firstWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'Temperature: ', expr: 'tempSmooth("thirdWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
 					{label: 'Liquid Temp: ', expr: 'tempSmooth("liquidLiq1")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
-					{label: 'Pressure: ', expr: 'pExt("firstWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'}
+					{label: 'Pressure: ', expr: 'pExt("thirdWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'},
+					{label: 'H: ', expr: '((enthalpy("thirdWall") + 11341)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 350)*25*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000)) / 1000 || (temp("liquidLiq1") - 350)*25*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000) / 1000', units: 'kJ', decPlaces: 1, handle: 'h', readout: 'mainReadout'},
 				],
+				dataRecord: [
+					{wallInfo: 'thirdWall', data: 'enthalpy'},
+					{wallInfo: 'liquidLiq1', data : 'enthalpy'},
+				],	
+				graphs: [
+					{
+						type: 'Scatter', handle: 'EnthalpyVsFracGas', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Enthalpy', axesInit:{y:{min:0, step:2},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 5}, axesFixed:{x: true, y: true},
+							sets: [
+								{handle: 'fracVH', label: 'frac\nGas', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '((enthalpy("thirdWall") + 11341)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 350)*25*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000)) / 1000 || (temp("liquidLiq1") - 350)*25*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000) / 1000 ', x: 'dotManager.lists.ALLDOTS.length/(dotManager.lists.ALLDOTS.length + curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length)'},trace: true, fillInPts: true, fillInPtsMin: 5}
+							]
+					}
+				]
 			},
 			prompts: [
 				{//Prompt 0
