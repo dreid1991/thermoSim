@@ -30,7 +30,7 @@ LevelData = {
 					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'firstWall', vol: 0.89, border: {type: 'open', yMin: 40},},
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 0, temp: 298, returnTo: 'firstWall', tag: 'firstWall'},
+					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 0, temp: 350, returnTo: 'firstWall', tag: 'firstWall'},
 				],
 				objs: [
 					{type: 'Piston',
@@ -40,7 +40,7 @@ LevelData = {
 						attrs: {handle: 'heaterOne', wallInfo: 'firstWall', max: 1, liquidHandle: 'liq1'}
 					},
 					{type: 'Liquid',
-						attrs: {wallInfo: 'firstWall', handle: 'liq1', tempInit: 298, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}
+						attrs: {wallInfo: 'firstWall', handle: 'liq1', tempInit: 350, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}
 					}
 				],
 				dataReadouts: [
@@ -52,7 +52,7 @@ LevelData = {
 			prompts:[ 
 						{//Prompt 0
 							sceneData: undefined,
-							text: " Above is a constant pressure system containing 1 mole of species A in the liquid phase at 298 K.  Heat the system until it reaches 450 K and all of species A is vaporized.",
+							text: " Above is a constant pressure system containing 1 mole of species A in the liquid phase at 350 K.  Heat the system until it reaches 450 K and all of species A is vaporized.",
 							quiz: [
 								{
 									type: 'textSmall',
@@ -66,7 +66,7 @@ LevelData = {
 						{
 							sceneData: undefined,
 							cutScene: true,
-							text: '<p>The liquid in the process vaporized at 450 K. Using the Antoine Equation calculate the pressure at which the process took place.',
+							text: '<p>The liquid in the process vaporized at 400 K. Using the Antoine Equation calculate the pressure at which the process took place.',
 							quiz: [
 								{
 									type: 'textSmall',
