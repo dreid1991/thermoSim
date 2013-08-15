@@ -48,6 +48,10 @@ LevelData = {
 					{label: 'Liquid Temp: ', expr: 'tempSmooth("liquidLiq1")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
 					// {label: 'Pressure: ', expr: 'pExt("firstWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'}
 				],
+				triggers: [
+					// {handle: 'trigger1', expr: 'fracDiff(temp("firstWall"), 450) < 0.05', message: 'Heat the system to 450 K', checkOn: 'conditions', requiredFor: 'prompt0'},
+					// {handle: 'freeze1', expr: 'temp("firstWall") >= 450 && dotManager.lists.ALLDOTS.length == 1000', satisfyCmmds: ['curLevel.heaterHeaterOne.disable()', 'walls.firstWall.isothermalInit(450)']}
+				]
 			},
 			prompts:[ 
 						{//Prompt 0
@@ -129,6 +133,13 @@ LevelData = {
 					{wallInfo: 'secondWall', data: 'enthalpy'},
 					{wallInfo: 'liquidLiq1', data : 'enthalpy'}
 				],
+				triggers: [
+					{handle: 'path0', expr: 'curLevel.liquidLiq1.temp > 448', message: 'What should the temperature be at the end of the first step?', checkOn: 'conditions', requiredFor: 'prompt0'},
+					{handle: 'path1', expr: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length < 10', message: 'What state should species A be at the end of the second step?', checkOn: 'conditions', requiredFor: 'prompt1'},
+					{handle: 'pathFreeze0', expr: 'curLevel.liquidLiq1.temp >= 450', satisfyCmmds: ['curLevel.heaterHeaterOne.disable()', '$("button")[3].click()'], requiredFor: 'prompt0'},
+					{handle: 'pathFreeze1', expr: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['$("button")[2].click()', 'curLevel.heaterHeaterOne.disable()'], requiredFor: 'prompt1'},
+					// {handle: 'noAdiabatic', expr: '!walls.secondWall.isothermal', message: 'Are you sure you want to make the system adiabatic?', satisfyCmmds: ['$("button")[3].click()'], requiredFor: 'prompt1'}
+				],
 				graphs: [
 					{
 						type: 'Scatter', handle: 'EnthalpyVsFracGas', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Enthalpy', axesInit:{y:{min:0, step:2},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 5}, axesFixed:{x: true, y: true},
@@ -152,7 +163,13 @@ LevelData = {
 					]
 				},
 				{//Prompt 1
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'curLevel.heaterHeaterOne.enable()',
+							'$("button")[3].click()',
+							'$($("button")[4]).hide()'
+						],
+					},
 					text: '<p>Take the next step in your hypothetical path. If you are vaporizing, you may want to have the system be isothermal at this step to make sure the enthalpy of vaporization is equal to the tabulated value.',
 					quiz: [
 						{
@@ -164,7 +181,13 @@ LevelData = {
 					]
 				},
 				{//Prompt 2
-					sceneData: undefined, 
+					sceneData: {
+						cmmds: [
+							'curLevel.heaterHeaterOne.enable()',
+							'$($("button")[1]).hide()',
+							'$($("button")[4]).show()'
+						]
+					},
 					text: '<p>Take the final step in your hypothetical path.',
 					quiz: [
 						{
