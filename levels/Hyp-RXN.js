@@ -4,7 +4,7 @@ LevelData = {
 	spcDefs: [
 		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 30,sF298: 15, antoineCoeffs: {a: 8.07, b:1730.6, c: 233.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
 		{spcName: 'spc2', m: 4, r: 2, col: Col(0, 200, 0), cv: 3.5 * R, hF298: -12, hVap298: 10, sF298: 15, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 4.5* R, spcVolLiq: .3},
-		{spcName: 'spc3', m: 3, r: 1, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10,sF298: 15, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3}
+		{spcName: 'spc3', m: 4, r: 2, col: Col(0, 200, 0), cv: 3.5 * R, hF298: -15, hVap298: 10,sF298: 15, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 4.5* R, spcVolLiq: .3}
 	],
 	mainSequence: [
 		{//First Scene
@@ -55,8 +55,8 @@ LevelData = {
 					{spcName: 'spc1', pos: P(55, 50), dims: V(400,300), count: 1000, temp: 500, returnTo: 'firstWall', tag: 'firstWall'},
 				],
 				rxns: [
-					{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: 5, prods: {spc2:2}},
-					{handle: 'rxn2', rctA: 'spc2', rctB: 'spc2', activeE: 6, prods: {spc1:2}}
+					{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: 5, prods: {spc3:2}},
+					{handle: 'rxn2', rctA: 'spc3', rctB: 'spc3', activeE: 6, prods: {spc1:2}}
 				],
 				buttonGroups: [
 					{handle: 'hypoPath', label: 'Reaction', prefIdx: 1, isRadio: true,
@@ -67,11 +67,11 @@ LevelData = {
 					}
 				],
 				dataRecord: [
-					{wallInfo: 'firstWall', data: 'frac', attrs: {spcName: 'spc2', tag: 'firstWall'}},
+					{wallInfo: 'firstWall', data: 'frac', attrs: {spcName: 'spc3', tag: 'firstWall'}},
 					{wallInfo: 'firstWall', data: 'Q'}
 				],
 				dataReadouts: [
-					{label: 'Extent of reaction: ', expr: 'frac("firstWall", {tag:"firstWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'extrxn', readout: 'mainReadout'},
+					{label: 'Extent of reaction: ', expr: 'frac("firstWall", {tag:"firstWall", spcName:"spc3"})', units: '', decPlaces: 2, handle: 'extrxn', readout: 'mainReadout'},
 					{label: 'Heat: ', expr: 'q("firstWall")', units: 'kJ', decPlaces: 2, handle: 'hRxn', readout: 'mainReadout'},
 					{label: 'Pressure: ', expr: 'pInt("firstWall")', units: 'bars', decPlaces: 2, handle: 'pInt', readout: 'mainReadout'}
 				],
@@ -88,12 +88,12 @@ LevelData = {
 						graphs: [
 							{type: 'Scatter', handle: 'molFracVsTime', xLabel: "Time (s)", yLabel: "Extent of rxn", axesInit:{x:{min:0, step:1},y:{min:0, step:0.2}}, numGridLines: {y:6}, axesFixed:{y: true},
 								sets: [
-									{handle: 'moleFrac', label:'moleFrac', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{x: 'time("firstWall")',y: 'frac("firstWall",{spcName:"spc2",tag: "firstWall"})'},trace: true, fillInPts: true, finnInPtsMin: 5}
+									{handle: 'moleFrac', label:'moleFrac', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{x: 'time("firstWall")',y: 'frac("firstWall",{spcName:"spc3",tag: "firstWall"})'},trace: true, fillInPts: true, finnInPtsMin: 5}
 								]
 							}
 						],
 						triggers: [
-							// {handle: 'firstReaction', expr: 'frac("firstWall", {tag:"firstWall", spcName:"spc2"})>0.5', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 
+							// {handle: 'firstReaction', expr: 'frac("firstWall", {tag:"firstWall", spcName:"spc3"})>0.5', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 
 						]
 					},
 					cutScene: false,
