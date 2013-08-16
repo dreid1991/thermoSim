@@ -156,12 +156,12 @@ LevelData = {
 					{wallInfo: 'liquidLiq1', data : 'enthalpy'}
 				],
 				triggers: [
-					{handle: 'path0', expr: 'curLevel.liquidLiq1.temp > 448', message: 'What should the temperature be at the end of the first step?', checkOn: 'conditions', requiredFor: 'prompt0'},
-					{handle: 'path1', expr: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length < 10', message: 'What state should species A be at the end of the second step?', checkOn: 'conditions', requiredFor: 'prompt1'},
+					{handle: 'path0', expr: 'curLevel.liquidLiq1.temp > 448 && curLevel.liquidLiq1.temp < 452', message: 'What should the temperature be at the end of the first step?', checkOn: 'conditions', requiredFor: 'prompt0'},
+					{handle: 'path1', expr: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length < 10 && fracDiff(temp("secondWall"), 450) < 0.1', message: 'What state and temperature should species A be at the end of the second step?', checkOn: 'conditions', requiredFor: 'prompt1'},
 					{handle: 'path2', expr: 'fracDiff(temp("secondWall"), 400) <= 0.08', message: 'What should the temperature be at the end of the third step?', checkOn: 'conditions', requiredFor: 'prompt2'},
-					{handle: 'pathFreeze0', expr: 'curLevel.liquidLiq1.temp >= 450', satisfyCmmds: ['curLevel.heaterHeaterOne.disable()', '$("button")[3].click()', 'walls.secondWall.isothermalInit(450)'], requiredFor: 'prompt0'},
-					{handle: 'pathFreeze1', expr: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['$("button")[2].click()', '$($("button")[1]).hide()', 'curLevel.heaterHeaterOne.disable()'], requiredFor: 'prompt1'},
-					{handle: 'pathFreeze2', expr: 'temp("secondWall") <= 400 && curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length <= 10', satisfyCmmds: ['$("button")[3].click()', 'curLevel.heaterHeaterOne.disable()', 'walls.secondWall.isothermalInit(400)'], requiredFor: 'prompt2'}
+					// {handle: 'pathFreeze0', expr: 'curLevel.liquidLiq1.temp >= 450', satisfyCmmds: ['curLevel.heaterHeaterOne.disable()', '$("button")[3].click()', 'walls.secondWall.isothermalInit(450)'], requiredFor: 'prompt0'},
+					{handle: 'pathFreeze1', expr: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['$("button")[2].click()', '$($("button")[1]).hide()'], requiredFor: 'prompt1'},
+					// {handle: 'pathFreeze2', expr: 'temp("secondWall") <= 400 && curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length <= 10', satisfyCmmds: ['$("button")[3].click()', 'curLevel.heaterHeaterOne.disable()', 'walls.secondWall.isothermalInit(400)'], requiredFor: 'prompt2'}
 					// {handle: 'noAdiabatic', expr: '!walls.secondWall.isothermal', message: 'Are you sure you want to make the system adiabatic?', satisfyCmmds: ['$("button")[3].click()'], requiredFor: 'prompt1'}
 				],
 				graphs: [
@@ -175,7 +175,11 @@ LevelData = {
 			},
 			prompts:[
 				{//Prompt 0
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'$($("button")[1]).hide()'
+						]
+					},
 					text: " Now we're going to carry out your hypothetical path.  Above is species A in the same initial state as the previous system. You can use the buttons to the right to set whether the system is isothermal and whether phase change occurs.<p> Take the first step in your hypothetical path.",
 					quiz:[
 						{
@@ -190,9 +194,10 @@ LevelData = {
 					sceneData: {
 						cmmds: [
 							'curLevel.heaterHeaterOne.enable()',
-							'$("button")[3].click()',
+							// '$("button")[3].click()',
 							'$($("button")[4]).hide()',
-							'$($("button")[0]).hide()'
+							'$($("button")[0]).hide()',
+							'$($("button")[1]).show()'
 						],
 					},
 					text: '<p>Take the next step in your hypothetical path. If you are vaporizing, you may want to have the system be isothermal at this step to make sure the enthalpy of vaporization is equal to the tabulated value.',
