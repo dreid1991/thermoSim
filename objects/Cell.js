@@ -116,7 +116,7 @@ _.extend(Cell.prototype, objectFuncs, {
 		return pts;	
 	},
 	assignWallHandlers: function(guideNodes, innerWall, outerWall, parentWallMemberTag, cellMemberTag, energyTransferMax, innerChanceTransport, outerChanceTransport, membraneThickness) {
-		for (var i=0; i<guideNodes.length; i++) {//OY - MAKE SURE YOU MEAN guideNodes[i].prev FOR THE OUTER WALL
+		for (var i=0; i<guideNodes.length; i++) {
 			this.assignWallHandler(innerWall, guideNodes[i].innerWallIdx, outerWall, guideNodes[i].outerWallIdx, guideNodes[i], guideNodes[i].next, cellMemberTag, parentWallMemberTag, -1, energyTransferMax, innerChanceTransport, membraneThickness);
 			this.assignWallHandler(outerWall, guideNodes[i].outerWallIdx, innerWall, guideNodes[i].innerWallIdx, guideNodes[i].next, guideNodes[i], parentWallMemberTag, cellMemberTag, 1, energyTransferMax, outerChanceTransport, membraneThickness);
 		}
@@ -127,7 +127,6 @@ _.extend(Cell.prototype, objectFuncs, {
 			
 			if (dot.tag == selfTag) {
 				if (Math.random() < chanceTransport[dot.spcName]) {
-				//if (3 * activeEs[dot.spcName] < Math.abs(perpV) * perpV * dot.m * dot.cvKinetic * dot.tConst) { //3 is 1.5 / .5.  1.5 is from 2d->3d, .5 is just from KE eqn
 					this.transferDot(dot, oppositeTag, perpUV, membraneThickness);
 				} else {
 					var distNodeANodeB = wallUV.dx * (nodeB.pos.x - nodeA.pos.x) + wallUV.dy * (nodeB.pos.y - nodeA.pos.y);//nodeA.pos.VTo(nodeB.pos).dotProd(wallUV);
@@ -233,30 +232,14 @@ _.extend(Cell.prototype, objectFuncs, {
 				nodes[i].v.dy *= .995;
 				
 				if (outerWall[nodes[i].prev.outerWallIdx].x < xMin) {
-					nodes[i].pos.x += 2;
-					nodes[i].v.dx = Math.abs(nodes[i].v.dx);
-					for (var j=0; j<nodes.length; j++) {
-						nodes[j].v.dx += .5;
-					}
+					this.containCell(nodes, 'x', 1, this.handle);
 				} else if (outerWall[nodes[i].prev.outerWallIdx].x > xMax) {
-					nodes[i].pos.x -= 2;
-					nodes[i].v.dx = -Math.abs(nodes[i].v.dx);
-					for (var j=0; j<nodes.length; j++) {
-						nodes[j].v.dx -= .5;
-					}
+					this.containCell(nodes, 'x', -1, this.handle);
 				}
 				if (outerWall[nodes[i].prev.outerWallIdx].y < yMin) {
-					nodes[i].pos.y += 2;
-					nodes[i].v.dy = Math.abs(nodes[i].v.dy);
-					for (var j=0; j<nodes.length; j++) {
-						nodes[j].v.dy += .5;
-					}
+					this.containCell(nodes, 'y', 1, this.handle);
 				} else if (outerWall[nodes[i].prev.outerWallIdx].y > yMax) {
-					nodes[i].pos.y -= 2;
-					nodes[i].v.dy = -Math.abs(nodes[i].v.dy);
-					for (var j=0; j<nodes.length; j++) {
-						nodes[j].v.dy -= .5;
-					}
+					this.containCell(nodes, 'y', -1, this.handle);
 				}
 			}
 			for (var i=0; i<nodes.length; i++) {
@@ -318,6 +301,22 @@ _.extend(Cell.prototype, objectFuncs, {
 			return diff;
 		}
 		
+	},
+	containCell: function(nodes, axis, sign, cellHandle) {
+		var listenerName = 'contain' + cellHandle + axis + sign;
+		var containTurn = 0;
+		var turnMax = 15;
+		if (!listenerExists(curLevel, 'update', listenerName)) {
+			addListener(curLevel, 'update', listenerName, function() {
+				var dPos = 2 * sign / turnMax * Math.sqrt(containTurn * (turnMax - containTurn)); //making smooth curve
+				for (var i=0; i<nodes.length; i++) {
+					nodes[i].pos[axis] += dPos;
+				}
+				
+				containTurn++;
+				if (containTurn == turnMax) removeListener(curLevel, 'update', listenerName);
+			}, undefined)
+		}
 	},
 	addDrawListener: function(nodes, innerWall, outerWall, membraneColor, canvasHandle) {
 		canvasManager.addListener(canvasHandle, 'drawCell' + this.handle, function(ctx) {
