@@ -17,14 +17,14 @@ LevelData = {
 					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: 'cVIsothermal', temp: 298.15, handle: 'wally', isothermalRate: 3/*, border: {type: 'open', thickness: 5, yMin: 30}*/}
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(350, 300), count: 1000, temp: 298.15, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'heavy', pos: P(55, 55), dims: V(350, 300), count: 600, temp: 298.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'spc1', pos: P(55, 55), dims: V(350, 300), count: 400, temp: 298.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'heavy', pos: P(55, 55), dims: V(350, 300), count: 400, temp: 298.15, returnTo: 'wally', tag: 'wally'},
 					
 				],
 				objs: [
 					{
 						type: 'Cell',
-						attrs: {pos: P(150, 150), rad: 100, handle: 'squishy', parentWallHandle: 'wally', temp: 298, dots: {fairy: 200, heavy: 50}, boundingCorner: P(70, 70), boundingVector: V(300, 350), numCorners: 18, col: Col(0, 150, 0), innerChanceTransport: {spc1: .7}, outerChanceTransport: {spc1: .2}}
+						attrs: {pos: P(150, 250), rad: 100, handle: 'squishy', parentWallHandle: 'wally', temp: 298, dots: {fairy: 200, heavy: 50}, boundingCorner: P(70, 70), boundingVector: V(300, 350), numCorners: 18, col: Col(0, 150, 0), innerChanceTransport: {spc1: .7}, outerChanceTransport: {spc1: .2}}
 					},
 					// {
 						// type: 'Inlet',
