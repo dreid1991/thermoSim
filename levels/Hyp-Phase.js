@@ -49,8 +49,8 @@ LevelData = {
 					// {label: 'Pressure: ', expr: 'pExt("firstWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'}
 				],
 				triggers: [
-					// {handle: 'trigger1', expr: 'fracDiff(temp("firstWall"), 450) < 0.05', message: 'Heat the system to 450 K', checkOn: 'conditions', requiredFor: 'prompt0'},
-					// {handle: 'freeze1', expr: 'temp("firstWall") >= 450 && dotManager.lists.ALLDOTS.length == 1000', satisfyCmmds: ['curLevel.heaterHeaterOne.disable()', 'walls.firstWall.isothermalInit(450)']}
+					{handle: 'trigger1', expr: 'fracDiff(temp("firstWall"), 450) < 0.05', message: 'Heat the system to 450 K', checkOn: 'conditions', requiredFor: 'prompt0'},
+					{handle: 'freeze1', expr: 'temp("firstWall") >= 450 && dotManager.lists.ALLDOTS.length == 1000', satisfyCmmds: ['curLevel.heaterHeaterOne.disable()', 'walls.firstWall.isothermalInit(450)']}
 				]
 			},
 			prompts:[ 
@@ -85,6 +85,28 @@ LevelData = {
 							sceneData: undefined,
 							cutScene: true,
 							text: "We wish to calculate the change in enthalpy for the previous process, but only have the following: <p><br> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>25</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>2</td></tr></table> </center></br></p> The heat capacities can assumed to be constant over the entire temperature range of the process.   The enthalpy of vaporization can be assumed to be constant with respect to pressure. <p>Construct a hypothetical path that will allow you to calculate the change in system enthalpy of the previous process.  Calculate the enthalpy change for each step in your hypothetical path and record the values on a separate sheet of paper. </p> The process is: 1 mole A (liq) 400 K##\\rightarrow## 1 mole A (gas) 400 K "
+						},
+						{//Prompt 2
+							sceneData: undefined,
+							cutScene: true,
+							text: 'Input your enthalpy change values for each step below',
+							quiz: [
+								{type: 'textSmall',
+								storeAs: 'step1',
+								units: 'kJ',
+								preText: '##\\Delta H## of step 1: ',
+								text: ''},
+								{type: 'textSmall',
+								storeAs:'step2',
+								units: 'kJ',
+								preText: '##\\Delta H## of step 2: ',
+								text: '',},
+								{type: 'textSmall',
+								storeAs: 'step3',
+								units: 'kJ',
+								preText: '##\\Delta H## of step 3: ',
+								text: '',}
+							]
 						}
 					]
 						
@@ -93,7 +115,7 @@ LevelData = {
 		{//Second Scene
 			sceneData: {//Scene1
 				walls: [
-					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', isothermalRate: 4, vol: 0.89, handle: 'secondWall', border: {type: 'open', yMin: 40},},
+					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', isothermalRate: 4, vol: 0.895, handle: 'secondWall', border: {type: 'open', yMin: 40},},
 				],
 				dots: [
 					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 0, temp: 400, returnTo: 'secondWall', tag: 'secondWall'},
@@ -136,8 +158,10 @@ LevelData = {
 				triggers: [
 					{handle: 'path0', expr: 'curLevel.liquidLiq1.temp > 448', message: 'What should the temperature be at the end of the first step?', checkOn: 'conditions', requiredFor: 'prompt0'},
 					{handle: 'path1', expr: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length < 10', message: 'What state should species A be at the end of the second step?', checkOn: 'conditions', requiredFor: 'prompt1'},
-					{handle: 'pathFreeze0', expr: 'curLevel.liquidLiq1.temp >= 450', satisfyCmmds: ['curLevel.heaterHeaterOne.disable()', '$("button")[3].click()'], requiredFor: 'prompt0'},
-					{handle: 'pathFreeze1', expr: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['$("button")[2].click()', 'curLevel.heaterHeaterOne.disable()'], requiredFor: 'prompt1'},
+					{handle: 'path2', expr: 'fracDiff(temp("secondWall"), 400) <= 0.08', message: 'What should the temperature be at the end of the third step?', checkOn: 'conditions', requiredFor: 'prompt2'},
+					{handle: 'pathFreeze0', expr: 'curLevel.liquidLiq1.temp >= 450', satisfyCmmds: ['curLevel.heaterHeaterOne.disable()', '$("button")[3].click()', 'walls.secondWall.isothermalInit(450)'], requiredFor: 'prompt0'},
+					{handle: 'pathFreeze1', expr: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['$("button")[2].click()', '$($("button")[1]).hide()', 'curLevel.heaterHeaterOne.disable()'], requiredFor: 'prompt1'},
+					{handle: 'pathFreeze2', expr: 'temp("secondWall") <= 400 && curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length <= 10', satisfyCmmds: ['$("button")[3].click()', 'curLevel.heaterHeaterOne.disable()', 'walls.secondWall.isothermalInit(400)'], requiredFor: 'prompt2'}
 					// {handle: 'noAdiabatic', expr: '!walls.secondWall.isothermal', message: 'Are you sure you want to make the system adiabatic?', satisfyCmmds: ['$("button")[3].click()'], requiredFor: 'prompt1'}
 				],
 				graphs: [
@@ -167,7 +191,8 @@ LevelData = {
 						cmmds: [
 							'curLevel.heaterHeaterOne.enable()',
 							'$("button")[3].click()',
-							'$($("button")[4]).hide()'
+							'$($("button")[4]).hide()',
+							'$($("button")[0]).hide()'
 						],
 					},
 					text: '<p>Take the next step in your hypothetical path. If you are vaporizing, you may want to have the system be isothermal at this step to make sure the enthalpy of vaporization is equal to the tabulated value.',
@@ -218,7 +243,7 @@ LevelData = {
 				{//Prompt 0
 					sceneData: undefined,
 					cutScene: true,
-					text: "Now that we know the enthalpy of vaporization at 400 K is 2.2 kJ, calculate the heat required for the real process. <p><br> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>25</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>2.0</td></tr></table> </center></br></p>",
+					text: "Now that we know the enthalpy of vaporization at 400 K is 2.2 kJ/mol, calculate the heat required for the real process:<p>##A (liquid, 350 K) \\rightarrow A(vapor, 450 K)##<p><br> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>25</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>2.0</td></tr></table> </center></br></p>",
 					quiz: [
 						{
 							type: 'textSmall',
@@ -267,16 +292,24 @@ LevelData = {
 								{handle: 'fracVH', label: 'frac\nGas', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '((enthalpy("thirdWall") + 11341)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 350)*25*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000)) / 1000 || (temp("liquidLiq1") - 350)*25*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000) / 1000 ', x: 'dotManager.lists.ALLDOTS.length/(dotManager.lists.ALLDOTS.length + curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length)'},trace: true, fillInPts: true, fillInPtsMin: 5}
 							]
 					}
+				],
+				triggers:[
+					{handle: 'artichoke', expr: 'temp("thirdWall") >= 440 && curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length == 0', message: 'Heat the system to 450 K', checkOn: 'conditions', requiredFor: 'prompt0'},
+					{handle: 'eggplant',  expr: 'temp("thirdWall") >= 450 && curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['walls.thirdWall.isothermalInit(450)', 'curLevel.heaterHeaterOne.disable()'], requiredFor: 'prompt0'}
 				]
 			},
 			prompts: [
 				{//Prompt 0
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'$($("button")[0]).show()'
+						]
+					},
 					text: 'Let`s perform the process again. This time the enthalpy change of the process is displayed and graphed. As before heat the system from 350 K to 450 K.',
 					quiz: [
 						{
 							type: 'text',
-							preText: 'How does the enthalpy of the real process compare to that which you calculated?',
+							preText: 'How does the enthalpy of vaporization of the real process compare to that which you calculated using hypothetical paths?',
 							storeAs: 'HypAns9',
 							text: 'Type your answer here'
 						}
