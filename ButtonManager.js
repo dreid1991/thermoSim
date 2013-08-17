@@ -47,6 +47,30 @@ ButtonManager.prototype = {
 			console.log('Bad group handle ' + groupHandle);
 		}
 	},
+	clickButton: function(groupHandle, buttonHandle) {
+		var group = this.getGroup(groupHandle);
+		if (group) {
+			group.clickButton(buttonHandle);
+		} else {
+			console.log('Tried to click button in bad group handle ' + groupHandle);
+		}
+	},
+	hideButton: function(groupHandle, buttonHandle) {
+		var group = this.getGroup(groupHandle);
+		if (group) {
+			group.hideButton(buttonHandle);
+		} else {
+			console.log('Bad group handle ' + groupHandle);
+		}	
+	},
+	showButton: function(groupHandle, buttonHandle) {
+		var group = this.getGroup(groupHandle);
+		if (group) {
+			group.showButton(buttonHandle);
+		} else {
+			console.log('Bad group handle ' + groupHandle);
+		}	
+	},
 	removeButton: function(groupHandle, buttonHandle) {
 		var group = this.getGroup(groupHandle);
 		if (group) {
@@ -241,6 +265,21 @@ ButtonManager.Group.prototype = {
 		if (mouseup) {
 			$(buttonJQ).mouseup(mouseup);
 		}
+	},
+	clickButton: function(buttonHandle) {
+		var button = this.getButton(buttonHandle);
+		var jqButton = $('button#' + button.buttonId);
+		jqButton.click();
+	},
+	hideButton: function(buttonHandle) {
+		var button = this.getButton(buttonHandle);
+		var jqButton = $('button#' + button.buttonId);
+		jqButton.hide();	
+	},
+	showButton: function(buttonHandle) {
+		var button = this.getButton(buttonHandle);
+		var jqButton = $('button#' + button.buttonId);
+		jqButton.show();
 	},
 	removeButton: function(buttonHandle) {
 		var button = this.getButton(buttonHandle);

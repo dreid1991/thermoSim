@@ -435,7 +435,7 @@ ReactionHandlerNonEmergent.Reaction.prototype = {
 		var updatedGroups = [];
 		for (var i=0; i<walls.length; i++) {
 			var wall = walls[i];
-			if (wall.data.temp) {
+			if (wall.data.temp && wall.closed && !wall.isLiquid) {
 				var existingGroup = this.getWallGroup(wallGroups, wall.handle);
 				if (existingGroup) {
 					updatedGroups.push(existingGroup);
