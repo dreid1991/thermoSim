@@ -21,9 +21,21 @@ LevelData = {
 						{
 							type: 'text',
 							text: 'type your answer here',
+							storeAs: 'longAns1'
 						}
 					]
 				},
+				{
+					cutScene: true,
+					text: '<p>A reversible process can be defined as a process that, after it is complete, can be reversed without having caused any changes to the system or its surroundings.</p><p>State what conditions you believe are necessary for a reversible process to take place.</p>',
+					quiz: [
+						{
+							type: 'text',
+							text: 'type your answer here',
+							storeAs: 'longAns2'
+						}
+					]
+				}
 			],	
 			
 		},
@@ -66,7 +78,7 @@ LevelData = {
 					}	
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
+					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}}, axesFixed: {y: true}, numGridLines: {y: 6},
 						sets:[
 							{handle: 'externalPressure', label: 'P Ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
 							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
@@ -80,7 +92,7 @@ LevelData = {
 				],
 				dataReadouts: [
 					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', decPlaces: 0, handle: 'tempReadout', readout: 'mainReadout'},
-					{label: 'Q: ', expr: 'q("left")', units: 'kJ', decPlaces: 1, handle: 'heatReadout', readout: 'mainReadout'},
+					// {label: 'Q: ', expr: 'q("left")', units: 'kJ', decPlaces: 1, handle: 'heatReadout', readout: 'mainReadout'},
 					{label: 'Pint: ', expr: 'pInt("left")', units: 'bar', decPlaces: 1, handle: 'pIntReadout', readout: 'pistonRightPistonLeft'},
 					{label: 'Vol: ', expr: 'vol("left")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonRight'}
@@ -96,7 +108,7 @@ LevelData = {
 					quiz: [
 						{	
 							type: 'textSmall',
-							preText: "Let's begin our experiment with an isothermal compression process using a single block. Please place the block on the piston. Estimate the value of work in this compression process.",
+							preText: "Let's begin our experiment with the isothermal compression of 1.1 moles of perfectly ideal gas using a single block. Please place the block on the piston. Estimate the value of work in this compression process.",
 							text: ' ', 
 							units: 'kJ',
 							storeAs: 'Ans1'
@@ -111,7 +123,7 @@ LevelData = {
 							type: 'text',
 							preText:'You calculated get("Ans1", "string") kJ for the isothermal compression process.  How does that compare to the value of heat?  Explain.',
 							text: 'type your answer here',
-							storeAs: 'Long1'
+							storeAs: 'LongAns3'
 						}
 					],
 				},
@@ -131,6 +143,17 @@ LevelData = {
 						}
 					],
 				},
+				{
+					sceneData: undefined,
+					quiz: [
+						{
+							type: 'text',
+							preText: 'The system above has returned to its intial state, but what about the surroundings? Have they changed? Explain. <p>Was this process reversible?',
+							text: 'type your answer here',
+							storeAs: 'LongAns4'
+						}
+					]
+				}
 			]
 		},
 		{	
@@ -171,7 +194,7 @@ LevelData = {
 					}	
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
+					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}}, axesFixed: {y: true}, numGridLines: {y: 6},
 						sets:[
 							{handle: 'externalPressure', label: 'P Ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
 							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
@@ -185,7 +208,7 @@ LevelData = {
 				],
 				dataReadouts: [
 					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', sigFigs: 3, handle: 'tempReadout', readout: 'mainReadout'},
-					{label: 'Q: ', expr: 'q("left")', units: 'kJ', sigFigs: 1, handle: 'heatReadout', readout: 'mainReadout'},
+					// {label: 'Q: ', expr: 'q("left")', units: 'kJ', sigFigs: 1, handle: 'heatReadout', readout: 'mainReadout'},
 					{label: 'Pint: ', expr: 'pInt("left")', units: 'bar', sigFigs: 2, handle: 'pIntReadout', readout: 'pistonRightPistonRight'},
 					{label: 'Vol: ', expr: 'vol("left")', units: 'L', sigFigs: 3, handle: 'volReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
@@ -201,7 +224,7 @@ LevelData = {
 					quiz: [
 						{	
 							type: 'textSmall',
-							preText: "Now place both blocks on the piston one at a time, waiting for the piston to settle before placing the next block. Estimate the value of work done on the system in this compression process.",
+							preText: "Now we're going to break the process into two steps. Place both blocks on the piston one at a time, waiting for the piston to settle before placing the next block. Estimate the value of work done on the system in this compression process.",
 							text: ' ', 
 							units: 'kJ',
 							storeAs: 'Ans3'
@@ -216,7 +239,7 @@ LevelData = {
 							type: 'text',
 							preText:'You calculated get("Ans3", "string") kJ for the isothermal compression process.  How does this compare to the value of work calculated in the single block simulation?  Explain.',
 							text: 'type your answer here',
-							storeAs: 'Long2'
+							storeAs: 'LongAns5'
 						}
 					],
 				},
@@ -236,6 +259,17 @@ LevelData = {
 						}
 					],
 				},
+				{
+					sceneData: undefined,
+					quiz: [
+						{
+							type: 'text',
+							preText: 'Now that this system has reached its initial state, are its surroundings unchanged? If you believe they have changed, how does it compare to the change in the first, single block process? Explain.',
+							text: 'type your answer here',
+							storeAs: 'longAns6'
+						}
+					]
+				}
 			]
 		},
 		{
@@ -275,7 +309,7 @@ LevelData = {
 					}	
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
+					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}}, axesFixed: {y: true}, numGridLines: {y: 6},
 						sets:[
 							{handle: 'externalPressure', label: 'P Ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
 							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
@@ -289,7 +323,7 @@ LevelData = {
 				],
 				dataReadouts: [
 					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', sigFigs: 3, handle: 'tempReadout', readout: 'mainReadout'},
-					{label: 'Q: ', expr: 'q("left")', units: 'kJ', decPlaces: 1, handle: 'heatReadout', readout: 'mainReadout'},
+					// {label: 'Q: ', expr: 'q("left")', units: 'kJ', decPlaces: 1, handle: 'heatReadout', readout: 'mainReadout'},
 					{label: 'pInt: ', expr: 'pInt("left")', units: 'bar', sigFigs: 2, handle: 'pIntReadout', readout: 'pistonRightPistonRight'},
 					{label: 'Vol: ', expr: 'vol("left")', units: 'L', sigFigs: 3, handle: 'volReadout', readout: 'mainReadout'},
 					{label: 'pExt: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
@@ -304,7 +338,7 @@ LevelData = {
 					quiz: [
 						{	
 							type: 'textSmall',
-							preText: "Now slowly add mass until the external pressure is equal to 4 bar. How much work was done on the system?",
+							preText: "Now we're going to break the process into even smaller pieces. Slowly add mass to the system by clicking and holding the button to the right of the piston-cylinder assembly until the external pressure is equal to 4 bar. <p>How much work was done on the 1.1 moles of ideal gas in the system? For simplicity, you can assume that the external pressure is approximately equal to the internal pressure of the system at all times.",
 							text: ' ', 
 							units: 'kJ',
 							storeAs: 'Ans5'
@@ -329,20 +363,21 @@ LevelData = {
 					quiz: [
 						{
 							type: 'text',
-							preText:'How do these two values of work compare? What can be said about the amount of work put into a sytem compared to the amount of work gotten out when external pressure is changed in smaller increments?',
+							preText:'How do these two values of work compare? Have the surroundings changed now? What can be said about the amount of work put into a sytem compared to the amount of work gotten out when external pressure is changed in smaller increments?',
 							text: 'type your answer here',
-							storeAs: 'Long3'
+							storeAs: 'longAns7'
 						}
 					],
 				},
 				{
 					sceneData: undefined, 
+					cutScene: true,
 					quiz: [
 						{
 							type: 'text',
-							preText:'Can a real process be truly reversible? What kind of changes in input are required for a process to be truly reversible?',
+							preText:'<p>Was this process actually reversible? Can a real process ever be reversible? <p>What kind of changes in input are required for a process to be truly reversible?',
 							text: 'type your answer here',
-							storeAs: 'Long4'
+							storeAs: 'longAns8'
 						}
 					],
 				},
