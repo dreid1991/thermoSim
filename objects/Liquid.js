@@ -300,7 +300,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			var tGas = dataGas.temp[dataGas.temp.length - 1];
 			//var dewWeight = .9;
 			var sign = getSign(tGas - tDew);
-			var tLiqF = tDew + sign * Math.min(7, sign * (tGas - tDew));
+			var tLiqF = tDew + sign * Math.min(3, sign * (tGas - tDew));
 			// console.log('from ' + Math.round(self.temp) + ' to ' + Math.round(tLiqF)); 
 			//var tLiqF = dewWeight * tDew + (1 - dewWeight) * tGas;  //so liquid is near dew pt but is moving in the direction the gas would push it in thermal equilibrium
 			var dE = (tLiqF - self.temp) * self.Cp;
