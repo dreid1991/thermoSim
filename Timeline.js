@@ -757,7 +757,7 @@ Timeline.Section.prototype = {
 		}
 		var arrangeHTMLCmmd = new Timeline.Command('point', arrangeHTMLSpawn, undefined, true);
 
-		this.pushPoint(moments, elems, timeline.takeNumber(), arrangeHTMLCmmd, Timeline.stateFuncs.cmmds.spawn, true, 'cmmds', false, timestampHead);
+		this.pushPoint(moments, elems, timeline.takeNumber(), arrangeHTMLCmmd, Timeline.stateFuncs.cmmds.spawn, false, 'cmmds', false, timestampHead);
 
 
 	},
@@ -876,21 +876,25 @@ Timeline.Section.prototype = {
 		}
 	},
 	getTimestampType: function(timestamp) {
-		if (timestamp % 1 - .8 < 1e-5) {
+		if (this.atDecimal(timestamp, .8)) {
 			return 'tailhtml';
-		} else if (Math.abs(timestamp % 1 - .9) < 1e-5) {
+		} else if (this.atDecimal(timestamp, .9)) {
 			return 'tail';
-		} else if (Math.abs(timestamp % 1 - .1) < 1e-5) {
+		} else if (this.atDecimal(timestamp, .1)) {
 			return 'setup';
-		} else if (Math.abs(timestamp % 1 - .2) < 1e-5) {
+		} else if (this.atDecimal(timestamp, .2)) {
 			return 'headhtml';
-		} else if (Math.abs(timestamp % 1 - .0) < 1e-5) {
+		} else if (this.atDecimal(timestamp, 0)) {
 			return 'head';
-		} else if (Math.abs(timestamp % 1 - .85) < 1e-5) {
+		} else if (this.atDecimal(timestamp, .85)) {
 			'branchPreClean';
-		} else if (Math.abs(timestamp % 1 - .95) < 1e-5) {
+		} else if (this.atDecimal(timestamp, .95)) {
 			'branchPostClean';
 		}
+	},
+	atDecimal: function(x, decimal) {
+		x = Math.abs(x);
+		return Math.abs(x - Math.floor(x) - decimal) < 1e-5;
 	},
 	parseIntegerTimeIdx: function(time) {
 		if (typeof time == 'string') {
