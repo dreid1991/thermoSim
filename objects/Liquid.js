@@ -45,7 +45,7 @@ function Liquid(attrs) {
 	this.numAbs = deepCopy(this.drivingForce);
 	this.numEjt = deepCopy(this.numAbs);
 	this.makeDots(this.wallLiq, this.wallGas, this.wallPtIdxs, spcCounts, tempInit, this.dotMgrLiq) && this.deleteCount(this.spcDefs);
-	this.dataGas = this.initData(this.wallGas, this.spcDefs, ['pInt', 'temp']);
+	this.dataGas = this.initData(this.wallGas, this.spcDefs, ['pInt', 'temp', 'vol']);
 	this.setupGrabPExt(this.wallGas, this.dataGas);
 	this.dataLiq = this.initData(this.wallLiq, this.spcDefs);
 	this.recordTempLiq(this.wallLiq);
@@ -253,7 +253,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			if (turns == 5) {
 				var checkUpdateEquilAndPhaseDiagram;
 				if (self.isTwoComp) {
-					self.checkUpdateEquilAndPhaseDiagram = self.setupCheckUpdateEquilPhaseDiagram(self.phaseDiagram, self.wallGas.getDataSrc('pExt'), self.wallGas.getDataSrc('pInt'));
+					self.checkUpdateEquilAndPhaseDiagram = self.setupCheckUpdateEquilPhaseDiagram(self.phaseDiagram, self.wallGas.getDataSrc('pExt', undefined, true), self.wallGas.getDataSrc('pInt'));
 					checkUpdateEquilAndPhaseDiagram = self.checkUpdateEquilAndPhaseDiagram;	
 				} else {
 					checkUpdateEquilAndPhaseDiagram = function(){};
@@ -262,7 +262,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var liqDots = self.dotMgrLiq.lists.ALLDOTS;
 				var gasDots = dotManager.lists.ALLDOTS;
 				addListener(curLevel, 'update', listenerName, function() {
-					if (0 < liqDots.length && liqDots.length < Math.min(75*pressureSrc[pressureSrc.length - 1] ,0.95*(liqDots.length + gasDots.length))) {
+					if (self.willFixTemp(liqDots, gasDots, dataGas.vol[dataGas.vol.length - 1], dataGas.pInt[dataGas.pInt.length - 1], dataGas.temp[dataGas.temp.length - 1])) {
 						fixLiquidTemp();
 					}
 
@@ -287,6 +287,11 @@ _.extend(Liquid.prototype, objectFuncs, {
 			
 		})
 	},
+	willFixTemp: function(liqDots, gasDots, gasVol, gasPInt, gasTemp) {
+		var molarDensity = gasDots.length / (gasVol * N);
+		var fluxCoeff = molarDensity / .1 * Math.sqrt(gasTemp / 298); //.1 is pretty normal density
+		return 0 < liqDots.length && liqDots.length < 75 * Math.max(1, fluxCoeff);
+	},
 	setupFixLiquidTemp: function(wallGas, dotMgrGas, dataGas) {
 		var self = this;
 
@@ -295,11 +300,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 			var tGas = dataGas.temp[dataGas.temp.length - 1];
 			//var dewWeight = .9;
 			var sign = getSign(tGas - tDew);
-<<<<<<< HEAD
 			var tLiqF = tDew + sign * Math.min(3, sign * (tGas - tDew));
-=======
-			var tLiqF = tDew + sign * Math.min(15, sign * (tGas - tDew));
->>>>>>> parent of 3465322... liquid condenses at high temp/pressure, button manager api updated
 			// console.log('from ' + Math.round(self.temp) + ' to ' + Math.round(tLiqF)); 
 			//var tLiqF = dewWeight * tDew + (1 - dewWeight) * tGas;  //so liquid is near dew pt but is moving in the direction the gas would push it in thermal equilibrium
 			var dE = (tLiqF - self.temp) * self.Cp;
@@ -311,7 +312,8 @@ _.extend(Liquid.prototype, objectFuncs, {
 	tDew: function(spcA, spcB, dataGas, equilData) {
 		if (spcA && spcB) {
 			var equilDataData = equilData.data;
-			var yLight = dataGas[equilData.keyLight][dataGas[equilData.keyLight].length - 1];
+			var yLight = dataGas[equilData.keyLight][dataGas[equilData.keyLight].length - 1] + 1e-5;
+			//1e-5 because if yLight == 0, equil data goes very close to 0
 			for (var i=1, ii=equilDataData.length; i<ii; i++) {
 				if (equilDataData[i].yLight <= yLight) {
 					var y2 = equilDataData[i].yLight;
