@@ -7,23 +7,23 @@ LevelData = {
 		{spcName: 'spc3', m: 3, r: 1, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3}
 	],
 	mainSequence: [
-		{//First Scene
-			sceneData: {//Scene 0
-			},
-			prompts:[ 
-				{//Prompt 0
-				sceneData: undefined,
-							cutScene: true,
-							text:" <p>Today we're going to examine hypothetical paths and how they can be used to determine unknown thermodynamic process values.</p><p>The use of hypothetical paths is entirely dependent on state functions. Please identify here what you believe are the distinguishing characteristics that make a thermodynamic property a state function.</p>",
-							quiz:[
-									{type: 'text',
-									storeAs:'HypAns1',
-									text: 'Type your answer here.'
-									}
-								]	
-				},
-			]
-		},		
+		// {//First Scene
+			// sceneData: {//Scene 0
+			// },
+			// prompts:[ 
+				// {//Prompt 0
+				// sceneData: undefined,
+							// cutScene: true,
+							// text:" <p>Today we're going to examine hypothetical paths and how they can be used to determine unknown thermodynamic process values.</p><p>The use of hypothetical paths is entirely dependent on state functions. Please identify here what you believe are the distinguishing characteristics that make a thermodynamic property a state function.</p>",
+							// quiz:[
+									// {type: 'text',
+									// storeAs:'HypAns1',
+									// text: 'Type your answer here.'
+									// }
+								// ]	
+				// },
+			// ]
+		// },		
 		{//First Scene
 			sceneData: {//Scene 0
 				walls: [

@@ -52,7 +52,7 @@ function Liquid(attrs) {
 	this.drawList = this.makeDrawList(this.dotMgrLiq); //need to make draw list in random order otherwise dots drawn on top will look more prominant than they are.
 	this.actCoeffFuncs = this.makeActCoeffFuncs(this.actCoeffType, this.actCoeffInfo, this.spcDefs);
 	this.chanceZeroDf = .4;
-	this.drivingForceSensitivity = 15;//formalize this a bit
+	this.drivingForceSensitivity = 10;//formalize this a bit
 	this.updateListenerName = this.type + this.handle;
 	this.phasePressure = attrs.phasePressure || 1;
 	this.makePhaseDiagram = this.wrapMakePhaseDiagram(this, this.spcDefs, this.actCoeffFuncs, 'liquid' + this.handle.toCapitalCamelCase(), attrs.primaryKey, attrs.makeGasMarker, attrs.makeSystemMarker, attrs.makeLiquidMarker, this.phasePressure);
@@ -482,7 +482,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				if (dF > 0) { 
 					numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
 				} else if (dF < 0) {
-					numEjt[spcName] += 1 + abs * (-dF * drivingForceSensitivity + 1);
+					numEjt[spcName] += 1 + Math.sqrt(abs * (-dF * drivingForceSensitivity + 1));
 					numEjt[spcName] += (wallLiq[0].x - wallLiq[1].x) * -dF * drivingForceSensitivity / 2000;
 				}
 				//numEjt[spcName] = 1;
