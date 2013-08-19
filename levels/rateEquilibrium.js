@@ -1,6 +1,5 @@
 LevelData = {
 	levelTitle: 'Chemical reaction rate and equilibrium',
-//Make the reactions non emergent. Calculations don't work out well.
 	spcDefs: [
 		{spcName: 'spc1', m: 4, r: 2, sF298: 0, col: Col(200, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, 
 		{spcName: 'ugly', m: 4, r: 2, sF298: 0, col: Col(52, 90, 224), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
@@ -70,7 +69,7 @@ LevelData = {
 						
 				],
 				triggers: [
-					{handle: 'trigger1', expr: "dotManager.lists.uglier.length > 450", message: 'Turn on the reaction and allow it to react.', checkOn: 'conditions', requiredFor: 'prompt0'}
+					// {handle: 'trigger1', expr: "dotManager.lists.uglier.length > 450", message: 'Turn on the reaction and allow it to react.', checkOn: 'conditions', requiredFor: 'prompt0'}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}},
@@ -174,11 +173,11 @@ LevelData = {
 		{//S2
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 'get("foo4", "float", 500)', handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
+					{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 'get("foo4", "float", 500, 300, 900)', handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
 				],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
-					{spcName: 'ugly', pos: P(70, 100), dims: V(400, 250), count: 600, temp: 'get("foo4", "float", 500)', returnTo: 'wally', tag: 'wally'}
+					{spcName: 'ugly', pos: P(70, 100), dims: V(400, 250), count: 600, temp: 'get("foo4", "float", 500, 300, 900)', returnTo: 'wally', tag: 'wally'}
 					//{spcName: 'duckling', pos: P(55, 55), dims: V(200, 200), count: 100, temp: 200, returnTo: 'wally', tag: 'wally'}
 				],
 				objs: [
@@ -311,7 +310,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Let's consider why the rate changes with temperature (or the reactivity of A). Using the Arrhenius equation, graph the reaction rate constant with respect to temperature from 0 to 1000 K. $$ k = Ae^{-E_{a}/{RT}} $$ The activation energy of this reaction is something kJ/mol and the pre-exponential constant is somethingelse. Why do you believe the rate behaves this way with respect to temperature?", 
+					text: "Let's consider why the rate changes with temperature (or the reactivity of A). Using the Arrhenius equation, graph the reaction rate constant with respect to temperature from 0 to 1000 K. $$ k = Ae^{-E_{a}/{RT}} $$ The activation energy of this reaction is 150 kJ/mol and the pre-exponential constant is ##0.05 M^{-1}s^{-1}##. Why do you believe the rate behaves this way with respect to temperature?", 
 					quiz:[
 							{
 								storeAs: 'foo7', 
@@ -324,7 +323,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "<p>Now we’re going to turn off the reaction, so there will be no production of B.  However, when a molecule’s kinetic energy is above the activation energy for A --> B, we’re going to turn it white.</p><p>How to do think the fraction of white molecules will change with temperature?</p>", 
+					text: "<p>Now we’re going to turn off the reaction, so there will be no production of B.  However, when a molecule’s kinetic energy is above the activation energy for ##A \\rightarrow B##, we’re going to turn it white.</p><p>How to do think the fraction of white molecules will change with temperature?</p>", 
 					quiz:[
 							{
 								storeAs: 'foo8', 
@@ -360,7 +359,7 @@ LevelData = {
 					// },
 					{
 						type: 'ActivationEnergyPair',
-						attrs: {spcNameLow: 'ugly', spcNameHigh: 'duckling', activationEnergy: 3}
+						attrs: {spcNameLow: 'ugly', spcNameHigh: 'duckling', activationEnergy: 1000}
 					},
 					// {
 						// type: 'Heater',
@@ -421,7 +420,7 @@ LevelData = {
 					// {handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
 				// ],
 				graphs: [
-					{type: 'Scatter', handle: 'PvsVOne', xLabel: "temp (K)", yLabel: "frac hot spc", axesInit:{x:{min:0, step:80}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'PvsVOne', xLabel: "temp (K)", yLabel: "fraction excited", axesInit:{x:{min:0, step:80}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
 							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'temp("wally")', y: "frac('wally', {spcName: 'duckling', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
 						]
@@ -498,7 +497,7 @@ LevelData = {
 						
 				],
 				triggers: [
-					{handle: 'trigger3', expr: "temp('wally') >= 698", message: 'Heat the system to 700 K.', requiredFor: 'prompt0', checkOn: 'conditions'}
+					// {handle: 'trigger3', expr: "temp('wally') >= 698", message: 'Heat the system to 700 K.', requiredFor: 'prompt0', checkOn: 'conditions'}
 				],
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
@@ -604,7 +603,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Now let's introduce the reverse reaction, ##B \\rightarrow A##, to our system. For the reaction of ##A \\rightarrow B##, ##\\Delta{h}_{rxn} = -2.5\\frac{kJ}{mol}## and ##\\Delta{s}_{rxn} = -3.3\\frac{J}{mol-K}##. With the isothermal system held at 300 K, what will be the equilibrium mole fraction of B?", 
+					text: "Now let's introduce the reverse reaction, ##B \\rightarrow A##, to our system. For the reaction of ##A \\rightarrow B##: $$\\Delta{h}_{rxn} = -2.5\\frac{kJ}{mol}$$ and $$\\Delta{s}_{rxn} = -3.3\\frac{J}{mol-K}$$ With the isothermal system held at 300 K, what will be the equilibrium mole fraction of B?", 
 					quiz:[
 							{
 								storeAs: 'foo13', 
@@ -619,7 +618,7 @@ LevelData = {
 		{//S9
 			sceneData: {
 				walls: [
-						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 300, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
+						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 300, isothermalRate: 5, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
 					],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
@@ -660,7 +659,7 @@ LevelData = {
 						
 				],
 				triggers: [
-					{handle: 'trigger5', expr: "dotManager.lists.ugliest.length >= 362", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'}
+					// {handle: 'trigger5', expr: "dotManager.lists.ugliest.length >= 362", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'}
 				],
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
@@ -762,7 +761,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "<p>Next we’re going to conduct the reaction at 500 K.  What will the equilibrium mole fraction of B be at this temperature?</p><p>Enter the fraction as a decimal between 0 and 1</p>", 
+					text: "<p>Next we’re going to conduct the reaction at 500 K.  What will the equilibrium mole fraction of B be at this temperature?</p><p>Enter the value as a decimal between 0 and 1</p>", 
 					quiz:[
 							{
 								storeAs: 'foo16', 
@@ -802,7 +801,7 @@ LevelData = {
 		{//S11
 			sceneData: {
 				walls: [
-						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 500, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
+						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 500, isothermalRate: 5, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
 					],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
@@ -843,7 +842,7 @@ LevelData = {
 						
 				],
 				triggers: [
-					{handle: 'trigger6', expr: "dotManager.lists.ugliest.length >= 320", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'}
+					// {handle: 'trigger6', expr: "dotManager.lists.ugliest.length >= 320", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'}
 				],
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
@@ -852,14 +851,14 @@ LevelData = {
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
 					//{data: 'collisions'}
 				],
-				// dataReadouts: [
-					// {label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
+				dataReadouts: [
+					{label: 'Temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 					// {label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},
 					// {label: 'Coll/sec: ', expr: 'collisions()', units: '', decPlaces: 0, handle: 'lala', readout: 'mainReadout'}
 					// {label: 'pInt: ', expr: 'pInt("wally")', units: 'bar', decPlaces: 1, handle: 'intintnit', readout: 'mainReadout'},
 					// {label: 'pExt: ', expr: 'pExt("wally")', units: 'bar', decPlaces: 1, handle: 'extextext', readout: 'mainReadout'}
 					// {label: 'RCT: ', expr: 'frac("wally", {spcName: "spc1", tag: "wally"}) + frac("wally", {spcName: "ugly", tag: "wally"})', sigFigs: 2, handle: 'coalseamgas', readout: 'mainReadout'}
-				// ],
+				],
 				buttonGroups: [
 					// {handle: 'heaterState', label: 'Heater', prefIdx: 1, isRadio: true, buttons: [
 						// {handle: 'on', label: 'On', isDown: true, exprs: ['curLevel.heaterHeaty.enable()']},
@@ -962,7 +961,7 @@ LevelData = {
 		{//S12
 			sceneData: {
 				walls: [
-						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 100, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
+						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 100, isothermalRate: 5, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
 					],
 				dots: [
 				//	{spcName: 'spc1', pos: P(55, 55), dims: V(150, 200), count: 500, temp: 350, returnTo: 'wally', tag: 'wally'},
@@ -1012,14 +1011,14 @@ LevelData = {
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
 					//{data: 'collisions'}
 				],
-				// dataReadouts: [
-					// {label: 'woop: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
+				dataReadouts: [
+					{label: 'Temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 					// {label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},
 					// {label: 'Coll/sec: ', expr: 'collisions()', units: '', decPlaces: 0, handle: 'lala', readout: 'mainReadout'}
 					// {label: 'pInt: ', expr: 'pInt("wally")', units: 'bar', decPlaces: 1, handle: 'intintnit', readout: 'mainReadout'},
 					// {label: 'pExt: ', expr: 'pExt("wally")', units: 'bar', decPlaces: 1, handle: 'extextext', readout: 'mainReadout'}
 					// {label: 'RCT: ', expr: 'frac("wally", {spcName: "spc1", tag: "wally"}) + frac("wally", {spcName: "ugly", tag: "wally"})', sigFigs: 2, handle: 'coalseamgas', readout: 'mainReadout'}
-				// ],
+				],
 				buttonGroups: [
 					// {handle: 'heaterState', label: 'Heater', prefIdx: 1, isRadio: true, buttons: [
 						// {handle: 'on', label: 'On', isDown: true, exprs: ['curLevel.heaterHeaty.enable()']},
@@ -1030,7 +1029,7 @@ LevelData = {
 						// {handle: 'isothermal', label: 'Isothermal', exprs: ['walls.wally.isothermalInit()']}
 					// ]},
 					{handle: 'rxnControl', label: 'Rxn control', isRadio: true, buttons: [
-						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Enable', exprs: ['collide.rxnHandlerNonEmergent.enableRxn("reacty5")', 'collide.rxnHandlerNonEmergent.enableRxn("reacty6")']},
+						{groupHandle: 'rxnControl', handle: 'rxnOn', label: 'Enable', exprs: ['collide.rxnHandlerNonEmergent.enableRxn("reacty5")', 'collide.rxnHandlerNonEmergent.enableRxn("reacty6")', '$("button")[5].click()']},
 						{groupHandle: 'rxnControl', isDown: true, handle: 'rxnOff', label: 'Disable', exprs: ['collide.rxnHandlerNonEmergent.disableRxn("reacty5")', 'collide.rxnHandlerNonEmergent.disableRxn("reacty6")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2On', label: 'Backward on', exprs: ['collide.rxnHandlerEmergent.enableRxn("rxn2")']},
 						// {groupHandle: 'rxnControl', handle: 'rxn2Off', label: 'Backward off', exprs: ['collide.rxnHandlerEmergent.disableRxn("rxn2")']}
