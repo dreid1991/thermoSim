@@ -69,7 +69,7 @@ LevelData = {
 						
 				],
 				triggers: [
-					// {handle: 'trigger1', expr: "dotManager.lists.uglier.length > 450", message: 'Turn on the reaction and allow it to react.', checkOn: 'conditions', requiredFor: 'prompt0'}
+					{handle: 'trigger1', expr: "dotManager.lists.uglier.length > 450", message: 'Turn on the reaction and allow it to react.', checkOn: 'conditions', requiredFor: 'prompt0'}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}},
@@ -359,7 +359,7 @@ LevelData = {
 					// },
 					{
 						type: 'ActivationEnergyPair',
-						attrs: {spcNameLow: 'ugly', spcNameHigh: 'duckling', activationEnergy: 1000}
+						attrs: {spcNameLow: 'ugly', spcNameHigh: 'duckling', activationEnergy: 15}
 					},
 					// {
 						// type: 'Heater',
@@ -378,7 +378,7 @@ LevelData = {
 						
 				],
 				triggers: [
-					//{handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: false}
+					// {handle: 'trumpet', expr: "pExt('wally') > 3", alertUnsatisfied: 'la', requiredForAdvance: false}
 				],
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
@@ -478,7 +478,7 @@ LevelData = {
 					// },
 					{
 						type: 'ActivationEnergyPair',
-						attrs: {spcNameLow: 'ugly', spcNameHigh: 'duckling', activationEnergy: 3}
+						attrs: {spcNameLow: 'ugly', spcNameHigh: 'duckling', activationEnergy: 15}
 					},
 					{
 						type: 'Heater',
@@ -497,7 +497,7 @@ LevelData = {
 						
 				],
 				triggers: [
-					// {handle: 'trigger3', expr: "temp('wally') >= 698", message: 'Heat the system to 700 K.', requiredFor: 'prompt0', checkOn: 'conditions'}
+					{handle: 'trigger3', expr: "temp('wally') >= 998", message: 'Heat the system to 700 K.', requiredFor: 'prompt0', checkOn: 'conditions'}
 				],
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
@@ -561,7 +561,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: 'Now try heating the system until it reaches 700 K. Describe how the fraction of excited molecules changes with temperature.', 
+					text: 'Now try heating the system until it reaches 1000 K. Describe how the fraction of excited molecules changes with temperature.', 
 					quiz:[
 							{
 								storeAs: 'foo10', 
@@ -659,7 +659,7 @@ LevelData = {
 						
 				],
 				triggers: [
-					// {handle: 'trigger5', expr: "dotManager.lists.ugliest.length >= 362", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'}
+					{handle: 'trigger5', expr: "dotManager.lists.ugliest.length >= 362", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'}
 				],
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
@@ -842,7 +842,7 @@ LevelData = {
 						
 				],
 				triggers: [
-					// {handle: 'trigger6', expr: "dotManager.lists.ugliest.length >= 320", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'}
+					{handle: 'trigger6', expr: "dotManager.lists.ugliest.length >= 320", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'}
 				],
 				dataRecord: [
 					// {wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}}
