@@ -37,7 +37,7 @@ LevelData = {
 						attrs: {handle: 'Piston', wallInfo: 'firstWall', min:2, init: 1.8, max: 4}
 					},
 					{type: 'Heater',
-						attrs: {handle: 'heaterOne', wallInfo: 'firstWall', max: 2, liquidHandle: 'liq1'}
+						attrs: {handle: 'heaterOne', wallInfo: 'firstWall', max: 5, liquidHandle: 'liq1'}
 					},
 					{type: 'Liquid',
 						attrs: {wallInfo: 'firstWall', handle: 'liq1', tempInit: 350, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}
