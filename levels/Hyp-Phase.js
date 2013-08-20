@@ -27,7 +27,7 @@ LevelData = {
 		{//First Scene
 			sceneData: {//Scene 0
 				walls: [
-					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'firstWall', vol: 0.89, border: {type: 'open', yMin: 40},},
+					{pts: [P(20,30), P(530,30), P(530,440), P(20,440)], handler: 'staticAdiabatic', handle: 'firstWall', vol: 0.89, border: {type: 'open', yMin: 40},},
 				],
 				dots: [
 					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 0, temp: 350, returnTo: 'firstWall', tag: 'firstWall'},
@@ -37,7 +37,7 @@ LevelData = {
 						attrs: {handle: 'Piston', wallInfo: 'firstWall', min:2, init: 1.8, max: 4}
 					},
 					{type: 'Heater',
-						attrs: {handle: 'heaterOne', wallInfo: 'firstWall', max: 5, liquidHandle: 'liq1'}
+						attrs: {handle: 'heaterOne', wallInfo: 'firstWall', max: 2, liquidHandle: 'liq1'}
 					},
 					{type: 'Liquid',
 						attrs: {wallInfo: 'firstWall', handle: 'liq1', tempInit: 350, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}
@@ -74,7 +74,7 @@ LevelData = {
 							quiz: [
 								{
 									type: 'textSmall',
-									preText: 'The Antoine coefficients are: ##A = 8.93, B = 3296.6 K, C = -10 K##',
+									preText: 'The Antoine coefficients are: ##A = 7.4, B = 1622.2 K, C = -20 K##',
 									text: '',
 									units: 'bar',
 									storeAs: 'HypAns3'
@@ -148,7 +148,7 @@ LevelData = {
 				dataReadouts: [
 					{label: 'Temperature: ', expr: 'tempSmooth("secondWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
 					{label: 'Liquid Temp: ', expr: 'tempSmooth("liquidLiq1")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
-					{label: 'H: ', expr: '((enthalpy("secondWall") + 10090)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 400)*25*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000)) / 1000 || (temp("liquidLiq1") - 400)*25*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000) / 1000', units: 'kJ', decPlaces: 1, handle: 'h', readout: 'mainReadout'},
+					{label: 'H: ', expr: '((enthalpy("secondWall") + 36839.93)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000)) / 1000 || (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000) / 1000', units: 'kJ', decPlaces: 1, handle: 'h', readout: 'mainReadout'},
 					// {label: 'Pressure: ', expr: 'pExt("firstWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'}
 				],
 				dataRecord: [
@@ -164,9 +164,9 @@ LevelData = {
 				],
 				graphs: [
 					{
-						type: 'Scatter', handle: 'EnthalpyVsFracGas', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Enthalpy', axesInit:{y:{min:0, step:2},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 5}, axesFixed:{x: true, y: true},
+						type: 'Scatter', handle: 'EnthalpyVsFracGas', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Enthalpy', axesInit:{y:{min:0, step:8},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 5}, axesFixed:{x: true, y: true},
 							sets: [
-								{handle: 'fracVH', label: 'frac\nGas', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '((enthalpy("secondWall") + 21080.82)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000)) / 1000 || (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000) / 1000 ', x: 'dotManager.lists.ALLDOTS.length/(dotManager.lists.ALLDOTS.length + curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length)'},trace: true, fillInPts: true, fillInPtsMin: 5}
+								{handle: 'fracVH', label: 'frac\nGas', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '((enthalpy("secondWall") + 36839.93)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000)) / 1000 || (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000) / 1000 ', x: 'dotManager.lists.ALLDOTS.length/(dotManager.lists.ALLDOTS.length + curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length)'},trace: true, fillInPts: true, fillInPtsMin: 5}
 							]
 					}
 				]
@@ -261,17 +261,17 @@ LevelData = {
 		{//Fourth Scene
 			sceneData: {
 				walls: [
-					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', handle: 'thirdWall', vol: 0.89, border: {type: 'open', yMin: 40},},
+					{pts: [P(20,30), P(530,30), P(530,440), P(20,440)], handler: 'staticAdiabatic', handle: 'thirdWall', vol: 0.89, border: {type: 'open', yMin: 40},},
 				],
 				dots: [
 					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 0, temp: 350, returnTo: 'thirdWall', tag: 'thirdWall'},
 				],
 				objs: [
 					{type: 'Piston',
-						attrs: {handle: 'Piston', wallInfo: 'thirdWall', min:2, init: 3, max: 4}
+						attrs: {handle: 'Piston', wallInfo: 'thirdWall', min:2, init: 1.8, max: 4}
 					},
 					{type: 'Heater',
-						attrs: {handle: 'heaterOne', wallInfo: 'thirdWall', max: 1, liquidHandle: 'liq1'}
+						attrs: {handle: 'heaterOne', wallInfo: 'thirdWall', max: 2, liquidHandle: 'liq1'}
 					},
 					{type: 'Liquid',
 						attrs: {wallInfo: 'thirdWall', handle: 'liq1', tempInit: 350, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}
@@ -282,17 +282,17 @@ LevelData = {
 					{label: 'Liquid Temp: ', expr: 'tempSmooth("liquidLiq1")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
 					{label: 'Pressure: ', expr: 'pExt("thirdWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'},
 					// {label: 'q: ', expr: 'q("thirdWall")', units: 'kJ', decPlaces: 1, handle: 'qwer', readout: 'mainReadout'},
-					{label: 'H: ', expr: '((enthalpy("thirdWall") + 11341)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 350)*25*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000)) / 1000 || (temp("liquidLiq1") - 350)*25*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000) / 1000', units: 'kJ', decPlaces: 1, handle: 'h', readout: 'mainReadout'},
+					{label: 'H: ', expr: '((enthalpy("thirdWall") + 38839.93)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 350)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000)) / 1000 || (temp("liquidLiq1") - 350)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000) / 1000', units: 'kJ', decPlaces: 1, handle: 'h', readout: 'mainReadout'},
 				],
 				dataRecord: [
 					{wallInfo: 'thirdWall', data: 'enthalpy'},
-					{wallInfo: 'liquidLiq1', data : 'enthalpy'},
+					{wallInfo: 'liquidLiq1', data: 'enthalpy'},
 				],	
 				graphs: [
 					{
-						type: 'Scatter', handle: 'EnthalpyVsFracGas', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Enthalpy', axesInit:{y:{min:0, step:2},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 5}, axesFixed:{x: true, y: true},
+						type: 'Scatter', handle: 'EnthalpyVsFracGas', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Enthalpy', axesInit:{y:{min:0, step:8},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 5}, axesFixed:{x: true, y: true},
 							sets: [
-								{handle: 'fracVH', label: 'frac\nGas', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '((enthalpy("thirdWall") + 11341)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 350)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000)) / 1000 || (temp("liquidLiq1") - 350)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000) / 1000 ', x: 'dotManager.lists.ALLDOTS.length/(dotManager.lists.ALLDOTS.length + curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length)'},trace: true, fillInPts: true, fillInPtsMin: 5}
+								{handle: 'fracVH', label: 'frac\nGas', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '((enthalpy("thirdWall") + 38839.93)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 350)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000)) / 1000 || (temp("liquidLiq1") - 350)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000) / 1000 ', x: 'dotManager.lists.ALLDOTS.length/(dotManager.lists.ALLDOTS.length + curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length)'},trace: true, fillInPts: true, fillInPtsMin: 5}
 							]
 					}
 				],
