@@ -3,7 +3,7 @@ LevelData = {
 	
 	spcDefs: [
 		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 30,sF298: 15, antoineCoeffs: {a: 8.07, b:1730.6, c: 233.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
-		{spcName: 'spc2', m: 4, r: 2, col: Col(0, 200, 0), cv: 3.5 * R, hF298: -12, hVap298: 10, sF298: 15, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 4.5* R, spcVolLiq: .3},
+		{spcName: 'spc2', m: 4, r: 2, col: Col(0, 200, 0), cv: 3.5 * R, hF298: -13.5, hVap298: 10, sF298: 15, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 4.5* R, spcVolLiq: .3},
 		{spcName: 'spc3', m: 4, r: 2, col: Col(0, 200, 0), cv: 3.5 * R, hF298: -15, hVap298: 10,sF298: 15, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 4.5* R, spcVolLiq: .3}
 	],
 	mainSequence: [
@@ -35,7 +35,7 @@ LevelData = {
 						]
 					},
 					cutScene: true,
-					text: "Over spring break Dr. Koretsky hiked up Eagle's Peak near San Francisco. The two routes he could take are seen to the right. How would the amounts of work required to complete the two routes compare? How would the potential energy change compare? Which of these two things, work or potential energy, is independent of path?<p>",
+					text: "Over spring break Dr. Koretsky hiked up Eagle's Peak near San Francisco. The two routes he could take are seen to the right. How would the amounts of work required to complete the two routes compare? How would the potential energy change compare? Which of these two things, work or potential energy, is independent of path and therefore a state function?<p>",
 					quiz:[
 									{type: 'text',
 									storeAs:'2ndans',
@@ -55,8 +55,8 @@ LevelData = {
 					{spcName: 'spc1', pos: P(55, 50), dims: V(400,300), count: 1000, temp: 500, returnTo: 'firstWall', tag: 'firstWall'},
 				],
 				rxns: [
-					{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: 5, prods: {spc3:2}},
-					{handle: 'rxn2', rctA: 'spc3', rctB: 'spc3', activeE: 6, prods: {spc1:2}}
+					{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: 9, prods: {spc3:2}},
+					{handle: 'rxn2', rctA: 'spc3', rctB: 'spc3', activeE: 10.8, prods: {spc1:2}}
 				],
 				buttonGroups: [
 					{handle: 'hypoPath', label: 'Reaction', prefIdx: 1, isRadio: true,
@@ -73,7 +73,7 @@ LevelData = {
 				dataReadouts: [
 					{label: 'Extent of reaction: ', expr: 'frac("firstWall", {tag:"firstWall", spcName:"spc3"})', units: '', decPlaces: 2, handle: 'extrxn', readout: 'mainReadout'},
 					{label: 'Heat: ', expr: 'q("firstWall")', units: 'kJ', decPlaces: 2, handle: 'hRxn', readout: 'mainReadout'},
-					{label: 'Pressure: ', expr: 'pInt("firstWall")', units: 'bars', decPlaces: 2, handle: 'pInt', readout: 'mainReadout'}
+					{label: 'Pressure: ', expr: 'pInt("firstWall")', units: 'bar', decPlaces: 2, handle: 'pInt', readout: 'mainReadout'}
 				],
 				objs: [
 					{type: 'QArrowsAmmt',
@@ -97,7 +97,7 @@ LevelData = {
 						]
 					},
 					cutScene: false,
-					text: "The isothermal system above is held at 500 K and contains 1 mole of A.  The red colored species A  can reversibly react to form the green species B.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  What is the sign of the enthalpy of reaction? Explain.",
+					text: "The isothermal system above is held at 500 K and contains 1 mole of A.  The red colored species A  can reversibly react to form the green species B.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  Is the reaction endothermic or exothermic? What is the sign of the enthalpy of reaction? Explain.",
 					quiz:[
 							{type: 'text',
 							storeAs:'realProcess',
@@ -108,12 +108,12 @@ LevelData = {
 				{//Prompt 1
 				sceneData: undefined,
 					cutScene: true,
-					text: "We can use hypothetical paths to calculate physical properties at states where data is unavailable. In this case, we don't have the enthalpy of reaction at 500 K, but we have the following data:<p> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A</td><td>3.5*R</td></tr><tr><td>B</td><td>4.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center>The enthalpy of reaction can be defined as the heat absorbed by a system undergoing a full conversion reaction at constant temperature and pressure.  For example, in a reaction of A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming one mole of A at constant temperature and pressure.  If the reaction were 2A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming two moles of A at constant temperature and pressure."
+					text: "We can use hypothetical paths to calculate physical properties at states where data is unavailable. In this case, we don't have the enthalpy of reaction at 500 K, but we have the following data:<p> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A</td><td>3.5*R</td></tr><tr><td>B</td><td>4.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-3.5</td></tr></table></p></center>The enthalpy of reaction can be defined as the heat absorbed by a system undergoing a full conversion reaction at constant temperature and pressure.  For example, in a reaction of A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming one mole of A at constant temperature and pressure.  If the reaction were 2A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming two moles of A at constant temperature and pressure."
 				},
 				{//Prompt 2
 				sceneData: undefined,
 					cutScene: true,
-					text: "<center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A</td><td>3.5*R</td></tr><tr><td>B</td><td>4.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center> <p> Using this data, construct a hypothetical path in three steps that will allow you to calculate the enthalpy of reaction for the previous process.  Calculate the enthalpy change for each step and record the values on a separate sheet of paper. <p> The process is: <p> 1 mole A (500 K) ##\\rightarrow## 1 mole B (500 K)",
+					text: "<center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A</td><td>3.5*R</td></tr><tr><td>B</td><td>4.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center> <p> Using this data, construct a hypothetical path in three steps that will allow you to calculate the enthalpy of reaction for the previous process.  Calculate the enthalpy change for each step and record the values on a separate sheet of paper. <p> The process is: <p> ##1 mole A (500 K) \\rightarrow 1 mole B (500 K)##",
 				},
 				{//Prompt 3
 				scendeData: undefined,
@@ -142,14 +142,14 @@ LevelData = {
 		{//Third Scene
 			sceneData: {//Scene2
 				walls: [
-					{pts: [P(40,30), P(510,30), P(510,400), P(40,400)], handler: 'cVIsothermal', isothermalRate: 3, handle: 'secondWall', temp: 500, border: {type: 'open'},},
+					{pts: [P(40,30), P(510,30), P(510,400), P(40,400)], handler: 'cVIsothermal', isothermalRate: 10, handle: 'secondWall', temp: 500, border: {type: 'open'},},
 				],
 				dots: [
 					{spcName: 'spc1', pos: P(55, 75), dims: V(400,300), count: 1000, temp: 500, returnTo: 'secondWall', tag: 'secondWall'},
 				],
 				rxns: [
-					{handle: 'rxn1', rctA: 'spc1',rctB: 'spc1', activeE: 3, prods: {spc2:2}},
-					{handle: 'rxn2', rctA: 'spc1', rctB: 'spc2', activeE: 2, prods: {spc2:2}}
+					{handle: 'rxn1', rctA: 'spc1',rctB: 'spc1', activeE: 4, prods: {spc2:2}},
+					{handle: 'rxn2', rctA: 'spc1', rctB: 'spc2', activeE: 6, prods: {spc2:2}}
 				],
 				buttonGroups: [
 					{handle: 'Reaction', label: 'Reaction', prefIdx: 1, isRadio: true,
@@ -182,11 +182,11 @@ LevelData = {
 					// }
 					{
 						type: 'Heater',
-						attrs: {wallInfo: 'secondWall', handle: 'heatyTHeater', max: 8, dims: V(100, 40)}
+						attrs: {wallInfo: 'secondWall', handle: 'heatyTHeater', max: 2, dims: V(100, 40)}
 					}
 				],
 				graphs: [
-							{type: 'Scatter', handle: 'EnthalpyFracVsTemp', xLabel: "Extent of rxn", yLabel: "Enthalpy", axesInit:{y:{min:-9, step:3},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 6}, axesFixed:{x: true, y: true},
+							{type: 'Scatter', handle: 'EnthalpyFracVsTemp', xLabel: "Extent of rxn", yLabel: "Enthalpy", axesInit:{y:{min:-12, step:3},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 6}, axesFixed:{x: true, y: true},
 								sets: [
 									{handle: 'moleFrac', label:'mole\nFrac', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '(enthalpy("secondWall") + 4122) / 1000',x: 'frac("secondWall",{spcName:"spc2",tag: "secondWall"})'},trace: true, fillInPts: true, fillInPtsMin: 5}
 								]
@@ -205,7 +205,7 @@ LevelData = {
 						{handle: 'hypPath1', expr: 'fracDiff(temp("secondWall"),298)<.01', message:"What should the temperature be at the end of your first step?"}
 					],
 					cmmds: [
-						'$($("button")[1]).hide()'
+						'buttonManager.hideButton("Reaction", "rxn1go")'
 					]
 				},
 					text:"Now we're going to carry out the hypothetical path.  Above is species A in the same initial state as the previous system.  You can use the buttons to the right to set whether the system is isothermal and whether the reaction occurs.  For this hypothetical process, the activation energy has been lowered so the reaction proceeds at 298 K and the reverse reaction has been disabled. <p> Take the first step in the hypothetical path. How does the enthalpy change compare to the value you calculated?",
@@ -219,11 +219,11 @@ LevelData = {
 				{//Prompt 1
 				sceneData: {
 					triggers:[
-						{handle:'hypPath2', expr: 'frac("secondWall", {tag:"secondWall", spcName:"spc2"})==1', message: "What should the extent of reaction be after the second step in your hypothetical path?", priority: 1}
+						{handle:'hypPath2', expr: 'frac("secondWall", {tag:"secondWall", spcName:"spc2"})>=0.96', message: "What should the extent of reaction be after the second step in your hypothetical path?", priority: 1}
 					],
 					cmmds: [
 						'$($("button")[0]).hide()',
-						'$($("button")[1]).show()'
+						'buttonManager.showButton("Reaction", "rxn1go")'
 					]
 				},
 					text: "Take the next step in the hypothetical path.  How does the enthalpy change of this step compare to the value you calculated?   <p>If you are reacting, you will want to have the system be isothermal at this step to make sure the enthalpy of reaction is equal to the tabulated value.",
@@ -270,8 +270,8 @@ LevelData = {
 					{spcName: 'spc1', pos: P(55, 50), dims: V(400,300), count: 1000, temp: 500, returnTo: 'thirdWall', tag: 'thirdWall'},
 				],
 				rxns: [
-					{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: 5, prods: {spc2:2}},
-					{handle: 'rxn2', rctA: 'spc2', rctB: 'spc2', activeE: 6, prods: {spc1:2}}
+					{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: 10, prods: {spc2:2}},
+					{handle: 'rxn2', rctA: 'spc2', rctB: 'spc2', activeE: 10.8, prods: {spc1:2}}
 				],
 				buttonGroups: [
 					{handle: 'hypoPath', label: 'Reaction ', prefIdx: 1, isRadio: true,
@@ -287,6 +287,7 @@ LevelData = {
 				],
 				dataReadouts: [
 					{label: 'Extent of reaction: ', expr: 'frac("thirdWall", {tag:"thirdWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'extrxn', readout: 'mainReadout'},
+					{label: 'Temp: ', expr: 'temp("thirdWall")', units: 'K', decPlaces: 0, handle: 'temp', readout: 'mainReadout'}
 					// {label: 'Heat: ', expr: 'q("thirdWall")', units: 'kJ', decPlaces: 2, handle: 'qReadout', readout: 'mainReadout'}
 				],
 				objs: [
@@ -302,7 +303,7 @@ LevelData = {
 				{//Prompt 0
 					sceneData:{
 						triggers: [
-								// {handle: 'lastReaction', expr: 'frac("thirdWall", {tag:"thirdWall", spcName:"spc2"})>0.5', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 
+								{handle: 'lastReaction', expr: 'frac("thirdWall", {tag:"thirdWall", spcName:"spc2"})>0.5', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 
 							]
 					},
 						text: "Now that we know the enthalpy of reaction at 500 K, perform the experiment and calculate the amount of heat released during the process by using the extent of reaction.",
@@ -325,8 +326,8 @@ LevelData = {
 					{spcName: 'spc1', pos: P(55, 50), dims: V(400,300), count: 1000, temp: 500, returnTo: 'fourthWall', tag: 'fourthWall'},
 				],
 				rxns: [
-					{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: 5, prods: {spc2:2}},
-					{handle: 'rxn2', rctA: 'spc2', rctB: 'spc2', activeE: 6, prods: {spc1:2}}
+					{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: 10, prods: {spc2:2}},
+					{handle: 'rxn2', rctA: 'spc2', rctB: 'spc2', activeE: 10.8, prods: {spc1:2}}
 				],
 				buttonGroups: [
 					{handle: 'hypoPath', label: 'Reaction ', prefIdx: 1, isRadio: true,
@@ -342,7 +343,8 @@ LevelData = {
 				],
 				dataReadouts: [
 					{label: 'Extent of reaction: ', expr: 'frac("fourthWall", {tag:"fourthWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'extrxn', readout: 'mainReadout'},
-					{label: 'Heat: ', expr: 'q("fourthWall")', units: 'kJ', decPlaces: 2, handle: 'qReadout', readout: 'mainReadout'}
+					{label: 'Heat: ', expr: 'q("fourthWall")', units: 'kJ', decPlaces: 2, handle: 'qReadout', readout: 'mainReadout'},
+					{label: 'Temp: ', expr: 'temp("fourthWall")', units: 'K', decPlaces: 0, handle: 'temp', readout: 'mainReadout'}					
 				],
 				objs: [
 					{type: 'QArrowsAmmt',
@@ -357,7 +359,7 @@ LevelData = {
 				{//Prompt 0
 					sceneData:{
 						triggers: [
-								// {handle: 'lastReaction', expr: 'frac("fourthWall", {tag:"fourthWall", spcName:"spc2"})>0.5', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 
+								{handle: 'lastReaction', expr: 'frac("fourthWall", {tag:"fourthWall", spcName:"spc2"})>0.5', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 
 							]
 					},
 						text: "Perform the experiment again. Record the actual amount of heating done by the reaction below.",
