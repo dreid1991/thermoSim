@@ -1,111 +1,139 @@
-canvasHeight = 450;
 LevelData = {
-	levelTitle: 'Phase Equilibrium Template',
-
-		
+	levelTitle: 'TEST!!!!!!!!!!!!',
+	
 	spcDefs: [
-		//add antoine coefs, cvLiq, hvap
-		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
-		{spcName: 'spc2', m: 4, r: 2, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
-		{spcName: 'spc3', m: 4, r: 1, col: Col(115, 250, 98), cv: 2.5 * R, hF298: -260, hVap298: 40.6, antoineCoeffs: {a: 8.07, b:1730.6, c:233.426-273.15}, cpLiq: 75.34, spcVolLiq: 1},
-		{spcName: 'spc4', m: 4, r: 1, col: Col(100, 100, 100), cv: 2.5 * R, hF298: -260, hVap298: 40.6, antoineCoeffs: {a: 8.14, b:1810.94, c:244.485-273.15}, cpLiq: 75.34, spcVolLiq: 1}
-	],	
-
+		{spcName: 'spc1', m: 4, r: 2, col: Col(252, 0, 177), cv: 1.5 * R, hF298: -10, hVap298: 30.92, antoineCoeffs: {a: 7.4, b:1622.4, c: -20}, cpLiq: 40, spcVolLiq: 0.8},
+		{spcName: 'spc2', m: 3, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
+		{spcName: 'spc3', m: 3, r: 1, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3}
+	],
 	mainSequence: [
-		{//First Scene
-			sceneData: {
+		{//Second Scene
+			sceneData: {//Scene1
 				walls: [
-					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 373.15, handle: 'wallo', vol: 4.5, isothermalRate: 4, border: {type: 'open', width: 10, yMin: 40} },
+					{pts: [P(40,30), P(510,30), P(510,440), P(40,440)], handler: 'staticAdiabatic', isothermalRate: 4, vol: 0.895, handle: 'secondWall', border: {type: 'open', yMin: 40},},
 				],
 				dots: [
-					{spcName: 'spc3', pos: P(45,100), dims: V(465,240), count: 1, temp:373.15, returnTo: 'wallo', tag: 'wallo'},
-					{spcName: 'spc4', pos: P(45,100), dims: V(465,240), count: 50, temp:373.15, returnTo: 'wallo', tag: 'wallo'}
-				],	
+					{spcName: 'spc1', pos: P(55, 210), dims: V(150,150), count: 0, temp: 400, returnTo: 'secondWall', tag: 'secondWall'},
+				],
 				objs: [
-					{
-						type: 'Piston',
-						attrs: {
-							handle: 'RightPiston',
-							wallInfo: 'wallo',
-							min: 0.5,
-							init: 0.5,
-							max: 20,
-							makeSlider: true,	
-							compMode: 'cPAdiabaticDamped',
-						}	
+					{type: 'Piston',
+						attrs: {handle: 'Piston', wallInfo: 'secondWall', min:2, init: 5.6478, max: 8}
 					},
-					{
-						type: 'Sandbox',
-						attrs: {
-							handle: 'mrSandMan',
-							wallInfo: 'wallo',
-							min: 0.5,
-							max: 9,
-							init: 0.5,
-						}
+					{type: 'Heater',
+						attrs: {handle: 'heaterOne', wallInfo: 'secondWall', max: 4, liquidHandle: 'liq1'}
 					},
-					{
-						type: 'Heater',
-						attrs: {
-							handle: 'heater1',
-							wallInfo: 'wallo',
-							liquidHandle: 'water',
-							temp: 373.15,
-							max: 2,
-						},
+					{type: 'Liquid',
+						attrs: {wallInfo: 'secondWall', handle: 'liq1', tempInit: 400, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}
+					}
+				],
+				buttonGroups: [
+					{handle: 'Phase', label: 'Phase', prefIdx: 1, isRadio: true,
+						buttons: [
+							{handle: 'enablePhase', label: 'Enable Phase Change', isDown: false, exprs: ['curLevel.liquidLiq1.enablePhaseChange()']},
+							{handle: 'disablePhase', label: 'Disable Phase Change', isDown: true, exprs: ['curLevel.liquidLiq1.disablePhaseChange()']}//CHANGE EXPRESSION!!
+						]
 					},
-					// {
-						// type: 'DragWeights',
-						// attrs: {
-							// handle: 'Weight1',
-							// wallInfo: 'wallo',
-							// weightDefs: [{count: 5, pressure:1}],
-							// pInit: 0,
-							// weightScalar: 100,
-							// pistonOffset: V(130,-41),
-							// displayText: true,
-						// }
-					// },
-					{
-						type: 'Liquid',
-						attrs:{
-							wallInfo: 'wallo',
-							handle: 'water',
-							tempInit: 373.15,
-							spcCounts: {spc3: 500},
-							actCoeffType: 'twoSfxMrg',
-							actCoeffInfo: {a: 3000},
-							makePhaseDiagram: true,
-							triplePointTemp: 273.16,
-							criticalPointTemp: 647.1,
-						},
-					},
+					{handle: 'Heat', label: 'Heat', prefIdx: 1, isRadio: true,
+						buttons: [
+							{handle: 'iso', label: 'Isothermal', isDown: false, exprs: ['walls.secondWall.isothermalInit(curLevel.liquidLiq1.temp || temp("secondWall"))']},
+							{handle: 'adiabatic', label: 'Adiabatic', isDown: true, exprs: ['walls.secondWall.isothermalStop()']}//CHANGE EXPRESSION!!
+						]
+					}
+				],
+				dataReadouts: [
+					{label: 'Temperature: ', expr: 'tempSmooth("secondWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'Liquid Temp: ', expr: 'tempSmooth("liquidLiq1")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
+					{label: 'H: ', expr: '((enthalpy("secondWall") + 36839.93)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000)) / 1000 || (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000) / 1000', units: 'kJ', decPlaces: 1, handle: 'h', readout: 'mainReadout'},
+					// {label: 'Pressure: ', expr: 'pExt("firstWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'}
 				],
 				dataRecord: [
-					{wallInfo: 'wallo', data: 'frac', attrs: {spcName: 'spc3', tag: 'wallo'}},
-					{wallInfo: 'wallo', data: 'enthalpy', attrs: {spcName: 'spc3', tag: 'wallo'}},
+					{wallInfo: 'secondWall', data: 'enthalpy'},
+					{wallInfo: 'liquidLiq1', data : 'enthalpy'}
 				],
-				// graphs: [
-					// {type: 'Scatter', handle: 'hTGraph', xLabel: 'Enthalpy (kJ)', yLabel: 'Temperature (K)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
-						// sets:[
-							// {handle: 'enthalpyTemperature', label: 'Phase Change', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
-							// data: {x: 'enthalpy("left")', y: 'tempSmooth("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
-						// ]
-					// }
-				// ],	
-				dataReadouts: [
-					{label: 'Vol: ', expr: 'vol("wallo")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
-					{label: 'Gas Temp: ', expr: 'tempSmooth("wallo")', units: 'K', decPlaces: 0, handle: 'tempGasReadout', readout: 'mainReadout'},
-					{label: 'Liquid Temp: ', expr:  'tempSmooth("liquidWater")', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
-					{label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
-				],
+				// triggers: [
+					// {handle: 'path0', expr: 'curLevel.liquidLiq1.temp > 448 && curLevel.liquidLiq1.temp < 452', message: 'What should the temperature be at the end of the first step?', checkOn: 'conditions', requiredFor: 'prompt0'},
+					// {handle: 'path1', expr: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length < 10 && fracDiff(temp("secondWall"), 450) < 0.1', message: 'What state and temperature should species A be at the end of the second step?', checkOn: 'conditions', requiredFor: 'prompt1'},
+					// {handle: 'path2', expr: 'fracDiff(temp("secondWall"), 400) <= 0.08', message: 'What should the temperature be at the end of the third step?', checkOn: 'conditions', requiredFor: 'prompt2'},
+					// // {handle: 'pathFreeze0', expr: 'curLevel.liquidLiq1.temp >= 450', satisfyCmmds: ['curLevel.heaterHeaterOne.disable()', 'buttonManager.clickButton("Heat", "iso")', 'walls.secondWall.isothermalInit(450)'], requiredFor: 'prompt0'},
+					// {handle: 'pathFreeze1', expr: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['buttonManager.clickButton("Phase", "disablePhase")', 'buttonManager.hideButton("Phase", "enablePhase")'], requiredFor: 'prompt1'},
+				// ],
+				graphs: [
+					{
+						type: 'Scatter', handle: 'EnthalpyVsFracGas', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Enthalpy', axesInit:{y:{min:0, step:8},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 5}, axesFixed:{x: true, y: true},
+							sets: [
+								{handle: 'fracVH', label: 'frac\nGas', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '((enthalpy("secondWall") + 36839.93)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000)) / 1000 || (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp*(curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length/1000) / 1000 ', x: 'dotManager.lists.ALLDOTS.length/(dotManager.lists.ALLDOTS.length + curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length)'},trace: true, fillInPts: true, fillInPtsMin: 5}
+							]
+					}
+				]
 			},
-			prompts: [
-				{//prompt0
-					sceneData: undefined,
-					text: 'Now increase the pressure to bring the system to saturation with the temperature held constant at 150 C.'		
+			prompts:[
+				{//Prompt 0
+					sceneData: {
+						// cmmds: [
+							// 'buttonManager.hideButton("Phase", "enablePhase")'
+						// ]
+					},
+					text: " Now we're going to carry out your hypothetical path.  Above is species A in the same initial state as the previous system. You can use the buttons to the right to set whether the system is isothermal and whether phase change occurs.<p> Take the first step in your hypothetical path.",
+					quiz:[
+						{
+							type: 'text',
+							preText: 'How does the enthalpy change compare to the value you calculated?',
+							text: 'Type your answer here',
+							storeAs: 'HypAns4'
+						}
+					]
 				},
-			]		
-		}
+				{//Prompt 1
+					sceneData: {
+						// cmmds: [
+							// 'curLevel.heaterHeaterOne.enable()',
+							// 'buttonManager.clickButton("Heat", "iso")',
+							// 'buttonManager.hideButton("Heat", "adiabatic")',
+							// '$($("button")[0]).hide()',
+							// 'buttonManager.showButton("Phase", "enablePhase")'
+						// ],
+					},
+					text: '<p>Take the next step in your hypothetical path. If you are vaporizing, you may want to have the system be isothermal at this step to make sure the enthalpy of vaporization is equal to the tabulated value.',
+					quiz: [
+						{
+							type: 'text',
+							preText: 'How does the enthalpy change of this step compare to the value you calculated?',
+							storeAs: 'HypAns5',
+							text: 'Type your answer here'
+						}
+					]
+				},
+				{//Prompt 2
+					sceneData: {
+						// cmmds: [
+							// 'curLevel.heaterHeaterOne.enable()',
+							// 'buttonManager.hideButton("Phase", "enablePhase")',
+							// 'buttonManager.showButton("Heat", "adiabatic")'
+						// ]
+					},
+					text: '<p>Take the final step in your hypothetical path.',
+					quiz: [
+						{
+							type: 'text',
+							preText: 'How does the enthalpy change of this step compare to the value you calculated?',
+							storeAs: 'HypAns6',
+							text: 'Type your answer here'
+						}
+					]
+				},
+				{//Prompt 3
+					sceneData: undefined,
+					cutScene: true,
+					text: 'How does the experimental enthalpy of vaporization compare to the value you predicted? Can you explain any differences?',
+					quiz: [
+						{
+							type: 'text',
+							storeAs: 'HypAns7',
+							text: 'Type your answer here'
+						}
+					]
+				}
+			]
+		},
 	]
-}	
+}
