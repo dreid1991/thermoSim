@@ -16,39 +16,45 @@ Copyright (C) 2013  Daniel Reid
 */
 function Experiment() {
 	this.mutables = {
-		eAF: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.rxns[0].activeE'),
-		eAR: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.rxns[1].activeE'),
-		hFA: new Experiment.Mutable('LevelData.spcDefs[0].hF298'),
-		hFB: new Experiment.Mutable('LevelData.spcDefs[1].hF298'),
-		hFC: new Experiment.Mutable('LevelData.spcDefs[2].hF298'),
-		hFD: new Experiment.Mutable('LevelData.spcDefs[3].hF298'),		
-		tempDots1: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.dots[0].temp'),
-		tempDots2: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.dots[1].temp'),
-		tempWalls: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.walls[0].temp')
+		count: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.dots[0].count'),
+		
+		// eAF: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.rxns[0].activeE'),
+		// eAR: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.rxns[1].activeE'),
+		// hFA: new Experiment.Mutable('LevelData.spcDefs[0].hF298'),
+		// hFB: new Experiment.Mutable('LevelData.spcDefs[1].hF298'),
+		// hFC: new Experiment.Mutable('LevelData.spcDefs[2].hF298'),
+		// hFD: new Experiment.Mutable('LevelData.spcDefs[3].hF298'),		
+		// tempDots1: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.dots[0].temp'),
+		// tempDots2: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.dots[1].temp'),
+		// tempWalls: new Experiment.Mutable('LevelData.mainSequence[0].sceneData.walls[0].temp')
 	}
 	this.data = { 
-		nA: new Experiment.Data('walls.wally.getDataSrc("vol")'),
-		nB: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "b", tag: "wally"})'),
-		nC: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "c", tag: "wally"})'),
-		nD: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "d", tag: "wally"})'),
-		temp: new Experiment.Data('walls[0].getDataSrc("temp")')
+		tempFinal: new Experiment.Data('walls.wally.getDataSrc("temp")')
+		// nA: new Experiment.Data('walls.wally.getDataSrc("vol")'),
+		// nB: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "b", tag: "wally"})'),
+		// nC: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "c", tag: "wally"})'),
+		// nD: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "d", tag: "wally"})'),
+		// temp: new Experiment.Data('walls[0].getDataSrc("temp")')
 	}
 	this.listData = {
-		vol: new Experiment.Data('walls.wally.getDataSrc("vol")')
+		vol: new Experiment.Data('walls.wally.getDataSrc("vol")'),
+		temp: new Experiment.Data('walls.wally.getDataSrc("temp")')
 	}
+	this.everyNth = 4; // print every nth value from listData
 	this.dataToEval = {
-		fracProdsExp: new Experiment.Data('nC + nD'),
-		eqConstExp: new Experiment.Data('nC * nD / (nB * nA)')
+		//fracProdsExp: new Experiment.Data('nC + nD'),
+		//eqConstExp: new Experiment.Data('nC * nD / (nB * nA)')
 	}
 	//appendEqData ONLY works for spcs [0] + [1] -> [2] + [3]
 	this.dimensions = [
-		new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempWalls'], testVals: '[298.15, 398.15 ... 900]'}]),
-		new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-20, -18 ... -16]'}, {paths: ['eAR'], testVals: '[24, 20... 16]'}])
+		new Experiment.Dimension([{paths: ['count'], testVals: '[300, 500 ... 500]'}])
+		// new Experiment.Dimension([{paths: ['tempDots1', 'tempDots2', 'tempWalls'], testVals: '[298.15, 398.15 ... 900]'}]),
+		// new Experiment.Dimension([{paths: ['hFC', 'hFD'], testVals: '[-20, -18 ... -16]'}, {paths: ['eAR'], testVals: '[24, 20... 16]'}])
 		//new Experiment.Dimension([{paths: ['BCollide'], testVals: '[.8, 1 ... 1.2]'}])
 	]
-	this.appendEqData = true;
-	this.numReps = 4;
-	this.runTime = 40; //seconds;
+	this.appendEqData = false;
+	this.numReps = 1;
+	this.runTime = 10; //seconds;
 
 	//end of experiment parameters
 	
@@ -89,7 +95,7 @@ Experiment.prototype = {
 		var table = '<table border="1" cellpadding="3">';
 		table += this.makeHeaderRow();
 		for (var i=0; i<orderedResults.length; i++) {
-			table += orderedResults[i].asTableRow(this.appendEqData, true);
+			table += orderedResults[i].asTableBlock(this.appendEqData, this.everyNth, true);
 
 		}
 		table += '</table>';
@@ -105,8 +111,8 @@ Experiment.prototype = {
 		var idxInSets = 0;
 		for (var i=0; i<groups.length; i++) {
 			var args = [idxInSets, groups[i].length].concat(this.sortResults(groups[i], dimOrder.slice(1, dimOrder.length - 1)));
-			sets.splice(args);
-			//Array.prototype.splice.apply(sets, args);
+			//sets.splice(args);
+			Array.prototype.splice.apply(sets, args);
 			idxInSets += groups[i].length;
 		}
 		return sets;
@@ -139,7 +145,7 @@ Experiment.prototype = {
 		return sets;
 	},
 	tryNextMeasurement: function() {
-		this.recordPt(this.data, this.mutables, this.dimValIdxs);
+		this.recordPt(this.data, this.mutables, this.listData, this.dimValIdxs);
 		this.finished = this.tick();
 		this.measureNext();
 
@@ -183,6 +189,9 @@ Experiment.prototype = {
 		for (var a in this.data) {
 			tableRow += '<td>' + a + '</td>';
 		}
+		for (var a in this.listData) {
+			tableRow += '<td>' + a + '</td>';
+		}
 		for (var a in this.dataToEval) {
 			tableRow += '<td>' + a + '</td>';
 		}
@@ -200,7 +209,7 @@ Experiment.prototype = {
 		}
 		return numSetPts * this.numReps;
 	},
-	recordPt: function(data, mutables, dataValIdxs) {
+	recordPt: function(data, mutables, listData, dataValIdxs) {
 		if (this.resultsSets.length) {
 			var last = this.resultsSets[this.resultsSets.length - 1];
 			if (!last.isAtIdxs(dataValIdxs)) {
@@ -210,7 +219,7 @@ Experiment.prototype = {
 			this.resultsSets.push(new Experiment.ResultsSet(dataValIdxs));
 		}
 		
-		this.resultsSets[this.resultsSets.length - 1] = new Experiment.Results(data, mutables, this.dataToEval);
+		this.resultsSets[this.resultsSets.length - 1].results = new Experiment.Results(data, mutables, listData, this.dataToEval);
 	},
 	setVals: function(mutables, dims, dimValIdxs) {
 		for (var i=0; i<dims.length; i++) {
@@ -246,10 +255,10 @@ Experiment.ResultsSet.prototype = {
 		}
 		return true;
 	},
-	asTableRow: function(appendEqData, pad) {
+	asTableBlock: function(appendEqData, everyNth, pad) {
 		var row = '';
 		if (pad) row += '<tr><td></td></tr>';
-		row += this.results.asTableRow(appendEqData);
+		row += this.results.asTableBlock(appendEqData, everyNth);
 		return row;
 	}
 }
@@ -334,7 +343,7 @@ Experiment.Dimension.prototype = {
 	}
 }
 
-Experiment.Results = function(data, mutables, dataToEval) {
+Experiment.Results = function(data, mutables, listData, dataToEval) {
 	this.data = {};
 	this.spcDefs = deepCopy(LevelData.spcDefs);
 	var tempSrc = walls[0].getDataSrc('temp');
@@ -343,6 +352,9 @@ Experiment.Results = function(data, mutables, dataToEval) {
 	for (var datum in data) {
 		this.data[datum] = data[datum].avg(200);
 	}
+	this.listData = {};
+	for (a in listData) 
+		this.listData[a] = eval(listData[a].path);
 	this.evaledData = this.evalData(dataToEval, this.data);
 }
 
@@ -369,22 +381,27 @@ Experiment.Results.prototype = {
 		}
 		return evaled;
 	},
-	asTableRow: function(appendEqData) {
-		var tableRow = '<tr>';
+	asTableBlock: function(appendEqData, everyNth) {
+		var tableBlock = '<tr>';
 		for (var a in this.setPts) {
-			tableRow += '<td>' + this.setPts[a] + '</td>';
+			tableBlock += '<td>' + this.setPts[a] + '</td>';
 		}
 		for (var a in this.data) {
-			tableRow += '<td>' + this.data[a] + '</td>';
+			tableBlock += '<td>' + this.data[a] + '</td>';
+		}
+		for (var a in this.listData) {
+			tableBlock += '<td>' + this.listData[a][0] + '</td>';  
 		}
 		for (var a in this.evaledData) {
-			tableRow += '<td>' + this.evaledData[a] + '</td>';
+			tableBlock += '<td>' + this.evaledData[a] + '</td>';
 		}
 		if (appendEqData) {
-			tableRow += this.makeEqData(this.spcDefs);
+			tableBlock += this.makeEqData(this.spcDefs);
 		}
-		tableRow += '</tr>';
-		return tableRow;
+		tableBlock += '</tr>';
+		if (countAttrs(this.listData)) 
+			tableBlock = this.appendListDataToTableBlock(this.setPts, this.data, this.listData, this.evaledData, appendEqData, tableBlock, everyNth);
+		return tableBlock;
 	},
 	makeEqData: function(spcDefs) {
 		var temp = this.finalTemp;
@@ -403,6 +420,33 @@ Experiment.Results.prototype = {
 			if (testFrac >= 0 && testFrac <= 1) break;
 		}
 		return '<td>' + eqConst + '</td><td>' + testFrac + '</td>';
+	},
+	appendListDataToTableBlock: function(setPts, data, listData, evaledData, appendEqData, tableBlock, everyNth) {
+		var maxLen = 0;
+		for (var a in listData) maxLen = Math.max(listData[a].length, maxLen);
+		
+		for (var i=1; i<maxLen; i++) {
+			if (i % everyNth == 0) { 
+				tableBlock += '<tr>';
+				for (var a in setPts) {
+					tableBlock += '<td>' + '</td>';
+				}
+				for (var a in data) {
+					tableBlock += '<td>' + '</td>';
+				}
+				for (var a in listData) {
+					tableBlock += '<td>' + (this.listData[a][i] !== undefined ? this.listData[a][i] : '') + '</td>';
+				}
+				for (var a in evaledData) {
+					tableBlock += '<td>' + '</td>';
+				}
+				//if (appendEqData) {
+				//	tableBlock += this.makeEqData(this.spcDefs);
+				//}		
+				tableBlock += '</tr>'
+			}
+		}
+		return tableBlock;
 	},
 	objToStr: function(obj) {
 		var str = '';
