@@ -21,7 +21,8 @@ LevelData = {
 						{
 							type: 'text',
 							text: 'type your answer here',
-							storeAs: 'longAns1'
+							storeAs: 'longAns1',
+							CWQuestionId: 13
 						}
 					]
 				},
@@ -32,7 +33,8 @@ LevelData = {
 						{
 							type: 'text',
 							text: 'type your answer here',
-							storeAs: 'longAns2'
+							storeAs: 'longAns2',
+							CWQuestionId: 14
 						}
 					]
 				}
@@ -111,7 +113,8 @@ LevelData = {
 							preText: "Let's begin our experiment with the isothermal compression of 1.1 moles of perfectly ideal gas using a single block. Please place the block on the piston. Estimate the value of work in this compression process.",
 							text: ' ', 
 							units: 'kJ',
-							storeAs: 'Ans1'
+							storeAs: 'Ans1',
+							CWQuestionId: 15
 						}
 					],
 					title: 'Current Step'		
@@ -123,7 +126,8 @@ LevelData = {
 							type: 'text',
 							preText:'You calculated get("Ans1", "string") kJ for the isothermal compression process.  How does that compare to the value of heat?  Explain.',
 							text: 'type your answer here',
-							storeAs: 'LongAns3'
+							storeAs: 'LongAns3',
+							CWQuestionId: 16
 						}
 					],
 				},
@@ -139,7 +143,8 @@ LevelData = {
 							preText:'Now remove the block and let the piston isothermally expand.  For the compression process, you estimated that it "cost" you get("Ans1", "string") kJ of work.  Estimate how much work you "got back" from the expansion.',
 							text: '',
 							units: 'kJ',
-							storeAs: 'Ans2'
+							storeAs: 'Ans2',
+							CWQuestionId: 17
 						}
 					],
 				},
@@ -150,7 +155,8 @@ LevelData = {
 							type: 'text',
 							preText: 'The system above has returned to its intial state, but what about the surroundings? Have they changed? Explain. <p>Was this process reversible?',
 							text: 'type your answer here',
-							storeAs: 'LongAns4'
+							storeAs: 'LongAns4',
+							CWQuestionId: 18
 						}
 					]
 				}
@@ -227,7 +233,8 @@ LevelData = {
 							preText: "Now we're going to break the process into two steps. Place both blocks on the piston one at a time, waiting for the piston to settle before placing the next block. Estimate the value of work done on the system in this compression process.",
 							text: ' ', 
 							units: 'kJ',
-							storeAs: 'Ans3'
+							storeAs: 'Ans3',
+							CWQuestionId: 19
 						}
 					],
 					title: 'Current Step'		
@@ -239,7 +246,8 @@ LevelData = {
 							type: 'text',
 							preText:'You calculated get("Ans3", "string") kJ for the isothermal compression process.  How does this compare to the value of work calculated in the single block simulation?  Explain.',
 							text: 'type your answer here',
-							storeAs: 'LongAns5'
+							storeAs: 'LongAns5',
+							CWQuestionId: 20
 						}
 					],
 				},
@@ -255,7 +263,8 @@ LevelData = {
 							preText:'Now remove both blocks one at a time, waiting for the piston to settle before removing the next block. Estimate the work done on the system',
 							text: '',
 							units: 'kJ',
-							storeAs: 'Ans4'
+							storeAs: 'Ans4',
+							CWQuestionId: 21
 						}
 					],
 				},
@@ -266,7 +275,8 @@ LevelData = {
 							type: 'text',
 							preText: 'Now that this system has reached its initial state, are its surroundings unchanged? If you believe they have changed, how does it compare to the change in the first, single block process? Explain.',
 							text: 'type your answer here',
-							storeAs: 'longAns6'
+							storeAs: 'longAns6',
+							CWQuestionId: 22
 						}
 					]
 				}
@@ -341,7 +351,8 @@ LevelData = {
 							preText: "Now we're going to break the process into even smaller pieces. Slowly add mass to the system by clicking and holding the button to the right of the piston-cylinder assembly until the external pressure is equal to 4 bar. <p>How much work was done on the 1.1 moles of ideal gas in the system? For simplicity, you can assume that the external pressure is approximately equal to the internal pressure of the system at all times.",
 							text: ' ', 
 							units: 'kJ',
-							storeAs: 'Ans5'
+							storeAs: 'Ans5',
+							CWQuestionId: 23
 						}
 					],
 					title: 'Current Step'		
@@ -354,7 +365,8 @@ LevelData = {
 							preText:'You calculated get("Ans5", "string") kJ for the isothermal compression process.  Now slowly remove mass until the external pressure is equal to 2 bar. How much work was done on the system?',
 							text: '',
 							units: 'kJ',
-							storeAs: 'Ans6'
+							storeAs: 'Ans6',
+							CWQuestionId: 24
 						}
 					],
 				},
@@ -365,7 +377,8 @@ LevelData = {
 							type: 'text',
 							preText:'How do these two values of work compare? Have the surroundings changed now? What can be said about the amount of work put into a sytem compared to the amount of work gotten out when external pressure is changed in smaller increments?',
 							text: 'type your answer here',
-							storeAs: 'longAns7'
+							storeAs: 'longAns7',
+							CWQuestionId: 25
 						}
 					],
 				},
@@ -377,7 +390,8 @@ LevelData = {
 							type: 'text',
 							preText:'<p>Was this process actually reversible? Can a real process ever be reversible? <p>What kind of changes in input are required for a process to be truly reversible?',
 							text: 'type your answer here',
-							storeAs: 'longAns8'
+							storeAs: 'longAns8',
+							CWQuestionId: 26
 						}
 					],
 				},

@@ -20,6 +20,7 @@ LevelData = {
 							storeAs: 'foo1', 
 							type:'text', 
 							text:'Type your answer here.', 
+							CWQuestionId: 27
 							}, 
 						]	
 					},	 
@@ -32,7 +33,8 @@ LevelData = {
 						type: 'textSmall', 
 						storeAs: 'foo2', 
 						units: 'kJ', 
-						text: ''
+						text: '',
+						CWQuestionId: 28
 					},							
 					 
 					]
@@ -78,6 +80,7 @@ LevelData = {
 							storeAs: 'foo3', 
 							type:'text', 
 							text:'Type your answer here.', 
+							CWQuestionId: 29
 						},
 					],					
 				},
@@ -89,6 +92,7 @@ LevelData = {
 							storeAs: 'foo4', 
 							type:'text', 
 							text:'Type your answer here.', 
+							CWQuestionId: 30
 						}, 
 					]
 				},
@@ -128,6 +132,7 @@ LevelData = {
 							storeAs: 'foo', 
 							type:'text', 
 							text:'Type your answer here.', 
+							CWQuestionId: 31
 						}, 
 					]
 				}				
@@ -144,14 +149,16 @@ LevelData = {
 						type: 'textSmall', 
 						storeAs: 'foo5', 
 						units: 'L', 
-						text: ''
+						text: '',
+						CWQuestionId: 32
 					},
 					{
 						type: 'textSmall', 
 						preText: '<br>How much work did the system do on its surroundings?<br>',
 						storeAs: 'foo6', 
 						units: 'kJ', 
-						text: ''
+						text: '',
+						CWQuestionId: 33
 					},						 
 					]
 				}
@@ -194,6 +201,7 @@ LevelData = {
 									storeAs: 'foo7', 
 									type:'text', 
 									text:'Type your answer here.', 
+									CWQuestionId: 34
 								},
 							]
 						}, 
@@ -209,6 +217,7 @@ LevelData = {
 									storeAs: 'foo8', 
 									type:'text', 
 									text:'Type your answer here.', 
+									CWQuestionId: 35
 								},
 							]	
 						}
@@ -225,6 +234,7 @@ LevelData = {
 							storeAs: 'foo9', 
 							type:'text', 
 							text:'Type your answer here.', 
+							CWQuestionId: 36
 						},
 					]
 				}

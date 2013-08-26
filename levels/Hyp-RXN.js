@@ -18,7 +18,8 @@ LevelData = {
 							quiz:[
 									{type: 'text',
 									storeAs:'HypAns',
-									text: 'Type your answer here.'
+									text: 'Type your answer here.',
+									CWQuestionId: 76
 									}
 								]	
 				},
@@ -39,7 +40,8 @@ LevelData = {
 					quiz:[
 									{type: 'text',
 									storeAs:'2ndans',
-									text: 'Type your answer here.'
+									text: 'Type your answer here.',
+									CWQuestionId: 77
 									}
 						]
 				},
@@ -101,7 +103,8 @@ LevelData = {
 					quiz:[
 							{type: 'text',
 							storeAs:'realProcess',
-							text: 'Type your answer here.'
+							text: 'Type your answer here.',
+							CWQuestionId: 78
 							}
 						]
 				},
@@ -124,17 +127,20 @@ LevelData = {
 						storeAs: 'step1',
 						units: 'kJ',
 						preText: '##\\Delta H## of step 1: ',
-						text: ''},
+						text: '',
+						CWQuestionId: 79},
 						{type: 'textSmall',
 						storeAs:'step2',
 						units: 'kJ',
 						preText: '##\\Delta H## of step 2: ',
-						text: '',},
+						text: '',
+						CWQuestionId: 80},
 						{type: 'textSmall',
 						storeAs: 'step3',
 						units: 'kJ',
 						preText: '##\\Delta H## of step 3: ',
-						text: '',}
+						text: '',
+						CWQuestionId: 81}
 					]
 				}
 			]
@@ -212,7 +218,8 @@ LevelData = {
 					quiz: [
 						{type: 'text',
 						storeAs: 'hypAns1',
-						text: 'Type your answer here'
+						text: 'Type your answer here',
+						CWQuestionId: 82
 						}
 					]
 				},
@@ -230,7 +237,8 @@ LevelData = {
 					quiz: [
 						{type: 'text',
 						storeAs: 'hypAns2',
-						text: 'Type your answer here'
+						text: 'Type your answer here',
+						CWQuestionId: 83
 						}
 					]
 				},
@@ -244,7 +252,8 @@ LevelData = {
 					quiz:[
 						{type: 'text',
 						storeAs: 'hypAns3',
-						text: 'Type your answer here'
+						text: 'Type your answer here',
+						CWQuestionId: 84
 						}
 					]
 				},
@@ -255,7 +264,8 @@ LevelData = {
 					quiz:[
 						{type: 'text',
 						storeAs: 'hypAns4',
-						text: 'Type your answer here'
+						text: 'Type your answer here',
+						CWQuestionId: 85
 						}
 					]
 				}
@@ -311,7 +321,8 @@ LevelData = {
 							{type: 'textSmall',
 							storeAs: 'finalAns',
 							text: ' ',
-							units: 'kJ'
+							units: 'kJ',
+							CWQuestionId: 86
 							}
 						]
 				}
@@ -367,7 +378,8 @@ LevelData = {
 							{type: 'textSmall',
 							storeAs: 'finalerAns',
 							text: ' ',
-							units: 'kJ'
+							units: 'kJ',
+							CWQuestionId: 87
 							}
 						]
 				},
@@ -379,6 +391,7 @@ LevelData = {
 							type: 'text',
 							storeAs: 'theLastAns',
 							text: 'Type your answer here',
+							CWQuestionId: 88
 						}
 					]
 				}

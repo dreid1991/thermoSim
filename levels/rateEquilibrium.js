@@ -20,6 +20,7 @@ LevelData = {
 						storeAs: 'foo1', 
 						type:'text', 
 						text:'Type your answer here.', 
+						CWQuestionId: 37
 					}, 
 				]	
 			},	 
@@ -78,6 +79,7 @@ LevelData = {
 								type:'textSmall', 
 								units: 'seconds',
 								text:'', 
+								CWQuestionId: 38
 							}, 
 					]
 				},
@@ -90,6 +92,7 @@ LevelData = {
 								storeAs: 'foo3', 
 								type:'text', 
 								text:'Type your response here.', 
+								CWQuestionId: 39
 							}, 
 					]
 				},
@@ -103,6 +106,7 @@ LevelData = {
 								type:'textSmall', 
 								units: 'K',
 								text:'', 
+								CWQuestionId: 40
 							}, 
 					]
 				},
@@ -160,6 +164,7 @@ LevelData = {
 								type:'textSmall', 
 								units: 'seconds',
 								text:'', 
+								CWQuestionId: 41
 							}, 
 					]
 				}
@@ -178,6 +183,7 @@ LevelData = {
 								storeAs: 'foo6', 
 								type:'text',
 								text:'Type your answer here.', 
+								CWQuestionId: 42
 							},
 					
 					]
@@ -191,6 +197,7 @@ LevelData = {
 								storeAs: 'foo7', 
 								type:'text',
 								text:'Type your answer here.', 
+								CWQuestionId: 43
 							},
 					
 					]
@@ -204,6 +211,7 @@ LevelData = {
 								storeAs: 'foo8', 
 								type:'text',
 								text:'Type your answer here.', 
+								CWQuestionId: 44
 							},					
 					]
 				}
@@ -249,6 +257,7 @@ LevelData = {
 								storeAs: 'foo9', 
 								type:'text', 							
 								text:'Type your answer here', 
+								CWQuestionId: 45
 							}, 
 					]
 				},
@@ -302,6 +311,7 @@ LevelData = {
 								storeAs: 'foo10', 
 								type:'text', 
 								text:'Type your answer here', 
+								CWQuestionId: 46
 							}, 
 					]
 				},
@@ -314,6 +324,7 @@ LevelData = {
 								storeAs: 'foo11', 
 								type:'text', 
 								text:'Type your answer here', 
+								CWQuestionId: 47
 							}, 
 					]
 				},
@@ -326,6 +337,7 @@ LevelData = {
 								storeAs: 'foo12', 
 								type:'text', 
 								text:'Type your answer here', 
+								CWQuestionId: 48
 							}, 
 					]
 				},
@@ -344,6 +356,7 @@ LevelData = {
 								storeAs: 'foo13', 
 								type:'text',
 								text:'Type your answer here.', 
+								CWQuestionId: 49
 							},
 					
 					]
@@ -401,6 +414,7 @@ LevelData = {
 								type:'textSmall',
 								units:'seconds',
 								text:'', 
+								CWQuestionId: 50
 							},
 					
 					]
@@ -414,6 +428,7 @@ LevelData = {
 								storeAs: 'foo15', 
 								type:'text',
 								text:'Type your answer here.', 
+								CWQuestionId:51
 							},
 					
 					]
@@ -433,6 +448,7 @@ LevelData = {
 								storeAs: 'foo16', 
 								type:'textSmall',
 								text:'', 
+								CWQuestionId: 52
 							},
 					
 					]
@@ -446,6 +462,7 @@ LevelData = {
 								storeAs: 'foo17', 
 								type:'text',
 								text:'Type your answer here.', 
+								CWQuestionId: 53
 							},
 					
 					]
@@ -459,6 +476,7 @@ LevelData = {
 								storeAs: 'foo18', 
 								type:'text',
 								text:'Type your answer here.', 
+								CWQuestionId: 54
 							},
 					]	
 				}
@@ -513,7 +531,8 @@ LevelData = {
 								storeAs: 'foo19', 
 								type:'textSmall',
 								text:'', 
-								units: 'seconds'
+								units: 'seconds',
+								CWQuestionId: 55
 							},
 					]
 				},
@@ -525,6 +544,7 @@ LevelData = {
 								storeAs: 'foo20', 
 								type:'text',
 								text:'Type your answer here', 
+								CWQuestionId: 56
 							},
 					]
 				},
@@ -537,6 +557,7 @@ LevelData = {
 								storeAs: 'foo21', 
 								type:'textSmall',
 								text:'', 
+								CWQuestionId: 57
 							},
 					
 					]
@@ -550,6 +571,7 @@ LevelData = {
 								storeAs: 'foo22', 
 								type:'text',
 								text:'Type your answer here.', 
+								CWQuestionId: 58
 							},
 					]
 				}
@@ -607,6 +629,7 @@ LevelData = {
 								storeAs: 'foo23', 
 								type:'text',
 								text:'Type your answer here.', 
+								CWQuestionId: 59
 							},
 					]
 				},
@@ -618,6 +641,7 @@ LevelData = {
 								storeAs: 'foo24', 
 								type:'textSmall',
 								text:'', 
+								CWQuestionId: 60
 							},
 					]
 				},
@@ -630,6 +654,7 @@ LevelData = {
 								storeAs: 'foo25', 
 								type:'text',
 								text:'Type your answer here', 
+								CWQuestionId: 61
 							},
 					]
 				},
@@ -642,6 +667,7 @@ LevelData = {
 								storeAs: 'foo26', 
 								type:'text',
 								text:'Type your answer here', 
+								CWQuestionId: 62
 							},
 					]
 				},
@@ -653,7 +679,8 @@ LevelData = {
 							{
 								storeAs: 'foo27', 
 								type:'text',
-								text:'Type your answer here', 
+								text:'Type your answer here',
+								CWQuestionId: 63
 							},
 					]
 				},

@@ -18,7 +18,8 @@ LevelData = {
 							quiz:[
 									{type: 'text',
 									storeAs:'HypAns1',
-									text: 'Type your answer here.'
+									text: 'Type your answer here.',
+									CWQuestionId: 64
 									}
 								]	
 				},
@@ -63,7 +64,8 @@ LevelData = {
 									preText: 'At what temperature did the liquid vaporize?',
 									units: 'K',
 									storeAs: 'HypAns2',
-									text: ''
+									text: '',
+									CWQuestionId: 65
 								}
 							]
 						},
@@ -77,7 +79,8 @@ LevelData = {
 									preText: 'The Antoine coefficients are: ##A = 7.4, B = 1622.2 K, C = -20 K##',
 									text: '',
 									units: 'bar',
-									storeAs: 'HypAns3'
+									storeAs: 'HypAns3',
+									CWQuestionId: 66
 								}
 							]
 						},
@@ -95,17 +98,20 @@ LevelData = {
 								storeAs: 'step1',
 								units: 'kJ',
 								preText: '##\\Delta H## of step 1: ',
-								text: ''},
+								text: '',
+								CWQuestionId: 67},
 								{type: 'textSmall',
 								storeAs:'step2',
 								units: 'kJ',
 								preText: '##\\Delta H## of step 2: ',
-								text: '',},
+								text: '',
+								CWQuestionId: 68},
 								{type: 'textSmall',
 								storeAs: 'step3',
 								units: 'kJ',
 								preText: '##\\Delta H## of step 3: ',
-								text: '',}
+								text: '',
+								CWQuestionId: 69}
 							]
 						}
 					]
@@ -184,7 +190,8 @@ LevelData = {
 							type: 'text',
 							preText: 'How does the enthalpy change compare to the value you calculated?',
 							text: 'Type your answer here',
-							storeAs: 'HypAns4'
+							storeAs: 'HypAns4',
+							CWQuestionId: 70
 						}
 					]
 				},
@@ -204,7 +211,8 @@ LevelData = {
 							type: 'text',
 							preText: 'How does the enthalpy change of this step compare to the value you calculated?',
 							storeAs: 'HypAns5',
-							text: 'Type your answer here'
+							text: 'Type your answer here',
+							CWQuestionId: 71
 						}
 					]
 				},
@@ -222,7 +230,8 @@ LevelData = {
 							type: 'text',
 							preText: 'How does the enthalpy change of this step compare to the value you calculated?',
 							storeAs: 'HypAns6',
-							text: 'Type your answer here'
+							text: 'Type your answer here',
+							CWQuestionId: 72
 						}
 					]
 				},
@@ -234,7 +243,8 @@ LevelData = {
 						{
 							type: 'text',
 							storeAs: 'HypAns7',
-							text: 'Type your answer here'
+							text: 'Type your answer here',
+							CWQuestionId: 73
 						}
 					]
 				}
@@ -252,7 +262,8 @@ LevelData = {
 							type: 'textSmall',
 							text: '',
 							units: 'kJ',
-							storeAs: 'HypAns8'
+							storeAs: 'HypAns8',
+							CWQuestionId: 74
 						}
 					]
 				}
@@ -314,7 +325,8 @@ LevelData = {
 							type: 'text',
 							preText: 'How does the enthalpy of vaporization of the real process compare to that which you calculated using hypothetical paths?',
 							storeAs: 'HypAns9',
-							text: 'Type your answer here'
+							text: 'Type your answer here',
+							CWQuestionId: 75
 						}
 					]
 				}
