@@ -76,7 +76,7 @@ LevelData = {
 							quiz: [
 								{
 									type: 'textSmall',
-									preText: 'The Antoine coefficients are: ##A = 7.4, B = 1622.2 K, C = -20 K##',
+									preText: 'The Antoine coefficients are: ##A = 7.4, B = 1622.2 K, C = -20 K## <p>Pressure is in mmHg</p>',
 									text: '',
 									units: 'bar',
 									storeAs: 'HypAns3',
@@ -87,7 +87,7 @@ LevelData = {
 						{//Prompt 1
 							sceneData: undefined,
 							cutScene: true,
-							text: "We wish to calculate the change in enthalpy for the previous process, but only have the following: <p><br> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>40</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>28</td></tr></table> </center></br></p> The heat capacities can assumed to be constant over the entire temperature range of the process.   The enthalpy of vaporization can be assumed to be constant with respect to pressure. <p>Construct a hypothetical path that will allow you to calculate the change in system enthalpy of the previous process.  Calculate the enthalpy change for each step in your hypothetical path and record the values on a separate sheet of paper. </p> The process is: 1 mole A (liq) 400 K##\\rightarrow## 1 mole A (gas) 400 K "
+							text: "We wish to calculate the change in enthalpy for the previous process, but only have the following: <p> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>40</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>28</td></tr></table> </center></p> The heat capacities can be assumed to be constant over the entire temperature range of the process.   The enthalpy of vaporization can be assumed to be constant with respect to pressure. <p>Construct a hypothetical path that will allow you to calculate the change in system enthalpy of the previous process.  Calculate the enthalpy change for each step in your hypothetical path and record the values on a separate sheet of paper. </p> The process is: 1 mole A (liq) 400 K##\\rightarrow## 1 mole A (gas) 400 K "
 						},
 						{//Prompt 2
 							sceneData: undefined,
@@ -319,7 +319,7 @@ LevelData = {
 							'$($("button")[0]).show()'
 						]
 					},
-					text: 'Let`s perform the process again. This time the enthalpy change of the process is displayed and graphed. As before heat the system from 350 K to 450 K.',
+					text: 'Let\'s perform the process again. This time the enthalpy change of the process is displayed and graphed. As before heat the system from 350 K to 450 K.',
 					quiz: [
 						{
 							type: 'text',

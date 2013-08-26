@@ -273,7 +273,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'text',
-							preText: 'Now that this system has reached its initial state, are its surroundings unchanged? If you believe they have changed, how does it compare to the change in the first, single block process? Explain.',
+							preText: 'Now that this system has reached its initial state, are its surroundings unchanged? If you believe there has been a change, how does it compare to the change in the first, single block process? Explain.',
 							text: 'type your answer here',
 							storeAs: 'longAns6',
 							CWQuestionId: 22

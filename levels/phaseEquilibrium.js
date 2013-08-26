@@ -281,7 +281,7 @@ LevelData = {
 							options:[
 										{text:"Decrease Pressure", correct: false, message:"That's not correct", CWAnswerId: 9},
 										{text:"Increase Pressure", correct: true, CWAnswerId: 10},
-										{text:"Remove Water Vapor", correct: false, message: "That's not correct". CWAnswerId: 11},
+										{text:"Remove Water Vapor", correct: false, message: "That's not correct", CWAnswerId: 11},
 										{text:"Add Water Vapor", correct: false, message:"That's not correct", CWAnswerId: 12},
 										{text:"Add Inert Species", correct: false, message: "That's not correct", CWAnswerId: 13}, 
 							]
@@ -396,7 +396,7 @@ LevelData = {
 						{
 							type: 'multChoice',
 							CWQuestionId: 101,
-							questionText: 'The vapor heat capacity of water is 1.9 kJ/kgK and the liquid heat capacity of water is 4.2 kJ/kgK. How ill the heat of vaporization at 150 C compare to the value at 100 C?',
+							questionText: 'The vapor heat capacity of water is 1.9 kJ/kgK and the liquid heat capacity of water is 4.2 kJ/kgK. How will the heat of vaporization at 150 C compare to the value at 100 C?',
 							options:[
 								{text: "Less at 150 C", correct: true, CWAnswerId: 14},
 								{text: "Equal at 150 C", correct: false, message: "That is the incorrect answer", CWAnswerId: 15},
