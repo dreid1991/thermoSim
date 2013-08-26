@@ -295,7 +295,7 @@ LevelData = {
 		{//Third Scene
 			sceneData: {
 				walls: [
-					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 423.15, handle: 'wallo', vol: 13.5, isothermalRate: 4, border: {type: 'open', width: 10, yMin: 40} },
+					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 423.15, handle: 'wallo', vol: 13.5, isothermalRate: 50, border: {type: 'open', width: 10, yMin: 40} },
 				],
 				dots: [
 					{spcName: 'spc3', pos: P(45,100), dims: V(465,240), count: 396, temp:423.15, returnTo: 'wallo', tag: 'wallo'}, //count 396
