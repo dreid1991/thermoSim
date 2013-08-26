@@ -76,7 +76,7 @@ LevelData = {
 							quiz: [
 								{
 									type: 'textSmall',
-									preText: 'The Antoine coefficients are: ##A = 7.4, B = 1622.2 K, C = -20 K## <p>Pressure is in mmHg</p>',
+									preText: 'The Antoine coefficients are: <p>##A = 7.4, B = 1622.2 K, C = -20 K##</p> <p>Pressure is in ##mmHg##.</p>',
 									text: '',
 									units: 'bar',
 									storeAs: 'HypAns3',
@@ -92,7 +92,7 @@ LevelData = {
 						{//Prompt 2
 							sceneData: undefined,
 							cutScene: true,
-							text: 'Input your enthalpy change values for each step below',
+							text: '<p>Input your enthalpy change values for each step below</p>',
 							quiz: [
 								{type: 'textSmall',
 								storeAs: 'step1',
