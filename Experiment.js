@@ -33,6 +33,9 @@ function Experiment() {
 		nD: new Experiment.Data('walls[0].getDataSrc("frac", {spcName: "d", tag: "wally"})'),
 		temp: new Experiment.Data('walls[0].getDataSrc("temp")')
 	}
+	this.listData = {
+		vol: new Experiment.Data('walls.wally.getDataSrc("vol")')
+	}
 	this.dataToEval = {
 		fracProdsExp: new Experiment.Data('nC + nD'),
 		eqConstExp: new Experiment.Data('nC * nD / (nB * nA)')
@@ -102,7 +105,8 @@ Experiment.prototype = {
 		var idxInSets = 0;
 		for (var i=0; i<groups.length; i++) {
 			var args = [idxInSets, groups[i].length].concat(this.sortResults(groups[i], dimOrder.slice(1, dimOrder.length - 1)));
-			Array.prototype.splice.apply(sets, args);
+			sets.splice(args);
+			//Array.prototype.splice.apply(sets, args);
 			idxInSets += groups[i].length;
 		}
 		return sets;
@@ -206,8 +210,7 @@ Experiment.prototype = {
 			this.resultsSets.push(new Experiment.ResultsSet(dataValIdxs));
 		}
 		
-
-		this.resultsSets[this.resultsSets.length - 1].addResults(new Experiment.Results(data, mutables, this.dataToEval));
+		this.resultsSets[this.resultsSets.length - 1] = new Experiment.Results(data, mutables, this.dataToEval);
 	},
 	setVals: function(mutables, dims, dimValIdxs) {
 		for (var i=0; i<dims.length; i++) {
@@ -229,13 +232,13 @@ Experiment.prototype = {
 
 Experiment.ResultsSet = function(dimValIdxs) {
 	this.dimValIdxs = dimValIdxs.concat();
-	this.results = [];
+	this.results = undefined;
 }
 
 
 Experiment.ResultsSet.prototype = {
 	addResults: function(results) {
-		this.results.push(results);
+		this.results = results;
 	},
 	isAtIdxs: function(idxs) {
 		for (var i=0; i<idxs.length; i++) {
@@ -246,9 +249,7 @@ Experiment.ResultsSet.prototype = {
 	asTableRow: function(appendEqData, pad) {
 		var row = '';
 		if (pad) row += '<tr><td></td></tr>';
-		for (var i=0; i<this.results.length; i++) {
-			row += this.results[i].asTableRow(appendEqData);
-		}
+		row += this.results.asTableRow(appendEqData);
 		return row;
 	}
 }
