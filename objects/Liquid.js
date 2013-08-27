@@ -239,7 +239,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 		this.calcEquil = this.setupUpdateEquil(wallGas, wallLiq, spcDefs, dataGas, dataLiq, actCoeffFuncs, drivingForce, dotMgrLiq);
 		this.addDrawListener(drawList);
 		this.moveDots = this.setupMoveDots(dotMgrLiq, spcDefs, wallLiq, wallGas, wallGasIdxs);
-		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcDefs, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt);//you were making the liquid eject if df<0 whether hit or not
+		this.ejectDots = this.setupEjectDots(dotMgrLiq, spcDefs, drivingForce, numAbs, drivingForceSensitivity, drawList, wallLiq, numEjt);
 		var sizeWall = this.setupSizeWall(wallLiq, wallGas, spcDefs, dotMgrLiq, wallGasIdxs, wallSurfAreaObj)
 		var zeroAttrs = this.zeroAttrs;
 		var fixLiquidTemp = this.setupFixLiquidTemp(wallGas, dotManager, dataGas);
@@ -262,7 +262,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var liqDots = self.dotMgrLiq.lists.ALLDOTS;
 				var gasDots = dotManager.lists.ALLDOTS;
 				addListener(curLevel, 'update', listenerName, function() {
-					if (0 < liqDots.length && liqDots.length < Math.min(75 * pressureSrc[pressureSrc.length - 1], 0.95 * (liqDots.length + gasDots.length)))/*(self.willFixTemp(liqDots, gasDots, dataGas.vol[dataGas.vol.length - 1], dataGas.pInt[dataGas.pInt.length - 1], dataGas.temp[dataGas.temp.length - 1]))*/ {
+					if (self.willFixTemp(liqDots, gasDots, dataGas.vol[dataGas.vol.length - 1], dataGas.temp[dataGas.temp.length - 1])) {
 						fixLiquidTemp();
 					}
 
@@ -287,10 +287,11 @@ _.extend(Liquid.prototype, objectFuncs, {
 			
 		})
 	},
-	willFixTemp: function(liqDots, gasDots, gasVol, gasPInt, gasTemp) {
-		var molarDensity = gasDots.length / (gasVol * N);
-		var fluxCoeff = molarDensity / .1 * Math.sqrt(gasTemp / 298); //.1 is pretty normal density
-		return 0 < liqDots.length && liqDots.length < 75 * Math.max(1, fluxCoeff);
+	willFixTemp: function(liqDots, gasDots, gasVol, gasTemp) {
+		return 0 < liqDots.length && liqDots.length < 75 * Math.max(1, this.fluxCoeff(gasDots, gasVol, gasTemp));
+	},
+	fluxCoeff: function(gasDots, gasVol, gasTemp) {
+		return gasDots.length / (gasVol * N) / .1 * Math.sqrt(gasTemp / 298); //.1 is pretty normal density
 	},
 	setupFixLiquidTemp: function(wallGas, dotMgrGas, dataGas) {
 		var self = this;
@@ -482,7 +483,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				if (dF > 0) { 
 					numEjt[spcName] += abs / (dF * drivingForceSensitivity + 1);
 				} else if (dF < 0) {
-					numEjt[spcName] += 1 + Math.sqrt(abs * (-dF * drivingForceSensitivity + 1));
+					numEjt[spcName] += 1 + Math.sqrt(abs * (-dF * drivingForceSensitivity + 1)); 
 					numEjt[spcName] += (wallLiq[0].x - wallLiq[1].x) * -dF * drivingForceSensitivity / 2000;
 				}
 				//numEjt[spcName] = 1;
@@ -490,6 +491,7 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var flr = Math.floor(numEjt[spcName])
 				
 				if (flr) {
+					console.log(flr);
 					self.eject(dotMgrLiq, window.dotManager, spcDefs, spcName, flr, wallGas, drawList, wallLiq);
 				}
 				numEjt[spcName] = 0;
@@ -581,7 +583,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 	},
 	hit: function(dot, wall, subWallIdx, wallUV, perpV, perpUV, extras){
 		//it's a sigmoid!
-		
 		var dF = this.drivingForce;
 		if (dF[dot.spcName] !== undefined) {
 			var chanceZero = this.chanceZeroDf;
