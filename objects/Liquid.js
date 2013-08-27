@@ -491,7 +491,6 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var flr = Math.floor(numEjt[spcName])
 				
 				if (flr) {
-					console.log(flr);
 					self.eject(dotMgrLiq, window.dotManager, spcDefs, spcName, flr, wallGas, drawList, wallLiq);
 				}
 				numEjt[spcName] = 0;
