@@ -61,7 +61,7 @@ LevelData = {
 					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 6, prods: {uglier: 2}},
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'molAtime', xLabel: "time", yLabel: "mole fraction of A", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'molAtime', xLabel: "time (s)", yLabel: "mole fraction of A", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
 							{handle:'moles', label:'frac A', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "time('wally')", y: "frac('wally', {spcName: 'ugly', tag: 'wally'})"}, trace: true, showPts: false, fillInPtsMin: 5}
 						]
@@ -72,7 +72,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: '<p>We first consider the case where A can react to form B, but B cannot react in "reverse" to form A. A will be represented by a blue molecule and B by a red molecule.</p><p> The isothermal system above is held at 300 K. You can start the reaction by clicking "enable reaction." How long does it take for 75% of the A to be consumed?</p>', 
+					text: '<p>We first consider the case where A can react to form B, but B cannot react in "reverse" to form A. A will be represented by a blue molecule and B by a red molecule.</p><p> The isothermal system above is held at 300 K. You can start the reaction by clicking "enable reaction." How long does it take for 60% of the A to be consumed?</p>', 
 					quiz:[
 							{
 								storeAs: 'foo2', 
@@ -146,7 +146,7 @@ LevelData = {
 					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 6, prods: {uglier: 2}},
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'molAtime', xLabel: "time", yLabel: "mole fraction of A", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'molAtime', xLabel: "time (s)", yLabel: "mole fraction of A", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
 							{handle:'moles', label:'frac A', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "time('wally')", y: "frac('wally', {spcName: 'ugly', tag: 'wally'})"}, trace: true, showPts: false, fillInPtsMin: 5}
 						]
@@ -157,7 +157,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: "Here is the same system, except at get('foo4', 'string', 'noValue') K instead of 300 K. Last time you said it took get('foo2', 'string', 'noValue') seconds for 75% of A to be consumed. When you're ready, click 'enable' and find out how long it takes this time. Enter the time you find in the text box.", 
+					text: "Here is the same system, except at get('foo4', 'string', 'noValue') K instead of 300 K. Last time you said it took get('foo2', 'string', 'noValue') seconds for 60% of A to be consumed. When you're ready, click 'enable' and find out how long it takes this time. Enter the time you find in the text box.", 
 					quiz:[
 							{
 								storeAs: 'foo5', 
@@ -191,7 +191,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Let's consider why the rate changes with temperature (or the reactivity of A). Using the Arrhenius equation, graph the reaction rate constant with respect to temperature from 0 to 1000 K. $$ k = Ae^{-E_{a}/{RT}} $$ The activation energy of this reaction is 150 kJ/mol and the pre-exponential constant is ##0.05 M^{-1}s^{-1}##. Why do you believe the rate behaves this way with respect to temperature?", 
+					text: "Let's consider why the rate changes with temperature (or the reactivity of A). Using the Arrhenius equation, graph on a separate piece of paper the reaction rate constant with respect to temperature from 0 to 1000 K. $$ k = Ae^{-E_{a}/{RT}} $$ The activation energy of this reaction is 150 kJ/mol and the pre-exponential constant is ##0.05 M^{-1}s^{-1}##. Why do you believe the rate behaves this way with respect to temperature?", 
 					quiz:[
 							{
 								storeAs: 'foo7', 
@@ -240,7 +240,7 @@ LevelData = {
 					{label: 'Temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 					],
 				graphs: [
-					{type: 'Scatter', handle: 'PvsVOne', xLabel: "temp (K)", yLabel: "fraction excited", axesInit:{x:{min:0, step:80}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'PvsVOne', xLabel: "temp (K)", yLabel: "Mole Fraction Excited", axesInit:{x:{min:0, step:80}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
 							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'temp("wally")', y: "frac('wally', {spcName: 'duckling', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
 						]
@@ -294,7 +294,7 @@ LevelData = {
 					{label: 'Temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'PvsVOne', xLabel: "temp (K)", yLabel: "fraction excited", axesInit:{x:{min:0, step:10}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'PvsVOne', xLabel: "temp (K)", yLabel: "Mole Fraction Excited", axesInit:{x:{min:0, step:10}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
 							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'temp("wally")', y: "frac('wally', {spcName: 'duckling', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
 						]

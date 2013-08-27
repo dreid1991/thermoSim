@@ -87,7 +87,7 @@ LevelData = {
 						{//Prompt 1
 							sceneData: undefined,
 							cutScene: true,
-							text: "We wish to calculate the change in enthalpy for the previous process, but only have the following: <p> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>40</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>28</td></tr></table> </center></p> The heat capacities can be assumed to be constant over the entire temperature range of the process.   The enthalpy of vaporization can be assumed to be constant with respect to pressure. <p>Construct a hypothetical path that will allow you to calculate the change in system enthalpy of the previous process.  Calculate the enthalpy change for each step in your hypothetical path and record the values on a separate sheet of paper. </p> The process is: 1 mole A (liq) 400 K##\\rightarrow## 1 mole A (gas) 400 K "
+							text: "We wish to calculate the change in enthalpy for the previous process, but only have the following: <p> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>40</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta h_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>28</td></tr></table> </center></p> The heat capacities can be assumed to be constant over the entire temperature range of the process.   The enthalpy of vaporization can be assumed to be constant with respect to pressure. <p>Construct a hypothetical path that will allow you to calculate the change in system enthalpy of the previous process.  Calculate the enthalpy change for each step in your hypothetical path and record the values on a separate sheet of paper. </p> The process is: 1 mole A (liq) 400 K##\\rightarrow## 1 mole A (gas) 400 K "
 						},
 						{//Prompt 2
 							sceneData: undefined,
@@ -256,7 +256,7 @@ LevelData = {
 				{//Prompt 0
 					sceneData: undefined,
 					cutScene: true,
-					text: "Now that we know the enthalpy of vaporization at 400 K is 2.2 kJ/mol, calculate the heat required for the real process:<p>##A (liquid, 350 K) \\rightarrow A(vapor, 450 K)##<p><br> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>25</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>2.0</td></tr></table> </center></br></p>",
+					text: "Now that we know the enthalpy of vaporization at 400 K is 28.6 kJ/mol, calculate the heat required for the real process:<p>##A (liquid, 350 K) \\rightarrow A(vapor, 450 K)##<p><br> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>25</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta h_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>2.0</td></tr></table> </center></br></p>",
 					quiz: [
 						{
 							type: 'textSmall',
