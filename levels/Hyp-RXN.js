@@ -3,8 +3,8 @@ LevelData = {
 	
 	spcDefs: [
 		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 30,sF298: 15, antoineCoeffs: {a: 8.07, b:1730.6, c: 233.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
-		{spcName: 'spc2', m: 4, r: 2, col: Col(0, 200, 0), cv: 3.5 * R, hF298: -13.5, hVap298: 10, sF298: 15, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 4.5* R, spcVolLiq: .3},
-		{spcName: 'spc3', m: 4, r: 2, col: Col(0, 200, 0), cv: 3.5 * R, hF298: -15, hVap298: 10,sF298: 15, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 4.5* R, spcVolLiq: .3}
+		{spcName: 'spc2', m: 4, r: 2, col: Col(250, 250, 0), cv: 3.5 * R, hF298: -13.5, hVap298: 10, sF298: 15, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 4.5* R, spcVolLiq: .3},
+		{spcName: 'spc3', m: 4, r: 2, col: Col(250, 250, 0), cv: 3.5 * R, hF298: -15, hVap298: 10,sF298: 15, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 4.5* R, spcVolLiq: .3}
 	],
 	mainSequence: [
 		{//First Scene
@@ -18,7 +18,8 @@ LevelData = {
 							quiz:[
 									{type: 'text',
 									storeAs:'HypAns',
-									text: 'Type your answer here.'
+									text: 'Type your answer here.',
+									CWQuestionId: 76
 									}
 								]	
 				},
@@ -39,7 +40,8 @@ LevelData = {
 					quiz:[
 									{type: 'text',
 									storeAs:'2ndans',
-									text: 'Type your answer here.'
+									text: 'Type your answer here.',
+									CWQuestionId: 77
 									}
 						]
 				},
@@ -97,11 +99,12 @@ LevelData = {
 						]
 					},
 					cutScene: false,
-					text: "The isothermal system above is held at 500 K and contains 1 mole of A.  The red colored species A  can reversibly react to form the green species B.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  Is the reaction endothermic or exothermic? What is the sign of the enthalpy of reaction? Explain.",
+					text: "The isothermal system above is held at 500 K and contains 1 mole of A.  The red colored species A  can reversibly react to form the yellow species B.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  Is the reaction endothermic or exothermic? What is the sign of the enthalpy of reaction? Explain.",
 					quiz:[
 							{type: 'text',
 							storeAs:'realProcess',
-							text: 'Type your answer here.'
+							text: 'Type your answer here.',
+							CWQuestionId: 78
 							}
 						]
 				},
@@ -124,17 +127,20 @@ LevelData = {
 						storeAs: 'step1',
 						units: 'kJ',
 						preText: '##\\Delta H## of step 1: ',
-						text: ''},
+						text: '',
+						CWQuestionId: 79},
 						{type: 'textSmall',
 						storeAs:'step2',
 						units: 'kJ',
 						preText: '##\\Delta H## of step 2: ',
-						text: '',},
+						text: '',
+						CWQuestionId: 80},
 						{type: 'textSmall',
 						storeAs: 'step3',
 						units: 'kJ',
 						preText: '##\\Delta H## of step 3: ',
-						text: '',}
+						text: '',
+						CWQuestionId: 81}
 					]
 				}
 			]
@@ -212,7 +218,8 @@ LevelData = {
 					quiz: [
 						{type: 'text',
 						storeAs: 'hypAns1',
-						text: 'Type your answer here'
+						text: 'Type your answer here',
+						CWQuestionId: 82
 						}
 					]
 				},
@@ -230,7 +237,8 @@ LevelData = {
 					quiz: [
 						{type: 'text',
 						storeAs: 'hypAns2',
-						text: 'Type your answer here'
+						text: 'Type your answer here',
+						CWQuestionId: 83
 						}
 					]
 				},
@@ -244,7 +252,8 @@ LevelData = {
 					quiz:[
 						{type: 'text',
 						storeAs: 'hypAns3',
-						text: 'Type your answer here'
+						text: 'Type your answer here',
+						CWQuestionId: 84
 						}
 					]
 				},
@@ -255,7 +264,8 @@ LevelData = {
 					quiz:[
 						{type: 'text',
 						storeAs: 'hypAns4',
-						text: 'Type your answer here'
+						text: 'Type your answer here',
+						CWQuestionId: 85
 						}
 					]
 				}
@@ -311,7 +321,8 @@ LevelData = {
 							{type: 'textSmall',
 							storeAs: 'finalAns',
 							text: ' ',
-							units: 'kJ'
+							units: 'kJ',
+							CWQuestionId: 86
 							}
 						]
 				}
@@ -367,7 +378,8 @@ LevelData = {
 							{type: 'textSmall',
 							storeAs: 'finalerAns',
 							text: ' ',
-							units: 'kJ'
+							units: 'kJ',
+							CWQuestionId: 87
 							}
 						]
 				},
@@ -379,6 +391,7 @@ LevelData = {
 							type: 'text',
 							storeAs: 'theLastAns',
 							text: 'Type your answer here',
+							CWQuestionId: 88
 						}
 					]
 				}

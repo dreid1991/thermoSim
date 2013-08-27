@@ -24,6 +24,7 @@ LevelData = {
 							type: 'text',
 							text: 'type your answer here',
 							storeAs: 'beginning1', 
+							CWQuestionId: 89
 						}
 					]
 				},
@@ -126,7 +127,8 @@ LevelData = {
 							type: 'text',							
 							preText: "Is the above system saturated? Explain",
 							text: 'Type your response here', 
-							storeAs: 'Ans1'
+							storeAs: 'Ans1',
+							CWQuestionId: 90
 						}
 					],
 					title: 'Current Step'		
@@ -139,7 +141,8 @@ LevelData = {
 							preText:'The system contains 0.4 moles of liquid water molecules. Determine the energy you have to add to the system in order to reach a saturated liquid state.',
 							text: '',
 							units: 'kJ',
-							storeAs: 'Ans2'
+							storeAs: 'Ans2',
+							CWQuestionId: 91
 						}
 					],
 				},
@@ -160,7 +163,8 @@ LevelData = {
 							preText:'<p>Determine the energy required to vaporize half the liquid. The enthalpy of vaporization for water is 40.68 kJ/mol</p>',
 							text: '',
 							units: 'kJ',
-							storeAs: 'Ans3'
+							storeAs: 'Ans3',
+							CWQuestionId: 92
 						}
 					],
 				},
@@ -182,6 +186,7 @@ LevelData = {
 							preText: 'How do the temperatures of the vapor and liquid phases compare?',
 							text: 'Type your response here',
 							storeAs: 'Ans4',
+							CWQuestionId: 93
 						}
 					],
 				},
@@ -193,6 +198,7 @@ LevelData = {
 							preText: 'Is the system saturated?',
 							text: '',
 							storeAs: 'Ans5',
+							CWQuestionId: 94
 						}
 					],
 				},	
@@ -205,6 +211,7 @@ LevelData = {
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans6',
+							CWQuestionId: 95
 						}
 					],
 				},
@@ -224,6 +231,7 @@ LevelData = {
 							preText: 'Is the system still saturated?',
 							text: ' ',
 							storeAs: 'Ans7',
+							CWQuestionId: 96
 						}
 					],
 				},
@@ -236,6 +244,7 @@ LevelData = {
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans8',
+							CWQuestionId: 97
 						}
 					],
 				},
@@ -252,6 +261,7 @@ LevelData = {
 							preText: 'Heat the vapor until it reaches 150 C. Is the system saturated at this new temperature?',
 							text: '',
 							storeAs: 'Ans9',
+							CWQuestionId: 98
 						}
 					],
 				},
@@ -266,13 +276,14 @@ LevelData = {
 					quiz: [
 						{
 							type: 'multChoice',
+							CWQuestionId: 99,
 							questionText: '<p>Now we want to return the system to saturation while keeping the temperature constant at 150 C. Which of the following will accomplish this goal?</p>',
 							options:[
-										{text:"Decrease Pressure", correct: false, message:"That's not correct"},
-										{text:"Increase Pressure", correct: true},
-										{text:"Remove Water Vapor", correct: false, message: "That's not correct"},
-										{text:"Add Water Vapor", correct: false, message:"That's not correct"},
-										{text:"Add Inert Species", correct: false, message: "That's not correct"}, 
+										{text:"Decrease Pressure", correct: false, message:"That's not correct", CWAnswerId: 9},
+										{text:"Increase Pressure", correct: true, CWAnswerId: 10},
+										{text:"Remove Water Vapor", correct: false, message: "That's not correct", CWAnswerId: 11},
+										{text:"Add Water Vapor", correct: false, message:"That's not correct", CWAnswerId: 12},
+										{text:"Add Inert Species", correct: false, message: "That's not correct", CWAnswerId: 13}, 
 							]
 						}
 					]
@@ -287,6 +298,7 @@ LevelData = {
 							text: '',
 							units: 'bar',
 							storeAs: 'Ans10',
+							CWQuestionId: 100
 						}	
 					],
 				},
@@ -295,7 +307,7 @@ LevelData = {
 		{//Third Scene
 			sceneData: {
 				walls: [
-					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 423.15, handle: 'wallo', vol: 13.5, isothermalRate: 4, border: {type: 'open', width: 10, yMin: 40} },
+					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 423.15, handle: 'wallo', vol: 13.5, isothermalRate: 50, border: {type: 'open', width: 10, yMin: 40} },
 				],
 				dots: [
 					{spcName: 'spc3', pos: P(45,100), dims: V(465,240), count: 396, temp:423.15, returnTo: 'wallo', tag: 'wallo'}, //count 396
@@ -383,11 +395,12 @@ LevelData = {
 					quiz: [
 						{
 							type: 'multChoice',
-							questionText: 'The vapor heat capacity of water is 1.9 kJ/kgK and the liquid heat capacity of water is 4.2 kJ/kgK. How ill the heat of vaporization at 150 C compare to the value at 100 C?',
+							CWQuestionId: 101,
+							questionText: 'The vapor heat capacity of water is 1.9 kJ/kgK and the liquid heat capacity of water is 4.2 kJ/kgK. How will the heat of vaporization at 150 C compare to the value at 100 C?',
 							options:[
-								{text: "Less at 150 C", correct: true},
-								{text: "Equal at 150 C", correct: false, message: "That is the incorrect answer"},
-								{text: "Greater at 150 C", correct: false, message: "That is the incorrect answer"}
+								{text: "Less at 150 C", correct: true, CWAnswerId: 14},
+								{text: "Equal at 150 C", correct: false, message: "That is the incorrect answer", CWAnswerId: 15},
+								{text: "Greater at 150 C", correct: false, message: "That is the incorrect answer", CWAnswerId: 16}
 							]
 						}
 					]	
@@ -400,7 +413,8 @@ LevelData = {
 							preText:'Condense the vapor. How much heat was removed?',
 							text: '',
 							units: 'kJ',
-							storeAs: 'Ans11'
+							storeAs: 'Ans11',
+							CWQuestionId: 102
 						}
 					],
 				},
@@ -410,7 +424,8 @@ LevelData = {
 						{
 							type: 'text',
 							preText: 'Vaporizing the liquid at 100 C took 2257 kJ/kg and condensing at 150 C took 2114 kJ/kg. Do these values agree with your prediction?',
-							storeAs: 'Ans12'
+							storeAs: 'Ans12',
+							CWQuestionId: 103
 						}
 					]
 				},
