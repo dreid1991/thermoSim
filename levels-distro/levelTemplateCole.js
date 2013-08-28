@@ -217,6 +217,9 @@ LevelData = {
 				},
 				{//Prompt 3
 					sceneData: {
+						cmmds: [
+							'$($("button")[0]).hide()'
+						],
 						triggers: [
 							{handle: 'checkPext2', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.enable()'], priority: 1},
 							{handle: 'checkPext3', expr: 'pExt("ThirdWall")==2', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.disable()'], priority: 1},

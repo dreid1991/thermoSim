@@ -1,10 +1,11 @@
 import sys
 import os
 import re
+import shutil
 
 fromDirectory = os.listdir('..\levels')
-toDirectory = os.listdir('c:')
-
+src = '..\levels'
+destination = '.'
 def extension(name):
 	extRegExp = re.compile("\.[a-zA-Z]*$")
 	match = extRegExp.search(name)
@@ -12,8 +13,10 @@ def extension(name):
 		return ""
 	else:
 		return match.group(0)
-def updateDistro(		
 
-print fromDirectory
-print toDirectory
-wait = input("press enter to continue")
+for entry in fromDirectory:
+	if (extension(entry) == '.js'):
+		entryName = os.path.join(src, entry)
+		shutil.copy(entryName, destination)
+		
+
