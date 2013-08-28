@@ -2,7 +2,7 @@ LevelData = {
 	levelTitle: 'Hypothetical Paths: Phase Change',
 	
 	spcDefs: [
-		{spcName: 'spc1', m: 4, r: 2, col: Col(252, 0, 177), cv: 1.5 * R, hF298: -10, hVap298: 30.92, antoineCoeffs: {a: 7.4, b:1622.4, c: -20}, cpLiq: 40, spcVolLiq: 0.8},
+		{spcName: 'spc1', m: 4, r: 2, col: Col(189, 0, 250), cv: 1.5 * R, hF298: -10, hVap298: 30.92, antoineCoeffs: {a: 7.4, b:1622.4, c: -20}, cpLiq: 40, spcVolLiq: 0.8},
 		{spcName: 'spc2', m: 3, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3},
 		{spcName: 'spc3', m: 3, r: 1, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b:1530.6, c: 239.4-273.15}, cpLiq: 2.5* R, spcVolLiq: .3}
 	],
@@ -38,7 +38,7 @@ LevelData = {
 						attrs: {handle: 'Piston', wallInfo: 'firstWall', min:2, init: 1.8, max: 4}
 					},
 					{type: 'Heater',
-						attrs: {handle: 'heaterOne', wallInfo: 'firstWall', max: 2, liquidHandle: 'liq1'}
+						attrs: {handle: 'heaterOne', wallInfo: 'firstWall', max: 2, liquidHandle: 'liq1', pos: new Point(225, 422.5), dims: new Vector(100, 12)}
 					},
 					{type: 'Liquid',
 						attrs: {wallInfo: 'firstWall', handle: 'liq1', tempInit: 350, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}
@@ -131,7 +131,7 @@ LevelData = {
 						attrs: {handle: 'Piston', wallInfo: 'secondWall', min:2, init: 5.6478, max: 8}
 					},
 					{type: 'Heater',
-						attrs: {handle: 'heaterOne', wallInfo: 'secondWall', max: 1, liquidHandle: 'liq1'}
+						attrs: {handle: 'heaterOne', wallInfo: 'secondWall', max: 1, liquidHandle: 'liq1', pos: new Point(225, 422.5), dims: new Vector(100, 12)}
 					},
 					{type: 'Liquid',
 						attrs: {wallInfo: 'secondWall', handle: 'liq1', tempInit: 400, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}
@@ -283,7 +283,7 @@ LevelData = {
 						attrs: {handle: 'Piston', wallInfo: 'thirdWall', min:2, init: 1.8, max: 4}
 					},
 					{type: 'Heater',
-						attrs: {handle: 'heaterOne', wallInfo: 'thirdWall', max: 2, liquidHandle: 'liq1'}
+						attrs: {handle: 'heaterOne', wallInfo: 'thirdWall', max: 2, liquidHandle: 'liq1', pos: new Point(225, 422.5), dims: new Vector(100, 12)}
 					},
 					{type: 'Liquid',
 						attrs: {wallInfo: 'thirdWall', handle: 'liq1', tempInit: 350, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}

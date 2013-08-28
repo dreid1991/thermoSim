@@ -20,7 +20,7 @@ LevelData = {
 						attrs: {handle: 'Piston', wallInfo: 'secondWall', min:2, init: 5.6478, max: 8}
 					},
 					{type: 'Heater',
-						attrs: {handle: 'heaterOne', wallInfo: 'secondWall', max: 4, liquidHandle: 'liq1'}
+						attrs: {handle: 'heaterOne', wallInfo: 'secondWall', max: 4, liquidHandle: 'liq1', pos: new Point(225, 422.5), dims: new Vector(100, 12)}
 					},
 					{type: 'Liquid',
 						attrs: {wallInfo: 'secondWall', handle: 'liq1', tempInit: 400, spcCounts: {spc1:1000}, actCoeffType: 'twoSfxMrg', actCoeffInfo: {a: 3000}}

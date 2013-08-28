@@ -76,6 +76,8 @@ LevelData = {
 							liquidHandle: 'water',
 							temp: 333.15,
 							max: 2,
+							pos: new Point(225, 335), 
+							dims: new Vector(100, 12)
 						},
 					},
 				],
