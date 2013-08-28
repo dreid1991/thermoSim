@@ -18,5 +18,3 @@ for entry in fromDirectory:
 	if (extension(entry) == '.js'):
 		entryName = os.path.join(src, entry)
 		shutil.copy(entryName, destination)
-		
-

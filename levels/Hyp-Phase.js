@@ -196,12 +196,12 @@ LevelData = {
 					]
 				},
 				{//Prompt 1
+					noRefresh: true,
 					sceneData: {
 						cmmds: [
 							'curLevel.heaterHeaterOne.enable()',
 							'buttonManager.clickButton("Heat", "iso")',
 							'buttonManager.hideButton("Heat", "adiabatic")',
-							'$($("button")[0]).hide()',
 							'buttonManager.showButton("Phase", "enablePhase")'
 						],
 					},
@@ -217,6 +217,7 @@ LevelData = {
 					]
 				},
 				{//Prompt 2
+					noRefresh: true,
 					sceneData: {
 						cmmds: [
 							'curLevel.heaterHeaterOne.enable()',
@@ -315,9 +316,6 @@ LevelData = {
 			prompts: [
 				{//Prompt 0
 					sceneData: {
-						cmmds: [
-							'$($("button")[0]).show()'
-						]
 					},
 					text: 'Let\'s perform the process again. This time the enthalpy change of the process is displayed and graphed. As before heat the system from 350 K to 450 K.',
 					quiz: [

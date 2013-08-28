@@ -224,16 +224,18 @@ LevelData = {
 					]
 				},
 				{//Prompt 1
+				noRefresh: true,
 				sceneData: {
 					triggers:[
 						{handle:'hypPath2', expr: 'frac("secondWall", {tag:"secondWall", spcName:"spc2"})>=0.96', message: "What should the extent of reaction be after the second step in your hypothetical path?", priority: 1}
 					],
 					cmmds: [
-						'$($("button")[0]).hide()',
-						'buttonManager.showButton("Reaction", "rxn1go")'
+						'buttonManager.showButton("Reaction", "rxn1go")',
+						'buttonManager.hideButton("Heat", "adiabatic")',
+						'buttonManager.clickButton("Heat", "isothermal")'
 					]
 				},
-					text: "Take the next step in the hypothetical path.  How does the enthalpy change of this step compare to the value you calculated?   <p>If you are reacting, you will want to have the system be isothermal at this step to make sure the enthalpy of reaction is equal to the tabulated value.",
+					text: "Take the next step in the hypothetical path.  How does the enthalpy change of this step compare to the value you calculated?",
 					quiz: [
 						{type: 'text',
 						storeAs: 'hypAns2',
@@ -243,9 +245,13 @@ LevelData = {
 					]
 				},
 				{//Prompt 2
+				noRefresh: true,
 				sceneData: {
 					triggers: [
 						{handle: 'hypPath1', expr: 'fracDiff(temp("secondWall"),500)<.01', message:"What should the temperature be at the end of your hypothetical path?"}
+					],
+					cmmds: [
+						'buttonManager.showButton("Heat", "adiabatic")'
 					]
 				},
 					text: "Take the final step in the hypothetical path. Input the enthalpy change.",
@@ -258,6 +264,7 @@ LevelData = {
 					]
 				},
 				{//Prompt 3
+				noRefresh: true,
 				sceneData: undefined,
 					cutScene: true,
 					text: "How does the enthalpy change of the process compare to the value you predicted?  Can you explain any differences?",
