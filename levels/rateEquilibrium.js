@@ -40,7 +40,7 @@ LevelData = {
 					
 				],
 				triggers: [
-					{handle: 'trigger1', expr: "dotManager.lists.uglier.length > 450", message: 'Turn on the reaction and allow it to react.', checkOn: 'conditions', requiredFor: 'prompt0'}
+					{handle: 'trigger1', expr: "dotManager.lists.uglier.length >= 360", message: 'Turn on the reaction and allow it to react.', checkOn: 'conditions', requiredFor: 'prompt0'}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}},
@@ -126,7 +126,7 @@ LevelData = {
 
 				],
 				triggers: [
-					{handle: 'trigger2', expr: "dotManager.lists.uglier.length >= 450", message: 'Turn on the reaction and allow it to react.', requiredFor: 'prompt0', checkOn: 'conditions'}
+					{handle: 'trigger2', expr: "dotManager.lists.uglier.length >= 360", message: 'Turn on the reaction and allow it to react.', requiredFor: 'prompt0', checkOn: 'conditions'}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugly', tag: 'wally'}}
@@ -157,7 +157,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: "Here is the same system, except at get('foo4', 'string', 'noValue') K instead of 300 K. Last time you said it took get('foo2', 'string', 'noValue') seconds for 60% of A to be consumed. When you're ready, click 'enable' and find out how long it takes this time. Enter the time you find in the text box.", 
+					text: "Here is the same system, except at get('foo4', 'float', 500, 300, 900) K instead of 300 K. Last time you said it took get('foo2', 'string', 'noValue') seconds for 60% of A to be consumed. When you're ready, click 'enable' and find out how long it takes this time. Enter the time you find in the text box.", 
 					quiz:[
 							{
 								storeAs: 'foo5', 
@@ -350,7 +350,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Now let's introduce the reverse reaction, ##B \\rightarrow A##, to our system. For the reaction of ##A \\rightarrow B##: $$\\Delta{h}_{rxn} = -2.5\\frac{kJ}{mol}$$ and $$\\Delta{s}_{rxn} = -3.3\\frac{J}{mol-K}$$ With the isothermal system held at 300 K, what will be the equilibrium mole fraction of B?", 
+					text: "Now let's introduce the reverse reaction, ##B \\rightarrow A##, to our system. For the reaction of ##A \\rightarrow B##: $$\\Delta{h}_{rxn} = -2.5\\frac{kJ}{mol}$$ and $$\\Delta{s}_{rxn} = -3.3\\frac{J}{mol-K}$$ You may assume that both of these values are constant with temperature. With the isothermal system held at 300 K, what will be the equilibrium mole fraction of B?", 
 					quiz:[
 							{
 								storeAs: 'foo13', 
