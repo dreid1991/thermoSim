@@ -86,14 +86,14 @@ LevelData = {
 					{wallInfo: 'wallo', data: 'moles', attrs: {spcName: 'Water', tag:'wallo'}},
 					{wallInfo: 'wallo', data: 'enthalpy'},
 				],
-				// graphs: [
-					// {type: 'Scatter', handle: 'hTGraph', xLabel: 'Enthalpy (kJ)', yLabel: 'Temperature (K)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
-						// sets:[
-							// {handle: 'enthalpyTemperature', label: 'Phase Change', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
-							// data: {x: 'enthalpy("wallo")', y: 'tempSmooth("wallo")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
-						// ]
-					// }
-				// ],	
+				graphs: [
+					{type: 'Scatter', handle: 'TVGraph', xLabel: 'Temperature (K)', yLabel: 'Volume (L)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
+						sets:[
+							{handle: 'tempVolume', label: 'Phase Change', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
+							data: {x: '(curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length && tempSmooth("liquidWater")) || tempSmooth("wallo")', y: 'vol("wallo")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+						]
+					}
+				],	
 				dataReadouts: [
 					{label: 'Vol: ', expr: 'vol("wallo")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
 					{label: 'Heat: ', expr: 'q("wallo") + q("liquidWater")', units: 'kJ', decPlaces: 1, handle: 'qReadout', readout: 'mainReadout'},

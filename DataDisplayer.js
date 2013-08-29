@@ -35,30 +35,30 @@ DataDisplayer.prototype = {
 		var readoutEntry = readout.addEntry(label + handle);
 		var dataEntry = new DataDisplayer.Entry(handle, label, decPlaces, expr, units, listenerStr, this, readoutEntry);
 		this.entries[dataEntry.handle] = dataEntry;
-		with (DataGetFuncs) {
-			var func;
-			if (exprHasReturn(expr)) {
-				func = eval('(function(){' + expr + '})');
-			} else {
-				func = eval('(function(){return ' + expr + '})')
-			
-			}
-			addListener(curLevel, 'update', listenerStr, function() {
-				var displayStr = label;
-				var valStr;
-				var val = func();
-				if (isNaN(val) || val === undefined) 
-					valStr = ''
-				else
-					valStr = val.toFixed(decPlaces);
-					
-				displayStr += valStr + ' ';
-				displayStr += units;
-				readoutEntry.setText(displayStr);
-			})
+		addListener(curLevel, 'update', listenerStr, function() {
+			var displayStr = label;
+			var valStr;
+			var val = dataEntry.func();
+			if (isNaN(val) || val === undefined) 
+				valStr = ''
+			else
+				valStr = val.toFixed(decPlaces);
+				
+			displayStr += valStr + ' ';
+			displayStr += units;
+			readoutEntry.setText(displayStr);
+		})
 		
-		}
 		return dataEntry;
+	},
+	setEntryValue: function(handle, newSetPoint) {
+		var entry = this.entries[handle];
+		if (!entry) {
+			console.log('bad handle ' + handle);
+		}
+		var offset = newSetPoint - entry.func();
+		entry.expr = entry.expr + ' + ' + offset;
+		entry.func = entry.wrapExprInFunc();
 	},
 	removeEntry: function(handle) {
 		if (this.entries[handle]) {
@@ -72,6 +72,7 @@ DataDisplayer.Entry = function(handle, label, decPlaces, expr, units, listenerSt
 	this.label = label;
 	this.decPlaces = decPlaces;
 	this.expr = expr;
+	this.func = this.wrapExprInFunc();
 	this.units = units;
 	this.listenerStr = listenerStr;
 	this.dataDisplayer = dataDisplayer;
@@ -87,5 +88,17 @@ DataDisplayer.Entry.prototype = {
 			removeListener(curLevel, 'update', this.listenerStr);
 			this.removed = true;
 		}
-	}	
+	},
+	wrapExprInFunc: function() {
+		var expr = this.expr
+		with (DataGetFuncs) {
+			var func;
+			if (exprHasReturn(expr)) {
+				func = eval('(function(){' + expr + '})');
+			} else {
+				func = eval('(function(){return ' + expr + '})');
+			}
+		}
+		return func;
+	}
 }
