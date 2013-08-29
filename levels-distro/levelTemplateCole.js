@@ -216,6 +216,7 @@ LevelData = {
 						]
 				},
 				{//Prompt 3
+					noRefresh: true,
 					sceneData: {
 						triggers: [
 							{handle: 'checkPext2', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.enable()'], priority: 1},
@@ -234,6 +235,7 @@ LevelData = {
 				},
 				{//Prompt 4
 					sceneData:undefined, 
+					noRefresh: true,
 					text: "",
 					quiz: [
 						{

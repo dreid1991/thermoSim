@@ -6,7 +6,7 @@ LevelData = {
 		//add antoine coefs, cvLiq, hvap
 		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
 		{spcName: 'spc2', m: 4, r: 1, col: Col(150, 100, 255), cv: 1.5 * R, hF298: -12, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.213, b: 1652.27, c: 231.48-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
-		{spcName: 'fairy', m: 4, r: 1, col: Col(250, 250, 250), cv: 1.5 * R, hF298: -12, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
+		{spcName: 'fairy', m: 4, r: 1, col: Col(250, 250, 250), cv: 1.5 * R, hF298: -14, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'duckling', m: 4, r: 1, col: Col(0, 255, 255), cv: 1.5 * R, hF298: -12, hVap298: 10, sF298: -1, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
 	],
 	mainSequence: [
@@ -14,10 +14,10 @@ LevelData = {
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(450, 50), P(450, 400), P(50, 400)], handler: 'staticAdiabatic', handle: 'wally', /*, border: {type: 'open', thickness: 5, yMin: 30}*/}
+					{pts: [P(50, 50), P(350, 50), P(350, 400), P(50, 400)], handler: 'staticAdiabatic',/* temp: 398.15,*/ handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}}
 				],
 				dots: [
-					{spcName: 'spc1', pos: P(55, 55), dims: V(250, 250), count: 1000, temp: 198.15, returnTo: 'wally', tag: 'wally'},
+					{spcName: 'spc1', pos: P(55, 55), dims: V(300, 325), count: 1000, temp: 198.15, returnTo: 'wally', tag: 'wally'},
 					// {spcName: 'ugly', pos: P(55, 55), dims: V(150, 200), count: 0, temp: 398.15, returnTo: 'wally', tag: 'wally'},
 					
 					
@@ -29,7 +29,7 @@ LevelData = {
 					// },
 					// {
 						// type: 'Liquid',  
-						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 700}, makePhaseDiagram: true, triplePointTemp: 300, criticalPointTemp: 500/*,primaryKey: 'heavy', actCoeffType: 'vanlaar', actCoeffInfo: {spc1:.9227, ugly: 1.67}, makePhaseDiagram: true*/}
+						// attrs:{wallInfo: 'wally', handle: 'swishy', tempInit: 400, spcCounts: {spc1: 100, spc2: 100}, makePhaseDiagram: true, triplePointTemp: 300, criticalPointTemp: 500, primaryKey: 'heavy', actCoeffType: 'vanlaar', actCoeffInfo: {spc1:.9227, spc2: 1.67}}
 					// },
 					// {
 						// type: 'DragWeights',
@@ -37,7 +37,7 @@ LevelData = {
 					// },
 					// {
 						// type: 'Cell',
-						// attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 100, dots: {fairy: 200}, boundingCorner: P(50, 50), boundingVector: V(400, 350), numCorners: 12, col: Col(0, 150, 0), innerChanceTransport: {spc1: .7}, outerChanceTransport: {spc1: .2}}
+						// attrs: {pos: P(150, 150), rad: 100, col: Col(30, 200, 30), handle: 'squishy', parentWallHandle: 'wally', temp: 100, dots: {fairy: 100}, boundingCorner: P(50, 50), boundingVector: V(400, 350), numCorners: 12, col: Col(0, 150, 0), innerChanceTransport: {spc1: 0}, outerChanceTransport: {spc1: 0}}
 					// },
 					// {
 						// type: 'ActivationEnergyPair',
@@ -48,20 +48,28 @@ LevelData = {
 						cleanUpWith: 'prompt1',
 						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
 					},
-					{
-						type: 'Heater',
-						attrs: {wallInfo: 'wally', max: 3, handle: 'other', offset: V(70, 0), sliderIdx: 0}
+					// {
+						// type: 'Heater',
+						// attrs: {wallInfo: 'wally', max: 3, handle: 'other', offset: V(70, 0), sliderIdx: 0}
 					
 					
-					},
+					// },
+					// {
+						// type: 'Inlet',
+						// attrs: {handle: 'inny', wallInfo: 'wally', width: 40, depth: 25, flows: [{spcName: 'spc1', temp:200, nDotMax: .05, tag: 'wally'}], ptIdxs: [3, 4], fracOffset: .2}
+					// },
+					// {
+						// type: 'Outlet',
+						// attrs: {handle: 'thor', wallInfo: 'wally', width: 70, depth: 30, ptIdxs: [1, 2], fracOffset: .4}
+					// }
 					// {
 						// type: 'QArrowsAmmt',
 						// attrs: {handle: 'arrowy', wallInfo: 'wally', scale: 1}
 					// }
-					// {
-						// type: 'Piston',
-						// attrs: {handle: 'pistony', wallInfo: 'wally', min: 2, init: 4, max: 6, makeSlider: true}
-					// }
+					{
+						type: 'Piston',
+						attrs: {handle: 'pistony', wallInfo: 'wally', min: 2, init: 8, max: 9, makeSlider: true}
+					}
 
 						
 				],
@@ -70,21 +78,25 @@ LevelData = {
 				// ],
 				dataRecord: [
 					//{wallInfo: 'wally', data: 'internalEnergy'}
-					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
-					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'a', tag: 'wally'}},
+					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
+					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc2', tag: 'wally'}}
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'b', tag: 'wally'}},
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'c', tag: 'wally'}},
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'd', tag: 'wally'}}
 					// {wallInfo: 'wally', data: 'vDist', attrs: {spcName: 'spc1', tag: 'wally'}},
 					//{data: 'collisions'}
 				],
-				rxns: [
-					//{handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: .5, prods: {spc2: 2}},
-					// {handle: 'rxn2', rctA: 'c', rctB: 'd', activeE: 10, prods: {a: 1, b: 1}}
-					//{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
+				// rxnsEmergent: [
+					// {handle: 'rxn1', rctA: 'spc1', rctB: 'spc1', activeE: .5, prods: {spc2: 2}},
+					// {handle: 'rxn2', rctA: 'spc2', rctB: 'spc2', activeE: 1.5, prods: {spc1: 2}}
+					// // {handle: 'rxn2', rctA: 'c', rctB: 'd', activeE: 10, prods: {a: 1, b: 1}}
+					// //{handle: 'rxn2', rctA: 'duckling', activeE: 15, prods: {spc1: 1, ugly: 1}}
+				// ],
+				rxnsNonEmergent: [
+					//{rcts: [{spcName: 'spc1', count: 2}], prods: [{spcName: 'spc2', count: 1}], preExpForward: 10, activeEForward: .2, handle: 'reacty7'}
 				],
 				dataReadouts: [
-					{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'}
 					//{label: 'cell temp: ', expr: 'tempSmooth("cellSquishyInner")', units: 'K', decPlaces: 1, handle: 'cell', readout: 'mainReadout'}
 					//{label: 'liq temp: ', expr: 'tempSmooth("liquidSwishy")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'}
 					// {label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},
@@ -115,18 +127,22 @@ LevelData = {
 						// ]
 					// }
 				// ],
+				// triggers: [
+					// {handle: 'trumpet', expr: "temp('wally') > 205", satisfyCmmds: ['curLevel.heaterHeaty.disable()'], alertUnsatisfied: 'la', requiredForAdvance: false}
+				// ],
 				cmmds: [
+					//"collide.rxnHandlerNonEmergent.disableRxn('reacty7')"
 					// //'walls.wally.isothermalStop()',
 					//'spcs.spc1.place([{pos: P(150, 200)/*P(230, 116.0)*/, dir: V(1, 1), temp: 40, tag: "wally", returnTo: "wally"}])'
 					// {type: 'span', spawn: 'walls.wally.isothermalInit()', remove: 'walls.wally.isothermalStop()', cleanUpWith: 'prompt1'}
 				],
 				graphs: [
-					// {type: 'Scatter', handle: 'fracs', xLabel: "time (s)", yLabel: "mole face", axesInit:{x:{min:0, step:1}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
-						// sets:[
-							// {handle:'fracRct', label:'frac\nRct', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'a', tag: 'wally'}) + frac('wally', {spcName: 'b', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5},
-							// {handle:'fracProd', label:'frac\nProd', pointCol:Col(50,50,255), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'c', tag: 'wally'}) + frac('wally', {spcName: 'd', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
-						// ]
-					// },
+					{type: 'Scatter', handle: 'fracs', xLabel: "time (s)", yLabel: "mole frac", axesInit:{x:{min:0, step:1}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+						sets:[
+							{handle:'fracRct', label:'frac\nRct', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'spc1', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5},
+							{handle:'fracProd', label:'frac\nProd', pointCol:Col(50,50,255), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'spc2', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
+						]
+					},
 					// {type: 'Scatter', handle: 'eqConst', xLabel: "time (s)", yLabel: "eq const", axesInit:{x:{min:0, step:1}, y:{min:0, step:.2}}, numGridLines: {y: 6}, 
 						// sets:[
 							// {handle:'frac', label:'eq\nconst', pointCol:Col(50,255,50), flashCol:Col(255,200,200), data:{x: 'time("wally")', y: "frac('wally', {spcName: 'c', tag: 'wally'}) * frac('wally', {spcName: 'd', tag: 'wally'}) / (frac('wally', {spcName: 'a', tag: 'wally'}) * frac('wally', {spcName: 'b', tag: 'wally'}))"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
