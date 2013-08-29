@@ -39,10 +39,14 @@ DataDisplayer.prototype = {
 			var displayStr = label;
 			var valStr;
 			var val = dataEntry.func();
-			if (isNaN(val) || val === undefined) 
+			if (val === undefined) {
 				valStr = ''
-			else
+			} else if (typeof val == 'number') {
 				valStr = val.toFixed(decPlaces);
+			} else {
+				valStr = val;
+			}
+				
 				
 			displayStr += valStr + ' ';
 			displayStr += units;
