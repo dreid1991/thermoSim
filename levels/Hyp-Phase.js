@@ -45,8 +45,8 @@ LevelData = {
 					}
 				],
 				dataReadouts: [
-					{label: 'Temperature: ', expr: 'tempSmooth("firstWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
-					{label: 'Liquid Temp: ', expr: 'tempSmooth("liquidLiq1")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
+					{label: 'Temperature: ', expr: 'var tempVal = tempSmooth("firstWall"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'Liquid Temp: ', expr: 'var tempVal = tempSmooth("liquidLiq1"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
 					// {label: 'Pressure: ', expr: 'pExt("firstWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'}
 				],
 				triggers: [

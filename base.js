@@ -521,7 +521,7 @@ function getLen(pts) {
 }
 
 function exprHasReturn(expr) {
-	return /(\(|\:|\?|\s)return/.test(' ' + expr);
+	return /(\(|\:|\?|\s|\{)return/.test(' ' + expr);
 }
 function byAttr(obj, attrVal, attr) {
 	if (obj instanceof Array) {
