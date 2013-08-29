@@ -39,7 +39,7 @@ DataDisplayer.prototype = {
 			var displayStr = label;
 			var valStr;
 			var val = dataEntry.func();
-			if (isNaN(val) || val === undefined) 
+			if (val === undefined) 
 				valStr = ''
 			else
 				valStr = val.toFixed(decPlaces);
