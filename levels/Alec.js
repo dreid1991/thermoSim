@@ -28,7 +28,7 @@ LevelData = {
 				},
 				{
 					cutScene: true,
-					text: '<p>A reversible process can be defined as a process that, after it is complete, can be reversed without having caused any changes to the system or its surroundings.</p><p>State what conditions you believe are necessary for a reversible process to take place.</p>',
+					text: '<p>A reversible process can be defined as a process that, after it is complete, can be returned to its initial state without having caused any changes to the system or its surroundings.</p><p>State what conditions you believe are necessary for a reversible process to take place.</p>',
 					quiz: [
 						{
 							type: 'text',
