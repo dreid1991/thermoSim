@@ -461,28 +461,42 @@ GraphBase = {
 	},
 	drawAxisVals: function() {
 		if (this.stepSize.x > 0 && this.stepSize.y > 0) {
-			for (var xGridIdx=0; xGridIdx<this.numGridLines.x; xGridIdx++){
-				var xPos = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing.x * xGridIdx;
-				var yPos = this.graphRangeFrac.y.min * this.dims.dy + this.hashMarkLen + 10 + this.axisValFontSize/2;
-				var text;
-				if (this.logScale.x) {
-					text = this.numToAxisVal(this.axisRange.x.min * Math.pow(10, xGridIdx));
-				} else {
-					text = this.numToAxisVal(this.axisRange.x.min + this.stepSize.x * xGridIdx, 1);
-				}
-				draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', 0, this.graphDisplay);
+			var evalXOnX = function(graphRangeFrac, dims, gridSpacing, lineIdx, hashMarkLen, axisValFontSize) {
+				return graphRangeFrac.x.min * dims.dx + gridSpacing.x * lineIdx
 			}
-			for (var yGridIdx=0; yGridIdx<this.numGridLines.y; yGridIdx++){
-				var yPos = this.graphRangeFrac.y.min * this.dims.dy - this.gridSpacing.y * yGridIdx;
-				var xPos = this.graphRangeFrac.x.min * this.dims.dx - this.hashMarkLen - 10;
-				var text;
-				if (this.logScale.y) {
-					text = this.numToAxisVal(this.axisRange.y.min * Math.pow(10, yGridIdx));
-				} else {
-					text = this.numToAxisVal(this.axisRange.y.min + this.stepSize.y * yGridIdx, 1);
-				}
-				draw.text(text, P(xPos,yPos), this.axisValFont, this.textCol, 'center', -Math.PI/2, this.graphDisplay);
-			}		
+			var evalYOnX = function(graphRangeFrac, dims, gridSpacing, lineIdx, hashMarkLen, axisValFontSize) {
+				return graphRangeFrac.y.min * dims.dy + hashMarkLen + 10 + axisValFontSize / 2;
+			}
+			var evalXOnY = function(graphRangeFrac, dims, gridSpacing, lineIdx, hashMarkLen, axisValFontSize) {
+				return graphRangeFrac.x.min * dims.dx - hashMarkLen - 10;
+			}
+			var evalYOnY = function(graphRangeFrac, dims, gridSpacing, lineIdx, hashMarkLen, axisValFontSize) {
+				return graphRangeFrac.y.min * dims.dy - gridSpacing.y * lineIdx;
+			}
+			this.drawSingleAxisVals(this.numGridLines.x, this.graphRangeFrac, this.axisRange.x, this.logScale.x, this.stepSize.x, evalXOnX, evalYOnX);
+			this.drawSingleAxisVals(this.numGridLines.y, this.graphRangeFrac, this.axisRange.y, this.logScale.y, this.stepSize.y, evalXOnY, evalYOnY);
+		
+		}
+	},
+	drawSingleAxisVals: function(numGridLines, graphRangeFrac, axisRange, logScale, stepSize, evalX, evalY) {
+		var oversizeEntries = false;
+		var showNextEntry = true;
+		for (var lineIdx=0; lineIdx<numGridLines; lineIdx++) {
+			var x = evalX(graphRangeFrac, this.dims, this.gridSpacing, lineIdx, this.hashMarkLen, this.axisValFontSize);
+			var y = evalY(graphRangeFrac, this.dims, this.gridSpacing, lineIdx, this.hashMarkLen, this.axisValFontSize);
+			var text;
+			if (logScale) {
+				text = this.numToAxisVal(axisRange.min * Math.pow(10, lineIdx));
+			} else {
+				text = this.numToAxisVal(axisRange.min + stepSize * lineIdx, 1);
+			}
+			oversizeEntries = oversizeEntries || text.length > 3;
+			
+			if (oversizeEntries) 
+				showNextEntry = !showNextEntry;
+			
+			if (showNextEntry) 
+				draw.text(text, P(x, y), this.axisValFont, this.textCol, 'center', 0, this.graphDisplay);
 		}
 	},
 	makeLegendEntry: function(set, label, handle, drawMarker) {
