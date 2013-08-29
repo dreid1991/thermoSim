@@ -152,9 +152,10 @@ LevelData = {
 					}
 				],
 				dataReadouts: [
-					{label: 'Temperature: ', expr: 'tempSmooth("secondWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
-					{label: 'Liquid Temp: ', expr: 'tempSmooth("liquidLiq1")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
+					{label: 'Temperature: ', expr: 'var tempVal = tempSmooth("secondWall"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'Liquid Temp: ', expr: 'var tempVal = tempSmooth("liquidLiq1"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
 					{label: 'H: ', expr: '((enthalpy("secondWall") + 36839.93)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp) / 1000 || (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp / 1000', units: 'kJ', decPlaces: 1, handle: 'h', readout: 'mainReadout'},
+					{label: 'H this step: ', expr: '((enthalpy("secondWall") + 36839.93)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp) / 1000 || (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp / 1000', units: 'kJ', decPlaces: 1, handle: 'hstep', readout: 'mainReadout'},
 					// {label: 'Pressure: ', expr: 'pExt("firstWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'}
 				],
 				dataRecord: [
@@ -202,7 +203,8 @@ LevelData = {
 							'curLevel.heaterHeaterOne.enable()',
 							'buttonManager.clickButton("Heat", "iso")',
 							'buttonManager.hideButton("Heat", "adiabatic")',
-							'buttonManager.showButton("Phase", "enablePhase")'
+							'buttonManager.showButton("Phase", "enablePhase")',
+							'dataDisplayer.setEntryValue("hstep", 0)'
 						],
 					},
 					text: '<p>Take the next step in your hypothetical path. If you are vaporizing, you may want to have the system be isothermal at this step to make sure the enthalpy of vaporization is equal to the tabulated value.',
@@ -222,7 +224,8 @@ LevelData = {
 						cmmds: [
 							'curLevel.heaterHeaterOne.enable()',
 							'buttonManager.hideButton("Phase", "enablePhase")',
-							'buttonManager.showButton("Heat", "adiabatic")'
+							'buttonManager.showButton("Heat", "adiabatic")',
+							'dataDisplayer.setEntryValue("hstep", 0)'
 						]
 					},
 					text: '<p>Take the final step in your hypothetical path.',
@@ -290,8 +293,8 @@ LevelData = {
 					}
 				],
 				dataReadouts: [
-					{label: 'Temperature: ', expr: 'tempSmooth("thirdWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
-					{label: 'Liquid Temp: ', expr: 'tempSmooth("liquidLiq1")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
+					{label: 'Temperature: ', expr: 'var tempVal = tempSmooth("thirdWall"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'Liquid Temp: ', expr: 'var tempVal = tempSmooth("liquidLiq1"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
 					{label: 'Pressure: ', expr: 'pExt("thirdWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'},
 					// {label: 'q: ', expr: 'q("thirdWall")', units: 'kJ', decPlaces: 1, handle: 'qwer', readout: 'mainReadout'},
 					{label: 'H: ', expr: '((enthalpy("thirdWall") + 38839.93)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 350)*curLevel.liquidLiq1.Cp) / 1000 || (temp("liquidLiq1") - 350)*curLevel.liquidLiq1.Cp / 1000', units: 'kJ', decPlaces: 1, handle: 'h', readout: 'mainReadout'},
