@@ -33,7 +33,7 @@ DataDisplayer.prototype = {
 		if (!readout) console.log('Bad readout name ' + attrs.readout);
 		var listenerStr = 'display' + label + this.entries.length;
 		var readoutEntry = readout.addEntry(label + handle);
-		var dataEntry = new this.Entry(handle, label, decPlaces, expr, units, listenerStr, this, readoutEntry);
+		var dataEntry = new DataDisplayer.Entry(handle, label, decPlaces, expr, units, listenerStr, this, readoutEntry);
 		this.entries[dataEntry.handle] = dataEntry;
 		with (DataGetFuncs) {
 			var func;
@@ -65,19 +65,21 @@ DataDisplayer.prototype = {
 			this.entries[handle].remove();
 		}
 	},
-	Entry: function(handle, label, decPlaces, expr, units, listenerStr, dataDisplayer, readoutEntry) {
-		this.handle = handle;
-		this.label = label;
-		this.decPlaces = decPlaces;
-		this.expr = expr;
-		this.units = units;
-		this.listenerStr = listenerStr;
-		this.dataDisplayer = dataDisplayer;
-		this.readoutEntry = readoutEntry;
-		this.removed = false;
-	},
 }
-DataDisplayer.prototype.Entry.prototype = {
+
+DataDisplayer.Entry = function(handle, label, decPlaces, expr, units, listenerStr, dataDisplayer, readoutEntry) {
+	this.handle = handle;
+	this.label = label;
+	this.decPlaces = decPlaces;
+	this.expr = expr;
+	this.units = units;
+	this.listenerStr = listenerStr;
+	this.dataDisplayer = dataDisplayer;
+	this.readoutEntry = readoutEntry;
+	this.removed = false;
+}
+
+DataDisplayer.Entry.prototype = {
 	remove: function() {
 		if (!this.removed) {
 			delete this.dataDisplayer.entries[this.handle];
