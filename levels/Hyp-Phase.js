@@ -45,7 +45,7 @@ LevelData = {
 					}
 				],
 				dataReadouts: [
-					{label: 'Temperature: ', expr: 'var tempVal = tempSmooth("firstWall"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'Gas Temp: ', expr: 'var tempVal = tempSmooth("firstWall"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
 					{label: 'Liquid Temp: ', expr: 'var tempVal = tempSmooth("liquidLiq1"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
 					// {label: 'Pressure: ', expr: 'pExt("firstWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'}
 				],
@@ -152,7 +152,7 @@ LevelData = {
 					}
 				],
 				dataReadouts: [
-					{label: 'Temperature: ', expr: 'var tempVal = tempSmooth("secondWall"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'Gas Temp: ', expr: 'var tempVal = tempSmooth("secondWall"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
 					{label: 'Liquid Temp: ', expr: 'var tempVal = tempSmooth("liquidLiq1"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
 					{label: 'H: ', expr: '((enthalpy("secondWall") + 36839.93)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp) / 1000 || (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp / 1000', units: 'kJ', decPlaces: 1, handle: 'h', readout: 'mainReadout'},
 					{label: 'H this step: ', expr: '((enthalpy("secondWall") + 36839.93)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp) / 1000 || (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp / 1000', units: 'kJ', decPlaces: 1, handle: 'hstep', readout: 'mainReadout'},
@@ -163,7 +163,7 @@ LevelData = {
 					{wallInfo: 'liquidLiq1', data : 'enthalpy'}
 				],
 				triggers: [
-					{handle: 'path0', expr: 'curLevel.liquidLiq1.temp > 448 && curLevel.liquidLiq1.temp < 452', message: 'What should the temperature be at the end of the first step?', checkOn: 'conditions', requiredFor: 'prompt0'},
+					{handle: 'path0', expr: 'curLevel.liquidLiq1.temp > 443 && curLevel.liquidLiq1.temp < 457', message: 'What should the temperature be at the end of the first step?', checkOn: 'conditions', requiredFor: 'prompt0'},
 					{handle: 'path1', expr: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length < 10 && fracDiff(temp("secondWall"), 450) < 0.1', message: 'What state and temperature should species A be at the end of the second step?', checkOn: 'conditions', requiredFor: 'prompt1'},
 					{handle: 'path2', expr: 'fracDiff(temp("secondWall"), 400) <= 0.08', message: 'What should the temperature be at the end of the third step?', checkOn: 'conditions', requiredFor: 'prompt2'},
 					// {handle: 'pathFreeze0', expr: 'curLevel.liquidLiq1.temp >= 450', satisfyCmmds: ['curLevel.heaterHeaterOne.disable()', 'buttonManager.clickButton("Heat", "iso")', 'walls.secondWall.isothermalInit(450)'], requiredFor: 'prompt0'},
@@ -171,9 +171,15 @@ LevelData = {
 				],
 				graphs: [
 					{
-						type: 'Scatter', handle: 'EnthalpyVsFracGas', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Enthalpy', axesInit:{y:{min:0, step:8},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 5}, axesFixed:{x: true, y: true},
+						type: 'Scatter', handle: 'EnthalpyVsFracGas', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Enthalpy (kJ)', axesInit:{y:{min:0, step:8},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 5}, axesFixed:{x: true, y: true},
 							sets: [
 								{handle: 'fracVH', label: 'frac\nGas', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '((enthalpy("secondWall") + 36839.93)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp) / 1000 || (temp("liquidLiq1") - 400)*curLevel.liquidLiq1.Cp / 1000 ', x: 'dotManager.lists.ALLDOTS.length/(dotManager.lists.ALLDOTS.length + curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length)'},trace: true, fillInPts: true, fillInPtsMin: 5}
+							]
+					},
+					{
+						type: 'Scatter', handle: 'TempVsFracGas', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Temperature (K)', axesInit:{y:{min:400, step:10},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 7}, axesFixed:{x: true, y: true},
+							sets: [
+								{handle: 'fracVH', label: 'frac\nGas', pointCol:Col(50,255,50),flashCol:Col(200,255,200),data:{y: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length > 50 ? tempSmooth("liquidLiq1") : tempSmooth("secondWall")', x: 'dotManager.lists.ALLDOTS.length/(dotManager.lists.ALLDOTS.length + curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length)'},trace: true, fillInPts: true, fillInPtsMin: 5}
 							]
 					}
 				]
@@ -185,11 +191,11 @@ LevelData = {
 							'buttonManager.hideButton("Phase", "enablePhase")'
 						]
 					},
-					text: " Now we're going to carry out your hypothetical path.  Above is species A in the same initial state as the previous system. You can use the buttons to the right to set whether the system is isothermal and whether phase change occurs.<p> Take the first step in your hypothetical path.",
+					text: "Now we're going to carry out your hypothetical path.  Above is species A in the same initial state as the previous system. You can use the buttons to the right to set whether the system is isothermal and whether phase change occurs.<p> Take the first step in your hypothetical path.",
 					quiz:[
 						{
 							type: 'text',
-							preText: 'How does the enthalpy change compare to the value you calculated?',
+							preText: 'How does the enthalpy change compare to the value of get("step1", "string", "noValue") kJ you calculated?',
 							text: 'Type your answer here',
 							storeAs: 'HypAns4',
 							CWQuestionId: 70
@@ -211,7 +217,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'text',
-							preText: 'How does the enthalpy change of this step compare to the value you calculated?',
+							preText: 'How does the enthalpy change of this step compare to the value of get("step2", "string", "noValue") kJ you calculated?',
 							storeAs: 'HypAns5',
 							text: 'Type your answer here',
 							CWQuestionId: 71
@@ -232,14 +238,28 @@ LevelData = {
 					quiz: [
 						{
 							type: 'text',
-							preText: 'How does the enthalpy change of this step compare to the value you calculated?',
+							preText: 'How does the enthalpy change of this step compare to the value of get("step3", "string", "noValue") kJ you calculated?',
 							storeAs: 'HypAns6',
 							text: 'Type your answer here',
 							CWQuestionId: 72
 						}
 					]
 				},
-				{//Prompt 3
+				{
+					noRefresh: true,
+					sceneData: undefined,
+					quiz: [
+						{
+							type: 'textSmall',
+							preText: 'What was the overall change in enthalpy for the process?',
+							storeAs: 'stepTotal',
+							units: 'kJ',
+							text: '',
+							CWQuestionId: 73
+						}
+					]
+				},
+				{//Prompt 4
 					sceneData: undefined,
 					cutScene: true,
 					text: 'How does the experimental enthalpy of vaporization compare to the value you predicted? Can you explain any differences?',
@@ -248,7 +268,7 @@ LevelData = {
 							type: 'text',
 							storeAs: 'HypAns7',
 							text: 'Type your answer here',
-							CWQuestionId: 73
+							CWQuestionId: 74
 						}
 					]
 				}
@@ -260,14 +280,14 @@ LevelData = {
 				{//Prompt 0
 					sceneData: undefined,
 					cutScene: true,
-					text: "Now that we know the enthalpy of vaporization at 400 K is 28.6 kJ/mol, calculate the heat required for the real process:<p>##A (liquid, 350 K) \\rightarrow A(vapor, 450 K)##<p><br> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>25</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta h_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>2.0</td></tr></table> </center></br></p>",
+					text: "Now that you have found the enthalpy of vaporization at 400 K to be get('stepTotal', 'string', 'noValue') kJ, calculate the heat required for the real process:<p>##A (liquid, 350 K) \\rightarrow A(vapor, 450 K)##<p><br> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>25</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta h_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>2.0</td></tr></table> </center></br></p>",
 					quiz: [
 						{
 							type: 'textSmall',
 							text: '',
 							units: 'kJ',
 							storeAs: 'HypAns8',
-							CWQuestionId: 74
+							CWQuestionId: 75
 						}
 					]
 				}
@@ -293,7 +313,7 @@ LevelData = {
 					}
 				],
 				dataReadouts: [
-					{label: 'Temperature: ', expr: 'var tempVal = tempSmooth("thirdWall"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'Gas Temp: ', expr: 'var tempVal = tempSmooth("thirdWall"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
 					{label: 'Liquid Temp: ', expr: 'var tempVal = tempSmooth("liquidLiq1"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'},
 					{label: 'Pressure: ', expr: 'pExt("thirdWall")', units: 'bar', decPlaces: 1, handle: 'pExt', readout: 'pistonPistonLeft'},
 					// {label: 'q: ', expr: 'q("thirdWall")', units: 'kJ', decPlaces: 1, handle: 'qwer', readout: 'mainReadout'},
@@ -308,6 +328,12 @@ LevelData = {
 						type: 'Scatter', handle: 'EnthalpyVsFracGas', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Enthalpy', axesInit:{y:{min:0, step:8},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 5}, axesFixed:{x: true, y: true},
 							sets: [
 								{handle: 'fracVH', label: 'frac\nGas', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '((enthalpy("thirdWall") + 38839.93)*dotManager.lists.ALLDOTS.length/1000 + (temp("liquidLiq1") - 350)*curLevel.liquidLiq1.Cp) / 1000 || (temp("liquidLiq1") - 350)*curLevel.liquidLiq1.Cp / 1000 ', x: 'dotManager.lists.ALLDOTS.length/(dotManager.lists.ALLDOTS.length + curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length)'},trace: true, fillInPts: true, fillInPtsMin: 5}
+							]
+					},
+					{
+						type: 'Scatter', handle: 'TempVsFracGas', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Temperature (K)', axesInit:{y:{min:350, step:20},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 7}, axesFixed:{x: true, y: true},
+							sets: [
+								{handle: 'fracVH', label: 'frac\nGas', pointCol:Col(50,255,50),flashCol:Col(200,255,200),data:{y: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length > 150 ? tempSmooth("liquidLiq1") : tempSmooth("thirdWall")', x: 'dotManager.lists.ALLDOTS.length/(dotManager.lists.ALLDOTS.length + curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length)'},trace: true, fillInPts: true, fillInPtsMin: 5}
 							]
 					}
 				],
@@ -327,7 +353,7 @@ LevelData = {
 							preText: 'How does the enthalpy of vaporization of the real process compare to that which you calculated using hypothetical paths?',
 							storeAs: 'HypAns9',
 							text: 'Type your answer here',
-							CWQuestionId: 75
+							CWQuestionId: 76
 						}
 					]
 				}

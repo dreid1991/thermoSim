@@ -19,7 +19,7 @@ LevelData = {
 									{type: 'text',
 									storeAs:'HypAns',
 									text: 'Type your answer here.',
-									CWQuestionId: 76
+									CWQuestionId: 77
 									}
 								]	
 				},
@@ -41,7 +41,7 @@ LevelData = {
 									{type: 'text',
 									storeAs:'2ndans',
 									text: 'Type your answer here.',
-									CWQuestionId: 77
+									CWQuestionId: 78
 									}
 						]
 				},
@@ -104,7 +104,7 @@ LevelData = {
 							{type: 'text',
 							storeAs:'realProcess',
 							text: 'Type your answer here.',
-							CWQuestionId: 78
+							CWQuestionId: 79
 							}
 						]
 				},
@@ -128,19 +128,19 @@ LevelData = {
 						units: 'kJ',
 						preText: '##\\Delta H## of step 1: ',
 						text: '',
-						CWQuestionId: 79},
+						CWQuestionId: 80},
 						{type: 'textSmall',
 						storeAs:'step2',
 						units: 'kJ',
 						preText: '##\\Delta H## of step 2: ',
 						text: '',
-						CWQuestionId: 80},
+						CWQuestionId: 81},
 						{type: 'textSmall',
 						storeAs: 'step3',
 						units: 'kJ',
 						preText: '##\\Delta H## of step 3: ',
 						text: '',
-						CWQuestionId: 81}
+						CWQuestionId: 82}
 					]
 				}
 			]
@@ -220,7 +220,7 @@ LevelData = {
 						{type: 'text',
 						storeAs: 'hypAns1',
 						text: 'Type your answer here',
-						CWQuestionId: 82
+						CWQuestionId: 83
 						}
 					]
 				},
@@ -242,7 +242,7 @@ LevelData = {
 						{type: 'text',
 						storeAs: 'hypAns2',
 						text: 'Type your answer here',
-						CWQuestionId: 83
+						CWQuestionId: 84
 						}
 					]
 				},
@@ -262,7 +262,7 @@ LevelData = {
 						{type: 'text',
 						storeAs: 'hypAns3',
 						text: 'Type your answer here',
-						CWQuestionId: 84
+						CWQuestionId: 85
 						}
 					]
 				},
@@ -275,7 +275,7 @@ LevelData = {
 						units: 'kJ',
 						storeAs: 'stepTotal',
 						text: '',
-						CWQuestionId: 85
+						CWQuestionId: 86
 						}
 					]
 				},
@@ -288,7 +288,7 @@ LevelData = {
 						{type: 'text',
 						storeAs: 'hypAns4',
 						text: 'Type your answer here',
-						CWQuestionId: 86
+						CWQuestionId: 87
 						}
 					],
 				}
@@ -352,7 +352,7 @@ LevelData = {
 							storeAs: 'finalAns',
 							text: ' ',
 							units: 'kJ',
-							CWQuestionId: 87
+							CWQuestionId: 88
 							}
 						]
 				}
@@ -416,7 +416,7 @@ LevelData = {
 							storeAs: 'finalerAns',
 							text: ' ',
 							units: 'kJ',
-							CWQuestionId: 88
+							CWQuestionId: 89
 							}
 						]
 				},
@@ -428,7 +428,7 @@ LevelData = {
 							type: 'text',
 							storeAs: 'theLastAns',
 							text: 'Type your answer here',
-							CWQuestionId: 89
+							CWQuestionId: 90
 						}
 					]
 				}
