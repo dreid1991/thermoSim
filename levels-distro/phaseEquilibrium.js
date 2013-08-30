@@ -1,6 +1,6 @@
 canvasHeight = 450;
 LevelData = {
-	levelTitle: 'Phase Equilibrium Template',
+	levelTitle: 'Phase Equilibrium',
 
 		
 	spcDefs: [
