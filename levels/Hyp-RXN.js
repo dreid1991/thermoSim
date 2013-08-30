@@ -88,7 +88,7 @@ LevelData = {
 				sceneData: 
 					{
 						graphs: [
-							{type: 'Scatter', handle: 'molFracVsTime', xLabel: "Time (s)", yLabel: "Extent of rxn", axesInit:{x:{min:0, step:1},y:{min:0, step:0.2}}, numGridLines: {y:6}, axesFixed:{y: true},
+							{type: 'Scatter', handle: 'molFracVsTime', xLabel: "Time (s)", yLabel: "Extent of Reaction", axesInit:{x:{min:0, step:1},y:{min:0, step:0.2}}, numGridLines: {y:6}, axesFixed:{y: true},
 								sets: [
 									{handle: 'moleFrac', label:'moleFrac', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{x: 'time("firstWall")',y: 'frac("firstWall",{spcName:"spc3",tag: "firstWall"})'},trace: true, fillInPts: true, finnInPtsMin: 5}
 								]
@@ -111,12 +111,12 @@ LevelData = {
 				{//Prompt 1
 				sceneData: undefined,
 					cutScene: true,
-					text: "We can use hypothetical paths to calculate physical properties at states where data is unavailable. In this case, we don't have the enthalpy of reaction at 500 K, but we have the following data:<p> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A</td><td>3.5*R</td></tr><tr><td>B</td><td>4.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-3.5</td></tr></table></p></center>The enthalpy of reaction can be defined as the heat absorbed by a system undergoing a full conversion reaction at constant temperature and pressure.  For example, in a reaction of A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming one mole of A at constant temperature and pressure.  If the reaction were 2A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming two moles of A at constant temperature and pressure."
+					text: "We can use hypothetical paths to calculate physical properties at states where data is unavailable. In this case, we don't have the enthalpy of reaction at 500 K, but we have the following data:<p> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A</td><td>3.5*R</td></tr><tr><td>B</td><td>4.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta h_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-3.5</td></tr></table></p></center>The enthalpy of reaction can be defined as the heat absorbed by a system undergoing a full conversion reaction at constant temperature and pressure.  For example, in a reaction of A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming one mole of A at constant temperature and pressure.  If the reaction were 2A##\\rightarrow##B, the enthalpy of reaction would describe the heat after consuming two moles of A at constant temperature and pressure."
 				},
 				{//Prompt 2
 				sceneData: undefined,
 					cutScene: true,
-					text: "<center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A</td><td>3.5*R</td></tr><tr><td>B</td><td>4.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta H_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-2</td></tr></table></p></center> <p> Using this data, construct a hypothetical path in three steps that will allow you to calculate the enthalpy of reaction for the previous process.  Calculate the enthalpy change for each step and record the values on a separate sheet of paper. <p> The process is: <p> ##1 mole A (500 K) \\rightarrow 1 mole B (500 K)##",
+					text: "<center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A</td><td>3.5*R</td></tr><tr><td>B</td><td>4.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta h_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-3.5</td></tr></table></p></center> <p> Using this data, construct a hypothetical path in three steps that will allow you to calculate the enthalpy of reaction for the previous process.  Calculate the enthalpy change for each step and record the values on a separate sheet of paper. <p> The process is: <p> ##1 mole A (500 K) \\rightarrow 1 mole B (500 K)##",
 				},
 				{//Prompt 3
 				scendeData: undefined,
@@ -193,12 +193,12 @@ LevelData = {
 					}
 				],
 				graphs: [
-							{type: 'Scatter', handle: 'EnthalpyFracVsTemp', xLabel: "Extent of rxn", yLabel: "Enthalpy", axesInit:{y:{min:-12, step:3},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 6}, axesFixed:{x: true, y: true},
+							{type: 'Scatter', handle: 'EnthalpyFracVsTemp', xLabel: "Extent of Reaction", yLabel: "Enthalpy (kJ)", axesInit:{y:{min:-12, step:3},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 6}, axesFixed:{x: true, y: true},
 								sets: [
 									{handle: 'moleFrac', label:'mole\nFrac', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: '(enthalpy("secondWall") + 4122) / 1000',x: 'frac("secondWall",{spcName:"spc2",tag: "secondWall"})'},trace: true, fillInPts: true, fillInPtsMin: 5}
 								]
 							},
-							{type: 'Scatter', handle: 'convVsTemp', xLabel: "Extent of rxn", yLabel: "Temperature", axesInit:{y:{min:200, step:80},x:{min:0, step:0.2}}, numGridLines: {x:6}, axesFixed:{x: true},
+							{type: 'Scatter', handle: 'convVsTemp', xLabel: "Extent of Reaction", yLabel: "Temperature (K)", axesInit:{y:{min:200, step:80},x:{min:0, step:0.2}}, numGridLines: {x:6}, axesFixed:{x: true},
 								sets: [
 									{handle: 'moleFrac', label:'mole\nFrac', pointCol:Col(50,250,50),flashCol:Col(255,200,200),data:{y: 'temp("secondWall")',x: 'frac("secondWall",{spcName:"spc2",tag: "secondWall"})'},trace: true, fillInPts: true, fillInPtsMin: 5}
 								]
@@ -215,7 +215,7 @@ LevelData = {
 						'buttonManager.hideButton("Reaction", "rxn1go")'
 					]
 				},
-					text:"Now we're going to carry out the hypothetical path.  Above is species A in the same initial state as the previous system.  You can use the buttons to the right to set whether the system is isothermal and whether the reaction occurs.  For this hypothetical process, the activation energy has been lowered so the reaction proceeds at 298 K and the reverse reaction has been disabled. <p> Take the first step in the hypothetical path. How does the enthalpy change compare to the value you calculated?",
+					text:"Now we're going to carry out the hypothetical path.  Above is species A in the same initial state as the previous system.  You can use the buttons to the right to set whether the system is isothermal and whether the reaction occurs.  For this hypothetical process, the activation energy has been lowered so the reaction proceeds at 298 K and the reverse reaction has been disabled. <p> Take the first step in the hypothetical path. How does the enthalpy change compare to the value of get('step1', 'string', 'noValue') kJ you calculated?",
 					quiz: [
 						{type: 'text',
 						storeAs: 'hypAns1',
@@ -237,7 +237,7 @@ LevelData = {
 						'dataDisplayer.setEntryValue("HStep", 0)'
 					]
 				},
-					text: "Take the next step in the hypothetical path.  How does the enthalpy change of this step compare to the value you calculated?",
+					text: "Take the next step in the hypothetical path.  How does the enthalpy change of this step compare to the value of get('step2', 'string', 'noValue') kJ you calculated?",
 					quiz: [
 						{type: 'text',
 						storeAs: 'hypAns2',
@@ -257,7 +257,7 @@ LevelData = {
 						'dataDisplayer.setEntryValue("HStep", 0)'
 					]
 				},
-					text: "Take the final step in the hypothetical path. Input the enthalpy change.",
+					text: "Take the final step in the hypothetical path. Input the enthalpy change of this step. Is it the same as the value of get('step3', 'string', 'noValue') kJ you calculated?",
 					quiz:[
 						{type: 'text',
 						storeAs: 'hypAns3',
@@ -267,17 +267,30 @@ LevelData = {
 					]
 				},
 				{//Prompt 3
+					noRefresh: true,
+					sceneData: undefined,
+					quiz:[
+						{type: 'textSmall',
+						preText: 'What was the overall enthalpy change?',
+						units: 'kJ',
+						storeAs: 'stepTotal',
+						text: '',
+						CWQuestionId: 85
+						}
+					]
+				},
+				{//Prompt 4
 				noRefresh: true,
 				sceneData: undefined,
 					cutScene: true,
-					text: "How does the enthalpy change of the process compare to the value you predicted?  Can you explain any differences?",
+					text: "How does the overall enthalpy change of the process compare to the value you predicted?  Can you explain any differences?",
 					quiz:[
 						{type: 'text',
 						storeAs: 'hypAns4',
 						text: 'Type your answer here',
-						CWQuestionId: 85
+						CWQuestionId: 86
 						}
-					]
+					],
 				}
 			]
 		},
@@ -317,7 +330,14 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'checkReaction1', expr: 'frac("thirdWall", {tag:"thirdWall", spcName:"spc2"})>0.52', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 				
-				]
+				],
+				graphs: [
+							{type: 'Scatter', handle: 'timevsextent', xLabel: "Time (s)", yLabel: "Extent of Reaction", axesInit:{y:{min:0, step:0.2},x:{min:0, step:5}}, numGridLines: {x:6, y: 6}, axesFixed:{y: true},
+								sets: [
+									{handle: 'moleFrac', label:'mole\nFrac', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: 'frac("thirdWall", {spcName: "spc2", tag: "thirdWall"})',x: 'time("thirdWall")'},trace: true, fillInPts: true, showPts: false, fillInPtsMin: 0}
+								]
+							},
+						],
 			},
 			prompts: [
 				{//Prompt 0
@@ -326,13 +346,13 @@ LevelData = {
 								{handle: 'lastReaction', expr: 'frac("thirdWall", {tag:"thirdWall", spcName:"spc2"})>0.5', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 
 							]
 					},
-						text: "Now that we know the enthalpy of reaction at 500 K, perform the experiment and calculate the amount of heat released during the process by using the extent of reaction.",
+						text: "Now that we know the enthalpy of reaction at 500 K to be get('stepTotal', 'string', 'noValue') kJ, perform the experiment and calculate the amount of heat released during the process by using the extent of reaction.",
 						quiz: [
 							{type: 'textSmall',
 							storeAs: 'finalAns',
 							text: ' ',
 							units: 'kJ',
-							CWQuestionId: 86
+							CWQuestionId: 87
 							}
 						]
 				}
@@ -374,7 +394,14 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'checkReaction2', expr: 'frac("fourthWall", {tag:"fourthWall", spcName:"spc2"})>0.52', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 				
-				]
+				],
+				graphs: [
+							{type: 'Scatter', handle: 'extentvsheat', xLabel: "Extent of Reaction", yLabel: "Heat (kJ)", axesInit:{y:{min:-3, step:1},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 6}, axesFixed:{x: true},
+								sets: [
+									{handle: 'moleFrac', label:'mole\nFrac', pointCol:Col(255,50,50),flashCol:Col(255,200,200),data:{y: 'q("fourthWall")',x: 'frac("fourthWall", {spcName: "spc2", tag: "fourthWall"})'},trace: true, fillInPts: true, showPts: true, fillInPtsMin: 5}
+								]
+							},
+						],
 			},
 			prompts: [
 				{//Prompt 0
@@ -389,7 +416,7 @@ LevelData = {
 							storeAs: 'finalerAns',
 							text: ' ',
 							units: 'kJ',
-							CWQuestionId: 87
+							CWQuestionId: 88
 							}
 						]
 				},
@@ -401,7 +428,7 @@ LevelData = {
 							type: 'text',
 							storeAs: 'theLastAns',
 							text: 'Type your answer here',
-							CWQuestionId: 88
+							CWQuestionId: 89
 						}
 					]
 				}

@@ -61,7 +61,7 @@ LevelData = {
 					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 6, prods: {uglier: 2}},
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'molAtime', xLabel: "time (s)", yLabel: "mole fraction of A", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'molAtime', xLabel: "Time (s)", yLabel: "Mole Fraction of A", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
 							{handle:'moles', label:'frac A', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "time('wally')", y: "frac('wally', {spcName: 'ugly', tag: 'wally'})"}, trace: true, showPts: false, fillInPtsMin: 5}
 						]
@@ -146,7 +146,7 @@ LevelData = {
 					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 6, prods: {uglier: 2}},
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'molAtime', xLabel: "time (s)", yLabel: "mole fraction of A", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'molAtime', xLabel: "Time (s)", yLabel: "Mole Fraction of A", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
 							{handle:'moles', label:'frac A', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "time('wally')", y: "frac('wally', {spcName: 'ugly', tag: 'wally'})"}, trace: true, showPts: false, fillInPtsMin: 5}
 						]
@@ -191,7 +191,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Let's consider why the rate changes with temperature (or the reactivity of A). Using the Arrhenius equation, graph on a separate piece of paper the reaction rate constant with respect to temperature from 0 to 1000 K. $$ k = Ae^{-E_{a}/{RT}} $$ The activation energy of this reaction is 150 kJ/mol and the pre-exponential constant is ##0.05 M^{-1}s^{-1}##. Why do you believe the rate behaves this way with respect to temperature?", 
+					text: "Let's consider why the rate changes with temperature (or the reactivity of A). Using the Arrhenius equation, graph on a separate piece of paper the reaction rate constant with respect to temperature from 0 to 1000 K. $$ k = Ae^{-E_{a}/{RT}} $$ The activation energy of this reaction is 11 kJ/mol and the pre-exponential constant is ##0.05 M^{-1}s^{-1}##. Why do you believe the rate behaves this way with respect to temperature?", 
 					quiz:[
 							{
 								storeAs: 'foo7', 
@@ -240,7 +240,7 @@ LevelData = {
 					{label: 'Temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 					],
 				graphs: [
-					{type: 'Scatter', handle: 'PvsVOne', xLabel: "temp (K)", yLabel: "Mole Fraction Excited", axesInit:{x:{min:0, step:80}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Temperature (K)", yLabel: "Mole Fraction Excited", axesInit:{x:{min:0, step:200}, y:{min:0, step:.2}}, numGridLines: {x: 6, y: 6}, axesFixed: {x: true, y: true},
 						sets:[
 							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'temp("wally")', y: "frac('wally', {spcName: 'duckling', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
 						]
@@ -284,7 +284,7 @@ LevelData = {
 					},
 				],
 				triggers: [
-					{handle: 'trigger3', expr: "temp('wally') >= 998", message: 'Heat the system to 700 K.', requiredFor: 'prompt0', checkOn: 'conditions'}
+					{handle: 'trigger3', expr: "temp('wally') >= 998", message: 'Heat the system to 1000 K.', requiredFor: 'prompt0', checkOn: 'conditions'}
 				],
 				dataRecord: [
 					
@@ -294,7 +294,7 @@ LevelData = {
 					{label: 'Temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'PvsVOne', xLabel: "temp (K)", yLabel: "Mole Fraction Excited", axesInit:{x:{min:0, step:10}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Temperature (K)", yLabel: "Mole Fraction Excited", axesInit:{x:{min:0, step:200}, y:{min:0, step:.2}}, numGridLines: {x: 6, y: 6}, axesFixed: {x: true, y: true},
 						sets:[
 							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'temp("wally")', y: "frac('wally', {spcName: 'duckling', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
 						]
