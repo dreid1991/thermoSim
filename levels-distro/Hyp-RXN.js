@@ -166,8 +166,8 @@ LevelData = {
 					},
 					{handle: 'Heat', label: 'Heat', prefIdx: 1, isRadio: true,
 						buttons: [
-							{handle: 'isothermal', label: 'Isothermal', isDown: true, exprs: ['walls.secondWall.isothermalInit("current")']},
-							{handle: 'adiabatic', label: 'Adiabatic', isDown: false, exprs: ['walls.secondWall.isothermalStop()']}
+							{handle: 'isothermal', label: 'Isothermal', isDown: false, exprs: ['walls.secondWall.isothermalInit("current")']},
+							{handle: 'adiabatic', label: 'Adiabatic', isDown: true, exprs: ['walls.secondWall.isothermalStop()']}
 						]
 					}
 				],
@@ -179,8 +179,9 @@ LevelData = {
 				],
 				dataReadouts: [
 					{label: 'Temperature: ', expr: 'tempSmooth("secondWall")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
-					{label: 'Change in Enthalpy: ', expr: '(enthalpy("secondWall") + 4122)/1000', units: 'kJ', decPlaces: 2, handle: 'H', readout: 'mainReadout'},
-					{label: 'x-rxn: ', expr: 'frac("secondWall", {tag:"secondWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'liqTemp', readout: 'mainReadout'}
+					{label: 'H: ', expr: '(enthalpy("secondWall") + 4122)/1000', units: 'kJ', decPlaces: 2, handle: 'H', readout: 'mainReadout'},
+					{label: 'x-rxn: ', expr: 'frac("secondWall", {tag:"secondWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'liqTemp', readout: 'mainReadout'},
+					{label: 'H this step: ', expr: '(enthalpy("secondWall") + 4122)/1000', units: 'kJ', decPlaces: 2, handle: 'HStep', readout: 'mainReadout'},
 				],
 				objs: [
 					// {type: 'QArrowsAmmt',
@@ -232,7 +233,8 @@ LevelData = {
 					cmmds: [
 						'buttonManager.showButton("Reaction", "rxn1go")',
 						'buttonManager.hideButton("Heat", "adiabatic")',
-						'buttonManager.clickButton("Heat", "isothermal")'
+						'buttonManager.clickButton("Heat", "isothermal")',
+						'dataDisplayer.setEntryValue("HStep", 0)'
 					]
 				},
 					text: "Take the next step in the hypothetical path.  How does the enthalpy change of this step compare to the value you calculated?",
@@ -251,7 +253,8 @@ LevelData = {
 						{handle: 'hypPath1', expr: 'fracDiff(temp("secondWall"),500)<.01', message:"What should the temperature be at the end of your hypothetical path?"}
 					],
 					cmmds: [
-						'buttonManager.showButton("Heat", "adiabatic")'
+						'buttonManager.showButton("Heat", "adiabatic")',
+						'dataDisplayer.setEntryValue("HStep", 0)'
 					]
 				},
 					text: "Take the final step in the hypothetical path. Input the enthalpy change.",
