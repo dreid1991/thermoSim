@@ -439,7 +439,24 @@ LevelData = {
 				{
 					cutScene: true,
 					title: '',
-					text: 'You have completed the simulation.'
+					text: 'You have completed the simulation.',
+					quiz: [
+						{
+							type: 'multChoice',
+							CWQuestionId: 106,
+							questionText: "<p>By selecting the button below and clicking 'Submit' you will exit the simulation. If you are not finished or would like to return to a previous page, click 'back' to return to the simulation.",
+							options:[
+								{text:"I would like to exit the simulation", correct: true, message:"Select the button labeled 'I would like to exit the simulation'", CWAnswerId: 17},
+							]
+						},
+					]
+				},
+				{
+					sceneData: {
+						cmmds: [
+							'location.reload()'
+						]
+					}	
 				}
 			]
 		}
