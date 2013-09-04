@@ -14,9 +14,9 @@ LevelData = {
 				{//Prompt 0
 				sceneData: undefined,
 							cutScene: true,
-							text: "<p>Today we're going to examine hypothetical paths and how they can be used to determine unknown thermodynamic process values.</p><p>The use of hypothetical paths is entirely dependent on state functions. Please identify here what you believe are the distinguishing characteristics that make a thermodynamic property a state function.</p>",
 							quiz:[
 									{type: 'text',
+									questionText: "<p>Today we're going to examine hypothetical paths and how they can be used to determine unknown thermodynamic process values.</p><p>The use of hypothetical paths is entirely dependent on state functions. Please identify here what you believe are the distinguishing characteristics that make a thermodynamic property a state function.</p>",
 									storeAs:'HypAns1',
 									text: 'Type your answer here.',
 									CWQuestionId: 64
@@ -97,19 +97,19 @@ LevelData = {
 								{type: 'textSmall',
 								storeAs: 'step1',
 								units: 'kJ',
-								preText: '##\\Delta H## of step 1: ',
+								label: '##\\Delta H## of step 1: ',
 								text: '',
 								CWQuestionId: 67},
 								{type: 'textSmall',
 								storeAs:'step2',
 								units: 'kJ',
-								preText: '##\\Delta H## of step 2: ',
+								label: '##\\Delta H## of step 2: ',
 								text: '',
 								CWQuestionId: 68},
 								{type: 'textSmall',
 								storeAs: 'step3',
 								units: 'kJ',
-								preText: '##\\Delta H## of step 3: ',
+								label: '##\\Delta H## of step 3: ',
 								text: '',
 								CWQuestionId: 69}
 							]
@@ -262,10 +262,10 @@ LevelData = {
 				{//Prompt 4
 					sceneData: undefined,
 					cutScene: true,
-					text: 'How does the experimental enthalpy of vaporization compare to the value you predicted? Can you explain any differences?',
 					quiz: [
 						{
 							type: 'text',
+							questionText: 'How does the experimental enthalpy of vaporization compare to the value you predicted? Can you explain any differences?',
 							storeAs: 'HypAns7',
 							text: 'Type your answer here',
 							CWQuestionId: 74
@@ -280,9 +280,9 @@ LevelData = {
 				{//Prompt 0
 					sceneData: undefined,
 					cutScene: true,
-					text: "Now that you have found the enthalpy of vaporization at 400 K to be get('stepTotal', 'string', 'noValue') kJ, calculate the heat required for the real process:<p>##A (liquid, 350 K) \\rightarrow A(vapor, 450 K)##<p><br> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>25</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta h_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>2.0</td></tr></table> </center></br></p>",
 					quiz: [
 						{
+							questionText: "Now that you have found the enthalpy of vaporization at 400 K to be get('stepTotal', 'string', 'noValue') kJ, calculate the heat required for the real process:<p>##A (liquid, 350 K) \\rightarrow A(vapor, 450 K)##<p><br> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>25</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta h_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>2.0</td></tr></table> </center></br></p>",
 							type: 'textSmall',
 							text: '',
 							units: 'kJ',

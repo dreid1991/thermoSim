@@ -14,9 +14,9 @@ LevelData = {
 				{//p0, q0
 					sceneData:undefined,
 					cutScene:true,
-					text:"<p>Today we're going to investigate heat capacities.  Using your own words, how would you explain the concept of a heat capacity to a high school senior?</p>",
 					quiz:[
 						{
+							questionText:"<p>Today we're going to investigate heat capacities.  Using your own words, how would you explain the concept of a heat capacity to a high school senior?</p>",
 							storeAs: 'foo1', 
 							type:'text', 
 							text:'Type your answer here.', 
@@ -27,9 +27,9 @@ LevelData = {
 				{//p1, q1
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "<p>We'll start by heating a constant volume system.  It contains 0.5 moles of an ideal monotomic gas.  How much energy should heating this system by 100 K 'cost'?</p>",
 					quiz:[						
 					{
+						questionText: "<p>We'll start by heating a constant volume system.  It contains 0.5 moles of an ideal monotomic gas.  How much energy should heating this system by 100 K 'cost'?</p>",
 						type: 'textSmall', 
 						storeAs: 'foo2', 
 						units: 'kJ', 
@@ -74,9 +74,9 @@ LevelData = {
 									// ],
 						// },											
 					cutScene:false,
-					text: "Now let's perform an experiment.  You wrote that this heating would 'cost' get('foo2', 'string', 'noValue') kJ.  The system shown above contains our 0.5 moles of ideal monatomic gas.   You can add energy by using the slider to activate the heater.  Increase the temperature by 100 K. Note that you can also cool the system if its temperature increases too much.<p>How does your prediction for the heating amount compare to the experimental result? Explain.</p>",
 					quiz:[
 						{
+							questionText: "Now let's perform an experiment.  You wrote that this heating would 'cost' get('foo2', 'string', 'noValue') kJ.  The system shown above contains our 0.5 moles of ideal monatomic gas.   You can add energy by using the slider to activate the heater.  Increase the temperature by 100 K. Note that you can also cool the system if its temperature increases too much.<p>How does your prediction for the heating amount compare to the experimental result? Explain.</p>",
 							storeAs: 'foo3', 
 							type:'text', 
 							text:'Type your answer here.', 
@@ -86,9 +86,9 @@ LevelData = {
 				},
 				{//p1, q3
 				cutScene: true, 
-				text: "<p>Now we're going to look at heating in a constant pressure system. This means the volume will no longer be held constant. <p>If we increase its temperature by 100 K, how will the system's energy 'cost' compare to that of the constant volume system? Explain.</p>", 
 				quiz:[
 						{
+							questionText: "<p>Now we're going to look at heating in a constant pressure system. This means the volume will no longer be held constant. <p>If we increase its temperature by 100 K, how will the system's energy 'cost' compare to that of the constant volume system? Explain.</p>", 
 							storeAs: 'foo4', 
 							type:'text', 
 							text:'Type your answer here.', 
@@ -126,9 +126,9 @@ LevelData = {
 						],
 					},
 					cutScene:false, 
-					text: "Here is the constant pressure version of the system filled with one mole of the ideal monatomic gas.  Heat the system by 100 K.  How does the value compare to the constant volume heating value of get('foo2', 'string', 'noValue') kJ?",
 					quiz:[
 						{
+							questionText: "Here is the constant pressure version of the system filled with one mole of the ideal monatomic gas.  Heat the system by 100 K.  How does the value compare to the constant volume heating value of get('foo2', 'string', 'noValue') kJ?",
 							storeAs: 'foo', 
 							type:'text', 
 							text:'Type your answer here.', 
@@ -143,9 +143,9 @@ LevelData = {
 			prompts:[
 				{//p0, q5
 				cutScene:true, 
-				text: "<p>The system had a constant external pressure of 3 bar, contained one mole of an ideal monatomic gas, and was heated by 100 K.</p>  Using the First Law of Thermodynamics, what should the change in system volume have been?<br>", 
 				quiz:[						
 					{
+						questionText: "<p>The system had a constant external pressure of 3 bar, contained one mole of an ideal monatomic gas, and was heated by 100 K.</p>  Using the First Law of Thermodynamics, what should the change in system volume have been?<br>", 
 						type: 'textSmall', 
 						storeAs: 'foo5', 
 						units: 'L', 
@@ -195,9 +195,9 @@ LevelData = {
 			},			
 			prompts: [					
 						{//p0, q6
-						text: "Here's the same system with the work done displayed.  Increase the temperature by 100 K.  You predicted that get('foo5', 'string', 'noValue') kJ of work would be done.  How does this compare to the experimental result?",
 						quiz:[
 								{		
+									questionText: "Here's the same system with the work done displayed.  Increase the temperature by 100 K.  You predicted that get('foo5', 'string', 'noValue') kJ of work would be done.  How does this compare to the experimental result?",
 									storeAs: 'foo7', 
 									type:'text', 
 									text:'Type your answer here.', 
@@ -211,9 +211,9 @@ LevelData = {
 									'curLevel.heaterHeaterWally3.disable()'
 								]
 							},
-							text: "We've established that when you expand at constant pressure, the system does work on its surroundings.  Can you use this idea to explain why a system's heat capacity is higher at constant pressure than at constant volume?",
 							quiz:[
 								{
+									questionText: "We've established that when you expand at constant pressure, the system does work on its surroundings.  Can you use this idea to explain why a system's heat capacity is higher at constant pressure than at constant volume?",
 									storeAs: 'foo8', 
 									type:'text', 
 									text:'Type your answer here.', 
@@ -228,9 +228,9 @@ LevelData = {
 			prompts:[
 				{
 				cutScene:true, 
-				text: "<p>The heat capacity per mole of gas can be described as the energy added through heat per temperature change, or ##\\frac{dq}{dT} ##.</p><p> We know that the constant volume heat capacity of an ideal monatomic gas is ##\\frac{3}{2}R##. </p><p>From the first law, solve for what the ##\\frac{dq}{dt}##, or heat capacity, would be for this system at constant pressure. </p><p>How does the result relate to your conceptual understanding of how constant pressure systems behave?  Explain.</p>", 
 				quiz:[
 						{
+							questionText: "<p>The heat capacity per mole of gas can be described as the energy added through heat per temperature change, or ##\\frac{dq}{dT} ##.</p><p> We know that the constant volume heat capacity of an ideal monatomic gas is ##\\frac{3}{2}R##. </p><p>From the first law, solve for what the ##\\frac{dq}{dt}##, or heat capacity, would be for this system at constant pressure. </p><p>How does the result relate to your conceptual understanding of how constant pressure systems behave?  Explain.</p>", 
 							storeAs: 'foo9', 
 							type:'text', 
 							text:'Type your answer here.', 

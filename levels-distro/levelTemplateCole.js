@@ -79,7 +79,6 @@ LevelData = {
 							{handle: 'firstCheck', expr: 'fracDiff(temp("FirstWall"), 400) > .05', message: "Try to hit the molecule with the slider and see what happens!", priority: 1, }
 						]
 					},
-					text: "",
 					quiz: [
 						{
 							questionText: "<center>##nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p>From the equation above we see that temperature increases as we do work by decreasing volume.  Temperature is an expression of molecular kinetic energy, so as the system is compressed, the molecules must speed up.  These ideal gas molecules can be thought of as perfectly elastic bouncy balls.  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?",
@@ -129,7 +128,6 @@ LevelData = {
 								{handle: 'CheckVol', expr: 'vol("SecondWall")<8', message: "Compress the system!", priority: 1}
 							]
 					},
-						text: "",
 						quiz: [
 							{
 								questionText: "Above is a well insulated piston cylinder assembly.  Place the block on top of the piston and observe the response.  Calculate the amount of work that the piston and block did on the system?",
@@ -138,9 +136,8 @@ LevelData = {
 				},
 				{//Prompt 1
 					sceneData: undefined,
-						text: "The system had an initial temperature of 200 K and contains 1.8 moles of an ideal monatomic gas.  You wrote that get('WorkDoneAnswer','int') kJ of work were done.  What final temperature should the system have?",
 						quiz: [
-							{CWQuestionId: 5, type: 'textSmall', storeAs: 'TempAnswer', units: 'K', text: ''}
+							{questionText: "The system had an initial temperature of 200 K and contains 1.8 moles of an ideal monatomic gas.  You wrote that get('WorkDoneAnswer','int') kJ of work were done.  What final temperature should the system have?", CWQuestionId: 5, type: 'textSmall', storeAs: 'TempAnswer', units: 'K', text: ''}
 						]
 				},
 			]
@@ -189,7 +186,6 @@ LevelData = {
 							{handle: 'checkVol2', expr: 'vol("ThirdWall")<8', message: "Compress the system!", priority: 1}
 						]
 					},
-					text: "",
 					quiz: [
 						{
 							questionText: "Previously you answered that the compression did get('WorkDoneAnswer','int') KJ on the system bringing it to a final temperature of get('TempAnswer','int') K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
@@ -236,7 +232,6 @@ LevelData = {
 				{//Prompt 4
 					sceneData:undefined, 
 					noRefresh: true,
-					text: "",
 					quiz: [
 						{
 							questionText: "The system has undergone a two-step process.  First it was compressed by adding a block.  Then it was expanded to its original volume by removing the block.  Before the compression, the system's temperature was 200K.  After the expansion, the temperature was get('Temp', 'int') K.  Why is the system temperature higher after going through this two-step process?",

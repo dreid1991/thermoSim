@@ -18,9 +18,9 @@ LevelData = {
 				{
 					sceneData: undefined,
 					cutScene: true,
-					text: "<p>Today we're going to look at single component phase equilibrium. Before we start, what does it mean for a system to be saturated?</p>",
 					quiz:[
 						{
+							questionText: "<p>Today we're going to look at single component phase equilibrium. Before we start, what does it mean for a system to be saturated?</p>",
 							type: 'text',
 							text: 'type your answer here',
 							storeAs: 'beginning1', 
@@ -293,9 +293,9 @@ LevelData = {
 				{//prompt1
 					sceneData: undefined,
 					cutScene: true,
-					text: '<p>Use your text book to determine the pressure at which the system will be saturated if the temperature is held at 150 C.',
 					quiz: [
 						{
+							questionText: '<p>Use your text book to determine the pressure at which the system will be saturated if the temperature is held at 150 C.',
 							type: 'textSmall',
 							text: '',
 							units: 'bar',

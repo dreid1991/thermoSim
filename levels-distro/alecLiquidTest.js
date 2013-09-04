@@ -23,7 +23,7 @@ LevelData = {
 								{text:"I would like to exit the simulation", correct: true, message:"Select the button labeled 'I would like to exit the simulation'", CWAnswerId: 17},
 							]
 						},
-					]
+					],
 				},
 				{
 					sceneData: {

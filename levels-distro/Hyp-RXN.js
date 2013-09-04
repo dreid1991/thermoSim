@@ -14,9 +14,9 @@ LevelData = {
 				{//Prompt 0
 				sceneData: undefined,
 							cutScene: true,
-							text:" <p>Today we're going to examine hypothetical paths and how they can be used to determine unknown thermodynamic process values.</p><p>The use of hypothetical paths is entirely dependent on state functions. Please identify here what you believe are the distinguishing characteristics that make a thermodynamic property a state function.</p>",
 							quiz:[
 									{type: 'text',
+									questionText:" <p>Today we're going to examine hypothetical paths and how they can be used to determine unknown thermodynamic process values.</p><p>The use of hypothetical paths is entirely dependent on state functions. Please identify here what you believe are the distinguishing characteristics that make a thermodynamic property a state function.</p>",
 									storeAs:'HypAns',
 									text: 'Type your answer here.',
 									CWQuestionId: 77
@@ -36,9 +36,9 @@ LevelData = {
 						]
 					},
 					cutScene: true,
-					text: "Over spring break Dr. Koretsky hiked up Eagle's Peak near San Francisco. The two routes he could take are seen to the right. How would the amounts of work required to complete the two routes compare? How would the potential energy change compare? Which of these two things, work or potential energy, is independent of path and therefore a state function?<p>",
 					quiz:[
 									{type: 'text',
+									questionText: "Over spring break Dr. Koretsky hiked up Eagle's Peak near San Francisco. The two routes he could take are seen to the right. How would the amounts of work required to complete the two routes compare? How would the potential energy change compare? Which of these two things, work or potential energy, is independent of path and therefore a state function?<p>",
 									storeAs:'2ndans',
 									text: 'Type your answer here.',
 									CWQuestionId: 78
@@ -99,9 +99,9 @@ LevelData = {
 						]
 					},
 					cutScene: false,
-					text: "The isothermal system above is held at 500 K and contains 1 mole of A.  The red colored species A  can reversibly react to form the yellow species B.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  Is the reaction endothermic or exothermic? What is the sign of the enthalpy of reaction? Explain.",
 					quiz:[
 							{type: 'text',
+							questionText: "The isothermal system above is held at 500 K and contains 1 mole of A.  The red colored species A  can reversibly react to form the yellow species B.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  Is the reaction endothermic or exothermic? What is the sign of the enthalpy of reaction? Explain.",
 							storeAs:'realProcess',
 							text: 'Type your answer here.',
 							CWQuestionId: 79
@@ -126,19 +126,19 @@ LevelData = {
 						{type: 'textSmall',
 						storeAs: 'step1',
 						units: 'kJ',
-						preText: '##\\Delta H## of step 1: ',
+						label: '##\\Delta H## of step 1: ',
 						text: '',
 						CWQuestionId: 80},
 						{type: 'textSmall',
 						storeAs:'step2',
 						units: 'kJ',
-						preText: '##\\Delta H## of step 2: ',
+						label: '##\\Delta H## of step 2: ',
 						text: '',
 						CWQuestionId: 81},
 						{type: 'textSmall',
 						storeAs: 'step3',
 						units: 'kJ',
-						preText: '##\\Delta H## of step 3: ',
+						label: '##\\Delta H## of step 3: ',
 						text: '',
 						CWQuestionId: 82}
 					]
@@ -215,9 +215,9 @@ LevelData = {
 						'buttonManager.hideButton("Reaction", "rxn1go")'
 					]
 				},
-					text:"Now we're going to carry out the hypothetical path.  Above is species A in the same initial state as the previous system.  You can use the buttons to the right to set whether the system is isothermal and whether the reaction occurs.  For this hypothetical process, the activation energy has been lowered so the reaction proceeds at 298 K and the reverse reaction has been disabled. <p> Take the first step in the hypothetical path. How does the enthalpy change compare to the value of get('step1', 'string', 'noValue') kJ you calculated?",
 					quiz: [
 						{type: 'text',
+						questionText:"Now we're going to carry out the hypothetical path.  Above is species A in the same initial state as the previous system.  You can use the buttons to the right to set whether the system is isothermal and whether the reaction occurs.  For this hypothetical process, the activation energy has been lowered so the reaction proceeds at 298 K and the reverse reaction has been disabled. <p> Take the first step in the hypothetical path. How does the enthalpy change compare to the value of get('step1', 'string', 'noValue') kJ you calculated?",
 						storeAs: 'hypAns1',
 						text: 'Type your answer here',
 						CWQuestionId: 83
@@ -237,9 +237,9 @@ LevelData = {
 						'dataDisplayer.setEntryValue("HStep", 0)'
 					]
 				},
-					text: "Take the next step in the hypothetical path.  How does the enthalpy change of this step compare to the value of get('step2', 'string', 'noValue') kJ you calculated?",
 					quiz: [
 						{type: 'text',
+						questionText: "Take the next step in the hypothetical path.  How does the enthalpy change of this step compare to the value of get('step2', 'string', 'noValue') kJ you calculated?",
 						storeAs: 'hypAns2',
 						text: 'Type your answer here',
 						CWQuestionId: 84
@@ -257,9 +257,9 @@ LevelData = {
 						'dataDisplayer.setEntryValue("HStep", 0)'
 					]
 				},
-					text: "Take the final step in the hypothetical path. Input the enthalpy change of this step. Is it the same as the value of get('step3', 'string', 'noValue') kJ you calculated?",
 					quiz:[
 						{type: 'text',
+						questionText: "Take the final step in the hypothetical path. Input the enthalpy change of this step. Is it the same as the value of get('step3', 'string', 'noValue') kJ you calculated?",
 						storeAs: 'hypAns3',
 						text: 'Type your answer here',
 						CWQuestionId: 85
@@ -283,9 +283,9 @@ LevelData = {
 				noRefresh: true,
 				sceneData: undefined,
 					cutScene: true,
-					text: "How does the overall enthalpy change of the process compare to the value you predicted?  Can you explain any differences?",
 					quiz:[
 						{type: 'text',
+						questionText: "How does the overall enthalpy change of the process compare to the value you predicted?  Can you explain any differences?",
 						storeAs: 'hypAns4',
 						text: 'Type your answer here',
 						CWQuestionId: 87
@@ -346,9 +346,9 @@ LevelData = {
 								{handle: 'lastReaction', expr: 'frac("thirdWall", {tag:"thirdWall", spcName:"spc2"})>0.5', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 
 							]
 					},
-						text: "Now that we know the enthalpy of reaction at 500 K to be get('stepTotal', 'string', 'noValue') kJ, perform the experiment and calculate the amount of heat released during the process by using the extent of reaction.",
 						quiz: [
 							{type: 'textSmall',
+							questionText: "Now that we know the enthalpy of reaction at 500 K to be get('stepTotal', 'string', 'noValue') kJ, perform the experiment and calculate the amount of heat released during the process by using the extent of reaction.",
 							storeAs: 'finalAns',
 							text: ' ',
 							units: 'kJ',
@@ -410,9 +410,9 @@ LevelData = {
 								{handle: 'lastReaction', expr: 'frac("fourthWall", {tag:"fourthWall", spcName:"spc2"})>0.5', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 
 							]
 					},
-						text: "Perform the experiment again. Record the actual amount of heating done by the reaction below.",
 						quiz: [
 							{type: 'textSmall',
+							questionText: "Perform the experiment again. Record the actual amount of heating done by the reaction below.",
 							storeAs: 'finalerAns',
 							text: ' ',
 							units: 'kJ',
@@ -422,10 +422,10 @@ LevelData = {
 				},
 				{//Prompt 1
 					sceneData: undefined,
-					text: 'How does the actual value compare to the value you calculated using the extent of reaction? Can you account for any discrepancies?',
 					quiz: [
 						{
 							type: 'text',
+							questionText: 'How does the actual value compare to the value you calculated using the extent of reaction? Can you account for any discrepancies?',
 							storeAs: 'theLastAns',
 							text: 'Type your answer here',
 							CWQuestionId: 90

@@ -16,9 +16,9 @@ LevelData = {
 			prompts: [
 				{
 					cutScene: true,
-					text: '<p>In these experiments, we will explore what makes a process irreversible and what makes a process reversible.</p><p>Before we get to the experiment, please first describe what you think the difference between an irreversible and a reversible process is.</p>',
 					quiz:[
 						{
+							questionText: '<p>In these experiments, we will explore what makes a process irreversible and what makes a process reversible.</p><p>Before we get to the experiment, please first describe what you think the difference between an irreversible and a reversible process is.</p>',
 							type: 'text',
 							text: 'type your answer here',
 							storeAs: 'longAns1',
@@ -28,9 +28,9 @@ LevelData = {
 				},
 				{
 					cutScene: true,
-					text: '<p>A reversible process can be defined as a process that, after it is complete, can be returned to its initial state without having caused any changes to the system or its surroundings.</p><p>State what conditions you believe are necessary for a reversible process to take place.</p>',
 					quiz: [
 						{
+							questionText: '<p>A reversible process can be defined as a process that, after it is complete, can be returned to its initial state without having caused any changes to the system or its surroundings.</p><p>State what conditions you believe are necessary for a reversible process to take place.</p>',
 							type: 'text',
 							text: 'type your answer here',
 							storeAs: 'longAns2',
