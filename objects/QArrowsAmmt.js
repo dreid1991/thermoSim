@@ -17,6 +17,7 @@ Copyright (C) 2013  Daniel Reid
 
 function QArrowsAmmt(attrs) {
 	this.type = 'QArrowsAmmt';
+	this.rate = attrs.rate != undefined ? attrs.rate : true;
 	this.wallHandle = attrs.wallInfo;
 	this.wall = walls[this.wallHandle];
 	this.handle = attrs.handle;
@@ -69,31 +70,52 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 			this.flipAmmtArrows(this.qArrowsAmmt);
 		}
 		this.listenerName = this.handle + 'updateQAmmtArrows';
-		addListener(curLevel, 'update', this.listenerName, 
-			function() {
-				console.log(wall.q - qLast);
-				if (turn == 20 || (Math.abs(wall.q - qLast) > 0.05 && Math.round(turn/6) == turn/6)) {
-					if (Math.abs(wall.q - qLast) > 0.025) {
-						if (wall.q - qLast< 0) {
+		if (this.rate) {
+			console.log('true');
+			addListener(curLevel, 'update', this.listenerName, 
+				function() {
+					if (turn == 30 || (Math.abs(wall.q - qLast) > 0.025 && Math.round(turn/6) == turn/6)) {
+						if (Math.abs(wall.q - qLast) > 0.025) {
+							if (wall.q - qLast< 0) {
+								dir = 'out';
+							} else {
+								dir = 'in';
+							}
+							this.setAmmtArrowDims(this.qArrowsAmmt, 0, lengthMax, widthMin, widthMax, 10 * (wall.q - qLast), qMax);
+							if (dirLast != dir) {
+								this.flipAmmtArrows(this.qArrowsAmmt);
+								dirLast = dir;
+							}
+							qLast = wall.q;
+						} else {
+							this.setAmmtArrowDims(this.qArrowsAmmt, 0, lengthMax, widthMin, widthMax, 0, 0.2);
+							qLast = wall.q;
+						}
+						turn = -1;
+					}
+					turn++;
+				},
+			this);	
+		} else {
+			console.log('false');
+			addListener(curLevel, 'update', this.listenerName, 
+				function() {
+					if (Math.abs(wall.q - qLast) > redrawThreshold) {
+						if (wall.q < 0) {
 							dir = 'out';
 						} else {
 							dir = 'in';
 						}
-						this.setAmmtArrowDims(this.qArrowsAmmt, 0, lengthMax, widthMin, widthMax, 10 * (wall.q - qLast), qMax);
+						this.setAmmtArrowDims(this.qArrowsAmmt, lengthMin, lengthMax, widthMin, widthMax, wall.q, qMax);
 						if (dirLast != dir) {
 							this.flipAmmtArrows(this.qArrowsAmmt);
 							dirLast = dir;
 						}
 						qLast = wall.q;
-					} else {
-						this.setAmmtArrowDims(this.qArrowsAmmt, 0, lengthMax, widthMin, widthMax, 0.00002, 0.2);
-						qLast = wall.q;
-					}
-					turn = -1;
-				}
-				turn++;
-			},
-		this);	
+					}					
+				},
+			this);	
+		}
 	},
 
 
@@ -102,7 +124,7 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 		for (var arrowIdx=0; arrowIdx<arrows.length; arrowIdx++) {
 			var arrow = arrows[arrowIdx];
 			var UV = angleToUV(arrow.getAngle()).mult(1);
-			arrow.move(UV.mult(arrow.getDims().dx));
+			// arrow.move(UV.mult(arrow.getDims().dx));
 			arrow.rotate(Math.PI);
 		}
 	},
@@ -115,7 +137,7 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 			var w = wMin + (wMax-wMin)*percent;
 			arrow.size(V(l, w));
 			if (q>0) {
-				// arrow.move(V(0, l-dimso.dx));
+				//arrow.move(V(0, dimso.dx));
 			}
 		}
 	},
