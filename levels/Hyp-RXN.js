@@ -79,7 +79,7 @@ LevelData = {
 				],
 				objs: [
 					{type: 'QArrowsAmmt',
-								attrs: {handle: 'arrow', wallInfo: 'firstWall', scale: 3}
+								attrs: {handle: 'arrow', wallInfo: 'firstWall', scale: 2}
 					}
 				]
 			},
@@ -320,12 +320,12 @@ LevelData = {
 				],
 				dataReadouts: [
 					{label: 'Extent of reaction: ', expr: 'frac("thirdWall", {tag:"thirdWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'extrxn', readout: 'mainReadout'},
-					{label: 'Temp: ', expr: 'temp("thirdWall")', units: 'K', decPlaces: 0, handle: 'temp', readout: 'mainReadout'}
+					{label: 'Temp: ', expr: 'tempSmooth("thirdWall")', units: 'K', decPlaces: 0, handle: 'temp', readout: 'mainReadout'}
 					// {label: 'Heat: ', expr: 'q("thirdWall")', units: 'kJ', decPlaces: 2, handle: 'qReadout', readout: 'mainReadout'}
 				],
 				objs: [
 					{type: 'QArrowsAmmt',
-								attrs: {handle: 'arrow', wallInfo: 'thirdWall', scale: 1}
+								attrs: {handle: 'arrow', wallInfo: 'thirdWall', scale: 3}
 					}
 				],
 				triggers: [
@@ -385,11 +385,11 @@ LevelData = {
 				dataReadouts: [
 					{label: 'Extent of reaction: ', expr: 'frac("fourthWall", {tag:"fourthWall", spcName:"spc2"})', units: '', decPlaces: 2, handle: 'extrxn', readout: 'mainReadout'},
 					{label: 'Heat: ', expr: 'q("fourthWall")', units: 'kJ', decPlaces: 2, handle: 'qReadout', readout: 'mainReadout'},
-					{label: 'Temp: ', expr: 'temp("fourthWall")', units: 'K', decPlaces: 0, handle: 'temp', readout: 'mainReadout'}					
+					{label: 'Temp: ', expr: 'tempSmooth("fourthWall")', units: 'K', decPlaces: 0, handle: 'temp', readout: 'mainReadout'}					
 				],
 				objs: [
 					{type: 'QArrowsAmmt',
-								attrs: {handle: 'arrow', wallInfo: 'fourthWall', scale: 1}
+								attrs: {handle: 'arrow', wallInfo: 'fourthWall', scale: 3}
 					}
 				],
 				triggers: [
