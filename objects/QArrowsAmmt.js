@@ -74,7 +74,7 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 			addListener(curLevel, 'update', this.listenerName, 
 				function() {
 					src.push(wall.q - qLast);
-					var numVals = Math.min(25, src.length);
+					var numVals = Math.min(75, src.length);
 					var init = src.length - numVals;
 					var sum = 0;
 					for (var i=0; i<numVals; i++) {
@@ -86,7 +86,7 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 					} else {
 						dir = 'in';
 					}
-					this.setAmmtArrowDims(this.qArrowsAmmt, 0, lengthMax, widthMin, widthMax, 80 * qRateSmooth, qMax);
+					this.setAmmtArrowDims(this.qArrowsAmmt, 0, lengthMax, widthMin, widthMax, 150 * qRateSmooth, qMax);
 					if (dirLast != dir) {
 						this.flipAmmtArrows(this.qArrowsAmmt);
 						dirLast = dir;
