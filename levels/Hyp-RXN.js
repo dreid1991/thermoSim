@@ -79,7 +79,7 @@ LevelData = {
 				],
 				objs: [
 					{type: 'QArrowsAmmt',
-								attrs: {handle: 'arrow', wallInfo: 'firstWall', scale: 1}
+								attrs: {handle: 'arrow', wallInfo: 'firstWall', scale: 3}
 					}
 				]
 			},

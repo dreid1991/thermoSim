@@ -62,7 +62,7 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 		this.qArrowsAmmt = [arrow1, arrow2];
 		var dirLast = 'out';
 		var dir;
-		var turn = 0;
+		var src = [];
 		var qLast = wall.q;
 		this.setAmmtArrowDims(this.qArrowsAmmt, lengthMin, lengthMax, widthMin, widthMax, wall.q, qMax);
 		if (wall.q >= 0) {
@@ -71,33 +71,30 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 		}
 		this.listenerName = this.handle + 'updateQAmmtArrows';
 		if (this.rate) {
-			console.log('true');
 			addListener(curLevel, 'update', this.listenerName, 
 				function() {
-					if (turn == 30 || (Math.abs(wall.q - qLast) > 0.025 && Math.round(turn/6) == turn/6)) {
-						if (Math.abs(wall.q - qLast) > 0.025) {
-							if (wall.q - qLast< 0) {
+							src.push(wall.q - qLast);
+							var numVals = Math.min(25, src.length);
+							var init = src.length - numVals;
+							var sum = 0;
+							for (var i=0; i<numVals; i++) {
+								sum += src[init + i];
+							}
+							var qRateSmooth = sum / numVals;
+							if (qRateSmooth < 0) {
 								dir = 'out';
 							} else {
 								dir = 'in';
 							}
-							this.setAmmtArrowDims(this.qArrowsAmmt, 0, lengthMax, widthMin, widthMax, 10 * (wall.q - qLast), qMax);
+							this.setAmmtArrowDims(this.qArrowsAmmt, 0, lengthMax, widthMin, widthMax, 80 * qRateSmooth, qMax);
 							if (dirLast != dir) {
 								this.flipAmmtArrows(this.qArrowsAmmt);
 								dirLast = dir;
 							}
 							qLast = wall.q;
-						} else {
-							this.setAmmtArrowDims(this.qArrowsAmmt, 0, lengthMax, widthMin, widthMax, 0, 0.2);
-							qLast = wall.q;
-						}
-						turn = -1;
-					}
-					turn++;
 				},
 			this);	
 		} else {
-			console.log('false');
 			addListener(curLevel, 'update', this.listenerName, 
 				function() {
 					if (Math.abs(wall.q - qLast) > redrawThreshold) {

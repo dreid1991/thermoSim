@@ -1,4 +1,4 @@
-LevelData = {
+sdLevelData = {
 	levelTitle: 'Work',
 	
 	spcDefs: [
@@ -188,7 +188,7 @@ LevelData = {
 					},
 					quiz: [
 						{
-							questionText: "Previously you answered that the compression did get('WorkDoneAnswer','int') KJ on the system bringing it to a final temperature of get('TempAnswer','int') K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepency, can you account for it?",
+							questionText: "Previously you answered that the compression did get('WorkDoneAnswer','int') KJ on the system bringing it to a final temperature of get('TempAnswer','int') K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepancy, can you account for it?",
 							type: 'text', CWQuestionId: 6, storeAs: 'DiscrepencyAnswer'}
 					]
 				},
