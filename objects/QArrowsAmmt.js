@@ -73,25 +73,25 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 		if (this.rate) {
 			addListener(curLevel, 'update', this.listenerName, 
 				function() {
-							src.push(wall.q - qLast);
-							var numVals = Math.min(25, src.length);
-							var init = src.length - numVals;
-							var sum = 0;
-							for (var i=0; i<numVals; i++) {
-								sum += src[init + i];
-							}
-							var qRateSmooth = sum / numVals;
-							if (qRateSmooth < 0) {
-								dir = 'out';
-							} else {
-								dir = 'in';
-							}
-							this.setAmmtArrowDims(this.qArrowsAmmt, 0, lengthMax, widthMin, widthMax, 80 * qRateSmooth, qMax);
-							if (dirLast != dir) {
-								this.flipAmmtArrows(this.qArrowsAmmt);
-								dirLast = dir;
-							}
-							qLast = wall.q;
+					src.push(wall.q - qLast);
+					var numVals = Math.min(25, src.length);
+					var init = src.length - numVals;
+					var sum = 0;
+					for (var i=0; i<numVals; i++) {
+						sum += src[init + i];
+					}
+					var qRateSmooth = sum / numVals;
+					if (qRateSmooth < 0) {
+						dir = 'out';
+					} else {
+						dir = 'in';
+					}
+					this.setAmmtArrowDims(this.qArrowsAmmt, 0, lengthMax, widthMin, widthMax, 80 * qRateSmooth, qMax);
+					if (dirLast != dir) {
+						this.flipAmmtArrows(this.qArrowsAmmt);
+						dirLast = dir;
+					}
+					qLast = wall.q;
 				},
 			this);	
 		} else {
