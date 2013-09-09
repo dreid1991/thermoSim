@@ -39,7 +39,7 @@ LevelData = {
 		{//First Scene
 			sceneData: {
 				walls: [
-					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'staticAdiabatic', handle: 'wallo', isothermalRate: 4, vol: 4.5, border: {type: 'open', width: 10, yMin: 40} },
+					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'wallo', isothermalRate: 4, vol: 4.5, border: {type: 'open', width: 10, yMin: 40} },
 				],
 				dots: [
 					{spcName: 'Water', pos: P(45,240), dims: V(465,110), count: 550, temp:550, returnTo: 'wallo', tag: 'wallo'}, //count 396
@@ -98,39 +98,40 @@ LevelData = {
 					}
 				],	
 				dataReadouts: [
-					{label: 'Vol: ', expr: 'vol("wallo")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
-					{label: 'Heat: ', expr: 'q("wallo") + q("liquidWater")', units: 'kJ', decPlaces: 1, handle: 'qReadout', readout: 'mainReadout'},
+					// {label: 'Vol: ', expr: 'vol("wallo")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
+					{label: 'Heat Total: ', expr: 'q("wallo") + q("liquidWater")', units: 'kJ', decPlaces: 1, handle: 'qReadout', readout: 'mainReadout'},
+					{label: 'Heat Step: ', expr: 'q("wallo") + q("liquidWater")', units: 'kJ', decPlaces: 1, handle: 'qReadoutStep', readout: 'mainReadout'},
 					// {label: 'frac: ', expr: 'frac("wallo")', units: '', decPlaces: 1, handle: 'fracReadout', readout: 'mainReadout'},
 					// {label: 'moles: ', expr: 'moles("wallo")', units: 'mol', decPlaces: 2, handle: 'molReadout', readout: 'mainReadout'},
 					// {label: 'Enthalpy: ', expr: 'enthalpy("wallo")', units: 'kJ', decPlaces: 2, handle: 'hReadout', readout: 'mainReadout'},
 					{label: 'Gas Temp: ', expr: 'var tempVal = tempSmooth("wallo"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'tempGasReadout', readout: 'mainReadout'},
 					{label: 'Liquid Temp: ', expr:  'var tempVal = tempSmooth("liquidWater"); if (curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
-					{label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
+					// {label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
 				],
-				// triggers: [
-					// {handle: 'trigger1', expr: 'curLevel.liquidWater.temp > 371', message: 'Heat the liquid', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
-					// {handle: 'freeze1', expr: 'curLevel.liquidWater.temp >= 371', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(373)'], requiredFor: 'prompt2'},
-					// {handle: 'trigger2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length <= 200 || !curLevel.heaterHeater1.enabled', message: 'Vaporize the liquid', checkOn: 'conditions', requiredFor: 'prompt4'},
-					// {handle: 'freeze2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length <= 200', satisfyCmmds: ['curLevel.heaterHeater1.disable()'], requiredFor: 'prompt4'},
-					// // {handle: 'unfreeze2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length > 200', satisfyCmmds: ['curLevel.heaterHeater1.enable()'], requiredFor: 'prompt2'},
-					// {handle: 'trigger3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length < 10', message: 'Fully vaporize the liquid', checkOn: 'conditions', requiredFor: 'prompt8'},
-					// {handle: 'freeze3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'curLevel.liquidWater.disablePhaseChange()'], requiredFor: 'prompt8'},
-					// {handle: 'trigger4', expr: 'temp("wallo") >= 405', message: 'Heat the vapor', requiredFor: 'prompt11', checkOn: 'conditions'},
-					// {handle: 'freeze4', expr: 'temp("wallo") > 423 && curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', requiredFor: 'prompt11', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(423)']},
+				triggers: [
+					{handle: 'trigger1', expr: 'tempSmooth("wallo") < 447', message: 'Cool the liquid', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
+					{handle: 'freeze1', expr: 'tempSmooth("wallo") <= 436', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(436)'], requiredFor: 'prompt2'},
+					{handle: 'trigger2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length >= 225 || !curLevel.heaterHeater1.enabled', message: 'Condense the vapor', checkOn: 'conditions', requiredFor: 'prompt4'},
+					{handle: 'freeze2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length >= 225', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'curLevel.liquidWater.disablePhaseChange()'], requiredFor: 'prompt4'},
+					{handle: 'trigger3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length > 540', message: 'Fully condense the vapor', checkOn: 'conditions', requiredFor: 'prompt8'},
+					{handle: 'freeze3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 550', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'curLevel.liquidWater.disablePhaseChange()'], requiredFor: 'prompt8'},
+					{handle: 'trigger4', expr: 'curLevel.liquidWater.temp <= 390', message: 'Heat the vapor', requiredFor: 'prompt11', checkOn: 'conditions'},
+					{handle: 'freeze4', expr: 'curLevel.liquidWater.temp <= 388 && curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 550', requiredFor: 'prompt11', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(388)']},
 					
-				// ]
+				]
 			},
 			prompts: [
 				{//prompt0
 					sceneData: {
-						// cmmds: [
-							// 'curLevel.heaterHeater1.disable()',
-						// ]	
+						cmmds: [
+							'curLevel.heaterHeater1.disable()',
+							'walls.wallo.isothermalStop()'
+						]	
 					},
 					quiz: [
 						{	
 							type: 'text',							
-							preText: "The system above depicts liquid water molecules at 6.5 bar. At the top right is another representation of the system in the form of a PT phase diagram. The pointer represents the current state of the system. <br>Is the system above saturated? Explain</br>",
+							preText: "The system above depicts liquid water molecules at 6.5 bar. At the top right is another representation of the system in the form of a PT phase diagram. The pointer represents the current state of the system. <br><br>Is the system above saturated? Explain",
 							text: 'Type your response here', 
 							storeAs: 'Ans1',
 							CWQuestionId: 92
@@ -143,7 +144,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'textSmall',
-							preText:'The system contains 1 mole of liquid water molecules. Determine the energy you have to add to the system in order to reach a saturated liquid state. You may use the steam tables in your book to find the saturation temperature.',
+							preText:'The system contains 1 mole of liquid water molecules. Determine the energy you have to remove from the system in order to reach a saturated vapor state. You may use the steam tables in your book to find the saturation temperature.',
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans2',
@@ -153,19 +154,23 @@ LevelData = {
 				},
 				{//prompt2
 					sceneData: {
-						// cmmds: [
-							// 'curLevel.heaterHeater1.enable()',
-							// 'curLevel.liquidWater.disablePhaseChange()'
-						// ]
+						cmmds: [
+							'curLevel.heaterHeater1.enable()',
+							'curLevel.liquidWater.disablePhaseChange()'
+						]
 					},
-					text: 'Heat the system until it reaches the saturated liquid state. Compare the energy required to what you calculated.'
+					text: 'Cool the system until it reaches the saturated vapor state. Compare the energy required to what you calculated.'
 				},
 				{//prompt3
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'dataDisplayer.setEntryValue("qReadoutStep", 0)'
+						]
+					},
 					quiz: [
 						{
 							type: 'textSmall',
-							preText:'<p>Determine the energy required to vaporize half the liquid. The enthalpy of vaporization for water at this temperature is !!!!!!!!!! kJ/mol</p>',
+							preText:'Determine the energy required to condense half the vapor. The enthalpy of vaporization for water at this temperature is 37.4 kJ/mol',
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans3',
@@ -175,13 +180,13 @@ LevelData = {
 				},
 				{//prompt4
 					sceneData: {
-						// cmmds: [
-							// 'curLevel.heaterHeater1.enable()',
-							// 'curLevel.liquidWater.enablePhaseChange()',
-							// 'walls["wallo"].isothermalStop()'
-						// ]
+						cmmds: [
+							'curLevel.heaterHeater1.enable()',
+							'walls.wallo.isothermalStop()',
+							'curLevel.liquidWater.enablePhaseChange()',
+						]
 					},
-					text: 'Vaporize half the liquid. Compare the energy required to what you calculated.'
+					text: 'Condense half the vapor. Compare the energy required to what you calculated.'
 				},
 				{//prompt5
 					sceneData: undefined,
@@ -208,11 +213,15 @@ LevelData = {
 					],
 				},	
 				{//prompt7
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'dataDisplayer.setEntryValue("qReadoutStep", 0)'
+						]	
+					},
 					quiz: [
 						{
 							type: 'textSmall',
-							preText: 'Determine the energy required to fully bring the system to the saturated vapor state.',
+							preText: 'Determine the energy required to fully bring the system to the saturated liquid state.',
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans6',
@@ -222,11 +231,12 @@ LevelData = {
 				},
 				{//prompt8
 					sceneData: {
-						// cmmds: [
-							// 'curLevel.heaterHeater1.enable()'
-						// ]
+						cmmds: [
+							'curLevel.heaterHeater1.enable()',
+							'curLevel.liquidWater.enablePhaseChange()'
+						]
 					},
-					text: 'Fully vaporize the liquid. Compare the energy required to what you calculated.'
+					text: 'Fully condense the vapor. Compare the energy required to what you calculated.'
 				},
 				{//prompt9
 					sceneData: undefined,
@@ -241,11 +251,15 @@ LevelData = {
 					],
 				},
 				{//prompt10
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'dataDisplayer.setEntryValue("qReadoutStep", 0)'
+						]
+					},
 					quiz: [
 						{
 							type: 'textSmall',
-							preText: 'Now we want to superheat the vapor to 150 C at constant pressure. Determine the energy required to reach this state.',
+							preText: 'Now we want to supercool the vapor to 115 C at constant pressure. Determine the energy required to reach this state.',
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans8',
@@ -255,15 +269,15 @@ LevelData = {
 				},
 				{//prompt11
 					sceneData: {
-						// cmmds: [
-							// 'curLevel.heaterHeater1.enable()',
-							// 'walls["wallo"].isothermalStop()'
-						// ]
+						cmmds: [
+							'curLevel.heaterHeater1.enable()',
+							'walls["wallo"].isothermalStop()'
+						]
 					},
 					quiz: [
 						{
 							type: 'text',
-							preText: 'Heat the vapor until it reaches 150 C. Is the system saturated at this new temperature?',
+							preText: 'Cool the liquid until it reaches 115 C. Is the system saturated at this new temperature?',
 							text: '',
 							storeAs: 'Ans9',
 							CWQuestionId: 100
@@ -282,13 +296,13 @@ LevelData = {
 						{
 							type: 'multChoice',
 							CWQuestionId: 101,
-							questionText: '<p>Now we want to return the system to saturation while keeping the temperature constant at 150 C. Which of the following will accomplish this goal?</p>',
+							questionText: '<p>Now we want to return the system to saturation while keeping the temperature constant at 115 C. Which of the following will accomplish this goal?</p>',
 							options:[
-										{text:"Decrease Pressure", correct: false, message:"That's not correct", CWAnswerId: 9},
-										{text:"Increase Pressure", correct: true, CWAnswerId: 10},
+										{text:"Decrease Pressure", correct: true, CWAnswerId: 9},
+										{text:"Increase Pressure", correct: false, message: "That's not correct", CWAnswerId: 10},
 										{text:"Remove Water Vapor", correct: false, message: "That's not correct", CWAnswerId: 11},
 										{text:"Add Water Vapor", correct: false, message:"That's not correct", CWAnswerId: 12},
-										{text:"Add Inert Species", correct: false, message: "That's not correct", CWAnswerId: 13}, 
+										// {text:"Add Inert Species", correct: false, message: "That's not correct", CWAnswerId: 13}, 
 							]
 						}
 					]
@@ -298,7 +312,7 @@ LevelData = {
 					cutScene: true,
 					quiz: [
 						{
-							questionText: '<p>Use your text book to determine the pressure at which the system will be saturated if the temperature is held at 150 C.',
+							questionText: '<p>Use your text book to determine the pressure at which the system will be saturated if the temperature is held at 115 C.',
 							type: 'textSmall',
 							text: '',
 							units: 'bar',
@@ -397,7 +411,7 @@ LevelData = {
 			prompts: [
 				{//prompt0
 					sceneData: undefined,
-					text: 'Now increase the pressure to bring the system to saturation with the temperature held constant at 150 C.'		
+					text: 'Now decrease the pressure to bring the system to saturation with the temperature held constant at 115 C.'		
 				},
 				{//prompt1
 					sceneData: undefined,
@@ -405,11 +419,11 @@ LevelData = {
 						{
 							type: 'multChoice',
 							CWQuestionId: 103,
-							questionText: 'The vapor heat capacity of water is 1.9 kJ/kgK and the liquid heat capacity of water is 4.2 kJ/kgK. How will the heat of vaporization at 150 C compare to the value at 100 C?',
+							questionText: 'The vapor heat capacity of water is 1.9 kJ/kgK and the liquid heat capacity of water is 4.2 kJ/kgK. How will the heat of vaporization at 115 C compare to the value at 162 C?',
 							options:[
-								{text: "Less at 150 C", correct: true, CWAnswerId: 14},
-								{text: "Equal at 150 C", correct: false, message: "That is the incorrect answer", CWAnswerId: 15},
-								{text: "Greater at 150 C", correct: false, message: "That is the incorrect answer", CWAnswerId: 16}
+								{text: "Less at 150 C", correct: false, message: "That is not the correct answer", CWAnswerId: 14},
+								{text: "Equal at 150 C", correct: false, message: "That is not the correct answer", CWAnswerId: 15},
+								{text: "Greater at 150 C", correct: true, CWAnswerId: 16}
 							]
 						}
 					]	
@@ -419,7 +433,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'textSmall',
-							preText:'Condense the vapor. How much heat was removed?',
+							preText:'Vaporize the liquid. How much heat was added?',
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans11',
@@ -432,7 +446,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'text',
-							preText: 'Vaporizing the liquid at 100 C took 2257 kJ/kg and condensing at 150 C took 2114 kJ/kg. Do these values agree with your prediction?',
+							preText: 'Condensing the liquid at 162 C took 37.40 kJ/mol and vaporizing at 115 C took 39.92 kJ/mol. Do these values agree with your prediction?',
 							storeAs: 'Ans12',
 							CWQuestionId: 105
 						}
