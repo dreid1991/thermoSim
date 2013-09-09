@@ -39,10 +39,10 @@ LevelData = {
 		{//First Scene
 			sceneData: {
 				walls: [
-					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'staticAdiabatic', handle: 'wallo', isothermalRate: 4, border: {type: 'open', width: 10, yMin: 40} },
+					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'staticAdiabatic', handle: 'wallo', isothermalRate: 4, vol: 4.5, border: {type: 'open', width: 10, yMin: 40} },
 				],
 				dots: [
-					{spcName: 'Water', pos: P(45,100), dims: V(465,240), count: 800, temp:423.15, returnTo: 'wallo', tag: 'wallo'}, //count 396
+					{spcName: 'Water', pos: P(45,240), dims: V(465,110), count: 550, temp:550, returnTo: 'wallo', tag: 'wallo'}, //count 396
 				],	
 				objs: [
 					{
@@ -51,8 +51,8 @@ LevelData = {
 							handle: 'RightPiston',
 							wallInfo: 'wallo',
 							min: 1,
-							init:4,
-							max: 6,
+							init:6.5,
+							max: 7,
 							makeSlider: false,	
 							compMode: 'cPAdiabaticDamped',
 						}	
@@ -62,7 +62,7 @@ LevelData = {
 						attrs:{
 							wallInfo: 'wallo',
 							handle: 'water',
-							tempInit: 423.15,
+							tempInit: 550,
 							spcCounts: {Water: 0},
 							actCoeffType: 'twoSfxMrg',
 							actCoeffInfo: {a: 3000},
@@ -77,10 +77,10 @@ LevelData = {
 							handle: 'heater1',
 							wallInfo: 'wallo',
 							liquidHandle: 'water',
-							temp: 423.15,
+							temp: 550,
 							max: 2,
-							pos: new Point(225, 335), 
-							dims: new Vector(100, 12)
+							pos: new Point(225, 325), 
+							dims: new Vector(100, 22)
 						},
 					},
 				],
@@ -104,7 +104,7 @@ LevelData = {
 					// {label: 'moles: ', expr: 'moles("wallo")', units: 'mol', decPlaces: 2, handle: 'molReadout', readout: 'mainReadout'},
 					// {label: 'Enthalpy: ', expr: 'enthalpy("wallo")', units: 'kJ', decPlaces: 2, handle: 'hReadout', readout: 'mainReadout'},
 					{label: 'Gas Temp: ', expr: 'var tempVal = tempSmooth("wallo"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'tempGasReadout', readout: 'mainReadout'},
-					{label: 'Liquid Temp: ', expr:  'var tempVal = tempSmooth("liquidWater"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
+					{label: 'Liquid Temp: ', expr:  'var tempVal = tempSmooth("liquidWater"); if (curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
 				],
 				// triggers: [
@@ -130,7 +130,7 @@ LevelData = {
 					quiz: [
 						{	
 							type: 'text',							
-							preText: "The system above depicts liquid water molecules at 1 bar. At the top right is another representation of the system in the form of a PT phase diagram. The pointer represents the current state of the system. <br>Is the system above saturated? Explain</br>",
+							preText: "The system above depicts liquid water molecules at 6.5 bar. At the top right is another representation of the system in the form of a PT phase diagram. The pointer represents the current state of the system. <br>Is the system above saturated? Explain</br>",
 							text: 'Type your response here', 
 							storeAs: 'Ans1',
 							CWQuestionId: 92
@@ -143,7 +143,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'textSmall',
-							preText:'The system contains 0.4 moles of liquid water molecules. Determine the energy you have to add to the system in order to reach a saturated liquid state.',
+							preText:'The system contains 1 mole of liquid water molecules. Determine the energy you have to add to the system in order to reach a saturated liquid state. You may use the steam tables in your book to find the saturation temperature.',
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans2',
@@ -165,7 +165,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'textSmall',
-							preText:'<p>Determine the energy required to vaporize half the liquid. The enthalpy of vaporization for water is 40.68 kJ/mol</p>',
+							preText:'<p>Determine the energy required to vaporize half the liquid. The enthalpy of vaporization for water at this temperature is !!!!!!!!!! kJ/mol</p>',
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans3',
@@ -312,7 +312,7 @@ LevelData = {
 		{//Third Scene
 			sceneData: {
 				walls: [
-					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 353.15, handle: 'wallo', vol: 0.5, isothermalRate: 50, border: {type: 'open', width: 10, yMin: 40} },
+					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 388.15, handle: 'wallo', vol: 0.5, isothermalRate: 50, border: {type: 'open', width: 10, yMin: 40} },
 				],
 				dots: [
 					{spcName: 'Water', pos: P(45,100), dims: V(465,240), count: 0, temp:333.15, returnTo: 'wallo', tag: 'wallo'}, //count 396
@@ -324,7 +324,7 @@ LevelData = {
 							handle: 'RightPiston',
 							wallInfo: 'wallo',
 							min: 0,
-							init: 0,
+							init: 0.5,
 							max: 20,
 							makeSlider: true,	
 							compMode: 'cPAdiabaticDamped',
@@ -336,8 +336,8 @@ LevelData = {
 							handle: 'mrSandMan',
 							wallInfo: 'wallo',
 							min: 0,
-							max: 1,
-							init: 1,
+							max: 3.5,
+							init: 3.5,
 						}
 					},
 					{
@@ -362,7 +362,7 @@ LevelData = {
 							wallInfo: 'wallo',
 							handle: 'water',
 							tempInit: 353.15,
-							spcCounts: {Water: 200},
+							spcCounts: {Water: 550},
 							actCoeffType: 'twoSfxMrg',
 							actCoeffInfo: {a: 3000},
 							makePhaseDiagram: true,
