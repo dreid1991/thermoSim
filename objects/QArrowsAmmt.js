@@ -17,7 +17,7 @@ Copyright (C) 2013  Daniel Reid
 
 function QArrowsAmmt(attrs) {
 	this.type = 'QArrowsAmmt';
-	this.rate = attrs.rate != undefined ? attrs.rate : true;
+	this.rate = attrs.rate != undefined ? attrs.rate : false;
 	this.wallHandle = attrs.wallInfo;
 	this.wall = walls[this.wallHandle];
 	this.handle = attrs.handle;
