@@ -77,7 +77,7 @@ LevelData = {
 					sceneData: {
 						triggers: [
 							{handle: 'firstCheck', expr: 'fracDiff(temp("FirstWall"), 400) > .05', message: "Try to hit the molecule with the slider and see what happens!", priority: 1, },
-							{handle: 'triggerTest', expr: 'fracDiff(temp("FirstWall"), 400) > .05', satisfyCmmds: ['sendToCW("molecule has been hit with slider", 107)'], priority: 1, }
+							{handle: 'triggerTest', expr: 'fracDiff(temp("FirstWall"), 400) > .05', satisfyCmmds: ['sendToCW("Molecule has been hit with slider", 107)'], priority: 1, }
 						]
 					},
 					quiz: [
