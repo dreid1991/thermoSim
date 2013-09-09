@@ -42,7 +42,7 @@ LevelData = {
 					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'staticAdiabatic', handle: 'wallo', isothermalRate: 4, border: {type: 'open', width: 10, yMin: 40} },
 				],
 				dots: [
-					{spcName: 'Water', pos: P(45,100), dims: V(465,240), count: 400, temp:423.15, returnTo: 'wallo', tag: 'wallo'}, //count 396
+					{spcName: 'Water', pos: P(45,100), dims: V(465,240), count: 800, temp:423.15, returnTo: 'wallo', tag: 'wallo'}, //count 396
 				],	
 				objs: [
 					{
@@ -51,7 +51,7 @@ LevelData = {
 							handle: 'RightPiston',
 							wallInfo: 'wallo',
 							min: 1,
-							init: 1,
+							init:4,
 							max: 6,
 							makeSlider: false,	
 							compMode: 'cPAdiabaticDamped',
