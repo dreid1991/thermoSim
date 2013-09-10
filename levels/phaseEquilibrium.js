@@ -1,6 +1,6 @@
 canvasHeight = 450;
 LevelData = {
-	levelTitle: 'Phase Equilibrium Template',
+	levelTitle: 'Phase Equilibrium',
 
 		
 	spcDefs: [
@@ -18,13 +18,13 @@ LevelData = {
 				{
 					sceneData: undefined,
 					cutScene: true,
-					text: "<p>Today we're going to look at single component phase equilibrium. Before we start, what does it mean for a system to be saturated?</p>",
 					quiz:[
 						{
+							questionText: "<p>Today we're going to look at single component phase equilibrium. Before we start, what does it mean for a system to be saturated?</p>",
 							type: 'text',
 							text: 'type your answer here',
 							storeAs: 'beginning1', 
-							CWQuestionId: 89
+							CWQuestionId: 91
 						}
 					]
 				},
@@ -100,8 +100,8 @@ LevelData = {
 					// {label: 'frac: ', expr: 'frac("wallo")', units: '', decPlaces: 1, handle: 'fracReadout', readout: 'mainReadout'},
 					// {label: 'moles: ', expr: 'moles("wallo")', units: 'mol', decPlaces: 2, handle: 'molReadout', readout: 'mainReadout'},
 					// {label: 'Enthalpy: ', expr: 'enthalpy("wallo")', units: 'kJ', decPlaces: 2, handle: 'hReadout', readout: 'mainReadout'},
-					{label: 'Gas Temp: ', expr: 'tempSmooth("wallo")', units: 'K', decPlaces: 0, handle: 'tempGasReadout', readout: 'mainReadout'},
-					{label: 'Liquid Temp: ', expr:  'tempSmooth("liquidWater")', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
+					{label: 'Gas Temp: ', expr: 'var tempVal = tempSmooth("wallo"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'tempGasReadout', readout: 'mainReadout'},
+					{label: 'Liquid Temp: ', expr:  'var tempVal = tempSmooth("liquidWater"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
 				],
 				triggers: [
@@ -111,7 +111,7 @@ LevelData = {
 					{handle: 'freeze2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length <= 200', satisfyCmmds: ['curLevel.heaterHeater1.disable()'], requiredFor: 'prompt4'},
 					// {handle: 'unfreeze2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length > 200', satisfyCmmds: ['curLevel.heaterHeater1.enable()'], requiredFor: 'prompt2'},
 					{handle: 'trigger3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length < 10', message: 'Fully vaporize the liquid', checkOn: 'conditions', requiredFor: 'prompt8'},
-					{handle: 'freeze3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(374)'], requiredFor: 'prompt8'},
+					{handle: 'freeze3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'curLevel.liquidWater.disablePhaseChange()'], requiredFor: 'prompt8'},
 					{handle: 'trigger4', expr: 'temp("wallo") >= 405', message: 'Heat the vapor', requiredFor: 'prompt11', checkOn: 'conditions'},
 					{handle: 'freeze4', expr: 'temp("wallo") > 423 && curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', requiredFor: 'prompt11', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(423)']},
 					
@@ -127,10 +127,10 @@ LevelData = {
 					quiz: [
 						{	
 							type: 'text',							
-							preText: "Is the above system saturated? Explain",
+							preText: "The system above depicts liquid water molecules at 1 bar. At the top right is another representation of the system in the form of a PT phase diagram. The pointer represents the current state of the system. <br>Is the system above saturated? Explain</br>",
 							text: 'Type your response here', 
 							storeAs: 'Ans1',
-							CWQuestionId: 90
+							CWQuestionId: 92
 						}
 					],
 					title: 'Current Step'		
@@ -144,7 +144,7 @@ LevelData = {
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans2',
-							CWQuestionId: 91
+							CWQuestionId: 93
 						}
 					],
 				},
@@ -166,7 +166,7 @@ LevelData = {
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans3',
-							CWQuestionId: 92
+							CWQuestionId: 94
 						}
 					],
 				},
@@ -188,7 +188,7 @@ LevelData = {
 							preText: 'How do the temperatures of the vapor and liquid phases compare?',
 							text: 'Type your response here',
 							storeAs: 'Ans4',
-							CWQuestionId: 93
+							CWQuestionId: 95
 						}
 					],
 				},
@@ -200,7 +200,7 @@ LevelData = {
 							preText: 'Is the system saturated?',
 							text: '',
 							storeAs: 'Ans5',
-							CWQuestionId: 94
+							CWQuestionId: 96
 						}
 					],
 				},	
@@ -213,7 +213,7 @@ LevelData = {
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans6',
-							CWQuestionId: 95
+							CWQuestionId: 97
 						}
 					],
 				},
@@ -233,7 +233,7 @@ LevelData = {
 							preText: 'Is the system still saturated?',
 							text: ' ',
 							storeAs: 'Ans7',
-							CWQuestionId: 96
+							CWQuestionId: 98
 						}
 					],
 				},
@@ -246,7 +246,7 @@ LevelData = {
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans8',
-							CWQuestionId: 97
+							CWQuestionId: 99
 						}
 					],
 				},
@@ -263,7 +263,7 @@ LevelData = {
 							preText: 'Heat the vapor until it reaches 150 C. Is the system saturated at this new temperature?',
 							text: '',
 							storeAs: 'Ans9',
-							CWQuestionId: 98
+							CWQuestionId: 100
 						}
 					],
 				},
@@ -278,7 +278,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'multChoice',
-							CWQuestionId: 99,
+							CWQuestionId: 101,
 							questionText: '<p>Now we want to return the system to saturation while keeping the temperature constant at 150 C. Which of the following will accomplish this goal?</p>',
 							options:[
 										{text:"Decrease Pressure", correct: false, message:"That's not correct", CWAnswerId: 9},
@@ -293,14 +293,14 @@ LevelData = {
 				{//prompt1
 					sceneData: undefined,
 					cutScene: true,
-					text: '<p>Determine the pressure at which the system will be saturated if the temperature is held at 150 C. Antoine coefficients are listed below.</p><p>A: 8.071</p><p>B:1730.6</p><p>C: 233.4</p>',
 					quiz: [
 						{
+							questionText: '<p>Use your text book to determine the pressure at which the system will be saturated if the temperature is held at 150 C.',
 							type: 'textSmall',
 							text: '',
 							units: 'bar',
 							storeAs: 'Ans10',
-							CWQuestionId: 100
+							CWQuestionId: 102
 						}	
 					],
 				},
@@ -309,7 +309,7 @@ LevelData = {
 		{//Third Scene
 			sceneData: {
 				walls: [
-					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 423.15, handle: 'wallo', vol: 13.5, isothermalRate: 50, border: {type: 'open', width: 10, yMin: 40} },
+					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 422, handle: 'wallo', vol: 13.5, isothermalRate: 50, border: {type: 'open', width: 10, yMin: 40} },
 				],
 				dots: [
 					{spcName: 'Water', pos: P(45,100), dims: V(465,240), count: 396, temp:423.15, returnTo: 'wallo', tag: 'wallo'}, //count 396
@@ -337,6 +337,10 @@ LevelData = {
 							init: 0.5,
 						}
 					},
+					{
+						type: 'QArrowsAmmt',
+						attrs: {handle: 'arrow', wallInfo: 'wallo', scale: 1}
+					},	
 					// {
 						// type: 'DragWeights',
 						// attrs: {
@@ -378,8 +382,8 @@ LevelData = {
 				// ],	
 				dataReadouts: [
 					{label: 'Vol: ', expr: 'vol("wallo")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
-					{label: 'Gas Temp: ', expr: 'tempSmooth("wallo")', units: 'K', decPlaces: 0, handle: 'tempGasReadout', readout: 'mainReadout'},
-					{label: 'Liquid Temp: ', expr:  'tempSmooth("liquidWater")', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
+					{label: 'Gas Temp: ', expr: 'var tempVal = tempSmooth("wallo"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'tempGasReadout', readout: 'mainReadout'},
+					{label: 'Liquid Temp: ', expr:  'var tempVal = tempSmooth("liquidWater"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
 				],
 				triggers: [
@@ -397,7 +401,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'multChoice',
-							CWQuestionId: 101,
+							CWQuestionId: 103,
 							questionText: 'The vapor heat capacity of water is 1.9 kJ/kgK and the liquid heat capacity of water is 4.2 kJ/kgK. How will the heat of vaporization at 150 C compare to the value at 100 C?',
 							options:[
 								{text: "Less at 150 C", correct: true, CWAnswerId: 14},
@@ -416,7 +420,7 @@ LevelData = {
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans11',
-							CWQuestionId: 102
+							CWQuestionId: 104
 						}
 					],
 				},
@@ -427,7 +431,7 @@ LevelData = {
 							type: 'text',
 							preText: 'Vaporizing the liquid at 100 C took 2257 kJ/kg and condensing at 150 C took 2114 kJ/kg. Do these values agree with your prediction?',
 							storeAs: 'Ans12',
-							CWQuestionId: 103
+							CWQuestionId: 105
 						}
 					]
 				},
@@ -439,7 +443,24 @@ LevelData = {
 				{
 					cutScene: true,
 					title: '',
-					text: 'You have completed the simulation.'
+					text: 'You have completed the simulation.',
+					quiz: [
+						{
+							type: 'multChoice',
+							CWQuestionId: 106,
+							questionText: "<p>By selecting the button below and clicking 'Submit' you will exit the simulation. If you are not finished or would like to return to a previous page, click 'back' to return to the simulation.",
+							options:[
+								{text:"I would like to exit the simulation", correct: true, message:"Select the button labeled 'I would like to exit the simulation'", CWAnswerId: 17},
+							]
+						},
+					]
+				},
+				{
+					sceneData: {
+						cmmds: [
+							'location.reload()'
+						]
+					}	
 				}
 			]
 		}

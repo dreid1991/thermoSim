@@ -47,6 +47,14 @@ LevelData = {
 					{label: 'Liquid temp: ', expr: 'tempSmooth("liquidSwishy")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
 					{label: 'Gas temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'}
 				],
+				graphs: [
+					{type: 'Scatter', handle: 'TVGraph', xLabel: 'Frac spc1', yLabel: 'Volume (L)', numGridLines: {x: 6, y: 6}, axesFixed: {x: true, y: true}, axesInit: {x:{min: 340, step: 10}, y:{min: 0, step: 0.2}},
+						sets:[
+							{handle: 'tempVolume', label: 'Phase Change', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
+							data: {x: 'tempSmooth("liquidSwishy")', y: 'curLevel.liquidSwishy.dotMgrLiq.lists.spc1.length / curLevel.liquidSwishy.dotMgrLiq.lists.ALLDOTS.length'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+						]
+					},
+				],	
 			},
 			prompts: [
 				{
@@ -90,6 +98,14 @@ LevelData = {
 					{label: 'Liquid temp: ', expr: 'tempSmooth("liquidSwishy")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'},
 					{label: 'Gas temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 0, handle: 'someTemp', readout: 'mainReadout'}
 				],
+				graphs: [
+					{type: 'Scatter', handle: 'TVGraph', xLabel: 'Frac spc1', yLabel: 'Volume (L)', numGridLines: {x: 6, y: 6}, axesFixed: {x: true, y: true}, axesInit: {x:{min: 380, step: 10}, y:{min: 0, step: 0.2}},
+						sets:[
+							{handle: 'tempVolume', label: 'Phase Change', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
+							data: {x: 'tempSmooth("liquidSwishy")', y: 'curLevel.liquidSwishy.dotMgrLiq.lists.spc1.length / curLevel.liquidSwishy.dotMgrLiq.lists.ALLDOTS.length'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+						]
+					},
+				],	
 			},
 			prompts: [
 				{
