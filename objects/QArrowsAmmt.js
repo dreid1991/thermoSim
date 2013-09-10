@@ -121,7 +121,7 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 		for (var arrowIdx=0; arrowIdx<arrows.length; arrowIdx++) {
 			var arrow = arrows[arrowIdx];
 			var UV = angleToUV(arrow.getAngle()).mult(1);
-			// arrow.move(UV.mult(arrow.getDims().dx));
+			arrow.move(UV.mult(arrow.getDims().dx));
 			arrow.rotate(Math.PI);
 		}
 	},
@@ -134,7 +134,7 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 			var w = wMin + (wMax-wMin)*percent;
 			arrow.size(V(l, w));
 			if (q>0) {
-				//arrow.move(V(0, dimso.dx));
+				arrow.move(V(0, dimso.dx));
 			}
 		}
 	},
