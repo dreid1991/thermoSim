@@ -42,7 +42,7 @@ LevelData = {
 					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'wallo', isothermalRate: 4, vol: 4.5, border: {type: 'open', width: 10, yMin: 40} },
 				],
 				dots: [
-					{spcName: 'Water', pos: P(45,240), dims: V(465,110), count: 550, temp:550, returnTo: 'wallo', tag: 'wallo'}, //count 396
+					{spcName: 'Water', pos: P(45,260), dims: V(455,90), count: 550, temp:550, returnTo: 'wallo', tag: 'wallo'}, //count 396
 				],	
 				objs: [
 					{
@@ -167,6 +167,7 @@ LevelData = {
 							'dataDisplayer.setEntryValue("qReadoutStep", 0)'
 						]
 					},
+					noRefresh: true,
 					quiz: [
 						{
 							type: 'textSmall',
@@ -186,10 +187,12 @@ LevelData = {
 							'curLevel.liquidWater.enablePhaseChange()',
 						]
 					},
+					noRefresh: true,
 					text: 'Condense half the vapor. Compare the energy required to what you calculated.'
 				},
 				{//prompt5
 					sceneData: undefined,
+					noRefresh: true,
 					quiz: [
 						{
 							type: 'text',
@@ -202,6 +205,7 @@ LevelData = {
 				},
 				{//prompt6
 					sceneData: undefined,
+					noRefresh: true,
 					quiz: [
 						{
 							type: 'text',
@@ -218,6 +222,7 @@ LevelData = {
 							'dataDisplayer.setEntryValue("qReadoutStep", 0)'
 						]	
 					},
+					noRefresh: true,
 					quiz: [
 						{
 							type: 'textSmall',
@@ -236,10 +241,12 @@ LevelData = {
 							'curLevel.liquidWater.enablePhaseChange()'
 						]
 					},
+					noRefresh: true,
 					text: 'Fully condense the vapor. Compare the energy required to what you calculated.'
 				},
 				{//prompt9
 					sceneData: undefined,
+					noRefresh: true,
 					quiz: [
 						{
 							type: 'text',
@@ -256,6 +263,7 @@ LevelData = {
 							'dataDisplayer.setEntryValue("qReadoutStep", 0)'
 						]
 					},
+					noRefresh: true,
 					quiz: [
 						{
 							type: 'textSmall',
@@ -274,6 +282,7 @@ LevelData = {
 							'walls["wallo"].isothermalStop()'
 						]
 					},
+					noRefresh: true,
 					quiz: [
 						{
 							type: 'text',
@@ -340,7 +349,7 @@ LevelData = {
 							min: 0,
 							init: 0.5,
 							max: 20,
-							makeSlider: true,	
+							makeSlider: false,	
 							compMode: 'cPAdiabaticDamped',
 						}	
 					},
@@ -427,10 +436,11 @@ LevelData = {
 							'curLevel.liquidWater.disablePhaseChange()'
 						]
 					},
-					text: 'Now decrease the pressure to bring the system to saturation with the temperature held constant at 115 C.'		
+					text: "Now decrease the pressure to bring the system to saturation with the temperature held constant at 115 C.<br><br>Click and hold the 'Remove mass' button in the sand controls section to decrease pressure."		
 				},
 				{//prompt1
 					sceneData: undefined,
+					noRefresh: true,
 					quiz: [
 						{
 							type: 'multChoice',
@@ -452,6 +462,7 @@ LevelData = {
 							'curLevel.liquidWater.enablePhaseChange()'
 						]
 					},
+					noRefresh: true,
 					quiz: [
 						{
 							type: 'textSmall',
@@ -465,6 +476,7 @@ LevelData = {
 				},
 				{//prompt3
 					sceneData: undefined,
+					noRefresh: true,
 					quiz: [
 						{
 							type: 'text',

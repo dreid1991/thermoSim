@@ -90,10 +90,10 @@ LevelData = {
 					{wallInfo: 'wallo', data: 'enthalpy'},
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'TVGraph', xLabel: 'Temperature (K)', yLabel: 'Volume (L)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
+					{type: 'Scatter', handle: 'TVGraph', xLabel: 'Temperature (K)', yLabel: 'Volume (L)', axesInit: {x:{min: 350, step: 40}, y:{min: 0, step: 1}}, numGridLines: {x: 6, y: 6},axesFixed: {x: true, y: true},
 						sets:[
 							{handle: 'tempVolume', label: 'Phase Change', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
-							data: {x: '(curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length && tempSmooth("liquidWater")) || tempSmooth("wallo")', y: 'vol("wallo")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+							data: {x: 'if (curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length < 25) {return tempSmooth("wallo");} else {return tempSmooth("liquidWater");}', y: 'vol("wallo")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
 						]
 					}
 				],	
@@ -300,9 +300,9 @@ LevelData = {
 							options:[
 										{text:"Decrease Pressure", correct: true, CWAnswerId: 9},
 										{text:"Increase Pressure", correct: false, message: "That's not correct", CWAnswerId: 10},
-										{text:"Remove Water Vapor", correct: false, message: "That's not correct", CWAnswerId: 11},
-										{text:"Add Water Vapor", correct: false, message:"That's not correct", CWAnswerId: 12},
-										// {text:"Add Inert Species", correct: false, message: "That's not correct", CWAnswerId: 13}, 
+										{text:"Remove Liquid Water", correct: false, message: "That's not correct", CWAnswerId: 11},
+										{text:"Add Liquid Water", correct: false, message:"That's not correct", CWAnswerId: 12},
+										{text:"Add Water Vapor", correct: false, message: "That's not correct", CWAnswerId: 13}, 
 							]
 						}
 					]
@@ -326,10 +326,10 @@ LevelData = {
 		{//Third Scene
 			sceneData: {
 				walls: [
-					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 388.15, handle: 'wallo', vol: 0.5, isothermalRate: 50, border: {type: 'open', width: 10, yMin: 40} },
+					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'cVIsothermal', temp: 388.15, handle: 'wallo', vol: 0.6, isothermalRate: 50, border: {type: 'open', width: 10, yMin: 40} },
 				],
 				dots: [
-					{spcName: 'Water', pos: P(45,100), dims: V(465,240), count: 0, temp:333.15, returnTo: 'wallo', tag: 'wallo'}, //count 396
+					{spcName: 'Water', pos: P(45,100), dims: V(465,240), count: 0, temp:388.15, returnTo: 'wallo', tag: 'wallo'}, //count 396
 				],	
 				objs: [
 					{
@@ -354,10 +354,10 @@ LevelData = {
 							init: 3.5,
 						}
 					},
-					{
-						type: 'QArrowsAmmt',
-						attrs: {handle: 'arrow', wallInfo: 'wallo', scale: 1}
-					},	
+					// {
+						// type: 'QArrowsAmmt',
+						// attrs: {handle: 'arrow', wallInfo: 'wallo', scale: 1}
+					// },	
 					// {
 						// type: 'DragWeights',
 						// attrs: {
@@ -375,7 +375,7 @@ LevelData = {
 						attrs:{
 							wallInfo: 'wallo',
 							handle: 'water',
-							tempInit: 353.15,
+							tempInit: 388.15,
 							spcCounts: {Water: 550},
 							actCoeffType: 'twoSfxMrg',
 							actCoeffInfo: {a: 3000},
@@ -399,18 +399,34 @@ LevelData = {
 				// ],	
 				dataReadouts: [
 					{label: 'Vol: ', expr: 'vol("wallo")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
+					{label: 'Heat: ', expr: 'q("wallo")', units: 'kJ', decPlaces: 1, handle: 'heatReadout', readout: 'mainReadout'},
 					{label: 'Gas Temp: ', expr: 'var tempVal = tempSmooth("wallo"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'tempGasReadout', readout: 'mainReadout'},
 					{label: 'Liquid Temp: ', expr:  'var tempVal = tempSmooth("liquidWater"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', decPlaces: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
 				],
-				// triggers: [
-					// {handle: 'triggery1', expr: 'pExt("wallo") >= 4.8', message: 'Add Pressure to the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt1'},
-					// //{handle: 'triggery1', expr: 'pExt("wallo") >= 4.9', satisfyCmmds: [], priority: 1, checkOn: 'conditions', requiredFor: 'prompt1'},
-				// ]
+				graphs: [
+					{type: 'Scatter', handle: 'PVGraph', xLabel: 'Pressure (bar)', yLabel: 'Volume (L)', axesInit: {x:{min: 0, step: 1}, y:{min: 0, step: 2}}, numGridLines: {x: 6, y: 6},axesFixed: {x: true, y: true},
+						sets:[
+							{handle: 'pressureVolume', label: 'Phase Change', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
+							data: {x: 'pExt("wallo")', y: 'vol("wallo")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+						]
+					}
+				],
+				triggers: [
+					{handle: 'triggery1', expr: 'pExt("wallo") <= 1.74', message: 'Remove sand from the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
+					{handle: 'triggery2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length < 30', message: 'Vaporize the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
+					{handle: 'triggery2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['curLevel.liquidWater.disablePhaseChange()'], priority: 1},
+					{handle: 'freeze1', expr: 'pExt("wallo") <= 1.70', satisfyCmmds: ['curLevel.sandboxMrSandMan.removeMassStop()', 'buttonManager.hideButton("mrSandManSandButtons", "add")', 'buttonManager.hideButton("mrSandManSandButtons", "remove")'], priority: 1},
+					{handle: 'freeze2', expr: 'pExt("wallo") <= 1.60', satisfyCmmds: ['curLevel.sandboxMrSandMan.removeMassStop()', 'buttonManager.hideButton("mrSandManSandButtons", "add")', 'buttonManager.hideButton("mrSandManSandButtons", "remove")'], priority: 1},
+				]
 			},
 			prompts: [
 				{//prompt0
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'curLevel.liquidWater.disablePhaseChange()'
+						]
+					},
 					text: 'Now decrease the pressure to bring the system to saturation with the temperature held constant at 115 C.'		
 				},
 				{//prompt1
@@ -421,19 +437,25 @@ LevelData = {
 							CWQuestionId: 103,
 							questionText: 'The vapor heat capacity of water is 1.9 kJ/kgK and the liquid heat capacity of water is 4.2 kJ/kgK. How will the heat of vaporization at 115 C compare to the value at 162 C?',
 							options:[
-								{text: "Less at 150 C", correct: false, message: "That is not the correct answer", CWAnswerId: 14},
-								{text: "Equal at 150 C", correct: false, message: "That is not the correct answer", CWAnswerId: 15},
-								{text: "Greater at 150 C", correct: true, CWAnswerId: 16}
+								{text: "Less at 115 C", correct: false, message: "That is not the correct answer", CWAnswerId: 14},
+								{text: "Equal at 115 C", correct: false, message: "That is not the correct answer", CWAnswerId: 15},
+								{text: "Greater at 115 C", correct: true, CWAnswerId: 16}
 							]
 						}
 					]	
 				},
 				{//prompt2
-					sceneData: undefined,
+					sceneData: {
+						cmmds: [
+							'buttonManager.showButton("mrSandManSandButtons", "add")', 
+							'buttonManager.showButton("mrSandManSandButtons", "remove")',
+							'curLevel.liquidWater.enablePhaseChange()'
+						]
+					},
 					quiz: [
 						{
 							type: 'textSmall',
-							preText:'Vaporize the liquid. How much heat was added?',
+							preText:'Vaporize the liquid. How much heating was done?',
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans11',
