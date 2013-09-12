@@ -458,6 +458,17 @@ function stringTogetherGET(obj) {
 	return strs.join('&');
 }
 
+function sendToCW(string, CWTriggerId) {
+	var request = new XMLHttpRequest();
+	var string64 = window.btoa(string);
+	var get;
+	if (/^(http|https)/.test(document.URL)) {
+		get = window.stringTogetherGET({'goto': 'simulation', command: 'send_answer', question_id: CWTriggerId, answer_text_64: string64});
+		request.open("GET", "CW.php?" + get, true);
+		request.send(null);
+	}
+}
+
 function hideSliders(){
 	for (var handleIdx=0; handleIdx<sliderList.length; idIdx++){
 		var handle = sliderList[handleIdx];

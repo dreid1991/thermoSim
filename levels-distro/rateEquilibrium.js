@@ -1,5 +1,5 @@
 LevelData = {
-	levelTitle: 'Chemical reaction rate and equilibrium',
+	levelTitle: 'Chemical Reaction Rate and Equilibrium',
 	spcDefs: [
 		{spcName: 'spc1', m: 4, r: 2, sF298: 0, col: Col(200, 0, 0), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, 
 		{spcName: 'ugly', m: 4, r: 2, sF298: 0, col: Col(52, 90, 224), cv: 3 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
@@ -14,10 +14,10 @@ LevelData = {
 			{//p0, q0
 				sceneData:undefined,
 				cutScene:true,
-				text:"<p>In this simulation we're going to investigate the distinction between chemical reaction rate and equilibrium. In your own words, how would you explain the difference between reaction rate and equilibrium?</p>",
 				quiz:[
 					{
 						storeAs: 'foo1', 
+						questionText: "<p>In this simulation we're going to investigate the distinction between chemical reaction rate and equilibrium. In your own words, how would you explain the difference between reaction rate and equilibrium?</p>",
 						type:'text', 
 						text:'Type your answer here.', 
 						CWQuestionId: 37
@@ -61,7 +61,7 @@ LevelData = {
 					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 6, prods: {uglier: 2}},
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'molAtime', xLabel: "time (s)", yLabel: "mole fraction of A", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'molAtime', xLabel: "Time (s)", yLabel: "Mole Fraction of A", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
 							{handle:'moles', label:'frac A', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "time('wally')", y: "frac('wally', {spcName: 'ugly', tag: 'wally'})"}, trace: true, showPts: false, fillInPtsMin: 5}
 						]
@@ -72,10 +72,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: '<p>We first consider the case where A can react to form B, but B cannot react in "reverse" to form A. A will be represented by a blue molecule and B by a red molecule.</p><p> The isothermal system above is held at 300 K. You can start the reaction by clicking "enable reaction." How long does it take for 60% of the A to be consumed?</p>', 
 					quiz:[
 							{
 								storeAs: 'foo2', 
+								questionText: '<p>We first consider the case where A can react to form B, but B cannot react in "reverse" to form A. A will be represented by a blue molecule and B by a red molecule.</p><p> The isothermal system above is held at 300 K. You can start the reaction by clicking "enable reaction." How long does it take for 60% of the A to be consumed?</p>', 
 								type:'textSmall', 
 								units: 'seconds',
 								text:'', 
@@ -86,10 +86,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: 'Do you believe the A molecules react every time they collide with another molecule? Explain.', 
 					quiz:[
 							{
 								storeAs: 'foo3', 
+								questionText: 'Do you believe the A molecules react every time they collide with another molecule? Explain.', 
 								type:'text', 
 								text:'Type your response here.', 
 								CWQuestionId: 39
@@ -99,10 +99,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: "Now let's try to make the reaction happen faster. Enter a temperature at which you would like to conduct the experiment in order to speed it up and click 'submit'.", 
 					quiz:[
 							{
 								storeAs: 'foo4', 
+								questionText: "Now let's try to make the reaction happen faster. Enter a temperature at which you would like to conduct the experiment in order to speed it up and click 'submit'.", 
 								type:'textSmall', 
 								units: 'K',
 								text:'', 
@@ -146,7 +146,7 @@ LevelData = {
 					{handle: 'rxn1', rctA: 'ugly', rctB: 'ugly', activeE: 6, prods: {uglier: 2}},
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'molAtime', xLabel: "time (s)", yLabel: "mole fraction of A", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'molAtime', xLabel: "Time (s)", yLabel: "Mole Fraction of A", axesInit:{x:{min:0, step:5}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
 						sets:[
 							{handle:'moles', label:'frac A', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: "time('wally')", y: "frac('wally', {spcName: 'ugly', tag: 'wally'})"}, trace: true, showPts: false, fillInPtsMin: 5}
 						]
@@ -157,10 +157,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: "Here is the same system, except at get('foo4', 'float', 500, 300, 900) K instead of 300 K. Last time you said it took get('foo2', 'string', 'noValue') seconds for 60% of A to be consumed. When you're ready, click 'enable' and find out how long it takes this time. Enter the time you find in the text box.", 
 					quiz:[
 							{
 								storeAs: 'foo5', 
+								questionText: "Here is the same system, except at get('foo4', 'float', 500, 300, 900) K instead of 300 K. Last time you said it took get('foo2', 'string', 'noValue') seconds for 60% of A to be consumed. When you're ready, click 'enable' and find out how long it takes this time. Enter the time you find in the text box.", 
 								type:'textSmall', 
 								units: 'seconds',
 								text:'', 
@@ -177,10 +177,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Your results are shown in the table below. Can you explain the data's behavior from a physical perspective?<p><table class = 'data' border='1'><tr><th>Temp (K)</th><th>Time (s)</th></tr><tr><td>300</td><td>get('foo2', 'string', 'noValue')</td></tr><tr><td>get('foo4', 'string', 'noValue')</td><td>get('foo5', 'string', 'noValue')</td></tr></table></p>", 
 					quiz:[
 							{
 								storeAs: 'foo6', 
+								questionText: "Your results are shown in the table below. Can you explain the data's behavior from a physical perspective?<p><table class = 'data' border='1'><tr><th>Temp (K)</th><th>Time (s)</th></tr><tr><td>300</td><td>get('foo2', 'string', 'noValue')</td></tr><tr><td>get('foo4', 'string', 'noValue')</td><td>get('foo5', 'string', 'noValue')</td></tr></table></p>", 
 								type:'text',
 								text:'Type your answer here.', 
 								CWQuestionId: 42
@@ -191,10 +191,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Let's consider why the rate changes with temperature (or the reactivity of A). Using the Arrhenius equation, graph on a separate piece of paper the reaction rate constant with respect to temperature from 0 to 1000 K. $$ k = Ae^{-E_{a}/{RT}} $$ The activation energy of this reaction is 150 kJ/mol and the pre-exponential constant is ##0.05 M^{-1}s^{-1}##. Why do you believe the rate behaves this way with respect to temperature?", 
 					quiz:[
 							{
 								storeAs: 'foo7', 
+								questionText: "Let's consider why the rate changes with temperature (or the reactivity of A). Using the Arrhenius equation, graph on a separate piece of paper the reaction rate constant with respect to temperature from 0 to 1000 K. $$ k = Ae^{-E_{a}/{RT}} $$ The activation energy of this reaction is 11 kJ/mol and the pre-exponential constant is ##0.05 M^{-1}s^{-1}##. Why do you believe the rate behaves this way with respect to temperature?", 
 								type:'text',
 								text:'Type your answer here.', 
 								CWQuestionId: 43
@@ -205,10 +205,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "<p>Now we’re going to turn off the reaction, so there will be no production of B.  However, when a molecule’s kinetic energy is above the activation energy for ##A \\rightarrow B##, we’re going to turn it white.</p><p>How to do think the fraction of white molecules will change with temperature?</p>", 
 					quiz:[
 							{
 								storeAs: 'foo8', 
+								questionText: "<p>Now we’re going to turn off the reaction, so there will be no production of B.  However, when a molecule’s kinetic energy is above the activation energy for ##A \\rightarrow B##, we’re going to turn it white.</p><p>How to do think the fraction of white molecules will change with temperature?</p>", 
 								type:'text',
 								text:'Type your answer here.', 
 								CWQuestionId: 44
@@ -240,7 +240,7 @@ LevelData = {
 					{label: 'Temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 					],
 				graphs: [
-					{type: 'Scatter', handle: 'PvsVOne', xLabel: "temp (K)", yLabel: "Mole Fraction Excited", axesInit:{x:{min:0, step:80}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Temperature (K)", yLabel: "Mole Fraction Excited", axesInit:{x:{min:0, step:200}, y:{min:0, step:.2}}, numGridLines: {x: 6, y: 6}, axesFixed: {x: true, y: true},
 						sets:[
 							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'temp("wally")', y: "frac('wally', {spcName: 'duckling', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
 						]
@@ -251,10 +251,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: 'Here is a system of A at 50 K. When a molecule reaches the activation energy, it will turn white. The mole fraction of white excited molecules is graphed with respect to temperature. Why are there not many white excited molecules at this temperature?', 
 					quiz:[
 							{
 								storeAs: 'foo9', 
+								questionText: 'Here is a system of A at 50 K. When a molecule reaches the activation energy, it will turn white. The mole fraction of white excited molecules is graphed with respect to temperature. Why are there not many white excited molecules at this temperature?', 
 								type:'text', 							
 								text:'Type your answer here', 
 								CWQuestionId: 45
@@ -284,7 +284,7 @@ LevelData = {
 					},
 				],
 				triggers: [
-					{handle: 'trigger3', expr: "temp('wally') >= 998", message: 'Heat the system to 700 K.', requiredFor: 'prompt0', checkOn: 'conditions'}
+					{handle: 'trigger3', expr: "temp('wally') >= 998", message: 'Heat the system to 1000 K.', requiredFor: 'prompt0', checkOn: 'conditions'}
 				],
 				dataRecord: [
 					
@@ -294,7 +294,7 @@ LevelData = {
 					{label: 'Temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'PvsVOne', xLabel: "temp (K)", yLabel: "Mole Fraction Excited", axesInit:{x:{min:0, step:10}, y:{min:0, step:.2}}, numGridLines: {y: 6}, axesFixed: {y: true},
+					{type: 'Scatter', handle: 'PvsVOne', xLabel: "Temperature (K)", yLabel: "Mole Fraction Excited", axesInit:{x:{min:0, step:200}, y:{min:0, step:.2}}, numGridLines: {x: 6, y: 6}, axesFixed: {x: true, y: true},
 						sets:[
 							{handle:'frac', label:'products', pointCol:Col(255,50,50), flashCol:Col(255,200,200), data:{x: 'temp("wally")', y: "frac('wally', {spcName: 'duckling', tag: 'wally'})"}, trace: true, showPts: false, fillInPts: true, fillInPtsMin: 5}
 						]
@@ -305,9 +305,9 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: 'Now try heating the system until it reaches 1000 K. Describe how the fraction of excited molecules changes with temperature.', 
 					quiz:[
 							{
+								questionText: 'Now try heating the system until it reaches 1000 K. Describe how the fraction of excited molecules changes with temperature.', 
 								storeAs: 'foo10', 
 								type:'text', 
 								text:'Type your answer here', 
@@ -318,10 +318,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: 'How does the graph of fraction of excited molecules vs. temperature compare to your graph of reaction rate vs. temperature?', 
 					quiz:[
 							{
 								storeAs: 'foo11', 
+								questionText: 'How does the graph of fraction of excited molecules vs. temperature compare to your graph of reaction rate vs. temperature?', 
 								type:'text', 
 								text:'Type your answer here', 
 								CWQuestionId: 47
@@ -331,10 +331,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
-					text: 'Can you come up with a physical explanation for why reaction rate behaves as described by the Arrhenius equation?', 
 					quiz:[
 							{
 								storeAs: 'foo12', 
+								questionText: 'Can you come up with a physical explanation for why reaction rate behaves as described by the Arrhenius equation?', 
 								type:'text', 
 								text:'Type your answer here', 
 								CWQuestionId: 48
@@ -350,10 +350,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "Now let's introduce the reverse reaction, ##B \\rightarrow A##, to our system. For the reaction of ##A \\rightarrow B##: $$\\Delta{h}_{rxn} = -2.5\\frac{kJ}{mol}$$ and $$\\Delta{s}_{rxn} = -3.3\\frac{J}{mol-K}$$ You may assume that both of these values are constant with temperature. With the isothermal system held at 300 K, what will be the equilibrium mole fraction of B?", 
 					quiz:[
 							{
 								storeAs: 'foo13', 
+								questionText: "Now let's introduce the reverse reaction, ##B \\rightarrow A##, to our system. For the reaction of ##A \\rightarrow B##: $$\\Delta{h}_{rxn} = -2.5\\frac{kJ}{mol}$$ and $$\\Delta{s}_{rxn} = -3.3\\frac{J}{mol-K}$$ You may assume that both of these values are constant with temperature. With the isothermal system held at 300 K, what will be the equilibrium mole fraction of B?", 
 								type:'text',
 								text:'Type your answer here.', 
 								CWQuestionId: 49
@@ -407,10 +407,10 @@ LevelData = {
 				{
 					sceneData: undefined,
 					cutScene: false, 
-					text: "Let's perform an experiment with both a forward and reverse reaction. Click 'enable' to start the reaction. How long does it take for the system at 300 K to reach the equilibrium mole fraction of the product B?", 
 					quiz:[
 							{
 								storeAs: 'foo14', 
+								questionText: "Let's perform an experiment with both a forward and reverse reaction. Click 'enable' to start the reaction. How long does it take for the system at 300 K to reach the equilibrium mole fraction of the product B?", 
 								type:'textSmall',
 								units:'seconds',
 								text:'', 
@@ -422,10 +422,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false,
-					text: "What can you say about the rates of the forward and reverse reactions now that the system is at equilibrium?",
 					quiz:[
 							{
 								storeAs: 'foo15', 
+								questionText: "What can you say about the rates of the forward and reverse reactions now that the system is at equilibrium?",
 								type:'text',
 								text:'Type your answer here.', 
 								CWQuestionId:51
@@ -442,10 +442,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "<p>Next we’re going to conduct the reaction at 500 K.  What will the equilibrium mole fraction of B be at this temperature?</p><p>Enter the value as a decimal between 0 and 1</p>", 
 					quiz:[
 							{
 								storeAs: 'foo16', 
+								questionText: "<p>Next we’re going to conduct the reaction at 500 K.  What will the equilibrium mole fraction of B be at this temperature?</p><p>Enter the value as a decimal between 0 and 1</p>", 
 								type:'textSmall',
 								text:'', 
 								CWQuestionId: 52
@@ -456,10 +456,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "How does this compare to the equilibrium concentration of 0.64 at 300 K?  Explain why the equilibrium concentrations might be different.", 
 					quiz:[
 							{
 								storeAs: 'foo17', 
+								questionText: "How does this compare to the equilibrium concentration of 0.64 at 300 K?  Explain why the equilibrium concentrations might be different.", 
 								type:'text',
 								text:'Type your answer here.', 
 								CWQuestionId: 53
@@ -470,10 +470,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true, 
-					text: "At 300 K, it took get('foo14', 'string', 'noValue') seconds to reach equilibrium.  How do you think this will compare to the time required to reach equilibrium at 500 K?", 
 					quiz:[
 							{
 								storeAs: 'foo18', 
+								questionText: "At 300 K, it took get('foo14', 'string', 'noValue') seconds to reach equilibrium.  How do you think this will compare to the time required to reach equilibrium at 500 K?", 
 								type:'text',
 								text:'Type your answer here.', 
 								CWQuestionId: 54
@@ -525,10 +525,10 @@ LevelData = {
 			prompts: [
 				{
 					sceneData: undefined, 
-					text: 'Let’s find out. Above is the same isothermal system but now at 500 K.  Click ‘enable’ to start the reaction.  You wrote it took get("foo14", "string", "noValue") seconds to reach equilibrium at 300 K.  How long does it take at 500 K?',
 					quiz:[
 							{
 								storeAs: 'foo19', 
+								questionText: 'Let’s find out. Above is the same isothermal system but now at 500 K.  Click ‘enable’ to start the reaction.  You wrote it took get("foo14", "string", "noValue") seconds to reach equilibrium at 300 K.  How long does it take at 500 K?',
 								type:'textSmall',
 								text:'', 
 								units: 'seconds',
@@ -538,10 +538,10 @@ LevelData = {
 				},
 				{
 					sceneData: undefined, 					
-					text: 'Does the equilibrium mole fraction match your predicted value of get("foo16", "string", "noValue")?',
 					quiz:[
 							{
 								storeAs: 'foo20', 
+								questionText: 'Does the equilibrium mole fraction match your predicted value of get("foo16", "string", "noValue")?',
 								type:'text',
 								text:'Type your answer here', 
 								CWQuestionId: 56
@@ -551,10 +551,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true,
-					text: "Now let’s lower the temperature to 100 K.  What will be the equilibrium mole fraction of product B at this temperature?",
 					quiz:[
 							{
 								storeAs: 'foo21', 
+								questionText: "Now let’s lower the temperature to 100 K.  What will be the equilibrium mole fraction of product B at this temperature?",
 								type:'textSmall',
 								text:'', 
 								CWQuestionId: 57
@@ -565,10 +565,10 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true,
-					text: "How do you think the time required to reach equilibrium at 100 K will compare to the times in the other two experiments?",
 					quiz:[
 							{
 								storeAs: 'foo22', 
+								questionText: "How do you think the time required to reach equilibrium at 100 K will compare to the times in the other two experiments?",
 								type:'text',
 								text:'Type your answer here.', 
 								CWQuestionId: 58
@@ -623,9 +623,9 @@ LevelData = {
 				},
 				{
 					sceneData: undefined, 
-					text: 'Why is the reaction not proceeding?',
 					quiz:[
 							{
+								questionText: 'Why is the reaction not proceeding?',
 								storeAs: 'foo23', 
 								type:'text',
 								text:'Type your answer here.', 
@@ -635,9 +635,9 @@ LevelData = {
 				},
 				{
 					sceneData: undefined, 
-					text: 'Although it appears nothing is happening, there is a non-zero rate constant in the forward direction. What will be the mole fraction of A if you wait for a very long time?',
 					quiz:[
 							{
+								questionText: 'Although it appears nothing is happening, there is a non-zero rate constant in the forward direction. What will be the mole fraction of A if you wait for a very long time?',
 								storeAs: 'foo24', 
 								type:'textSmall',
 								text:'', 
@@ -648,9 +648,9 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true,
-					text: '<br>Describe how the reaction equilibrium changed with temperature for the exothermic reaction ##A \\rightarrow B##.<br>',
 					quiz:[
 							{
+								questionText: '<br>Describe how the reaction equilibrium changed with temperature for the exothermic reaction ##A \\rightarrow B##.<br>',
 								storeAs: 'foo25', 
 								type:'text',
 								text:'Type your answer here', 
@@ -661,9 +661,9 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true,
-					text: '<br>Describe how the reaction rate changed with temperature for the exothermic reaction ##A \\rightarrow B##.<br>',
 					quiz:[
 							{
+								questionText: '<br>Describe how the reaction rate changed with temperature for the exothermic reaction ##A \\rightarrow B##.<br>',
 								storeAs: 'foo26', 
 								type:'text',
 								text:'Type your answer here', 
@@ -674,9 +674,9 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: true,
-					text: '<br>In a couple of sentences, explain the difference between reaction rate and equilibrium.<br>',
 					quiz:[
 							{
+								questionText: '<br>In a couple of sentences, explain the difference between reaction rate and equilibrium.<br>',
 								storeAs: 'foo27', 
 								type:'text',
 								text:'Type your answer here',
@@ -692,7 +692,24 @@ LevelData = {
 				{
 					cutScene: true,
 					title: '',
-					text: 'You have completed the simulation.'
+					text: 'You have completed the simulation.',
+					quiz: [
+						{
+							type: 'multChoice',
+							CWQuestionId: 106,
+							questionText: "<p>By selecting the button below and clicking 'Submit' you will exit the simulation. If you are not finished or would like to return to a previous page, click 'back' to return to the simulation.",
+							options:[
+								{text:"I would like to exit the simulation", correct: true, message:"Select the button labeled 'I would like to exit the simulation'", CWAnswerId: 17},
+							]
+						},
+					]
+				},
+				{
+					sceneData: {
+						cmmds: [
+							'location.reload()'
+						]
+					}	
 				}
 			]
 		}

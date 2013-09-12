@@ -262,7 +262,8 @@ _.extend(Liquid.prototype, objectFuncs, {
 				var liqDots = self.dotMgrLiq.lists.ALLDOTS;
 				var gasDots = dotManager.lists.ALLDOTS;
 				addListener(curLevel, 'update', listenerName, function() {
-					if (self.willFixTemp(liqDots, gasDots, dataGas.vol[dataGas.vol.length - 1], dataGas.temp[dataGas.temp.length - 1])) {
+					// if (self.willFixTemp(liqDots, gasDots, dataGas.vol[dataGas.vol.length - 1], dataGas.temp[dataGas.temp.length - 1])) {
+					if (0 < liqDots.length && liqDots.length < Math.min(75 * pressureSrc[pressureSrc.length - 1], 0.95 * (liqDots.length + gasDots.length))) {
 						fixLiquidTemp();
 					}
 

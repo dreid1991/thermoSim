@@ -17,6 +17,7 @@ Copyright (C) 2013  Daniel Reid
 
 function QArrowsAmmt(attrs) {
 	this.type = 'QArrowsAmmt';
+	this.rate = attrs.rate != undefined ? attrs.rate : false;
 	this.wallHandle = attrs.wallInfo;
 	this.wall = walls[this.wallHandle];
 	this.handle = attrs.handle;
@@ -60,30 +61,58 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 		var redrawThreshold = qMax/(lengthMax-lengthMin);
 		this.qArrowsAmmt = [arrow1, arrow2];
 		var dirLast = 'out';
-		qLast = wall.q;
+		var dir;
+		var src = [];
+		var qLast = wall.q;
 		this.setAmmtArrowDims(this.qArrowsAmmt, lengthMin, lengthMax, widthMin, widthMax, wall.q, qMax);
 		if (wall.q >= 0) {
 			dirLast = 'in';
 			this.flipAmmtArrows(this.qArrowsAmmt);
 		}
 		this.listenerName = this.handle + 'updateQAmmtArrows';
-		addListener(curLevel, 'update', this.listenerName, 
-			function() {
-				if (Math.abs(wall.q - qLast) > redrawThreshold) {
-					if (wall.q < 0) {
+		if (this.rate) {
+			addListener(curLevel, 'update', this.listenerName, 
+				function() {
+					src.push(wall.q - qLast);
+					var numVals = Math.min(75, src.length);
+					var init = src.length - numVals;
+					var sum = 0;
+					for (var i=0; i<numVals; i++) {
+						sum += src[init + i];
+					}
+					var qRateSmooth = sum / numVals;
+					if (qRateSmooth < 0) {
 						dir = 'out';
 					} else {
 						dir = 'in';
 					}
-					this.setAmmtArrowDims(this.qArrowsAmmt, lengthMin, lengthMax, widthMin, widthMax, wall.q, qMax);
+					this.setAmmtArrowDims(this.qArrowsAmmt, 0, lengthMax, widthMin, widthMax, 150 * qRateSmooth, qMax);
 					if (dirLast != dir) {
 						this.flipAmmtArrows(this.qArrowsAmmt);
 						dirLast = dir;
 					}
 					qLast = wall.q;
-				}
-			},
-		this);	
+				},
+			this);	
+		} else {
+			addListener(curLevel, 'update', this.listenerName, 
+				function() {
+					if (Math.abs(wall.q - qLast) > redrawThreshold) {
+						if (wall.q < 0) {
+							dir = 'out';
+						} else {
+							dir = 'in';
+						}
+						this.setAmmtArrowDims(this.qArrowsAmmt, lengthMin, lengthMax, widthMin, widthMax, wall.q, qMax);
+						if (dirLast != dir) {
+							this.flipAmmtArrows(this.qArrowsAmmt);
+							dirLast = dir;
+						}
+						qLast = wall.q;
+					}					
+				},
+			this);	
+		}
 	},
 
 
@@ -105,7 +134,7 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 			var w = wMin + (wMax-wMin)*percent;
 			arrow.size(V(l, w));
 			if (q>0) {
-				arrow.move(V(0, l-dimso.dx));
+				arrow.move(V(0, dimso.dx));
 			}
 		}
 	},
