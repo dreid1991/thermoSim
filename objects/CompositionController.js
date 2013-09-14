@@ -20,7 +20,7 @@ function CompositionController(attrs) {
 	this.handle = attrs.handle;
 	this.inletDepth = attrs.inletDepth;
 	this.outletDepth = attrs.outletDepth;
-	this.flowWidth = 30;
+	this.flowWidth = defaultTo(30, attrs.width);
 	this.flowSpacing = 4;
 	this.wallInfo = attrs.wallInfo;
 	this.wall = walls[this.wallInfo];
@@ -31,7 +31,7 @@ function CompositionController(attrs) {
 	}
 	this.temp = attrs.inletTemp; 
 	if (!this.temp) console.log('No/zero temperature sent to inlet ' + this.handle);
-	this.segmentIdxs = attrs.ptIdxs; //list of all walls to cover, including last one
+	this.segmentIdxs = _.sortBy(attrs.ptIdxs, function(a) {return a}); //list of all wall segments to cover, including last one
 	var attrFlows = attrs.flows;
 	//this.flowGroupSliders = this.addFlowSliders(attrs.sliders || [], this.flows); figure this out later
 	this.tempSlider = undefined;
@@ -46,7 +46,7 @@ function CompositionController(attrs) {
 	this.init();	
 }
 
-_.extend(ConpositionController.prototype, objectFuncs, flowFuncs, {
+_.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
 	tileWallSegments: function(wall, segmentIdxs, inletDepth, outletDepth, flowWidth, flowSpacing, attrFlows, temp, tempMin, tempMax, inlets, outlets) {
 		//so ORBVIOUSLY I should start at the end and work to the front
 		for (var i=segmentIdxs.length-1; i>=0; i--) {
@@ -73,4 +73,10 @@ _.extend(ConpositionController.prototype, objectFuncs, flowFuncs, {
 			
 		}
 	},
+	remove: function() {
+		for (var i=0; i<this.inlets.length; i++) this.inlets[i].remove();
+		for (var i=0; i<this.outlets.length; i++) this.outlets[i].remove();
+		this.inlets = [];
+		this.outlets = [];
+	}	
 })
