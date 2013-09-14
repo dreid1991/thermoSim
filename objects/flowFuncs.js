@@ -31,8 +31,8 @@ var flowFuncs = {
 	addPts: function() {
 		var aIdx = Math.min(this.ptIdxs[0], this.ptIdxs[1]);
 		var bIdx = Math.max(this.ptIdxs[0], this.ptIdxs[1]);
-		var a = this.wall.getPt(aIdx).copy();
-		var b = this.wall.getPt(bIdx).copy();
+		var a = this.wall[aIdx].copy();
+		var b = this.wall[bIdx].copy();
 		this.perp = this.wall.getPerpUV(aIdx);
 		var UV = this.wall.getUV(aIdx);
 		this.pts = this.getPts(a, b, UV, this.perp, this.fracOffset);
@@ -50,5 +50,6 @@ var flowFuncs = {
 			arrows.push(new ArrowStatic({pos: pos, dims: this.arrowDims, UV: UV.copy(), handle: this.handle + 'Idx' + ctIdx, fill: this.arrowFill, stroke: this.arrowStroke, cleanUpWith: this.cleanUpWith}));
 		}
 		return arrows;
-	}
+	},
+
 }
