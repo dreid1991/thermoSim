@@ -46,6 +46,7 @@ var flowFuncs = {
 				}
 			}
 		}
+		return pts;
 	},
 	addArrows: function(UV, type) {
 		var arrows = [];

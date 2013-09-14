@@ -55,7 +55,7 @@ _.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
 	},
 	tileWallSegment: function(wall, segmentIdx, inletDepth, outletDepth, flowWidth, flowSpacing, attrFlows, temp, tempMin, tempMax, inlets, outlets) {
 		var distInit = wall[segmentIdx].distTo(wall[segmentIdx + 1]);
-		var numHoles = Math.floor((dist - flowSpacing)/ (flowWidth + flowSpacing))//a hole being an inlet or an outlet, I guess.  Flows is sort of used
+		var numHoles = Math.floor((distInit - flowSpacing)/ (flowWidth + flowSpacing))//a hole being an inlet or an outlet, I guess.  Flows is sort of used
 		var edgeSpacing = (distInit - numHoles * flowWidth + (numHoles - 1) * flowSpacing) / 2;
 		//wall is shinking as I add more, so need to be tricky about calculating fracOffset
 		//also, fracOffset references the center of the flow
@@ -67,9 +67,9 @@ _.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
 			var handle = this.handle + 'Wall' + wall.handle + 'Segment' + segmentIdx + 'Flow' + i;
 			
 			if (i % 2) 
-				this.inlets.push(new Inlet({handle: handle, wallInfo: wall.handle, addArrows: false, temp: temp, tempMin: tempMin, tempMax: tempMax, flows: attrFlows, width: flowWidth, depth: inletDepth}));
+				this.inlets.push(new Inlet({handle: handle, wallInfo: wall.handle, ptIdxs: [segmentIdx, segmentIdx + 1], addArrows: false, temp: temp, tempMin: tempMin, tempMax: tempMax, flows: attrFlows, width: flowWidth, depth: inletDepth}));
 			else 
-				this.outlets.push(new Outlet({handle: handle, wallInfo: wall.handle, width: flowWidth, depth: outletDepth}));
+				this.outlets.push(new Outlet({handle: handle, wallInfo: wall.handle, ptIdxs: [segmentIdx, segmentIdx + 1], width: flowWidth, depth: outletDepth}));
 			
 		}
 	},
