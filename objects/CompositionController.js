@@ -67,9 +67,9 @@ _.extend(ConpositionController.prototype, objectFuncs, flowFuncs, {
 			var handle = this.handle + 'Wall' + wall.handle + 'Segment' + segmentIdx + 'Flow' + i;
 			
 			if (i % 2) 
-				this.inlets.push(new Inlet({handle: handle, addArrows: false, temp: temp, tempMin: tempMin, tempMax: tempMax, flows: attrFlows, width: flowWidth, depth: inletDepth}));
+				this.inlets.push(new Inlet({handle: handle, wallInfo: wall.handle, addArrows: false, temp: temp, tempMin: tempMin, tempMax: tempMax, flows: attrFlows, width: flowWidth, depth: inletDepth}));
 			else 
-				this.outlets.push(new Outlet({handle: handle, width: flowWidth, depth: outletDepth, 
+				this.outlets.push(new Outlet({handle: handle, wallInfo: wall.handle, width: flowWidth, depth: outletDepth}));
 			
 		}
 	},

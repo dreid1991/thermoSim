@@ -26,7 +26,7 @@ var flowFuncs = {
 		var pt4 = a.copy().fracMoveTo(b, bOffset);
 		var pt2 = pt1.copy().movePt(perp.copy().neg().mult(this.depth));
 		var pt3 = pt4.copy().movePt(perp.copy().neg().mult(this.depth));
-		return [pt1, pt2, pt3, pt4];
+		return this.deleteDuplicatePts([pt1, pt2, pt3, pt4]);
 	},
 	addPts: function() {
 		var aIdx = Math.min(this.ptIdxs[0], this.ptIdxs[1]);
@@ -36,6 +36,16 @@ var flowFuncs = {
 		this.perp = this.wall.getPerpUV(aIdx);
 		var UV = this.wall.getUV(aIdx);
 		this.pts = this.getPts(a, b, UV, this.perp, this.fracOffset);
+	},
+	deleteDuplicatePts: function(pts) {
+		for (var i=0; i<pts.length-1; i++) {
+			for (var j=i+1; j<pts.length; j++) {
+				if (pts[i].sameAs(pts[j])) {
+					pts.splice(j, 1);
+					j--;
+				}
+			}
+		}
 	},
 	addArrows: function(UV, type) {
 		var arrows = [];
