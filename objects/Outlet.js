@@ -24,8 +24,6 @@ function Outlet(attrs) {
 	//if depth is 0, just have it not add any pointsa
 	this.width = defaultTo(30, attrs.width);
 	this.depth = defaultTo(20, attrs.depth) || 20; //can't be zero, need to set a wall handler
-	this.fracOpen = defaultTo(1, attrs.fracOpen);
-	this.makePts = this.depth;
 	this.wallInfo = attrs.wallInfo;
 	this.wall = walls[this.wallInfo];
 	this.ptIdxs = attrs.ptIdxs;
@@ -40,17 +38,18 @@ function Outlet(attrs) {
 
 _.extend(Outlet.prototype, flowFuncs, objectFuncs, {
 	init: function() {	
-		this.addPts();
-		if (this.makePts) {
-			this.wall.addPts(this.ptIdxs[1], this.pts);
-		}
-		var subWallIdx = Math.min(this.ptIdxs[0], this.ptIdxs[1]) + 2;
+		this.addPts(); //sets this.pts
+		this.wall.addPts(this.ptIdxs[1], this.pts);
+		var subWallIdx = Math.min(this.ptIdxs[0], this.ptIdxs[1]) + this.pts.length == 4 ? 2 : 1;
 		this.arrows = this.addArrows(this.pts[1].VTo(this.pts[2]).UV().perp('cw'));
 		walls.setSubWallHandler(this.wallInfo, subWallIdx, new Listener(this.hit, this));
 	},
 	hit: function(dot, wall, subWallIdx, wallUV, perpV, perpUV) {
 		//using this so pFloor can be changed, should that become a thing
-		if (this.pList[this.pList.length - 1] > this.pFloor) {
+		var pressure = this.pList[this.pList.length - 1];
+		var interpRange = Math.min(.75, .1 * this.pFloor);
+		var chance = (pressure - this.pFloor + interpRange) / (2 * interpRange);
+		if (Math.random() < chance) {
 			return dotManager.remove(dot, true);
 		} else {
 			return WallMethods.collideMethods.reflect(dot, wallUV, perpV);

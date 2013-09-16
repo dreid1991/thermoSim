@@ -51,6 +51,7 @@
 ../objects/DragArrow.js
 ../objects/DragWeights.js
 ../objects/flowFuncs.js
+../objects/CompositionController.js
 ../objects/Heater.js
 ../objects/Inlet.js
 ../objects/Liquid.js

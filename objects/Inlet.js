@@ -25,6 +25,7 @@ function Inlet (attrs) {
 	this.arrowFill = Col(200, 0, 0);
 	this.arrowStroke = Col(100, 100, 100);
 	this.type = 'Inlet';
+	this.addArrows = defaultTo(true, attrs.addArrows);
 	this.temp = attrs.temp; 
 	if (!this.temp) console.log('No/zero temperature sent to inlet ' + this.handle);
 	this.handle = attrs.handle;
@@ -40,21 +41,13 @@ function Inlet (attrs) {
 	this.flows = this.processFlows(attrs.flows);
 	this.flowGroupSliders = this.addFlowSliders(attrs.sliders || [], this.flows);
 	this.tempSlider = undefined;
+	this.tempMin = attrs.tempMin;
+	this.tempMax = attrs.tempMax;
 	if (attrs.makeTempSlider) {
-		this.tempMin = attrs.tempMin;
-		this.tempMax = attrs.tempMax;
 		this.tempSlider = this.addTempSlider(attrs.tempMin, attrs.tempMax, attrs.temp, attrs.tempSliderTitle || 'Inlet temp');
 	}
-	// this.makeSlider = defaultTo(true, attrs.makeSlider);
-	
-	// if (this.makeSlider) {
-		// this.slider = sliderManager.addSlider(attrs.title || 'Flow rate', this.handle + 'Slider',  {value: this.fracOpen*100},
-			// [{eventType:'slide', obj:this, func:this.parseSlider}],
-		// attrs.sliderIdx
-		// )
-	// }
+
 	this.setupStd();
-	this.arrows = [];
 	this.init();
 	
 }
@@ -65,21 +58,14 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 		
 		//add pts to wall, need to figure out handler.  I guess use the one for pt a
 		//make wall check if any adjacent points are equal, splice out if they are (to deal with depth == 0 case)
-		if (this.makePts) {
+		if (this.makePts) 
 			this.wall.addPts(this.ptIdxs[1], this.pts);
-		}
+		
 		var inletLine = {pos: this.pts[1].copy(), vec: this.pts[1].VTo(this.pts[2]), dir: this.perp.copy()};
-		this.arrows = this.addArrows(this.pts[1].VTo(this.pts[2]).UV().perp('ccw'));
+		this.arrows = this.addArrows ? this.addArrows(this.pts[1].VTo(this.pts[2]).UV().perp('ccw')) : [];
+ 
+	
 		this.makeInlet(inletLine, this.flows, this.dotTag, this.dotReturnTo);
-	},
-
-	processFlows: function(flows) {
-		var procdFlows = [];
-		for (var flowIdx=0; flowIdx<flows.length; flowIdx++) {
-			var flow = flows[flowIdx];
-			procdFlows.push(new Inlet.Flow(flow.spcName, flow.nDotMax * 1000 / updateInterval, flow.handle));
-		}
-		return procdFlows;
 	},
 	parseSlider: function(event, ui){
 		this.fracOpen = ui.value / 100;
@@ -113,6 +99,14 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 		undefined
 		)
 		
+	},
+	processFlows: function(flows) {
+		var procdFlows = [];
+		for (var flowIdx=0; flowIdx<flows.length; flowIdx++) {
+			var flow = flows[flowIdx];
+			procdFlows.push(new Inlet.Flow(flow.spcName, flow.nDotMax * 1000 / updateInterval, flow.handle));
+		}
+		return procdFlows;
 	},
 	setFracOpen: function(sliderHandle, fracOpen) {
 		var slider = this.getSlider(sliderHandle);
