@@ -76,8 +76,8 @@ LevelData = {
 				{//Prompt 0
 					sceneData: {
 						triggers: [
-							{handle: 'firstCheck', expr: 'fracDiff(temp("FirstWall"), 400) > .05', message: "Try to hit the molecule with the slider and see what happens!", priority: 1, },
-							{handle: 'triggerTest', expr: 'fracDiff(temp("FirstWall"), 400) > .05', satisfyCmmds: ['sendToCW("Molecule has been hit with slider", 107)'], priority: 1, }
+							{handle: 'firstCheck', expr: 'fracDiff(temp("FirstWall"), 400) > .05', message: "Try to hit the molecule with the slider and see what happens!", priority: 1},
+							{handle: 'triggerTest', expr: 'fracDiff(temp("FirstWall"), 400) > .05', satisfyCmmds: ['sendToCW("Molecule has been hit with slider", 107)'], priority: 1}
 						]
 					},
 					quiz: [
@@ -200,7 +200,7 @@ LevelData = {
 						quiz: [
 							{type: 'textSmall', CWQuestionId: 7, label: 'Slope from graph', storeAs: 'slopeFromGraph', text: " "},
 							{type: 'textSmall', CWQuestionId: 8, label: 'Slope from equation', storeAs: 'slopeFromEquation', text: " "},
-							{type: 'text', CWQuestionId: 9, questionText: "Given our ## P_{ext} ## should the graph be linear or did something go wrong? Explain.", boxText: " "}
+							{type: 'text', CWQuestionId: 9, questionText: "Given our ## P_{ext} ## should the graph be linear or did something go wrong? <br><br>Explain.", boxText: " "}
 						]
 				},
 				{//Prompt 2
