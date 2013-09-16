@@ -77,8 +77,9 @@ LevelData = {
 					sceneData: {
 						triggers: [
 							{handle: 'firstCheck', expr: 'fracDiff(temp("FirstWall"), 400) > .05', message: "Try to hit the molecule with the slider and see what happens!", priority: 1},
-							{handle: 'triggerTest', expr: 'fracDiff(temp("FirstWall"), 400) > .05', satisfyCmmds: ['sendToCW("Work done on molecule", 107)', 'console.log("work done on molecule")', 'var curTempList = walls.FirstWall.data.temp.src(); var curTemp = curTempList[curTempList.length - 1]; curLevel.tempStore = curTemp;']},
-							{handle: 'triggerTest2', expr: 'temp("FirstWall") < curLevel.tempStore', satisfyCmmds: ['sendToCW("Work done by molecule", 108)', 'console.log("work done by molecule")']}
+							// {handle: 'triggerTest', expr: 'fracDiff(temp("FirstWall"), 400) > .05', satisfyCmmds: ['sendToCW("Work done on molecule", 107)', 'console.log("work done on molecule")', 'var curTempList = walls.FirstWall.data.temp.src(); var curTemp = curTempList[curTempList.length - 1]; curLevel.tempStore = curTemp;']},
+							// {handle: 'triggerTest2', expr: 'temp("FirstWall") < curLevel.tempStore', satisfyCmmds: ['sendToCW("Work done by molecule", 108)', 'console.log("work done by molecule")']},
+							{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 107)']}
 						]
 					},
 					quiz: [
@@ -121,6 +122,9 @@ LevelData = {
 						]
 					}
 				],
+				triggers: [
+					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 108)']}
+				]
 			},
 			prompts:[
 				{//Prompt 0
@@ -178,6 +182,9 @@ LevelData = {
 							{handle:'temp', label:'T sys', pointCol:Col(50,50,255), flashCol:Col(50,50,255), data:{x: 'vol("ThirdWall")', y: 'temp("ThirdWall")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]
 					}	
+				],
+				triggers: [
+					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 109)']}
 				]
 			},
 			prompts:[

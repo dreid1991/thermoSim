@@ -103,6 +103,7 @@ LevelData = {
 					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Place the block on the piston', requiredFor: 'prompt0', checkOn:'conditions'},
 					{handle: 'freeze', expr: 'pExt("left") == 4', satisfyCmmds: ['curLevel.dragWeightsWeight1.disable()'], requiredFor: 'prompt0'},
 					{handle: 'trigger2', expr: 'fracDiff(pExt("left"), 2) < 0.15', message: 'Remove the block from the piston', requiredFor: 'prompt2', checkOn:'conditions'},
+					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 110)']}
 				],	
 			},
 			prompts: [
@@ -223,6 +224,7 @@ LevelData = {
 					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Place the blocks on the piston', requiredFor: 'prompt0', checkOn:'conditions'},
 					{handle: 'freeze', expr: 'pExt("left") == 4', satisfyCmmds: ['curLevel.dragWeightsWeight1.disable()'], requiredFor: 'prompt0'},
 					{handle: 'trigger2', expr: 'fracDiff(pExt("left"), 2) < 0.15', message: 'Remove the blocks from the piston', requiredFor: 'prompt2', checkOn:'conditions'},
+					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 111)']}
 				]	
 			},
 			prompts:[
@@ -340,7 +342,9 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Add mass to the system', requiredFor: 'prompt0', checkOn:'conditions'},
-					{handle: 'trigger2', expr: 'fracDiff(pExt("left"), 2) < 0.15', message: 'Remove mass from the system', requiredFor: 'prompt1', checkOn:'conditions'},
+					{handle: 'notRefreshed', expr: 'fracDiff(pExt("left"), 4) < 0.1', satisfyCmmds: ['curLevel.notRefreshed = true']},
+					{handle: 'trigger2', expr: 'fracDiff(pExt("left"), 2) < 0.15 && curLevel.notRefreshed', message: 'Remove mass from the system', requiredFor: 'prompt1', checkOn:'conditions'},
+					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 112)']}
 				],	
 			},
 			prompts:[

@@ -40,7 +40,8 @@ LevelData = {
 					
 				],
 				triggers: [
-					{handle: 'trigger1', expr: "dotManager.lists.uglier.length >= 360", message: 'Turn on the reaction and allow it to react.', checkOn: 'conditions', requiredFor: 'prompt0'}
+					{handle: 'trigger1', expr: "dotManager.lists.uglier.length >= 360", message: 'Turn on the reaction and allow it to react.', checkOn: 'conditions', requiredFor: 'prompt0'},
+					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 116)']}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}},
@@ -126,7 +127,8 @@ LevelData = {
 
 				],
 				triggers: [
-					{handle: 'trigger2', expr: "dotManager.lists.uglier.length >= 360", message: 'Turn on the reaction and allow it to react.', requiredFor: 'prompt0', checkOn: 'conditions'}
+					{handle: 'trigger2', expr: "dotManager.lists.uglier.length >= 360", message: 'Turn on the reaction and allow it to react.', requiredFor: 'prompt0', checkOn: 'conditions'},
+					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 117)']}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugly', tag: 'wally'}}
@@ -284,7 +286,8 @@ LevelData = {
 					},
 				],
 				triggers: [
-					{handle: 'trigger3', expr: "temp('wally') >= 998", message: 'Heat the system to 1000 K.', requiredFor: 'prompt0', checkOn: 'conditions'}
+					{handle: 'trigger3', expr: "temp('wally') >= 998", message: 'Heat the system to 1000 K.', requiredFor: 'prompt0', checkOn: 'conditions'},
+					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 118)']}
 				],
 				dataRecord: [
 					
@@ -376,7 +379,8 @@ LevelData = {
 				objs: [
 				],
 				triggers: [
-					{handle: 'trigger5', expr: "dotManager.lists.ugliest.length >= 362", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'}
+					{handle: 'trigger5', expr: "dotManager.lists.ugliest.length >= 362", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'},
+					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 119)']}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugliest', tag: 'wally'}}
@@ -495,7 +499,8 @@ LevelData = {
 				objs: [
 				],
 				triggers: [
-					{handle: 'trigger6', expr: "dotManager.lists.ugliest.length >= 320", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'}
+					{handle: 'trigger6', expr: "dotManager.lists.ugliest.length >= 320", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'},
+					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 120']}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugliest', tag: 'wally'}}
@@ -590,7 +595,8 @@ LevelData = {
 				objs: [
 				],
 				triggers: [
-					{handle: 'trigger7', expr: "collide.rxnHandlerNonEmergent.rxnIsEnabled('reacty5')",message: 'Enable the reaction', requiredFor: 'prompt0', checkOn:'conditions'}
+					{handle: 'trigger7', expr: "collide.rxnHandlerNonEmergent.rxnIsEnabled('reacty5')",message: 'Enable the reaction', requiredFor: 'prompt0', checkOn:'conditions'},
+					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 121)']}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugliest', tag: 'wally'}}

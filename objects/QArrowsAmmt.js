@@ -134,7 +134,7 @@ _.extend(QArrowsAmmt.prototype, objectFuncs, {
 			var w = wMin + (wMax-wMin)*percent;
 			arrow.size(V(l, w));
 			if (q>0) {
-				arrow.move(V(0, dimso.dx));
+				// arrow.move(V(0, dimso.dx));
 			}
 		}
 	},

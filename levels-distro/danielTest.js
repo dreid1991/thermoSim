@@ -48,6 +48,10 @@ LevelData = {
 						cleanUpWith: 'prompt1',
 						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
 					},
+					{
+						type: 'CompositionController',
+						attrs: {handle: 'warpSpeed', temp: 300, tempMin: 200, tempMax: 400, wallInfo: 'wally', inletDepth: 10, outletDepth: 15, width: 25, ptIdxs: [0, 1, 2, 3], flows: []}
+					}
 					// {
 						// type: 'Heater',
 						// attrs: {wallInfo: 'wally', max: 3, handle: 'other', offset: V(70, 0), sliderIdx: 0}
@@ -66,10 +70,10 @@ LevelData = {
 						// type: 'QArrowsAmmt',
 						// attrs: {handle: 'arrowy', wallInfo: 'wally', scale: 1}
 					// }
-					{
-						type: 'Piston',
-						attrs: {handle: 'pistony', wallInfo: 'wally', min: 2, init: 8, max: 9, makeSlider: true}
-					}
+					// {
+						// type: 'Piston',
+						// attrs: {handle: 'pistony', wallInfo: 'wally', min: 2, init: 8, max: 9, makeSlider: true}
+					// }
 
 						
 				],

@@ -62,7 +62,8 @@ LevelData = {
 					{handle: 'at250', expr: 'temp("wally1") >= 245', satisfyCmmds: ['curLevel.at250 = true']},
 					{handle: 'superCool', expr: 'temp("wally1") <= 140', satisfyCmmds: ['console.log("chilly in here")']},
 					{handle: 'coolingBelow250', expr: 'temp("wally1") <= 235 && curLevel.at250', satisfyCmmds: ['console.log("jyioijojo")']},
-					{handle: 'triggery2', expr: 'temp("wally1") <= 255', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'}
+					{handle: 'triggery2', expr: 'temp("wally1") <= 255', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
+					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 113)']}
 				]
 					// triggers: [
 							// {handle: 'heatcheck', expr: 'fracDiff(temp("wally1"), 250) < 0.05', message: 'Heat the system by 100 K', priorityUnsatisfied:1},
@@ -126,6 +127,7 @@ LevelData = {
 							{handle: 'superCool', expr: 'temp("wally2") <= 135', satisfyCmmds: ['console.log("chilly in here")']},
 							{handle: 'coolingBelow250', expr: 'temp("wally2") <= 235 && curLevel.isAt250', satisfyCmmds: ['console.log("jyioijojo")']},
 							{handle: 'triggery4', expr: 'temp("wally2") <= 262', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
+							{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 114)']}
 						],
 						cmmds: [
 							'curLevel.heaterHeaterWally1.disable()'
@@ -197,6 +199,7 @@ LevelData = {
 					triggers: [
 						{handle: 'triggery5', expr: 'temp("wally3") >= 238', message: 'Heat the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
 						{handle: 'triggery6', expr: 'temp("wally3") <= 262', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
+						{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 115)']}
 					]
 			},			
 			prompts: [					
