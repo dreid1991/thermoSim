@@ -59,6 +59,9 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'triggery1', expr: 'temp("wally1") >= 245', message: 'Heat the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
+					{handle: 'at250', expr: 'temp("wally1") >= 245', satisfyCmmds: ['curLevel.at250 = true']},
+					{handle: 'superCool', expr: 'temp("wally1") <= 140', satisfyCmmds: ['console.log("chilly in here")']},
+					{handle: 'coolingBelow250', expr: 'temp("wally1") <= 235 && curLevel.at250', satisfyCmmds: ['console.log("jyioijojo")']},
 					{handle: 'triggery2', expr: 'temp("wally1") <= 255', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'}
 				]
 					// triggers: [
@@ -119,6 +122,9 @@ LevelData = {
 							],
 						triggers: [
 							{handle: 'triggery3', expr: 'temp("wally2") >= 238', message: 'Heat the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
+							{handle: 'at250', expr: 'temp("wally2") >= 245 && turn > 25', satisfyCmmds: ['curLevel.isAt250 = true']},
+							{handle: 'superCool', expr: 'temp("wally2") <= 135', satisfyCmmds: ['console.log("chilly in here")']},
+							{handle: 'coolingBelow250', expr: 'temp("wally2") <= 235 && curLevel.isAt250', satisfyCmmds: ['console.log("jyioijojo")']},
 							{handle: 'triggery4', expr: 'temp("wally2") <= 262', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
 						],
 						cmmds: [
