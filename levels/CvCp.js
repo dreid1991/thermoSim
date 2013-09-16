@@ -60,8 +60,8 @@ LevelData = {
 				triggers: [
 					{handle: 'triggery1', expr: 'temp("wally1") >= 245', message: 'Heat the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
 					{handle: 'at250', expr: 'temp("wally1") >= 245', satisfyCmmds: ['curLevel.at250 = true']},
-					{handle: 'superCool', expr: 'temp("wally1") <= 140', satisfyCmmds: ['console.log("chilly in here")']},
-					{handle: 'coolingBelow250', expr: 'temp("wally1") <= 235 && curLevel.at250', satisfyCmmds: ['console.log("jyioijojo")']},
+					{handle: 'superCool', expr: 'temp("wally1") <= 140', satisfyCmmds: ['sendToCW("Constant volume system cooled below 150 K", 133)']},
+					{handle: 'coolingBelow250', expr: 'temp("wally1") <= 235 && curLevel.at250', satisfyCmmds: ['sendToCW("Constant volume system raised to 250 K but then cooled again", 134)']},
 					{handle: 'triggery2', expr: 'temp("wally1") <= 255', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
 					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 113)']}
 				]
@@ -124,8 +124,8 @@ LevelData = {
 						triggers: [
 							{handle: 'triggery3', expr: 'temp("wally2") >= 238', message: 'Heat the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
 							{handle: 'at250', expr: 'temp("wally2") >= 245 && turn > 25', satisfyCmmds: ['curLevel.isAt250 = true']},
-							{handle: 'superCool', expr: 'temp("wally2") <= 135', satisfyCmmds: ['console.log("chilly in here")']},
-							{handle: 'coolingBelow250', expr: 'temp("wally2") <= 235 && curLevel.isAt250', satisfyCmmds: ['console.log("jyioijojo")']},
+							{handle: 'superCool', expr: 'temp("wally2") <= 135', satisfyCmmds: ['sendToCW("Constant pressure system cooled below 150 K", 135)']},
+							{handle: 'coolingBelow250', expr: 'temp("wally2") <= 235 && curLevel.isAt250', satisfyCmmds: ['sendToCW("Constant pressure system raised to 250 K but then cooled again", 136)']},
 							{handle: 'triggery4', expr: 'temp("wally2") <= 262', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
 							{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 114)']}
 						],
