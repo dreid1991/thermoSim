@@ -109,6 +109,7 @@ LevelData = {
 					// {label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
 				],
 				triggers: [
+					{handle: 'resetterTest', expr: 'wasReset == 1', satisfyCmmds: ['console.log("shenanigans!!!!!!!!!!!")']},
 					{handle: 'trigger1', expr: 'tempSmooth("wallo") < 447', message: 'Cool the liquid', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
 					{handle: 'freeze1', expr: 'tempSmooth("wallo") <= 436', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(436)'], requiredFor: 'prompt2'},
 					{handle: 'trigger2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length >= 225 || !curLevel.heaterHeater1.enabled', message: 'Condense the vapor', checkOn: 'conditions', requiredFor: 'prompt4'},

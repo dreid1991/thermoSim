@@ -341,7 +341,8 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Add mass to the system', requiredFor: 'prompt0', checkOn:'conditions'},
-					{handle: 'trigger2', expr: 'fracDiff(pExt("left"), 2) < 0.15', message: 'Remove mass from the system', requiredFor: 'prompt1', checkOn:'conditions'},
+					{handle: 'notRefreshed', expr: 'fracDiff(pExt("left"), 4) < 0.1', satisfyCmmds: ['curLevel.notRefreshed = true']},
+					{handle: 'trigger2', expr: 'fracDiff(pExt("left"), 2) < 0.15 && curLevel.notRefreshed', message: 'Remove mass from the system', requiredFor: 'prompt1', checkOn:'conditions'},
 				],	
 			},
 			prompts:[
