@@ -103,7 +103,7 @@ LevelData = {
 					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Place the block on the piston', requiredFor: 'prompt0', checkOn:'conditions'},
 					{handle: 'freeze', expr: 'pExt("left") == 4', satisfyCmmds: ['curLevel.dragWeightsWeight1.disable()'], requiredFor: 'prompt0'},
 					{handle: 'trigger2', expr: 'fracDiff(pExt("left"), 2) < 0.15', message: 'Remove the block from the piston', requiredFor: 'prompt2', checkOn:'conditions'},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 110)']}
+					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 110)', 'console.log("shenanigans!")']}
 				],	
 			},
 			prompts: [

@@ -89,10 +89,10 @@ $(function(){
 	sceneNavigator = new SceneNavigator();
 	interpreter = new ExpressionInterpreter();
 	$('#resetExp').click(function(){sceneNavigator.refresh(); wasReset = true;});
-	$('#toSim').click(function(){sceneNavigator.nextPrompt(); wasReset = false;});
-	$('#toLastStep').click(function(){sceneNavigator.prevPrompt(); wasReset = false;});
-	$('#previous').click(function(){sceneNavigator.prevPrompt(); wasReset = false;});
-	$('#next').click(function(){sceneNavigator.nextPrompt(); wasReset = false;});	
+	$('#toSim').click(function(){sceneNavigator.nextPrompt()});
+	$('#toLastStep').click(function(){sceneNavigator.prevPrompt()});
+	$('#previous').click(function(){sceneNavigator.prevPrompt()});
+	$('#next').click(function(){sceneNavigator.nextPrompt()});	
 	window.dashRunId = 0;
 	timeline = new Timeline();
 	canvasHeight = 450;
