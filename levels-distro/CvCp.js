@@ -63,7 +63,7 @@ LevelData = {
 					{handle: 'superCool', expr: 'temp("wally1") <= 140', satisfyCmmds: ['sendToCW("Constant volume system cooled below 150 K", 133)']},
 					{handle: 'coolingBelow250', expr: 'temp("wally1") <= 235 && curLevel.at250', satisfyCmmds: ['sendToCW("Constant volume system raised to 250 K but then cooled again", 134)']},
 					{handle: 'triggery2', expr: 'temp("wally1") <= 255', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
-					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 113)']}
+					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 113)']}
 				]
 					// triggers: [
 							// {handle: 'heatcheck', expr: 'fracDiff(temp("wally1"), 250) < 0.05', message: 'Heat the system by 100 K', priorityUnsatisfied:1},
@@ -127,7 +127,7 @@ LevelData = {
 							{handle: 'superCool', expr: 'temp("wally2") <= 135', satisfyCmmds: ['sendToCW("Constant pressure system cooled below 150 K", 135)']},
 							{handle: 'coolingBelow250', expr: 'temp("wally2") <= 235 && curLevel.isAt250', satisfyCmmds: ['sendToCW("Constant pressure system raised to 250 K but then cooled again", 136)']},
 							{handle: 'triggery4', expr: 'temp("wally2") <= 262', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
-							{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 114)']}
+							{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 114)']}
 						],
 						cmmds: [
 							'curLevel.heaterHeaterWally1.disable()'
@@ -199,7 +199,7 @@ LevelData = {
 					triggers: [
 						{handle: 'triggery5', expr: 'temp("wally3") >= 238', message: 'Heat the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
 						{handle: 'triggery6', expr: 'temp("wally3") <= 262', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
-						{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 115)']}
+						{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 115)']}
 					]
 			},			
 			prompts: [					

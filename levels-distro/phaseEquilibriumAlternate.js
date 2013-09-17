@@ -117,7 +117,7 @@ LevelData = {
 					{handle: 'freeze3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 550', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'curLevel.liquidWater.disablePhaseChange()'], requiredFor: 'prompt8'},
 					{handle: 'trigger4', expr: 'curLevel.liquidWater.temp <= 390', message: 'Heat the vapor', requiredFor: 'prompt11', checkOn: 'conditions'},
 					{handle: 'freeze4', expr: 'curLevel.liquidWater.temp <= 388 && curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 550', requiredFor: 'prompt11', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(388)']},
-					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 129)']}
+					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 129)']}
 					
 				]
 			},
@@ -428,7 +428,7 @@ LevelData = {
 					{handle: 'triggery2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['curLevel.liquidWater.disablePhaseChange()'], priority: 1},
 					{handle: 'freeze1', expr: 'pExt("wallo") <= 1.70', satisfyCmmds: ['curLevel.sandboxMrSandMan.removeMassStop()', 'buttonManager.hideButton("mrSandManSandButtons", "add")', 'buttonManager.hideButton("mrSandManSandButtons", "remove")'], priority: 1},
 					{handle: 'freeze2', expr: 'pExt("wallo") <= 1.60', satisfyCmmds: ['curLevel.sandboxMrSandMan.removeMassStop()', 'buttonManager.hideButton("mrSandManSandButtons", "add")', 'buttonManager.hideButton("mrSandManSandButtons", "remove")'], priority: 1},
-					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 130)']}
+					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 130)']}
 				]
 			},
 			prompts: [

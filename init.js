@@ -69,6 +69,7 @@ $(function(){
 	ACTUALN = 6.022e23;
 	g = 1.75;
 	gInternal = .01;
+	wasReset = false;
 	updateInterval = 30;
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);

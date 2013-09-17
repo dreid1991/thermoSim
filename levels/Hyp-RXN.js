@@ -83,7 +83,7 @@ LevelData = {
 					}
 				],
 				triggers: [
-					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 125)']}
+					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 125)']}
 				]
 			},
 			prompts: [
@@ -196,7 +196,7 @@ LevelData = {
 					}
 				],
 				triggers: [
-					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 126)']}
+					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 126)']}
 				],
 				graphs: [
 							{type: 'Scatter', handle: 'EnthalpyFracVsTemp', xLabel: "Extent of Reaction", yLabel: "Enthalpy (kJ)", axesInit:{y:{min:-12, step:3},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 6}, axesFixed:{x: true, y: true},
@@ -336,7 +336,7 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'checkReaction1', expr: 'frac("thirdWall", {tag:"thirdWall", spcName:"spc2"})>0.52', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1},
-					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 127)']}
+					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 127)']}
 				],
 				graphs: [
 							{type: 'Scatter', handle: 'timevsextent', xLabel: "Time (s)", yLabel: "Extent of Reaction", axesInit:{y:{min:0, step:0.2},x:{min:0, step:5}}, numGridLines: {x:6, y: 6}, axesFixed:{y: true},
@@ -401,7 +401,7 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'checkReaction2', expr: 'frac("fourthWall", {tag:"fourthWall", spcName:"spc2"})>0.52', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1},
-					{handle: 'refreshCheck', expr: 'wasReset', satifsyCmmds: ['sendToCW("Section was refreshed", 128)']}					
+					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 128)']}					
 				],
 				graphs: [
 							{type: 'Scatter', handle: 'extentvsheat', xLabel: "Extent of Reaction", yLabel: "Heat (kJ)", axesInit:{y:{min:-3, step:1},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 6}, axesFixed:{x: true},

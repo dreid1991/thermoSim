@@ -41,9 +41,9 @@ QuizRenderer.prototype = {
 				this.renderQuestion(quiz.questions[i], content);
 			}
 			if (questions[0] && questions[0].type == 'setVals') {
-				this.appendButtons(footer, function(){ sceneNavigator.prevPrompt()}, function(){ sceneNavigator.refresh()}, 'Back', 'Set values');
+				this.appendButtons(footer, function(){ sceneNavigator.prevPrompt(); wasReset = false;}, function(){ sceneNavigator.refresh(); wasReset = false;}, 'Back', 'Set values');
 			} else {
-				this.appendButtons(footer, function(){ sceneNavigator.prevPrompt()}, function(){ sceneNavigator.nextPrompt()}, 'Back', 'Submit');
+				this.appendButtons(footer, function(){ sceneNavigator.prevPrompt(); wasReset = false;}, function(){ sceneNavigator.nextPrompt();  wasReset = false;}, 'Back', 'Submit');
 			}
 			//always make submit button because we're making mult choice be click choice, then submit.  Deals with multiple questions better.
 			return quiz;
