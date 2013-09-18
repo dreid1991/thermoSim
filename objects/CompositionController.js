@@ -21,7 +21,7 @@ function CompositionController(attrs) {
 	this.inletDepth = attrs.inletDepth;
 	this.outletDepth = attrs.outletDepth;
 	this.flowWidth = defaultTo(30, attrs.width);
-	this.flowSpacing = 4;
+	this.flowSpacing = 12;
 	this.wallInfo = attrs.wallInfo;
 	this.wall = walls[this.wallInfo];
 	this.inlets = [];
@@ -56,20 +56,20 @@ _.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
 	tileWallSegment: function(wall, segmentIdx, inletDepth, outletDepth, flowWidth, flowSpacing, attrFlows, temp, tempMin, tempMax, inlets, outlets) {
 		var distInit = wall[segmentIdx].distTo(wall[segmentIdx + 1]);
 		var numHoles = Math.floor((distInit - flowSpacing)/ (flowWidth + flowSpacing))//a hole being an inlet or an outlet, I guess.  Flows is sort of used
-		var edgeSpacing = (distInit - numHoles * flowWidth + (numHoles - 1) * flowSpacing) / 2;
+		var edgeSpacing = (distInit - numHoles * flowWidth - (numHoles - 1) * flowSpacing) / 2;
 		//wall is shinking as I add more, so need to be tricky about calculating fracOffset
 		//also, fracOffset references the center of the flow
 		for (var i=0; i<numHoles; i++) {
 			//need to put in terms for inlet/outlet attrs
-			flowCenterAlongInit = distInit - edgeSpacing - i * (flowWidth + flowSpacing) - flowWidth * .5;
+			var flowCenterAlongInit = distInit - edgeSpacing - i * (flowWidth + flowSpacing) - flowWidth * .5;
 			var distCur = wall[segmentIdx].distTo(wall[segmentIdx + 1]);
 			var fracOffset = flowCenterAlongInit / distCur;
 			var handle = this.handle + 'Wall' + wall.handle + 'Segment' + segmentIdx + 'Flow' + i;
 			
 			if (i % 2) 
-				this.inlets.push(new Inlet({handle: handle, wallInfo: wall.handle, ptIdxs: [segmentIdx, segmentIdx + 1], addArrows: false, temp: temp, tempMin: tempMin, tempMax: tempMax, flows: attrFlows, width: flowWidth, depth: inletDepth}));
+				this.inlets.push(new Inlet({handle: handle, wallInfo: wall.handle, ptIdxs: [segmentIdx, segmentIdx + 1], addArrows: false, temp: temp, tempMin: tempMin, tempMax: tempMax, flows: attrFlows, width: flowWidth, depth: inletDepth, fracOffset: fracOffset}));
 			else 
-				this.outlets.push(new Outlet({handle: handle, wallInfo: wall.handle, ptIdxs: [segmentIdx, segmentIdx + 1], width: flowWidth, depth: outletDepth}));
+				this.outlets.push(new Outlet({handle: handle, wallInfo: wall.handle, ptIdxs: [segmentIdx, segmentIdx + 1], width: flowWidth, depth: outletDepth, fracOffset: fracOffset}));
 			
 		}
 	},
