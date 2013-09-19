@@ -28,7 +28,7 @@ LevelData = {
 							{
 								type: 'multChoice',
 								CWQuestionId: 1,
-								questionText: '<p>If we compress the adiabatic system pictured to the right at a constant external pressure from state 1 to state 2, which of the following equations best represents the work done?</p>',
+								questionText: '<p>If we compress the adiabatic ideal gas system pictured to the right at a constant external pressure from state 1 to state 2, which of the following equations best represents the work done?</p>',
 								options:[
 									{text:"## W = -\\int_{V_{1}}^{V_{2}}P_{sys}dV ##", correct: false, message:"That's not correct", CWAnswerId: 1},
 									{text:"## W = - V\\Delta P_{ext} ##", correct: false, message:"That's not correct", CWAnswerId: 2},
