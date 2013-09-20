@@ -85,7 +85,7 @@ LevelData = {
 							{handle: 'externalPressure', label: 'P Ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
 							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
 							{handle: 'internalPressure', label: 'P Int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
-							data: {x: 'vol("left")', y: 'pInt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
+							data: {x: 'vol("left")', y: 'pInt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5, showPts: false}
 						]
 					}
 				],	
@@ -206,7 +206,7 @@ LevelData = {
 							{handle: 'externalPressure', label: 'P Ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
 							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
 							{handle: 'internalPressure', label: 'P Int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
-							data: {x: 'vol("left")', y: 'pInt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
+							data: {x: 'vol("left")', y: 'pInt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5, showPts: false}
 						]
 					}
 				],	
@@ -326,7 +326,7 @@ LevelData = {
 							{handle: 'externalPressure', label: 'P Ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
 							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
 							{handle: 'internalPressure', label: 'P Int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
-							data: {x: 'vol("left")', y: 'pInt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
+							data: {x: 'vol("left")', y: 'pInt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5, showPts: false}
 						]
 					}
 				],	

@@ -52,7 +52,7 @@ LevelData = {
 				triggers: [
 					{handle: 'trigger1', expr: 'fracDiff(temp("firstWall"), 450) < 0.05', message: 'Heat the system to 450 K', checkOn: 'conditions', requiredFor: 'prompt0'},
 					{handle: 'freeze1', expr: 'temp("firstWall") >= 450 && dotManager.lists.ALLDOTS.length == 1000', satisfyCmmds: ['curLevel.heaterHeaterOne.disable()', 'walls.firstWall.isothermalInit(450)'], requiredFor: 'prompt0'},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 122)']}
+					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 122)'], requiredFor: false}
 				]
 			},
 			prompts:[ 
@@ -173,7 +173,7 @@ LevelData = {
 					{handle: 'path2', expr: 'fracDiff(temp("secondWall"), 400) <= 0.08', message: 'What should the temperature be at the end of the third step?', checkOn: 'conditions', requiredFor: 'prompt2'},
 					// {handle: 'pathFreeze0', expr: 'curLevel.liquidLiq1.temp >= 450', satisfyCmmds: ['curLevel.heaterHeaterOne.disable()', 'buttonManager.clickButton("Heat", "iso")', 'walls.secondWall.isothermalInit(450)'], requiredFor: 'prompt0'},
 					{handle: 'pathFreeze1', expr: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['buttonManager.clickButton("Phase", "disablePhase")', 'buttonManager.hideButton("Phase", "enablePhase")'], requiredFor: 'prompt1'},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 123)']}
+					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 123)'], requiredFor: false}
 				],
 				graphs: [
 					{
@@ -348,7 +348,7 @@ LevelData = {
 				triggers:[
 					{handle: 'artichoke', expr: 'temp("thirdWall") >= 440 && curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length == 0', message: 'Heat the system to 450 K', checkOn: 'conditions', requiredFor: 'prompt0'},
 					{handle: 'eggplant',  expr: 'temp("thirdWall") >= 450 && curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['walls.thirdWall.isothermalInit(450)', 'curLevel.heaterHeaterOne.disable()'], requiredFor: 'prompt0'},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 124)']}
+					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 124)'], requiredFor: false}
 				]
 			},
 			prompts: [
