@@ -110,11 +110,11 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'trigger1', expr: 'tempSmooth("wallo") < 447', message: 'Cool the liquid', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
-					{handle: 'freeze1', expr: 'tempSmooth("wallo") <= 436', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(436)'], requiredFor: 'prompt2'},
+					{handle: 'freeze1', expr: 'tempSmooth("wallo") <= 436', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(436)'], requiredFor: false},
 					{handle: 'trigger2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length >= 225 || !curLevel.heaterHeater1.enabled', message: 'Condense the vapor', checkOn: 'conditions', requiredFor: 'prompt4'},
-					{handle: 'freeze2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length >= 225', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'curLevel.liquidWater.disablePhaseChange()'], requiredFor: 'prompt4'},
+					{handle: 'freeze2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length >= 225', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'curLevel.liquidWater.disablePhaseChange()'], requiredFor: false},
 					{handle: 'trigger3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length > 540', message: 'Fully condense the vapor', checkOn: 'conditions', requiredFor: 'prompt8'},
-					{handle: 'freeze3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 550', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'curLevel.liquidWater.disablePhaseChange()'], requiredFor: 'prompt8'},
+					{handle: 'freeze3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 550', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'curLevel.liquidWater.disablePhaseChange()'], requiredFor: false},
 					{handle: 'trigger4', expr: 'curLevel.liquidWater.temp <= 390', message: 'Heat the vapor', requiredFor: 'prompt11', checkOn: 'conditions'},
 					{handle: 'freeze4', expr: 'curLevel.liquidWater.temp <= 388 && curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 550', requiredFor: 'prompt11', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(388)']},
 					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 129)'], requiredFor: false}
@@ -425,9 +425,9 @@ LevelData = {
 				triggers: [
 					{handle: 'triggery1', expr: 'pExt("wallo") <= 1.74', message: 'Remove sand from the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
 					{handle: 'triggery2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length < 30', message: 'Vaporize the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
-					{handle: 'triggery2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['curLevel.liquidWater.disablePhaseChange()'], priority: 1},
-					{handle: 'freeze1', expr: 'pExt("wallo") <= 1.70', satisfyCmmds: ['curLevel.sandboxMrSandMan.removeMassStop()', 'buttonManager.hideButton("mrSandManSandButtons", "add")', 'buttonManager.hideButton("mrSandManSandButtons", "remove")'], priority: 1},
-					{handle: 'freeze2', expr: 'pExt("wallo") <= 1.60', satisfyCmmds: ['curLevel.sandboxMrSandMan.removeMassStop()', 'buttonManager.hideButton("mrSandManSandButtons", "add")', 'buttonManager.hideButton("mrSandManSandButtons", "remove")'], priority: 1},
+					{handle: 'triggery2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['curLevel.liquidWater.disablePhaseChange()'], priority: 1, requiredFor: false},
+					{handle: 'freeze1', expr: 'pExt("wallo") <= 1.70', satisfyCmmds: ['curLevel.sandboxMrSandMan.removeMassStop()', 'buttonManager.hideButton("mrSandManSandButtons", "add")', 'buttonManager.hideButton("mrSandManSandButtons", "remove")'], priority: 1, requiredFor: false},
+					{handle: 'freeze2', expr: 'pExt("wallo") <= 1.60', satisfyCmmds: ['curLevel.sandboxMrSandMan.removeMassStop()', 'buttonManager.hideButton("mrSandManSandButtons", "add")', 'buttonManager.hideButton("mrSandManSandButtons", "remove")'], priority: 1, requiredFor: false},
 					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 130)'], requiredFor: false}
 				]
 			},
