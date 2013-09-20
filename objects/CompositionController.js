@@ -39,6 +39,7 @@ function CompositionController(attrs) {
 		this.tempSliderTitle = attrs.tempSliderTitle || 'Inlet temp';
 		//this.tempSlider = this.addTempSlider(attrs.tempMin, attrs.tempMax, attrs.temp, attrs.tempSliderTitle || 'Inlet temp'); figure out later
 	}
+	this.attrSliders = attrs.sliders;
 	this.attrFlows = attrs.flows;
 	this.setupStd();
 	this.init();	
@@ -59,6 +60,7 @@ _.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
 		this.tileWallSegments(this.wall, this.segmentIdxs, this.inletDepth, this.outletDepth, this.flowWidth, this.flowSpacing, this.attrFlows, this.temp, this.tempMin, this.tempMax, this.inlets, this.outlets);	
 		this.scaleInletFlows(this.inlets);
 		if (this.willMakeTempSlider) this.tempSlider = this.addTempSlider(this.tempSliderTitle); //making temp slider be state-y so you can change bounds easily
+		this.flowGroupSliders = this.addFlowSliders(this.attrSliders, this.getAllFlows(this.inlets));
 		//this.addSliders(this.inlets, this.makeTempSlider, 
 	},
 	addTempSlider: function(title) {
@@ -68,6 +70,7 @@ _.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
 		undefined
 		)
 	},
+
 	parseTempSlider: function(event, ui) {
 		for (var i=0; i<this.inlets.length; i++) {
 			this.inlets[i].parseTempSlider(event, ui);
@@ -107,9 +110,17 @@ _.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
 			
 		}
 	},
+	getAllFlows: function(inlets) {
+		var flows = [];
+		for (var i=0; i<inlets.length; i++) {
+			flows = flows.concat(inlets[i].flows);
+		}
+		return flows;
+	},
 	remove: function() {
 		for (var i=0; i<this.inlets.length; i++) this.inlets[i].remove();
 		for (var i=0; i<this.outlets.length; i++) this.outlets[i].remove();
+		if (this.tempSlider) this.tempSlider.remove();
 		this.inlets = [];
 		this.outlets = [];
 	}	

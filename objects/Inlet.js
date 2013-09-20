@@ -70,26 +70,6 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 	parseSlider: function(event, ui){
 		this.fracOpen = ui.value / 100;
 	},
-	addFlowSliders: function(attrSliders, flows) {
-		var sliders = [];
-		for (var i=0; i<attrSliders.length; i++) {
-			var attrSlider = attrSliders[i];
-			var sliderFlowHandles = attrSlider.flowHandles;
-			var sliderFlows = this.pluckFlows(flows, sliderFlowHandles);
-			var handle = attrSlider.handle;
-			var title = attrSlider.title;
-			var fracOpen = attrSlider.fracOpen;
-			var sliderIdx = attrSlider.sliderIdx;
-			var sliderGroup = new Inlet.FlowGroupSlider(title, handle, sliderFlows);
-			var slider = sliderManager.addSlider(title, this.handle + 'Slider' + handle.toCapitalCamelCase(),  {value: fracOpen*100},
-				[{eventType:'slide', obj: sliderGroup, func: sliderGroup.parseSlider}],
-			undefined
-			)
-			sliderGroup.slider = slider;
-			sliders.push(sliderGroup);
-		}
-		return sliders;
-	},
 	addTempSlider: function(min, max, init, title) {
 		if (typeof min != 'number' || typeof max != 'number') console.log('Making heater ' + this.handle + ' temp slider without tempMin or tempMax');
 		
@@ -144,14 +124,7 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 		}
 	},
 
-	pluckFlows: function(flows, flowHandles) {
-		var plucked = [];
-		for (var i=0; i<flowHandles.length; i++) {
-			var flow = _.find(flows, function(flow) {return flow.handle == flowHandles[i]});
-			flow ? plucked.push(flow) : console.log('Could not find flow ' + flowHandles[i] + ' for inlet slider');
-		}
-		return plucked;
-	},
+
 	getSlider: function(handle) {
 		for (var i=0; i<this.flowGroupSliders.length; i++) {
 			if (this.flowGroupSliders[i].handle == handle) return this.flowGroupSliders[i];
