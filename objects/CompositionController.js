@@ -60,8 +60,8 @@ _.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
 		this.tileWallSegments(this.wall, this.segmentIdxs, this.inletDepth, this.outletDepth, this.flowWidth, this.flowSpacing, this.attrFlows, this.temp, this.tempMin, this.tempMax, this.inlets, this.outlets);	
 		this.scaleInletFlows(this.inlets);
 		if (this.willMakeTempSlider) this.tempSlider = this.addTempSlider(this.tempSliderTitle); //making temp slider be state-y so you can change bounds easily
+		//giving the flows from all the inlets to the sliders.  This way sliders for comp controller and normal inlet work the same way
 		this.flowGroupSliders = this.addFlowSliders(this.attrSliders, this.getAllFlows(this.inlets));
-		//this.addSliders(this.inlets, this.makeTempSlider, 
 	},
 	addTempSlider: function(title) {
 		if (typeof this.tempMin != 'number' || typeof this.tempMax != 'number') console.log('Making heater ' + this.handle + ' temp slider without tempMin or tempMax');
@@ -121,6 +121,7 @@ _.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
 		for (var i=0; i<this.inlets.length; i++) this.inlets[i].remove();
 		for (var i=0; i<this.outlets.length; i++) this.outlets[i].remove();
 		if (this.tempSlider) this.tempSlider.remove();
+		for (var i=0; i<this.flowGroupSliders.length; i++) this.flowGroupSliders[i].slider.remove();
 		this.inlets = [];
 		this.outlets = [];
 	}	

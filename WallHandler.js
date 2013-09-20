@@ -263,8 +263,7 @@ WallMethods.main = {
 		
 	},
 	idxByInfo: function(info){
-		var wallIdx;
-		if (parseFloat(info)!=info) {
+		if (typeof info != 'number') {
 			return this.idxByHandle(info)
 		} else {
 			return info;
