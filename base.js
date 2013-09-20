@@ -143,6 +143,15 @@ function round(val, dec){
 	return Math.round(val*pow)/pow;
 }
 
+function averageLast(list, n) {
+	var n = Math.min(list.length, n);
+	var sum = 0;
+	for (var i=list.length - n; i<list.length; i++) {
+		sum += list[i];
+	}
+	return sum / n;
+}
+
 function unique(name, obj){
 	if (typeof(obj)=="function"){
 		if (!obj(name)) {
@@ -166,6 +175,7 @@ function unique(name, obj){
 		}
 	}
 }
+
 
 function addListener(object, typeName, funcName, func, obj) {
 	object[typeName + 'Listeners'][funcName] = new Listener(func, obj);

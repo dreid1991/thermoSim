@@ -39,6 +39,7 @@ function CompositionController(attrs) {
 		this.tempSliderTitle = attrs.tempSliderTitle || 'Inlet temp';
 		//this.tempSlider = this.addTempSlider(attrs.tempMin, attrs.tempMax, attrs.temp, attrs.tempSliderTitle || 'Inlet temp'); figure out later
 	}
+	this.pSetPt = attrs.pressure;
 	this.attrSliders = attrs.sliders;
 	this.attrFlows = attrs.flows;
 	this.setupStd();
@@ -46,22 +47,39 @@ function CompositionController(attrs) {
 }
 
 _.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
-	capPtIdxs: function(ptIdxs, wall) {
-		var maxPtIdx = wall.length - 2;
-		for (var i=0; i<ptIdxs.length; i++) {
-			if (ptIdxs[i] > maxPtIdx) {
-				ptIdxs.splice(i, 1);
-				i--;
-			}
-		}
-		return ptIdxs;
-	},
+
 	init: function() {
 		this.tileWallSegments(this.wall, this.segmentIdxs, this.inletDepth, this.outletDepth, this.flowWidth, this.flowSpacing, this.attrFlows, this.temp, this.tempMin, this.tempMax, this.inlets, this.outlets);	
 		this.scaleInletFlows(this.inlets);
 		if (this.willMakeTempSlider) this.tempSlider = this.addTempSlider(this.tempSliderTitle); //making temp slider be state-y so you can change bounds easily
 		//giving the flows from all the inlets to the sliders.  This way sliders for comp controller and normal inlet work the same way
-		this.flowGroupSliders = this.addFlowSliders(this.attrSliders, this.getAllFlows(this.inlets));
+		var allFlows = this.getAllFlows(this.inlets);
+		this.flowGroupSliders = this.addFlowSliders(this.attrSliders, allFlows);
+		if (this.pSetPt) {
+			this.initPressureControl(this.wall, allFlows);
+		}
+	},
+	initPressureControl: function(wall, allFlows) {
+		//doing pressure control without using pFloor of outlets.  Might settle into very low flow rates if using pFloor, and that is not what I want
+		var listenerHandle = this.handle + 'PressureControl';
+		var tempList = this.wall.getDataSrc('temp');
+		var dots = dotManager.get({tag: wall.handle});
+		var volList = this.wall.getDataSrc('vol');
+		var pList = this.wall.getDataSrc('pInt');
+		var timeConst = 5; //not strictly speaking a time constant, but it will scale the time it takes to respond
+		addListener(curLevel, 'data', listenerHandle, function() {
+			//pressure takes longer to respond, going to use NRT/V instead
+			var pressure = averageLast(pList, 30);
+			var vol = volList[volList.length - 1];
+			var temp = tempList[tempList.length - 1];
+			var pressure = 1e-5 * (dots.length / N * R * temp) / (vol / 1000);
+			var setPt = this.pSetPt;
+			var correctBy = (setPt / pressure + timeConst) / (1 + timeConst);
+			for (var i=0; i<allFlows.length; i++) {
+				allFlows[i].scalar *= correctBy;
+			}
+		}, this)
+		return listenerHandle
 	},
 	addTempSlider: function(title) {
 		if (typeof this.tempMin != 'number' || typeof this.tempMax != 'number') console.log('Making heater ' + this.handle + ' temp slider without tempMin or tempMax');
@@ -109,6 +127,16 @@ _.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
 				this.outlets.push(new Outlet({handle: handle, wallInfo: wall.handle, ptIdxs: [segmentIdx, segmentIdx + 1], width: flowWidth, depth: outletDepth, fracOffset: fracOffset}));
 			
 		}
+	},
+	capPtIdxs: function(ptIdxs, wall) {
+		var maxPtIdx = wall.length - 2;
+		for (var i=0; i<ptIdxs.length; i++) {
+			if (ptIdxs[i] > maxPtIdx) {
+				ptIdxs.splice(i, 1);
+				i--;
+			}
+		}
+		return ptIdxs;
 	},
 	getAllFlows: function(inlets) {
 		var flows = [];
