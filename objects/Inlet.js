@@ -100,6 +100,11 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 		)
 		
 	},
+	modifyFlows: function(cb, obj) {
+		for (var i=0; i<this.flows.length; i++) {
+			cb.apply(obj, [this.flows[i]]);
+		}
+	},
 	processFlows: function(flows) {
 		var procdFlows = [];
 		for (var flowIdx=0; flowIdx<flows.length; flowIdx++) {
@@ -138,12 +143,7 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 			this.tempSlider.slider.slider('value', 100 * this.tempToFrac(this.tempMin, this.tempMax, temp));
 		}
 	},
-	fracToTemp: function(min, max, frac) {
-		return min + (max - min) * frac;
-	},
-	tempToFrac: function(min, max, temp) {
-		return (temp - min) / (max - min);
-	},
+
 	pluckFlows: function(flows, flowHandles) {
 		var plucked = [];
 		for (var i=0; i<flowHandles.length; i++) {

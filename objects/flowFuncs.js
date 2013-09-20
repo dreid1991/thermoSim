@@ -37,6 +37,12 @@ var flowFuncs = {
 		var UV = this.wall.getUV(aIdx);
 		this.pts = this.getPts(a, b, UV, this.perp, this.fracOffset);
 	},
+	fracToTemp: function(min, max, frac) {
+		return min + (max - min) * frac;
+	},
+	tempToFrac: function(min, max, temp) {
+		return (temp - min) / (max - min);
+	},
 	deleteDuplicatePts: function(pts) {
 		for (var i=0; i<pts.length-1; i++) {
 			for (var j=i+1; j<pts.length; j++) {

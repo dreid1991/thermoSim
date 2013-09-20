@@ -21,32 +21,66 @@ function CompositionController(attrs) {
 	this.inletDepth = attrs.inletDepth;
 	this.outletDepth = attrs.outletDepth;
 	this.flowWidth = defaultTo(30, attrs.width);
-	this.flowSpacing = 12;
+	this.flowSpacing = 18;
 	this.wallInfo = attrs.wallInfo;
 	this.wall = walls[this.wallInfo];
 	this.inlets = [];
 	this.outlets = [];
-	if (attrs.makeTempSlider) {
 	
-	}
-	this.temp = attrs.inletTemp; 
+	this.temp = attrs.temp; 
 	if (!this.temp) console.log('No/zero temperature sent to inlet ' + this.handle);
-	this.segmentIdxs = _.sortBy(attrs.ptIdxs, function(a) {return a}); //list of all wall segments to cover, including last one
-	var attrFlows = attrs.flows;
+	this.segmentIdxs = this.capPtIdxs(_.sortBy(attrs.ptIdxs, function(a) {return a}), this.wall); //list of all wall segments to cover, including last one
 	//this.flowGroupSliders = this.addFlowSliders(attrs.sliders || [], this.flows); figure this out later
 	this.tempSlider = undefined;
 	this.tempMin = attrs.tempMin;
 	this.tempMax = attrs.tempMax;
 	if (attrs.makeTempSlider) {
+		this.willMakeTempSlider = true;
+		this.tempSliderTitle = attrs.tempSliderTitle || 'Inlet temp';
 		//this.tempSlider = this.addTempSlider(attrs.tempMin, attrs.tempMax, attrs.temp, attrs.tempSliderTitle || 'Inlet temp'); figure out later
 	}
-	
-	this.tileWallSegments(this.wall, this.segmentIdxs, this.inletDepth, this.outletDepth, this.flowWidth, this.flowSpacing, attrFlows, this.temp, this.tempMin, this.tempMax, this.inlets, this.outlets);
+	this.attrFlows = attrs.flows;
 	this.setupStd();
 	this.init();	
 }
 
 _.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
+	capPtIdxs: function(ptIdxs, wall) {
+		var maxPtIdx = wall.length - 2;
+		for (var i=0; i<ptIdxs.length; i++) {
+			if (ptIdxs[i] > maxPtIdx) {
+				ptIdxs.splice(i, 1);
+				i--;
+			}
+		}
+		return ptIdxs;
+	},
+	init: function() {
+		this.tileWallSegments(this.wall, this.segmentIdxs, this.inletDepth, this.outletDepth, this.flowWidth, this.flowSpacing, this.attrFlows, this.temp, this.tempMin, this.tempMax, this.inlets, this.outlets);	
+		this.scaleInletFlows(this.inlets);
+		if (this.willMakeTempSlider) this.tempSlider = this.addTempSlider(this.tempSliderTitle); //making temp slider be state-y so you can change bounds easily
+		//this.addSliders(this.inlets, this.makeTempSlider, 
+	},
+	addTempSlider: function(title) {
+		if (typeof this.tempMin != 'number' || typeof this.tempMax != 'number') console.log('Making heater ' + this.handle + ' temp slider without tempMin or tempMax');
+		return sliderManager.addSlider(title, this.handle + 'TempSlider', {value: 100 * this.tempToFrac(this.tempMin, this.tempMax, this.temp)},
+			[{eventType: 'slide', obj: this, func: this.parseTempSlider}],
+		undefined
+		)
+	},
+	parseTempSlider: function(event, ui) {
+		for (var i=0; i<this.inlets.length; i++) {
+			this.inlets[i].parseTempSlider(event, ui);
+		}
+	},
+	scaleInletFlows: function(inlets) {
+		var scaleFunc = function(flow) {
+			flow.nDotMax /= inlets.length;
+		}
+		for (var i=0; i<inlets.length; i++) {
+			inlets[i].modifyFlows(scaleFunc, undefined);
+		}
+	},
 	tileWallSegments: function(wall, segmentIdxs, inletDepth, outletDepth, flowWidth, flowSpacing, attrFlows, temp, tempMin, tempMax, inlets, outlets) {
 		//so ORBVIOUSLY I should start at the end and work to the front
 		for (var i=segmentIdxs.length-1; i>=0; i--) {
