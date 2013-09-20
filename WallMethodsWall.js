@@ -534,7 +534,7 @@ WallMethods.wall = {
 		var oldHandlers = [];
 		var idx = this.parent.idxByInfo(this.handle);
 		for (var handlerIdx=spliceIdx; handlerIdx<this.length; handlerIdx++) {
-			oldHandlers.push(this.parent.getSubWallHandler(idx, spliceIdx))
+			oldHandlers.push(this.parent.getSubWallHandler(idx, handlerIdx))
 		}
 		var oldPts = this.concat();
 		var toAddVs = [];

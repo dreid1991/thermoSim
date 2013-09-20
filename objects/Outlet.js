@@ -40,7 +40,7 @@ _.extend(Outlet.prototype, flowFuncs, objectFuncs, {
 	init: function() {	
 		this.addPts(); //sets this.pts
 		this.wall.addPts(this.ptIdxs[1], this.pts);
-		var subWallIdx = Math.min(this.ptIdxs[0], this.ptIdxs[1]) + this.pts.length == 4 ? 2 : 1;
+		var subWallIdx = Math.min(this.ptIdxs[0], this.ptIdxs[1]) + (this.pts.length == 4 ? 2 : 1);
 		this.arrows = this.addArrows(this.pts[1].VTo(this.pts[2]).UV().perp('cw'));
 		walls.setSubWallHandler(this.wallInfo, subWallIdx, new Listener(this.hit, this));
 	},
