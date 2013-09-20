@@ -54,6 +54,7 @@ java -jar ../../compiler.jar ^
 --js ../objects/DragArrow.js ^
 --js ../objects/DragWeights.js ^
 --js ../objects/flowFuncs.js ^
+--js ../objects/CompositionController.js ^
 --js ../objects/Heater.js ^
 --js ../objects/Inlet.js ^
 --js ../objects/Liquid.js ^
