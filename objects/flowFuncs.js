@@ -37,6 +37,46 @@ var flowFuncs = {
 		var UV = this.wall.getUV(aIdx);
 		this.pts = this.getPts(a, b, UV, this.perp, this.fracOffset);
 	},
+	addFlowSliders: function(attrSliders, flows) {
+		var sliders = [];
+		for (var i=0; i<attrSliders.length; i++) {
+			var attrSlider = attrSliders[i];
+			var sliderFlowHandles = attrSlider.flowHandles;
+			var sliderFlows = this.pluckFlows(flows, sliderFlowHandles);
+			var handle = attrSlider.handle;
+			var title = attrSlider.title;
+			var fracOpen = attrSlider.fracOpen;
+			var sliderIdx = attrSlider.sliderIdx;
+			var sliderGroup = new Inlet.FlowGroupSlider(title, handle, sliderFlows);
+			var slider = sliderManager.addSlider(title, this.handle + 'Slider' + handle.toCapitalCamelCase(),  {value: fracOpen*100},
+				[{eventType:'slide', obj: sliderGroup, func: sliderGroup.parseSlider}],
+			undefined
+			)
+			sliderGroup.slider = slider;
+			sliders.push(sliderGroup);
+		}
+		return sliders;
+	},
+	fracToTemp: function(min, max, frac) {
+		return min + (max - min) * frac;
+	},
+	tempToFrac: function(min, max, temp) {
+		return (temp - min) / (max - min);
+	},
+	pluckFlows: function(flows, flowHandles) {
+		var plucked = [];
+		for (var i=0; i<flowHandles.length; i++) {
+			var foundFlow = false;
+			for (var j=0; j<flows.length; j++) {
+				if (flows[j].handle == flowHandles[i]) {
+					plucked.push(flows[j]);
+					foundFlow = true;
+				}
+			}
+			if (!foundFlow) console.log('Could not find flow ' + flowHandles[i] + ' for inlet slider');
+		}
+		return plucked;
+	},
 	deleteDuplicatePts: function(pts) {
 		for (var i=0; i<pts.length-1; i++) {
 			for (var j=i+1; j<pts.length; j++) {

@@ -369,44 +369,51 @@ WallMethods.main = {
 	getWallsByHandles: function(handles) {
 		var grabbed = []
 		for (var i=0; i<handles.length; i++) {
-			grabbed.push(this[handles[i]]);
-			if (!grabbed[grabbed.length - 1]) console.log('Bad wall handle ' + handles[i]);
+			var next = this[handles[i]];
+			if (next) 
+				grabbed.push(next);
+			else
+				console.log('Bad wall handle ' + handles[i]);
 		}
 		return grabbed;
 	},
 	//One wall, assuming first/last points do not overlap
 	wallVolume: function(wallInfo){
-		return this.area(this[wallInfo].slice(0,this[wallInfo].length-1))*vConst;
+		return this.area(this[wallInfo].slice(0,this[wallInfo].length-1)) * vConst;
 	},
 	area: function(pts){
-		var area=0;
+		var area = 0;
 		var convexResults = this.isConvex(pts);
-		var multiplier = convexResults.multiplier;
-		var isConvex = convexResults.isConvex;
-		if(isConvex){
+		if (convexResults.isConvex) {
 			return this.areaConvex(pts);
-		}else{
-			var ptSets = this.splitConcave(pts, multiplier);
-			area+=this.area(ptSets[0]);
-			area+=this.area(ptSets[1]);
+		} else if (pts.length > 3) { //three points in a row returns concave, but that ain't no concave polygon
+			var ptSets = this.splitConcave(pts, convexResults.multiplier);
+			area += this.area(ptSets[0]);
+			area += this.area(ptSets[1]);
+			
 		}
 		return area;
 	},
 	isConvex: function(pts){
+		var ConvexResult = function(isConvex, multiplier) {
+			this.isConvex = isConvex;
+			this.multiplier = multiplier;
+		}
+	
 		var multiplier = this.getMult(pts);
 		for (var ptIdx=1; ptIdx<pts.length-1; ptIdx++){
 			var abcs = this.abcs(pts, ptIdx);
 			var angle = this.angleBetweenPts(abcs.a, abcs.b, abcs.c, multiplier);
-			if (angle>Math.PI){
-				return {isConvex:false, multiplier: multiplier};
+			if (angle > Math.PI) {
+				return new ConvexResult(false, multiplier);
 			}
 		}
 		var angle = this.angleBetweenPts(pts[pts.length-2], pts[pts.length-1], pts[0], multiplier);
 		var angle = this.angleBetweenPts(pts[pts.length-1], pts[0], pts[1], multiplier);
-		if (angle>Math.PI){
-			return {isConvex:false, multiplier: multiplier};
+		if (angle > Math.PI) {
+			return new ConvexResult(false, multiplier);
 		}
-		return {isConvex:true, multiplier: multiplier};
+		return new ConvexResult(true, multiplier);
 		
 	},
 	getMult: function(pts){
@@ -443,15 +450,15 @@ WallMethods.main = {
 	},
 	splitConcave: function(ptsOrig, multiplier){
 		var pts = new Array(ptsOrig.length+2);
-		for (var ptIdx=0; ptIdx<ptsOrig.length; ptIdx++){pts[ptIdx]=ptsOrig[ptIdx]};
+		for (var ptIdx=0; ptIdx<ptsOrig.length; ptIdx++) pts[ptIdx] = ptsOrig[ptIdx];
 		pts[pts.length-2] = ptsOrig[0];
 		pts[pts.length-1] = ptsOrig[1];
-		for (var ptIdx=1; ptIdx<pts.length-1; ptIdx++){
+		for (var ptIdx=1; ptIdx<pts.length-1; ptIdx++) {
 			var abcs = this.abcs(pts, ptIdx);
 			var angle = this.angleBetweenPts(abcs.a, abcs.b, abcs.c, multiplier);
-			if(angle>Math.PI){
-				if(ptIdx==ptsOrig.length){
-					ptIdx=0;
+			if (angle > Math.PI) {
+				if (ptIdx == ptsOrig.length) {
+					ptIdx = 0;
 				}
 				return this.splitAt(pts.slice(0, pts.length-2), ptIdx, multiplier);
 			}
@@ -511,46 +518,46 @@ WallMethods.main = {
 
 	},
 	getDist: function(aP1, aP2, bP1, bP2, UVA, UVB, from){
-		if(from=='p1'){
-			a = aP1
-			b = bP1;
-		}else{
-			a = aP2;
-			b = bP2;
+		if (from=='p1') {
+			var a = aP1
+			var b = bP1;
+		} else {
+			var a = aP2;
+			var b = bP2;
 		}
-		if(UVA.dx==0 && UVB.dx==0){
+		if (UVA.dx==0 && UVB.dx==0) {
 			return new Vector(Infinity, Infinity);
-		} else if (UVA.dx==0){
+		} else if (UVA.dx==0) {
 			var dx = a.x-b.x;
 			var magMovement = Math.abs(dx/UVB.dx)
 			var hitPt = b.copy().movePt(UVB.copy().mult(magMovement));
 			return new Vector(a.distTo(hitPt), b.distTo(hitPt));
-		} else if (UVB.dx==0){
+		} else if (UVB.dx==0) {
 			var dx = b.x-a.x;
 			var magMovement = Math.abs(dx/UVA.dx);
 			var hitPt = a.copy().movePt(UVA.copy().mult(magMovement));
 			return new Vector(a.distTo(hitPt), b.distTo(hitPt));		
 		}
-		if(UVA.dy==0 && UVB.dy==0){
+		if (UVA.dy==0 && UVB.dy==0) {
 			return new Vector(Infinity, Infinity);
-		}else if(UVA.dy==0){
+		} else if(UVA.dy==0) {
 			var dy = a.y-b.y;
 			var magMovement = Math.abs(dy/UVB.dy)
 			var hitPt = b.copy().movePt(UVB.copy().mult(magMovement));
 			return new Vector(a.distTo(hitPt), b.distTo(hitPt));
-		}else if(UVB.dy==0){
+		} else if(UVB.dy==0) {
 			var dy = b.y-a.y;
 			var magMovement = Math.abs(dy/UVA.dy)
 			var hitPt = a.copy().movePt(UVA.copy().mult(magMovement));
 			return new Vector(a.distTo(hitPt), b.distTo(hitPt));
 		}
 		var denom = UVB.dx*UVA.dy/UVA.dx - UVB.dy;
-		if(denom==0){
+		if (denom==0) {
 			return new Vector(Infinity, Infinity);
 		}
-		var num = b.y - a.y - UVA.dy*b.x/UVA.dx + a.x*UVA.dy/UVA.dx;
-		var db = num/denom;
-		var da = (b.x + UVB.dx*db - a.x)/UVA.dx;
+		var num = b.y - a.y - UVA.dy*b.x / UVA.dx + a.x*UVA.dy / UVA.dx;
+		var db = num / denom;
+		var da = (b.x + UVB.dx*db - a.x) / UVA.dx;
 		return new Vector(da, db);
 	},
 	angleBetweenPts: function(a, b, c, multiplier){
@@ -564,10 +571,10 @@ WallMethods.main = {
 		return this.distBetweenAngles(angleBA, angleCenter) + this.distBetweenAngles(angleCenter, angleBC);
 	},
 	distBetweenAngles: function(a, b){
-		if(a<0){a+=Math.PI*2;}
-		if(b<0){b+=Math.PI*2;}
-		var diff = Math.max(a, b) - Math.min(a, b);;
-		if (diff>Math.PI) {
+		if (a < 0) a+=Math.PI*2;
+		if (b < 0) b+=Math.PI*2;
+		var diff = Math.max(a, b) - Math.min(a, b);
+		if (diff > Math.PI) {
 			return 2*Math.PI - diff;
 		} else {
 			return diff;
@@ -577,7 +584,7 @@ WallMethods.main = {
 	areaConvex: function(pts){
 		var area = 0;
 		var originPt = pts[0];
-		for (var ptIdx=2; ptIdx<pts.length; ptIdx++){
+		for (var ptIdx=2; ptIdx<pts.length; ptIdx++) {
 			var pt1 = pts[ptIdx-1];
 			var pt2 = pts[ptIdx];
 			area += originPt.area(pt1, pt2);
