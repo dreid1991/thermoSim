@@ -153,27 +153,16 @@ function averageLast(list, n) {
 }
 
 function unique(name, obj){
-	if (typeof(obj)=="function"){
-		if (!obj(name)) {
-			return name;
-		} else {
-			var uniqueId = 1;
-			while(obj(name+uniqueId)){
-				uniqueId++;
-			}
-			return name+uniqueId;		
-		}
+	if (!obj[name]) {
+		return name;
 	} else {
-		if (!obj[name]) {
-			return name;
-		} else {
-			var uniqueId = 1;
-			while (obj[name+uniqueId]) {
-				uniqueId++;
-			}
-			return name+uniqueId;
+		var uniqueId = 1;
+		while (obj[name + uniqueId]) {
+			uniqueId++;
 		}
+		return name + uniqueId;
 	}
+
 }
 
 
@@ -266,22 +255,22 @@ function getAndEval(sceneElem) {
 	} else if (typeof sceneElem == 'boolean') {
 		return sceneElem;
 	} else if (sceneElem instanceof Point) {
-		var x = this.getAndEval(sceneElem.x);
-		var y = this.getAndEval(sceneElem.y);
+		var x = getAndEval(sceneElem.x);
+		var y = getAndEval(sceneElem.y);
 		return P(x, y);
 	} else if (sceneElem instanceof Vector) {
-		var dx = this.getAndEval(sceneElem.dx);
-		var dy = this.getAndEval(sceneElem.dy);
+		var dx = getAndEval(sceneElem.dx);
+		var dy = getAndEval(sceneElem.dy);
 		return V(dx, dy);
 	} else if (sceneElem instanceof Color) {
-		var r = this.getAndEval(sceneElem.r);
-		var g = this.getAndEval(sceneElem.g);
-		var b = this.getAndEval(sceneElem.b);
+		var r = getAndEval(sceneElem.r);
+		var g = getAndEval(sceneElem.g);
+		var b = getAndEval(sceneElem.b);
 		return Col(r, g, b);
 	} else if (sceneElem instanceof Array) {
 		var newArr = [];
 		for (var idx=0; idx<sceneElem.length; idx++) {
-			newArr.push(this.getAndEval(sceneElem[idx]));
+			newArr.push(getAndEval(sceneElem[idx]));
 		}
 		return newArr = newArr;
 	} else if (typeof sceneElem == 'function') {
@@ -289,7 +278,7 @@ function getAndEval(sceneElem) {
 	} else if (sceneElem instanceof Object) {
 		var newObj = {};
 		for (var name in sceneElem) {
-			newObj[name] = this.getAndEval(sceneElem[name])
+			newObj[name] = getAndEval(sceneElem[name])
 		}
 		return newObj;
 	}

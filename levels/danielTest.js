@@ -48,10 +48,10 @@ LevelData = {
 						cleanUpWith: 'prompt1',
 						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
 					},
-					{
-						type: 'CompositionController',
-						attrs: {handle: 'warpSpeed', temp: 300, tempMin: 200, tempMax: 400, wallInfo: 'wally', makeTempSlider: true, inletDepth: 10, outletDepth: 15, width: 25, pressure: 3, ptIdxs: [0, 1, 2, 3], flows: [{spcName: 'spc1', nDotMax: .05, tag: 'wally', handle: 'woop'}], sliders: [{flowHandles: ['woop'], title: 'hello', fracOpen: .5, handle: 'floppy'}]}
-					}
+					// {
+						// type: 'CompositionController',
+						// attrs: {handle: 'warpSpeed', temp: 300, tempMin: 200, tempMax: 400, wallInfo: 'wally', makeTempSlider: true, inletDepth: 10, outletDepth: 15, width: 25, pressure: 3, ptIdxs: [0, 1, 2, 3], flows: [{spcName: 'spc1', nDotMax: .05, tag: 'wally', handle: 'woop'}], sliders: [{flowHandles: ['woop'], title: 'hello', fracOpen: .5, handle: 'floppy'}]}
+					// }
 					// {
 						// type: 'Heater',
 						// attrs: {wallInfo: 'wally', max: 3, handle: 'other', offset: V(70, 0), sliderIdx: 0}
