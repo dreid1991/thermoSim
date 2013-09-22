@@ -4,7 +4,7 @@ LevelData = {
 
 	spcDefs: [
 		//add antoine coefs, cvLiq, hvap
-		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
+		{spcName: 'spc1', m: 4, r: 1, col: Col(200, 0, 0), cv: 1.5 * R, hF298: -10, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
 		{spcName: 'spc2', m: 4, r: 1, col: Col(150, 100, 255), cv: 1.5 * R, hF298: -12, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.213, b: 1652.27, c: 231.48-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'fairy', m: 4, r: 1, col: Col(250, 250, 250), cv: 1.5 * R, hF298: -14, hVap298: 10, sF298: -1, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
 		{spcName: 'duckling', m: 4, r: 1, col: Col(0, 255, 255), cv: 1.5 * R, hF298: -12, hVap298: 10, sF298: -1, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
@@ -48,10 +48,10 @@ LevelData = {
 						cleanUpWith: 'prompt1',
 						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
 					},
-					// {
-						// type: 'CompositionController',
-						// attrs: {handle: 'warpSpeed', temp: 300, tempMin: 200, tempMax: 400, wallInfo: 'wally', makeTempSlider: true, inletDepth: 10, outletDepth: 15, width: 25, pressure: 3, ptIdxs: [0, 1, 2, 3], flows: [{spcName: 'spc1', nDotMax: .05, tag: 'wally', handle: 'woop'}], sliders: [{flowHandles: ['woop'], title: 'hello', fracOpen: .5, handle: 'floppy'}]}
-					// }
+					{
+						type: 'CompositionController',
+						attrs: {handle: 'warpSpeed', temp: 300, tempMin: 200, tempMax: 400, wallInfo: 'wally', makeTempSlider: true, inletDepth: 10, outletDepth: 15, width: 25, pressure: 3, ptIdxs: [0, 1, 2, 3], flows: [{spcName: 'spc1', nDotMax: .05, tag: 'wally', handle: 'woop'}], sliders: [{flowHandles: ['woop'], title: 'hello', fracOpen: .5, handle: 'floppy'}]}
+					}
 					// {
 						// type: 'Heater',
 						// attrs: {wallInfo: 'wally', max: 3, handle: 'other', offset: V(70, 0), sliderIdx: 0}
@@ -83,7 +83,8 @@ LevelData = {
 				dataRecord: [
 					//{wallInfo: 'wally', data: 'internalEnergy'}
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc1', tag: 'wally'}},
-					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc2', tag: 'wally'}}
+					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'spc2', tag: 'wally'}},
+					{wallInfo: 'wally', data: 'moles', attrs: {tag: 'wally'}},
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'b', tag: 'wally'}},
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'c', tag: 'wally'}},
 					// {wallInfo: 'wally', data: 'frac', attrs: {spcName: 'd', tag: 'wally'}}
@@ -100,7 +101,9 @@ LevelData = {
 					//{rcts: [{spcName: 'spc1', count: 2}], prods: [{spcName: 'spc2', count: 1}], preExpForward: 10, activeEForward: .2, handle: 'reacty7'}
 				],
 				dataReadouts: [
-					{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'}
+					{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
+					{label: 'pInt: ', expr: 'pInt("wally")', units: 'bar', decPlaces: 2, handle: 'willow', readout: 'mainReadout'},
+					{label: 'pCalc: ', expr: '1e-5 * moles("wally", {tag: "wally"}) * R * temp("wally") / (vol("wally") / 1000)', units: 'bar', decPlaces: 2, handle: 'piglet', readout: 'mainReadout'},
 					//{label: 'cell temp: ', expr: 'tempSmooth("cellSquishyInner")', units: 'K', decPlaces: 1, handle: 'cell', readout: 'mainReadout'}
 					//{label: 'liq temp: ', expr: 'tempSmooth("liquidSwishy")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'}
 					// {label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},

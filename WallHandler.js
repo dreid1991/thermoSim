@@ -206,6 +206,7 @@ WallMethods.main = {
 		this[wallIdx].massChunks = {};
 		this[wallIdx].forceInternal = 0;
 		this[wallIdx].pLastRecord = turn;
+		this[wallIdx].containedWalls = []; //contained walls that have data, for say calculating nRT/V
 		this[wallIdx].isothermalRate = defaultTo(1, isothermalRate);
 		this[wallIdx].boundMaxHandlers = [];
 		this[wallIdx].boundMinHandlers = [];

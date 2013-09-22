@@ -67,12 +67,18 @@ _.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
 		var volList = this.wall.getDataSrc('vol');
 		var pList = this.wall.getDataSrc('pInt');
 		var timeConst = 5; //not strictly speaking a time constant, but it will scale the time it takes to respond
+		var containedWalls = wall.containedWalls;
 		addListener(curLevel, 'data', listenerHandle, function() {
 			//pressure takes longer to respond, going to use NRT/V instead
-			var pressure = averageLast(pList, 30);
+			//other factor: inflow -> molecules jammed up near inlet, leads to many collisions with walls and artifically high pressure.  confinement, yo
+			//this will not take into account var der waals stuff like volume of molecules
 			var vol = volList[volList.length - 1];
+			for (var i=0; i<containedWalls.length; i++) {
+				var containedVol = containedWalls[0].data.vol.srcVal;
+				vol -= containedVol[containedVol.length - 1];
+			}
 			var temp = tempList[tempList.length - 1];
-			var pressure = 1e-5 * (dots.length / N * R * temp) / (vol / 1000);
+			var pressure = 1e-2 * (dots.length / N) * R * temp / vol;
 			var setPt = this.pSetPt;
 			var correctBy = (setPt / pressure + timeConst) / (1 + timeConst);
 			for (var i=0; i<allFlows.length; i++) {

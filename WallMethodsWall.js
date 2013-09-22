@@ -571,6 +571,10 @@ WallMethods.wall = {
 		this.parent.setupWall(this.handle);
 		if (this.border && ! this.border.removed) this.border.update();
 	},
+	removeContainedWall: function(wall) {
+		var idx = this.containedWalls.indexOf(wall);
+		if (idx > -1) this.containedWalls.splice(idx, 1);
+	},
 	getPt: function(idx) {
 		return this[idx];
 	},
