@@ -278,9 +278,9 @@ Color.prototype = {
 		return this;	
 	},
 	setHex: function(){
-		var r = Number(Math.round(this.r)).toString(16);
-		var g = Number(Math.round(this.g)).toString(16);
-		var b = Number(Math.round(this.b)).toString(16);
+		var r = Math.round(this.r).toString(16);
+		var g = Math.round(this.g).toString(16);
+		var b = Math.round(this.b).toString(16);
 		if (r.length==1) {r = '0'+r;}
 		if (g.length==1) {g = '0'+g;}
 		if (b.length==1) {b = '0'+b;}

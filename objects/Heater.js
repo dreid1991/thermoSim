@@ -31,6 +31,7 @@ function Heater(attrs){
 	this.sliderTitleWrapper = attrs.sliderTitleWrapper;
 	
 	this.wall = walls[attrs.wallInfo];
+	
 	this.pos = attrs.pos ? attrs.pos : this.centerOnWall(attrs.wallInfo, this.dims);
 
 	if (attrs.offset) this.pos.movePt(attrs.offset);
@@ -73,7 +74,7 @@ function Heater(attrs){
 		attrs.sliderIdx
 		)
 	}
-	this.init(this.wallHandleHeater, this.wall.handle);
+	this.init(this.wallHandleHeater, this.wall);
 }
 
 _.extend(Heater.prototype, objectFuncs, {
@@ -205,21 +206,22 @@ _.extend(Heater.prototype, objectFuncs, {
 		steps['1']=up;
 		return steps;
 	},
-	init: function(wallHandleHeater, wallHandleParent){
+	init: function(wallHandleHeater, wallParent){
 		canvasManager.addListener(this.canvasHandle, 'drawHeater' + this.handle, this.draw, this, 1);
-		this.setupWalls(wallHandleHeater, wallHandleParent);
+		this.setupWalls(wallHandleHeater, wallParent);
 		
 
 
 		this.eAdded=0;
 	},
-	setupWalls: function(wallHandleHeater, wallHandleParent){
+	setupWalls: function(wallHandleHeater, wallParent){
 		var handler = {func:this.hit, obj:this};
 		walls.addWall({pts:this.wallPts, handler:handler, handle: wallHandleHeater, record:false, show:false});
 		walls[wallHandleHeater].createSingleValDataObj('vol', function() {
 			return walls.wallVolume(wallHandleHeater);
 		})
-		window.dotMigrator.migrateDots(window.dotManager.get({tag: wallHandleParent}), [wallHandleParent], 'only', [wallHandleHeater], 'or');
+		wallParent.containedWalls.push(walls[wallHandleHeater]);
+		window.dotMigrator.migrateDots(window.dotManager.get({tag: wallParent.handle}), [wallParent.handle], 'only', [wallHandleHeater], 'or');
 	},
 	wrapHit: function(tempList) {
 		return function(dot, wallIdx, subWallIdx, wallUV, vPerp, perpUV) {
@@ -251,6 +253,7 @@ _.extend(Heater.prototype, objectFuncs, {
 		this.slider.remove();
 		canvasManager.removeListener(this.canvasHandle, 'drawHeater' + this.handle)
 		if (window.walls && !walls.removed) {
+			if (this.wall) this.wall.removeContainedWall(window.walls[this.wallHandleHeater]);
 			walls.removeWall(this.wallHandleHeater);
 		}
 	}

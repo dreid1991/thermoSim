@@ -32,6 +32,8 @@ function Outlet(attrs) {
 	this.pFloor = attrs.pressureFloor || 0;
 	//should probably scale probability to leaving based on dist from pFloor
 	this.pList = this.wall.getDataSrc('pInt');
+	this.currentSubwallHandler = undefined;
+	this.subWallPt = undefined;
 	this.setupStd();
 	this.init();
 }
@@ -40,8 +42,10 @@ _.extend(Outlet.prototype, flowFuncs, objectFuncs, {
 	init: function() {	
 		this.addPts(); //sets this.pts
 		this.wall.addPts(this.ptIdxs[1], this.pts);
-		var subWallIdx = Math.min(this.ptIdxs[0], this.ptIdxs[1]) + this.pts.length == 4 ? 2 : 1;
+		var subWallIdx = Math.min(this.ptIdxs[0], this.ptIdxs[1]) + (this.pts.length == 4 ? 2 : 1);
 		this.arrows = this.addArrows(this.pts[1].VTo(this.pts[2]).UV().perp('cw'));
+		this.origSubWallHandler = walls.getSubWallHandler(this.wallInfo, subWallIdx);
+		this.subWallPt = this.wall[subWallIdx];
 		walls.setSubWallHandler(this.wallInfo, subWallIdx, new Listener(this.hit, this));
 	},
 	hit: function(dot, wall, subWallIdx, wallUV, perpV, perpUV) {
@@ -56,6 +60,8 @@ _.extend(Outlet.prototype, flowFuncs, objectFuncs, {
 		}
 	},
 	remove: function() {
+		walls.setSubWallHandler(this.wall.handle, this.wall.indexOf(this.subWallPt), this.origSubWallHandler); 
 		this.arrows.map(function(arrow) {arrow.remove()});
+		
 	},
 })

@@ -142,7 +142,7 @@ _.extend(Inlet.prototype, flowFuncs, objectFuncs, {
 		addListener(curLevel, 'update', this.type + this.handle, function() {
 			for (var flowIdx=0; flowIdx<flowLen; flowIdx++) {
 				var flow = flows[flowIdx];
-				dotBank[flowIdx] += flow.fracOpen * flow.nDotMax;
+				dotBank[flowIdx] += flow.fracOpen * flow.nDotMax * flow.scalar;
 				var toMake = Math.floor(dotBank[flowIdx])
 				if (toMake) {
 					var newDots = [];
@@ -175,6 +175,7 @@ Inlet.Flow = function(spcName, nDotMax, handle) {
 	this.nDotMax = nDotMax;
 	this.handle = handle;
 	this.fracOpen = 1;
+	this.scalar = 1; 
 }
 
 Inlet.FlowGroupSlider = function(title, handle, flows) {

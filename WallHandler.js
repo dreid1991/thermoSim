@@ -206,6 +206,7 @@ WallMethods.main = {
 		this[wallIdx].massChunks = {};
 		this[wallIdx].forceInternal = 0;
 		this[wallIdx].pLastRecord = turn;
+		this[wallIdx].containedWalls = []; //contained walls that have data, for say calculating nRT/V
 		this[wallIdx].isothermalRate = defaultTo(1, isothermalRate);
 		this[wallIdx].boundMaxHandlers = [];
 		this[wallIdx].boundMinHandlers = [];
@@ -247,14 +248,13 @@ WallMethods.main = {
 	copyWallPts: function(wall){
 		var len = wall.length;
 		var copy = new Array(len);
-		for (var ptIdx=0; ptIdx<len; ptIdx++){
+		for (var ptIdx=0; ptIdx<len; ptIdx++) {
 			copy[ptIdx] = wall[ptIdx].copy();
 		}
 		return copy;
 	},
-	idxByHandle: function(handle){
-		
-		for (var idx=0; idx<this.length; idx++){
+	idxByHandle: function(handle) {
+		for (var idx=0; idx<this.length; idx++) {
 			if (handle==this[idx].handle) {
 				return idx;
 			}
@@ -263,15 +263,14 @@ WallMethods.main = {
 		
 	},
 	idxByInfo: function(info){
-		var wallIdx;
-		if (parseFloat(info)!=info) {
+		if (typeof info != 'number') {
 			return this.idxByHandle(info)
 		} else {
 			return info;
 		}
 	},
 	remove: function(){
-		for(var wallIdx=this.length-1; wallIdx>=0; wallIdx-=1){
+		for (var wallIdx=this.length-1; wallIdx>=0; wallIdx-=1) {
 			this.removeWall(wallIdx);
 		}
 		//Hey - if I want to remove just one wall when multiple are present, will need to remove wallMove by wall, but I don't think that case will happen
