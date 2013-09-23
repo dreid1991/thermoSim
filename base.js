@@ -449,14 +449,6 @@ function recursiveAddClass(elem, HTMLClass) {
 	
 }
 
-function stringTogetherGET(obj) {
-	var strs = []
-	for (var a in obj) {
-		strs.push(a + '=' + obj[a]);
-	}
-	return strs.join('&');
-}
-
 function sendToCW(string, CWTriggerId) {
 	var request = new XMLHttpRequest();
 	var string64 = window.btoa(string);
@@ -466,6 +458,14 @@ function sendToCW(string, CWTriggerId) {
 		request.open("GET", "CW.php?" + get, true);
 		request.send(null);
 	}
+}
+
+function stringTogetherGET(obj) {
+	var strs = []
+	for (var a in obj) {
+		strs.push(a + '=' + obj[a]);
+	}
+	return strs.join('&');
 }
 
 function hideSliders(){

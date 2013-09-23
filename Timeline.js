@@ -129,6 +129,7 @@ Timeline.prototype = {
 	},
 	show: function(sectionIdx, promptIdx, refreshing, forceShowPrompt) {
 		//this.steppingTowards = {sectionIdx: sectionIdx, promptIdx: promptIdx};
+		wasReset = false;
 		var changingSection = this.sectionIdx != sectionIdx;
 		var changingPrompt = changingSection || promptIdx != this.sections[sectionIdx].promptIdx || forceShowPrompt;
 		// if (changingPrompt || refreshing) {
