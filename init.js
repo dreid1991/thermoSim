@@ -69,6 +69,7 @@ $(function(){
 	ACTUALN = 6.022e23;
 	g = 1.75;
 	gInternal = .01;
+	wasReset = false;
 	updateInterval = 30;
 	dataInterval = 1250;
 	borderCol = Col(155,155,155);
@@ -87,7 +88,7 @@ $(function(){
 	quizRenderer = new QuizRenderer();
 	sceneNavigator = new SceneNavigator();
 	interpreter = new ExpressionInterpreter();
-	$('#resetExp').click(function(){sceneNavigator.refresh()});
+	$('#resetExp').click(function(){sceneNavigator.refresh(); wasReset = true;});
 	$('#toSim').click(function(){sceneNavigator.nextPrompt()});
 	$('#toLastStep').click(function(){sceneNavigator.prevPrompt()});
 	$('#previous').click(function(){sceneNavigator.prevPrompt()});

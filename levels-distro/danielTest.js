@@ -14,7 +14,7 @@ LevelData = {
 		{
 			sceneData: {
 				walls: [
-					{pts: [P(50, 50), P(350, 50), P(350, 400), P(50, 400)], handler: 'staticAdiabatic',/* temp: 398.15,*/ handle: 'wally', border: {type: 'open', thickness: 5, yMin: 30}}
+					{pts: [P(50, 50), P(350, 50), P(350, 400), P(50, 400)], handler: 'staticAdiabatic',/* temp: 398.15,*/ handle: 'wally', border: {type: 'wrap', thickness: 5}}
 				],
 				dots: [
 					{spcName: 'spc1', pos: P(55, 55), dims: V(300, 325), count: 1000, temp: 198.15, returnTo: 'wally', tag: 'wally'},
@@ -48,6 +48,10 @@ LevelData = {
 						cleanUpWith: 'prompt1',
 						attrs: {wallInfo: 'wally', max: 3, handle: 'heaty'/*, liquidHandle: 'swishy'*/}
 					},
+					{
+						type: 'CompositionController',
+						attrs: {handle: 'warpSpeed', temp: 300, tempMin: 200, tempMax: 400, wallInfo: 'wally', makeTempSlider: true, inletDepth: 10, outletDepth: 15, width: 25, ptIdxs: [0, 1, 2, 3], flows: [{spcName: 'spc1', nDotMax: .05, tag: 'wally', handle: 'woop'}], sliders: [{flowHandles: ['woop'], title: 'hello', fracOpen: .5, handle: 'floppy'}]}
+					}
 					// {
 						// type: 'Heater',
 						// attrs: {wallInfo: 'wally', max: 3, handle: 'other', offset: V(70, 0), sliderIdx: 0}
@@ -66,10 +70,10 @@ LevelData = {
 						// type: 'QArrowsAmmt',
 						// attrs: {handle: 'arrowy', wallInfo: 'wally', scale: 1}
 					// }
-					{
-						type: 'Piston',
-						attrs: {handle: 'pistony', wallInfo: 'wally', min: 2, init: 8, max: 9, makeSlider: true}
-					}
+					// {
+						// type: 'Piston',
+						// attrs: {handle: 'pistony', wallInfo: 'wally', min: 2, init: 8, max: 9, makeSlider: true}
+					// }
 
 						
 				],

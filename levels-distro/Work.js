@@ -28,7 +28,7 @@ LevelData = {
 							{
 								type: 'multChoice',
 								CWQuestionId: 1,
-								questionText: '<p>If we compress the adiabatic system pictured to the right at a constant external pressure from state 1 to state 2, which of the following equations best represents the work done?</p>',
+								questionText: '<p>If we compress the adiabatic ideal gas system pictured to the right at a constant external pressure from state 1 to state 2, which of the following equations best represents the work done?</p>',
 								options:[
 									{text:"## W = -\\int_{V_{1}}^{V_{2}}P_{sys}dV ##", correct: false, message:"That's not correct", CWAnswerId: 1},
 									{text:"## W = - V\\Delta P_{ext} ##", correct: false, message:"That's not correct", CWAnswerId: 2},
@@ -76,8 +76,10 @@ LevelData = {
 				{//Prompt 0
 					sceneData: {
 						triggers: [
-							{handle: 'firstCheck', expr: 'fracDiff(temp("FirstWall"), 400) > .05', message: "Try to hit the molecule with the slider and see what happens!", priority: 1, },
-							{handle: 'triggerTest', expr: 'fracDiff(temp("FirstWall"), 400) > .05', satisfyCmmds: ['sendToCW("Molecule has been hit with slider", 107)'], priority: 1, }
+							{handle: 'firstCheck', expr: 'fracDiff(temp("FirstWall"), 400) > .05', message: "Try to hit the molecule with the slider and see what happens!", priority: 1},
+							{handle: 'send1', expr: 'fracDiff(temp("FirstWall"), 400) > .05', satisfyCmmds: ['sendToCW("Work done on molecule", 131)', 'var curTempList = walls.FirstWall.data.temp.src(); var curTemp = curTempList[curTempList.length - 1]; curLevel.tempStore = curTemp;'], requiredFor: false},
+							{handle: 'send2', expr: 'temp("FirstWall") < curLevel.tempStore', satisfyCmmds: ['sendToCW("Work done by molecule", 132)'], requiredFor: false},
+							{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 107)'], requiredFor: false}
 						]
 					},
 					quiz: [
@@ -120,6 +122,9 @@ LevelData = {
 						]
 					}
 				],
+				triggers: [
+					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 108)'], requiredFor: false}
+				]
 			},
 			prompts:[
 				{//Prompt 0
@@ -177,6 +182,9 @@ LevelData = {
 							{handle:'temp', label:'T sys', pointCol:Col(50,50,255), flashCol:Col(50,50,255), data:{x: 'vol("ThirdWall")', y: 'temp("ThirdWall")'}, trace: true, fillInPts: true, fillInPtsMin: 5}
 						]
 					}	
+				],
+				triggers: [
+					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 109)'], requiredFor: false}
 				]
 			},
 			prompts:[
@@ -200,7 +208,7 @@ LevelData = {
 						quiz: [
 							{type: 'textSmall', CWQuestionId: 7, label: 'Slope from graph', storeAs: 'slopeFromGraph', text: " "},
 							{type: 'textSmall', CWQuestionId: 8, label: 'Slope from equation', storeAs: 'slopeFromEquation', text: " "},
-							{type: 'text', CWQuestionId: 9, questionText: "Given our ## P_{ext} ## should the graph be linear or did something go wrong? Explain.", boxText: " "}
+							{type: 'text', CWQuestionId: 9, questionText: "Given our ## P_{ext} ## should the graph be linear or did something go wrong? <br><br>Explain.", boxText: " "}
 						]
 				},
 				{//Prompt 2
