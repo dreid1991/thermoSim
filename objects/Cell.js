@@ -33,9 +33,11 @@ function Cell(attrs) {
 	var innerWallPts = this.makeInnerWallPts(this.guideNodes, thickness);
 	this.outerWall = walls.addWall({pts: outerWallPts, handle: 'cell' + this.handle.toCapitalCamelCase() + 'Outer', handler: 'staticAdiabatic', show: false, record: false, col: Col(255, 255, 255)});
 	this.innerWall = walls.addWall({pts: innerWallPts, handle: 'cell' + this.handle.toCapitalCamelCase() + 'Inner', handler: 'staticAdiabatic', show: false, record: true, col: Col(255, 255, 255)});
+	this.outerWall.recordVol();
 	this.innerWall.hitThreshold = 10;
 	this.outerWall.hitThreshold = 10;
 	this.parentWallMemberTag = attrs.parentWallHandle;
+	walls[this.parentWallMemberTag].containedWalls.push(this.outerWall);
 	this.cellMemberTag = this.innerWall.handle;
 	var innerChanceTransport = attrs.innerChanceTransport || {};
 	var outerChanceTransport = attrs.outerChanceTransport || {};
@@ -383,6 +385,7 @@ _.extend(Cell.prototype, objectFuncs, {
 		
 	},
 	remove: function() {
+		walls[this.parentWallHandle].removeContainedWall(this.outerWall);
 		walls.removeWall(this.innerWall.handle);
 		walls.removeWall(this.outerWall.handle);
 		dotManager.removeByAttr('elemId', this.dotId);

@@ -50,7 +50,7 @@ LevelData = {
 					},
 					{
 						type: 'CompositionController',
-						attrs: {handle: 'warpSpeed', temp: 300, tempMin: 200, tempMax: 400, wallInfo: 'wally', makeTempSlider: true, inletDepth: 10, outletDepth: 15, width: 25, pressure: 3, ptIdxs: [0, 1, 2, 3], flows: [{spcName: 'spc1', nDotMax: .05, tag: 'wally', handle: 'woop'}], sliders: [{flowHandles: ['woop'], title: 'hello', fracOpen: .5, handle: 'floppy'}]}
+						attrs: {handle: 'warpSpeed', temp: 300, tempMin: 200, tempMax: 400, wallInfo: 'wally', makeTempSlider: true, inletDepth: 20, outletDepth: 25, width: 30, pressure: 3, ptIdxs: [0, 1, 2, 3], flows: [{spcName: 'spc1', nDotMax: .05, tag: 'wally', handle: 'woop'}, {spcName: 'spc2', nDotMax: .05, tag: 'wally', handle: 'numTwo'}], compSetPts: {spc1: .3, spc2: .7}, spc2sliders: [{flowHandles: ['woop'], title: 'hello', fracOpen: .5, handle: 'floppy'}]}
 					}
 					// {
 						// type: 'Heater',
@@ -102,8 +102,8 @@ LevelData = {
 				],
 				dataReadouts: [
 					{label: 'temp: ', expr: 'tempSmooth("wally")', units: 'K', decPlaces: 1, handle: 'someTemp', readout: 'mainReadout'},
-					{label: 'pInt: ', expr: 'pInt("wally")', units: 'bar', decPlaces: 2, handle: 'willow', readout: 'mainReadout'},
-					{label: 'pCalc: ', expr: '1e-5 * moles("wally", {tag: "wally"}) * R * temp("wally") / (vol("wally") / 1000)', units: 'bar', decPlaces: 2, handle: 'piglet', readout: 'mainReadout'},
+					{label: 'pInt: ', expr: 'averageLast(walls.wally.data.pInt.srcVal, 60)', units: 'bar', decPlaces: 2, handle: 'willow', readout: 'mainReadout'},
+					{label: 'pCalc: ', expr: '1e-5 * moles("wally", {tag: "wally"}) * R * temp("wally") / ((vol("wally") - vol("heaterHeaty")) / 1000)', units: 'bar', decPlaces: 2, handle: 'piglet', readout: 'mainReadout'},
 					//{label: 'cell temp: ', expr: 'tempSmooth("cellSquishyInner")', units: 'K', decPlaces: 1, handle: 'cell', readout: 'mainReadout'}
 					//{label: 'liq temp: ', expr: 'tempSmooth("liquidSwishy")', units: 'K', decPlaces: 1, handle: 'liqTemp', readout: 'mainReadout'}
 					// {label: 'Vol: ', expr: 'vol("wally")', units: 'L', decPlaces: 1, handle: 'loopy', readout: 'mainReadout'},
