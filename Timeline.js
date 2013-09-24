@@ -129,7 +129,6 @@ Timeline.prototype = {
 	},
 	show: function(sectionIdx, promptIdx, refreshing, forceShowPrompt) {
 		//this.steppingTowards = {sectionIdx: sectionIdx, promptIdx: promptIdx};
-		wasReset = false;
 		var changingSection = this.sectionIdx != sectionIdx;
 		var changingPrompt = changingSection || promptIdx != this.sections[sectionIdx].promptIdx || forceShowPrompt;
 		// if (changingPrompt || refreshing) {
@@ -156,6 +155,7 @@ Timeline.prototype = {
 	},
 	refresh: function() {
 		//beware all ye who enter this function.  It hangs on by a thread.  
+		this.sendRefreshToCW();
 		var curSection = this.sections[this.sectionIdx];
 		var promptIdx = curSection.promptIdx;
 		var dataCurPrompt = curSection.sectionData.prompts[promptIdx];
@@ -172,6 +172,11 @@ Timeline.prototype = {
 		newMotherSection.showSection();
 		newMotherSection.deepStepTo(dataCurPrompt, motherSection.branches); 
 
+	},
+	sendRefreshToCW: function() {
+		var resetId = this.curPrompt().resetId;
+		if (resetId !== undefined) 
+			sendToCW("Section was refreshed", reset);
 	},
 	takeNumber: function() {
 		return this.curId ++;

@@ -78,10 +78,10 @@ LevelData = {
 						triggers: [
 							{handle: 'firstCheck', expr: 'fracDiff(temp("FirstWall"), 400) > .05', message: "Try to hit the molecule with the slider and see what happens!", priority: 1},
 							{handle: 'send1', expr: 'fracDiff(temp("FirstWall"), 400) > .05', satisfyCmmds: ['sendToCW("Work done on molecule", 131)', 'var curTempList = walls.FirstWall.data.temp.src(); var curTemp = curTempList[curTempList.length - 1]; curLevel.tempStore = curTemp;'], requiredFor: false},
-							{handle: 'send2', expr: 'temp("FirstWall") < curLevel.tempStore', satisfyCmmds: ['sendToCW("Work done by molecule", 132)'], requiredFor: false},
-							{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 107)'], requiredFor: false}
+							{handle: 'send2', expr: 'temp("FirstWall") < curLevel.tempStore', satisfyCmmds: ['sendToCW("Work done by molecule", 132)'], requiredFor: false}
 						]
 					},
+					resetId: 107,
 					quiz: [
 						{
 							questionText: "<center>##nc_v\\Delta T = -P_{ext}\\Delta V ## </center> <p>From the equation above we see that temperature increases as we do work by decreasing volume.  Temperature is an expression of molecular kinetic energy, so as the system is compressed, the molecules must speed up.  These ideal gas molecules can be thought of as perfectly elastic bouncy balls.  Using the movable wall above, can you determine what event causes the molecule's speed to change?  Can you explain why that would cause a temperature change in many molecules?",
