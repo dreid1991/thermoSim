@@ -41,7 +41,6 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'trigger1', expr: "dotManager.lists.uglier.length >= 360", message: 'Turn on the reaction and allow it to react.', checkOn: 'conditions', requiredFor: 'prompt0'},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 116)'], requiredFor: false}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'moles', attrs: {spcName: 'ugly', tag: 'wally'}},
@@ -72,7 +71,8 @@ LevelData = {
 			prompts: [
 				{
 					sceneData: undefined, 
-					cutScene: false, 
+					cutScene: false,
+					resetId: 127,
 					quiz:[
 							{
 								storeAs: 'foo2', 
@@ -87,6 +87,7 @@ LevelData = {
 				{
 					sceneData: undefined, 
 					cutScene: false, 
+					resetId: 128,
 					quiz:[
 							{
 								storeAs: 'foo3', 
@@ -99,7 +100,8 @@ LevelData = {
 				},
 				{
 					sceneData: undefined, 
-					cutScene: false, 
+					cutScene: false,
+					resetId: 129,
 					quiz:[
 							{
 								storeAs: 'foo4', 
@@ -128,7 +130,6 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'trigger2', expr: "dotManager.lists.uglier.length >= 360", message: 'Turn on the reaction and allow it to react.', requiredFor: 'prompt0', checkOn: 'conditions'},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 117)'], requiredFor: false}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugly', tag: 'wally'}}
@@ -158,6 +159,7 @@ LevelData = {
 			prompts:[
 				{
 					sceneData: undefined, 
+					resetId: 130,
 					cutScene: false, 
 					quiz:[
 							{
@@ -219,7 +221,7 @@ LevelData = {
 				}
 			]
 		},
-		{//S6
+		{//S4
 			sceneData: {
 				walls: [
 					{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'staticAdiabatic', temp: 300, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
@@ -252,6 +254,7 @@ LevelData = {
 			prompts: [
 				{
 					sceneData: undefined, 
+					resetId: 131,
 					cutScene: false, 
 					quiz:[
 							{
@@ -265,7 +268,7 @@ LevelData = {
 				},
 			]
 		},
-		{//S7
+		{//S5
 			sceneData: {
 				walls: [
 					{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'staticAdiabatic', temp: 50, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
@@ -287,7 +290,6 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'trigger3', expr: "temp('wally') >= 998", message: 'Heat the system to 1000 K.', requiredFor: 'prompt0', checkOn: 'conditions'},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 118)'], requiredFor: false}
 				],
 				dataRecord: [
 					
@@ -307,6 +309,7 @@ LevelData = {
 			prompts: [
 				{
 					sceneData: undefined, 
+					resetId: 132,
 					cutScene: false, 
 					quiz:[
 							{
@@ -320,6 +323,7 @@ LevelData = {
 				},
 				{
 					sceneData: undefined, 
+					resetId: 133,
 					cutScene: false, 
 					quiz:[
 							{
@@ -332,7 +336,8 @@ LevelData = {
 					]
 				},
 				{
-					sceneData: undefined, 
+					sceneData: undefined,
+					resetId: 134,
 					cutScene: false, 
 					quiz:[
 							{
@@ -346,7 +351,7 @@ LevelData = {
 				},
 			]
 		},
-		{//S8
+		{//S6
 			sceneData: undefined, 
 			cutScene: true,
 			prompts:[
@@ -366,7 +371,7 @@ LevelData = {
 				}
 			]
 		},
-		{//S9
+		{//S7
 			sceneData: {
 				walls: [
 						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 300, isothermalRate: 5, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
@@ -380,7 +385,6 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'trigger5', expr: "dotManager.lists.ugliest.length >= 362", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 119)'], requiredFor: false}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugliest', tag: 'wally'}}
@@ -410,6 +414,7 @@ LevelData = {
 			prompts:[
 				{
 					sceneData: undefined,
+					resetId: 135,
 					cutScene: false, 
 					quiz:[
 							{
@@ -425,6 +430,7 @@ LevelData = {
 				},
 				{
 					sceneData: undefined, 
+					resetId: 136,
 					cutScene: false,
 					quiz:[
 							{
@@ -439,7 +445,7 @@ LevelData = {
 				}
 			]
 		},
-		{//S10
+		{//S8
 			sceneData: undefined, 
 			cutScene: true,
 			prompts:[
@@ -486,7 +492,7 @@ LevelData = {
 				}
 			]
 		},
-		{//S11
+		{//S9
 			sceneData: {
 				walls: [
 						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 500, isothermalRate: 5, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
@@ -500,7 +506,6 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'trigger6', expr: "dotManager.lists.ugliest.length >= 320", message: 'Enable the reaction and allow it to reach equilibrium.', requiredFor: 'prompt0', checkOn: 'conditions'},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 120'], requiredFor: false}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugliest', tag: 'wally'}}
@@ -530,6 +535,7 @@ LevelData = {
 			prompts: [
 				{
 					sceneData: undefined, 
+					resetId: 137,
 					quiz:[
 							{
 								storeAs: 'foo19', 
@@ -542,7 +548,8 @@ LevelData = {
 					]
 				},
 				{
-					sceneData: undefined, 					
+					sceneData: undefined, 
+					resetId: 138,
 					quiz:[
 							{
 								storeAs: 'foo20', 
@@ -582,7 +589,7 @@ LevelData = {
 				}
 			]
 		},
-		{//S12
+		{//S10
 			sceneData: {
 				walls: [
 						{pts: [P(50, 50), P(500, 50), P(500, 350), P(50, 350)], handler: 'cVIsothermal', temp: 100, isothermalRate: 5, handle: 'wally', vol: 12, border: {type: 'wrap', thickness: 5, yMin: 30}} 
@@ -596,7 +603,6 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'trigger7', expr: "collide.rxnHandlerNonEmergent.rxnIsEnabled('reacty5')",message: 'Enable the reaction', requiredFor: 'prompt0', checkOn:'conditions'},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 121)'], requiredFor: false}
 				],
 				dataRecord: [
 					{wallInfo: 'wally', data: 'frac', attrs: {spcName: 'ugliest', tag: 'wally'}}
@@ -625,10 +631,12 @@ LevelData = {
 			prompts: [
 				{
 					sceneData: undefined,
+					resetId: 139,
 					text: "Click 'Enable' to start the reaction.",
 				},
 				{
 					sceneData: undefined, 
+					resetId: 140,
 					quiz:[
 							{
 								questionText: 'Why is the reaction not proceeding?',
@@ -641,6 +649,7 @@ LevelData = {
 				},
 				{
 					sceneData: undefined, 
+					resetId: 141,
 					quiz:[
 							{
 								questionText: 'Although it appears nothing is happening, there is a non-zero rate constant in the forward direction. What will be the mole fraction of A if you wait for a very long time?',
