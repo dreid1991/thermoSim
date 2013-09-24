@@ -102,7 +102,7 @@ WallMethods.collideMethods ={
 		if (dot.v.dy * dotVyF < 0) dot.v.dy *= -1;
 		wall.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
 	},
-	staticAdiabatic: function(dot, wall, subWallIdx, wallUV, perpV, perpUV){
+	staticAdiabatic: function(dot, wall, subWallIdx, wallUV, perpV, perpUV) {
 		this.reflect(dot, wallUV, perpV);
 		wall.forceInternal += 2*dot.m*Math.abs(perpV);
 	},

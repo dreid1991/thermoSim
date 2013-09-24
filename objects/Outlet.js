@@ -55,8 +55,8 @@ _.extend(Outlet.prototype, flowFuncs, objectFuncs, {
 		var chance = (pressure - this.pFloor + interpRange) / (2 * interpRange);
 		if (Math.random() < chance) {
 			return dotManager.remove(dot, true);
-		} else {
-			return WallMethods.collideMethods.reflect(dot, wallUV, perpV);
+		} else {   
+			return WallMethods.collideMethods.staticAdiabatic.apply(walls, [dot, wall, subWallIdx, wallUV, perpV, perpUV]);
 		}
 	},
 	remove: function() {

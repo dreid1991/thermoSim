@@ -18,10 +18,10 @@ Copyright (C) 2013  Daniel Reid
 function CompositionController(attrs) {
 	this.type = 'CompositionController';
 	this.handle = attrs.handle;
-	this.inletDepth = attrs.inletDepth;
-	this.outletDepth = attrs.outletDepth;
-	this.flowWidth = defaultTo(30, attrs.width);
-	this.flowSpacing = 18;
+	this.inletDepth = Math.max(defaultTo(attrs.inletDepth, 20), 20);
+	this.outletDepth = Math.max(defaultTo(attrs.outletDepth, 20), 20);
+	this.flowWidth = Math.max(defaultTo(30, attrs.width), 30);
+	this.flowSpacing = 35
 	this.wallInfo = attrs.wallInfo;
 	this.wall = walls[this.wallInfo];
 	this.inlets = [];
