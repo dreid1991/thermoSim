@@ -83,7 +83,6 @@ LevelData = {
 					}
 				],
 				triggers: [
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 125)'], requiredFor: false}
 				]
 			},
 			prompts: [
@@ -101,6 +100,7 @@ LevelData = {
 							{handle: 'firstReaction', expr: 'frac("firstWall", {tag:"firstWall", spcName:"spc3"})>0.5', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 
 						]
 					},
+					resetId: 145,
 					cutScene: false,
 					quiz:[
 							{type: 'text',
@@ -196,7 +196,6 @@ LevelData = {
 					}
 				],
 				triggers: [
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 126)'], requiredFor: false}
 				],
 				graphs: [
 							{type: 'Scatter', handle: 'EnthalpyFracVsTemp', xLabel: "Extent of Reaction", yLabel: "Enthalpy (kJ)", axesInit:{y:{min:-12, step:3},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 6}, axesFixed:{x: true, y: true},
@@ -221,6 +220,7 @@ LevelData = {
 						'buttonManager.hideButton("Reaction", "rxn1go")'
 					]
 				},
+				resetId: 146,
 					quiz: [
 						{type: 'text',
 						questionText:"Now we're going to carry out the hypothetical path.  Above is species A in the same initial state as the previous system.  You can use the buttons to the right to set whether the system is isothermal and whether the reaction occurs.  For this hypothetical process, the activation energy has been lowered so the reaction proceeds at 298 K and the reverse reaction has been disabled. <p> Take the first step in the hypothetical path. How does the enthalpy change compare to the value of get('step1', 'string', 'noValue') kJ you calculated?",
@@ -336,7 +336,6 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'checkReaction1', expr: 'frac("thirdWall", {tag:"thirdWall", spcName:"spc2"})>0.52', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 127)'], requiredFor: false}
 				],
 				graphs: [
 							{type: 'Scatter', handle: 'timevsextent', xLabel: "Time (s)", yLabel: "Extent of Reaction", axesInit:{y:{min:0, step:0.2},x:{min:0, step:5}}, numGridLines: {x:6, y: 6}, axesFixed:{y: true},
@@ -353,6 +352,7 @@ LevelData = {
 								{handle: 'lastReaction', expr: 'frac("thirdWall", {tag:"thirdWall", spcName:"spc2"})>0.5', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 
 							]
 					},
+					resetId: 147,
 						quiz: [
 							{type: 'textSmall',
 							questionText: "Now that we know the enthalpy of reaction at 500 K to be get('stepTotal', 'string', 'noValue') kJ, perform the experiment and calculate the amount of heat released during the process by using the extent of reaction.",
@@ -401,7 +401,6 @@ LevelData = {
 				],
 				triggers: [
 					{handle: 'checkReaction2', expr: 'frac("fourthWall", {tag:"fourthWall", spcName:"spc2"})>0.52', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 128)'], requiredFor: false}					
 				],
 				graphs: [
 							{type: 'Scatter', handle: 'extentvsheat', xLabel: "Extent of Reaction", yLabel: "Heat (kJ)", axesInit:{y:{min:-3, step:1},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 6}, axesFixed:{x: true},
@@ -418,6 +417,7 @@ LevelData = {
 								{handle: 'lastReaction', expr: 'frac("fourthWall", {tag:"fourthWall", spcName:"spc2"})>0.5', message: "Perform the reaction and allow the process to reach equilibrium.", priority: 1} 
 							]
 					},
+					resetId: 148,
 						quiz: [
 							{type: 'textSmall',
 							questionText: "Perform the experiment again. Record the actual amount of heating done by the reaction below.",
@@ -430,6 +430,7 @@ LevelData = {
 				},
 				{//Prompt 1
 					sceneData: undefined,
+					resetId: 149,
 					quiz: [
 						{
 							type: 'text',
