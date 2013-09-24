@@ -91,6 +91,7 @@ LevelData = {
 				},
 				{//Prompt 1
 				sceneData: undefined,
+				resetId: 108,
 				text: "<p>So the molecules speed up when they collide with the moving wall.  Those collisions add kinetic energy, which means that the temperature increases.</p><p>Now let's do an experiment where we compress our adiabatic system.",
 				}
 			]
@@ -122,9 +123,6 @@ LevelData = {
 						]
 					}
 				],
-				triggers: [
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 108)'], requiredFor: false}
-				]
 			},
 			prompts:[
 				{//Prompt 0
@@ -134,6 +132,7 @@ LevelData = {
 								{handle: 'CheckVol', expr: 'vol("SecondWall")<8', message: "Compress the system!", priority: 1}
 							]
 					},
+					resetId: 109,
 						quiz: [
 							{
 								questionText: "Above is a well insulated piston cylinder assembly.  Place the block on top of the piston and observe the response.  Calculate the amount of work that the piston and block did on the system?",
@@ -142,6 +141,7 @@ LevelData = {
 				},
 				{//Prompt 1
 					sceneData: undefined,
+					resetId: 110,
 						quiz: [
 							{questionText: "The system had an initial temperature of 200 K and contains 1.8 moles of an ideal monatomic gas.  You wrote that get('WorkDoneAnswer','int') kJ of work were done.  What final temperature should the system have?", CWQuestionId: 5, type: 'textSmall', storeAs: 'TempAnswer', units: 'K', text: ''}
 						]
@@ -183,9 +183,6 @@ LevelData = {
 						]
 					}	
 				],
-				triggers: [
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 109)'], requiredFor: false}
-				]
 			},
 			prompts:[
 				{//Prompt 0
@@ -195,10 +192,11 @@ LevelData = {
 							{handle: 'checkVol2', expr: 'vol("ThirdWall")<8', message: "Compress the system!", priority: 1}
 						]
 					},
+					resetId: 111,
 					quiz: [
 						{
 							questionText: "Previously you answered that the compression did get('WorkDoneAnswer','int') KJ on the system bringing it to a final temperature of get('TempAnswer','int') K.  Here's the same compression, but this time we're displaying work done and temperature. How do the results compare?  If there's a discrepancy, can you account for it?",
-							type: 'text', CWQuestionId: 6, storeAs: 'DiscrepencyAnswer'}
+							type: 'text', CWQuestionId: 6, storeAs: 'DiscrepancyAnswer'}
 					]
 				},
 				{//Prompt 1
