@@ -116,9 +116,7 @@ LevelData = {
 					{handle: 'trigger3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length > 540', message: 'Fully condense the vapor', checkOn: 'conditions', requiredFor: 'prompt8'},
 					{handle: 'freeze3', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 550', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'curLevel.liquidWater.disablePhaseChange()'], requiredFor: false},
 					{handle: 'trigger4', expr: 'curLevel.liquidWater.temp <= 390', message: 'Heat the vapor', requiredFor: 'prompt11', checkOn: 'conditions'},
-					{handle: 'freeze4', expr: 'curLevel.liquidWater.temp <= 388 && curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 550', requiredFor: 'prompt11', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(388)']},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 129)'], requiredFor: false}
-					
+					{handle: 'freeze4', expr: 'curLevel.liquidWater.temp <= 388 && curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 550', requiredFor: 'prompt11', satisfyCmmds: ['curLevel.heaterHeater1.disable()', 'walls["wallo"].isothermalInit(388)']},			
 				]
 			},
 			prompts: [
@@ -129,6 +127,7 @@ LevelData = {
 							'walls.wallo.isothermalStop()'
 						]	
 					},
+					resetId: 150,
 					quiz: [
 						{	
 							type: 'text',							
@@ -142,6 +141,7 @@ LevelData = {
 				},
 				{//prompt1
 					sceneData: undefined,
+					resetId: 151,
 					quiz: [
 						{
 							type: 'textSmall',
@@ -160,6 +160,7 @@ LevelData = {
 							'curLevel.liquidWater.disablePhaseChange()'
 						]
 					},
+					resetId: 152,
 					text: 'Cool the system until it reaches the saturated vapor state. Compare the energy required to what you calculated.'
 				},
 				{//prompt3
@@ -428,7 +429,6 @@ LevelData = {
 					{handle: 'triggery2', expr: 'curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length == 0', satisfyCmmds: ['curLevel.liquidWater.disablePhaseChange()'], priority: 1, requiredFor: false},
 					{handle: 'freeze1', expr: 'pExt("wallo") <= 1.70', satisfyCmmds: ['curLevel.sandboxMrSandMan.removeMassStop()', 'buttonManager.hideButton("mrSandManSandButtons", "add")', 'buttonManager.hideButton("mrSandManSandButtons", "remove")'], priority: 1, requiredFor: false},
 					{handle: 'freeze2', expr: 'pExt("wallo") <= 1.60', satisfyCmmds: ['curLevel.sandboxMrSandMan.removeMassStop()', 'buttonManager.hideButton("mrSandManSandButtons", "add")', 'buttonManager.hideButton("mrSandManSandButtons", "remove")'], priority: 1, requiredFor: false},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 130)'], requiredFor: false}
 				]
 			},
 			prompts: [
@@ -438,6 +438,7 @@ LevelData = {
 							'curLevel.liquidWater.disablePhaseChange()'
 						]
 					},
+					resetId: 153,
 					text: "Now decrease the pressure to bring the system to saturation with the temperature held constant at 115 C.<br><br>Click and hold the 'Remove mass' button in the sand controls section to decrease pressure."		
 				},
 				{//prompt1
