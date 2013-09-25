@@ -60,10 +60,9 @@ LevelData = {
 				triggers: [
 					{handle: 'triggery1', expr: 'temp("wally1") >= 245', message: 'Heat the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
 					{handle: 'at250', expr: 'temp("wally1") >= 245', satisfyCmmds: ['curLevel.at250 = true'], requiredFor: false},
-					{handle: 'superCool', expr: 'temp("wally1") <= 140', satisfyCmmds: ['sendToCW("Constant volume system cooled below 150 K", 133)'], requiredFor: false},
-					{handle: 'coolingBelow250', expr: 'temp("wally1") <= 235 && curLevel.at250', satisfyCmmds: ['sendToCW("Constant volume system raised to 250 K but then cooled again", 134)'], requiredFor: false},
+					{handle: 'superCool', expr: 'temp("wally1") <= 140', satisfyCmmds: ['sendToCW("Constant volume system cooled below 150 K", 156)'], requiredFor: false},
+					{handle: 'coolingBelow250', expr: 'temp("wally1") <= 235 && curLevel.at250', satisfyCmmds: ['sendToCW("Constant volume system raised to 250 K but then cooled again", 157)'], requiredFor: false},
 					{handle: 'triggery2', expr: 'temp("wally1") <= 255', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 113)'], requiredFor: false}
 				]
 					// triggers: [
 							// {handle: 'heatcheck', expr: 'fracDiff(temp("wally1"), 250) < 0.05', message: 'Heat the system by 100 K', priorityUnsatisfied:1},
@@ -78,6 +77,7 @@ LevelData = {
 									// ],
 						// },											
 					cutScene:false,
+					resetId: 123,
 					quiz:[
 						{
 							questionText: "Now let's perform an experiment.  You wrote that this heating would 'cost' get('foo2', 'string', 'noValue') kJ.  The system shown above contains our 0.5 moles of ideal monatomic gas.   You can add energy by using the slider to activate the heater.  Increase the temperature by 100 K. Note that you can also cool the system if its temperature increases too much.<p>How does your prediction for the heating amount compare to the experimental result? Explain.</p>",
@@ -124,16 +124,16 @@ LevelData = {
 						triggers: [
 							{handle: 'triggery3', expr: 'temp("wally2") >= 238', message: 'Heat the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
 							{handle: 'at250', expr: 'temp("wally2") >= 245 && turn > 25', satisfyCmmds: ['curLevel.isAt250 = true'], requiredFor: false},
-							{handle: 'superCool', expr: 'temp("wally2") <= 135', satisfyCmmds: ['sendToCW("Constant pressure system cooled below 150 K", 135)'], requiredFor: false},
-							{handle: 'coolingBelow250', expr: 'temp("wally2") <= 235 && curLevel.isAt250', satisfyCmmds: ['sendToCW("Constant pressure system raised to 250 K but then cooled again", 136)'], requiredFor: false},
+							{handle: 'superCool', expr: 'temp("wally2") <= 135', satisfyCmmds: ['sendToCW("Constant pressure system cooled below 150 K", 158)'], requiredFor: false},
+							{handle: 'coolingBelow250', expr: 'temp("wally2") <= 235 && curLevel.isAt250', satisfyCmmds: ['sendToCW("Constant pressure system raised to 250 K but then cooled again", 159)'], requiredFor: false},
 							{handle: 'triggery4', expr: 'temp("wally2") <= 262', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt2'},
-							{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 114)'], requiredFor: false}
 						],
 						cmmds: [
 							'curLevel.heaterHeaterWally1.disable()'
 						],
 					},
-					cutScene:false, 
+					cutScene:false,
+					resetId: 124,
 					quiz:[
 						{
 							questionText: "Here is the constant pressure version of the system filled with one mole of the ideal monatomic gas.  Heat the system by 100 K.  How does the value compare to the constant volume heating value of get('foo2', 'string', 'noValue') kJ?",
@@ -199,11 +199,11 @@ LevelData = {
 					triggers: [
 						{handle: 'triggery5', expr: 'temp("wally3") >= 238', message: 'Heat the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
 						{handle: 'triggery6', expr: 'temp("wally3") <= 262', message: 'Cool the system', priority: 1, checkOn: 'conditions', requiredFor: 'prompt0'},
-						{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 115)'], requiredFor: false}
 					]
 			},			
 			prompts: [					
 						{//p0, q6
+						resetId: 125,
 						quiz:[
 								{		
 									questionText: "Here's the same system with the work done displayed.  Increase the temperature by 100 K.  You predicted that get('foo5', 'string', 'noValue') kJ of work would be done.  How does this compare to the experimental result?",
@@ -215,6 +215,7 @@ LevelData = {
 							]
 						}, 
 						{//p1, q7
+							resetId: 126,
 							sceneData: {
 								cmmds: [
 									'curLevel.heaterHeaterWally3.disable()'

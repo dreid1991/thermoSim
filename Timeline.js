@@ -176,7 +176,7 @@ Timeline.prototype = {
 	sendRefreshToCW: function() {
 		var resetId = this.curPrompt().resetId;
 		if (resetId !== undefined) 
-			sendToCW("Section was refreshed", reset);
+			sendToCW("Section was refreshed", resetId);
 	},
 	takeNumber: function() {
 		return this.curId ++;
