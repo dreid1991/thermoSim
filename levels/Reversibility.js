@@ -11,7 +11,7 @@ LevelData = {
 	],	
 
 	mainSequence: [
-		{
+		{//Scene 0
 			sceneData: undefined,
 			prompts: [
 				{
@@ -41,7 +41,7 @@ LevelData = {
 			],	
 			
 		},
-		{
+		{//Scene 1
 			sceneData: {
 				walls: [
 					{pts:[P(40,95), P(510,95), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'left', temp: 273, isothermalRate: 4, border: {type: 'open', width: 10} },
@@ -103,7 +103,6 @@ LevelData = {
 					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Place the block on the piston', requiredFor: 'prompt0', checkOn:'conditions'},
 					{handle: 'freeze', expr: 'pExt("left") == 4', satisfyCmmds: ['curLevel.dragWeightsWeight1.disable()'], requiredFor: 'prompt0'},
 					{handle: 'trigger2', expr: 'fracDiff(pExt("left"), 2) < 0.15', message: 'Remove the block from the piston', requiredFor: 'prompt2', checkOn:'conditions'},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 110)'], requiredFor: false}
 				],	
 			},
 			prompts: [
@@ -118,10 +117,12 @@ LevelData = {
 							CWQuestionId: 15
 						}
 					],
+					resetId: 112,
 					title: 'Current Step'		
 				},
 				{
 					sceneData: undefined,
+					resetId: 113,
 					quiz: [
 						{
 							type: 'text',
@@ -138,6 +139,7 @@ LevelData = {
 							'curLevel.dragWeightsWeight1.enable()'
 						],
 					},	
+					resetId: 114,
 					quiz: [
 						{
 							type: 'textSmall',
@@ -151,6 +153,7 @@ LevelData = {
 				},
 				{
 					sceneData: undefined,
+					resetId: 115,
 					quiz: [
 						{
 							type: 'text',
@@ -163,7 +166,7 @@ LevelData = {
 				}
 			]
 		},
-		{	
+		{//Scene 2	
 			sceneData: {
 				walls: [
 					{pts:[P(40,95), P(510,95), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'left', temp: 273, isothermalRate: 4, border: {type: 'open', width: 10} },
@@ -224,7 +227,6 @@ LevelData = {
 					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Place the blocks on the piston', requiredFor: 'prompt0', checkOn:'conditions'},
 					{handle: 'freeze', expr: 'pExt("left") == 4', satisfyCmmds: ['curLevel.dragWeightsWeight1.disable()'], requiredFor: 'prompt0'},
 					{handle: 'trigger2', expr: 'fracDiff(pExt("left"), 2) < 0.15', message: 'Remove the blocks from the piston', requiredFor: 'prompt2', checkOn:'conditions'},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 111)'], requiredFor: false}
 				]	
 			},
 			prompts:[
@@ -239,10 +241,12 @@ LevelData = {
 							CWQuestionId: 19
 						}
 					],
+					resetId: 116,
 					title: 'Current Step'		
 				},
 				{
 					sceneData: undefined, 
+					resetId: 117,
 					quiz: [
 						{
 							type: 'text',
@@ -259,6 +263,7 @@ LevelData = {
 							'curLevel.dragWeightsWeight1.enable()'
 						],
 					},	
+					resetId: 118,
 					quiz: [
 						{
 							type: 'textSmall',
@@ -272,6 +277,7 @@ LevelData = {
 				},
 				{
 					sceneData: undefined,
+					resetId: 119,
 					quiz: [
 						{
 							type: 'text',
@@ -284,7 +290,7 @@ LevelData = {
 				}
 			]
 		},
-		{
+		{//Scene 3
 			sceneData: {
 				walls: [
 					{pts:[P(40,95), P(510,95), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'left', temp: 273, isothermalRate: 4, border: {type: 'open', width: 10} },
@@ -344,7 +350,6 @@ LevelData = {
 					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Add mass to the system', requiredFor: 'prompt0', checkOn:'conditions'},
 					{handle: 'notRefreshed', expr: 'fracDiff(pExt("left"), 4) < 0.1', satisfyCmmds: ['curLevel.notRefreshed = true']},
 					{handle: 'trigger2', expr: 'fracDiff(pExt("left"), 2) < 0.15 && curLevel.notRefreshed', message: 'Remove mass from the system', requiredFor: 'prompt1', checkOn:'conditions'},
-					{handle: 'refreshCheck', expr: 'wasReset', satisfyCmmds: ['sendToCW("Section was refreshed", 112)'], requiredFor: false}
 				],	
 			},
 			prompts:[
@@ -359,10 +364,12 @@ LevelData = {
 							CWQuestionId: 23
 						}
 					],
+					resetId: 120,
 					title: 'Current Step'		
 				},
 				{
 					sceneData: undefined, 
+					resetId: 121,
 					quiz: [
 						{
 							type: 'textSmall',
@@ -376,6 +383,7 @@ LevelData = {
 				},
 				{
 					sceneData: undefined, 
+					resetId: 122,
 					quiz: [
 						{
 							type: 'text',
