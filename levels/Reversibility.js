@@ -267,7 +267,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'textSmall',
-							preText:'Now remove both blocks one at a time, waiting for the piston to settle before removing the next block. Estimate the work done on the system',
+							preText:'Now remove both blocks one at a time, waiting for the piston to settle before removing the next block. Estimate the work done on the system.',
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans4',
@@ -407,6 +407,23 @@ LevelData = {
 						}
 					],
 				},
+			]
+		},
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
+					quiz: [
+						{
+							type: 'text',
+							questionText: 'Now that you have completed the simulation, describe what you think the difference between reversible and irreversible processes is.',
+							text: 'type your answer here',
+							storeAs: 'longAns9',
+							CWQuestionId: 1000
+						}	
+					]
+				}
 			]
 		},
 		{

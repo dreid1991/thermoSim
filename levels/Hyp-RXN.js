@@ -104,7 +104,7 @@ LevelData = {
 					cutScene: false,
 					quiz:[
 							{type: 'text',
-							questionText: "The isothermal system above is held at 500 K and contains 1 mole of A.  The red colored species A  can reversibly react to form the yellow species B.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  Is the reaction endothermic or exothermic? What is the sign of the enthalpy of reaction? Explain.",
+							questionText: "The isothermal system above is held at 500 K and contains 1 mole of A.  The red colored species A  can reversibly react to form the yellow species B according to the reaction ##A \\rightarrow B##.  Begin the reaction and let it proceed to equilibrium.  You can start the reaction by clicking the 'Enable reaction' button.  Is the reaction endothermic or exothermic? What is the sign of the enthalpy of reaction? Explain.",
 							storeAs:'realProcess',
 							text: 'Type your answer here.',
 							CWQuestionId: 79

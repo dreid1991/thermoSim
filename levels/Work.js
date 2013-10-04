@@ -135,7 +135,7 @@ LevelData = {
 					resetId: 109,
 						quiz: [
 							{
-								questionText: "Above is a well insulated piston cylinder assembly.  Place the block on top of the piston and observe the response.  Calculate the amount of work that the piston and block did on the system?",
+								questionText: "Above is a well insulated piston cylinder assembly.  Place the block on top of the piston and observe the response.  Calculate the amount of work that the piston and block did on the system.",
 								CWQuestionId: 4, type: 'textSmall', storeAs: 'WorkDoneAnswer', units: 'kJ', boxText: ''}
 						]
 				},
@@ -212,7 +212,7 @@ LevelData = {
 				{//Prompt 2
 					sceneData: undefined,
 						cutScene: true,
-						text: "Now we'll look at expanding the same system of 1.8 moles with ## P_{ext} ## of 2 bar from 7.5L to 15 L. <p> How much work will the system do on its surroundings in this expansion, and what will its final temperature be?",
+						text: "Now we'll look at expanding the same system of 1.8 moles with ## P_{ext} ## of 2 bar from 7.5 L to 15 L. <p> How much work will the system do on its surroundings in this expansion, and what will its final temperature be?",
 						quiz: [
 							{type: 'textSmall', CWQuestionId: 10, label: "Work Done:",storeAs: 'workAnswer', text: " ", units: "kJ"},
 							{type: 'textSmall', CWQuestionId: 11, label: 'Final Temperature:', storeAs: 'tempAnswer', text: " ", units: "K"}
@@ -243,6 +243,22 @@ LevelData = {
 						{
 							questionText: "The system has undergone a two-step process.  First it was compressed by adding a block.  Then it was expanded to its original volume by removing the block.  Before the compression, the system's temperature was 200K.  After the expansion, the temperature was get('Temp', 'int') K.  Why is the system temperature higher after going through this two-step process?",
 							type: 'text', CWQuestionId: 12, text: "Type your answer here."}
+					]
+				}
+			]
+		},
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
+					quiz: [
+						{
+							type: 'text',
+							questionText: 'Now that you have completed the simulation, describe how work adds energy to a system.',
+							text: 'type your answer here',
+							CWQuestionId: 1000
+						}	
 					]
 				}
 			]

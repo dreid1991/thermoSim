@@ -29,7 +29,7 @@ LevelData = {
 					cutScene: true, 
 					quiz:[						
 					{
-						questionText: "<p>We'll start by heating a constant volume system.  It contains 0.5 moles of an ideal monotomic gas.  How much energy should heating this system by 100 K 'cost'?</p>",
+						questionText: "<p>We'll start by heating a constant volume system.  It contains 0.5 moles of an ideal monatomic gas.  How much energy should heating this system by 100 K 'cost'?</p>",
 						type: 'textSmall', 
 						storeAs: 'foo2', 
 						units: 'kJ', 
@@ -246,6 +246,23 @@ LevelData = {
 							text:'Type your answer here.', 
 							CWQuestionId: 36
 						},
+					]
+				}
+			]
+		},
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
+					quiz: [
+						{
+							type: 'text',
+							questionText: 'Now that you have completed the simulation, how would you describe the difference between a constant volume and constant pressure heat capacity.',
+							text: 'type your answer here',
+							storeAs: 'foo10',
+							CWQuestionId: 1001
+						}	
 					]
 				}
 			]
