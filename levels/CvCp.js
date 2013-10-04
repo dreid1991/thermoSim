@@ -240,7 +240,7 @@ LevelData = {
 				cutScene:true, 
 				quiz:[
 						{
-							questionText: "<p>The heat capacity per mole of gas can be described as the energy added through heat per temperature change, or ##\\frac{dq}{dT} ##.</p><p> We know that the constant volume heat capacity of an ideal monatomic gas is ##\\frac{3}{2}R##. </p><p>From the first law, solve for what the ##\\frac{dq}{dt}##, or heat capacity, would be for this system at constant pressure. </p><p>How does the result relate to your conceptual understanding of how constant pressure systems behave?  Explain.</p>", 
+							questionText: "<p>The heat capacity per mole of gas can be described as the energy added through heat per temperature change, or ##\\frac{dq}{dT} ##.</p><p> We know that the constant volume heat capacity of an ideal monatomic gas is ##\\frac{3}{2}R##. </p><p>From the first law, solve for what the ##\\frac{dq}{dT}##, or heat capacity, would be for this system at constant pressure. </p><p>How does the result relate to your conceptual understanding of how constant pressure systems behave?  Explain.</p>", 
 							storeAs: 'foo9', 
 							type:'text', 
 							text:'Type your answer here.', 
