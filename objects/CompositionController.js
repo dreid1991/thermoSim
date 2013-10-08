@@ -44,6 +44,8 @@ function CompositionController(attrs) {
 	this.attrSliders = attrs.sliders;
 	this.attrFlows = attrs.flows;
 	this.setupStd();
+	this.flowsBySpc = {};
+	this.compositions = this.recordCompositions(this.wall);
 	this.init();	
 }
 
@@ -55,7 +57,8 @@ _.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
 		if (this.willMakeTempSlider) this.tempSlider = this.addTempSlider(this.tempSliderTitle); //making temp slider be state-y so you can change bounds easily
 		//giving the flows from all the inlets to the sliders.  This way sliders for comp controller and normal inlet work the same way
 		var allFlows = this.getAllFlows(this.inlets);
-		this.flowGroupSliders = this.addFlowSliders(this.attrSliders, allFlows);
+		this.populateFlowsBySpc(this.flowsBySpc, allFlows);
+		this.flowGroupSliders = this.addFlowSliders(this.attrSliders || [], allFlows);
 		if (this.pSetPt) {
 			this.pControlListenerHandle = this.initPressureControl(this.wall, allFlows);
 		}
@@ -79,8 +82,40 @@ _.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
 		}, this)
 		return listenerHandle
 	},
+	recordCompositions: function(wall) {
+		var fracs = {};
+		for (var a in spcs) {
+			fracs[a] = wall.recordFrac({spcName: a, tag: wall.handle}).src();
+		}
+		return fracs;
+	},
 	initCompControl: function(setPts) {
-		
+		var sum = 0;
+		for (var a in setPts) sum += setPts[a];
+		if (a > 1) for (var a in setPts) setPts[a] *= 1/sum;
+		var comps = this.compositions;
+		var timeConst = 5;
+		var flowsBySpc
+		this.compComtrolHandle = 'controlComp' + this.handle.toCapitalCamelCase();
+		var flowsBySpc = this.flowsBySpc;
+		//pressure control is happening at the same time, so hopefully we can control both total flow and composition
+		addListener(curLevel, 'data', handle, function() {
+			for (var a in setPts) {
+				var comp = comps[a][comps[a].length - 1];
+				var dComp = setPts[a] - comp;
+				var flows = flowsBySpc[a];
+				var correctBy = (setPts[a] / comp + timeConst) / (1 + timeConst)
+				if (correctBy != Infinity) {
+					for (var i=0; i<flows.length; i++) {
+						flows[i].fracOpen *= correctBy;
+					}
+				} else {
+					for (var i=0; i<flows.length; i++) {
+						flows[i].fracOpen += setPts[a]; //just getting it started, could probably make more educated guess 
+					}
+				}
+			}
+		}, this)
 	},
 	addTempSlider: function(title) {
 		if (typeof this.tempMin != 'number' || typeof this.tempMax != 'number') console.log('Making heater ' + this.handle + ' temp slider without tempMin or tempMax');
@@ -153,11 +188,18 @@ _.extend(CompositionController.prototype, objectFuncs, flowFuncs, {
 		}
 		return flows;
 	},
+	populateFlowsBySpc: function(flowsBySpc, allFlows) {
+		for (var a in spcs) flowsBySpc[a] = [];
+		for (var i=0; i<allFlows.length; i++) {
+			flowsBySpc[allFlows[i].spcName].push(allFlows[i]);
+		}
+		
+	},
 	remove: function() {
 		for (var i=0; i<this.inlets.length; i++) this.inlets[i].remove();
 		for (var i=0; i<this.outlets.length; i++) this.outlets[i].remove();
 		if (this.tempSlider) this.tempSlider.remove();
-		removeListener(curLevel, 'data' this.pControlListenerHandle);
+		removeListener(curLevel, 'data', this.pControlListenerHandle);
 		for (var i=0; i<this.flowGroupSliders.length; i++) this.flowGroupSliders[i].slider.remove();
 		this.inlets = [];
 		this.outlets = [];
