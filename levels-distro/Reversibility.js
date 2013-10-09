@@ -379,7 +379,7 @@ LevelData = {
 							type: 'text',
 							preText: 'Placing the two blocks on quickly made the process more like the single block compression. What effect does waiting for the piston to reach equilibrium before adding another block have on the work done?',
 							text: 'type your answer here',
-							storeAs: 'longAns6',
+							storeAs: 'longAns7',
 							CWQuestionId: 163
 						}
 					]
@@ -486,7 +486,7 @@ LevelData = {
 							type: 'text',
 							preText:'How did your two calculated values of work in this last process compare? Were the surroundings unchanged? <p>What can you say about amount of work done during compression compared to amount of work done during expansion when the process is broken into smaller increments?',
 							text: 'type your answer here',
-							storeAs: 'longAns7',
+							storeAs: 'longAns8',
 							CWQuestionId: 25
 						}
 					],
@@ -499,7 +499,7 @@ LevelData = {
 							type: 'text',
 							preText:'Depending on how slowly you added and removed mass, you can probably see that the external pressure curves do not perfectly overlap. Explain why the two curves do not overlap. Hint: Think back to both two block processes.',
 							text: 'type your answer here',
-							storeAs: 'longAns7',
+							storeAs: 'longAns9',
 							CWQuestionId: 164
 						}
 					],
@@ -511,13 +511,13 @@ LevelData = {
 						{
 							type: 'text',
 							preText:'<p>Was this last process actually reversible? You assumed for your calculations that external pressure was always equal to internal pressure. Was it?',
-							storeAs: 'longAns8',
+							storeAs: 'longAns10',
 							CWQuestionId: 26
 						},
 						{
 							type: 'text',
 							preText: '<p>If you answered no to the previous question, do you think treating the process as reversible is a good approximation? Explain. <p>How about treating the one block or two block processes as reversible?',
-							storeAs: 'longAns9',
+							storeAs: 'longAns11',
 							CWQuestionID: 165
 						}
 					],
@@ -529,7 +529,7 @@ LevelData = {
 						{
 							type: 'text',
 							preText:'<p>What size do the changes in input need to be for a process to be truly reversible? Can a real process be truly reversible, or can it only get close to being reversible?',
-							storeAs: 'longAns10',
+							storeAs: 'longAns12',
 							CWQuestionId: 166
 						}
 					],
@@ -546,7 +546,7 @@ LevelData = {
 							type: 'text',
 							questionText: '<p>Now that you have completed the simulation, describe the difference between reversible and irreversible processes.',
 							text: 'type your answer here',
-							storeAs: 'longAns11',
+							storeAs: 'longAns13',
 							CWQuestionId: 167
 						}	
 					]
@@ -563,6 +563,7 @@ LevelData = {
 							type: 'text',
 							questionText: '<p>Identify and describe in 1-2 sentences the most important concepts about reversibility this interactive virtual laboratory addressed.',
 							text: 'type your response here',
+							storeAs: 'longAns14',
 							CWQuestionId: 168
 							
 						},
@@ -570,6 +571,7 @@ LevelData = {
 							type: 'text',
 							questionText: '<p>How do these concepts connect to what you have been learning in class?',
 							text: 'type your response here',
+							storeAs: 'longAns15',
 							CWQuestionId: 169
 							
 						}

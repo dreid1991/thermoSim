@@ -277,6 +277,7 @@ LevelData = {
 							type: 'text',
 							questionText: '<p>Identify and describe in 1-2 sentences the most important concepts about heat capacities this interactive virtual laboratory addressed.',
 							text: 'type your response here',
+							storeAs: 'finalAns1',
 							CWQuestionId: 171
 							
 						},
@@ -284,6 +285,7 @@ LevelData = {
 							type: 'text',
 							questionText: '<p>How do these concepts connect to what you have been learning in class?',
 							text: 'type your response here',
+							storeAs: 'finalAns2',
 							CWQuestionId: 172
 							
 						}
