@@ -62,7 +62,7 @@ LevelData = {
 								]
 							},
 							resetId: 142,
-							text: " Above is a constant pressure system containing 1 mole of species A in the liquid phase at 350 K.  Heat the system until it reaches 450 K and all of species A is vaporized.",
+							text: "Above is a constant pressure system containing 1 mole of species A in the liquid phase at 350 K.  Heat the system until it reaches 450 K and all of species A is vaporized.",
 							quiz: [
 								{
 									type: 'textSmall',
@@ -358,7 +358,7 @@ LevelData = {
 						]
 					},
 					resetId: 144,
-					text: 'Let\'s perform the process again. This time the enthalpy change of the process is displayed and graphed. As before heat the system from 350 K to 450 K.',
+					text: "Let's perform the process again. This time the enthalpy change of the process is displayed and graphed. As before heat the system from 350 K to 450 K.",
 					quiz: [
 						{
 							type: 'text',
@@ -381,7 +381,7 @@ LevelData = {
 							type: 'text',
 							questionText: 'Now that you have completed the simulation, how would you use the properties of state functions to determine an unknown enthalpy of vaporization?',
 							text: 'type your response here',
-							CWQuestionId: 100000
+							CWQuestionId: 173
 						}
 					]
 				}
@@ -397,14 +397,14 @@ LevelData = {
 							type: 'text',
 							questionText: '<p>Identify and describe in 1-2 sentences the most important concepts about hypothetical paths this interactive virtual laboratory addressed.',
 							text: 'type your response here',
-							CWQuestionId: 555555
+							CWQuestionId: 174
 							
 						},
 						{
 							type: 'text',
 							questionText: '<p>How do these concepts connect to what you have been learning in class?',
 							text: 'type your response here',
-							CWQuestionId: 555555
+							CWQuestionId: 175
 							
 						}
 					]

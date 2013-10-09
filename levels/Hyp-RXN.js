@@ -453,7 +453,7 @@ LevelData = {
 							type: 'text',
 							questionText: 'Now that you have completed the simulation, how would you use the properties of state functions to determine an unknown enthalpy of reaction?',
 							text: 'type your response here',
-							CWQuestionId: 100000
+							CWQuestionId: 176
 						}
 					]
 				}
@@ -469,14 +469,14 @@ LevelData = {
 							type: 'text',
 							questionText: '<p>Identify and describe in 1-2 sentences the most important concepts about hypothetical paths this interactive virtual laboratory addressed.',
 							text: 'type your response here',
-							CWQuestionId: 555555
+							CWQuestionId: 177
 							
 						},
 						{
 							type: 'text',
 							questionText: '<p>How do these concepts connect to what you have been learning in class?',
 							text: 'type your response here',
-							CWQuestionId: 555555
+							CWQuestionId: 178
 							
 						}
 					]

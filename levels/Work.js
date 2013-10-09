@@ -257,7 +257,7 @@ LevelData = {
 							type: 'text',
 							questionText: '<p>Now that you have completed the simulation, describe how the process of doing work adds energy to a system.',
 							text: 'type your answer here',
-							CWQuestionId: 1000
+							CWQuestionId: 160
 						}	
 					]
 				}
@@ -273,14 +273,14 @@ LevelData = {
 							type: 'text',
 							questionText: '<p>Identify and describe in 1-2 sentences the most important concepts about work this interactive virtual laboratory addressed.',
 							text: 'type your response here',
-							CWQuestionId: 555555
+							CWQuestionId: 161
 							
 						},
 						{
 							type: 'text',
 							questionText: '<p>How do these concepts connect to what you have been learning in class?',
 							text: 'type your response here',
-							CWQuestionId: 555555
+							CWQuestionId: 162
 							
 						}
 					]
