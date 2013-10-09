@@ -255,10 +255,34 @@ LevelData = {
 					quiz: [
 						{
 							type: 'text',
-							questionText: 'Now that you have completed the simulation, describe how work adds energy to a system.',
+							questionText: '<p>Now that you have completed the simulation, describe how the process of doing work adds energy to a system.',
 							text: 'type your answer here',
 							CWQuestionId: 1000
 						}	
+					]
+				}
+			]
+		},
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
+					quiz: [
+						{
+							type: 'text',
+							questionText: '<p>Identify and describe in 1-2 sentences the most important concepts about work this interactive virtual laboratory addressed.',
+							text: 'type your response here',
+							CWQuestionId: 555555
+							
+						},
+						{
+							type: 'text',
+							questionText: '<p>How do these concepts connect to what you have been learning in class?',
+							text: 'type your response here',
+							CWQuestionId: 555555
+							
+						}
 					]
 				}
 			]

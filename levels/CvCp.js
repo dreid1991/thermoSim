@@ -258,11 +258,35 @@ LevelData = {
 					quiz: [
 						{
 							type: 'text',
-							questionText: 'Now that you have completed the simulation, how would you describe the difference between a constant volume and constant pressure heat capacity.',
+							questionText: '<p>Now that you have completed the simulation, how would you describe the difference between a constant volume and constant pressure heat capacity.',
 							text: 'type your answer here',
 							storeAs: 'foo10',
 							CWQuestionId: 1001
 						}	
+					]
+				}
+			]
+		},
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
+					quiz: [
+						{
+							type: 'text',
+							questionText: '<p>Identify and describe in 1-2 sentences the most important concepts about heat capacities this interactive virtual laboratory addressed.',
+							text: 'type your response here',
+							CWQuestionId: 555555
+							
+						},
+						{
+							type: 'text',
+							questionText: '<p>How do these concepts connect to what you have been learning in class?',
+							text: 'type your response here',
+							CWQuestionId: 555555
+							
+						}
 					]
 				}
 			]

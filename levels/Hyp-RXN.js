@@ -448,6 +448,30 @@ LevelData = {
 			prompts: [
 				{
 					cutScene: true,
+					quiz: [
+						{
+							type: 'text',
+							questionText: '<p>Identify and describe in 1-2 sentences the most important concepts about hypothetical paths this interactive virtual laboratory addressed.',
+							text: 'type your response here',
+							CWQuestionId: 555555
+							
+						},
+						{
+							type: 'text',
+							questionText: '<p>How do these concepts connect to what you have been learning in class?',
+							text: 'type your response here',
+							CWQuestionId: 555555
+							
+						}
+					]
+				}
+			]
+		},
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
 					title: '',
 					text: 'You have completed the simulation.',
 					quiz: [
