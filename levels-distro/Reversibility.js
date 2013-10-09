@@ -56,10 +56,10 @@ LevelData = {
 							handle: 'RightPiston',
 							wallInfo: 'left',
 							min: 1,
-							init: 1,
+							init: 2,
 							max: 4,
 							makeSlider: false,	
-							compMode: 'cPAdiabaticDamped',
+							compMode: 'cPAdiabatic',
 						}	
 					},
 					{
@@ -68,7 +68,7 @@ LevelData = {
 							handle: 'Weight1',
 							wallInfo: 'left',
 							weightDefs: [{count: 1, pressure:2}],
-							pInit: 1,
+							pInit: 0,
 							weightScalar: 100,
 							pistonOffset: V(0,-10),
 							displayText: true,
@@ -83,20 +83,21 @@ LevelData = {
 					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}}, axesFixed: {y: true}, numGridLines: {y: 6},
 						sets:[
 							{handle: 'externalPressure', label: 'P Ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
-							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+							data: {x: '1.059 * vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
 							{handle: 'internalPressure', label: 'P Int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
-							data: {x: 'vol("left")', y: 'pInt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5, showPts: false}
+							data: {x: '1.059 * vol("left")', y: 'moles("left", {spcName: "spc3", tag: "left"}) * R / 100 * 273 / (1.059*vol("left"))'}, trace: true, fillInPts: true, fillInPtsMin: 5, showPts: false}
 						]
 					}
 				],	
 				dataRecord: [
-					{wallInfo: 'left', data: 'frac', attrs: {spcName: 'spc3', tag: 'left'}}
+					{wallInfo: 'left', data: 'frac', attrs: {spcName: 'spc3', tag: 'left'}},
+					{wallInfo: 'left', data: 'moles', attrs: {spcName: 'spc3', tag: 'left'}}
 				],
 				dataReadouts: [
 					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', decPlaces: 0, handle: 'tempReadout', readout: 'mainReadout'},
 					// {label: 'Q: ', expr: 'q("left")', units: 'kJ', decPlaces: 1, handle: 'heatReadout', readout: 'mainReadout'},
-					{label: 'Pint: ', expr: 'pInt("left")', units: 'bar', decPlaces: 1, handle: 'pIntReadout', readout: 'pistonRightPistonLeft'},
-					{label: 'Vol: ', expr: 'vol("left")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
+					{label: 'Pint: ', expr: 'moles("left", {spcName: "spc3", tag: "left"}) * R / 100 * 273 / (1.059*vol("left"))', units: 'bar', decPlaces: 1, handle: 'pIntReadout', readout: 'pistonRightPistonLeft'},
+					{label: 'Vol: ', expr: '1.059 * vol("left")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonRight'}
 				],
 				triggers: [
@@ -157,7 +158,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'text',
-							preText: 'The system above has returned to its intial state, but what about the surroundings? Have they changed? Explain. <p>Was this process reversible?',
+							preText: 'The system above has returned to its intial state, but what about the surroundings? Have they changed? Explain. <p>Hint: Think about heat. <p>Was this process reversible?',
 							text: 'type your answer here',
 							storeAs: 'LongAns4',
 							CWQuestionId: 18
@@ -207,21 +208,103 @@ LevelData = {
 					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}}, axesFixed: {y: true}, numGridLines: {y: 6},
 						sets:[
 							{handle: 'externalPressure', label: 'P Ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
-							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+							data: {x: '1.059 * vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
 							{handle: 'internalPressure', label: 'P Int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
-							data: {x: 'vol("left")', y: 'pInt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5, showPts: false}
+							data: {x: '1.059 * vol("left")', y: 'moles("left", {spcName: "spc3", tag: "left"}) * R / 100 * 273 / (1.059*vol("left"))'}, trace: true, fillInPts: true, fillInPtsMin: 5, showPts: false}
 						]
 					}
 				],	
 				dataRecord: [
-					{wallInfo: 'left', data: 'frac', attrs: {spcName: 'spc3', tag: 'left'}}
+					{wallInfo: 'left', data: 'frac', attrs: {spcName: 'spc3', tag: 'left'}},
+					{wallInfo: 'left', data: 'moles', attrs: {spcName: 'spc3', tag: 'left'}}
 				],
 				dataReadouts: [
-					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', sigFigs: 3, handle: 'tempReadout', readout: 'mainReadout'},
-					// {label: 'Q: ', expr: 'q("left")', units: 'kJ', sigFigs: 1, handle: 'heatReadout', readout: 'mainReadout'},
-					{label: 'Pint: ', expr: 'pInt("left")', units: 'bar', sigFigs: 2, handle: 'pIntReadout', readout: 'pistonRightPistonRight'},
-					{label: 'Vol: ', expr: 'vol("left")', units: 'L', sigFigs: 3, handle: 'volReadout', readout: 'mainReadout'},
-					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
+					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', decPlaces: 0, handle: 'tempReadout', readout: 'mainReadout'},
+					// {label: 'Q: ', expr: 'q("left")', units: 'kJ', decPlaces: 1, handle: 'heatReadout', readout: 'mainReadout'},
+					{label: 'Pint: ', expr: 'moles("left", {spcName: "spc3", tag: "left"}) * R / 100 * 273 / (1.059*vol("left"))', units: 'bar', decPlaces: 1, handle: 'pIntReadout', readout: 'pistonRightPistonLeft'},
+					{label: 'Vol: ', expr: '1.059 * vol("left")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
+					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonRight'}
+				],
+				triggers: [
+					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Place the blocks on the piston', requiredFor: 'prompt0', checkOn:'conditions'},
+					{handle: 'freeze', expr: 'pExt("left") == 4', satisfyCmmds: ['curLevel.dragWeightsWeight1.disable()'], requiredFor: 'prompt0'},
+					{handle: 'trigger2', expr: 'fracDiff(pExt("left"), 2) < 0.15', message: 'Remove the blocks from the piston', requiredFor: 'prompt2', checkOn:'conditions'},
+				]	
+			},
+			prompts:[
+				{
+					text:  "Now we are going to perform a process with two blocks. Place both blocks on the piston as quickly as possible, one immediately after the other.",  
+					resetId: 179,
+					title: 'Current Step'		
+				},
+				{
+					sceneData: {
+						cmmds: [
+							'curLevel.dragWeightsWeight1.enable()'
+						],
+					},	
+					resetId: 180,
+					text: "Take note of the external pressure curve at the top right. Now remove both blocks as quickly as possible"
+				},
+			]
+		},
+		{//Scene 3	
+			sceneData: {
+				walls: [
+					{pts:[P(40,95), P(510,95), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'left', temp: 273, isothermalRate: 4, border: {type: 'open', width: 10} },
+				],
+				dots: [
+					{spcName: 'spc3', pos: P(45,100), dims: V(465,240), count: 1100, temp:273, returnTo: 'left', tag: 'left'},
+				],	
+				objs: [
+					{
+						type: 'Piston',
+						attrs: {
+							handle: 'RightPiston',
+							wallInfo: 'left',
+							min: 1,
+							init: 1,
+							max: 4,
+							makeSlider: false,	
+							compMode: 'cPAdiabaticDamped',
+						}	
+					},
+					{
+						type: 'DragWeights',
+						attrs: {
+							handle: 'Weight1',
+							wallInfo: 'left',
+							weightDefs: [{count: 2, pressure:1}],
+							pInit: 1,
+							pistonOffset: V(0,-10),
+							displayText: true,
+						}
+					},
+					{
+						type: 'QArrowsAmmt',
+						attrs: {handle: 'arrow', wallInfo: 'left', scale: 1}
+					}	
+				],
+				graphs: [
+					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}}, axesFixed: {y: true}, numGridLines: {y: 6},
+						sets:[
+							{handle: 'externalPressure', label: 'P Ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
+							data: {x: '1.059 * vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+							{handle: 'internalPressure', label: 'P Int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
+							data: {x: '1.059 * vol("left")', y: 'moles("left", {spcName: "spc3", tag: "left"}) * R / 100 * 273 / (1.059*vol("left"))'}, trace: true, fillInPts: true, fillInPtsMin: 5, showPts: false}
+						]
+					}
+				],	
+				dataRecord: [
+					{wallInfo: 'left', data: 'frac', attrs: {spcName: 'spc3', tag: 'left'}},
+					{wallInfo: 'left', data: 'moles', attrs: {spcName: 'spc3', tag: 'left'}}
+				],
+				dataReadouts: [
+					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', decPlaces: 0, handle: 'tempReadout', readout: 'mainReadout'},
+					// {label: 'Q: ', expr: 'q("left")', units: 'kJ', decPlaces: 1, handle: 'heatReadout', readout: 'mainReadout'},
+					{label: 'Pint: ', expr: 'moles("left", {spcName: "spc3", tag: "left"}) * R / 100 * 273 / (1.059*vol("left"))', units: 'bar', decPlaces: 1, handle: 'pIntReadout', readout: 'pistonRightPistonLeft'},
+					{label: 'Vol: ', expr: '1.059 * vol("left")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
+					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonRight'}
 				],
 				triggers: [
 					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Place the blocks on the piston', requiredFor: 'prompt0', checkOn:'conditions'},
@@ -234,7 +317,7 @@ LevelData = {
 					quiz: [
 						{	
 							type: 'textSmall',
-							preText: "Now we're going to break the process into two steps. Place both blocks on the piston one at a time, waiting for the piston to settle before placing the next block. Estimate the value of work done on the system in this compression process.",
+							preText: "Now we're going to repeat the exact same process, but this time place the blocks on the piston one at a time, waiting for the piston to settle before placing the next block. Estimate the value of work done on the system in this compression process.",
 							text: ' ', 
 							units: 'kJ',
 							storeAs: 'Ans3',
@@ -267,7 +350,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'textSmall',
-							preText:'Now remove both blocks one at a time, waiting for the piston to settle before removing the next block. Estimate the work done on the system',
+							preText:'Now remove both blocks one at a time, waiting for the piston to settle before removing the next block. Estimate the work done on the system.',
 							text: '',
 							units: 'kJ',
 							storeAs: 'Ans4',
@@ -287,10 +370,23 @@ LevelData = {
 							CWQuestionId: 22
 						}
 					]
+				},
+				{
+					sceneData: undefined,
+					resetId: 181,
+					quiz: [
+						{
+							type: 'text',
+							preText: 'Placing the two blocks on quickly made the process more like the single block compression. What effect does waiting for the piston to reach equilibrium before adding another block have on the work done?',
+							text: 'type your answer here',
+							storeAs: 'longAns6',
+							CWQuestionId: 163
+						}
+					]
 				}
 			]
 		},
-		{//Scene 3
+		{//Scene 4
 			sceneData: {
 				walls: [
 					{pts:[P(40,95), P(510,95), P(510,350), P(40,350)], handler: 'cVIsothermal', handle: 'left', temp: 273, isothermalRate: 4, border: {type: 'open', width: 10} },
@@ -330,21 +426,22 @@ LevelData = {
 					{type: 'Scatter', handle: 'pVGraph', xLabel: 'Volume (L)', yLabel: 'Pressure (bar)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}}, axesFixed: {y: true}, numGridLines: {y: 6},
 						sets:[
 							{handle: 'externalPressure', label: 'P Ext', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
-							data: {x: 'vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+							data: {x: '1.059 * vol("left")', y: 'pExt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
 							{handle: 'internalPressure', label: 'P Int', pointCol: Col(50, 255, 50), flashCol: Col(50, 255, 50),
-							data: {x: 'vol("left")', y: 'pInt("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5, showPts: false}
+							data: {x: '1.059 * vol("left")', y: 'moles("left", {spcName: "spc3", tag: "left"}) * R / 100 * 273 / (1.059*vol("left"))'}, trace: true, fillInPts: true, fillInPtsMin: 5, showPts: false}
 						]
 					}
 				],	
 				dataRecord: [
-					{wallInfo: 'left', data: 'frac', attrs: {spcName: 'spc3', tag: 'left'}}
+					{wallInfo: 'left', data: 'frac', attrs: {spcName: 'spc3', tag: 'left'}},
+					{wallInfo: 'left', data: 'moles', attrs: {spcName: 'spc3', tag: 'left'}}
 				],
 				dataReadouts: [
-					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', sigFigs: 3, handle: 'tempReadout', readout: 'mainReadout'},
+					{label: 'Temp: ', expr: 'tempSmooth("left")', units: 'K', decPlaces: 0, handle: 'tempReadout', readout: 'mainReadout'},
 					// {label: 'Q: ', expr: 'q("left")', units: 'kJ', decPlaces: 1, handle: 'heatReadout', readout: 'mainReadout'},
-					{label: 'pInt: ', expr: 'pInt("left")', units: 'bar', sigFigs: 2, handle: 'pIntReadout', readout: 'pistonRightPistonRight'},
-					{label: 'Vol: ', expr: 'vol("left")', units: 'L', sigFigs: 3, handle: 'volReadout', readout: 'mainReadout'},
-					{label: 'pExt: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
+					{label: 'Pint: ', expr: 'moles("left", {spcName: "spc3", tag: "left"}) * R / 100 * 273 / (1.059*vol("left"))', units: 'bar', decPlaces: 1, handle: 'pIntReadout', readout: 'pistonRightPistonLeft'},
+					{label: 'Vol: ', expr: '1.059 * vol("left")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
+					{label: 'Pext: ', expr: 'pExt("left")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonRight'}
 				],
 				triggers: [
 					{handle: 'trigger1', expr: 'fracDiff(pExt("left"), 4) < 0.1', message: 'Add mass to the system', requiredFor: 'prompt0', checkOn:'conditions'},
@@ -387,10 +484,23 @@ LevelData = {
 					quiz: [
 						{
 							type: 'text',
-							preText:'How do these two values of work compare? Have the surroundings changed now? What can be said about the amount of work put into a sytem compared to the amount of work gotten out when external pressure is changed in smaller increments?',
+							preText:'How did your two calculated values of work in this last process compare? Were the surroundings unchanged? <p>What can you say about amount of work done during compression compared to amount of work done during expansion when the process is broken into smaller increments?',
 							text: 'type your answer here',
 							storeAs: 'longAns7',
 							CWQuestionId: 25
+						}
+					],
+				},
+				{
+					sceneData: undefined, 
+					resetId: 182,
+					quiz: [
+						{
+							type: 'text',
+							preText:'Depending on how slowly you added and removed mass, you can probably see that the external pressure curves do not perfectly overlap. Explain why the two curves do not overlap. Hint: Think back to both two block processes.',
+							text: 'type your answer here',
+							storeAs: 'longAns7',
+							CWQuestionId: 164
 						}
 					],
 				},
@@ -400,13 +510,71 @@ LevelData = {
 					quiz: [
 						{
 							type: 'text',
-							preText:'<p>Was this process actually reversible? Can a real process ever be reversible? <p>What kind of changes in input are required for a process to be truly reversible?',
-							text: 'type your answer here',
+							preText:'<p>Was this last process actually reversible? You assumed for your calculations that external pressure was always equal to internal pressure. Was it?',
 							storeAs: 'longAns8',
 							CWQuestionId: 26
+						},
+						{
+							type: 'text',
+							preText: '<p>If you answered no to the previous question, do you think treating the process as reversible is a good approximation? Explain. <p>How about treating the one block or two block processes as reversible?',
+							storeAs: 'longAns9',
+							CWQuestionID: 165
 						}
 					],
 				},
+				{
+					sceneData: undefined, 
+					cutScene: true,
+					quiz: [
+						{
+							type: 'text',
+							preText:'<p>What size do the changes in input need to be for a process to be truly reversible? Can a real process be truly reversible, or can it only get close to being reversible?',
+							storeAs: 'longAns10',
+							CWQuestionId: 166
+						}
+					],
+				},
+			]
+		},
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
+					quiz: [
+						{
+							type: 'text',
+							questionText: '<p>Now that you have completed the simulation, describe the difference between reversible and irreversible processes.',
+							text: 'type your answer here',
+							storeAs: 'longAns11',
+							CWQuestionId: 167
+						}	
+					]
+				}
+			]
+		},
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
+					quiz: [
+						{
+							type: 'text',
+							questionText: '<p>Identify and describe in 1-2 sentences the most important concepts about reversibility this interactive virtual laboratory addressed.',
+							text: 'type your response here',
+							CWQuestionId: 168
+							
+						},
+						{
+							type: 'text',
+							questionText: '<p>How do these concepts connect to what you have been learning in class?',
+							text: 'type your response here',
+							CWQuestionId: 169
+							
+						}
+					]
+				}
 			]
 		},
 		{
