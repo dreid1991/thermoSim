@@ -79,7 +79,7 @@ LevelData = {
 				],
 				objs: [
 					{type: 'QArrowsAmmt',
-								attrs: {handle: 'arrow', wallInfo: 'firstWall', scale: 2}
+								attrs: {handle: 'arrow', wallInfo: 'firstWall', scale: 0.8}
 					}
 				],
 				triggers: [
@@ -119,7 +119,7 @@ LevelData = {
 				{//Prompt 2
 				sceneData: undefined,
 					cutScene: true,
-					text: "<center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A</td><td>3.5*R</td></tr><tr><td>B</td><td>4.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta h_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-3.5</td></tr></table></p></center> <p> Using this data, construct a hypothetical path in three steps that will allow you to calculate the enthalpy of reaction for the previous process.  Calculate the enthalpy change for each step and record the values on a separate sheet of paper. <p> The process is: <p> ##1 mole A (500 K) \\rightarrow 1 mole B (500 K)##",
+					text: "<center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A</td><td>3.5*R</td></tr><tr><td>B</td><td>4.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta h_{rxn}## (kJ/mol)</th></tr><tr><td>298</td><td>-3.5</td></tr></table></p></center> <p> Using this data, construct a hypothetical path in three steps that will allow you to calculate the enthalpy of reaction for the previous process.  Calculate the enthalpy change for each step and record the values on a separate sheet of paper. <p> The process is: <p> 1 mole A (500 K) ##\\rightarrow## 1 mole B (500 K)",
 				},
 				{//Prompt 3
 				scendeData: undefined,
@@ -438,6 +438,22 @@ LevelData = {
 							storeAs: 'theLastAns',
 							text: 'Type your answer here',
 							CWQuestionId: 90
+						}
+					]
+				}
+			]
+		},
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
+					quiz: [
+						{
+							type: 'text',
+							questionText: 'Now that you have completed the simulation, how would you use the properties of state functions to determine an unknown enthalpy of reaction?',
+							text: 'type your response here',
+							CWQuestionId: 100000
 						}
 					]
 				}

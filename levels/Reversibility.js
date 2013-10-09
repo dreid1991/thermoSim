@@ -480,19 +480,6 @@ LevelData = {
 				},
 				{
 					sceneData: undefined, 
-					resetId: 1201,
-					quiz: [
-						{
-							type: 'text',
-							preText:'Depending on how slowly you added and removed mass, you can probably see that the external pressure curves do not perfectly overlap. Explain why the two curves do not overlap. Hint: Think back to the two different two block processes.',
-							text: 'type your answer here',
-							storeAs: 'longAns7',
-							CWQuestionId: 10001
-						}
-					],
-				},
-				{
-					sceneData: undefined, 
 					resetId: 122,
 					quiz: [
 						{
@@ -506,13 +493,14 @@ LevelData = {
 				},
 				{
 					sceneData: undefined, 
-					cutScene: true,
+					resetId: 1201,
 					quiz: [
 						{
 							type: 'text',
-							preText:'<p>Was this last process actually reversible? You assumed for your calculations that external pressure was always equal to internal pressure. Was it?',
-							storeAs: 'longAns8',
-							CWQuestionId: 26
+							preText:'Depending on how slowly you added and removed mass, you can probably see that the external pressure curves do not perfectly overlap. Explain why the two curves do not overlap. Hint: Think back to both two block processes.',
+							text: 'type your answer here',
+							storeAs: 'longAns7',
+							CWQuestionId: 10001
 						}
 					],
 				},
@@ -522,8 +510,26 @@ LevelData = {
 					quiz: [
 						{
 							type: 'text',
-							preText:'<p>What size must the changes in input be for a process to be truly reversible? Can any real process be truly reversible?',
+							preText:'<p>Was this last process actually reversible? You assumed for your calculations that external pressure was always equal to internal pressure. Was it?',
 							storeAs: 'longAns8',
+							CWQuestionId: 26
+						},
+						{
+							type: 'text',
+							preText: '<p>If you answered no to the previous question, do you think treating the process as reversible is a good approximation? Explain. <p>How about treating the one block or two block processes as reversible?',
+							storeAs: 'longAns9',
+							CWQuestionID: 10000000
+						}
+					],
+				},
+				{
+					sceneData: undefined, 
+					cutScene: true,
+					quiz: [
+						{
+							type: 'text',
+							preText:'<p>What size do the changes in input need to be for a process to be truly reversible? Can a real process be truly reversible, or can it only get close to being reversible?',
+							storeAs: 'longAns10',
 							CWQuestionId: 1000000
 						}
 					],
@@ -540,7 +546,7 @@ LevelData = {
 							type: 'text',
 							questionText: '<p>Now that you have completed the simulation, describe the difference between reversible and irreversible processes.',
 							text: 'type your answer here',
-							storeAs: 'longAns9',
+							storeAs: 'longAns11',
 							CWQuestionId: 1000
 						}	
 					]
