@@ -377,7 +377,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'text',
-							preText: 'Placing the two blocks on quickly made the process more like the single block simulation. What effect does waiting for the piston to reach equilibrium before adding another block have on the work done?',
+							preText: 'Placing the two blocks on quickly made the process more like the single block compression. What effect does waiting for the piston to reach equilibrium before adding another block have on the work done?',
 							text: 'type your answer here',
 							storeAs: 'longAns6',
 							CWQuestionId: 10000
@@ -497,7 +497,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'text',
-							preText:'How did your two calculated values of work in this last process compare? Were the surroundings unchanged? What can you say about amount of work done during a compression compared to amount of work done during expansion when the process is broken into smaller increments?',
+							preText:'How did your two calculated values of work in this last process compare? Were the surroundings unchanged? <p>What can you say about amount of work done during compression compared to amount of work done during expansion when the process is broken into smaller increments?',
 							text: 'type your answer here',
 							storeAs: 'longAns7',
 							CWQuestionId: 25
@@ -522,7 +522,7 @@ LevelData = {
 					quiz: [
 						{
 							type: 'text',
-							preText:'<p>What size must changes in input be for a process to be truly reversible? Can any real process be truly reversible?',
+							preText:'<p>What size must the changes in input be for a process to be truly reversible? Can any real process be truly reversible?',
 							storeAs: 'longAns8',
 							CWQuestionId: 1000000
 						}
