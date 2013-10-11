@@ -62,7 +62,7 @@ LevelData = {
 								]
 							},
 							resetId: 142,
-							text: " Above is a constant pressure system containing 1 mole of species A in the liquid phase at 350 K.  Heat the system until it reaches 450 K and all of species A is vaporized.",
+							text: "Above is a constant pressure system containing 1 mole of species A in the liquid phase at 350 K.  Heat the system until it reaches 450 K and all of species A is vaporized.",
 							quiz: [
 								{
 									type: 'textSmall',
@@ -92,7 +92,7 @@ LevelData = {
 						{//Prompt 1
 							sceneData: undefined,
 							cutScene: true,
-							text: "We wish to calculate the change in enthalpy for the previous process, but only have the following: <p> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>40</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta h_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>28</td></tr></table> </center></p> The heat capacities can be assumed to be constant over the entire temperature range of the process.   The enthalpy of vaporization can be assumed to be constant with respect to pressure. <br>Construct a hypothetical path that will allow you to calculate the change in system enthalpy of the previous process.  Calculate the enthalpy change for each step in your hypothetical path and record the values on a separate sheet of paper. </br> The process is: 1 mole A (liq) 400 K##\\rightarrow## 1 mole A (gas) 400 K "
+							text: "We wish to calculate the change in enthalpy for the previous process, but only have the following: <p> <center><table class= 'data'><tr><th>Species</th><th>##c_{p}##(J/mol-K)</th></tr><tr><td>A liq</td><td>40</td></tr><tr><td>A vap</td><td>2.5*R</td></tr></table><p> <table class='data'> <tr><th>T (K)</th><th>##\\Delta h_{vap}## (kJ/mol)</th></tr><tr><td>450</td><td>28</td></tr></table> </center></p> The heat capacities can be assumed to be constant over the entire temperature range of the process.   The enthalpy of vaporization can be assumed to be constant with respect to pressure. <br>Construct a hypothetical path that will allow you to calculate the change in system enthalpy of the previous process.  Calculate the enthalpy change for each step in your hypothetical path and record the values on a separate sheet of paper. </br> <br>The process is: 1 mole A (liq) 400 K ##\\rightarrow## 1 mole A (gas) 400 K "
 						},
 						{//Prompt 2
 							sceneData: undefined,
@@ -358,7 +358,7 @@ LevelData = {
 						]
 					},
 					resetId: 144,
-					text: 'Let\'s perform the process again. This time the enthalpy change of the process is displayed and graphed. As before heat the system from 350 K to 450 K.',
+					text: "Let's perform the process again. This time the enthalpy change of the process is displayed and graphed. As before heat the system from 350 K to 450 K.",
 					quiz: [
 						{
 							type: 'text',
@@ -366,6 +366,49 @@ LevelData = {
 							storeAs: 'HypAns9',
 							text: 'Type your answer here',
 							CWQuestionId: 76
+						}
+					]
+				}
+			]
+		},
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
+					quiz: [
+						{
+							type: 'text',
+							questionText: 'Now that you have completed the simulation, how would you use the properties of state functions to determine an unknown enthalpy of vaporization?',
+							text: 'type your response here',
+							storeAs: 'finalAns1',
+							CWQuestionId: 173
+						}
+					]
+				}
+			]
+		},
+		{
+			sceneData: undefined,
+			prompts: [
+				{
+					cutScene: true,
+					quiz: [
+						{
+							type: 'text',
+							questionText: '<p>Identify and describe in 1-2 sentences the most important concepts about hypothetical paths this interactive virtual laboratory addressed.',
+							text: 'type your response here',
+							storeAs: 'finalAns2',
+							CWQuestionId: 174
+							
+						},
+						{
+							type: 'text',
+							questionText: '<p>How do these concepts connect to what you have been learning in class?',
+							text: 'type your response here',
+							storeAs: 'finalAns3',
+							CWQuestionId: 175
+							
 						}
 					]
 				}
