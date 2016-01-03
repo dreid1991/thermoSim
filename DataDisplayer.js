@@ -31,7 +31,7 @@ DataDisplayer.prototype = {
 		var units = attrs.units || '';
 		var readout = this.readouts[attrs.readout];
 		if (!readout) console.log('Bad readout name ' + attrs.readout);
-		var listenerStr = 'display' + label + this.entries.length;
+		var listenerStr = 'display_' + handle;
 		var readoutEntry = readout.addEntry(label + handle);
 		var dataEntry = new DataDisplayer.Entry(handle, label, decPlaces, expr, units, listenerStr, this, readoutEntry);
 		this.entries[dataEntry.handle] = dataEntry;

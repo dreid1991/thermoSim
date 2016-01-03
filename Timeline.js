@@ -1133,11 +1133,19 @@ Timeline.Moment = function(timestamp) {
 
 Timeline.Moment.prototype = {
 	fire: function(from, to) {
-		this.fireSpans(this.events.dots, from, to);
-		this.fireSpans(this.events.walls, from, to);
-		this.fireSpans(this.events.objs, from, to);
-		this.fireCmmds(this.events.cmmds, from, to);
-		this.fireCmmds([this.events.branchCmmd], from, to);
+        if (to >= from) {
+            this.fireSpans(this.events.dots, from, to);
+            this.fireSpans(this.events.walls, from, to);
+            this.fireSpans(this.events.objs, from, to);
+            this.fireCmmds(this.events.cmmds, from, to);
+            this.fireCmmds([this.events.branchCmmd], from, to);
+        } else {
+            this.fireSpans(this.events.dots, from, to);
+            this.fireSpans(this.events.objs, from, to);
+            this.fireCmmds(this.events.cmmds, from, to);
+            this.fireSpans(this.events.walls, from, to);
+            this.fireCmmds([this.events.branchCmmd], from, to);
+        }
 	},
 	fireSpans: function(spans, from, to) {
 		for (var i=0; i<spans.length; i++) {
