@@ -57,7 +57,8 @@ function Piston(attrs) {
 	this.readoutLeft = new Readout('piston' + this.handle.toCapitalCamelCase() + 'Left', readoutLeftLeft, readoutLeftRight, readoutY, readoutFont, readoutFontCol, 'center', curLevel);
 	this.readoutRight = new Readout('piston' + this.handle.toCapitalCamelCase() + 'Right', readoutRightLeft, readoutRightRight, readoutY, readoutFont, readoutFontCol, 'center', curLevel);
 	this.wall.moveInit();
-	
+    console.log('creating piston!');
+    console.log('comp mode is ' + attrs.compMode);
 	this.wall.recordPExt();
 	this.wall.recordWork();
 	this.savedWallHandler = this.wall.handlers[0];

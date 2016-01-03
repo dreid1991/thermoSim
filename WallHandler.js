@@ -113,6 +113,8 @@ WallMethods.main = {
 	},		
 	setSubWallHandler: function(wallInfo, subWallIdx, handler) {
 		var wallIdx = this.idxByInfo(wallInfo);
+        console.log('info is ' + wallInfo);
+        console.log(wallIdx);
 		if (typeof handler == 'string') {
 			this[wallIdx][subWallIdx].isothermal = /isothermal/i.test(handler); 
 			//wall handlers are addressed by string

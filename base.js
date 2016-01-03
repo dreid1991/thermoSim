@@ -71,6 +71,7 @@ function HOLDSTILL() {
 }
 */
 
+MANAGE_EXTENSIONS = false;
 
 function gauss(avg, stdev){
 	var numStdev = (Math.random() + Math.random() + Math.random())-1.5;

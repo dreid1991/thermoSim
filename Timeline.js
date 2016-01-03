@@ -128,6 +128,7 @@ Timeline.prototype = {
 		return matches;
 	},
 	show: function(sectionIdx, promptIdx, refreshing, forceShowPrompt) {
+        console.log('showing ' + sectionIdx + ' ' + promptIdx)
 		//this.steppingTowards = {sectionIdx: sectionIdx, promptIdx: promptIdx};
 		var changingSection = this.sectionIdx != sectionIdx;
 		var changingPrompt = changingSection || promptIdx != this.sections[sectionIdx].promptIdx || forceShowPrompt;
@@ -139,6 +140,7 @@ Timeline.prototype = {
 		}
 
 		if (changingSection || refreshing) {
+            console.log('changing section')
 			this.clearCurrentSection();
 			this.sectionIdx = sectionIdx;
 			//going to assume prompts are shown in sequential order for now

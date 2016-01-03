@@ -31,8 +31,10 @@ SceneNavigator.prototype = {
 		var curSection = timeline.curSection();
 		var curPrompt = timeline.curPrompt();
 		var now = timeline.now();
-		var willAdvance = forceAdvance || this.checkWillAdvance();
-		var amAdvancing = true;
+        var willAdvance = Math.max(false, MANAGE_EXTENSIONS); 
+        if (!willAdvance) {
+            willAdvance = forceAdvance || this.checkWillAdvance();
+        }
 		if (willAdvance) {
 			// if (curPrompt) {
 				// curPrompt.finished = true;
