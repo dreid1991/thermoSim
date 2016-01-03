@@ -1,0 +1,7 @@
+okay, so you were looking at how moments were getting fired (around Timeline 1137 or so).  On entering or exiting, may need to have different order.
+
+Specifically, when you go back into problem scene from next, it looks for problem q and pExt.  I suspect that things are getting added in the wrong order (objs before walls), so data collection isn't done.  Need to figure some way in which we add and remove in specific orders
+
+like one pass for adding, another for removing.  This would be done in Timeline 1137 area
+
+on going back, piston constructor isn't called??  This is weird.  So... pext and q (problem data) aren't being told to record. FIND OUT how piston is being put back, and sort out how things are removed and added.
