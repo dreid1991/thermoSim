@@ -667,6 +667,7 @@ Timeline.Section.prototype = {
 		//walls pare data cmmd
 		//not paring data.  Doesn't make performance difference, makes it more difficult to look at data
 		//this.addSceneDataToMoments(timeline, elems, moments, {cmmds: [{type: 'point', spawn: 'addListener(curLevel, "data", "pareWallsData", walls.pareData, walls)', oneWay: false}]}, -1, undefined);
+        //paring data, by the way, is just cutting data lists when the get too long.  See WallMethodsWall.js
 		this.addSceneDataToMoments(timeline, elems, moments, sectionData.sceneData, -1, undefined);
 		var prompts = sectionData.prompts;
 		for (var promptIdx=0; promptIdx<prompts.length; promptIdx++) {
@@ -776,6 +777,7 @@ Timeline.Section.prototype = {
 			this.applySpanToMoments(timeline, moments, elems, sceneData.walls, 'walls', timestamp, Timeline.stateFuncs.walls.spawn, Timeline.stateFuncs.walls.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.dots, 'dots', timestamp, Timeline.stateFuncs.dots.spawn, Timeline.stateFuncs.dots.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.objs, 'objs', timestamp, Timeline.stateFuncs.objs.spawn, Timeline.stateFuncs.objs.remove);
+            //important that datareadouts / other data go after objs, b/c they can depend on objects
 			this.applySpanToMoments(timeline, moments, elems, sceneData.dataRecord, 'objs', timestamp, Timeline.stateFuncs.dataRecord.spawn, Timeline.stateFuncs.dataRecord.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.dataReadouts, 'objs', timestamp, Timeline.stateFuncs.dataReadouts.spawn, Timeline.stateFuncs.dataReadouts.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.triggers, 'objs', timestamp, Timeline.stateFuncs.triggers.spawn, Timeline.stateFuncs.triggers.remove);
@@ -795,7 +797,7 @@ Timeline.Section.prototype = {
 			var elemDatum = elemData[i];
 			var cleanUpWith = elemDatum.cleanUpWith;
 			var timestampTail = this.getTimestamp(cleanUpWith || timestampHead, 'tail');
-
+        
 			this.pushSpan(timelineElems, elemDatum, spawnFunc, removeFunc, id, moments, timestampHead, timestampTail, false, eventClass);
 
 
