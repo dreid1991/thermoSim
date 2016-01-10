@@ -1133,46 +1133,56 @@ Timeline.Moment = function(timestamp) {
 
 Timeline.Moment.prototype = {
 	fire: function(from, to) {
-        if (to >= from) {
-            this.fireSpans(this.events.dots, from, to);
-            this.fireSpans(this.events.walls, from, to);
-            this.fireSpans(this.events.objs, from, to);
-            this.fireCmmds(this.events.cmmds, from, to);
-            this.fireCmmds([this.events.branchCmmd], from, to);
-        } else {
-            this.fireSpans(this.events.dots, from, to);
-            this.fireSpans(this.events.objs, from, to);
-            this.fireCmmds(this.events.cmmds, from, to);
-            this.fireSpans(this.events.walls, from, to);
-            this.fireCmmds([this.events.branchCmmd], from, to);
-        }
+        //okay, so span (fireSpans) can either add or remove things.  Objs / dots depend on walls, so if you
+        //add, add the walls first, if you remove, remove the walls last.
+        //
+        //So do two passes.  The first, only fire spans you are stepping out of, and do objs, dots, walls.  The seconds, fire only spans you are stepping into, and to walls, dots, objs
+        //
+        this.fireSpans(this.events.objs, from, to, 'remove');
+        this.fireSpans(this.events.dots, from, to, 'remove');
+        this.fireSpans(this.events.walls, from, to, 'remove');
+
+        this.fireSpans(this.events.walls, from, to, 'spawn');
+        this.fireSpans(this.events.dots, from, to, 'spawn');
+        this.fireSpans(this.events.objs, from, to, 'spawn');
+
+        this.fireCmmds(this.events.cmmds, from, to);
+        this.fireCmmds([this.events.branchCmmd], from, to);
 	},
-	fireSpans: function(spans, from, to) {
+	fireSpans: function(spans, from, to, stepType) {
 		for (var i=0; i<spans.length; i++) {
-			this.fireSpan(spans[i], from, to);
+			this.fireSpan(spans[i], from, to, stepType);
 		}
 	},
-	fireSpan: function(span, from, to) {
+	fireSpan: function(span, from, to, stepType) {
 		if (span.active) {
-			var elemDatum = getAndEval(span.elemDatum);
-			if (span.boundType == 'head') {
-				if (from < to && from < this.timestamp && to < span.partner.moment.timestamp) {
-					span.spawn(span.section, span.timelineElems, span.id, elemDatum);
-				} else if (to < from && to < this.timestamp && from <= span.partner.moment.timestamp) {
-					span.remove(span.section, span.timelineElems, span.id);
-					if (span.once) {
-						span.active = false;
-						span.partner.active = false;
-					}
-				}
-			} else if (span.boundType == 'tail') {
-				if (to > from && from >= span.partner.moment.timestamp && from < this.timestamp) {
-					span.remove(span.section, span.timelineElems, span.id);
-					if (span.once) 
-						span.active = false;
-				} else if (to < from && to >= span.partner.moment.timestamp) {
-					span.spawn(span.section, span.timelineElems, span.id, elemDatum);
-				}
+            var elemDatum = getAndEval(span.elemDatum);
+            if (span.boundType == 'head') {
+                if (from < to && from < this.timestamp && to < span.partner.moment.timestamp) {
+                    if (stepType=='spawn' || stepType=='cmmd') {
+                        span.spawn(span.section, span.timelineElems, span.id, elemDatum);
+                    }
+                } else if (to < from && to < this.timestamp && from <= span.partner.moment.timestamp) {
+                    if (stepType=='remove' || stepType == 'cmmd') {
+                        span.remove(span.section, span.timelineElems, span.id);
+                        if (span.once) {
+                            span.active = false;
+                            span.partner.active = false;
+                        }
+                    }
+                }
+            } else if (span.boundType == 'tail') {
+                if (to > from && from >= span.partner.moment.timestamp && from < this.timestamp) {
+                    if (stepType=='remove' || stepType=='cmmd') {
+                        span.remove(span.section, span.timelineElems, span.id);
+                        if (span.once) 
+                            span.active = false;
+                    }
+                } else if (to < from && to >= span.partner.moment.timestamp) {
+                    if (stepType=='spawn' || stepType=='cmmd') {
+                        span.spawn(span.section, span.timelineElems, span.id, elemDatum);
+                    }
+                }
 			}
 		}
 	},
@@ -1181,7 +1191,7 @@ Timeline.Moment.prototype = {
 		for (var i=0; i<cmmds.length; i++) {
 			var event = cmmds[i];
 			if (event instanceof Timeline.Event.Span) {
-				this.fireSpans([event], from, to)
+				this.fireSpans([event], from, to, 'cmmd')
 			} else if (event instanceof Timeline.Event.Point || event instanceof Timeline.Event.BranchCmmd) {
 				if (((from < this.timestamp && this.timestamp <= to) || (to <= this.timestamp && this.timestamp < from)) && (event.elemDatum.oneWay ? from < to : true) && event.active) {
 					elemDatum = getAndEval(event.elemDatum);
