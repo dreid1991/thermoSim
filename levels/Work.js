@@ -220,21 +220,25 @@ LevelData = {
 				},
 				{//Prompt 3
 					noRefresh: true,
-					sceneData: {
-						triggers: [
-							{handle: 'checkPext2', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.enable()'], priority: 1},
-							{handle: 'checkPext3', expr: 'pExt("ThirdWall")==2', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.disable()'], priority: 1},
-							{handle: 'checkPext4', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['walls.ThirdWall.resetWork()'], priority: 1},
-							{handle: 'checkVole3', expr: 'fracDiff(vol("ThirdWall"),14.9)<.01', message: "Take the block off the system!", satisfyStore: [{storeAs:'Temp', expr: 'temp("ThirdWall")'}]}
-						],
-						objs: [
-							{type: 'Stops',
-							cleanUpWith: 'prompt4',
-								attrs: { handle: 'stopper', wallInfo: 'ThirdWall', stopPt: {vol: 15}}
-							}
-						]
-					},
-					text: "You wrote that the system would do get('workAnswer', 'int') kJ of work for a final temperature of get('tempAnswer', 'int') K. Find out if you were right by performing the experiment above. ",
+                    sceneData: {
+                        cmmds: [
+                        {spawn: 'curLevel.dragWeightsDragsTwo.enable()', oneWay: true, type: 'point', once: true},
+                        {spawn: 'walls.ThirdWall.resetWork()', oneWay: true, type: 'point', once:true}
+                        ],
+                            triggers: [
+                           // {handle: 'checkPext2', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.enable()'], priority: 1},
+                            {handle: 'checkPext3', expr: 'pExt("ThirdWall")==2', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.disable()'], priority: 1},
+                        //    {handle: 'checkPext4', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['walls.ThirdWall.resetWork()'], priority: 1},
+                            {handle: 'checkVol3', expr: 'fracDiff(vol("ThirdWall"),14.9)<.01', message: "Take the block off the system!", satisfyStore: [{storeAs:'Temp', expr: 'temp("ThirdWall")'}]}
+                        ],
+                            objs: [
+                            {type: 'Stops',
+                                cleanUpWith: 'prompt4',
+                                attrs: { handle: 'stopper', wallInfo: 'ThirdWall', stopPt: {vol: 15}}
+                            }
+                        ]
+                    },
+                    text: "You wrote that the system would do get('workAnswer', 'int') kJ of work for a final temperature of get('tempAnswer', 'int') K. Find out if you were right by performing the experiment above. ",
 				},
 				{//Prompt 4
 					sceneData:undefined, 
