@@ -113,16 +113,16 @@ LevelData = {
                 {
                     walls: [
                         //{pts:[P(40,40), P(250,40), P(250,425), P(40,425)], handler:'staticAdiabatic', handle:'wally1', border: {type: 'wrap'}},
-                    {pts:[P(300,40), P(510,40), P(510,425), P(300,425)], handler:'staticAdiabatic', handle:'wally2', vol: 4.7, border: {type: 'open', yMin: 50}, cleanUpWith: 'section'},
+                    {pts:[P(300,40), P(510,40), P(510,425), P(300,425)], handler:'staticAdiabatic', handle:'wally2', vol: 2.65, border: {type: 'open', yMin: 50}, cleanUpWith: 'section'},
                     ],
                     dots: [	
                         //{type: 'spc1', pos: P(100, 100), dims: V(300, 300), count: 500, temp:600, returnTo: 'wally', tag: 'wally1'},
                         //{type: 'ugly', pos: P(100, 100), dims: V(300, 300), count: 500, temp:600, returnTo: 'wally1', tag: 'wally1'},
-                    {spcName: 'ugly', pos: P(310, 220), dims: V(200, 180), count: 500, temp:150, returnTo: 'wally2', tag: 'wally2', cleanUpWith: 'section'},
+                    {spcName: 'ugly', pos: P(310, 310), dims: V(200, 90), count: 500, temp:154, returnTo: 'wally2', tag: 'wally2', cleanUpWith: 'section'},
                     ],
                     objs: [
-                    {type: 'Heater', attrs: {handle: 'heaterWally2', wallInfo: 'wally2', max: 2}, cleanUpWith: 'section'},
-                    {type: 'Piston', attrs: {handle: 'pistony',  wallInfo: 'wally2', makeSlider: false, init: 1.5}, cleanUpWith: 'section'},								
+                    {type: 'Heater', attrs: {handle: 'heaterWally2', wallInfo: 'wally2', max: 0.5}, cleanUpWith: 'section'},
+                    {type: 'Piston', attrs: {handle: 'pistony',  wallInfo: 'wally2', makeSlider: false, init: 3.0}, cleanUpWith: 'section'},								
                     ],
                     dataReadouts: [								
                     {label: 'Heat: ', expr: 'q("wally2")', units: 'kJ', sigFigs: 2, handle: 'heating2', readout: 'mainReadout'},
@@ -163,7 +163,7 @@ LevelData = {
                 {
                     questionText: "<p>The system had a constant external pressure of 3 bar, contained one mole of an ideal monatomic gas, and was heated by 100 K.</p>  Using the First Law of Thermodynamics, what should the change in system volume have been?<br>", 
                     type: 'textSmall', 
-                    storeAs: 'foo5', 
+                    storeAs: 'changeInVol', 
                     units: 'L', 
                     text: '',
                     CWQuestionId: 32
@@ -171,7 +171,7 @@ LevelData = {
                 {
                     type: 'textSmall', 
                     preText: '<br>How much work did the system do on its surroundings?<br>',
-                    storeAs: 'foo6', 
+                    storeAs: 'workDone', 
                     units: 'kJ', 
                     text: '',
                     CWQuestionId: 33
@@ -186,17 +186,17 @@ LevelData = {
             {
                 walls: [
                     //{pts:[P(40,40), P(250,40), P(250,425), P(40,425)], handler:'staticAdiabatic', handle:'wally1', border: {type: 'wrap'}},
-                {pts:[P(300,40), P(510,40), P(510,425), P(300,425)], handler:'staticAdiabatic', handle:'wally3', vol: 4.7, border: {type: 'open', yMin: 50}},
+                {pts:[P(300,40), P(510,40), P(510,425), P(300,425)], handler:'staticAdiabatic', handle:'wally3', vol: 2.65, border: {type: 'open', yMin: 50}},
 
                 ],
                 dots: [	
                     //{type: 'spc1', pos: P(100, 100), dims: V(300, 300), count: 500, temp:600, returnTo: 'wally', tag: 'wally1'},
                     //{type: 'ugly', pos: P(100, 100), dims: V(300, 300), count: 500, temp:600, returnTo: 'wally1', tag: 'wally1'},
-                {spcName: 'ugly', pos: P(310, 200), dims: V(200, 200), count: 500, temp:150, returnTo: 'wally3', tag: 'wally3'},
+                {spcName: 'ugly', pos: P(310, 310), dims: V(200, 90), count: 500, temp:154, returnTo: 'wally3', tag: 'wally3'},
                 ],
                 objs: [
-                {type: 'Heater', attrs: {handle: 'heaterWally3', cleanUpWith: 'section', wallInfo: 'wally3'}},
-                {type: 'Piston', attrs: {handle: 'pistony3', cleanUpWith: 'section', wallInfo: 'wally3', makeSlider: false, init: 1.5}},
+                {type: 'Heater', attrs: {handle: 'heaterWally3', cleanUpWith: 'section', wallInfo: 'wally3', max: 0.5}},
+                {type: 'Piston', attrs: {handle: 'pistony3', cleanUpWith: 'section', wallInfo: 'wally3', makeSlider: false, init: 3.0}},
                 ],
                 dataReadouts: [							
                 {label: 'Heat: ', expr: 'q("wally3")', units: 'kJ', sigFigs: 2, handle: 'heating3', readout: 'mainReadout'},
@@ -215,7 +215,7 @@ LevelData = {
                 resetId: 125,
                 quiz:[
                 {		
-                    questionText: "Here's the same system with the work done displayed.  Increase the temperature by 100 K.  You predicted that get('foo5', 'string', 'noValue') kJ of work would be done.  How does this compare to the experimental result?",
+                    questionText: "Here's the same system with the work done displayed.  Increase the temperature by 100 K.  You predicted that get('workDone', 'string', 'noValue') kJ of work would be done.  How does this compare to the experimental result?",
                     storeAs: 'foo7', 
                     type:'text', 
                     text:'Type your answer here.', 
