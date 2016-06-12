@@ -101,6 +101,22 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 				}
 				this.makeLegendEntry(set, set.label, attrs.handle, drawFunc);
 				this.drawAllBG();
+				//loading values from level input into data set
+				if (attrs.dataVals != undefined) {
+					x = attrs.dataVals.x;
+					y = attrs.dataVals.y;
+					if (x != undefined && y != undefined && x.length == y.length) {
+						for (var i=0; i<x.length; i++) {
+							set.data.x = [x[i]];
+							set.data.y = [y[i]];
+							this.addLast(true);
+
+
+						}
+
+
+					}
+				}
 			}
 		},
 		setDataValid: function() {
@@ -124,12 +140,14 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 				set.drawPts(justQueue !== false);
 			}
 		},
-		addLast: function(){ //point of entry
+		addLast: function(force){ //point of entry for adding data
 			var toAdd = [];
 			for (var setName in this.data){
 				var set = this.data[setName];
-				if (set.recording && set.dataValid) {
-					set.trimNewData();
+				if ((set.recording || force) && set.dataValid) {
+					if (set.fillInPts) {
+						set.trimNewData();
+					}
 					set.enqueuePts();
 				}
 			}
@@ -177,6 +195,7 @@ GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol,
 	this.graphedPts = [];
 	this.graphedPtIdxs = [];
 	dataExprs = dataExprs || {};
+	//if you don't want data added, just don't add .x .y attributes.  setValidData with say that the data is invalid and new points won't be added
 	this.dataFuncs = new GraphScatter.DataFuncs(graph, dataExprs.x, dataExprs.y);
 	this.pointCol = pointCol;
 	this.flashCol = flashCol;
@@ -243,7 +262,7 @@ GraphScatter.Set.prototype = {
 	recordStop: function() {
 		removeListener(curLevel, 'update', this.recordListenerName);
 	},
-	trimNewData: function() {
+	trimNewData: function() { //so we record data points with the update interval, but we graph new ones every data inverval.  This means we get a lot of new points we might have to graph every data intervals.  Often, these points all lie on a line.  This function removes points that all fall in a line (except the two ends of the line) so the graph looks cleaner
 		if (this.graphedPtIdxs.length) {
 			var dataX = this.data.x;
 			var dataY = this.data.y;

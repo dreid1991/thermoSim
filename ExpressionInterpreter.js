@@ -45,7 +45,8 @@ ExpressionInterpreter.prototype = {
 		return this.addImgs(this.eval(this.addStored(expr)));
 	},
 	renderMath: function(div) {
-		MathJax.Hub.Queue(['Typeset', MathJax.Hub, div ? $(div).attr('id') : undefined])
+		console.log('ALSO COMMENTED OUT MATH IN EXPRESSION INTERPRETER');
+		//MathJax.Hub.Queue(['Typeset', MathJax.Hub, div ? $(div).attr('id') : undefined])
 	},
 	addStored: function(text) {
 		with ({'get': DataGetFuncs.get}) { //for compiler

@@ -272,7 +272,7 @@ LevelTools = {
 		$('#dashOutro').hide();
 		$('#dashCutScene').hide();
 	},
-
+//okay, this is the root iteration function.  It's called via the interval set in init.  When we pause, we just swap out this function for a blank function to stop all updating
 	update: function(){
 		this.numUpdates++;
 		turn++;

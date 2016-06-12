@@ -1023,13 +1023,13 @@ Timeline.stateFuncs = {
 			} else {
 				graph = new window.Graphs[graphDatum.type](graphDatum);
 			}
-			graph.drawAllData();
 			if (graphDatum.sets) {
 				for (var setIdx=0; setIdx<graphDatum.sets.length; setIdx++) {
 					var set = graphDatum.sets[setIdx];
 					graph.addSet(set);
 				}
 			}
+			graph.drawAllData();
 			section.level.graphs[graphDatum.handle] = graph;
 			elems[id] = graph;
 		},
