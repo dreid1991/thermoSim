@@ -56,6 +56,8 @@ _.extend(GraphHist.prototype, AuxFunctions, GraphBase,
 				this.drawAllBG();
 			}
 		},
+		activateClickable: function() {},
+		deactivateClickable: function() {},
 		drawAllData: function(){
 			this.drawAllBG();
 			if (this.bins) {
@@ -154,6 +156,8 @@ GraphHist.Set.prototype = {
 	addVal: function() {
 		this.data.x = this.dataFunc.x();
 	},
+	activateClickable: function() {},
+	deactivateClickable: function() {},
 	recordStop: function(){},
 	setDataValid: function() {
 		try {

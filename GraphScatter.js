@@ -50,6 +50,7 @@ function GraphScatter(attrs) {
 	this.layers.addLayer('marker');
 
 	this.drawAllBG();
+	this.clickableDataSetListenerName = 'clickableDataSet' + this.handle
 	
 }
 _.extend(GraphScatter.prototype, AuxFunctions, GraphBase, 
@@ -78,6 +79,30 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			}
 			return new GraphBase.Range(xMin, xMax, yMin, yMax);
 		},
+		activateClickable: function() {
+			var numClickables = 0
+			for (var i=0; i<data.length; i++) {
+				if (data[i].clickable) {
+					numClickables ++;
+				}
+			}
+			if (numClickables > 1) {
+				console.log("WARNING - MORE THAN ONE CLICKABLE SET FOR GRAPH " + graph.handle);
+			}
+			for (var i=0; i<data.length; i++) {
+				if (data[i].clickable) {
+
+					addListener(curLevel, 'mousedown', this.clickableDataSetListenerName, this.mousedown, this);
+				}
+			}
+	    },
+		deactivateClickable: function() {
+			removeListener(curLevel, 'mousedown', this.clickableDataSetListenerName); //mousemove and mouseup deactivate themselves if you move out of graph, so this is only one that can be active
+	    },
+		mousedown: function() {
+			//YOU WERE HERE.  Need to figure out of mouse of near a data point, all that stuff
+			//4.5 hrs worked, btw
+	    },
 		addSet: function(attrs){//address, label, pointCol, flashCol, data:{x:{wallInfo, data}, y:{same}}){
 			if (!this.data[attrs.handle]) {
 				var self = this;

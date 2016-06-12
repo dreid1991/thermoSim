@@ -69,6 +69,8 @@ GraphPhaseTwoComp.prototype = {
 		this.graph.setDataValid();
 		
 	},
+	activateClickable: function() {},
+	deactivateClickable: function() {},
 	makeLiquidMarker: function() {
 		this.graph.addMarker({handle: 'liquid', col: Col(200, 0, 0), markerType: 'bullseye', x: this.xFuncKillLow, y: this.liqTempFunc, label: 'Liquid'});
 	},

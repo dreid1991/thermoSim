@@ -38,6 +38,8 @@ function GraphBlank (parentDiv) {
 
 _.extend(GraphBlank.prototype, GraphBase,
 {
+	activateClickable: function() {},
+	deactivateClickable: function() {},
 	drawBGBlank: function() {
 		this.graph.save();
 		this.drawBGRect();

@@ -53,6 +53,8 @@ GraphPhaseOneComp.prototype = {
 			this.graph.addSet({handle: this.equilDataHandles[i], label: 'Phase\nData', pointCol: Col(255, 255, 255), flashCol: Col(0, 0, 0), trace: true, recording: false, showPts: false});	
 		}
 	},
+	activateClickable: function() {},
+	deactivateClickable: function() {},
 	makeMarker: function() {
 		this.graph.addMarker({handle: 'system', col: Col(200, 0, 0), markerType: 'bullseye', x: this.tempFunc, y: this.pressureFunc, label: 'System'});
 	},
