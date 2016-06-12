@@ -146,6 +146,13 @@ GraphBase = {
 			}
 		}
 	},
+	deactivateToggleListeners() {
+		if (this.legend) {
+			for (var legendEntry in this.legend) {
+				this.legend[legendEntry].toggleDeactivate();
+			}
+		}
+	},
 	clearHTML: function() {
 		this.cleanUpParent();
 	},
@@ -155,6 +162,7 @@ GraphBase = {
 		removeListenerByName(curLevel, 'update', 'flashAdvance' + this.handle);
 		this.layers.removeAll();
 		this.cleanUpParent();
+		this.deactivateToggleListeners();
 		return this;
 	},
 	enable: function(addPt){

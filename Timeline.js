@@ -1029,6 +1029,15 @@ Timeline.stateFuncs = {
 					graph.addSet(set);
 				}
 			}
+			var numClickables = 0
+			//for (var i=0; i<graph.sets.length; i++) {
+			//	if (graph.sets[i].clickable) {
+			//		numClickables ++;
+			//	}
+			//}
+			if (numClickables > 1) {
+				console.log("WARNING - MORE THAN ONE CLICKABLE SET FOR GRAPH " + graph.handle);
+			}
 			graph.drawAllData();
 			section.level.graphs[graphDatum.handle] = graph;
 			elems[id] = graph;

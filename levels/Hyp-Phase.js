@@ -97,7 +97,9 @@ LevelData = {
 									{
 										type: 'Scatter', handle: 'userDrawPath', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Temperature (kJ)', axesInit:{y:{min:400, step:8},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 5}, axesFixed:{x: true, y: true},
 										sets: [
-										{handle: 'fracVH', label: 'frac\nGas', pointCol:Col(50,255,50),flashCol:Col(200,255,200),data:{}, dataVals: {x:[0, 0.1, 0.4], y:[400, 410, 402]}, trace: true, fillInPts: true, fillInPtsMin: 5, recording: false}
+										{handle: 'fracVH', label: 'frac\nGas', pointCol:Col(50,255,50),flashCol:Col(200,255,200),data:{}, dataVals: {x:[0, 0.1, 0.4], y:[400, 410, 402]}, trace: true, fillInPts: true, fillInPtsMin: 5, recording: false},
+										//make sure to check that set is visible before snapping to it!
+										{handle: 'extend', label: 'user pts', pointCol:Col(255,255,255),flashCol:Col(100,100,100), trace: true, recording: false, data:{}, clickable:true, snapToSets:['fracVH']}
 
 										]
 									}

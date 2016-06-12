@@ -81,7 +81,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 		addSet: function(attrs){//address, label, pointCol, flashCol, data:{x:{wallInfo, data}, y:{same}}){
 			if (!this.data[attrs.handle]) {
 				var self = this;
-				var set = new GraphScatter.Set(this, attrs.handle, attrs.label, attrs.data, attrs.pointCol, attrs.flashCol, attrs.fillInPts, attrs.fillInPtsMin, attrs.trace, attrs.recording, attrs.showPts);
+				var set = new GraphScatter.Set(this, attrs.handle, attrs.label, attrs.data, attrs.pointCol, attrs.flashCol, attrs.fillInPts, attrs.fillInPtsMin, attrs.trace, attrs.recording, attrs.showPts, attrs.clickable, attrs.snapToSets);
 				var ptCol = attrs.pointCol.copy();
 				this.data[attrs.handle] = set;
 				var drawFunc;
@@ -117,8 +117,15 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 
 					}
 				}
+				//data set member variables for setting whether can create data sets through clicking on graph.  Only one set can be set as the 'clickable' one for a given graph.  We do a check of this when graph creates all the sets (in Timeline graph spawn function)
+				this.clickable = defaultTo(false, attrs.clickable);
+				this.snapToSets = defaultTo([], attrs.snapToSets);
+				if (this.clickable) {
+					//addClickListener();	
+				}
 			}
 		},
+
 		setDataValid: function() {
 			for (var setName in this.data) {
 				this.data[setName].setDataValid();
