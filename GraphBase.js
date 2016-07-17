@@ -540,13 +540,22 @@ GraphBase = {
 		return {min:min, max:max};
 	},
 
-	resetStd: function(){
-		for (var setName in this.data) this.data[setName].reset();
+	resetStd: function() {
+        newMaxDataLen = 0;
+		for (var setName in this.data) {
+            newMaxDataLen = Math.max(newMaxDataLen, this.data[setName].reset());
+        }
 
 		removeListener(curLevel, 'update', 'flash'+this.name);
 		this.drawAllBG();
 		this.resetRanges();
-		this.hasData = false;
+        if (newMaxDataLen > 0) {
+            this.hasData = true;
+            this.updateRange();
+            this.drawAllData();
+        } else {
+            this.hasData = false;
+        }
 	},	
 	resetRanges: function(){
 		this.axisRange = new GraphBase.Range(Number.MAX_VALUE, -Number.MAX_VALUE, Number.MAX_VALUE, -Number.MAX_VALUE);

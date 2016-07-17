@@ -53,6 +53,8 @@ function GraphScatter(attrs) {
 	this.clickableDataSetListenerName = 'clickableDataSet' + this.handle;
     this.userMouseActive = false;
     this.handleClickable = null;
+    this.clickTime = null; //time (gotten with Date.now() when mouseup last detected. Used for finding double click
+    this.clickDataLen = 0; //used for recoding num clicked data points, because using mousemove may or may not register if using, say, a tablet
 	
 }
 _.extend(GraphScatter.prototype, AuxFunctions, GraphBase, 
@@ -99,12 +101,12 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
                     this.handleClickable = handle;
                     
                 
-					addListener(curLevel, 'mousedown', this.clickableDataSetListenerName, this.mousedown, this);
+					addListener(curLevel, 'mouseup', this.clickableDataSetListenerName, this.mouseup, this);
 				}
 			}
 	    },
 		deactivateClickable: function() {
-			removeListener(curLevel, 'mousedown', this.clickableDataSetListenerName); //mousemove and mouseup deactivate themselves if you move out of graph, so this is only one that can be active
+			removeListener(curLevel, 'mouseup', this.clickableDataSetListenerName); //mousemove and mouseup deactivate themselves if you move out of graph, so this is only one that can be active
 	    },
         addMousePoint: function(posInDiv) {
             dataSetClickable = this.data[this.handleClickable];
@@ -124,32 +126,53 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
                 }
             }
             if (minDistVal !== null && minDistSqr < 30*30) { //hardcoding in px value right now.
-                console.log("snap!");
                 dataSetClickable.data.addData([minDistVal]);
             } else {
                 dataSetClickable.data.addData([this.coordToVal(posInDiv)]);
             }
 
         },
-		mousedown: function() {
-            posInDiv = mouseOffsetDiv(this.parentDivId)
-            console.log(posInDiv);
+        mouseInGraph: function(posInDiv) {
             var ptOrigin = P(this.graphRangeFrac.x.min * this.dims.dx, this.graphRangeFrac.y.max * this.dims.dy);
             var width = this.dims.dx * (this.graphRangeFrac.x.max - this.graphRangeFrac.x.min);
             var height = this.dims.dy * (this.graphRangeFrac.y.min - this.graphRangeFrac.y.max);
             var ptUpper = P(ptOrigin.x + width, ptOrigin.y + height);
-            if (posInDiv.x > ptOrigin.x && posInDiv.y > ptOrigin.y && posInDiv.x < ptUpper.x && posInDiv.y < ptUpper.y) {
+            return (posInDiv.x > ptOrigin.x && posInDiv.y > ptOrigin.y && posInDiv.x < ptUpper.x && posInDiv.y < ptUpper.y)
+        },
+		mouseup: function() {
+            //var ka
+            this.clickTime = Date.now();
+            posInDiv = mouseOffsetDiv(this.parentDivId)
+           
+            if (this.mouseInGraph(posInDiv)) {
+                //should add a thing to record current idx in case user mouses out
+                this.data[this.handleClickable].resetToLen(this.clickDataLen);
+
+                this.addMousePoint(posInDiv);
+                this.addLastSingleSet(this.handleClickable, true);
+                //this.drawPts(false);
+                //add mousemove listener
                 if (!this.userMouseActive) {
-
-                    this.addMousePoint(posInDiv);
-                    this.addLastSingleSet(this.handleClickable, true);
-                    //this.drawPts(false);
-                    //add mousemove listener
-
+                    addListener(curLevel, 'mousemove', this.clickableDataSetListenerName, this.mousemove, this);
+                    this.userMouseActive = true;
                 }
+                this.clickDataLen += 1;
+
             }
 
 	    },
+        mousemove: function() {
+            posInDiv = mouseOffsetDiv(this.parentDivId);
+            if (!this.mouseInGraph(posInDiv)) {
+                this.data[this.handleClickable].reset(); 
+                removeListener(curLevel, 'mousemove', this.clickableDataSetListenerName);
+                this.drawAllBG();
+                this.drawAllData();
+                this.userMouseActive = false;
+                this.clickDataLen = 0;
+            } else {
+            }
+        },
 		addSet: function(attrs){//address, label, pointCol, flashCol, data:{x:{wallInfo, data}, y:{same}}){
 			if (!this.data[attrs.handle]) {
 				var self = this;
@@ -307,12 +330,19 @@ GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol,
 
 GraphScatter.Set.prototype = {
 	reset: function() {
-		this.graphedPts.splice(this.initialDataLen, this.graphedPts.length);
-		this.graphedPtIdxs.splice(this.initialDataLen, this.graphedPtIdxs.length);
-		this.flashers.splice(0, this.flashers.length);
+        this.resetToLen(this.initialDataLen);
+        return this.initialDataLen;
+	},
+    resetToLen: function(x) {
+		this.graphedPts.splice(x, this.graphedPts.length);
+		this.graphedPtIdxs.splice(x, this.graphedPtIdxs.length);
+        for (var i=0; i<this.flashers.length; i++) {
+            this.flashers[i].remove(); //this takes care of splicing them
+        }
+	//	this.flashers.splice(0, this.flashers.length);
 		this.queueIdxs.splice(0, this.queueIdxs.length);
 		this.queuePts.splice(0, this.queuePts.length);
-	},
+    },
 	setDataValid: function() {
 		try {
 			var x = this.dataFuncs.x();
@@ -591,11 +621,19 @@ GraphScatter.Set.prototype = {
 				var imgCharacLen = 2 * this.graph.characLen * this.graph.flashMult;
 				var len = this.graph.characLen * 2 * this.graph.flashMult + 2;
 				var curCharacLen = this.graph.characLen * this.graph.flashMult;
-				new GraphScatter.Flasher(pt, pointCol, flashCol, curCol, curCharacLen, imgCharacLen, this.graph.characLen, this.graph.flashMult, this.graph.flashRate, this.graph.graphDisplay, this.graph.layers, this.graph);
+				flasher = new GraphScatter.Flasher(pt, pointCol, flashCol, curCol, curCharacLen, imgCharacLen, this.graph.characLen, this.graph.flashMult, this.graph.flashRate, this.graph.graphDisplay, this.graph.layers, this.graph, this);
+                this.flashers.push(flasher);
 			}
 		}
 		
 	},
+    removeFlasher: function(flasher) {
+        for (var i=0; i<this.flashers.length; i++) {
+            if (this.flashers[i] == flasher) {
+                this.flashers.splice(i, i+1);
+            }
+        }
+    },
 
 	flushQueue: function() {
 		this.graphedPts = this.graphedPts.concat(this.queuePts);
@@ -642,7 +680,6 @@ GraphScatter.Data.prototype = {
 	},
 	addData: function(data) {//takes list of points
 		for (var i=0; i<data.length; i++) {
-            console.log(data);
 			this.x.push(data[i].x)
 			this.y.push(data[i].y)
 		}
@@ -669,7 +706,7 @@ GraphScatter.Coord.prototype = {
 	}
 }
 
-GraphScatter.Flasher = function(pt, pointCol, flashCol, curCol, curCharacLen, imgCharacLen, finalCharacLen, flashMult, flashRate, graphDisplay, layers, graph) {
+GraphScatter.Flasher = function(pt, pointCol, flashCol, curCol, curCharacLen, imgCharacLen, finalCharacLen, flashMult, flashRate, graphDisplay, layers, graph, dataSet) {
 	this.pt = pt;
 	this.pointCol = pointCol;
 	this.flashCol = flashCol;
@@ -682,6 +719,7 @@ GraphScatter.Flasher = function(pt, pointCol, flashCol, curCol, curCharacLen, im
 	this.graphDisplay = graphDisplay;
 	this.layers = layers;
 	this.graph = graph;
+    this.dataSet = dataSet;
 	this.coordLast = this.graph.valToCoord(this.pt);
 	this.advanceListenerHandle = this.addAdvanceListener();
 	this.lifetime = 1 / this.flashRate;
@@ -706,6 +744,7 @@ GraphScatter.Flasher.prototype = {
 	},
 	remove: function() {
 		this.layers.removeItem('flasher', this);
+        this.dataSet.removeFlasher(this);
 		removeListener(curLevel, 'update', this.advanceListenerHandle);
 	},
 	advance: function() {
