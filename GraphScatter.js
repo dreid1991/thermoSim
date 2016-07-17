@@ -149,7 +149,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
                 this.data[this.handleClickable].resetToLen(this.clickDataLen);
 
                 this.addMousePoint(posInDiv);
-                this.addLastSingleSet(this.handleClickable, true);
+                this.addLastSingleSet(this.handleClickable, true, true, false);
                 //this.drawPts(false);
                 //add mousemove listener
                 if (!this.userMouseActive) {
@@ -165,12 +165,18 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
             posInDiv = mouseOffsetDiv(this.parentDivId);
             if (!this.mouseInGraph(posInDiv)) {
                 this.data[this.handleClickable].reset(); 
+                this.data[this.handleClickable].data.clear();
                 removeListener(curLevel, 'mousemove', this.clickableDataSetListenerName);
                 this.drawAllBG();
                 this.drawAllData();
                 this.userMouseActive = false;
                 this.clickDataLen = 0;
             } else {
+                this.data[this.handleClickable].resetToLen(this.clickDataLen);
+                this.data[this.handleClickable].resetRawDataToLen(this.clickDataLen);
+                this.drawAllBG();
+                this.addMousePoint(posInDiv);
+                this.addLastSingleSet(this.handleClickable, true, false, true);
             }
         },
 		addSet: function(attrs){//address, label, pointCol, flashCol, data:{x:{wallInfo, data}, y:{same}}){
@@ -251,7 +257,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			this.flushQueues(true, false);
 			this.hasData = true;
 		},
-        addLastSingleSet(setHandle, force) { //used for user-clicked points.  
+        addLastSingleSet(setHandle, force, flash, drawAllData) { //used for user-clicked points.  
             var set = this.data[setHandle];
             if ((set.recording || force) && set.dataValid) {
                 if (set.fillInPts) {
@@ -259,7 +265,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
                 }
                 set.enqueuePts();
             }
-			this.flushQueues(true, false);
+			this.flushQueues(flash, drawAllData);
 			this.hasData = true;
 
         },
@@ -308,7 +314,8 @@ GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol,
 	this.dataFuncs = new GraphScatter.DataFuncs(graph, dataExprs.x, dataExprs.y);
 	this.pointCol = pointCol;
 	this.flashCol = flashCol;
-	this.fillInPts = defaultTo(true, fillInPts);
+    this.clickable = defaultTo(false, clickable);
+	this.fillInPts = defaultTo(true && !this.clickable, fillInPts);
 	this.fillInPtsMin = defaultTo(5, fillInPtsMin);
 	this.trace = defaultTo(false, trace);
 	this.visible = true;
@@ -321,7 +328,6 @@ GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol,
 	this.recording = defaultTo(true, recording);
 	this.dataValid = true;
     //data set member variables for setting whether can create data sets through clicking on graph.  Only one set can be set as the 'clickable' one for a given graph.  We do a check of this when graph creates all the sets (in Timeline graph spawn function)
-    this.clickable = defaultTo(false, clickable);
     this.snapToSets = defaultTo([], snapToSets);
     this.initialDataLen = 0; //this is the number of data points set by the input script.  These points will not be erased on reset
 	if (this.recording) this.recordStart();
@@ -342,6 +348,10 @@ GraphScatter.Set.prototype = {
 	//	this.flashers.splice(0, this.flashers.length);
 		this.queueIdxs.splice(0, this.queueIdxs.length);
 		this.queuePts.splice(0, this.queuePts.length);
+    },
+    resetRawDataToLen: function(x) {
+        this.data.x.splice(x, this.data.x.length)
+        this.data.y.splice(x, this.data.x.length)
     },
 	setDataValid: function() {
 		try {
