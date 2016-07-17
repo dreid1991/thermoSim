@@ -309,7 +309,7 @@ GraphBase = {
 		
 		for (var setName in this.data) {
 			var set = this.data[setName];
-			if (set.visible) set.updateRange(this.valRange);
+			if (set.visible && !set.clickable) set.updateRange(this.valRange);
 		}
 
 		var oldAxisRange = this.axisRange.copy();

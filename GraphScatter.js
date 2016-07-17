@@ -94,7 +94,6 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			if (numClickables > 1) {
 				console.log("WARNING - MORE THAN ONE CLICKABLE SET FOR GRAPH " + graph.handle);
 			}
-            console.log(this.data);
             for (var handle in this.data) {
                 var dataSet = this.data[handle];
 				if (dataSet.clickable) {
@@ -102,11 +101,13 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
                     
                 
 					addListener(curLevel, 'mouseup', this.clickableDataSetListenerName, this.mouseup, this);
+                    addListener(curLevel, 'mousedown', this.clickableDataSetListenerName, this.mousedown, this);
 				}
 			}
 	    },
 		deactivateClickable: function() {
-			removeListener(curLevel, 'mouseup', this.clickableDataSetListenerName); //mousemove and mouseup deactivate themselves if you move out of graph, so this is only one that can be active
+			removeListener(curLevel, 'mouseup', this.clickableDataSetListenerName); //mousemove deactivates itself if you move out of graph, so this is only one that can be active
+			removeListener(curLevel, 'mousedown', this.clickableDataSetListenerName); 
 	    },
         addMousePoint: function(posInDiv) {
             dataSetClickable = this.data[this.handleClickable];
@@ -139,31 +140,60 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
             var ptUpper = P(ptOrigin.x + width, ptOrigin.y + height);
             return (posInDiv.x > ptOrigin.x && posInDiv.y > ptOrigin.y && posInDiv.x < ptUpper.x && posInDiv.y < ptUpper.y)
         },
+        mouseInDiv: function(posInDiv) {
+            return posInDiv.x > 0 && posInDiv.y > 0 && posInDiv.x < this.dims.dx && posInDiv.y < this.dims.dy;
+        },
 		mouseup: function() {
-            //var ka
+            var clickTimeLast = this.clickTime;
             this.clickTime = Date.now();
-            posInDiv = mouseOffsetDiv(this.parentDivId)
+            posInDiv = mouseOffsetDiv(this.parentDivId);
            
             if (this.mouseInGraph(posInDiv)) {
                 //should add a thing to record current idx in case user mouses out
-                this.data[this.handleClickable].resetToLen(this.clickDataLen);
+                var clickableSet = this.data[this.handleClickable];
+                clickableSet.resetToLen(this.clickDataLen);
+                clickableSet.resetRawDataToLen(this.clickDataLen);
+                var clickCloseToLastPt = false;
+                if (clickableSet.graphedPts.length >= 2) {
+                    ptCompare = clickableSet.graphedPts[clickableSet.graphedPts.length-1];
+                    ptAsPx = this.valToCoord(ptCompare);
+                    if (ptAsPx.distSqrTo(posInDiv) < 30*30) {
+                        clickCloseToLastPt = true;
+                    }
 
-                this.addMousePoint(posInDiv);
-                this.addLastSingleSet(this.handleClickable, true, true, false);
-                //this.drawPts(false);
-                //add mousemove listener
-                if (!this.userMouseActive) {
-                    addListener(curLevel, 'mousemove', this.clickableDataSetListenerName, this.mousemove, this);
-                    this.userMouseActive = true;
+
                 }
-                this.clickDataLen += 1;
+                if (this.userMouseActive && this.clickTime - clickTimeLast < 500 && clickCloseToLastPt) {
+                    removeListener(curLevel, 'mousemove', this.clickableDataSetListenerName);
+                    this.userMouseActive = false;
+                    this.drawAllBG();
+                    this.drawAllData();
+                } else {
 
+                    this.addMousePoint(posInDiv);
+                    this.addLastSingleSet(this.handleClickable, true, true, false);
+                    //this.drawPts(false);
+                    //add mousemove listener
+                    if (!this.userMouseActive) {
+                        addListener(curLevel, 'mousemove', this.clickableDataSetListenerName, this.mousemove, this);
+                        this.userMouseActive = true;
+                    }
+                    this.clickDataLen += 1;
+                }
             }
 
 	    },
+        mousedown: function() {
+            posInDiv = mouseOffsetDiv(this.parentDivId);
+            if (this.mouseInGraph(posInDiv) && !this.userMouseActive) {
+                this.data[this.handleClickable].reset();
+                this.data[this.handleClickable].data.clear();
+                this.clickDataLen = 0;
+            }
+        },
         mousemove: function() {
             posInDiv = mouseOffsetDiv(this.parentDivId);
-            if (!this.mouseInGraph(posInDiv)) {
+            if (!this.mouseInDiv(posInDiv)) {
                 this.data[this.handleClickable].reset(); 
                 this.data[this.handleClickable].data.clear();
                 removeListener(curLevel, 'mousemove', this.clickableDataSetListenerName);
@@ -171,6 +201,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
                 this.drawAllData();
                 this.userMouseActive = false;
                 this.clickDataLen = 0;
+
             } else {
                 this.data[this.handleClickable].resetToLen(this.clickDataLen);
                 this.data[this.handleClickable].resetRawDataToLen(this.clickDataLen);

@@ -202,6 +202,7 @@ LevelData = {
 						type: 'Scatter', handle: 'TempVsFracGas', xLabel: 'Fraction of molecules in gas phase', yLabel: 'Temperature (K)', axesInit:{y:{min:400, step:10},x:{min:0, step:0.2}}, numGridLines: {x:6, y: 7}, axesFixed:{x: true, y: true},
 							sets: [
 								{handle: 'fracVH', label: 'frac\nGas', pointCol:Col(50,255,50),flashCol:Col(200,255,200),data:{y: 'curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length > 400 ? tempSmooth("liquidLiq1") : (curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length > 0 ? 450 + 2 * (Math.random() - 0.5) : tempSmooth("secondWall"))', x: 'dotManager.lists.ALLDOTS.length/(dotManager.lists.ALLDOTS.length + curLevel.liquidLiq1.dotMgrLiq.lists.ALLDOTS.length)'},trace: true, fillInPts: true, fillInPtsMin: 5}
+
 							]
 					}
 				]
