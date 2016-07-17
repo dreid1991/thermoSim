@@ -562,6 +562,7 @@ GraphBase = {
 		return true;
 	},
 	valToCoord: function(val) {
+        //converting data value to pixel value on the graph
 		var x, y;
 		if (this.logScale.x) {
 			x = this.graphRangeFrac.x.min * this.dims.dx + this.gridSpacing.x * (this.numGridLines.x - 1) * Math.log(val.x / this.axisRange.x.min) / Math.log(this.axisRange.x.max / this.axisRange.x.min);
@@ -578,6 +579,25 @@ GraphBase = {
 		}
 		return P(x,y);
 	},
+    coordToVal: function(coord) {
+        //converting pixel value to data value on the graph
+        var x, y;
+        if (this.logScale.x) {
+            //implement
+        } else {
+			var rangeX = this.axisRange.x.max - this.axisRange.x.min;
+            x = this.axisRange.x.min + rangeX * (coord.x - this.graphRangeFrac.x.min*this.dims.dx) / (this.gridSpacing.x * (this.numGridLines.x-1));
+
+        }
+        if (this.logScale.y) {
+            //implement
+        } else {
+			var rangeY = this.axisRange.y.max - this.axisRange.y.min;
+            y = this.axisRange.y.min - rangeY * (coord.y - this.dims.dy + (1 - this.graphRangeFrac.y.min) * this.dims.dy) / (this.gridSpacing.y * (this.numGridLines.y-1))
+
+        }
+        return P(x,y);
+    },
 	dataScaling: function() {
 		var dx = this.gridSpacing.x / this.stepSize.x;
 		var dy = this.gridSpacing.y / this.stepSize.y;

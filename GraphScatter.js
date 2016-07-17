@@ -50,7 +50,9 @@ function GraphScatter(attrs) {
 	this.layers.addLayer('marker');
 
 	this.drawAllBG();
-	this.clickableDataSetListenerName = 'clickableDataSet' + this.handle
+	this.clickableDataSetListenerName = 'clickableDataSet' + this.handle;
+    this.userMouseActive = false;
+    this.handleClickable = null;
 	
 }
 _.extend(GraphScatter.prototype, AuxFunctions, GraphBase, 
@@ -80,18 +82,23 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			return new GraphBase.Range(xMin, xMax, yMin, yMax);
 		},
 		activateClickable: function() {
-			var numClickables = 0
-			for (var i=0; i<data.length; i++) {
-				if (data[i].clickable) {
+			var numClickables = 0;
+            for (var handle in this.data) {
+                var dataSet = this.data[handle];
+				if (dataSet.clickable) {
 					numClickables ++;
 				}
 			}
 			if (numClickables > 1) {
 				console.log("WARNING - MORE THAN ONE CLICKABLE SET FOR GRAPH " + graph.handle);
 			}
-			for (var i=0; i<data.length; i++) {
-				if (data[i].clickable) {
-
+            console.log(this.data);
+            for (var handle in this.data) {
+                var dataSet = this.data[handle];
+				if (dataSet.clickable) {
+                    this.handleClickable = handle;
+                    
+                
 					addListener(curLevel, 'mousedown', this.clickableDataSetListenerName, this.mousedown, this);
 				}
 			}
@@ -99,9 +106,49 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 		deactivateClickable: function() {
 			removeListener(curLevel, 'mousedown', this.clickableDataSetListenerName); //mousemove and mouseup deactivate themselves if you move out of graph, so this is only one that can be active
 	    },
+        addMousePoint: function(posInDiv) {
+            dataSetClickable = this.data[this.handleClickable];
+            //now read through all points of snapToSets sets and pick closest.  If less than some dist away, snap to that pos, otherwise just go where you are now
+            var minDistSqr = 50000;
+            var minDistVal = null;
+            snapToSets = dataSetClickable.snapToSets;
+            for (var i=0; i<snapToSets.length; i++) {
+                set = this.data[snapToSets[i]];
+                for (var j=0; j<set.graphedPts.length; j++) {
+                    var valPosInDiv = this.valToCoord(set.graphedPts[j]);
+                    var distSqr = posInDiv.distSqrTo(valPosInDiv);
+                    if (distSqr < minDistSqr) {
+                        minDistVal = set.graphedPts[j];
+                        minDistSqr = distSqr;
+                    }
+                }
+            }
+            if (minDistVal !== null && minDistSqr < 30*30) { //hardcoding in px value right now.
+                console.log("snap!");
+                dataSetClickable.data.addData([minDistVal]);
+            } else {
+                dataSetClickable.data.addData([this.coordToVal(posInDiv)]);
+            }
+
+        },
 		mousedown: function() {
-			//YOU WERE HERE.  Need to figure out of mouse of near a data point, all that stuff
-			//4.5 hrs worked, btw
+            posInDiv = mouseOffsetDiv(this.parentDivId)
+            console.log(posInDiv);
+            var ptOrigin = P(this.graphRangeFrac.x.min * this.dims.dx, this.graphRangeFrac.y.max * this.dims.dy);
+            var width = this.dims.dx * (this.graphRangeFrac.x.max - this.graphRangeFrac.x.min);
+            var height = this.dims.dy * (this.graphRangeFrac.y.min - this.graphRangeFrac.y.max);
+            var ptUpper = P(ptOrigin.x + width, ptOrigin.y + height);
+            if (posInDiv.x > ptOrigin.x && posInDiv.y > ptOrigin.y && posInDiv.x < ptUpper.x && posInDiv.y < ptUpper.y) {
+                if (!this.userMouseActive) {
+
+                    this.addMousePoint(posInDiv);
+                    this.addLastSingleSet(this.handleClickable, true);
+                    //this.drawPts(false);
+                    //add mousemove listener
+
+                }
+            }
+
 	    },
 		addSet: function(attrs){//address, label, pointCol, flashCol, data:{x:{wallInfo, data}, y:{same}}){
 			if (!this.data[attrs.handle]) {
@@ -138,16 +185,12 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 
 
 						}
+                        set.initialDataLen = x.length;
 
 
 					}
 				}
-				//data set member variables for setting whether can create data sets through clicking on graph.  Only one set can be set as the 'clickable' one for a given graph.  We do a check of this when graph creates all the sets (in Timeline graph spawn function)
-				this.clickable = defaultTo(false, attrs.clickable);
-				this.snapToSets = defaultTo([], attrs.snapToSets);
-				if (this.clickable) {
-					//addClickListener();	
-				}
+
 			}
 		},
 
@@ -173,9 +216,8 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			}
 		},
 		addLast: function(force){ //point of entry for adding data
-			var toAdd = [];
-			for (var setName in this.data){
-				var set = this.data[setName];
+			for (var setHandle in this.data){
+				var set = this.data[setHandle];
 				if ((set.recording || force) && set.dataValid) {
 					if (set.fillInPts) {
 						set.trimNewData();
@@ -186,6 +228,18 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			this.flushQueues(true, false);
 			this.hasData = true;
 		},
+        addLastSingleSet(setHandle, force) { //used for user-clicked points.  
+            var set = this.data[setHandle];
+            if ((set.recording || force) && set.dataValid) {
+                if (set.fillInPts) {
+                    set.trimNewData();
+                }
+                set.enqueuePts();
+            }
+			this.flushQueues(true, false);
+			this.hasData = true;
+
+        },
 		getAxisBounds: function(){
 			this.getXBounds();
 			this.getYBounds();
@@ -218,7 +272,7 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 )
 
 
-GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol, fillInPts, fillInPtsMin, trace, recording, showPts) {
+GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol, fillInPts, fillInPtsMin, trace, recording, showPts, clickable, snapToSets) {
 	this.graph = graph;
 	this.handle = handle;
 	this.label = label;
@@ -243,14 +297,18 @@ GraphScatter.Set = function(graph, handle, label, dataExprs, pointCol, flashCol,
 	this.queueIdxs = [];
 	this.recording = defaultTo(true, recording);
 	this.dataValid = true;
+    //data set member variables for setting whether can create data sets through clicking on graph.  Only one set can be set as the 'clickable' one for a given graph.  We do a check of this when graph creates all the sets (in Timeline graph spawn function)
+    this.clickable = defaultTo(false, clickable);
+    this.snapToSets = defaultTo([], snapToSets);
+    this.initialDataLen = 0; //this is the number of data points set by the input script.  These points will not be erased on reset
 	if (this.recording) this.recordStart();
 
 }
 
 GraphScatter.Set.prototype = {
 	reset: function() {
-		this.graphedPts.splice(0, this.graphedPts.length);
-		this.graphedPtIdxs.splice(0, this.graphedPtIdxs.length);
+		this.graphedPts.splice(this.initialDataLen, this.graphedPts.length);
+		this.graphedPtIdxs.splice(this.initialDataLen, this.graphedPtIdxs.length);
 		this.flashers.splice(0, this.flashers.length);
 		this.queueIdxs.splice(0, this.queueIdxs.length);
 		this.queuePts.splice(0, this.queuePts.length);
@@ -584,6 +642,7 @@ GraphScatter.Data.prototype = {
 	},
 	addData: function(data) {//takes list of points
 		for (var i=0; i<data.length; i++) {
+            console.log(data);
 			this.x.push(data[i].x)
 			this.y.push(data[i].y)
 		}

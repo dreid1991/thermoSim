@@ -23,8 +23,8 @@ $(function(){
 		window.IMGPATHPREFIX = 'content/sims/levels/'
 	}
 	$('#resetExp').append("<img src='" + IMGPATHPREFIX + "img/refresh.gif'></img>");
-	console.log('MATHJAX CONFIG IS COMMENTED OUT')
-	//MathJax.Hub.Config({tex2jax: {inlineMath: [['##','##'], ['\\(','\\)']], displayMath: [['$$', '$$']]}});
+	//console.log('MATHJAX CONFIG IS COMMENTED OUT')
+	MathJax.Hub.Config({tex2jax: {inlineMath: [['##','##'], ['\\(','\\)']], displayMath: [['$$', '$$']]}});
 	_.extend(Array.prototype, toInherit.ArrayExtenders);
 	_.extend(Math, toInherit.MathExtenders);
 	_.extend(String.prototype, toInherit.StringExtenders);
