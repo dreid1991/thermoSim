@@ -109,7 +109,8 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 			removeListener(curLevel, 'mouseup', this.clickableDataSetListenerName); //mousemove deactivates itself if you move out of graph, so this is only one that can be active
 			removeListener(curLevel, 'mousedown', this.clickableDataSetListenerName); 
 	    },
-        addMousePoint: function(posInDiv) {
+        getNearPoint: function(posInDiv) {
+            nearClickable = false;
             dataSetClickable = this.data[this.handleClickable];
             //now read through all points of snapToSets sets and pick closest.  If less than some dist away, snap to that pos, otherwise just go where you are now
             var minDistSqr = 50000;
@@ -126,11 +127,21 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
                     }
                 }
             }
-            if (minDistVal !== null && minDistSqr < 30*30) { //hardcoding in px value right now.
-                dataSetClickable.data.addData([minDistVal]);
-            } else {
+            if (minDistSqr < 30*30) {
+                return minDistVal;
+            }
+            return null;
+        },
+        addMousePoint: function(posInDiv, alwaysAdd) { //always add, as opposed to only adding if you're near one of the points - as would be required if you're just starting the clicked data set
+            nearPoint = this.getNearPoint(posInDiv);
+            console.log(nearPoint);
+            if (nearPoint !== null) { //hardcoding in px value right now.
+                dataSetClickable.data.addData([nearPoint]);
+                nearClickable = true;
+            } else if (alwaysAdd) {
                 dataSetClickable.data.addData([this.coordToVal(posInDiv)]);
             }
+            return nearClickable;
 
         },
         mouseInGraph: function(posInDiv) {
@@ -144,48 +155,52 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
             return posInDiv.x > 0 && posInDiv.y > 0 && posInDiv.x < this.dims.dx && posInDiv.y < this.dims.dy;
         },
 		mouseup: function() {
-            var clickTimeLast = this.clickTime;
-            this.clickTime = Date.now();
-            posInDiv = mouseOffsetDiv(this.parentDivId);
-           
-            if (this.mouseInGraph(posInDiv)) {
-                //should add a thing to record current idx in case user mouses out
-                var clickableSet = this.data[this.handleClickable];
-                clickableSet.resetToLen(this.clickDataLen);
-                clickableSet.resetRawDataToLen(this.clickDataLen);
-                var clickCloseToLastPt = false;
-                if (clickableSet.graphedPts.length >= 2) {
-                    ptCompare = clickableSet.graphedPts[clickableSet.graphedPts.length-1];
-                    ptAsPx = this.valToCoord(ptCompare);
-                    if (ptAsPx.distSqrTo(posInDiv) < 30*30) {
-                        clickCloseToLastPt = true;
+            if (this.handleClickable != null) {
+                var clickTimeLast = this.clickTime;
+                this.clickTime = Date.now();
+                posInDiv = mouseOffsetDiv(this.parentDivId);
+                canAddToSet = this.userMouseActive || this.clickDataLen == 0;
+                if (this.mouseInGraph(posInDiv) && canAddToSet) {
+                    //should add a thing to record current idx in case user mouses out
+                    var clickableSet = this.data[this.handleClickable];
+                    clickableSet.resetToLen(this.clickDataLen);
+                    clickableSet.resetRawDataToLen(this.clickDataLen);
+                    var clickCloseToLastPt = false;
+                    if (clickableSet.graphedPts.length >= 2) {
+                        ptCompare = clickableSet.graphedPts[clickableSet.graphedPts.length-1];
+                        ptAsPx = this.valToCoord(ptCompare);
+                        if (ptAsPx.distSqrTo(posInDiv) < 30*30) {
+                            clickCloseToLastPt = true;
+                        }
+
+
                     }
+                    if (this.userMouseActive && this.clickTime - clickTimeLast < 500 && clickCloseToLastPt) {
+                        removeListener(curLevel, 'mousemove', this.clickableDataSetListenerName);
+                        this.userMouseActive = false;
+                        this.drawAllBG();
+                        this.drawAllData();
+                    } else {
 
-
-                }
-                if (this.userMouseActive && this.clickTime - clickTimeLast < 500 && clickCloseToLastPt) {
-                    removeListener(curLevel, 'mousemove', this.clickableDataSetListenerName);
-                    this.userMouseActive = false;
-                    this.drawAllBG();
-                    this.drawAllData();
-                } else {
-
-                    this.addMousePoint(posInDiv);
-                    this.addLastSingleSet(this.handleClickable, true, true, false);
-                    //this.drawPts(false);
-                    //add mousemove listener
-                    if (!this.userMouseActive) {
-                        addListener(curLevel, 'mousemove', this.clickableDataSetListenerName, this.mousemove, this);
-                        this.userMouseActive = true;
+                        nearClickable = this.addMousePoint(posInDiv, this.userMouseActive);
+                        this.addLastSingleSet(this.handleClickable, true, true, false);
+                        //this.drawPts(false);
+                        //add mousemove listener
+                        if (nearClickable) {
+                            if (!this.userMouseActive) {
+                                addListener(curLevel, 'mousemove', this.clickableDataSetListenerName, this.mousemove, this);
+                                this.userMouseActive = true;
+                            }
+                            this.clickDataLen += 1;
+                        }
                     }
-                    this.clickDataLen += 1;
                 }
             }
 
 	    },
         mousedown: function() {
             posInDiv = mouseOffsetDiv(this.parentDivId);
-            if (this.mouseInGraph(posInDiv) && !this.userMouseActive) {
+            if (this.mouseInGraph(posInDiv) && !this.userMouseActive && this.clickDataLen == 0 && this.handleClickable != null) {
                 this.data[this.handleClickable].reset();
                 this.data[this.handleClickable].data.clear();
                 this.clickDataLen = 0;
@@ -194,19 +209,18 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
         mousemove: function() {
             posInDiv = mouseOffsetDiv(this.parentDivId);
             if (!this.mouseInDiv(posInDiv)) {
-                this.data[this.handleClickable].reset(); 
-                this.data[this.handleClickable].data.clear();
+                this.data[this.handleClickable].resetToLen(this.clickDataLen);
+                this.data[this.handleClickable].resetRawDataToLen(this.clickDataLen);
                 removeListener(curLevel, 'mousemove', this.clickableDataSetListenerName);
                 this.drawAllBG();
                 this.drawAllData();
                 this.userMouseActive = false;
-                this.clickDataLen = 0;
 
             } else {
                 this.data[this.handleClickable].resetToLen(this.clickDataLen);
                 this.data[this.handleClickable].resetRawDataToLen(this.clickDataLen);
                 this.drawAllBG();
-                this.addMousePoint(posInDiv);
+                this.addMousePoint(posInDiv, true);
                 this.addLastSingleSet(this.handleClickable, true, false, true);
             }
         },
@@ -327,6 +341,13 @@ _.extend(GraphScatter.prototype, AuxFunctions, GraphBase,
 		},
 		reset: function(){
 			this.resetStd()
+            if (this.handleClickable != null) {
+                this.clickDataLen = 0; 
+                if (this.userMouseActive) {
+                    removeListener(curLevel, 'mousemove', this.clickableDataSetListenerName);
+                    this.userMouseActive = false;
+                }
+            }
 		},
 	}
 )
