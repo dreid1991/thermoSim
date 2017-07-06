@@ -5,3 +5,10 @@ Specifically, when you go back into problem scene from next, it looks for proble
 like one pass for adding, another for removing.  This would be done in Timeline 1137 area
 
 on going back, piston constructor isn't called??  This is weird.  So... pext and q (problem data) aren't being told to record. FIND OUT how piston is being put back, and sort out how things are removed and added.
+
+
+
+
+
+The data I want is in global 'stored' object.
+need to figure shove gotten data back into simulation.  Multiple choice questions, maybe need to have repr for each object.  That would be a big pain
