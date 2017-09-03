@@ -14,7 +14,11 @@ Copyright (C) 2013  Daniel Reid
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+ROUNDTO=4;
 
+function reprNum(x) {
+    return String(round(x, ROUNDTO))
+}
 function Dot(x, y, v, spcName, tag, elemId, returnTo) {
 	var def = window.spcs[spcName]
 	this.x = x;
@@ -254,6 +258,9 @@ Vector.prototype = {
 		this.x = 0;
 		this.y = 0;
 	},
+    repr: function() {
+        return 'V(' + reprNum(this.dx) + ',' + reprNum(this.dy) + ')'
+    }
 }
 Color.prototype = {
 	adjust: function(dr, dg, db){
@@ -313,6 +320,9 @@ Color.prototype = {
 	sameAs: function(b){
 		return this.r == b.r && this.g == b.g && this.b == b.b;
 	}
+    repr: function() {
+        return 'Col(' + reprNum(this.r) + ',' + reprNum(this.g) + ',' + reprNum(this.b) + ')'
+    }
 
 }
 Point.prototype = {
@@ -499,7 +509,11 @@ Point.prototype = {
 			this.tracking = false;
 		}
 		return this;
-	}
+	},
+
+    repr: function() {
+        return 'P(' + reprNum(this.x) + ',' + reprNum(this.y) + ')'
+    }
 }
 Dot.prototype = {
 	KE: function() {
