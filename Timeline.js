@@ -655,6 +655,9 @@ Timeline.Section.prototype = {
 		this.sortMoments();
 	},
 
+    loadRestartData(sectionIdx, promptIdx) {
+        return null
+    },
 	addCmmdPoint: function(prompt, when, func, oneWay, once) { //public func.  Test settings a heater's liquid
 		//make this be point with once argument
 		promptIdx = prompt == 'now' ? this.promptIdx : prompt;
@@ -673,13 +676,13 @@ Timeline.Section.prototype = {
         //paring data, by the way, is just cutting data lists when the get too long.  See WallMethodsWall.js
         restartData = null
         if (sectionIdx !== null) {
-            restartData = loadRestartData(sectionIdx, null)
+            restartData = this.loadRestartData(sectionIdx, null)
         }
 		this.addSceneDataToMoments(timeline, elems, moments, sectionData.sceneData, restartData, -1, undefined);
 		var prompts = sectionData.prompts;
 		for (var promptIdx=0; promptIdx<prompts.length; promptIdx++) {
             if (sectionIdx !== null) {
-                restartData = loadRestartData(sectionIdx, promptIdx)
+                restartData = this.loadRestartData(sectionIdx, promptIdx)
             }
 			if (prompts[promptIdx].sceneData) this.addSceneDataToMoments(timeline, elems, moments, prompts[promptIdx].sceneData, restartData, promptIdx);
 		}
@@ -785,18 +788,20 @@ Timeline.Section.prototype = {
 		if (sceneData) {
 
 
-
-			this.applySpanToMoments(timeline, moments, elems, sceneData.walls, 'walls', timestamp, Timeline.stateFuncs.walls.spawn, Timeline.stateFuncs.walls.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.dots, 'dots', timestamp, Timeline.stateFuncs.dots.spawn, Timeline.stateFuncs.dots.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.objs, 'objs', timestamp, Timeline.stateFuncs.objs.spawn, Timeline.stateFuncs.objs.remove);
+            if (restartData == null) {
+                restartData = {}; //so I can get get members from it w/o a bunch of if statements
+            }
+			this.applySpanToMoments(timeline, moments, elems, sceneData.walls, restartData.walls, 'walls', timestamp, Timeline.stateFuncs.walls.spawn, Timeline.stateFuncs.walls.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.dots, restartData.dots, 'dots', timestamp, Timeline.stateFuncs.dots.spawn, Timeline.stateFuncs.dots.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.objs, restartData.objs, 'objs', timestamp, Timeline.stateFuncs.objs.spawn, Timeline.stateFuncs.objs.remove);
             //important that datareadouts / other data go after objs, b/c they can depend on objects
-			this.applySpanToMoments(timeline, moments, elems, sceneData.dataRecord, 'objs', timestamp, Timeline.stateFuncs.dataRecord.spawn, Timeline.stateFuncs.dataRecord.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.dataReadouts, 'objs', timestamp, Timeline.stateFuncs.dataReadouts.spawn, Timeline.stateFuncs.dataReadouts.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.triggers, 'objs', timestamp, Timeline.stateFuncs.triggers.spawn, Timeline.stateFuncs.triggers.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.graphs, 'objs', timestamp, Timeline.stateFuncs.graphs.spawn, Timeline.stateFuncs.graphs.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.rxnsEmergent, 'objs', timestamp, Timeline.stateFuncs.rxnsEmergent.spawn, Timeline.stateFuncs.rxnsEmergent.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.rxnsNonEmergent, 'objs', timestamp, Timeline.stateFuncs.rxnsNonEmergent.spawn, Timeline.stateFuncs.rxnsNonEmergent.remove);
-			this.applySpanToMoments(timeline, moments, elems, sceneData.buttonGroups, 'objs', timestamp, Timeline.stateFuncs.buttonGrps.spawn, Timeline.stateFuncs.buttonGrps.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.dataRecord, restartData.dataRecord, 'objs', timestamp, Timeline.stateFuncs.dataRecord.spawn, Timeline.stateFuncs.dataRecord.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.dataReadouts, restartData.dataReadouts, 'objs', timestamp, Timeline.stateFuncs.dataReadouts.spawn, Timeline.stateFuncs.dataReadouts.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.triggers, restartData.triggers, 'objs', timestamp, Timeline.stateFuncs.triggers.spawn, Timeline.stateFuncs.triggers.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.graphs, restartData.triggers, 'objs', timestamp, Timeline.stateFuncs.graphs.spawn, Timeline.stateFuncs.graphs.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.rxnsEmergent, restartData.rxnsEmergent, 'objs', timestamp, Timeline.stateFuncs.rxnsEmergent.spawn, Timeline.stateFuncs.rxnsEmergent.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.rxnsNonEmergent, restartData.rxnsNonEmergent, 'objs', timestamp, Timeline.stateFuncs.rxnsNonEmergent.spawn, Timeline.stateFuncs.rxnsNonEmergent.remove);
+			this.applySpanToMoments(timeline, moments, elems, sceneData.buttonGroups, restartData.buttonGroups, 'objs', timestamp, Timeline.stateFuncs.buttonGrps.spawn, Timeline.stateFuncs.buttonGrps.remove);
 			
 			this.applyCmmdsToMoments(timeline, moments, elems, sceneData.cmmds, 'cmmds', timestamp);
 
@@ -807,7 +812,10 @@ Timeline.Section.prototype = {
 		for (var i=0; i<elemData.length; i++) {
 			var id = timeline.takeNumber();
 			var elemDatum = elemData[i];
-			var restartDatum = restartData[i];
+            var restartDatum = null;
+            if (restartData != null & restartData != undefined && restartDatum.length>=i) {
+                var restartDatum = restartData[i];
+            }
 			var cleanUpWith = elemDatum.cleanUpWith;
 			var timestampTail = this.getTimestamp(cleanUpWith || timestampHead, 'tail');
         
@@ -866,7 +874,7 @@ Timeline.Section.prototype = {
 		momentHead.events[eventClass].push(eventHead);
 		momentTail.events[eventClass].push(eventTail);		
 	},
-	pushPoint: function(moments, timelineElems, id, elemDatum, restartDatum, spawn, oneWay, eventClass, once, timestamp) {
+	pushPoint: function(moments, timelineElems, id, elemDatum, spawn, oneWay, eventClass, once, timestamp) {
 		var moment = this.getOrCreateMoment(moments, timestamp);
 		var event = new Timeline.Event.Point(this, timelineElems, elemDatum, spawn, id, oneWay, once, moment);
 		moment.events[eventClass].push(event);

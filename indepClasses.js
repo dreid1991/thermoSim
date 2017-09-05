@@ -319,7 +319,7 @@ Color.prototype = {
 	},
 	sameAs: function(b){
 		return this.r == b.r && this.g == b.g && this.b == b.b;
-	}
+	},
     repr: function() {
         return 'Col(' + reprNum(this.r) + ',' + reprNum(this.g) + ',' + reprNum(this.b) + ')'
     }
