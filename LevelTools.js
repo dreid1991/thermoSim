@@ -454,4 +454,6 @@ LevelTools = {
 		makeListenerHolder(this, 'promptCondition');
 		makeListenerHolder(this, 'setup');
 	},
+    repr: function() {
+    }
 }

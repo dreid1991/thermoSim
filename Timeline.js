@@ -35,8 +35,8 @@ Timeline.prototype = {
 	curPrompt:function() {
 		return this.sections[this.sectionIdx].curPrompt();
 	},
-	pushSection: function(sectionData, motherTimeline, motherSection) {
-		this.sections.push(new Timeline.Section(this, sectionData, this.buttonManagerBlank, undefined, motherTimeline, motherSection));
+	pushSection: function(sectionData, motherTimeline, motherSection, sectionIdx) {
+		this.sections.push(new Timeline.Section(this, sectionData, sectionIdx, this.buttonManagerBlank, undefined, motherTimeline, motherSection));
 	},
 	clearCurrentSection: function() {
 		if (this.sectionIdx !== undefined) 
@@ -186,15 +186,18 @@ Timeline.prototype = {
 
 }
 
-Timeline.Section = function(timeline, sectionData, buttonManagerBlank, conditionManager, motherTimeline, motherSection) {
+Timeline.Section = function(timeline, sectionData, sectionIdx, buttonManagerBlank, conditionManager, motherTimeline, motherSection) {
+    //sectionIdx is null if we are not in main sequence
 	this.timeline = timeline;
 	this.inited = false
 	this.promptIdx = -1;
 	this.time = -2;
 	this.branches = [];
 	this.sectionData = sectionData;
+    this.sectionIdx = sectionIdx
 	this.moments = [];
-	this.populateMoments(timeline, timeline.elems, this.moments, this.sectionData);
+    //sectionIdx is used for loading restart data.  It is null if from an aux section
+	this.populateMoments(timeline, timeline.elems, this.moments, this.sectionData, this.sectionIdx);
 	this.sortMoments();
 
 	this.level = new LevelInstance();
@@ -500,7 +503,7 @@ Timeline.Section.prototype = {
 			} else {
 				var branchTimeline = new Timeline(curTimeline, curSection.buttonManagerBlank, false, true);
 				curSection.branches[promptIdx] = new Timeline.Branch(branchTimeline, prompts.id);
-				branchTimeline.pushSection({prompts: prompts}, curSection.motherTimeline, curSection.motherSection);
+				branchTimeline.pushSection({prompts: prompts}, curSection.motherTimeline, curSection.motherSection, null);
 				branchTimeline.sections[0].inheritState(curSection);
 				//this makes it so we don't have to call showSection, which would replace the html
 				branchTimeline.sectionIdx = 0;
@@ -535,7 +538,7 @@ Timeline.Section.prototype = {
 			} else {
 				var branchTimeline = new Timeline(curTimeline, curTimeline.buttonManagerBlank, true, false);
 				for (var i=0; i<sections.length; i++) {
-					branchTimeline.pushSection(sections[i]);
+					branchTimeline.pushSection(sections[i], null, null, null);
 				}
 				curSection.branches[curSection.promptIdx] = new Timeline.Branch(branchTimeline, sections.id);
 				//don't need to clear prompt, that will be taken care of when we resume
@@ -662,16 +665,23 @@ Timeline.Section.prototype = {
 		this.applyCmmdPoint(this.timeline, this.moments, this.timeline.elems, cmmd, 'cmmds', once, timestamp, id);
 		this.sortMoments();
 	},
-	populateMoments: function(timeline, elems, moments, sectionData) {
+	populateMoments: function(timeline, elems, moments, sectionData, sectionIdx) {
 		moments.push(new Timeline.Moment(-2)); //dummy moment to start on
 		//walls pare data cmmd
 		//not paring data.  Doesn't make performance difference, makes it more difficult to look at data
 		//this.addSceneDataToMoments(timeline, elems, moments, {cmmds: [{type: 'point', spawn: 'addListener(curLevel, "data", "pareWallsData", walls.pareData, walls)', oneWay: false}]}, -1, undefined);
         //paring data, by the way, is just cutting data lists when the get too long.  See WallMethodsWall.js
-		this.addSceneDataToMoments(timeline, elems, moments, sectionData.sceneData, -1, undefined);
+        restartData = null
+        if (sectionIdx !== null) {
+            restartData = loadRestartData(sectionIdx, null)
+        }
+		this.addSceneDataToMoments(timeline, elems, moments, sectionData.sceneData, restartData, -1, undefined);
 		var prompts = sectionData.prompts;
 		for (var promptIdx=0; promptIdx<prompts.length; promptIdx++) {
-			if (prompts[promptIdx].sceneData) this.addSceneDataToMoments(timeline, elems, moments, prompts[promptIdx].sceneData, promptIdx);
+            if (sectionIdx !== null) {
+                restartData = loadRestartData(sectionIdx, promptIdx)
+            }
+			if (prompts[promptIdx].sceneData) this.addSceneDataToMoments(timeline, elems, moments, prompts[promptIdx].sceneData, restartData, promptIdx);
 		}
 		this.populateHTMLMoments(timeline, elems, moments, sectionData);
 	},
@@ -710,7 +720,7 @@ Timeline.Section.prototype = {
 			}
 			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
-			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');
+			this.pushSpan(elems, cmmd, null, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');
 		} else {
 			id = timeline.takeNumber();
 			spawnFunc = function() {
@@ -728,7 +738,7 @@ Timeline.Section.prototype = {
 			
 			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
-			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');
+			this.pushSpan(elems, cmmd, null, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');
 		}
 		if (prompt.quiz) { 
 			var spawnFunc, removeFunc;
@@ -738,7 +748,7 @@ Timeline.Section.prototype = {
 			
 			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
-			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');
+			this.pushSpan(elems, cmmd, null, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');
 		}
 		if (prompt.title) {
 			id = timeline.takeNumber();
@@ -746,7 +756,7 @@ Timeline.Section.prototype = {
 			removeFunc = function() {$('#baseHeader').html('')};
 			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
-			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');			
+			this.pushSpan(elems, cmmd, null, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');			
 		}
 		
 		if (prompt.noReset === true || prompt.noRefresh === true) {
@@ -755,7 +765,7 @@ Timeline.Section.prototype = {
 			removeFunc = function() {$('#resetExp').show()};
 			cmmd = new Timeline.Command('span', spawnFunc, removeFunc);
 			timestampTail = this.getTimestamp(promptIdx, 'tailHTML');
-			this.pushSpan(elems, cmmd, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');
+			this.pushSpan(elems, cmmd, null, Timeline.stateFuncs.cmmds.spawn, Timeline.stateFuncs.cmmds.remove, id, moments, timestampHead, timestampTail, false, 'cmmds');
 		}
 		
 		var arrangeHTMLSpawn = function() {
@@ -770,10 +780,12 @@ Timeline.Section.prototype = {
 
 
 	},
-	addSceneDataToMoments: function(timeline, elems, moments, sceneData, timestamp) {
+	addSceneDataToMoments: function(timeline, elems, moments, sceneData, restartData, timestamp) {
 		var moment = this.getOrCreateMoment(moments, timestamp);
 		if (sceneData) {
-			//will be able to interp all of these data nuggets before rendering
+
+
+
 			this.applySpanToMoments(timeline, moments, elems, sceneData.walls, 'walls', timestamp, Timeline.stateFuncs.walls.spawn, Timeline.stateFuncs.walls.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.dots, 'dots', timestamp, Timeline.stateFuncs.dots.spawn, Timeline.stateFuncs.dots.remove);
 			this.applySpanToMoments(timeline, moments, elems, sceneData.objs, 'objs', timestamp, Timeline.stateFuncs.objs.spawn, Timeline.stateFuncs.objs.remove);
@@ -790,15 +802,16 @@ Timeline.Section.prototype = {
 
 		}
 	},
-	applySpanToMoments: function(timeline, moments, timelineElems, elemData, eventClass, timestampHead, spawnFunc, removeFunc) {
+	applySpanToMoments: function(timeline, moments, timelineElems, elemData, restartData, eventClass, timestampHead, spawnFunc, removeFunc) {
 		elemData = elemData ? elemData : [];
 		for (var i=0; i<elemData.length; i++) {
 			var id = timeline.takeNumber();
 			var elemDatum = elemData[i];
+			var restartDatum = restartData[i];
 			var cleanUpWith = elemDatum.cleanUpWith;
 			var timestampTail = this.getTimestamp(cleanUpWith || timestampHead, 'tail');
         
-			this.pushSpan(timelineElems, elemDatum, spawnFunc, removeFunc, id, moments, timestampHead, timestampTail, false, eventClass);
+			this.pushSpan(timelineElems, elemDatum, restartDatum, spawnFunc, removeFunc, id, moments, timestampHead, timestampTail, false, eventClass);
 
 
 		}
@@ -833,7 +846,7 @@ Timeline.Section.prototype = {
 		var cleanUpWith = cmmd.cleanUpWith;
 		var timestampTail = this.getTimestamp(cleanUpWith || timestampHead, 'tail');
 
-		this.pushSpan(timelineElems, cmmd, spawn, remove, id, moments, timestampHead, timestampTail, once, 'cmmds');
+		this.pushSpan(timelineElems, cmmd, null, spawn, remove, id, moments, timestampHead, timestampTail, once, 'cmmds');
 	},
 	applyCmmdPoint: function(timeline, moments, timelineElems, cmmd, eventClass, once, timestamp, id) {
 		var id = id === undefined ? timeline.takeNumber() : id;
@@ -841,19 +854,19 @@ Timeline.Section.prototype = {
 		var oneWay = defaultTo(true, cmmd.oneWay);
 		this.pushPoint(moments, timelineElems, id, cmmd, spawn, oneWay, eventClass, once, timestamp);
 	},
-	pushSpan: function(timelineElems, elemDatum, spawn, remove, id, moments, timestampHead, timestampTail, once, eventClass) {
+	pushSpan: function(timelineElems, elemDatum, restartDatum, spawn, remove, id, moments, timestampHead, timestampTail, once, eventClass) {
 		var momentHead = this.getOrCreateMoment(moments, timestampHead);
 		var momentTail = this.getOrCreateMoment(moments, timestampTail);
 		//need to disable partner
-		var eventHead = new Timeline.Event.Span(this, timelineElems, elemDatum, spawn, remove, id, 'head', once, momentHead);
-		var eventTail = new Timeline.Event.Span(this, timelineElems, elemDatum, spawn, remove, id, 'tail', once, momentTail);
+		var eventHead = new Timeline.Event.Span(this, timelineElems, elemDatum, restartDatum, spawn, remove, id, 'head', once, momentHead);
+		var eventTail = new Timeline.Event.Span(this, timelineElems, elemDatum, restartDatum, spawn, remove, id, 'tail', once, momentTail);
 		eventHead.partner = eventTail;
 		eventTail.partner = eventHead;
 
 		momentHead.events[eventClass].push(eventHead);
 		momentTail.events[eventClass].push(eventTail);		
 	},
-	pushPoint: function(moments, timelineElems, id, elemDatum, spawn, oneWay, eventClass, once, timestamp) {
+	pushPoint: function(moments, timelineElems, id, elemDatum, restartDatum, spawn, oneWay, eventClass, once, timestamp) {
 		var moment = this.getOrCreateMoment(moments, timestamp);
 		var event = new Timeline.Event.Point(this, timelineElems, elemDatum, spawn, id, oneWay, once, moment);
 		moment.events[eventClass].push(event);
@@ -935,9 +948,10 @@ Timeline.Section.prototype = {
 }
 
 
+//need to make restartDatum do something
 Timeline.stateFuncs = {
 	walls: {
-		spawn: function(section, elems, id, datum) {
+		spawn: function(section, elems, id, datum, restartDatum) {
 			elems[id] = section.walls.addWall(datum);
 		},
 		remove: function(section, elems, id) {
@@ -947,7 +961,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	dots: {
-		spawn: function(section, elems, id, datum) {
+		spawn: function(section, elems, id, datum, restartDatum) {
 			section.spcs[datum.spcName].populate(datum.pos, datum.dims, datum.count, datum.temp, datum.tag, id, datum.returnTo);
 			elems[id] = 'dots';
 		},
@@ -957,7 +971,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	objs: {
-		spawn: function(section, elems, id, datum) {
+		spawn: function(section, elems, id, datum, restartDatum) {
 			var objFunc = window[datum.type];
 			if (!objFunc) console.log('Bad object type ' + datum.type);
 			elems[id] = new objFunc(datum.attrs);
@@ -969,7 +983,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	dataRecord: {
-		spawn: function(section, elems, id, entry) {
+		spawn: function(section, elems, id, entry, restartDatum) {
 			if (/collisions/i.test(entry.data)) {
 				section.collide.recordCollisions();
 			} else {
@@ -988,7 +1002,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	dataReadouts: {
-		spawn: function(section, elems, id, datum) {
+		spawn: function(section, elems, id, datum, restartDatum) {
 			var displayEntry = section.dataDisplayer.addEntry(datum);
 			elems[id] = displayEntry;
 		},
@@ -999,7 +1013,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	triggers: {
-		spawn: function(section, elems, id, datum) {
+		spawn: function(section, elems, id, datum, restartDatum) {
 			elems[id] = new window.Trigger(datum);
 		},
 		remove: function(section, elems, id) {
@@ -1009,7 +1023,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	graphs: {
-		spawn: function(section, elems, id, graphDatum) {
+		spawn: function(section, elems, id, graphDatum, restartDatum) {
 			var graph;
 			if (/^load$/i.test(graphDatum.type)) {
 				graph = window.storedGraphs[graphDatum.handle];
@@ -1047,7 +1061,7 @@ Timeline.stateFuncs = {
 		}		
 	},
 	rxnsEmergent: {
-		spawn: function(section, elems, id, rxnDatum) {
+        spawn: function(section, elems, id, rxnDatum, restartDatum) {
 			var rxn = section.collide.rxnHandlerEmergent.addReaction(rxnDatum);
 			elems[id] = rxn;
 		},
@@ -1058,7 +1072,7 @@ Timeline.stateFuncs = {
 		}		
 	},
 	rxnsNonEmergent: {
-		spawn: function(section, elems, id, rxnDatum) {
+		spawn: function(section, elems, id, rxnDatum, restartDatum) {
 			var rxn = section.collide.rxnHandlerNonEmergent.addReaction(rxnDatum);
 			elems[id] = rxn;
 		},
@@ -1069,7 +1083,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	buttonGrps: {
-		spawn: function(section, elems, id, grpDatum) {
+		spawn: function(section, elems, id, grpDatum, restartDatum) {
 			section.buttonManager.addGroup(grpDatum.handle, grpDatum.label, grpDatum.prefIdx, grpDatum.isRadio, grpDatum.isToggle);
 			if (grpDatum.buttons) {
 				for (var i=0; i<grpDatum.buttons.length; i++) {
@@ -1089,7 +1103,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	cmmds: {
-		spawn: function(section, elems, id, cmmd) {
+		spawn: function(section, elems, id, cmmd, restartDatum) {
 			var spawnExpr = cmmd.spawn;
 			elems[id] = cmmd;
 			if (spawnExpr) {
@@ -1162,10 +1176,19 @@ Timeline.Moment.prototype = {
 	fireSpan: function(span, from, to, stepType) {
 		if (span.active) {
             var elemDatum = getAndEval(span.elemDatum);
+            var restartDatum = span.restartDatum;
+            for (var item in restartDatum) {
+                if (item in elemDatum) {
+                    elemDatum[item] = restartDatum[item];
+                }
+            }
+            //okay so restart data will be substituted in in two phases
+            //First, restartDatum items will be substituted into elemDatum, so things may be overwritten 
+            //Second, any addition items stored in restartDatum will just be passed to the individual spawn functions for processing
             if (span.boundType == 'head') {
                 if (from < to && from < this.timestamp && to < span.partner.moment.timestamp) {
                     if (stepType=='spawn' || stepType=='cmmd') {
-                        span.spawn(span.section, span.timelineElems, span.id, elemDatum);
+                        span.spawn(span.section, span.timelineElems, span.id, elemDatum, restartDatum);
                     }
                 } else if (to < from && to < this.timestamp && from <= span.partner.moment.timestamp) {
                     if (stepType=='remove' || stepType == 'cmmd') {
@@ -1228,10 +1251,11 @@ Timeline.EventClassHolder = function() {
 }
 
 Timeline.Event = {
-	Span: function(section, timelineElems, elemDatum, spawn, remove, id, boundType, once, moment) {
+	Span: function(section, timelineElems, elemDatum, restartDatum, spawn, remove, id, boundType, once, moment) {
 		this.section = section;
 		this.timelineElems = timelineElems;
 		this.elemDatum = elemDatum;
+        this.restartDatum = restartDatum;
 		this.spawn = spawn;
 		this.remove = remove;
 		this.id = id;
@@ -1252,7 +1276,7 @@ Timeline.Event = {
 		this.once = once;
 		this.active = true;
 	},
-	BranchCmmd: function(section, timelineElems, elemDatum, spawn, id, moment, isSectionsBranch) {
+	BranchCmmd: function(section, timelineElems, elemDatum, restartDatum, spawn, id, moment, isSectionsBranch) {
 		this.section = section;
 		this.section = section;
 		this.timelineElems = timelineElems;

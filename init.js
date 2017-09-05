@@ -138,7 +138,7 @@ $(function(){
 	}
 
 	for (var sectionIdx=0; sectionIdx<LevelData.mainSequence.length; sectionIdx++) {
-		timeline.pushSection(LevelData.mainSequence[sectionIdx]);
+		timeline.pushSection(LevelData.mainSequence[sectionIdx], null, null, sectionIdx);
 	}
 	timeline.show(0, 0);
 
