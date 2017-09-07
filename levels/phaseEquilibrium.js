@@ -5,10 +5,7 @@ LevelData = {
 		
 	spcDefs: [
 		//add antoine coefs, cvLiq, hvap
-		{spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
-		{spcName: 'spc2', m: 4, r: 2, col: Col(150, 100, 100), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
-		{spcName: 'Water', m: 4, r: 2, col: Col(27, 181, 224), cv: 3.37 * R, hF298: -260, hVap298: 40.6, antoineCoeffs: {a: 8.07, b:1730.6, c:233.426-273.15}, cpLiq: 75.34, spcVolLiq: 1},
-		{spcName: 'spc4', m: 4, r: 1, col: Col(115, 250, 98), cv: 2.5 * R, hF298: -260, hVap298: 40.6, antoineCoeffs: {a: 8.14, b:1810.94, c:244.485-273.15}, cpLiq: 75.34, spcVolLiq: 1}
+		{spcName: 'Water', m: 4, r: 2, col: Col(27, 181, 224), cv: 3.37 * R, hF298: -260, hVap298: 40.6, antoineCoeffs: {a: 8.07, b:1730.6, c:233.426-273.15}, cpLiq: 75.34, spcVolLiq: 0.5}
 	],	
 
 	mainSequence: [
@@ -39,7 +36,7 @@ LevelData = {
 		{//First Scene
 			sceneData: {
 				walls: [
-					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'staticAdiabatic', handle: 'wallo', vol: 0.5, isothermalRate: 4, border: {type: 'open', width: 10, yMin: 40} },
+					{pts:[P(40,55), P(510,55), P(510,350), P(40,350)], handler: 'staticAdiabatic', handle: 'wallo', vol: 0.2, isothermalRate: 4, border: {type: 'open', width: 10, yMin: 40} },
 				],
 				objs: [
 					{
@@ -75,7 +72,7 @@ LevelData = {
 							wallInfo: 'wallo',
 							liquidHandle: 'water',
 							temp: 333.15,
-							max: 2,
+							max: 1.25,
 							pos: new Point(225, 335), 
 							dims: new Vector(100, 12)
 						},
@@ -95,7 +92,8 @@ LevelData = {
 					}
 				],	
 				dataReadouts: [
-					{label: 'Vol: ', expr: 'vol("wallo")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
+                    //I am subtracting off the initial liquid volume.  If I make the liquid's specific volume too small, I can't see it, which is bad.  The gas volume will be a little too low now, but that's okay
+					{label: 'Vol: ', expr: 'vol("wallo")-.28', units: 'L', decPlaces: 2, handle: 'volReadout', readout: 'mainReadout'},
 					{label: 'Heat: ', expr: 'q("wallo") + q("liquidWater")', units: 'kJ', decPlaces: 1, handle: 'qReadout', readout: 'mainReadout'},
 					// {label: 'frac: ', expr: 'frac("wallo")', units: '', decPlaces: 1, handle: 'fracReadout', readout: 'mainReadout'},
 					// {label: 'moles: ', expr: 'moles("wallo")', units: 'mol', decPlaces: 2, handle: 'molReadout', readout: 'mainReadout'},
@@ -323,7 +321,7 @@ LevelData = {
 							min: 0.5,
 							init: 0.5,
 							max: 20,
-							makeSlider: true,	
+							makeSlider: false,	
 							compMode: 'cPAdiabaticDamped',
 						}	
 					},
@@ -381,7 +379,7 @@ LevelData = {
 					// }
 				// ],	
 				dataReadouts: [
-					{label: 'Vol: ', expr: 'vol("wallo")', units: 'L', decPlaces: 1, handle: 'volReadout', readout: 'mainReadout'},
+					{label: 'Vol: ', expr: 'vol("wallo")-.27', units: 'L', decPlaces: 2, handle: 'volReadout', readout: 'mainReadout'},
 					{label: 'Gas Temp: ', expr: 'var tempVal = tempSmooth("wallo"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'tempGasReadout', readout: 'mainReadout'},
 					{label: 'Liquid Temp: ', expr:  'var tempVal = tempSmooth("liquidWater"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
