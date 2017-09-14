@@ -84,7 +84,7 @@ LevelData = {
 					{wallInfo: 'wallo', data: 'enthalpy'},
 				],
 				graphs: [
-					{type: 'Scatter', handle: 'TVGraph', xLabel: 'Temperature (K)', yLabel: 'Volume (L)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
+					{type: 'Scatter', handle: 'TVGraph', xLabel: 'Temperature (K)', yLabel: 'Volume (L)', axesInit: {x:{min: 325, step:25}, y:{min: 0, step: 1}},
 						sets:[
 							{handle: 'tempVolume', label: 'Phase Change', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
 							data: {x: '(curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length && tempSmooth("liquidWater")) || tempSmooth("wallo")', y: 'vol("wallo")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
@@ -93,7 +93,7 @@ LevelData = {
 				],	
 				dataReadouts: [
                     //I am subtracting off the initial liquid volume.  If I make the liquid's specific volume too small, I can't see it, which is bad.  The gas volume will be a little too low now, but that's okay
-					{label: 'Vol: ', expr: 'vol("wallo")-.28', units: 'L', decPlaces: 2, handle: 'volReadout', readout: 'mainReadout'},
+					{label: 'Vol: ', expr: 'vol("wallo")-.287', units: 'L', decPlaces: 3, handle: 'volReadout', readout: 'mainReadout'},
 					{label: 'Heat: ', expr: 'q("wallo") + q("liquidWater")', units: 'kJ', decPlaces: 1, handle: 'qReadout', readout: 'mainReadout'},
 					// {label: 'frac: ', expr: 'frac("wallo")', units: '', decPlaces: 1, handle: 'fracReadout', readout: 'mainReadout'},
 					// {label: 'moles: ', expr: 'moles("wallo")', units: 'mol', decPlaces: 2, handle: 'molReadout', readout: 'mainReadout'},
@@ -368,10 +368,20 @@ LevelData = {
 				],
 				dataRecord: [
 					{wallInfo: 'wallo', data: 'frac', attrs: {spcName: 'Water', tag: 'wallo'}},
-					{wallInfo: 'wallo', data: 'enthalpy', attrs: {spcName: 'Water', tag: 'wallo'}},
-				],
-				// graphs: [
-					// {type: 'Scatter', handle: 'hTGraph', xLabel: 'Enthalpy (kJ)', yLabel: 'Temperature (K)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
+                    {wallInfo: 'wallo', data: 'enthalpy', attrs: {spcName: 'Water', tag: 'wallo'}},
+                ],
+                graphs: [
+                    {type: 'load', handle: 'TVGraph',  
+                        sets:[
+                            {handle: 'tempVolume2', label: 'Phase Change', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
+                                data: {x: '(curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length && tempSmooth("liquidWater")) || tempSmooth("wallo")', y: 'vol("wallo")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+                        ]
+                    }
+
+                ],	
+
+                // graphs: [
+                // {type: 'Scatter', handle: 'hTGraph', xLabel: 'Enthalpy (kJ)', yLabel: 'Temperature (K)', axesInit: {x:{min: 0, step:3}, y:{min: 0, step: 1}},
 						// sets:[
 							// {handle: 'enthalpyTemperature', label: 'Phase Change', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
 							// data: {x: 'enthalpy("left")', y: 'tempSmooth("left")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
