@@ -127,7 +127,7 @@ QuizRenderer.prototype = {
         if (question.options.length==1) {
             //if only one option, send answer by default.  This is helpful for ending the simulation, which needs "I am done" questions to be answered to know use is done with sim
             click(0);
-            question.sendAnswerToCW();
+         //   question.sendAnswerToCW();
         }
 		for (var i=0; i<question.options.length; i++) {
 			this.bindMultChoiceOption(question, click, question.options, question.options[i]);
