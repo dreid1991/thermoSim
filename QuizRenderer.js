@@ -124,8 +124,14 @@ QuizRenderer.prototype = {
 		if (getStore(question.storeAs) !== undefined) {
 			click(getStore(question.storeAs));
 		}
-		for (var i=0; i<question.options.length; i++) 
+        if (question.options.length==1) {
+            //if only one option, send answer by default.  This is helpful for ending the simulation, which needs "I am done" questions to be answered to know use is done with sim
+            click(0);
+            question.sendAnswerToCW();
+        }
+		for (var i=0; i<question.options.length; i++) {
 			this.bindMultChoiceOption(question, click, question.options, question.options[i]);
+        }
 	},
 	bindMultChoiceOption: function(question, clickFunc, options, option) {
 		var renderer = this;
