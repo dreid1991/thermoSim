@@ -389,7 +389,7 @@ LevelData = {
 					// }
 				// ],	
 				dataReadouts: [
-					{label: 'Vol: ', expr: 'vol("wallo")-.27', units: 'L', decPlaces: 2, handle: 'volReadout', readout: 'mainReadout'},
+                    {label: 'Vol: ', expr: 'vol("wallo")-.287', units: 'L', decPlaces: 3, handle: 'volReadout', readout: 'mainReadout'},
 					{label: 'Gas Temp: ', expr: 'var tempVal = tempSmooth("wallo"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'tempGasReadout', readout: 'mainReadout'},
 					{label: 'Liquid Temp: ', expr:  'var tempVal = tempSmooth("liquidWater"); if (tempVal){return tempVal;} else {return "N/A";}', units: 'K', decPlaces: 0, handle: 'tempLiquidReadout', readout: 'mainReadout'},
 					{label: 'Pext: ', expr: 'pExt("wallo")', units: 'bar', sigfigs: 2, handle: 'pExtReadout', readout: 'pistonRightPistonLeft'}
