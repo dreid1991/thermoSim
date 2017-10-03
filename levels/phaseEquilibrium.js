@@ -87,7 +87,7 @@ LevelData = {
 					{type: 'Scatter', handle: 'TVGraph', xLabel: 'Temperature (K)', yLabel: 'Volume (L)', axesInit: {x:{min: 325, step:25}, y:{min: 0, step: 1}},
 						sets:[
 							{handle: 'tempVolume', label: 'Phase Change', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
-							data: {x: '(curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length && tempSmooth("liquidWater")) || tempSmooth("wallo")', y: 'vol("wallo")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+							data: {x: '(curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length * tempSmooth("liquidWater") + dotManager.lists.ALLDOTS.length * tempSmooth("wallo")) / (curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length + dotManager.lists.ALLDOTS.length)', y: 'vol("wallo")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
 						]
 					}
 				],	
@@ -373,8 +373,8 @@ LevelData = {
                 graphs: [
                     {type: 'load', handle: 'TVGraph',  
                         sets:[
-                            {handle: 'tempVolume2', label: 'Phase Change', pointCol: Col(255, 50, 50), flashCol: Col(255, 50, 50),
-                                data: {x: '(curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length && tempSmooth("liquidWater")) || tempSmooth("wallo")', y: 'vol("wallo")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
+                            {handle: 'tempVolume'}, 
+                       //         data: {x: '(curLevel.liquidWater.dotMgrLiq.lists.ALLDOTS.length && tempSmooth("liquidWater")) || tempSmooth("wallo")', y: 'vol("wallo")'}, trace: true, fillInPts: true, fillInPtsMin: 5},
                         ]
                     }
 

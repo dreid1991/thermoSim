@@ -1041,15 +1041,27 @@ Timeline.stateFuncs = {
 				} else {
 					console.log("Tried to load graph with bad handle " + graphDatum.handle);
 				}
-				graph.setDataValid();
+                //EXCUSE ME - I COMMENTED THIS OUT - NOT SURE IF IT WILL CAUSE ANY PROBLEMS.
+			//	graph.setDataValid();
+                if (graphDatum.sets) {
+                    for (var setIdx=0; setIdx<graphDatum.sets.length; setIdx++) {
+                        var set = graphDatum.sets[setIdx];
+                        if (!(set['handle'] in graph.data)) {
+                            graph.addSet(set);
+                        } else {
+                            graph.data[set.handle].recording = true;
+                            graph.data[set.handle].recordStart();
+                        }
+                    }
+                }
 			} else {
 				graph = new window.Graphs[graphDatum.type](graphDatum);
-			}
-			if (graphDatum.sets) {
-				for (var setIdx=0; setIdx<graphDatum.sets.length; setIdx++) {
-					var set = graphDatum.sets[setIdx];
-					graph.addSet(set);
-				}
+                if (graphDatum.sets) {
+                    for (var setIdx=0; setIdx<graphDatum.sets.length; setIdx++) {
+                        var set = graphDatum.sets[setIdx];
+                        graph.addSet(set);
+                    }
+                }
 			}
 			graph.activateClickable(); //clickable data set
 			
