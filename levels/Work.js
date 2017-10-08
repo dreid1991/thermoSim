@@ -68,7 +68,7 @@ LevelData = {
 				],
 				objs: [
 					{type: 'CompArrow',
-						attrs: {handle: 'compArrow', wallInfo: 'FirstWall', speed: 2, bounds: {y: {max:320, min: 30}}, stops: true}
+						attrs: {handle: 'compArrow', wallInfo: 'FirstWall', speed: 2, bounds: {y: {max:300, min: 30}}, stops: true}
 					}
 				]
 			},

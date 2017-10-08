@@ -136,7 +136,12 @@ WallMethods.collideMethods ={
 		It behaves fine in a many-molecule case, but in this case, just doing an elastic collision is better
 		*/
 		//walls only move in y right now...
+        console.log(dot.v.dy)
 		dot.v.dy = -dot.v.dy + 2 * wall.vs[subWallIdx].dy;
+        //this is just to make it so we don't have really fast atoms that escape the box
+        if (dot.v.dy > 10) {
+            dot.v.dy = 10;
+        }
 		
 	},
 	reflect: function(dot, wallUV, perpV) {
