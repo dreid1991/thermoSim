@@ -814,7 +814,8 @@ Timeline.Section.prototype = {
 			var elemDatum = elemData[i];
             var restartDatum = null;
             if (restartData != null & restartData != undefined && restartDatum.length>=i) {
-                var restartDatum = restartData[i];
+                restartDatum = restartData[i];
+                restartDatum.used = false; //okay, so any restart datum will only be used once, otherwise it would mess up refreshes
             }
 			var cleanUpWith = elemDatum.cleanUpWith;
 			var timestampTail = this.getTimestamp(cleanUpWith || timestampHead, 'tail');
@@ -1197,11 +1198,17 @@ Timeline.Moment.prototype = {
 		if (span.active) {
             var elemDatum = getAndEval(span.elemDatum);
             var restartDatum = span.restartDatum;
-            for (var item in restartDatum) {
-                if (item in elemDatum) {
-                    elemDatum[item] = restartDatum[item];
+            if (restartDatum !== null && restartDatum.used == false) {
+                for (var item in restartDatum) {
+                    if (item in elemDatum) {
+                        elemDatum[item] = restartDatum[item];
+                    }
                 }
             }
+            if (restartDatum !== null) {
+                restartDatum.used = true;
+            }
+            //HEY - IF YOU HIT HARD REFRESH, WE SHOULD DISCARD RESTART DATA.  THIS IS IMPORTANT
             //okay so restart data will be substituted in in two phases
             //First, restartDatum items will be substituted into elemDatum, so things may be overwritten 
             //Second, any addition items stored in restartDatum will just be passed to the individual spawn functions for processing
