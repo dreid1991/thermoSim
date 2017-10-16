@@ -269,6 +269,7 @@ Timeline.Section.prototype = {
 		}
 
 	},
+
 	stepTo: function(dest) {
 		var branchType = false;
 		var suspended = false;
@@ -277,6 +278,8 @@ Timeline.Section.prototype = {
 		var moments = this.moments;
 		//hey, all the 1e-4 business is to indicate that I'm going past the last moment I want to hit.  1e-5 is to account for rounding error
 		if (dest > this.time || (dest < this.time && !/headhtml/i.test(this.getTimestampType(dest)))) {
+            //If going forward, send restart data to cw
+            this.sendRestartData();
 			var curMom = this.momentAt(this.time);
 			if (curMom) curMom.fire(this.time, dest);
 			if (curMom) this.time += dest > this.time ? 1e-4 : -1e-4;
@@ -655,6 +658,43 @@ Timeline.Section.prototype = {
 		this.sortMoments();
 	},
 
+    dotsRestartChunk: function() {
+        restart = ''
+        bySpcAndWall = {}
+        dots = dotManager.lists.ALLDOTS
+        for (var i=0; i<dots.length; i++) {
+            var dot = dots[i];
+            tag = dot.spcName + '-' + dot.tag;
+            if (! (tag in bySpcAndWall)) {
+                bySpcAndWall[tag] = []
+            }
+            bySpcAndWall[tag].push(dot)
+        }
+        //WILL NEED TO ASSOCIATE THESE WITH INPUT DATA - TAG AND SPC ARE ENOUGH TO MAKE IT UNIQUE
+        for (var tag in bySpcAndWall) {
+            //get x and y bounds, spc 
+            //then wrap into obj
+        }
+        //uhh... think about how to do this please.
+        //for (var spcName in dotManager.spcList
+    },
+    sendRestartData() {
+        var elems = this.timeline.elems.length;
+        restartData = {}
+        for (var i=0; i<elems.length; i++) {
+            var elem = elems[i];
+            var restartChunk;
+            if (elem == 'dots') {
+                restartChunk = this.dotsRestartChunk();
+                restartData['dots'] = restartChunk;
+
+            } else if ('restartChunk' in elem) {
+                restartChunk = elem.restartChunk();
+                restartData[elem.handle] = restartChunk;
+            }
+
+        }
+    },
     loadRestartData(sectionIdx, promptIdx) {
         return null
     },
