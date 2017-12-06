@@ -57,7 +57,9 @@ _.extend(Trigger.prototype, objectFuncs, {
 					this.recordVals();
 					if (this.satisfyCmmds) {
 						for (var cmmdIdx=0; cmmdIdx<this.satisfyCmmds.length; cmmdIdx++) {
-							eval(this.satisfyCmmds[cmmdIdx]);
+                            with (DataGetFuncs) {
+                                eval(this.satisfyCmmds[cmmdIdx]);
+                            }
 						}
 					}
 					removeListener(curLevel, 'update', this.handle);
