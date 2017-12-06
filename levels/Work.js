@@ -229,7 +229,8 @@ LevelData = {
                            // {handle: 'checkPext2', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.enable()'], priority: 1},
                             {handle: 'checkPext3', expr: 'pExt("ThirdWall")==2', satisfyCmmds: ['curLevel.dragWeightsDragsTwo.disable()'], priority: 1},
                         //    {handle: 'checkPext4', expr: 'pExt("ThirdWall")==15', satisfyCmmds: ['walls.ThirdWall.resetWork()'], priority: 1},
-                            {handle: 'checkVol3', expr: 'fracDiff(vol("ThirdWall"),14.9)<.01', message: "Take the block off the system!", satisfyStore: [{storeAs:'Temp', expr: 'temp("ThirdWall")'}]}
+                            {handle: 'checkVol3', expr: 'fracDiff(vol("ThirdWall"),14.9)<.01', message: "Take the block off the system!", satisfyStore: [{storeAs:'Temp', expr: 'temp("ThirdWall")'}]},
+							{handle: 'freeze', expr: 'fracDiff(vol("ThirdWall"),14.9)<.01', satisfyCmmds: ['walls[0].moveStop();walls.setSubWallHandler("ThirdWall", 0, "staticAdiabatic")'], requiredFor: false}
                         ],
                             objs: [
                             {type: 'Stops',

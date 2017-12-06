@@ -3,7 +3,7 @@ LevelData = {
     spcDefs: [
         //add antoine coefs, cvLiq, hvap
     {spcName: 'spc1', m: 4, r: 2, col: Col(200, 0, 0), cv: 2.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.07, b: 1730.6, c: 233.4-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3}, //act coeff will depend on mixture - don't put in spcDef
-    {spcName: 'ugly', m: 4, r: 1.5, col: Col(16, 200, 200), cv: 1.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
+    {spcName: 'ugly', m: 4, r: .5, col: Col(16, 200, 200), cv: 1.5 * R, hF298: -10, hVap298: 10, antoineCoeffs: {a: 8.08, b: 1582.27, c: 239.7-273.15}, cpLiq: 2.5 * R, spcVolLiq: .3},
     {spcName: 'duckling', m: 4, r: 2, col: Col(255, 255, 255), cv: 2.5 * R, hF298: -30, hVap298: 10, antoineCoeffs: {}, cpLiq: 12, spcVolLiq: 1}
     ],
 
@@ -118,11 +118,11 @@ LevelData = {
                     dots: [	
                         //{type: 'spc1', pos: P(100, 100), dims: V(300, 300), count: 500, temp:600, returnTo: 'wally', tag: 'wally1'},
                         //{type: 'ugly', pos: P(100, 100), dims: V(300, 300), count: 500, temp:600, returnTo: 'wally1', tag: 'wally1'},
-                    {spcName: 'ugly', pos: P(310, 310), dims: V(200, 90), count: 500, temp:154, returnTo: 'wally2', tag: 'wally2', cleanUpWith: 'section'},
+                    {spcName: 'ugly', pos: P(310, 310), dims: V(200, 90), count: 5000, temp:154, returnTo: 'wally2', tag: 'wally2', cleanUpWith: 'section'},
                     ],
                     objs: [
                     {type: 'Heater', attrs: {handle: 'heaterWally2', wallInfo: 'wally2', max: 0.5}, cleanUpWith: 'section'},
-                    {type: 'Piston', attrs: {handle: 'pistony',  wallInfo: 'wally2', makeSlider: false, init: 3.0}, cleanUpWith: 'section'},								
+                    {type: 'Piston', attrs: {handle: 'pistony',  wallInfo: 'wally2', makeSlider: false, init: 30.0}, cleanUpWith: 'section'},								
                     ],
                     dataReadouts: [								
                     {label: 'Heat: ', expr: 'q("wally2")', units: 'kJ', sigFigs: 2, handle: 'heating2', readout: 'mainReadout'},

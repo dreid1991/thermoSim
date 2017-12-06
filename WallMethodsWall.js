@@ -360,8 +360,13 @@ WallMethods.wall = {
 		}
 		this.vs[0].dy+=gLocal*tHit;
 		this.vs[1].dy+=gLocal*tHit;
+        //console.log('LAWGING');
+        //console.log(this);
+        //console.log(this.vs[0].dy);
 		this.vs[0].dy*=-1;
 		this.vs[1].dy*=-1;
+        //taking into account internal pressure
+        this.forceInternal += this.mass * (2*this.vs[0].dy);
 		tLeft-=tHit;
 		dy = this.vs[0].dy;
 		if(-2*dy< tLeft*gLocal && dy<0){
@@ -370,10 +375,14 @@ WallMethods.wall = {
 			tLeft-=numBounces*tBounce;
 		}
 		var nextY = boundedY + dy*tLeft + .5*gLocal*tLeft*tLeft;
+        //console.log("HITTING BOUNDS");
  
 		
 		this.vs[0].dy += gLocal*tLeft;
 		this.vs[1].dy += gLocal*tLeft;
+        
+        //LOOK HERE PLEASE
+	//	wall.forceInternal += dot.m*(Math.abs(perpV) + Math.abs(dot.v.dy));
 		
 		return nextY;
 	},

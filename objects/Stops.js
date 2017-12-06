@@ -45,8 +45,9 @@ function Stops(attrs){
 }
 _.extend(Stops.prototype, objectFuncs, {
 	makeDrawFunc: function(height){
-		var pLeft = this.pts[3].copy().position({y:height});
-		var pRight = this.pts[2].copy().position({y:height}).movePt({dx:-this.stopWidth});
+        //just added stop width thing
+		var pLeft = this.pts[3].copy().position({y:height-this.stopHeight});
+		var pRight = this.pts[2].copy().position({y:height-this.stopHeight}).movePt({dx:-this.stopWidth});
 		var stopWidth = this.stopWidth;
 		var stopHeight = this.stopHeight;
 		var dims = V(stopWidth, stopHeight);
