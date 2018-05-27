@@ -659,30 +659,65 @@ Timeline.Section.prototype = {
 	},
 
     dotsRestartChunk: function() {
-        restart = ''
-        bySpcAndWall = {}
-        dots = dotManager.lists.ALLDOTS
+        console.log('WARNING, DOTS IMPLEMENTATION IS NOT FINISHED');
+        toReprAll = [];
+        byDotInfo = [];
+        dots = dotManager.lists.ALLDOTS;
+        //okay, so we first run through all the dots and group them by spc, tag, and returnTo.  Then we take those positions and speeds and turn them info 
         for (var i=0; i<dots.length; i++) {
             var dot = dots[i];
-            tag = dot.spcName + '-' + dot.tag;
-            if (! (tag in bySpcAndWall)) {
-                bySpcAndWall[tag] = []
+            var infolet = null;
+            for (var infoIdx=0; infoIdx<byDotInfo.length; infoIdx++) {
+                var curInfolet = byDotInfo[infoIdx];
+                if (dot.spcName==curInfolet.spcName && dot.tag==curInfolet.tag && dot.returnTo==curInfolet.returnTo) {
+                    infolet = curInfolet;
+                    break;
+                }
+
             }
-            bySpcAndWall[tag].push(dot)
+            if (infolet == null) {
+                infolet = {spcName: dot.spcName, tag: dot.tag, returnTo: dot.returnTo, dots: []}
+                byDotInfo.push(infolet);
+            }
+            infolet.dots.push(dot);
         }
-        //WILL NEED TO ASSOCIATE THESE WITH INPUT DATA - TAG AND SPC ARE ENOUGH TO MAKE IT UNIQUE
-        for (var tag in bySpcAndWall) {
-            //get x and y bounds, spc 
-            //then wrap into obj
+        for (var infoIdx=0; infoIdx<byDotInfo.length; infoIdx++) {
+            var infolet = byDotInfo[infoIdx];
+            var posLo = P(100000, 100000);
+            var posHi = P(0, 0);
+            var sumKE = 0;
+            for (var i=0; i<infolet.dots.length; i++) {
+                var dot = infolet.dots[i];
+                var x = dot.x;
+                var y = dot.y;
+                posLo.x = Math.min(x, posLo.x);
+                posLo.y = Math.min(y, posLo.y);
+
+                posHi.x = Math.max(x, posHi.x);
+                posHi.y = Math.max(y, posHi.y);
+                
+                sumKE += dot.KE();
+            }
+
+            var temp = tConst * sumKE / infolet.dots.length; 
+
+            var diff = posLo.VTo(posHi);
+            
+					//{spcName: 'spc3', pos: P(45,100), dims: V(465,240), count: 1100, temp:273, returnTo: 'left', tag: 'left'},
+            toRepr = {spcName: infolet.spcName, pos: posLo, dims: diff, count: infolet.dots.length, temp: temp, returnTo: infolet.returnTo, tag:infolet.tag};
+            toReprAll.push(toRepr);
+
         }
-        //uhh... think about how to do this please.
-        //for (var spcName in dotManager.spcList
+        return repr(toReprAll);
     },
     sendRestartData() {
-        var elems = this.timeline.elems.length;
+        var elems = this.timeline.elems;
         restartData = {}
         for (var i=0; i<elems.length; i++) {
             var elem = elems[i];
+            if (elem == undefined) {
+                continue;
+            }
             var restartChunk;
             if (elem == 'dots') {
                 restartChunk = this.dotsRestartChunk();

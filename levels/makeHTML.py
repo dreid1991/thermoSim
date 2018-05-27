@@ -3,7 +3,7 @@ import os
 import re
 
 # files = open(sys.argv[1], 'r')
-directory = os.listdir('c:') #huh?
+directory = os.listdir('.') #huh?
 print directory
 def extension(name):
 	extRegExp = re.compile("\.[a-zA-Z]*$")
@@ -27,7 +27,7 @@ def makeHTML(levelDataFileName, fileListName):
 		<tr><td>
 			<div id='main' class='sim main noSelect'>
 				<div id='mainHeader' class='sim header noSelect'>
-					
+
 				</div>
 				<div id='canvasDiv' class='sim canvasDiv noSelect'>
 					<canvas id='myCanvas'>
@@ -40,7 +40,7 @@ def makeHTML(levelDataFileName, fileListName):
 
 				<div id='dashRunWrapper' style='position:relative'>
 					<div id='dashRunBlank' class='sim dashMed noSelect' style='position:relative;display:none;'>
-					
+
 					</div>
 					<button id='resetExp' style='position:absolute; right:.5em; bottom:.25em; z-index: 1' class='sim'><!image appended in init></button>
 				</div>
@@ -48,10 +48,10 @@ def makeHTML(levelDataFileName, fileListName):
 			</div>
 		</td>
 		<td class='padLeft floatTop'>
-		
+
 			<div id = 'buttonManagerWrapper'>
 				<div class='sim buttonManager' id='buttonManager'>
-				
+
 				</div>
 			</div>
 
@@ -76,9 +76,9 @@ def makeHTML(levelDataFileName, fileListName):
 			</div>
 			<div style='padding:10px' class='sim displayText noSelect'>
 				<div id='prompt'>
-				
+
 				</div>
-			
+
 				<div id='nextPrevDiv' align='right' class='sim'>
 					<button id = 'previous'>Back</button>
 					<button id = 'next'>Next</button>
@@ -90,7 +90,7 @@ def makeHTML(levelDataFileName, fileListName):
 		<div id='baseDash' class='sim bottomRound noSelect'></div>
 	</div>
 	<img id='brickImg' src='img/brick.bmp' style='visibility:hidden'></img>
-	<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 	"""
 	for fileName in files:
 		html += "<script src = '" + fileName.rstrip() + "'></script>"
@@ -108,5 +108,5 @@ for entry in directory:
 		htmlName = rootName + '.html'
 		f = open(htmlName, 'w')
 		f.write(makeHTML(entry, sys.argv[1]))
-		
-		
+
+

@@ -71,4 +71,6 @@
 ../LevelTools.js
 ../LevelInstance.js
 ../Timeline.js
+../repr.js
 ../init.js
+

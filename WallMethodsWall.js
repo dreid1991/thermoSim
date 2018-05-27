@@ -642,7 +642,16 @@ WallMethods.wall = {
 			var listener = listeners[listenerName];
 			listener.func.apply(listener.obj);
 		}
-	}
+	},
+    restartChunk: function() { //only going to store points for now.  Maybe this will change later
+//{pts:[P(40,95), P(510,95), P(510,350), P(40,350)], 
+        toRepr = [];
+        for (var i=0; i<this.length; i++) {
+            toRepr.push(this[i]);
+        }
+        console.log("WALL LOG");
+        console.log(repr(toRepr));
+    }
 	
 }
 WallMethods.BoundHandler = function(func, obj, replacesStd) {
