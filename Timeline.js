@@ -1035,7 +1035,7 @@ Timeline.Section.prototype = {
 //need to make restartDatum do something
 Timeline.stateFuncs = {
 	walls: {
-		spawn: function(section, elems, id, datum, restartDatum) {
+		spawn: function(section, elems, id, datum) {
 			elems[id] = section.walls.addWall(datum);
 		},
 		remove: function(section, elems, id) {
@@ -1045,7 +1045,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	dots: {
-		spawn: function(section, elems, id, datum, restartDatum) {
+		spawn: function(section, elems, id, datum) {
 			section.spcs[datum.spcName].populate(datum.pos, datum.dims, datum.count, datum.temp, datum.tag, id, datum.returnTo);
 			elems[id] = 'dots';
 		},
@@ -1055,7 +1055,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	objs: {
-		spawn: function(section, elems, id, datum, restartDatum) {
+		spawn: function(section, elems, id, datum) {
 			var objFunc = window[datum.type];
 			if (!objFunc) console.log('Bad object type ' + datum.type);
 			elems[id] = new objFunc(datum.attrs);
@@ -1067,7 +1067,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	dataRecord: {
-		spawn: function(section, elems, id, entry, restartDatum) {
+		spawn: function(section, elems, id, entry) {
 			if (/collisions/i.test(entry.data)) {
 				section.collide.recordCollisions();
 			} else {
@@ -1086,7 +1086,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	dataReadouts: {
-		spawn: function(section, elems, id, datum, restartDatum) {
+		spawn: function(section, elems, id, datum) {
 			var displayEntry = section.dataDisplayer.addEntry(datum);
 			elems[id] = displayEntry;
 		},
@@ -1097,7 +1097,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	triggers: {
-		spawn: function(section, elems, id, datum, restartDatum) {
+		spawn: function(section, elems, id, datum) {
 			elems[id] = new window.Trigger(datum);
 		},
 		remove: function(section, elems, id) {
@@ -1107,7 +1107,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	graphs: {
-		spawn: function(section, elems, id, graphDatum, restartDatum) {
+		spawn: function(section, elems, id, graphDatum) {
 			var graph;
 			if (/^load$/i.test(graphDatum.type)) {
 				graph = window.storedGraphs[graphDatum.handle];
@@ -1157,7 +1157,7 @@ Timeline.stateFuncs = {
 		}		
 	},
 	rxnsEmergent: {
-        spawn: function(section, elems, id, rxnDatum, restartDatum) {
+        spawn: function(section, elems, id, rxnDatum) {
 			var rxn = section.collide.rxnHandlerEmergent.addReaction(rxnDatum);
 			elems[id] = rxn;
 		},
@@ -1168,7 +1168,7 @@ Timeline.stateFuncs = {
 		}		
 	},
 	rxnsNonEmergent: {
-		spawn: function(section, elems, id, rxnDatum, restartDatum) {
+		spawn: function(section, elems, id, rxnDatum) {
 			var rxn = section.collide.rxnHandlerNonEmergent.addReaction(rxnDatum);
 			elems[id] = rxn;
 		},
@@ -1179,7 +1179,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	buttonGrps: {
-		spawn: function(section, elems, id, grpDatum, restartDatum) {
+		spawn: function(section, elems, id, grpDatum) {
 			section.buttonManager.addGroup(grpDatum.handle, grpDatum.label, grpDatum.prefIdx, grpDatum.isRadio, grpDatum.isToggle);
 			if (grpDatum.buttons) {
 				for (var i=0; i<grpDatum.buttons.length; i++) {
@@ -1199,7 +1199,7 @@ Timeline.stateFuncs = {
 		}
 	},
 	cmmds: {
-		spawn: function(section, elems, id, cmmd, restartDatum) {
+		spawn: function(section, elems, id, cmmd) {
 			var spawnExpr = cmmd.spawn;
 			elems[id] = cmmd;
 			if (spawnExpr) {
@@ -1279,10 +1279,12 @@ Timeline.Moment.prototype = {
                         elemDatum[item] = restartDatum[item];
                     }
                 }
-            }
-            if (restartDatum !== null) {
                 restartDatum.used = true;
+            } else {
+                restartDatum = null;
             }
+            //okay, so objects or whatever can read from the restartDatum entry
+            elemDatum.restartDatum = restartDatum;
             //HEY - IF YOU HIT HARD REFRESH, WE SHOULD DISCARD RESTART DATA.  THIS IS IMPORTANT
             //okay so restart data will be substituted in in two phases
             //First, restartDatum items will be substituted into elemDatum, so things may be overwritten 
@@ -1290,7 +1292,7 @@ Timeline.Moment.prototype = {
             if (span.boundType == 'head') {
                 if (from < to && from < this.timestamp && to < span.partner.moment.timestamp) {
                     if (stepType=='spawn' || stepType=='cmmd') {
-                        span.spawn(span.section, span.timelineElems, span.id, elemDatum, restartDatum);
+                        span.spawn(span.section, span.timelineElems, span.id, elemDatum);
                     }
                 } else if (to < from && to < this.timestamp && from <= span.partner.moment.timestamp) {
                     if (stepType=='remove' || stepType == 'cmmd') {

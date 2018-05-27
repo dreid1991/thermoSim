@@ -60,6 +60,9 @@ function DragWeights(attrs) {
 	this.addWeights(this.weightGroups);
 	this.setupStd();
 	this.init(attrs.weightDefs);
+    if (attrs.restartDatum != null) {
+        this.handleRestart(attrs.restartDatum);
+    }
 }
 
 _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
@@ -87,6 +90,18 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		canvasManager.removeListener(this.canvasHandle, 'drawDragWeights' + this.wallInfo);
 		removeListener(curLevel, 'mousedown', 'weights' + this.wallInfo);
 	},
+    handleRestart: function(restartDatum) {
+        //this may put some weights onto piston
+        for (var groupName in restartDatum) {
+            if ('piston' in restartDatum[groupName]) {
+                var nPiston = restartDatum[groupName]['piston'];
+                for (var i=0; i<nPiston; i++) {
+					this.dropIntoBin(this.weights[grpName][i], 'piston', 'instant');
+                }
+            }
+
+        }
+    },
 	getWeightDims: function(weightDefs){
 		var dims = {};
 		var adjBinWidth = this.storeBinWidth - this.blockSpacing;
@@ -490,6 +505,25 @@ _.extend(DragWeights.prototype, objectFuncs, compressorFuncs, {
 		return img;
 		
 	},
+    restartChunk: function() {
+        //just going to store weight statuses
+        var byGrpName = {};
+        for (var grpName in this.weightGroups) {
+            var statuses = {};
+            var weightGroup = this.weightGroups[grpName];
+            for (var weightIdx=0; weightIdx<weightGroup.weights.length; weightIdx++) {
+                var weight = weightGroup.weights[weightIdx];
+                var stat = weight.status;
+                if (! (stat in statuses)) {
+                    statuses[stat] = 0;
+                }
+                statuses[stat] ++;
+            }
+            byGrpName[grpName] = statuses;
+        }
+        return repr(byGrpName);
+
+    }
 })
 
 

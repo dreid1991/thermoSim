@@ -649,8 +649,6 @@ WallMethods.wall = {
         for (var i=0; i<this.length; i++) {
             toRepr.push(this[i]);
         }
-        console.log("WALL LOG");
-        console.log(repr(toRepr));
     }
 	
 }
