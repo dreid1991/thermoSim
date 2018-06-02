@@ -279,7 +279,6 @@ Timeline.Section.prototype = {
 		//hey, all the 1e-4 business is to indicate that I'm going past the last moment I want to hit.  1e-5 is to account for rounding error
 		if (dest > this.time || (dest < this.time && !/headhtml/i.test(this.getTimestampType(dest)))) {
             //If going forward, send restart data to cw
-            this.sendRestartData();
 			var curMom = this.momentAt(this.time);
 			if (curMom) curMom.fire(this.time, dest);
 			if (curMom) this.time += dest > this.time ? 1e-4 : -1e-4;

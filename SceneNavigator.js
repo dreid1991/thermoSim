@@ -49,6 +49,7 @@ SceneNavigator.prototype = {
 				timeline.sections[timeline.sectionIdx].killBranches();
 			}
 			if (instrs.advance) {
+                this.sendRestartData();
 				var nextIdxs = this.getNextIdxs();
 				var now = timeline.now();
 				if (nextIdxs.sectionIdx == now.sectionIdx && nextIdxs.promptIdx == Math.floor(now.promptIdx)) {
